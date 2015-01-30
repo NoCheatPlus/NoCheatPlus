@@ -28,15 +28,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
-import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
-import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
-import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
-import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
-import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
-import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
@@ -406,19 +398,20 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Clear all stored (check) config instances.<br>
+     * Clear all cached CheckConfig instances.<br>
      * This does not cleanup ConfigManager, i.e. stored yml-versions.
      */
     public static void clearConfigs() {
-        // The dirty bit !
-        BlockBreakConfig.clear();
-        BlockInteractConfig.clear();
-        BlockPlaceConfig.clear();
-        ChatConfig.clear();
-        CombinedConfig.clear();
-        FightConfig.clear();
-        InventoryConfig.clear();
-        MovingConfig.clear();
+        final Set<CheckConfigFactory> factories = new LinkedHashSet<CheckConfigFactory>();
+        for (final CheckType checkType : CheckType.values()) {
+            final CheckConfigFactory factory = checkType.getConfigFactory();
+            if (factory != null) {
+                factories.add(factory);
+            }
+        }
+        for (final CheckConfigFactory factory : factories) {
+            factory.removeAllConfigs();
+        }
     }
 
     /**

@@ -18,4 +18,9 @@ public interface CheckConfigFactory {
      */
     public ICheckConfig getConfig(Player player);
 
+    /**
+     * Remove all stored configurations.
+     */
+    public void removeAllConfigs();
+
 }

@@ -21,13 +21,18 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
  */
 public class BlockBreakConfig extends ACheckConfig {
 
-	/** The factory creating configurations. */
-	public static final CheckConfigFactory factory = new CheckConfigFactory() {
-		@Override
-		public final ICheckConfig getConfig(final Player player) {
-			return BlockBreakConfig.getConfig(player);
-		}
-	};
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory factory = new CheckConfigFactory() {
+        @Override
+        public final ICheckConfig getConfig(final Player player) {
+            return BlockBreakConfig.getConfig(player);
+        }
+
+        @Override
+        public void removeAllConfigs() {
+            clear(); // Band-aid.
+        }
+    };
 
     /** The map containing the configurations per world. */
     private static final Map<String, BlockBreakConfig> worldsMap = new HashMap<String, BlockBreakConfig>();
@@ -58,27 +63,27 @@ public class BlockBreakConfig extends ACheckConfig {
 
     public final boolean    fastBreakCheck;
     public final boolean    fastBreakStrict;
-	public final int        fastBreakBuckets;
-	public final long       fastBreakBucketDur;
-	public final float      fastBreakBucketFactor;
-	public final long       fastBreakGrace;
-	public final long       fastBreakDelay;	
-	public final int        fastBreakModSurvival;
+    public final int        fastBreakBuckets;
+    public final long       fastBreakBucketDur;
+    public final float      fastBreakBucketFactor;
+    public final long       fastBreakGrace;
+    public final long       fastBreakDelay;	
+    public final int        fastBreakModSurvival;
     public final ActionList fastBreakActions;
-    
-    
-	public final boolean    frequencyCheck;
-	public final int        frequencyBuckets;
-	public final long       frequencyBucketDur;
-	public final float      frequencyBucketFactor;  
-	public final int        frequencyIntervalCreative;
-	public final int        frequencyIntervalSurvival;
+
+
+    public final boolean    frequencyCheck;
+    public final int        frequencyBuckets;
+    public final long       frequencyBucketDur;
+    public final float      frequencyBucketFactor;  
+    public final int        frequencyIntervalCreative;
+    public final int        frequencyIntervalSurvival;
 
     public final int        frequencyShortTermLimit;
-	public final int        frequencyShortTermTicks;
-	public final ActionList frequencyActions;
-    
-	public boolean          improbableFastBreakCheck;
+    public final int        frequencyShortTermTicks;
+    public final ActionList frequencyActions;
+
+    public boolean          improbableFastBreakCheck;
 
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
@@ -87,9 +92,9 @@ public class BlockBreakConfig extends ACheckConfig {
     public final ActionList reachActions;
 
     public final boolean    wrongBlockCheck;
-	public final float      wrongBLockLevel;
-	public final ActionList wrongBlockActions;
-	
+    public final float      wrongBLockLevel;
+    public final ActionList wrongBlockActions;
+
     /**
      * Instantiates a new block break configuration.
      * 
@@ -120,15 +125,15 @@ public class BlockBreakConfig extends ACheckConfig {
         frequencyIntervalCreative = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE);
         frequencyIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL);
         frequencyShortTermLimit = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT);
-    	frequencyShortTermTicks = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS);
+        frequencyShortTermTicks = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS);
         frequencyActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
-        
+
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
         noSwingActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
         reachActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
-        
+
         wrongBlockCheck = data.getBoolean(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK);
         wrongBLockLevel = data.getInt(ConfPaths.BLOCKBREAK_WRONGBLOCK_LEVEL);
         wrongBlockActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, Permissions.BLOCKBREAK_WRONGBLOCK);
@@ -140,22 +145,22 @@ public class BlockBreakConfig extends ACheckConfig {
     @Override
     public final boolean isEnabled(final CheckType checkType) {
         switch (checkType) {
-        case BLOCKBREAK_DIRECTION:
-            return directionCheck;
-        case BLOCKBREAK_FASTBREAK:
-            return fastBreakCheck;
-        case BLOCKBREAK_FREQUENCY:
-        	return frequencyCheck; 
-        case BLOCKBREAK_NOSWING:
-            return noSwingCheck;
-        case BLOCKBREAK_REACH:
-            return reachCheck;
-        case BLOCKBREAK_WRONGBLOCK:
-        	return wrongBlockCheck;
-        case BLOCKBREAK_BREAK:
-        	return true;
-        default:
-            return true;
+            case BLOCKBREAK_DIRECTION:
+                return directionCheck;
+            case BLOCKBREAK_FASTBREAK:
+                return fastBreakCheck;
+            case BLOCKBREAK_FREQUENCY:
+                return frequencyCheck; 
+            case BLOCKBREAK_NOSWING:
+                return noSwingCheck;
+            case BLOCKBREAK_REACH:
+                return reachCheck;
+            case BLOCKBREAK_WRONGBLOCK:
+                return wrongBlockCheck;
+            case BLOCKBREAK_BREAK:
+                return true;
+            default:
+                return true;
         }
     }
 }

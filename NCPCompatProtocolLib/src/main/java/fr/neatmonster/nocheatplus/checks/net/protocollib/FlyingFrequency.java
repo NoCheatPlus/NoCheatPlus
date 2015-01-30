@@ -1,8 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -13,14 +11,16 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
-import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
@@ -31,66 +31,36 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * @author dev1mc
  *
  */
-public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener {
+public class FlyingFrequency extends PacketAdapter {
 
+    // Setup for flying packets.
+    public static final int numBooleans = 3;
+    public static final int indexOnGround = 0;
+    public static final int indexhasPos = 1;
+    public static final int indexhasLook = 2;
+
+    // Thresholds for firing moving events (CraftBukkit).
     public static final double minMoveDistSq = 1f / 256; // PlayerConnection magic.
-
     public static final float minLookChange = 10f;
 
-    // TODO: Most efficient registration + optimize (primary thread or asynchronous).
+    /** Dummy check to access hasBypass for FlyingFrequency. */
+    private final Check frequency = new Check(CheckType.NET_FLYINGFREQUENCY) {
+        // Dummy check to access hasBypass.
+    };
 
-    private class FFData {
-        public static final int numBooleans = 3;
-        public static final int indexOnGround = 0;
-        public static final int indexhasPos = 1;
-        public static final int indexhasLook = 2;
-
-        public final ActionFrequency all;
-        // Last move on-ground.
-        public boolean onGround = false;
-        public long timeOnGround = 0;
-        public long timeNotOnGround = 0;
-
-        public FFData(int seconds) {
-            all = new ActionFrequency(seconds, 1000L);
-        }
-    }
-
-    private final Map<String, FFData> freqMap = new HashMap<String, FFData>();  
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idSilent = counters.registerKey("packet.flying.silentcancel");
-    private final int idRedundant = counters.registerKey("packet.flying.silentcancel.redundant");
     private final int idNullPlayer = counters.registerKey("packet.flying.nullplayer");
 
     private boolean cancelRedundant = true;
 
     private final NetConfigCache configs;
+    private final NetDataFactory dataFactory;
 
-    public FlyingFrequency(NetConfigCache configs, Plugin plugin) {
+    public FlyingFrequency(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
         super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
-        this.configs = configs;
-    }
-
-    @Override
-    public void playerJoins(Player player) {
-        // Ignore.
-    }
-
-    @Override
-    public void playerLeaves(Player player) {
-        freqMap.remove(player.getName());
-    }
-
-    private FFData getData(final String name, final NetConfig cc) {
-        final FFData freq = this.freqMap.get(name);
-        if (freq != null) {
-            return freq;
-        } else {
-            final FFData newFreq = new FFData(cc.flyingFrequencySeconds);
-            this.freqMap.put(name, newFreq);
-            return newFreq;
-        }
+        this.configs = (NetConfigCache) CheckType.NET.getConfigFactory();
+        this.dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
     }
 
     @Override
@@ -109,32 +79,32 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
             return;
         }
 
-        final FFData data = getData(player.getName(), cc);
-        final long t = System.currentTimeMillis();
+        final NetData data = dataFactory.getData(player);
+        final long time =  Monotonic.millis();
         // Counting all packets.
-        data.all.add(t, 1f);
-        final float allScore = data.all.score(1f);
-        if (allScore > cc.flyingFrequencyMaxPackets) {
-            counters.add(idSilent, 1); // Until it is sure if we can get these async.
+        // TODO: Consider using the NetStatic check.
+        data.flyingFrequencyAll.add(time, 1f);
+        final float allScore = data.flyingFrequencyAll.score(1f);
+        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !frequency.hasBypass(player) && frequency.executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions, true)) {
             event.setCancelled(true);
             return;
         }
 
         // Cancel redundant packets, when frequency is high anyway.
-        if (cancelRedundant && cc.flyingFrequencyCancelRedundant && checkRedundantPackets(player, event, allScore, data, cc)) {
+        if (cancelRedundant && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, event, allScore, time, data, cc) ) {
             event.setCancelled(true);
         }
 
     }
 
-    private boolean checkRedundantPackets(final Player player, final PacketEvent event, final float allScore, final FFData data, final NetConfig cc) {
+    private boolean checkRedundantPackets(final Player player, final PacketEvent event, final float allScore, final long time, final NetData data, final NetConfig cc) {
         // TODO: Consider quick return conditions.
         // TODO: Debug logging (better with integration into DataManager).
         // TODO: Consider to compare to moving data directly, skip keeping track extra.
 
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
-        if (booleans.size() != FFData.numBooleans) {
+        if (booleans.size() != FlyingFrequency.numBooleans) {
             return packetMismatch();
         }
 
@@ -143,30 +113,29 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
             // Can not check.
             return false;
         }
-        final boolean hasPos = booleans.get(FFData.indexhasPos).booleanValue();
-        final boolean hasLook = booleans.get(FFData.indexhasLook).booleanValue();
-        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
+        final boolean hasPos = booleans.get(FlyingFrequency.indexhasPos).booleanValue();
+        final boolean hasLook = booleans.get(FlyingFrequency.indexhasLook).booleanValue();
+        final boolean onGround = booleans.get(FlyingFrequency.indexOnGround).booleanValue();
         boolean onGroundSkip = false;
 
         // Allow at least one on-ground change per state and second.
         // TODO: Consider to verify on ground somehow (could tell MovingData the state).
-        if (onGround != data.onGround) {
-            // Regard as not redundant only if sending the same state happened at least a second ago. 
-            final long time = Monotonic.millis();
+        if (onGround != data.flyingFrequencyOnGround) {
+            // Regard as not redundant only if sending the same state happened at least a second ago.
             final long lastTime;
             if (onGround) {
-                lastTime = data.timeOnGround;
-                data.timeOnGround = time;
+                lastTime = data.flyingFrequencyTimeOnGround;
+                data.flyingFrequencyTimeOnGround = time;
             } else {
-                lastTime = data.timeNotOnGround;
-                data.timeNotOnGround = time;
+                lastTime = data.flyingFrequencyTimeNotOnGround;
+                data.flyingFrequencyTimeNotOnGround = time;
             }
             if (time - lastTime > 1000) {
                 // Override 
                 onGroundSkip = true;
             }
         }
-        data.onGround = onGround;
+        data.flyingFrequencyOnGround = onGround;
 
         if (hasPos) {
             final List<Double> doubles = packet.getDoubles().getValues();
@@ -206,13 +175,15 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
             return false;
         }
 
-        // TODO: Could check first bucket or even just 50 ms to last packet.
-        if (allScore / cc.flyingFrequencySeconds > 20f) {
-            counters.add(idRedundant, 1);
-            return true;
-        } else {
-            return false;
+        // Packet is redundant, if more than 20 packets per second arrive.
+        if (allScore / cc.flyingFrequencySeconds > 20f && !frequency.hasBypass(player)) {
+            // (Must re-check bypass here.)
+            data.flyingFrequencyRedundantFreq.add(time, 1f);
+            if (frequency.executeActions(player, data.flyingFrequencyRedundantFreq.score(1f) / cc.flyingFrequencyRedundantSeconds, 1.0 / cc.flyingFrequencyRedundantSeconds, cc.flyingFrequencyRedundantActions, true)) {
+                return true;
+            }
         }
+        return false;
     }
 
     /**

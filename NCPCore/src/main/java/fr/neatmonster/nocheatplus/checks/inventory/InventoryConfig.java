@@ -31,6 +31,11 @@ public class InventoryConfig extends ACheckConfig {
         public final ICheckConfig getConfig(final Player player) {
             return InventoryConfig.getConfig(player);
         }
+
+        @Override
+        public void removeAllConfigs() {
+            clear(); // Band-aid.
+        }
     };
 
     /** The map containing the configurations per world. */

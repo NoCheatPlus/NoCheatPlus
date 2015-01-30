@@ -24,13 +24,18 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
  */
 public class BlockPlaceConfig extends ACheckConfig {
 
-	/** The factory creating configurations. */
-	public static final CheckConfigFactory factory = new CheckConfigFactory() {
-		@Override
-		public final ICheckConfig getConfig(final Player player) {
-			return BlockPlaceConfig.getConfig(player);
-		}
-	};
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory factory = new CheckConfigFactory() {
+        @Override
+        public final ICheckConfig getConfig(final Player player) {
+            return BlockPlaceConfig.getConfig(player);
+        }
+
+        @Override
+        public void removeAllConfigs() {
+            clear(); // Band-aid.
+        }
+    };
 
     /** The map containing the configurations per world. */
     private static final Map<String, BlockPlaceConfig> worldsMap = new HashMap<String, BlockPlaceConfig>();
@@ -55,10 +60,10 @@ public class BlockPlaceConfig extends ACheckConfig {
                     new BlockPlaceConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
         return worldsMap.get(player.getWorld().getName());
     }
-    
+
     public final boolean	againstCheck;
     public final ActionList againstActions;
-    
+
     public final boolean    autoSignCheck;
     public final ActionList autoSignActions;
 
@@ -90,14 +95,14 @@ public class BlockPlaceConfig extends ACheckConfig {
      */
     public BlockPlaceConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKPLACE);
-        
+
         againstCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AGAINST_CHECK);
         againstActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, Permissions.BLOCKPLACE_AGAINST);
 
         autoSignCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
         autoSignActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
 
-        
+
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
         directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
@@ -125,22 +130,22 @@ public class BlockPlaceConfig extends ACheckConfig {
     @Override
     public final boolean isEnabled(final CheckType checkType) {
         switch (checkType) {
-        case BLOCKPLACE_DIRECTION:
-            return directionCheck;
-        case BLOCKPLACE_FASTPLACE:
-            return fastPlaceCheck;
-        case BLOCKPLACE_NOSWING:
-            return noSwingCheck;
-        case BLOCKPLACE_REACH:
-            return reachCheck;
-        case BLOCKPLACE_SPEED:
-            return speedCheck;
-        case BLOCKPLACE_AGAINST:
-        	return againstCheck;
-        case BLOCKPLACE_AUTOSIGN:
-        	return autoSignCheck;
-        default:
-            return true;
+            case BLOCKPLACE_DIRECTION:
+                return directionCheck;
+            case BLOCKPLACE_FASTPLACE:
+                return fastPlaceCheck;
+            case BLOCKPLACE_NOSWING:
+                return noSwingCheck;
+            case BLOCKPLACE_REACH:
+                return reachCheck;
+            case BLOCKPLACE_SPEED:
+                return speedCheck;
+            case BLOCKPLACE_AGAINST:
+                return againstCheck;
+            case BLOCKPLACE_AUTOSIGN:
+                return autoSignCheck;
+            default:
+                return true;
         }
     }
 }

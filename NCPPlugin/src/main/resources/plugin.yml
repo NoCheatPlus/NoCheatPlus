@@ -169,7 +169,7 @@ permissions:
                             nocheatplus.checks.moving.nofall:
                                 description: Allow the player to bypass the NoFall check.
                             nocheatplus.checks.moving.passable:
-                                description: Allow bypassing the passable check.
+                                description: Allow bypassing the Passable check.
                             nocheatplus.checks.moving.survivalfly:
                                 description: Allow the player to bypass the SurvivalFly check.
                                 children:
@@ -183,6 +183,11 @@ permissions:
                                         description: Allow the player to sprint backwards.
                                     nocheatplus.checks.moving.survivalfly.step:
                                         description: Allow the player to use the 'step' functionality of his client.
+                    nocheatplus.checks.net:
+                      description: Allow a player to bypass the net (packet) checks.
+                      children:
+                        nocheatplus.checks.net.flyingfrequency:
+                          description: Bypass the FlyingFrequency check (flying packet spam). 
             
             nocheatplus.mods:
                 description: Allow the player to use all the client mods.

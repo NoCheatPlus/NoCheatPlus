@@ -20,6 +20,8 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
+import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
@@ -60,8 +62,8 @@ public enum CheckType {
     CHAT_TEXT(CHAT, Permissions.CHAT_TEXT),
     CHAT_LOGINS(CHAT, Permissions.CHAT_LOGINS),
     CHAT_RELOG(CHAT, Permissions.CHAT_RELOG),
-    
-    
+
+
     COMBINED(CombinedConfig.factory, CombinedData.factory, Permissions.COMBINED),
     COMBINED_BEDLEAVE(COMBINED, Permissions.COMBINED_BEDLEAVE),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
@@ -95,68 +97,76 @@ public enum CheckType {
     MOVING_NOFALL(MOVING, Permissions.MOVING_NOFALL),
     MOVING_PASSABLE(MOVING, Permissions.MOVING_PASSABLE),
     MOVING_SURVIVALFLY(MOVING, Permissions.MOVING_SURVIVALFLY),
-    
+
+    NET(new NetConfigCache(), new NetDataFactory(), Permissions.NET),
+    NET_FLYINGFREQUENCY(NET, Permissions.NET_FLYINGFREQUENCY),
+    NET_SOUNDDISTANCE(NET), // Can not exempt players from this one.
+
     UNKNOWN;
 
-	/** If not null, this is the check group usually. */
-	private final CheckType parent;
+    /** If not null, this is the check group usually. */
+    private final CheckType parent;
 
-	/** The check config factory (access CheckConfig instances by CheckType). */
-	private final CheckConfigFactory configFactory;
+    /** The check config factory (access CheckConfig instances by CheckType). */
+    private final CheckConfigFactory configFactory;
 
-	/** The check data factory (access CheckData instances by CheckType). */
-	private final CheckDataFactory dataFactory;
+    /** The check data factory (access CheckData instances by CheckType). */
+    private final CheckDataFactory dataFactory;
 
-	/** The bypass permission. */
-	private final String permission;
+    /** The bypass permission. */
+    private final String permission;
 
-	/**
-	 * Special purpose check types (likely not actual checks).
-	 */
-	private CheckType() {
-		this(null, null, null);
-	}
-	
-	/**
-	 * Special purpose for grouping (ALL).
-	 * @param permission
-	 */
-	private CheckType(final String permission){
-		this(null, null, permission);
-	}
-	
-	/**
-	 * Constructor for root checks or check groups, that are not grouped under another check type.
-	 * @param configFactory
-	 * @param dataFactory
-	 * @param permission
-	 */
-	private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, final String permission) {
-		this(null, permission, configFactory, dataFactory);
-	}
+    /**
+     * Special purpose check types (likely not actual checks).
+     */
+    private CheckType() {
+        this(null, null, null);
+    }
 
-	/**
-	 * Constructor for sub-checks grouped under another check type.
-	 * @param parent
-	 * @param permission
-	 */
-	private CheckType(final CheckType parent, final String permission) {
-		this(parent, permission, parent.getConfigFactory(), parent.getDataFactory());
-	}
+    /**
+     * Special purpose for grouping (ALL).
+     * @param permission
+     */
+    private CheckType(final String permission){
+        this(null, null, permission);
+    }
 
-	/**
-	 * General constructor (usually used for root check groups).
-	 * @param parent Super check type (usually the group).
-	 * @param permission Bypass permission.
-	 * @param configFactory Check config factory.
-	 * @param dataFactory Check data factory.
-	 */
-	private CheckType(final CheckType parent, final String permission, final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
-		this.parent = parent;
-		this.permission = permission;
-		this.configFactory = configFactory;
-		this.dataFactory = dataFactory;
-	}
+    private CheckType(final CheckType parent) {
+        this(parent, null);
+    }
+
+    /**
+     * Constructor for root checks or check groups, that are not grouped under another check type.
+     * @param configFactory
+     * @param dataFactory
+     * @param permission
+     */
+    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, final String permission) {
+        this(null, permission, configFactory, dataFactory);
+    }
+
+    /**
+     * Constructor for sub-checks grouped under another check type.
+     * @param parent
+     * @param permission
+     */
+    private CheckType(final CheckType parent, final String permission) {
+        this(parent, permission, parent.getConfigFactory(), parent.getDataFactory());
+    }
+
+    /**
+     * General constructor (usually used for root check groups).
+     * @param parent Super check type (usually the group).
+     * @param permission Bypass permission.
+     * @param configFactory Check config factory.
+     * @param dataFactory Check data factory.
+     */
+    private CheckType(final CheckType parent, final String permission, final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+        this.parent = parent;
+        this.permission = permission;
+        this.configFactory = configFactory;
+        this.dataFactory = dataFactory;
+    }
 
     /**
      * Gets the configFactory.
@@ -202,16 +212,16 @@ public enum CheckType {
     public String getPermission() {
         return permission;
     }
-    
+
     /**
      * Quick permission check for cached entriy only (for async checks). If not present, after failure will need to deal with this.
      * @param player
      * @return
      */
     public boolean hasCachedPermission(final Player player){
-    	return hasCachedPermission(player, getPermission());
+        return hasCachedPermission(player, getPermission());
     }
-    		
+
     /**
      * Quick permission check for cached entries only (for async checks). If not present, after failure will need to deal with this.
      * @param player
@@ -219,7 +229,7 @@ public enum CheckType {
      * @return
      */
     public boolean hasCachedPermission(final Player player, final String permission){
-    	return dataFactory.getData(player).hasCachedPermission(permission);
+        return dataFactory.getData(player).hasCachedPermission(permission);
     }
 
     /**

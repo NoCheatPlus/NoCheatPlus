@@ -12,7 +12,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
@@ -28,7 +28,6 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class ProtocolLibComponent implements DisableListener, INotifyReload {
 
-    private final NetConfigCache configs = new NetConfigCache();
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
     public ProtocolLibComponent(Plugin plugin) {
@@ -75,7 +74,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
     private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
         try {
             // Construct a new instance using reflection.
-            PacketAdapter adapter = clazz.getDeclaredConstructor(NetConfigCache.class, Plugin.class).newInstance(configs, plugin);
+            PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
             ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
             registeredPacketAdapters.add(adapter);
         } catch (Throwable t) {
@@ -92,6 +91,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
     @Override
     public void onReload() {
         unregister();
+        CheckType.NET.getDataFactory().removeAllData(); // Currently needed for FlyingFRequency.
         register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // Store instead ?
     }
 
@@ -107,7 +107,6 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
             }
         }
         registeredPacketAdapters.clear();
-        configs.clearAllConfigs();
     }
 
 }

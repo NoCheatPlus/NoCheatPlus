@@ -114,6 +114,9 @@ public class Permissions {
     public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
     public static final String  INVENTORY_OPEN               = INVENTORY + ".open";
 
+    public static final String  NET                          = CHECKS + ".net";
+    public static final String  NET_FLYINGFREQUENCY          = NET + ".flyingfrequency";
+
     public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
@@ -166,5 +169,5 @@ public class Permissions {
     private static final String JOURNEY                      = MODS + ".journey";
     public static final String  JOURNEY_RADAR                = JOURNEY + ".radar";
     public static final String  JOURNEY_CAVE                 = JOURNEY + ".cavemap";
-    
+
 }

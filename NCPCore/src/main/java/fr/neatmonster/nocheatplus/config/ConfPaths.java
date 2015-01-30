@@ -595,19 +595,23 @@ public abstract class ConfPaths {
     public  static final String MOVING_TRACE_SIZE						 = MOVING_TRACE + "size";
     public  static final String MOVING_TRACE_MERGEDIST					 = MOVING_TRACE + "mergedist";
 
-    private static final String NET										 = CHECKS + "net.";
+    public static final String  NET                                      = CHECKS + "net.";
 
-    private static final String NET_SOUNDDISTANCE						 = NET + "sounddistance.";
-    public static final String  NET_SOUNDDISTANCE_ACTIVE				 = NET_SOUNDDISTANCE + "active";
-    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE			 = NET_SOUNDDISTANCE + "maxdistance";
+    private static final String NET_SOUNDDISTANCE                        = NET + "sounddistance.";
+    public static final String  NET_SOUNDDISTANCE_ACTIVE                 = NET_SOUNDDISTANCE + "active";
+    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE            = NET_SOUNDDISTANCE + "maxdistance";
 
-    private static final String NET_FLYINGFREQUENCY						 = NET + "flyingfrequency.";
-    public static final String  NET_FLYINGFREQUENCY_ACTIVE				 = NET_FLYINGFREQUENCY + "active";
+    private static final String NET_FLYINGFREQUENCY                      = NET + "flyingfrequency.";
+    public static final String  NET_FLYINGFREQUENCY_ACTIVE               = NET_FLYINGFREQUENCY + "active";
     @GlobalConfig
-    public static final String  NET_FLYINGFREQUENCY_SECONDS				 = NET_FLYINGFREQUENCY + "seconds";
+    public static final String  NET_FLYINGFREQUENCY_SECONDS              = NET_FLYINGFREQUENCY + "seconds";
     @GlobalConfig
-    public static final String  NET_FLYINGFREQUENCY_MAXPACKETS			 = NET_FLYINGFREQUENCY + "maxpackets";
-    public static final String  NET_FLYINGFREQUENCY_CANCELREDUNDANT      = NET_FLYINGFREQUENCY + "cancelredundant";
+    public static final String  NET_FLYINGFREQUENCY_PACKETSPERSECOND     = NET_FLYINGFREQUENCY + "packetspersecond";
+    public static final String  NET_FLYINGFREQUENCY_ACTIONS              = NET_FLYINGFREQUENCY + "actions";
+    private static final String NET_FLYINGFREQUENCY_REDUNDANT            = NET_FLYINGFREQUENCY + "reduceredundant.";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE     = NET_FLYINGFREQUENCY_REDUNDANT + "active";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_SECONDS    = NET_FLYINGFREQUENCY_REDUNDANT + "seconds";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS    = NET_FLYINGFREQUENCY_REDUNDANT + "actions";
 
 
     public static final String  STRINGS                                  = "strings";
@@ -650,6 +654,8 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_ENSURECLOSE                    = "checks.inventory.ensureclose";
     @Moved(newPath = LOGGING_EXTENDED_STATUS)
     public static final String LOGGING_DEBUG                             = "logging.debug";
+    @Moved(newPath = NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE)
+    public static final String  NET_FLYINGFREQUENCY_CANCELREDUNDANT      = "checks.net.flyingfrequency.cancelredundant";
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
     @Deprecated
@@ -666,5 +672,7 @@ public abstract class ConfPaths {
     public static final String  FIGHT_KNOCKBACK_INTERVAL                 = "checks.fight.knockback.interval";
     @Deprecated
     public static final String  FIGHT_KNOCKBACK_ACTIONS                  = "checks.fight.knockback.actions";
+    @Deprecated
+    public static final String NET_FLYINGFREQUENCY_MAXPACKETS            = "checks.net.flyingfrequency.maxpackets";
 
 }

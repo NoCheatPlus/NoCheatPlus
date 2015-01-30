@@ -160,7 +160,8 @@ public abstract class Check implements MCAccessHolder{
     }
 
     /**
-     * Checks if this check is enabled for the specified player.
+     * Checks both configuration flags and if the player is exempted from this
+     * check (hasBypass).
      * 
      * @param player
      *            the player
@@ -170,17 +171,29 @@ public abstract class Check implements MCAccessHolder{
         if (!type.isEnabled(player)) {
             return false;
         }
+        return !hasBypass(player);
+    }
+
+    /**
+     * Check if the player is exempted by permissions or otherwise.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean hasBypass(final Player player) {
         // TODO: Checking for the thread might be a temporary measure.
         if (Bukkit.isPrimaryThread()) {
             // Check permissions directly.
-            if (player.hasPermission(type.getPermission())) {
-                return false;
+            final String permission = type.getPermission();
+            if (permission != null && player.hasPermission(permission)) {
+                return true;
             }
         }
         else if (type.hasCachedPermission(player)) {
             // Assume asynchronously running check.
-            return false;
+            return true;
         }
+        // TODO: ExemptionManager relies on initial setup (problematic).
         return !NCPExemptionManager.isExempted(player, type);
     }
 

@@ -10,6 +10,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -38,9 +39,9 @@ public class SoundDistance extends PacketAdapter {
     private final NetConfigCache configs;
     private final Location useLoc = new Location(null, 0, 0, 0);
 
-    public SoundDistance(NetConfigCache configs, Plugin plugin) {
+    public SoundDistance(Plugin plugin) {
         super(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT);
-        this.configs = configs;
+        this.configs = (NetConfigCache) CheckType.NET.getConfigFactory(); // TODO: DataManager.getConfig(NetConfigCache.class);
     }
 
     @Override
