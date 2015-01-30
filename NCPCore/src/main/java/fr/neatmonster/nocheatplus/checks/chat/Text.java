@@ -268,12 +268,12 @@ public class Text extends Check implements INotifyReload {
             }
             else{
                 if (shortTermViolation) {
-                    if (executeActions(player, data.textVL, added, cc.textFreqShortTermActions, isMainThread)) {
+                    if (executeActions(player, data.textVL, added, cc.textFreqShortTermActions)) {
                         cancel = true;
                     }
                 }
                 else if (normalViolation) {
-                    if (executeActions(player, data.textVL, added, cc.textFreqNormActions, isMainThread)) {
+                    if (executeActions(player, data.textVL, added, cc.textFreqNormActions)) {
                         cancel = true;
                     }
                 }

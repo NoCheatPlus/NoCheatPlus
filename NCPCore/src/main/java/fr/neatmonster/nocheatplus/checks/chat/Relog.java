@@ -42,7 +42,7 @@ public class Relog extends Check {
             } else{
                 // Find out if we need to ban the player or not.
                 data.relogVL += 1D;
-                cancel = executeActions(player, (double) data.relogVL, 1D, cc.relogActions, true);
+                cancel = executeActions(player, (double) data.relogVL, 1D, cc.relogActions);
             }
         }
         // TODO: decrease relog vl ?

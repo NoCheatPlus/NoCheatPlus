@@ -20,7 +20,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
  * TODO: Re-think visibility questions.
  * @author asofold
  */
-public class ViolationData implements IViolationInfo, ActionData{
+public class ViolationData implements IViolationInfo, ActionData {
 
     /** The actions to be executed. */
     public final ActionList actions;
@@ -41,12 +41,15 @@ public class ViolationData implements IViolationInfo, ActionData{
     public final double     vL;
 
     /** Filled in parameters. */
-    private Map<ParameterName, String> parameters;
+    private Map<ParameterName, String> parameters = null;
 
     private boolean needsParameters = false;
 
     /**
      * Instantiates a new violation data.
+     * <hr>
+     * This constructor must be thread-safe for checks that might be executed
+     * outside of the primary thread.
      * 
      * @param check
      *            the check
@@ -59,8 +62,7 @@ public class ViolationData implements IViolationInfo, ActionData{
      * @param actions
      *            the actions
      */
-    public ViolationData(final Check check, final Player player, final double vL, final double addedVL,
-            final ActionList actions) {
+    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions) {
         this.check = check;
         this.player = player;
         this.vL = vL;
@@ -74,7 +76,6 @@ public class ViolationData implements IViolationInfo, ActionData{
                 break;
             }
         }
-        parameters = needsParameters ? check.getParameterMap(this) : null;
         this.needsParameters = needsParameters;
     }
 
@@ -133,21 +134,21 @@ public class ViolationData implements IViolationInfo, ActionData{
             return "<???>";
         }
         switch (parameterName) {
-        case CHECK:
-            return check.getClass().getSimpleName();
-        case IP:
-            return player.getAddress().toString().substring(1).split(":")[0];
-        case PLAYER:
-        case PLAYER_NAME:
-            return player.getName();
-        case PLAYER_DISPLAY_NAME:
-            return player.getDisplayName();
-        case UUID:
-            return player.getUniqueId().toString();
-        case VIOLATIONS:
-            return String.valueOf((long) Math.round(vL));
-        default:
-            break;
+            case CHECK:
+                return check.getClass().getSimpleName();
+            case IP:
+                return player.getAddress().toString().substring(1).split(":")[0];
+            case PLAYER:
+            case PLAYER_NAME:
+                return player.getName();
+            case PLAYER_DISPLAY_NAME:
+                return player.getDisplayName();
+            case UUID:
+                return player.getUniqueId().toString();
+            case VIOLATIONS:
+                return String.valueOf((long) Math.round(vL));
+            default:
+                break;
         }
         if (parameters == null) {
             // Return what would have been parsed to get the parameter.
@@ -158,11 +159,23 @@ public class ViolationData implements IViolationInfo, ActionData{
     }
 
     @Override
-    public void setParameter(final ParameterName parameterName, String value) {
+    public void setParameter(final ParameterName parameterName, final String value) {
         if (parameters == null) {
             parameters = new HashMap<ParameterName, String>();
         }
         parameters.put(parameterName, value);
+    }
+
+    /**
+     * Convenience method: Delegates to setParameter, return this for chaining.
+     * 
+     * @param parameterName
+     * @param value
+     * @return This ViolationData instance.
+     */
+    public ViolationData chainParameter(final ParameterName parameterName, final String value) {
+        setParameter(parameterName, value);
+        return this;
     }
 
     @Override

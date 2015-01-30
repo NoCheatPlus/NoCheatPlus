@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import java.util.Map;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -17,9 +15,9 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * The Reach check will find out if a player interacts with something that's too far away.
  */
 public class Reach extends Check {
-	
-	/** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
-	private final Location useLoc = new Location(null, 0, 0, 0);
+
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
     /** The maximum distance allowed to interact with a block in creative mode. */
     public static final double CREATIVE_DISTANCE = 5.6D;
@@ -65,7 +63,9 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, distance, BlockBreakConfig.getConfig(player).reachActions);
+            final ViolationData vd = new ViolationData(this, player, data.reachVL, distance, BlockBreakConfig.getConfig(player).reachActions);
+            vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(data.reachDistance)));
+            cancel = executeActions(vd);
         } else{
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;
@@ -73,11 +73,5 @@ public class Reach extends Check {
 
         return cancel;
     }
-    
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(BlockBreakData.getData(violationData.player).reachDistance)));
-		return parameters;
-	}
+
 }

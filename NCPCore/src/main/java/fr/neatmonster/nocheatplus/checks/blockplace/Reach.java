@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import java.util.Map;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -23,9 +21,9 @@ public class Reach extends Check {
 
     /** The maximum distance allowed to interact with a block in survival mode. */
     public static final double SURVIVAL_DISTANCE = 5.2D;
-    
+
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
-	private final Location useLoc = new Location(null, 0, 0, 0);
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * Instantiates a new reach check.
@@ -67,7 +65,9 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, distance, cc.reachActions);
+            final ViolationData vd = new ViolationData(this, player, data.reachVL, distance, cc.reachActions);
+            vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(data.reachDistance));
+            cancel = executeActions(vd);
         } else{
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;
@@ -75,15 +75,8 @@ public class Reach extends Check {
 
         // Cleanup.
         useLoc.setWorld(null);
-        
+
         return cancel;
     }
-    
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.REACH_DISTANCE, "" +Math.round(BlockPlaceData.getData(violationData.player).reachDistance));
-		return parameters;
-	}
 
 }

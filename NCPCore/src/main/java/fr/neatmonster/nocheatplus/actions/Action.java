@@ -51,6 +51,10 @@ public abstract class Action <D extends ActionData, L extends AbstractActionList
 
     /**
      * Check if parameters are needed at all for faster processing.
+     * <hr>
+     * This method must be thread-safe, if an execution of this might happen
+     * outside of the primary thread.
+     * 
      * @return
      */
     public boolean needsParameters() {

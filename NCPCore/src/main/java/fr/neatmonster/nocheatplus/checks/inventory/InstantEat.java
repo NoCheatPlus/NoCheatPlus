@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
-import java.util.Map;
-
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -31,9 +29,9 @@ public class InstantEat extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final int level) {
-    	// Take time once.
-    	final long time = System.currentTimeMillis();
-    	
+        // Take time once.
+        final long time = System.currentTimeMillis();
+
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
@@ -60,19 +58,16 @@ public class InstantEat extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.instantEatVL, difference,
-                    InventoryConfig.getConfig(player).instantEatActions);
+            final ViolationData vd = new ViolationData(this, player, data.instantEatVL, difference, InventoryConfig.getConfig(player).instantEatActions);
+            if (data.instantEatFood != null) {
+                vd.setParameter(ParameterName.FOOD, data.instantEatFood.toString());
+            }
+            cancel = executeActions(vd);
         }
-        
+
         data.instantEatInteract = 0;
         data.instantEatFood = null;
         return cancel;
     }
 
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.FOOD, InventoryData.getData(violationData.player).instantEatFood.toString());
-		return parameters;
-	}
 }

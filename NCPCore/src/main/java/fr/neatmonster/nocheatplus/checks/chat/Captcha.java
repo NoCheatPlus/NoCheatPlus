@@ -39,7 +39,7 @@ public class Captcha extends Check implements ICaptcha{
             // Have they failed too man times?
             if (data.captchTries > cc.captchaTries) {
                 // Find out if we need to kick the player or not.
-                executeActions(player, data.captchaVL, 1, cc.captchaActions, isMainThread);
+                executeActions(player, data.captchaVL, 1, cc.captchaActions);
                 // (Resetting captcha tries is done on quit/kick).
             }
 

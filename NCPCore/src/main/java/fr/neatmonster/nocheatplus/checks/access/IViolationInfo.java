@@ -7,7 +7,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterHolder;
  * @author mc_dev
  *
  */
-public interface IViolationInfo extends ParameterHolder{
+public interface IViolationInfo extends ParameterHolder {
     /**
      * Get the violation level just added by this violation.
      * @return

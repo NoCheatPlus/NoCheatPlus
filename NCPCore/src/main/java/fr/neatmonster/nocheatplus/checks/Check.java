@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -20,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 /**
  * The parent class of all checks. Don't let this implement Listener without knowing that this might be registered as component with NCP before the check-listeners.
  */
-public abstract class Check implements MCAccessHolder{
+public abstract class Check implements MCAccessHolder {
 
     // TODO: Do these get cleaned up ?
     /** The execution histories of each check. */
@@ -59,8 +58,7 @@ public abstract class Check implements MCAccessHolder{
     }
 
     /**
-     * Execute actions, possibly thread safe according to the isMainThread flag.<br>
-     * This does not use extra synchronization.
+     * Execute actions, thread-safe.<br>
      * 
      * @param player
      *            the player
@@ -72,50 +70,19 @@ public abstract class Check implements MCAccessHolder{
      *            if the thread the main thread
      * @return true, if successful
      */
-    public boolean executeActions(final Player player, final double vL, final double addedVL,
-            final ActionList actions, boolean isMainThread) {
+    public boolean executeActions(final Player player, final double vL, final double addedVL, final ActionList actions) {
         // Sync it into the main thread by using an event.
-        return executeActions(new ViolationData(this, player, vL, addedVL, actions), isMainThread);
+        return executeActions(new ViolationData(this, player, vL, addedVL, actions));
     }
 
     /**
-     * Convenience method: Execute actions from the main thread only.
-     * 
-     * @param player
-     *            the player
-     * @param vL
-     *            the violation level
-     * @param addedVL
-     *            the violation level added
-     * @param actions
-     *            the actions
-     * @return true, if the event should be cancelled
-     */
-    protected boolean executeActions(final Player player, final double vL, final double addedVL,
-            final ActionList actions) {
-        return executeActions(new ViolationData(this, player, vL, addedVL, actions), true);
-    }
-
-    /**
-     * Execute some actions for the specified player, only for the main thread.
+     * Execute actions, thread safe.
      * 
      * @param violationData
      *            the violation data
      * @return true, if the event should be cancelled
      */
-    protected boolean executeActions(final ViolationData violationData) {
-        return executeActions(violationData, true);
-    }
-
-    /**
-     * Execute some actions for the specified player.
-     * 
-     * @param violationData
-     *            the violation data
-     * @param isMainThread If this is called from within the main thread. If true, this must really be the main thread and not from synchronized code coming form another thread.
-     * @return true, if the event should be cancelled
-     */
-    protected boolean executeActions(final ViolationData violationData, final boolean isMainThread) {
+    public boolean executeActions(final ViolationData violationData) {
 
         // Dispatch the VL processing to the hook manager (now thread safe).
         if (NCPHookManager.shouldCancelVLProcessing(violationData)) {
@@ -125,7 +92,7 @@ public abstract class Check implements MCAccessHolder{
 
         final boolean hasCancel = violationData.hasCancel(); 
 
-        if (isMainThread) {
+        if (Bukkit.isPrimaryThread()) {
             return violationData.executeActions();
         }
         else {
@@ -135,19 +102,6 @@ public abstract class Check implements MCAccessHolder{
 
         // (Design change: Permission checks are moved to cached permissions, lazily updated.)
         return hasCancel;
-    }
-
-    /**
-     * Fill in parameters for creating violation data. 
-     * Individual checks should override this to fill in check specific parameters,
-     * which then are fetched by the violation data instance.
-     * @param player
-     * @return
-     */
-    protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-        final Map<ParameterName, String> params = new HashMap<ParameterName, String>();
-        // (Standard parameters like player, vl, check name are filled in in ViolationData.getParameter!)
-        return params;
     }
 
     /**

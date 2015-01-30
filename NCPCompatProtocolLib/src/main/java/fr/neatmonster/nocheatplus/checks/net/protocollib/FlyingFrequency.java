@@ -85,7 +85,7 @@ public class FlyingFrequency extends PacketAdapter {
         // TODO: Consider using the NetStatic check.
         data.flyingFrequencyAll.add(time, 1f);
         final float allScore = data.flyingFrequencyAll.score(1f);
-        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !frequency.hasBypass(player) && frequency.executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions, true)) {
+        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !frequency.hasBypass(player) && frequency.executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions)) {
             event.setCancelled(true);
             return;
         }
@@ -179,7 +179,7 @@ public class FlyingFrequency extends PacketAdapter {
         if (allScore / cc.flyingFrequencySeconds > 20f && !frequency.hasBypass(player)) {
             // (Must re-check bypass here.)
             data.flyingFrequencyRedundantFreq.add(time, 1f);
-            if (frequency.executeActions(player, data.flyingFrequencyRedundantFreq.score(1f) / cc.flyingFrequencyRedundantSeconds, 1.0 / cc.flyingFrequencyRedundantSeconds, cc.flyingFrequencyRedundantActions, true)) {
+            if (frequency.executeActions(player, data.flyingFrequencyRedundantFreq.score(1f) / cc.flyingFrequencyRedundantSeconds, 1.0 / cc.flyingFrequencyRedundantSeconds, cc.flyingFrequencyRedundantActions)) {
                 return true;
             }
         }
