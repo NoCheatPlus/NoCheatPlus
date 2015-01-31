@@ -146,6 +146,7 @@ public class Direction extends Check {
             final Vector blockEyes = new Vector(dLoc.x - loc.getX(),  dLoc.y + context.damagedHeight / 2D - loc.getY() - player.getEyeHeight(), dLoc.z - loc.getZ());
             final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
             context.minViolation = Math.min(context.minViolation, distance);
+            cancel = true;
         }
         context.minResult = Math.min(context.minResult, off);
 
