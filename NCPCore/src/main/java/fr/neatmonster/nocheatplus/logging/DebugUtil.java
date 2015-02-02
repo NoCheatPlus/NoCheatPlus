@@ -206,13 +206,18 @@ public class DebugUtil {
                 // TODO: Check backwards compatibility (1.4.2). Remove try-catch
                 builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
             } catch (Throwable t){}
-            final Vector v = player.getVelocity();
-            builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
             if (player.isSprinting()){
                 builder.append("(sprinting)");
             }
             if (player.isSneaking()){
                 builder.append("(sneaking)");
+            }
+            if (player.isBlocking()) {
+                builder.append("(blocking)");
+            }
+            final Vector v = player.getVelocity();
+            if (v.lengthSquared() > 0.0) {
+                builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
             }
         }
         if (speed != Double.NEGATIVE_INFINITY){
