@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 /**
  * JourneyMap + VoxelMap mod.
- * @author web4web1
+ * @author asofold
  *
  */
 public class JourneyMapMOTD extends ClientMOTD {

@@ -15,7 +15,7 @@ public class PluginTests {
 
     /**
      * Dummy API, providing only a minimal subset of functionality for offline-testing. Some methods do nothing, some throw an UnsupportedOperationException, some will do something (set/get MCAccess).
-     * @author web4web1
+     * @author asofold
      *
      */
     public static class DummyNoCheatPlusAPI implements NoCheatPlusAPI {

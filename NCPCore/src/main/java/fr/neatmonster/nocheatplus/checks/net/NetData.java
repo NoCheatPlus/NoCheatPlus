@@ -5,7 +5,7 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /**
  * Primary thread only.
- * @author web4web1
+ * @author asofold
  *
  */
 public class NetData extends ACheckData {

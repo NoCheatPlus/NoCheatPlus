@@ -8,7 +8,7 @@ import fr.neatmonster.nocheatplus.config.WorldConfigCache;
 
 /**
  * Copy-on-write per-world configuration cache.
- * @author web4web1
+ * @author asofold
  *
  */
 public class NetConfigCache extends WorldConfigCache<NetConfig> implements CheckConfigFactory {

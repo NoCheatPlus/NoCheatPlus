@@ -4,7 +4,7 @@ import org.bukkit.World;
 
 /**
  * World-specific cache for configurations. World names are used as keys, convenience methods are added.
- * @author web4web1
+ * @author asofold
  *
  * @param <C>
  */

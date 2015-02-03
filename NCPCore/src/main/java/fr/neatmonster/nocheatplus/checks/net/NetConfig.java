@@ -10,7 +10,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
  * Configuration for the net checks (fast version, sparse).
- * @author web4web1
+ * @author asofold
  *
  */
 public class NetConfig extends ACheckConfig {

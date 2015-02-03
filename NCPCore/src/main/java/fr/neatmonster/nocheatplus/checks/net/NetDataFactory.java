@@ -9,7 +9,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 
 /**
  * Currently primary thread only!
- * @author web4web1
+ * @author asofold
  *
  */
 public class NetDataFactory implements CheckDataFactory {

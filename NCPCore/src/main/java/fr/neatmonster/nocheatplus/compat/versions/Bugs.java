@@ -10,7 +10,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 
 /**
  * Feature selection, based on the version.
- * @author web4web1
+ * @author asofold
  *
  */
 public class Bugs {

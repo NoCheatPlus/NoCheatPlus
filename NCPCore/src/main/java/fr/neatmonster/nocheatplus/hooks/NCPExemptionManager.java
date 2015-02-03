@@ -42,20 +42,21 @@ public class NCPExemptionManager {
     /**
      * Exempt an entity from all checks permanently.
      * 
-     * @param entityId
-     *            the entity id
+     * @param id
+     *            The unique id.
      */
     public static final void exemptPermanently(final UUID id) {
         exemptPermanently(id, CheckType.ALL);
     }
 
     /**
-     * Exempt an entity from the given check or check group permanently (only until restart).
+     * Exempt an entity from the given check or check group permanently (only
+     * until restart).
      * 
-     * @param entityId
-     *            the entity id
+     * @param id
+     *            The unique id.
      * @param checkType
-     *            the check type
+     *            The check type.
      */
     public static final void exemptPermanently(final UUID id, final CheckType checkType) {
         exempted.get(checkType).add(id);
@@ -78,9 +79,9 @@ public class NCPExemptionManager {
      * Exempt a player from a check or check group permanently.
      * 
      * @param player
-     *            the player
+     *            The player to exempt.
      * @param checkType
-     *            the check type
+     *            The check type.
      */
     public static final void exemptPermanently(final Player player, final CheckType checkType) {
         exemptPermanently(player.getUniqueId(), checkType);
@@ -89,15 +90,16 @@ public class NCPExemptionManager {
     /**
      * Check if an entity is exempted from a check right now by entity id.
      * <hr>
-     * This might help exempting NPCs from checks for all time, making performance a lot better. A future purpose might
-     * be to exempt vehicles and similar (including passengers) from checks.
+     * This might help exempting NPCs from checks for all time, making
+     * performance a lot better. A future purpose might be to exempt vehicles
+     * and similar (including passengers) from checks.
      * 
-     * @param entityId
-     *            the entity id to exempt from checks
+     * @param id
+     *            The unique id.
      * @param checkType
-     *            the type of check to exempt the player from. This can be individual check types, as well as a check
-     *            group like MOVING or ALL
-     * @return if the entity is exempted from checks right now
+     *            This can be individual check types, as well as a check group
+     *            like MOVING or ALL.
+     * @return If the entity is exempted from checks right now.
      */
     public static final boolean isExempted(final UUID id, final CheckType checkType) {
         return exempted.get(checkType).contains(id);
@@ -107,11 +109,11 @@ public class NCPExemptionManager {
      * Check if a player is exempted from a check right now.
      * 
      * @param player
-     *            the player to exempt from checks
+     *            The player to exempt from checks
      * @param checkType
-     *            the type of check to exempt the player from. This can be individual check types, as well as a check
-     *            group like MOVING or ALL
-     * @return if the player is exempted from the check right now
+     *            This can be individual check types, as well as a check group
+     *            like MOVING or ALL.
+     * @return If the player is exempted from the check right now.
      */
     public static final boolean isExempted(final Player player, final CheckType checkType) {
         return isExempted(player.getUniqueId(), checkType);
@@ -121,7 +123,7 @@ public class NCPExemptionManager {
      * Undo exempting an entity from all checks.
      * 
      * @param id
-     *            Unique id of a player to exempt.
+     *            The unique id.
      */
     public static final void unexempt(final UUID id) {
         unexempt(id, CheckType.ALL);
@@ -130,10 +132,10 @@ public class NCPExemptionManager {
     /**
      * Undo exempting an entity from a certain check, or check group, as given.
      * 
-     * @param entityId
-     *            the entity id
+     * @param id
+     *            The unique id.
      * @param checkType
-     *            the check type
+     *            The check type.
      */
     public static final void unexempt(final UUID id,  final CheckType checkType) {
         exempted.get(checkType).remove(id);

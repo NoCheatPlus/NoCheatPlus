@@ -7,7 +7,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 /**
  * Simple cache for configurations, adding some convenience functionality.
- * @author web4web1
+ * @author asofold
  *
  */
 public abstract class ConfigCache <K, C> {
