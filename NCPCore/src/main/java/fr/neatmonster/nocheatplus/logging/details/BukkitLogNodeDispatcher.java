@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.logging.details;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.components.TickListener;
@@ -47,7 +48,11 @@ public class BukkitLogNodeDispatcher extends AbstractLogNodeDispatcher { // TODO
         synchronized (queueAsynchronous) {
             if (taskAsynchronousID == -1) {
                 // Deadlocking should not be possible.
-                taskAsynchronousID = Bukkit.getScheduler().runTaskAsynchronously(plugin, taskAsynchronous).getTaskId();
+                try {
+                    taskAsynchronousID = Bukkit.getScheduler().runTaskAsynchronously(plugin, taskAsynchronous).getTaskId();
+                } catch (IllegalPluginAccessException ex) {
+                    // (Should be during onDisable, ignore for now.)
+                }
                 // TODO: Re-check task id here.
             }
         }
