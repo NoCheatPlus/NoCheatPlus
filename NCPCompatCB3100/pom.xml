@@ -10,14 +10,14 @@
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>LATEST</version>
   </parent>
 
   <dependencies>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcore</artifactId>
-    	<version>1.1-SNAPSHOT</version>
+    	<version>LATEST</version>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
