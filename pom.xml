@@ -4,7 +4,7 @@
   <groupId>fr.neatmonster</groupId>
   <artifactId>nocheatplus-parent</artifactId>
   <packaging>pom</packaging>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
   <name>NoCheatPlus Parent</name>
   <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   <properties>
@@ -46,9 +46,7 @@
     </repository>
   </repositories>
 
-  <description>The initial pom design had been taken from mbax (GitHub, TODO: link).
-
-Version updating is done for the NoCheatPlus sub-module.
+  <description>The initial pom design had been taken from mbax (GitHub).
 
 The naming of the native compatibility modules mostly follows NCPCompat + shortcut of server mod name + earliest build/version that the module would run with (though it should be compiled with the latest available build rather, latest build also can be used, if it is the first module depicting an API incompatibility transition).
 

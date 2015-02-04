@@ -5,12 +5,12 @@
   <artifactId>ncpcompatglowstone</artifactId>
   <packaging>jar</packaging>
   <name>NCPCompatGlowstone</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>static</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
   
   <repositories>
@@ -25,7 +25,7 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcore</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>net.glowstone</groupId>
@@ -35,7 +35,7 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatbukkit</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

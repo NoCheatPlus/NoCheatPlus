@@ -5,7 +5,7 @@
   <groupId>fr.neatmonster</groupId>
   <artifactId>ncpplugin</artifactId>
   <name>NCPPlugin</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
   
   <packaging>jar</packaging>
   
@@ -26,92 +26,92 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcore</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatbukkit</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2512</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2545</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2602</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2645</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2691</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2763</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2794</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2808</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2882</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2922</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb3026</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb3043</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb3100</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcbdev</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatprotocollib</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatglowstone</artifactId>
-        <version>static</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -122,10 +122,10 @@
   
   <description>Mainly contains the plugin class and the factories.
 
-Version updating is done for the NoCheatPlus sub-module.</description>
+For the plugin/artifact version see the NoCheatPlus module.</description>
   <parent>
   	<groupId>fr.neatmonster</groupId>
   	<artifactId>nocheatplus-parent</artifactId>
-  	<version>static</version>
+  	<version>1.1-SNAPSHOT</version>
   </parent>
 </project>

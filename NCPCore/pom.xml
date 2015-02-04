@@ -5,12 +5,12 @@
   <artifactId>ncpcore</artifactId>
   <packaging>jar</packaging>
   <name>NCPCore</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>static</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -22,12 +22,10 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
   <description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level.
-
-Version updating is done for the NoCheatPlus sub-module.
 </description>
 </project>

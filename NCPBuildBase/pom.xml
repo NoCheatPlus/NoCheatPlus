@@ -5,12 +5,12 @@
   <artifactId>ncpbuildbase</artifactId>
   <packaging>jar</packaging>
   <name>NCPBuildBase</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>static</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -21,8 +21,7 @@
   	</dependency>
   </dependencies>
   <description>Very basic dependencies that have to be built before commons, no use of Bukkit.
-
-Version updating is done for the NoCheatPlus sub-module.</description>
+</description>
 
   <build>
     <resources>

@@ -5,12 +5,12 @@
   <artifactId>ncpcommons</artifactId>
   <packaging>jar</packaging>
   <name>NCPCommons</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>static</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -22,11 +22,10 @@
   	<dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpbuildbase</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <description>Common data structures and other, no use of Bukkit.
-
-Version updating is done for the NoCheatPlus sub-module.</description>
+</description>
 
 </project>

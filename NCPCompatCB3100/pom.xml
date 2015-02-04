@@ -5,19 +5,19 @@
   <artifactId>ncpcompatcb3100</artifactId>
   <packaging>jar</packaging>
   <name>NCPCompatCB3100</name>
-  <version>static</version>
+  <version>1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>static</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcore</artifactId>
-    	<version>static</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
@@ -27,7 +27,5 @@
   </dependencies>
 
   <description>Compatibility for CraftBukkit build 3100 (MC 1.7.10).
-
-Version updating is done for the NoCheatPlus sub-module.
 </description>
 </project>
