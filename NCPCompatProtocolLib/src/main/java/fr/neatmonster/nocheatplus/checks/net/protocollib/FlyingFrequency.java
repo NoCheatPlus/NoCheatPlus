@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
@@ -58,7 +59,7 @@ public class FlyingFrequency extends PacketAdapter {
 
     public FlyingFrequency(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
-        super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
+        super(plugin, ListenerPriority.LOW, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
         this.configs = (NetConfigCache) CheckType.NET.getConfigFactory();
         this.dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
     }

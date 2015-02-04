@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
@@ -40,7 +41,7 @@ public class SoundDistance extends PacketAdapter {
     private final Location useLoc = new Location(null, 0, 0, 0);
 
     public SoundDistance(Plugin plugin) {
-        super(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT);
+        super(plugin, ListenerPriority.LOW, PacketType.Play.Server.NAMED_SOUND_EFFECT);
         this.configs = (NetConfigCache) CheckType.NET.getConfigFactory(); // TODO: DataManager.getConfig(NetConfigCache.class);
     }
 
