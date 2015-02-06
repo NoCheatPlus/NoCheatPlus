@@ -182,7 +182,7 @@ public class MovingConfig extends ACheckConfig {
         creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
         final ModelFlying defaultModel = new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying());
         for (final GameMode gameMode : GameMode.values()) {
-            flyingModels.put(gameMode, new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + gameMode.toString().toLowerCase() + ".", defaultModel));
+            flyingModels.put(gameMode, new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
         }
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 

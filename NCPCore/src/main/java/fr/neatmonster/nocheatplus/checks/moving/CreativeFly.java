@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -10,6 +11,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -44,7 +46,8 @@ public class CreativeFly extends Check {
             data.setSetBack(from);
         }
 
-        final ModelFlying model = cc.flyingModels.get(player.getGameMode());
+        final GameMode gameMode = player.getGameMode();
+        final ModelFlying model = cc.flyingModels.get(gameMode);
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
@@ -77,7 +80,7 @@ public class CreativeFly extends Check {
             fSpeed = 1D + 0.2D * (speedModifier + 1D);
         }
 
-        final boolean flying = player.isFlying();
+        final boolean flying = gameMode == BridgeMisc.GAME_MODE_SPECTATOR || player.isFlying();
         if (flying) {
             // TODO: Consider mechanichs for flying backwards.
             fSpeed *= data.flySpeed / 0.1;
