@@ -26,92 +26,92 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcore</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatbukkit</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2512</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2545</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2602</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2645</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2691</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2763</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2794</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2808</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2882</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb2922</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb3026</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb3043</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatcb3100</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcbdev</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatprotocollib</artifactId>
-    	<version>LATEST</version>
+    	<version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
         <artifactId>ncpcompatglowstone</artifactId>
-        <version>LATEST</version>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -126,6 +126,6 @@ For the plugin/artifact version see the NoCheatPlus module.</description>
   <parent>
   	<groupId>fr.neatmonster</groupId>
   	<artifactId>nocheatplus-parent</artifactId>
-  	<version>LATEST</version>
+  	<version>1.1-SNAPSHOT</version>
   </parent>
 </project>
