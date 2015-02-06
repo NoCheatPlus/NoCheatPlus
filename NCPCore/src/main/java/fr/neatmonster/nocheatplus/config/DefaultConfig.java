@@ -6,6 +6,8 @@ import java.util.LinkedList;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+
 /**
  * These are the default settings for NoCheatPlus. They will be used in addition to/in replacement of configurations
  * given in the configFactory.yml file.
@@ -350,9 +352,14 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_CREATIVEFLY_CHECK, true);
         set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, false); // TODO: -> true ?
         set(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE, false); // TODO: -> true ?
-        set(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED, 100);
-        set(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT, 128);
-        set(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED, 100);
+        set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative." + ConfPaths.SUB_HORIZONTALSPEED, 100);
+        set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative." + ConfPaths.SUB_VERTICALSPEED, 100);
+        set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative." + ConfPaths.SUB_MAXHEIGHT, 128);
+        if (BridgeMisc.GAME_MODE_SPECTATOR != null) {
+            set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "spectator." + ConfPaths.SUB_HORIZONTALSPEED, 400);
+            set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "spectator." + ConfPaths.SUB_VERTICALSPEED, 100);
+            set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "spectator." + ConfPaths.SUB_MAXHEIGHT, 128);
+        }
         set(ConfPaths.MOVING_CREATIVEFLY_ACTIONS,
                 "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
 

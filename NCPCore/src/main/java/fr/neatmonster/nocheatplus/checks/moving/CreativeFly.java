@@ -20,15 +20,6 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  */
 public class CreativeFly extends Check {
 
-    /** The horizontal speed in creative mode. */
-    private static final double HORIZONTAL_SPEED = 0.6D;
-
-    /** The vertical speed in creative mode. */
-    private static final double VERTICAL_SPEED   = 1D;
-    
-    /** Modifier for sprinting (1.8 feature). */
-    public static final double modSprintFly = 1.92;
-
     /**
      * Instantiates a new creative fly check.
      */
@@ -53,8 +44,10 @@ public class CreativeFly extends Check {
             data.setSetBack(from);
         }
 
+        final ModelFlying model = cc.flyingModels.get(player.getGameMode());
+
         // Before doing anything, do a basic height check to determine if players are flying too high.
-        final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
+        final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
         if (to.getY() > maximumHeight) {
             // TODO: USE velocity if possible.
             return new Location(player.getWorld(), data.getSetBackX(), Math.max(maximumHeight - 10D, to.getWorld().getMaxHeight()), data.getSetBackZ(), to.getYaw(), to.getPitch());
@@ -90,7 +83,7 @@ public class CreativeFly extends Check {
             fSpeed *= data.flySpeed / 0.1;
             if (sprinting) {
                 // TODO: Prevent for pre-1.8?
-                fSpeed *= modSprintFly;
+                fSpeed *= model.hModSprint;
             }
         }
         else {
@@ -98,7 +91,7 @@ public class CreativeFly extends Check {
             fSpeed *= data.walkSpeed / 0.2;
         }
 
-        final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;
+        final double limitH = model.hMod / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
 
         // Finally, determine how far the player went beyond the set limits.
         //        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
@@ -134,7 +127,7 @@ public class CreativeFly extends Check {
 
         resultH *= 100D;
 
-        final double limitV = cc.creativeFlyVerticalSpeed / 100D * VERTICAL_SPEED; // * data.jumpAmplifier;
+        final double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
 
         // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]

@@ -7,11 +7,16 @@ public abstract class ConfPaths {
 
     // Sub-paths that are used with different path prefixes potentially.
     // TODO: These might better be in another class.
-    public static final String SUB_DEBUG 								 = "debug";
-    public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
     public static final String SUB_ALLOWINSTANTBREAK                     = "allowinstantbreak";
-    public static final String SUB_OVERRIDEFLAGS					 	 = "overrideflags";
-    public static final String SUB_LAG       							 = "lag";
+    public static final String SUB_DEBUG                                 = "debug";
+    public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed";
+    public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
+    public static final String SUB_LAG                                   = "lag";
+    public static final String SUB_MAXHEIGHT                             = "maxheight";
+    public static final String SUB_MODEL                                 = "model";
+    public static final String SUB_MODSPRINT                             = "modsprint";
+    public static final String SUB_OVERRIDEFLAGS                         = "overrideflags";
+    public static final String SUB_VERTICALSPEED                         = "verticalspeed";
 
     // General.
     public static final String SAVEBACKCONFIG                            = "savebackconfig";
@@ -499,9 +504,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_CREATIVEFLY_CHECK                 = MOVING_CREATIVEFLY + "active";
     public static final String  MOVING_CREATIVEFLY_IGNORECREATIVE        = MOVING_CREATIVEFLY + "ignorecreative";
     public static final String  MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT     = MOVING_CREATIVEFLY + "ignoreallowflight";
-    public static final String  MOVING_CREATIVEFLY_HORIZONTALSPEED       = MOVING_CREATIVEFLY + "horizontalspeed";
-    public static final String  MOVING_CREATIVEFLY_MAXHEIGHT             = MOVING_CREATIVEFLY + "maxheight";
-    public static final String  MOVING_CREATIVEFLY_VERTICALSPEED         = MOVING_CREATIVEFLY + "verticalspeed";
+    public static final String  MOVING_CREATIVEFLY_MODEL                 = MOVING_CREATIVEFLY + SUB_MODEL + ".";
     public static final String  MOVING_CREATIVEFLY_ACTIONS               = MOVING_CREATIVEFLY + "actions";
 
     private static final String MOVING_MOREPACKETS                       = MOVING + "morepackets.";
@@ -656,6 +659,12 @@ public abstract class ConfPaths {
     public static final String LOGGING_DEBUG                             = "logging.debug";
     @Moved(newPath = NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE)
     public static final String  NET_FLYINGFREQUENCY_CANCELREDUNDANT      = "checks.net.flyingfrequency.cancelredundant";
+    @Moved(newPath = MOVING_CREATIVEFLY_MODEL + "creative." + SUB_HORIZONTALSPEED)
+    public static final String  MOVING_CREATIVEFLY_HORIZONTALSPEED       = "checks.moving.creativefly.horizontalspeed";
+    @Moved(newPath = MOVING_CREATIVEFLY_MODEL + "creative." + SUB_VERTICALSPEED)
+    public static final String  MOVING_CREATIVEFLY_VERTICALSPEED         = "checks.moving.creativefly.verticalspeed";
+    @Moved(newPath = MOVING_CREATIVEFLY_MODEL + "creative." + SUB_MAXHEIGHT)
+    public static final String  MOVING_CREATIVEFLY_MAXHEIGHT             = "checks.moving.creativefly.maxheight";
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
     @Deprecated

@@ -63,4 +63,26 @@ public class TestConfig {
         }
     }
 
+    @Test
+    public void testDefaults() {
+        ConfigFile defaults = new ConfigFile();
+        defaults.set("all", 1.0);
+        defaults.set("defaultsOnly", 1.0);
+        ConfigFile config = new ConfigFile();
+        config.setDefaults(defaults);
+        config.set("all", 2.0);
+        double val = config.getDouble("all", 3.0);
+        if (val != 2.0) {
+            fail("Expect 2.0 if set in config, got instead: " + val);
+        }
+        val = config.getDouble("defaultsOnly", 3.0);
+        if (val != 3.0) { // Pitty.
+            fail("Expect 3.0 (default argument), got instead: " + val);
+        }
+        val = config.getDouble("notset", 3.0);
+        if (val != 3.0) {
+            fail("Expect 3.0 (not set), got instead: " + val);
+        }
+    }
+
 }

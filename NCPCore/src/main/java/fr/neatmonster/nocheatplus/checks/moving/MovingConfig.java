@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -79,9 +80,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    ignoreAllowFlight;
 
     public final boolean    creativeFlyCheck;
-    public final int        creativeFlyHorizontalSpeed;
-    public final int        creativeFlyMaxHeight;
-    public final int        creativeFlyVerticalSpeed;
+    public final Map<GameMode, ModelFlying> flyingModels = new HashMap<GameMode, ModelFlying>();
     public final ActionList creativeFlyActions;
 
     public final boolean    morePacketsCheck;
@@ -181,9 +180,10 @@ public class MovingConfig extends ACheckConfig {
         ignoreAllowFlight = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
 
         creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
-        creativeFlyHorizontalSpeed = config.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
-        creativeFlyMaxHeight = config.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
-        creativeFlyVerticalSpeed = config.getInt(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED);
+        final ModelFlying defaultModel = new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying());
+        for (final GameMode gameMode : GameMode.values()) {
+            flyingModels.put(gameMode, new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + gameMode.toString().toLowerCase() + ".", defaultModel));
+        }
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
@@ -266,7 +266,6 @@ public class MovingConfig extends ACheckConfig {
         traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
 
     }
-
 
 
     /* (non-Javadoc)
