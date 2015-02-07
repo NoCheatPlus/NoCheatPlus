@@ -51,6 +51,8 @@ public class FlyingFrequency extends PacketAdapter {
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idNullPlayer = counters.registerKey("packet.flying.nullplayer");
+    private final int idHandled = counters.registerKey("packet.flying.handled");
+    private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
 
     private boolean cancelRedundant = true;
 
@@ -80,6 +82,8 @@ public class FlyingFrequency extends PacketAdapter {
             return;
         }
 
+        counters.add(idHandled, 1);
+
         final NetData data = dataFactory.getData(player);
         final long time =  Monotonic.millis();
         // Counting all packets.
@@ -91,11 +95,17 @@ public class FlyingFrequency extends PacketAdapter {
             return;
         }
 
-        // Cancel redundant packets, when frequency is high anyway.
-        if (cancelRedundant && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, event, allScore, time, data, cc) ) {
-            event.setCancelled(true);
+        if (event.isAsync()) {
+            // Count all asynchronous events.
+            counters.add(idAsyncFlying, 1);
+            // TODO: Detect game phase for the player and warn if it is PLAY.
         }
-
+        else {
+            // Cancel redundant packets, when frequency is high anyway.
+            if (cancelRedundant && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, event, allScore, time, data, cc)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     private boolean checkRedundantPackets(final Player player, final PacketEvent event, final float allScore, final long time, final NetData data, final NetConfig cc) {

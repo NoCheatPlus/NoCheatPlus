@@ -1,11 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.net;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 /**
  * Currently primary thread only!
@@ -14,7 +13,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
  */
 public class NetDataFactory implements CheckDataFactory {
 
-    private final HashMap<String, NetData> dataMap = new HashMap<String, NetData>();
+    private final LinkedHashMapCOW<String, NetData> dataMap = new LinkedHashMapCOW<String, NetData>();
 
     @Override
     public void removeAllData() {
