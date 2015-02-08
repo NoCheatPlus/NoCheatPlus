@@ -10,16 +10,6 @@
   
   <packaging>jar</packaging>
   
-  <repositories>
-    <repository>
-      <id>md_5-releases</id>
-      <url>http://repo.md-5.net/content/repositories/releases/</url>
-	</repository>
-	<repository>
-      <id>md_5-snapshots</id>
-      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-	</repository>
-  </repositories>
   <distributionManagement>
     <repository>
       <id>md_5-releases</id>

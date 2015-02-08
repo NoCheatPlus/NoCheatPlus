@@ -9,14 +9,6 @@
   
   <packaging>jar</packaging>
   
-  <repositories>
-    <repository>
-	    <id>bukkit</id>
-	    <name>Bukkit</name>
-	    <url>http://repo.bukkit.org/content/groups/public/</url>
-    </repository>
-  </repositories>
-  
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
