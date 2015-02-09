@@ -8,8 +8,12 @@ package fr.neatmonster.nocheatplus.utilities;
  */
 public class ActionFrequency {
 
-    /** Reference time for filling in. */
+    /** Reference time for the transition from the first to the second bucket. */
     private long time = 0;
+    /**
+     * Time of last update (add). Should be the "time of the last event" for the
+     * usual case.
+     */
     private long lastUpdate = 0;
     private final boolean noAutoReset;
 
@@ -45,7 +49,7 @@ public class ActionFrequency {
     }
 
     /**
-     * Update and add.
+     * Update and add (updates reference and update time).
      * @param now
      * @param amount
      */
@@ -63,7 +67,9 @@ public class ActionFrequency {
     }
 
     /**
-     * Update without adding, also updates time. Detects time running backwards.
+     * Update without adding, also updates reference and update time. Detects
+     * time running backwards.
+     * 
      * @param now
      */
     public final void update(final long now) {
@@ -99,6 +105,10 @@ public class ActionFrequency {
         lastUpdate = now;
     }
 
+    /**
+     * Clear all counts, reset reference and update time.
+     * @param now
+     */
     public final void clear(final long now) {
         for (int i = 0; i < buckets.length; i++) {
             buckets[i] = 0f;
@@ -189,7 +199,7 @@ public class ActionFrequency {
     }
 
     /**
-     * Set the reference time.
+     * Set the reference time and last update time.
      * @param time
      */
     public final void setTime(final long time) {
@@ -198,7 +208,7 @@ public class ActionFrequency {
     }
 
     /**
-     * Get reference time.
+     * Get the reference time for the transition from the first to the second bucket.
      * @return
      */
     public final long lastAccess() { // TODO: Should rename this.
@@ -206,7 +216,7 @@ public class ActionFrequency {
     }
     
     /**
-     * 
+     * Get the last time when update was called (adding).
      * @return
      */
     public final long lastUpdate() {
