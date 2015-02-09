@@ -23,6 +23,9 @@ public class NetConfig extends ACheckConfig {
     public final int flyingFrequencyRedundantSeconds;
     public final ActionList flyingFrequencyRedundantActions;
 
+    public final boolean keepAliveFrequencyActive;
+    public final ActionList keepAliveFrequencyActions;
+
     public final boolean soundDistanceActive;
     /** Maximum distance for lightning effects (squared). */
     public final double soundDistanceSq;
@@ -40,6 +43,9 @@ public class NetConfig extends ACheckConfig {
         // Same permission for "silent".
         flyingFrequencyRedundantActions = config.getOptimizedActionList(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS, Permissions.NET_FLYINGFREQUENCY);
 
+        keepAliveFrequencyActive = config.getBoolean(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE);
+        keepAliveFrequencyActions = config.getOptimizedActionList(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, Permissions.NET_KEEPALIVEFREQUENCY);
+
         soundDistanceActive = config.getBoolean(ConfPaths.NET_SOUNDDISTANCE_ACTIVE);
         double dist = config.getDouble(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE);
         soundDistanceSq = dist * dist;
@@ -53,6 +59,8 @@ public class NetConfig extends ACheckConfig {
                 return flyingFrequencyActive;
             case NET_SOUNDDISTANCE:
                 return soundDistanceActive;
+            case NET_KEEPALIVEFREQUENCY:
+                return keepAliveFrequencyActive;
             default:
                 return true;
         }

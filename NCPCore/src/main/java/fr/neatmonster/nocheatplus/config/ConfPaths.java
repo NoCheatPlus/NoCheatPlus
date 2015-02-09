@@ -600,10 +600,6 @@ public abstract class ConfPaths {
 
     public static final String  NET                                      = CHECKS + "net.";
 
-    private static final String NET_SOUNDDISTANCE                        = NET + "sounddistance.";
-    public static final String  NET_SOUNDDISTANCE_ACTIVE                 = NET_SOUNDDISTANCE + "active";
-    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE            = NET_SOUNDDISTANCE + "maxdistance";
-
     private static final String NET_FLYINGFREQUENCY                      = NET + "flyingfrequency.";
     public static final String  NET_FLYINGFREQUENCY_ACTIVE               = NET_FLYINGFREQUENCY + "active";
     @GlobalConfig
@@ -613,9 +609,17 @@ public abstract class ConfPaths {
     public static final String  NET_FLYINGFREQUENCY_ACTIONS              = NET_FLYINGFREQUENCY + "actions";
     private static final String NET_FLYINGFREQUENCY_REDUNDANT            = NET_FLYINGFREQUENCY + "reduceredundant.";
     public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE     = NET_FLYINGFREQUENCY_REDUNDANT + "active";
+    @GlobalConfig
     public static final String  NET_FLYINGFREQUENCY_REDUNDANT_SECONDS    = NET_FLYINGFREQUENCY_REDUNDANT + "seconds";
     public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS    = NET_FLYINGFREQUENCY_REDUNDANT + "actions";
 
+    private static final String NET_KEEPALIVEFREQUENCY                   = NET + "keepalivefrequency.";
+    public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE            = NET_KEEPALIVEFREQUENCY + "active";
+    public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS           = NET_KEEPALIVEFREQUENCY + "actions";
+
+    private static final String NET_SOUNDDISTANCE                        = NET + "sounddistance.";
+    public static final String  NET_SOUNDDISTANCE_ACTIVE                 = NET_SOUNDDISTANCE + "active";
+    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE            = NET_SOUNDDISTANCE + "maxdistance";
 
     public static final String  STRINGS                                  = "strings";
 

@@ -116,6 +116,7 @@ public class Permissions {
 
     public static final String  NET                          = CHECKS + ".net";
     public static final String  NET_FLYINGFREQUENCY          = NET + ".flyingfrequency";
+    public static final String  NET_KEEPALIVEFREQUENCY       = NET + ".keepalivefrequency";
 
     public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";

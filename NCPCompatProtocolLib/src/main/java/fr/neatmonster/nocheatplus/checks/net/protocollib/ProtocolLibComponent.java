@@ -19,6 +19,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -27,6 +28,9 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 public class ProtocolLibComponent implements DisableListener, INotifyReload {
+
+    // TODO: Static reference is problematic (needs a static and accessible Counters instance?). 
+    public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.flying.nullplayer");
 
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
@@ -39,6 +43,9 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
         // Register Classes having a constructor with Plugin as argument.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);
+        }
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE)) {
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveFrequency", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.SoundDistance", plugin);
@@ -91,7 +98,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
     @Override
     public void onReload() {
         unregister();
-        CheckType.NET.getDataFactory().removeAllData(); // Currently needed for FlyingFRequency.
+        CheckType.NET.getDataFactory().removeAllData(); // Currently needed for FlyingFrequency.
         register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // Store instead ?
     }
 

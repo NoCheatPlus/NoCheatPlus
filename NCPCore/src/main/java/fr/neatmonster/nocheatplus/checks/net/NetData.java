@@ -4,22 +4,31 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /**
- * Primary thread only.
+ * Data for net checks. Some data structures may not be thread-safe, but
+ * accessing each checks data individually respecting the sequence of events
+ * should work.
+ * 
  * @author asofold
  *
  */
 public class NetData extends ACheckData {
 
-    /** All flying packets, use Monotonic.millis() for time. */
+    /** All flying packets, use System.currentTimeMillis() for time. */
     public final ActionFrequency flyingFrequencyAll;
     public boolean flyingFrequencyOnGround = false;
     public long flyingFrequencyTimeOnGround = 0L;
     public long flyingFrequencyTimeNotOnGround = 0L;
     /**
      * Monitors redundant packets, when more than 20 packets per second are
-     * sent. Use Monotonic.millis() for time.
+     * sent. Use System.currentTimeMillis() for time.
      */
     public final ActionFrequency flyingFrequencyRedundantFreq;
+
+    /**
+     * Last 20 seconds keep alive packets counting. Use lastUpdate() for the
+     * time of the last event. System.currentTimeMillis() is used.
+     */
+    public ActionFrequency keepAliveFreq = new ActionFrequency(20, 1000);
 
     public NetData(final NetConfig config) {
         super(config);

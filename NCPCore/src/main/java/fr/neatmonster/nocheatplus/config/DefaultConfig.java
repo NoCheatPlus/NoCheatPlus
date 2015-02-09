@@ -447,6 +447,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_SECONDS, 3);
         set(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS, "cancel"); // TODO: Log actions.
 
+        // KeepAliveFrequency
+        set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE, true);
+        set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, "cancel vl>10 cancel log:keepalive:0:10:if vl>40 cancel log:keepalive:0:10:icf vl>100 cancel log:keepalive:0:10:icf cmd:kickalive");
+
         // SoundDistance
         set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true);
         set(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE, 320);
@@ -493,7 +497,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
+        set(ConfPaths.STRINGS + ".keepalive", start + "spams keep-alive packets (god/freecam?)" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".kickalive", "ncp kick [player] Too many keep-alive packets.");
         set(ConfPaths.STRINGS + ".kickbedleave", "ncp delay ncp kick [player] Go find a bed!");
         set(ConfPaths.STRINGS + ".kickbspeed", "ncp kick [player] You interacted too fast!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");

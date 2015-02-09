@@ -7,7 +7,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
@@ -16,12 +15,8 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
-import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
-import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.stats.Counters;
-import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
@@ -32,7 +27,7 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * @author dev1mc
  *
  */
-public class FlyingFrequency extends PacketAdapter {
+public class FlyingFrequency extends BaseAdapter {
 
     // Setup for flying packets.
     public static final int numBooleans = 3;
@@ -44,40 +39,31 @@ public class FlyingFrequency extends PacketAdapter {
     public static final double minMoveDistSq = 1f / 256; // PlayerConnection magic.
     public static final float minLookChange = 10f;
 
-    /** Dummy check to access hasBypass for FlyingFrequency. */
-    private final Check frequency = new Check(CheckType.NET_FLYINGFREQUENCY) {
-        // Dummy check to access hasBypass.
-    };
+    /** Dummy check for bypass checking and actions execution. */
+    private final Check frequency = new Check(CheckType.NET_FLYINGFREQUENCY) {};
 
-    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idNullPlayer = counters.registerKey("packet.flying.nullplayer");
     private final int idHandled = counters.registerKey("packet.flying.handled");
     private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
 
     private boolean cancelRedundant = true;
 
-    private final NetConfigCache configs;
-    private final NetDataFactory dataFactory;
-
     public FlyingFrequency(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
-        super(plugin, ListenerPriority.LOW, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
-        this.configs = (NetConfigCache) CheckType.NET.getConfigFactory();
-        this.dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
+        super(plugin, ListenerPriority.LOW, PacketType.Play.Client.FLYING);
     }
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
-
+        final long time =  System.currentTimeMillis();
         final Player player = event.getPlayer();
         if (player == null) {
             // TODO: Need config?
-            counters.add(idNullPlayer, 1);
+            counters.add(ProtocolLibComponent.idNullPlayer, 1);
             event.setCancelled(true);
             return;
         }
 
-        final NetConfig cc = configs.getConfig(player.getWorld());
+        final NetConfig cc = configFactory.getConfig(player.getWorld());
         if (!cc.flyingFrequencyActive) {
             return;
         }
@@ -85,7 +71,7 @@ public class FlyingFrequency extends PacketAdapter {
         counters.add(idHandled, 1);
 
         final NetData data = dataFactory.getData(player);
-        final long time =  Monotonic.millis();
+        
         // Counting all packets.
         // TODO: Consider using the NetStatic check.
         data.flyingFrequencyAll.add(time, 1f);
@@ -141,7 +127,7 @@ public class FlyingFrequency extends PacketAdapter {
                 lastTime = data.flyingFrequencyTimeNotOnGround;
                 data.flyingFrequencyTimeNotOnGround = time;
             }
-            if (time - lastTime > 1000) {
+            if (time < lastTime || time - lastTime > 1000) {
                 // Override 
                 onGroundSkip = true;
             }

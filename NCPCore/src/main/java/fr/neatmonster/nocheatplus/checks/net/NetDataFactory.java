@@ -7,7 +7,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 /**
- * Currently primary thread only!
+ * Copy on write, right now.
  * @author asofold
  *
  */
