@@ -35,7 +35,7 @@ public class CheckUtils {
         long ref = Long.MIN_VALUE;
         // Estimate last fight action time (important for gode modes).
         final FightData fData = FightData.getData(player); 
-        ref = Math.max(ref, fData.speedBuckets.lastAccess());
+        ref = Math.max(ref, fData.speedBuckets.lastUpdate());
         ref = Math.max(ref, now - 50L * (tick - fData.lastAttackTick)); // Ignore lag.
         // Health regain (not unimportant).
         ref = Math.max(ref, fData.regainHealthTime);
@@ -47,7 +47,7 @@ public class CheckUtils {
         ref = Math.max(ref, iData.instantEatInteract);
         // BlcokBreak/interact.
         final BlockBreakData bbData = BlockBreakData.getData(player);
-        ref = Math.max(ref, bbData.frequencyBuckets.lastAccess());
+        ref = Math.max(ref, bbData.frequencyBuckets.lastUpdate());
         ref = Math.max(ref, bbData.fastBreakfirstDamage);
         // TODO: More, less ...
         if (ref > now || ref < now - maxAge){

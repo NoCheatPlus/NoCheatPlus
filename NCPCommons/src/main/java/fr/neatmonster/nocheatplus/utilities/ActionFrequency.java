@@ -24,23 +24,28 @@ public class ActionFrequency {
      */
     private final float[] buckets;
 
-    /** Duration in milliseconds that oe bucket covers. */
+    /** Duration in milliseconds that one bucket covers. */
     private final long durBucket;
-    
+
     /**
-     * This constructor will set noAutoReset to false, optimized for short term accounting.
+     * This constructor will set noAutoReset to false, optimized for short term
+     * accounting.
+     * 
      * @param nBuckets
      * @param durBucket
      */
     public ActionFrequency(final int nBuckets, final long durBucket) {
         this(nBuckets, durBucket, false);
     }
-    
+
     /**
      * 
      * @param nBuckets
      * @param durBucket
-     * @param noAutoReset Set to true, to prevent auto-resetting with "time ran backwards".
+     * @param noAutoReset
+     *            Set to true, to prevent auto-resetting with
+     *            "time ran backwards". Setting this to true is recommended if
+     *            larger time frames are monitored, to prevent data loss.
      */
     public ActionFrequency(final int nBuckets, final long durBucket, final boolean noAutoReset) {
         this.buckets = new float[nBuckets];
@@ -75,10 +80,12 @@ public class ActionFrequency {
     public final void update(final long now) {
         final long diff = now - time;
         if (now < lastUpdate) {
-            // Clear (beyond range).
+            // Time ran backwards.
             if (noAutoReset) {
+                // Only update time and lastUpdate.
                 time = lastUpdate = now;
             } else {
+                // Clear all.
                 clear(now);
                 return;
             }
@@ -89,19 +96,21 @@ public class ActionFrequency {
             return;
         }
         else if (diff < durBucket) {
-            // No update (first bucket).
-            return; 
+            // No changes (first bucket).
         }
-        final int shift = (int) ((float) diff / (float) durBucket);
-        // Update buckets.
-        for (int i = 0; i < buckets.length - shift; i++) {
-            buckets[buckets.length - (i + 1)] = buckets[buckets.length - (i + 1 + shift)];
+        else {
+            final int shift = (int) ((float) diff / (float) durBucket);
+            // Update buckets.
+            for (int i = 0; i < buckets.length - shift; i++) {
+                buckets[buckets.length - (i + 1)] = buckets[buckets.length - (i + 1 + shift)];
+            }
+            for (int i = 0; i < shift; i++) {
+                buckets[i] = 0;
+            }
+            // Set time according to bucket duration (!).
+            time += durBucket * shift;
         }
-        for (int i = 0; i < shift; i++) {
-            buckets[i] = 0;
-        }
-        // Set time according to bucket duration (!).
-        time += durBucket * shift;
+        // Ensure lastUpdate is set.
         lastUpdate = now;
     }
 
@@ -214,7 +223,7 @@ public class ActionFrequency {
     public final long lastAccess() { // TODO: Should rename this.
         return time;
     }
-    
+
     /**
      * Get the last time when update was called (adding).
      * @return
