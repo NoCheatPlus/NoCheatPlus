@@ -42,9 +42,11 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
         StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
         // Register Classes having a constructor with Plugin as argument.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
+            // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);
         }
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE)) {
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE) || ConfigManager.isTrueForAnyConfig(ConfPaths.FIGHT_GODMODE_CHECK)) {
+            // (Set lastKeepAlive if this or fight.godmode is enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveFrequency", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {

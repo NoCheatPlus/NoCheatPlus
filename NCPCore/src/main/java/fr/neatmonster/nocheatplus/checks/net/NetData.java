@@ -29,6 +29,10 @@ public class NetData extends ACheckData {
      * time of the last event. System.currentTimeMillis() is used.
      */
     public ActionFrequency keepAliveFreq = new ActionFrequency(20, 1000);
+    
+    // Shared.
+    /** Last time some action was received (keep alive or flying). Also maintained for fight.godmode. */
+    public long lastKeepAliveTime = 0L;
 
     public NetData(final NetConfig config) {
         super(config);

@@ -1310,6 +1310,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
+    public boolean hasFeatureTag(final String key, final String feature) {
+        final Collection<String>  features = this.featureTags.get(key);
+        return features == null ? false : features.contains(feature);
+    }
+
+    @Override
     public Map<String, Set<String>> getAllFeatureTags() {
         final LinkedHashMap<String, Set<String>> allTags = new LinkedHashMap<String, Set<String>>();
         for (final Entry<String, LinkedHashSet<String>> entry : this.featureTags.entrySet()) {

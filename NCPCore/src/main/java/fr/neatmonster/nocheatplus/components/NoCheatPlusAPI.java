@@ -53,6 +53,14 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
     public void setFeatureTags(String key, Collection<String> featureTags);
 
     /**
+     * Test if an entry has been made.
+     * @param key
+     * @param feature
+     * @return
+     */
+    public boolean hasFeatureTag(String key, String feature);
+
+    /**
      * Get a map with all feature tags that have been set.
      * @return
      */

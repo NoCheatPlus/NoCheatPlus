@@ -12,6 +12,13 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 
+/**
+ * Limit keep alive packet frequency, set lastKeepAliveTime (even if disabled,
+ * in case fight.godmode is enabled).
+ * 
+ * @author asofold
+ *
+ */
 public class KeepAliveFrequency extends BaseAdapter {
 
     /** Dummy check for bypass checking and actions execution. */
@@ -30,15 +37,17 @@ public class KeepAliveFrequency extends BaseAdapter {
             event.setCancelled(true);
             return;
         }
+        // Always update last received time.
+        final NetData data = dataFactory.getData(player);
+        data.lastKeepAliveTime = time;
+        // Check activation.
         final NetConfig cc = configFactory.getConfig(player);
         if (!cc.keepAliveFrequencyActive) {
             return;
         }
-        final NetData data = dataFactory.getData(player);
         // TODO: Better modeling of actual packet sequences (flying vs. keep alive vs. request/ping).
-        // TODO: Better integration wih god-mode check / trigger reset ndt.
+        // TODO: Better integration with god-mode check / trigger reset ndt.
         data.keepAliveFreq.add(time, 1f);
-        // Use last time accepted as a hard reference.
         final float first = data.keepAliveFreq.bucketScore(0);
         if (first > 1f && !check.hasBypass(player)) {
             // Trigger a violation.

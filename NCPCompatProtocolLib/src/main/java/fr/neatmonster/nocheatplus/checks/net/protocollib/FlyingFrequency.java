@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Prevent extremely fast ticking by just sending packets that don't do anything
- * new and also don't trigger moving events in CraftBukkit.
+ * new and also don't trigger moving events in CraftBukkit. Also update lastKeepAliveTime.
  * 
  * @author dev1mc
  *
@@ -71,6 +71,7 @@ public class FlyingFrequency extends BaseAdapter {
         counters.add(idHandled, 1);
 
         final NetData data = dataFactory.getData(player);
+        data.lastKeepAliveTime = time; // Update without much of a contract.
         
         // Counting all packets.
         // TODO: Consider using the NetStatic check.

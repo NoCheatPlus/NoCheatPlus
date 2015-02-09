@@ -134,6 +134,10 @@ public class PluginTests {
             throw new UnsupportedOperationException();
         }
 
+        @Override
+        public boolean hasFeatureTag(String key, String feature) {
+            throw new UnsupportedOperationException();
+        }
 
     }
 
