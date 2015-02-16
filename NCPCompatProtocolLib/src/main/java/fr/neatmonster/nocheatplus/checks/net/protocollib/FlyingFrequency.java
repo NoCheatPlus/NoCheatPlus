@@ -49,7 +49,13 @@ public class FlyingFrequency extends BaseAdapter {
 
     public FlyingFrequency(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
-        super(plugin, ListenerPriority.LOW, PacketType.Play.Client.FLYING);
+        super(plugin, ListenerPriority.LOW, new PacketType[] {
+                PacketType.Play.Client.FLYING,
+                // TODO: What with the other packets (specifically on player-join, compare PlayerMoveEvent)?
+//                PacketType.Play.Client.LOOK,
+//                PacketType.Play.Client.POSITION,
+//                PacketType.Play.Client.POSITION_LOOK
+                });
     }
 
     @Override
