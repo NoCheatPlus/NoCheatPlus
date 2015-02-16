@@ -31,7 +31,9 @@ public class NetConfig extends ACheckConfig {
     public final double soundDistanceSq;
 
     public NetConfig(final ConfigFile config) {
-        super(config, ConfPaths.NET);
+        super(config, ConfPaths.NET, new String[] {
+            Permissions.NET_FLYINGFREQUENCY, Permissions.NET_KEEPALIVEFREQUENCY
+            });
 
         final ConfigFile globalConfig = ConfigManager.getConfigFile();
         flyingFrequencyActive = config.getBoolean(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE);
