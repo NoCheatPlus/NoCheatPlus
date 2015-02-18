@@ -148,7 +148,7 @@ public abstract class Check implements MCAccessHolder {
             return true;
         }
         // TODO: ExemptionManager relies on initial setup (problematic).
-        return !NCPExemptionManager.isExempted(player, type);
+        return NCPExemptionManager.isExempted(player, type);
     }
 
     @Override
