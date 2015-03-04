@@ -48,9 +48,19 @@ public class Angle extends Check {
         	}
         }
 
+        long currentTimeMillis = System.currentTimeMillis();
+
+        //Check if something exists for the current time
+        if(data.angleHits.containsKey(currentTimeMillis)) {
+            //We already have a hit this millisecond so we're going to force a violation
+            data.angleHits.put(currentTimeMillis, player.getLocation()); // This needs to be a copy at present.
+            data.angleVL += 50;
+            return executeActions(player, data.angleVL, 50, cc.angleActions);
+        }
+
         // Add the new location to the map.
         // TODO: Alter method to store something less fat.
-        data.angleHits.put(System.currentTimeMillis(), player.getLocation()); // This needs to be a copy at present.
+        data.angleHits.put(currentTimeMillis, player.getLocation()); // This needs to be a copy at present.
 
         // Not enough data to calculate deltas.
         if (data.angleHits.size() < 2)
