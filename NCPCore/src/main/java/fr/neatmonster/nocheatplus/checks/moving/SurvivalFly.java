@@ -644,11 +644,11 @@ public class SurvivalFly extends Check {
      */
     private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: Confine by max y distance and max/min xz-distance?
-        if (yDistance >= -0.5 && yDistance <= 0.52 + data.jumpAmplifier * 0.2) {
+        if (yDistance >= -0.5 && yDistance <= 0.594 + data.jumpAmplifier * 0.2) {
             // "Mild" Ascending / descending.
             // Stairs.
             // TODO: More safety guards.
-            if (from.isAboveStairs()) {
+            if (yDistance <= 0.52 + data.jumpAmplifier * 0.2 && from.isAboveStairs()) {
                 applyLostGround(player, from, true, data, "stairs");
                 return true;
             }
@@ -1151,8 +1151,8 @@ public class SurvivalFly extends Check {
         final double setBackYDistance = to.getY() - data.getSetBackY();
 
         // Half block step up.
-        if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.2 * data.jumpAmplifier && to.isOnGround()) {
-            if (data.sfLastYDist < 0.0 || from.isOnGround(0.5 - Math.abs(yDistance))) {
+        if (yDistance <= (sprinting ? 0.594 : 0.5) && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.2 * data.jumpAmplifier && to.isOnGround()) {
+            if (data.sfLastYDist < 0.0 || yDistance <= 0.5 && from.isOnGround(0.5 - Math.abs(yDistance))) {
                 return applyLostGround(player, from, true, data, "step");
             }
         }
