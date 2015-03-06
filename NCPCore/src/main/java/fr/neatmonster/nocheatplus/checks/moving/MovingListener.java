@@ -796,7 +796,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 final Location ref = player.getVehicle().getLocation(useLoc);
                 mData.resetPositions(ref);
                 useLoc.setWorld(null);
-                mData.updateTrace(player, ref, time);
+                MovingData.getData(player).updateTrace(player, to, time);
             }
             else if (!fromWorldName.equals(toWorldName)) {
                 mData.resetPositions(to);
