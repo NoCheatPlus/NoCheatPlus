@@ -339,7 +339,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
         final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
 
-        final long traceOldest = tick; // - damagedTrace.getMaxSize(); // TODO: Set by window.
+        final long traceOldest = tick - 15; // - damagedTrace.getMaxSize(); // TODO: Set by window.
         // TODO: Iterating direction, which, static/dynamic choice.
         final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
 
