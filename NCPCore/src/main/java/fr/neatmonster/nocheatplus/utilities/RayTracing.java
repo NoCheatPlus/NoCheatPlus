@@ -21,6 +21,9 @@ public abstract class RayTracing {
     /** Current block. */
     protected int blockX, blockY, blockZ;
 
+    /** End block. */
+    protected int endBlockX, endBlockY, endBlockZ;
+
     /** Offset within current block. */
     protected double oX, oY, oZ;
 
@@ -67,6 +70,9 @@ public abstract class RayTracing {
         blockX = Location.locToBlock(x0);
         blockY = Location.locToBlock(y0);
         blockZ = Location.locToBlock(z0);
+        endBlockX = Location.locToBlock(x1);
+        endBlockY = Location.locToBlock(y1);
+        endBlockZ = Location.locToBlock(z1);
         oX = (double) (x0 - blockX);
         oY = (double) (y0 - blockY);
         oZ = (double) (z0 - blockZ);
@@ -74,11 +80,11 @@ public abstract class RayTracing {
         step = 0;
     }
 
-    private static final double tDiff(final double dTotal, final double offset){
+    private static final double tDiff(final double dTotal, final double offset, final int block, final int endBlock){
         if (dTotal > 0.0){
             if (offset >= 1.0) {
                 // Static block change (e.g. diagonal move).
-                return 0.0;
+                return block == endBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return (1.0 - offset) / dTotal; 
             }
@@ -86,7 +92,7 @@ public abstract class RayTracing {
         else if (dTotal < 0.0){
             if (offset <= 0.0) {
                 // Static block change (e.g. diagonal move).
-                return 0.0;
+                return block == endBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return offset / -dTotal;
             }
@@ -107,9 +113,9 @@ public abstract class RayTracing {
         boolean changed;
         while (1.0 - t > tol){
             // Determine smallest time to block edge.
-            tX = tDiff(dX, oX);
-            tY = tDiff(dY, oY);
-            tZ = tDiff(dZ, oZ);
+            tX = tDiff(dX, oX, blockX, endBlockX);
+            tY = tDiff(dY, oY, blockY, endBlockY);
+            tZ = tDiff(dZ, oZ, blockZ, endBlockZ);
             tMin = Math.min(tX,  Math.min(tY, tZ));
             if (tMin == Double.MAX_VALUE) {
                 // All differences are 0 (no progress).
@@ -186,6 +192,7 @@ public abstract class RayTracing {
                 break;
             }
         }
+        // TODO: Catch special case with going beyond coordinates.
     }
 
     /**

@@ -14,6 +14,8 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 public class TestRayTracing {
 
+    // TODO: Add a test that fails if going beyond target block coordinate.
+
     protected static final Random random = new Random(System.nanoTime() + 13391);
 
     protected static double maxFactor = 9.0;
@@ -90,9 +92,9 @@ public class TestRayTracing {
                 step = 0;
             }
 
-//            private boolean ignEdge(double offset, double dTotal){
-//                return offset == 1 && dTotal > 0 || offset == 0 && dTotal < 0;
-//            }
+            //            private boolean ignEdge(double offset, double dTotal){
+            //                return offset == 1 && dTotal > 0 || offset == 0 && dTotal < 0;
+            //            }
 
             @Override
             protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
@@ -102,13 +104,13 @@ public class TestRayTracing {
                 if (dT < 0.0){
                     doFail("dT < 0 at t = " + StringUtil.fdec3.format(t), coords);
                 }
-                
+
                 // TODO: Check if this check makes sense at all (dT=0 happens during multi-transitions.)l.
-//                if (dT == 0.0 && 1.0 - (t + dT) > tol){
-//                    if (!ignEdge(oX, dX) && !ignEdge(oY, dY) && !ignEdge(oZ, dZ)){
-//                        doFail("Premature dT = 0 at t = " + StringUtil.fdec3.format(t), coords);
-//                    }
-//                }
+                //                if (dT == 0.0 && 1.0 - (t + dT) > tol){
+                //                    if (!ignEdge(oX, dX) && !ignEdge(oY, dY) && !ignEdge(oZ, dZ)){
+                //                        doFail("Premature dT = 0 at t = " + StringUtil.fdec3.format(t), coords);
+                //                    }
+                //                }
 
                 checkOffset(oX, "x");
                 checkOffset(oY, "y");
