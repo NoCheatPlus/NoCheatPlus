@@ -51,7 +51,7 @@ public class NoFall extends Check {
         //        final int nfD = getDamage(data.noFallFallDistance);
         //        final int yD = getDamage((float) (data.noFallMaxY - y));
         //        final int maxD = Math.max(Math.max(pD, nfD), yD);
-        final double maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
+        final double maxD = estimateDamage(player, y, data);
         if (maxD >= 1.0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
@@ -63,6 +63,17 @@ public class NoFall extends Check {
             dealFallDamage(player, maxD);
         }
         else data.clearNoFallData();
+    }
+
+    /**
+     * Convenience method to estimate fall damage at a certain y-level, checking data and mc-fall-distance.
+     * @param player
+     * @param y
+     * @param data
+     * @return
+     */
+    public double estimateDamage(final Player player, final double y, final MovingData data) {
+        return getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
     }
 
     private final void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
@@ -91,7 +102,7 @@ public class NoFall extends Check {
                 mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
             }
         }
-        
+
         // TODO: let this be done by the damage event (!).
         //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
         player.setFallDistance(0);
@@ -249,7 +260,7 @@ public class NoFall extends Check {
         // Deal damage.
         handleOnGround(player, y, false, data, cc);
     }
-    
+
     /**
      * Convenience method bypassing the factories.
      * @param player

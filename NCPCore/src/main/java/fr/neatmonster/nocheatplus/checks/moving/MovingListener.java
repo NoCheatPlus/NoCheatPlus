@@ -563,7 +563,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             else{
                 if (checkNf && cc.sfFallDamage) {
-                    if (mightSkipNoFall) {
+                    if (noFall.estimateDamage(player, from.getY(), data) < 1.0) {
+                        // TODO: Consider making this / damage amount configurable.
+                        mightSkipNoFall = true;
+                    }
+                    else if (mightSkipNoFall) {
                         // Check if to really skip.
                         if (!pFrom.isOnGround() && !pFrom.isResetCond()) {
                             mightSkipNoFall = false;
