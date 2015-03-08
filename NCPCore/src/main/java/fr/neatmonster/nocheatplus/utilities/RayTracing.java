@@ -39,11 +39,11 @@ public abstract class RayTracing {
     /** Maximum steps that will be done. */
     private int maxSteps = Integer.MAX_VALUE;
 
-    public RayTracing(double x0, double y0, double z0, double x1, double y1, double z1){
+    public RayTracing(double x0, double y0, double z0, double x1, double y1, double z1) {
         set(x0, y0, z0, x1, y1, z1);
     }
 
-    public RayTracing(){
+    public RayTracing() {
         set(0, 0, 0, 0, 0, 0);
     }
 
@@ -56,7 +56,7 @@ public abstract class RayTracing {
      * @param y1
      * @param z1
      */
-    public void set(double x0, double y0, double z0, double x1, double y1, double z1){
+    public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
         //		this.x0 = x0;
         //		this.y0 = y0;
         //		this.z0 = z0;
@@ -80,24 +80,24 @@ public abstract class RayTracing {
         step = 0;
     }
 
-    private static final double tDiff(final double dTotal, final double offset, final int block, final int endBlock){
-        if (dTotal > 0.0){
+    private static final double tDiff(final double dTotal, final double offset, final int block, final int endBlock) {
+        if (dTotal > 0.0) {
             if (offset >= 1.0) {
                 // Static block change (e.g. diagonal move).
-                return block == endBlock ? Double.MAX_VALUE : 0.0;
+                return 0.0; // block == endBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return (1.0 - offset) / dTotal; 
             }
         }
-        else if (dTotal < 0.0){
+        else if (dTotal < 0.0) {
             if (offset <= 0.0) {
                 // Static block change (e.g. diagonal move).
-                return block == endBlock ? Double.MAX_VALUE : 0.0;
+                return 0.0; //block == endBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return offset / -dTotal;
             }
         }
-        else{
+        else {
             return Double.MAX_VALUE;
         }
     }
@@ -105,13 +105,13 @@ public abstract class RayTracing {
     /**
      * Loop through blocks.
      */
-    public void loop(){
+    public void loop() {
         // TODO: Might intercept 0 dist ?
 
         // Time to block edge.
         double tX, tY, tZ, tMin;
         boolean changed;
-        while (1.0 - t > tol){
+        while (1.0 - t > tol) {
             // Determine smallest time to block edge.
             tX = tDiff(dX, oX, blockX, endBlockX);
             tY = tDiff(dY, oY, blockY, endBlockY);
@@ -135,7 +135,7 @@ public abstract class RayTracing {
             if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) {
                 break;
             }
-            if (t + tMin >= 1.0 - tol) {
+            if (t + tMin >= 1.0 - tol) { // && isEndBlock()) {
                 break;
             }
             // Advance (add to t etc.).
@@ -145,13 +145,13 @@ public abstract class RayTracing {
             oZ = Math.min(1.0, Math.max(0.0, oZ + tMin * dZ));
             // TODO: Consider Heuristic change of the checking order for dy > 0 vs. dy < 0. 
             // x
-            if (tX == tMin){
-                if (dX < 0){
+            if (tX == tMin && blockX != endBlockX) {
+                if (dX < 0) {
                     oX = 1.0;
                     blockX --;
                     changed = true;
                 }
-                else if (dX > 0){
+                else if (dX > 0) {
                     oX = 0.0;
                     blockX ++;
                     changed = true;
@@ -159,13 +159,13 @@ public abstract class RayTracing {
             }
             if (!changed) {
                 // y
-                if (tY == tMin){
-                    if (dY < 0){
+                if (tY == tMin && blockY != endBlockY) {
+                    if (dY < 0) {
                         oY = 1.0;
                         blockY --;
                         changed = true;
                     }
-                    else if (dY > 0){
+                    else if (dY > 0) {
                         oY = 0.0;
                         blockY ++;
                         changed = true;
@@ -173,13 +173,13 @@ public abstract class RayTracing {
                 }
                 if (!changed) {
                     // z
-                    if (tZ == tMin){
-                        if (dZ < 0){
+                    if (tZ == tMin && blockZ != endBlockZ) {
+                        if (dZ < 0) {
                             oZ = 1.0;
                             blockZ --;
                             changed = true;
                         }
-                        else if (dZ > 0){
+                        else if (dZ > 0) {
                             oZ = 0.0;
                             blockZ ++;
                             changed = true;
@@ -188,7 +188,7 @@ public abstract class RayTracing {
                 }
             }
             t += tMin;
-            if (!changed || step >= maxSteps){
+            if (!changed || step >= maxSteps) {
                 break;
             }
         }
@@ -203,6 +203,10 @@ public abstract class RayTracing {
         return false;
     }
 
+    public boolean isEndBlock() {
+        return blockX == endBlockX && blockY == endBlockY && blockZ == endBlockZ;
+    }
+
     /**
      * This is for external use. The field step will be incremented before
      * step(...) is called, thus checking it from within step means to get the
@@ -210,7 +214,7 @@ public abstract class RayTracing {
      * 
      * @return
      */
-    public int getStepsDone(){
+    public int getStepsDone() {
         return step;
     }
 
