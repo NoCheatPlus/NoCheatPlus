@@ -234,12 +234,15 @@ public class TestRayTracing {
                 {7.388348424961977, -8.000000029346532, -2.5365675909347507  ,  2.17126848312847, 3.236994108042559, -8.423292642985071},
                 {7.525633617461991, 2.654408573114717, 3.5119744782127893  ,  9.99999995904821, 9.599753890871172, 6.721727939686946},
                 {1.1, 1.1, 1.1  ,  1.3, 1.3, 1.3},
-                {1.3, 1.3, 1.3  ,  1.1, 1.1, 1.1},
                 {1.1, 1.1, 1.1  ,  1.1, 1.1, 1.1},
                 {-6.0, -4.0, -3.0  ,  -4.0, -3.0, -2.0},
                 {-3.0, 3.0, -6.0  ,  2.0, -3.0, 4.0},
         }) {
             checkConsistency(coords);
+            // Test reversed.
+            if (coords[0] != coords[3] || coords[1] != coords[4] || coords[2] != coords[5]) {
+                checkConsistency(new double[] {coords[3], coords [4], coords[5], coords[0], coords[1], coords[2]});
+            }
         }
 
         final boolean e = BuildParameters.testLevel > 0;
@@ -285,8 +288,10 @@ public class TestRayTracing {
      * 
      * @param rt
      * @param setups Array of Arrays of 6 doubles as argument for RayTracing.set(...).
+     * @param expectCollide
+     * @param expectNotCollide
      * @param stepsManhattan
-     * @return Int array of size 2: {not colliding, colliding}
+     * @param testReversed
      */
     public static void runCoordinates(RayTracing rt, double[][] setups, boolean expectCollide, boolean expectNotCollide, double stepsManhattan, boolean testReversed) {
         for (int i = 0; i < setups.length; i++) {
