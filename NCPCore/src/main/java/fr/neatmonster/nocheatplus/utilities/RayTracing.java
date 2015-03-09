@@ -18,7 +18,7 @@ public abstract class RayTracing {
     /** Distance per axis. */
     protected double dX, dY, dZ;
 
-    /** Current block. */
+    /** Current block, step always has been or is called with these. */
     protected int blockX, blockY, blockZ;
 
     /** End block. */
@@ -43,9 +43,6 @@ public abstract class RayTracing {
 
     /** If to call stepSecondary at all (secondary transitions).*/
     protected boolean secondaryStep = true;
-
-    /** If to pass secondary transitions if ANY sub-call succeeds. */
-    protected boolean secondaryPassSingular = false;
 
     /** Maximum steps that will be done. */
     private int maxSteps = Integer.MAX_VALUE;
@@ -134,10 +131,13 @@ public abstract class RayTracing {
         boolean transX, transY, transZ;
 
         // Actual loop.
-        // TODO: Fix last transition not taken sometimes (with "off by x-th digit" or "t=0 transition").
+        /*
+         * TODO: Fix last transition not taken sometimes (with
+         * "off by x-th digit" or "t=0 transition"). Consider correcting t on
+         * base of the block coordinates in use.
+         */
         while (1.0 - t > tol) {
             // Determine smallest time to block edge, per axis.
-            // TODO: if all coords are in the  end block: ensure the full distance is taken towards the end coordinate.
             tX = tDiff(dX, oX, blockX == endBlockX);
             tY = tDiff(dY, oY, blockY == endBlockY);
             tZ = tDiff(dZ, oZ, blockZ == endBlockZ);
@@ -155,6 +155,7 @@ public abstract class RayTracing {
             }
             if (t + tMin > 1.0) {
                 // Set to the remaining distance (does trigger).
+                // TODO: Inaccurate t can mean iterating too short.
                 tMin = 1.0 - t;
             }
 
@@ -261,7 +262,7 @@ public abstract class RayTracing {
     }
 
     /**
-     * 
+     * Handle all secondary transitions (incomplete transitions).
      * @param transitions
      * @param transX
      * @param transY
@@ -272,49 +273,34 @@ public abstract class RayTracing {
     protected boolean handleSecondaryTransitions(final int transitions, final boolean transX, final boolean transY, final boolean transZ, final double tMin) {
         // Handle one transition.
         if (transX) {
-            if (step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ, dX > 0 ? 0.0 : 1.0, oY, oZ, 0.0, false)) {
-                if (secondaryPassSingular) {
-                    return true;
-                }
-            }
-            else if (!secondaryPassSingular) {
+            if (!step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ, dX > 0 ? 0.0 : 1.0, oY, oZ, 0.0, false)) {
                 return false;
             }
         }
         if (transY) {
-            if (step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ, oX, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
-                if (secondaryPassSingular) {
-                    return true;
-                }
-            }
-            else if (!secondaryPassSingular) {
+            if (!step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ, oX, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
                 return false;
             }
         }
         if (transZ) {
-            if (step(blockX, blockY, blockZ + (dZ > 0 ? 1 : -1), oX, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
-                if (secondaryPassSingular) {
-                    return true;
-                }
-            }
-            else if (!secondaryPassSingular) {
+            if (!step(blockX, blockY, blockZ + (dZ > 0 ? 1 : -1), oX, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
                 return false;
             }
         }
 
-        // Handle two transitions.
+        // Handle double-transitions.
         if (transitions == 3) {
             if (!handleSecondaryDoubleTransitions(transitions, transX, transY, transZ, tMin)) {
                 return false; 
             }
         }
 
-        // If secondaryPassSingular is true, all returned false, otherwise none returned false.
-        return !secondaryPassSingular;
+        // All passed.
+        return true;
     }
 
     /**
-     * 
+     * Handle secondary transitions with 2 axes at once (incomplete transitions).
      * @param transitions
      * @param transX
      * @param transY
@@ -325,34 +311,19 @@ public abstract class RayTracing {
     protected boolean handleSecondaryDoubleTransitions(final int transitions, final boolean transX, final boolean transY, final boolean transZ, final double tMin) {
         // Two transitions at once, thus step directly.
         // X and Y.
-        if (step(blockX + (dX > 0 ? 1 : -1), blockY + (dY > 0 ? 1 : -1), blockZ, dX > 0 ? 0.0 : 1.0, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
-            if (secondaryPassSingular) {
-                return true;
-            }
-        }
-        else if (!secondaryPassSingular) {
+        if (!step(blockX + (dX > 0 ? 1 : -1), blockY + (dY > 0 ? 1 : -1), blockZ, dX > 0 ? 0.0 : 1.0, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
             return false;
         }
         // X and Z.
-        if (step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ + (dZ > 0 ? 1 : -1), dX > 0 ? 0.0 : 1.0, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
-            if (secondaryPassSingular) {
-                return true;
-            }
-        }
-        else if (!secondaryPassSingular) {
+        if (!step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ + (dZ > 0 ? 1 : -1), dX > 0 ? 0.0 : 1.0, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
             return false;
         }
         // Y and Z.
-        if (step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ + (dZ > 0 ? 1 : -1), oX, dY > 0 ? 0.0 : 1.0, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
-            if (secondaryPassSingular) {
-                return true;
-            }
-        }
-        else if (!secondaryPassSingular) {
+        if (!step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ + (dZ > 0 ? 1 : -1), oX, dY > 0 ? 0.0 : 1.0, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
             return false;
         }
-        // If secondaryPassSingular is true, all returned false, otherwise none returned false.
-        return !secondaryPassSingular;
+        // All passed.
+        return true;
     }
 
     /**
@@ -364,6 +335,7 @@ public abstract class RayTracing {
     }
 
     /**
+     * Test if the primary line reached the end block.<br>
      * (Might later get changed to protected visibility.)
      * @return
      */
