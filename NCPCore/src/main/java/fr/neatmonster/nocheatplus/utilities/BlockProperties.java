@@ -2242,7 +2242,7 @@ public class BlockProperties {
      * @param z
      * @param id
      * @param bounds Not null: bounds of the block at x, y, z.
-     * @param flags Block flags for the block at x, y, z.
+     * @param flags Block flags for the block at x, y, z. Mix in F_COLLIDE_EDGES to disallow the "high edges" of blocks.
      * @return
      */
     public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {

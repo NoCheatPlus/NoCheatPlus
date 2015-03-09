@@ -21,6 +21,7 @@ public class TestRayTracing {
     protected static double maxFactor = 9.0;
 
     protected static int maxSteps(double dX, double dY, double dZ) {
+        // TODO: Better calculation.
         return (int) (maxFactor * (1 + Math.abs(dX) + Math.abs(dY) + Math.abs(dZ)));
     }
 
@@ -32,7 +33,7 @@ public class TestRayTracing {
 
         @Override
         protected boolean step(int blockX, int blockY, int blockZ, double oX,
-                double oY, double oZ, double dT) {
+                double oY, double oZ, double dT, boolean isPrimary) {
             if (step > maxSteps(dX, dY, dZ)) {
                 System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
                 return false; 
@@ -80,7 +81,7 @@ public class TestRayTracing {
 
             protected double ldt = 0;
 
-            protected int step = 0;
+            protected double lox, loy, loz;
 
             /* (non-Javadoc)
              * @see fr.neatmonster.nocheatplus.utilities.RayTracing#set(double, double, double, double, double, double)
@@ -91,8 +92,10 @@ public class TestRayTracing {
                 lbx = blockX - 1;
                 lby = blockY - 1;
                 lbz = blockZ - 1;
+                lox = oX;
+                loy = oY;
+                loz = oZ;
                 ldt = 0;
-                step = 0;
             }
 
             //            private boolean ignEdge(double offset, double dTotal) {
@@ -100,9 +103,8 @@ public class TestRayTracing {
             //            }
 
             @Override
-            protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
+            protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, boolean isPrimary) {
                 // TODO: This does not check last step for some occasions where it should.
-                step ++;
 
                 if (dT < 0.0) {
                     doFail("dT < 0 at t = " + StringUtil.fdec3.format(t), coords);
@@ -130,21 +132,28 @@ public class TestRayTracing {
                 lbx = blockX;
                 lby = blockY;
                 lbz = blockZ;
+                lox = oX;
+                loy = oY;
+                loz = oZ;
                 ldt = dT;
-                if (step > maxSteps(dX, dY, dZ)) doFail("max steps exceeded: " + maxSteps(dX, dY, dZ), coords); 
+                if (step > maxSteps(dX, dY, dZ)) {
+                    doFail("max steps exceeded: " + maxSteps(dX, dY, dZ), coords); 
+                }
                 return true;
             }
 
             private void checkOffset(double offset, String name) {
-                if (offset < 0.0 || offset > 1.0) doFail("Bad " + name + "-offset: " + offset, coords);
+                if (offset < 0.0 || offset > 1.0) {
+                    doFail("Bad " + name + "-offset: " + offset, coords);
+                }
             }
 
             @Override
             public void loop() {
                 super.loop();
-//                checkBlockTarget(coords[3], blockX, oX, dX, ldt, "x");
-//                checkBlockTarget(coords[4], blockY, oY, dY, ldt, "y");
-//                checkBlockTarget(coords[5], blockZ, oZ, dZ, ldt, "z");
+                checkBlockTarget(coords[3], lbx, lox, dX, ldt, "x");
+                checkBlockTarget(coords[4], lby, loy, dY, ldt, "y");
+                checkBlockTarget(coords[5], lbz, loz, dZ, ldt, "z");
             }
 
             private void checkBlockTarget(double target, int current, double offset, double dTotal, double dT, String name) {
@@ -153,19 +162,22 @@ public class TestRayTracing {
                     // TODO: Might do with or without these ?
                     //					if (current == b + 1 && dTotal > 0 && offset == 0) return;
                     //					if (current == b - 1 && dTotal < 0 && offset == 1) return;
-                    if (Math.abs(dT * dTotal + offset + (double) current - target) <= 0.001) {
+                    double diff = Math.abs(dT * dTotal + offset + (double) current - target);
+                    if (diff <= 0.001) {
+                        // TODO: Test how far off this usually is...
                         // TODO: Narrow down by edge coordinates or so.
                         return;
                     }
                     System.out.println(target + "|" +  current + "|" + offset + "|" + dT * dTotal);
                     // Failure.
-                    doFail("Bad target " + name + "-coordinate: " + current + " instead of " + b, coords);
+                    doFail("Bad target " + name + "-coordinate: " + current + " instead of " + b + " (" + diff + " off)", coords);
                 }
             }		
         };
         rt.loop();
         if (!rt.isEndBlock()) {
-            //doFail("Incorrect end block.", coords);
+            // TODO: Fix last transition not taken sometimes (with "off by x-th digit" or "t=0 transition").
+//            doFail("Incorrect end block.", coords);
         }
         return rt;
     }
@@ -176,9 +188,6 @@ public class TestRayTracing {
         int done = crt.getStepsDone();
         if (done != steps) {
             doFail("Wrong number of steps: " + done + " instead of " + steps, coords);
-        }
-        if (!crt.isEndBlock()) {
-            //doFail("Incorrect end block.", coords);
         }
         return crt;
     }
@@ -192,7 +201,7 @@ public class TestRayTracing {
     public static RayTracing dumpRawRayTracing(final double[] coords) {
         RayTracing rt = new RayTracing(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]) {
             @Override
-            protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
+            protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, boolean isPrimary) {
                 dump(blockX, blockY, blockZ, oX, oY, oZ, t, dT);
                 if (step > maxSteps(dX, dY, dZ)) {
                     System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
@@ -211,7 +220,7 @@ public class TestRayTracing {
     @Test
     public void testNumberOfSteps() {
         // Hand picked stuff.
-        checkNumberOfSteps(new double[]{0.5, 0.5, 0.5, 1.5, -0.5, 1.5}, 4);
+        checkNumberOfSteps(new double[]{0.5, 0.5, 0.5, 1.5, -0.5, 1.5}, 2);
     }
 
     @Test
@@ -219,13 +228,16 @@ public class TestRayTracing {
         // Past failures / making a difference.		
         for (double[] coords : new double[][] {
                 // Sort by x0.
-                new double[]{-9.873, -4.773, -3.387, -0.161, -1.879, -7.079},
-                new double[]{-3.0066423238842366, 0.8056808285866079, 5.359238045631369  ,  2.0000000356757375, -2.3002237817433757, -5.889349195033338},
-                new double[]{2.5619753859456917, -5.010424935746547, -7.39326637860553  ,  -4.678643570182639, -2.0000000105642313, -4.634727842675916},
-                new double[]{7.388348424961977, -8.000000029346532, -2.5365675909347507  ,  2.17126848312847, 3.236994108042559, -8.423292642985071},
-                new double[]{7.525633617461991, 2.654408573114717, 3.5119744782127893  ,  9.99999995904821, 9.599753890871172, 6.721727939686946},
-                new double[] {-6.0, -4.0, -3.0  ,  -4.0, -3.0, -2.0},
-                new double[]{-3.0, 3.0, -6.0  ,  2.0, -3.0, 4.0},
+                {-9.873, -4.773, -3.387, -0.161, -1.879, -7.079},
+                {-3.0066423238842366, 0.8056808285866079, 5.359238045631369  ,  2.0000000356757375, -2.3002237817433757, -5.889349195033338},
+                {2.5619753859456917, -5.010424935746547, -7.39326637860553  ,  -4.678643570182639, -2.0000000105642313, -4.634727842675916},
+                {7.388348424961977, -8.000000029346532, -2.5365675909347507  ,  2.17126848312847, 3.236994108042559, -8.423292642985071},
+                {7.525633617461991, 2.654408573114717, 3.5119744782127893  ,  9.99999995904821, 9.599753890871172, 6.721727939686946},
+                {1.1, 1.1, 1.1  ,  1.3, 1.3, 1.3},
+                {1.3, 1.3, 1.3  ,  1.1, 1.1, 1.1},
+                {1.1, 1.1, 1.1  ,  1.1, 1.1, 1.1},
+                {-6.0, -4.0, -3.0  ,  -4.0, -3.0, -2.0},
+                {-3.0, 3.0, -6.0  ,  2.0, -3.0, 4.0},
         }) {
             checkConsistency(coords);
         }
@@ -237,7 +249,6 @@ public class TestRayTracing {
             checkConsistency(randomCoords(10.0));
         }
 
-        // TODO: make these work.
         for (int i = 0; i < (e ? 10000000 : 1000); i++) {
             checkConsistency(randomBlockCoords(6));
         }

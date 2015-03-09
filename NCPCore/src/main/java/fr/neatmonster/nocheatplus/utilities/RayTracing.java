@@ -33,8 +33,19 @@ public abstract class RayTracing {
     /** Tolerance for time, for checking the abort condition: 1.0 - t <= tol . */
     protected double tol = 0.0;
 
-    /** Counting the number of steps. Step is incremented before calling step(), and is 0 after set(...).  Checking this from within step means to get the current step number, checking after loop gets the number of steps done. */
+    /**
+     * Counting the number of steps along the primary line. Step is incremented
+     * before calling step(), and is 0 after set(...). Checking this from within
+     * step means to get the current step number, checking after loop gets the
+     * number of steps done.
+     */
     protected int step = 0;
+
+    /** If to call stepSecondary at all (secondary transitions).*/
+    protected boolean secondaryStep = true;
+
+    /** If to pass secondary transitions if ANY sub-call succeeds. */
+    protected boolean secondaryPassSingular = false;
 
     /** Maximum steps that will be done. */
     private int maxSteps = Integer.MAX_VALUE;
@@ -80,11 +91,19 @@ public abstract class RayTracing {
         step = 0;
     }
 
-    private static final double tDiff(final double dTotal, final double offset, final int block, final int endBlock) {
+    /**
+     * 
+     * @param dTotal
+     * @param offset
+     * @param isEndBlock If the end block coordinate is reached for this axis.
+     * @return
+     */
+    private static final double tDiff(final double dTotal, final double offset, final boolean isEndBlock) {
+        // TODO: endBlock check only for == not </> ?
         if (dTotal > 0.0) {
             if (offset >= 1.0) {
                 // Static block change (e.g. diagonal move).
-                return 0.0; // block == endBlock ? Double.MAX_VALUE : 0.0;
+                return isEndBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return (1.0 - offset) / dTotal; 
             }
@@ -92,7 +111,7 @@ public abstract class RayTracing {
         else if (dTotal < 0.0) {
             if (offset <= 0.0) {
                 // Static block change (e.g. diagonal move).
-                return 0.0; //block == endBlock ? Double.MAX_VALUE : 0.0;
+                return isEndBlock ? Double.MAX_VALUE : 0.0;
             } else {
                 return offset / -dTotal;
             }
@@ -106,23 +125,31 @@ public abstract class RayTracing {
      * Loop through blocks.
      */
     public void loop() {
-        // TODO: Might intercept 0 dist ?
 
         // Time to block edge.
         double tX, tY, tZ, tMin;
-        boolean changed;
+        // Number of axes to make a transition for.
+        int transitions;
+        // Transition direction per axis.
+        boolean transX, transY, transZ;
+
+        // Actual loop.
+        // TODO: Fix last transition not taken sometimes (with "off by x-th digit" or "t=0 transition").
         while (1.0 - t > tol) {
-            // Determine smallest time to block edge.
-            tX = tDiff(dX, oX, blockX, endBlockX);
-            tY = tDiff(dY, oY, blockY, endBlockY);
-            tZ = tDiff(dZ, oZ, blockZ, endBlockZ);
-            tMin = Math.min(tX,  Math.min(tY, tZ));
+            // Determine smallest time to block edge, per axis.
+            // TODO: if all coords are in the  end block: ensure the full distance is taken towards the end coordinate.
+            tX = tDiff(dX, oX, blockX == endBlockX);
+            tY = tDiff(dY, oY, blockY == endBlockY);
+            tZ = tDiff(dZ, oZ, blockZ == endBlockZ);
+            // Adjust time.
+            tMin = Math.max(0.0, Math.min(tX,  Math.min(tY, tZ)));
             if (tMin == Double.MAX_VALUE) {
                 // All differences are 0 (no progress).
                 if (step < 1) {
-                    // Allow one step.
+                    // Allow one step always.
                     tMin = 0.0;
-                } else {
+                }
+                else {
                     break;
                 }
             }
@@ -130,69 +157,202 @@ public abstract class RayTracing {
                 // Set to the remaining distance (does trigger).
                 tMin = 1.0 - t;
             }
-            // Call step with appropriate arguments.
+
+
+            // Step for the primary line.
             step ++;
-            if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) {
+            if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin, true)) {
                 break;
             }
-            if (t + tMin >= 1.0 - tol) { // && isEndBlock()) {
+
+            // Abort if arrived.
+            if (t + tMin >= 1.0 - tol && isEndBlock()) {
                 break;
             }
-            // Advance (add to t etc.).
-            changed = false;
+
+            // Determine transitions, per axis.
+            transitions = 0;
+            transX = transY = transZ = false;
+            if (tX == tMin && blockX != endBlockX && dX != 0.0) {
+                transX = true;
+                transitions ++;
+            }
+            if (tY == tMin && blockY != endBlockY && dY != 0.0) {
+                transY = true;
+                transitions ++;
+            }
+            if (tZ == tMin && blockZ != endBlockZ && dZ != 0.0) {
+                transZ = true;
+                transitions ++;
+            }
+
+            // Advance on-block origin based on this move.
+            // TODO: Calculate "directly" based on this/next block or and/t?
             oX = Math.min(1.0, Math.max(0.0, oX + tMin * dX));
             oY = Math.min(1.0, Math.max(0.0, oY + tMin * dY));
             oZ = Math.min(1.0, Math.max(0.0, oZ + tMin * dZ));
-            // TODO: Consider Heuristic change of the checking order for dy > 0 vs. dy < 0. 
-            // x
-            if (tX == tMin && blockX != endBlockX) {
-                if (dX < 0) {
-                    oX = 1.0;
-                    blockX --;
-                    changed = true;
-                }
-                else if (dX > 0) {
-                    oX = 0.0;
-                    blockX ++;
-                    changed = true;
+
+            // Advance time.
+            t = Math.min(1.0, t + tMin);
+
+            // Handle block transitions.
+            if (transitions > 0) {
+                if (!handleTransitions(transitions, transX, transY, transZ, tMin)) {
+                    break;
                 }
             }
-            if (!changed) {
-                // y
-                if (tY == tMin && blockY != endBlockY) {
-                    if (dY < 0) {
-                        oY = 1.0;
-                        blockY --;
-                        changed = true;
-                    }
-                    else if (dY > 0) {
-                        oY = 0.0;
-                        blockY ++;
-                        changed = true;
-                    }
-                }
-                if (!changed) {
-                    // z
-                    if (tZ == tMin && blockZ != endBlockZ) {
-                        if (dZ < 0) {
-                            oZ = 1.0;
-                            blockZ --;
-                            changed = true;
-                        }
-                        else if (dZ > 0) {
-                            oZ = 0.0;
-                            blockZ ++;
-                            changed = true;
-                        }
-                    }
-                }
-            }
-            t += tMin;
-            if (!changed || step >= maxSteps) {
+
+            // Abort if done or exceeded maxSteps.
+            if (transitions == 0 || step >= maxSteps) {
                 break;
             }
         }
-        // TODO: Catch special case with going beyond coordinates.
+    }
+
+    /**
+     * 
+     * @param transitions
+     * @param transX
+     * @param transY
+     * @param transZ
+     * @param tMin
+     * @return If to continue at all.
+     */
+    protected boolean handleTransitions(final int transitions, final boolean transX, final boolean transY, final boolean transZ, final double tMin) {
+        // Secondary transitions.
+        if (transitions > 1 && secondaryStep) {
+            if (!handleSecondaryTransitions(transitions, transX, transY, transZ, tMin)) {
+                return false; 
+            }
+        }
+
+        // Apply all transitions to the primary line.
+        if (transX) {
+            if (dX > 0.0) {
+                blockX ++;
+                oX = 0.0;
+            }
+            else {
+                blockX --;
+                oX = 1.0;
+            }
+        }
+        if (transY) {
+            if (dY > 0.0) {
+                blockY ++;
+                oY = 0.0;
+            }
+            else {
+                blockY --;
+                oY = 1.0;
+            }
+        }
+        if (transZ) {
+            if (dZ > 0.0) {
+                blockZ ++;
+                oZ = 0.0;
+            }
+            else {
+                blockZ --;
+                oZ = 1.0;
+            }
+        }
+        return true; // Continue loop.
+    }
+
+    /**
+     * 
+     * @param transitions
+     * @param transX
+     * @param transY
+     * @param transZ
+     * @param tMin
+     * @return If to continue at all.
+     */
+    protected boolean handleSecondaryTransitions(final int transitions, final boolean transX, final boolean transY, final boolean transZ, final double tMin) {
+        // Handle one transition.
+        if (transX) {
+            if (step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ, dX > 0 ? 0.0 : 1.0, oY, oZ, 0.0, false)) {
+                if (secondaryPassSingular) {
+                    return true;
+                }
+            }
+            else if (!secondaryPassSingular) {
+                return false;
+            }
+        }
+        if (transY) {
+            if (step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ, oX, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
+                if (secondaryPassSingular) {
+                    return true;
+                }
+            }
+            else if (!secondaryPassSingular) {
+                return false;
+            }
+        }
+        if (transZ) {
+            if (step(blockX, blockY, blockZ + (dZ > 0 ? 1 : -1), oX, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
+                if (secondaryPassSingular) {
+                    return true;
+                }
+            }
+            else if (!secondaryPassSingular) {
+                return false;
+            }
+        }
+
+        // Handle two transitions.
+        if (transitions == 3) {
+            if (!handleSecondaryDoubleTransitions(transitions, transX, transY, transZ, tMin)) {
+                return false; 
+            }
+        }
+
+        // If secondaryPassSingular is true, all returned false, otherwise none returned false.
+        return !secondaryPassSingular;
+    }
+
+    /**
+     * 
+     * @param transitions
+     * @param transX
+     * @param transY
+     * @param transZ
+     * @param tMin
+     * @return
+     */
+    protected boolean handleSecondaryDoubleTransitions(final int transitions, final boolean transX, final boolean transY, final boolean transZ, final double tMin) {
+        // Two transitions at once, thus step directly.
+        // X and Y.
+        if (step(blockX + (dX > 0 ? 1 : -1), blockY + (dY > 0 ? 1 : -1), blockZ, dX > 0 ? 0.0 : 1.0, dY > 0 ? 0.0 : 1.0, oZ, 0.0, false)) {
+            if (secondaryPassSingular) {
+                return true;
+            }
+        }
+        else if (!secondaryPassSingular) {
+            return false;
+        }
+        // X and Z.
+        if (step(blockX + (dX > 0 ? 1 : -1), blockY, blockZ + (dZ > 0 ? 1 : -1), dX > 0 ? 0.0 : 1.0, oY, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
+            if (secondaryPassSingular) {
+                return true;
+            }
+        }
+        else if (!secondaryPassSingular) {
+            return false;
+        }
+        // Y and Z.
+        if (step(blockX, blockY + (dY > 0 ? 1 : -1), blockZ + (dZ > 0 ? 1 : -1), oX, dY > 0 ? 0.0 : 1.0, dZ > 0 ? 0.0 : 1.0, 0.0, false)) {
+            if (secondaryPassSingular) {
+                return true;
+            }
+        }
+        else if (!secondaryPassSingular) {
+            return false;
+        }
+        // If secondaryPassSingular is true, all returned false, otherwise none returned false.
+        return !secondaryPassSingular;
     }
 
     /**
@@ -203,6 +363,10 @@ public abstract class RayTracing {
         return false;
     }
 
+    /**
+     * (Might later get changed to protected visibility.)
+     * @return
+     */
     public boolean isEndBlock() {
         return blockX == endBlockX && blockY == endBlockY && blockZ == endBlockZ;
     }
@@ -236,8 +400,24 @@ public abstract class RayTracing {
 
     /**
      * One step in the loop.
-     * @return If to continue loop.
+     * 
+     * @param blockX
+     *            The block coordinates regarded in this step.
+     * @param blockY
+     * @param blockZ
+     * @param oX
+     *            Origin relative to the block coordinates.
+     * @param oY
+     * @param oZ
+     * @param dT
+     *            Amount of time regarded in this step (note that 0.0 is
+     *            possible for transitions).
+     * @param isPrimary
+     *            If this is along the primary line, for which all transitions
+     *            are done at once. The secondary line would cover all
+     *            combinations of transitions off the primary line.
+     * @return If to continue processing at all.
      */
-    protected abstract boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT);
+    protected abstract boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, boolean isPrimary);
 
 }
