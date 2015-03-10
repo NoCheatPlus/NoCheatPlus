@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.RayTracing;
@@ -259,6 +260,16 @@ public class TestRayTracing {
         // TODO: Add tests for typical coordinates a with interact, passable.
     }
 
+    /**
+     * 
+     * @param rt
+     * @param setup
+     * @param expectCollide
+     * @param expectNotCollide
+     * @param stepsManhattan
+     * @param reverse If set to true, end points will be exchanged for this run (not in addition).
+     * @param tag
+     */
     public static void runCoordinates(RayTracing rt, double[] setup, boolean expectCollide, boolean expectNotCollide, double stepsManhattan, boolean reverse, String tag) {
         if (reverse) {
             rt.set(setup[3], setup [4], setup[5], setup[0], setup[1], setup[2]);
@@ -291,7 +302,7 @@ public class TestRayTracing {
      * @param expectCollide
      * @param expectNotCollide
      * @param stepsManhattan
-     * @param testReversed
+     * @param testReversed If to test the each ray with reversed end points in addition.
      */
     public static void runCoordinates(RayTracing rt, double[][] setups, boolean expectCollide, boolean expectNotCollide, double stepsManhattan, boolean testReversed) {
         for (int i = 0; i < setups.length; i++) {
@@ -300,6 +311,63 @@ public class TestRayTracing {
             if (testReversed) {
                 // Reverse.
                 runCoordinates(rt, setup, expectCollide, expectNotCollide, stepsManhattan, true, "index=" + i);
+            }
+        }
+    }
+
+    /**
+     * Run (some) standard directions towards the center.
+     * @param rt
+     * @param cX
+     * @param cY
+     * @param cZ
+     * @param length Rough length of the rays (might be applied per-axis including an additum).
+     * @param nRandom Test a number of random rays as well.
+     * @param expectCollide
+     * @param expectNotCollide
+     * @param testReversed If to test the each ray with reversed end points in addition.
+     */
+    public static void runCenterRays(RayTracing rt, double cX, double cY, double cZ, double length, int nRandom, boolean expectCollide, boolean expectNotCollide, boolean testReversed) {
+        double[] mult = new double[] {-1.0, 0.0, 1.0};
+        for (int ix = 0; ix < 3; ix ++) {
+            for (int iy = 0; iy < 3; iy++) {
+                for (int iz = 0; iz < 3; iz++) {
+                    if (ix == 1 && iy == 1 &&  iz == 1) {
+                        // Skip the center itself.
+                        continue;
+                    }
+                    double[] coords = new double[] {
+                            cX + length * mult[ix], 
+                            cY + length * mult[iy],
+                            cZ + length * mult[iz],
+                            cX,
+                            cY,
+                            cZ
+                            };
+                    // TODO: Generate differing target points on/near middle as well.
+                    TestRayTracing.runCoordinates(rt, coords, true, false, 3.0, false, "");
+                    if (testReversed) {
+                        TestRayTracing.runCoordinates(rt, coords, true, false, 3.0, true, "");
+                    }
+                }
+            }
+        }
+        // TODO: Consider running block coordinates with larger radius (potentially all within some radius?).
+        for (int n = 0; n < nRandom; n ++) {
+            // TODO: Check if normalize is necessary.
+            // One totally random vector.
+            Vector vec = Vector.getRandom().normalize().multiply(length);
+            double[] coords = new double[] {
+                    cX + vec.getX(), 
+                    cY + vec.getY(),
+                    cZ + vec.getZ(),
+                    cX,
+                    cY,
+                    cZ
+                    };
+            TestRayTracing.runCoordinates(rt, coords, true, false, 3.0, false, "random");
+            if (testReversed) {
+                TestRayTracing.runCoordinates(rt, coords, true, false, 3.0, true, "random");
             }
         }
     }

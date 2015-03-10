@@ -6,22 +6,23 @@ import org.junit.Test;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
 import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 public class TestPassableRayTracing {
-    
+
     // TODO: Moving into a block, 
     // TODO: Moving out of a block
     // TODO: Moving horizontally on various kinds of ground (normal, half blocks)
     // TODO: Moving up stairs etc ?
     // TODO: From ground and onto ground moves, onto-edge moves (block before edge, into block, etc).
     // TODO: Randomized tests (Collide with inner sphere, not collide with outer sphere).
-    
+
     public TestPassableRayTracing() {
         StaticLog.setUseLogManager(false);
         BlockTests.initBlockProperties();
         StaticLog.setUseLogManager(true);
     }
-    
+
     @Test
     public void testAir() {
         FakeBlockCache bc = new FakeBlockCache();
@@ -39,7 +40,7 @@ public class TestPassableRayTracing {
         rt.cleanup();
         bc.cleanup();
     }
-    
+
     @Test
     public void testThroughOneBlock() {
         FakeBlockCache bc = new FakeBlockCache();
@@ -47,26 +48,26 @@ public class TestPassableRayTracing {
         PassableRayTracing rt = new PassableRayTracing();
         rt.setBlockCache(bc);
         double[][] setups = new double[][] {
-            // Through the middle of the block.
-            {0.5, 0.5, -0.5, 0.5, 0.5, 1.5},
-            {-0.5, 0.5, 0.5, 1.5, 0.5, 0.5},
-            {0.5, -0.5, 0.5, 0.5, 1.5, 0.5},
-            // Along the edges.
-            {0.5, 0.0, -0.5, 0.5, 0.0, 1.5},
-            {-0.5, 0.0, 0.5, 1.5, 0.0, 0.5},
-            // Exactly diagonal.
-            {-0.5, -0.5, -0.5, 1.5, 1.5, 1.5}, // 3d
-            {-0.5, 0.0, -0.5, 1.5, 0.0, 1.5}, // 2d
-            // Through a corner.
-            {1.2, 0.5, 0.5, 0.5, 0.5, 1.2},
-            
-            // TODO: More of each and other... + generic set-ups?
+                // Through the middle of the block.
+                {0.5, 0.5, -0.5, 0.5, 0.5, 1.5},
+                {-0.5, 0.5, 0.5, 1.5, 0.5, 0.5},
+                {0.5, -0.5, 0.5, 0.5, 1.5, 0.5},
+                // Along the edges.
+                {0.5, 0.0, -0.5, 0.5, 0.0, 1.5},
+                {-0.5, 0.0, 0.5, 1.5, 0.0, 0.5},
+                // Exactly diagonal.
+                {-0.5, -0.5, -0.5, 1.5, 1.5, 1.5}, // 3d
+                {-0.5, 0.0, -0.5, 1.5, 0.0, 1.5}, // 2d
+                // Through a corner.
+                {1.2, 0.5, 0.5, 0.5, 0.5, 1.2},
+
+                // TODO: More of each and other... + generic set-ups?
         };
         TestRayTracing.runCoordinates(rt, setups, true, false, 3.0, true);
         rt.cleanup();
         bc.cleanup();
     }
-    
+
     /**
      * Moving diagonally through an "empty corner", seen from above:<br>
      * ox<br>
@@ -88,17 +89,18 @@ public class TestPassableRayTracing {
         rt.setBlockCache(bc);
         // TODO: More Directions, over a corner, sides, etc.
         double[][] setups = new double[][] {
-            // Slightly off the middle (11, y, 11)
-            {11.4, 70.0, 10.4, 10.6, 70.0, 11.4},
-            // Going exactly through the middle (11, y, 11)
-            {11.4, 70.0, 10.6, 10.6, 70.0, 11.4},
-            {11.5, 70.0, 10.5, 10.5, 70.0, 11.5},
+                // Slightly off the middle (11, y, 11)
+                {11.4, 70.0, 10.4, 10.6, 70.0, 11.4},
+                // Going exactly through the middle (11, y, 11)
+                {11.4, 70.0, 10.6, 10.6, 70.0, 11.4},
+                {11.5, 70.0, 10.5, 10.5, 70.0, 11.5},
+                //{11.5, 70.0, 10.5, 10.99999999999, 70.0, 11.00000000001}, // TODO: Craft something here
         };
         TestRayTracing.runCoordinates(rt, setups, true, false, 3.0, true);
         rt.cleanup();
         bc.cleanup();
     }
-    
+
     @Test
     public void testGround() {
         FakeBlockCache bc = new FakeBlockCache();
@@ -112,21 +114,21 @@ public class TestPassableRayTracing {
         rt.setBlockCache(bc);
         // TODO: More Directions, also from air underneath to ground).
         double[][] noCollision = new double[][] {
-            {1.3, 66.0, 2.43, 5.25, 66.0, 7.12},
+                {1.3, 66.0, 2.43, 5.25, 66.0, 7.12},
         };
         TestRayTracing.runCoordinates(rt, noCollision, false, true, 3.0, true);
         double[][] shouldCollide = new double[][] {
-            {1.3, 65.1, 2.43, 2.3, 65.1, 4.43},
-            {1.3, 65.0, 2.43, 2.3, 65.0, 4.43},
-            {1.3, 66.0, 2.43, 1.3, 65.9, 2.43},
-            {1.3, 66.0, 2.43, 5.25, 65.9, 7.12},
-            {1.3, 65.4, 2.43, 1.3, 65.4, 2.43}, // No distance.
+                {1.3, 65.1, 2.43, 2.3, 65.1, 4.43},
+                {1.3, 65.0, 2.43, 2.3, 65.0, 4.43},
+                {1.3, 66.0, 2.43, 1.3, 65.9, 2.43},
+                {1.3, 66.0, 2.43, 5.25, 65.9, 7.12},
+                {1.3, 65.4, 2.43, 1.3, 65.4, 2.43}, // No distance.
         };
         TestRayTracing.runCoordinates(rt, shouldCollide, true, false, 3.0, true);
         rt.cleanup();
         bc.cleanup();
     }
-    
+
     @Test
     public void testGroundSteps() {
         FakeBlockCache bc = new FakeBlockCache();
@@ -142,19 +144,39 @@ public class TestPassableRayTracing {
         rt.setBlockCache(bc);
         // TODO: More Directions, also from air underneath to ground).
         double[][] noCollision = new double[][] {
-            {1.3, 65.5, 2.43, 5.25, 65.5, 7.12},
+                {1.3, 65.5, 2.43, 5.25, 65.5, 7.12},
         };
         TestRayTracing.runCoordinates(rt, noCollision, false, true, 3.0, true);
         double[][] shouldCollide = new double[][] {
-            {1.3, 65.1, 2.43, 2.3, 65.1, 7.43},
-            {1.3, 65.0, 2.43, 2.3, 65.0, 7.43},
-            {1.3, 65.5, 2.43, 1.3, 65.4, 2.43},
-            {1.3, 65.5, 2.43, 5.25, 65.4, 7.12},
-            {1.3, 65.4, 2.43, 1.3, 65.4, 2.43}, // No distance.
+                {1.3, 65.1, 2.43, 2.3, 65.1, 7.43},
+                {1.3, 65.0, 2.43, 2.3, 65.0, 7.43},
+                {1.3, 65.5, 2.43, 1.3, 65.4, 2.43},
+                {1.3, 65.5, 2.43, 5.25, 65.4, 7.12},
+                {1.3, 65.4, 2.43, 1.3, 65.4, 2.43}, // No distance.
         };
         TestRayTracing.runCoordinates(rt, shouldCollide, true, false, 3.0, true);
         rt.cleanup();
         bc.cleanup();
     }
-    
+
+    @Test
+    public void testRoom() {
+        FakeBlockCache bc = new FakeBlockCache();
+        bc.room(-1, 64, -1, 1, 66, 1, Material.STONE);
+        double[] middle = new double[] {0.5, 65.5, 0.5}; // Free spot.
+        PassableRayTracing rt = new PassableRayTracing();
+        rt.setBlockCache(bc);
+        boolean intense = BuildParameters.testLevel > 1;
+        for (double x = -0.5; x < 1.0; x += 0.5) {
+            for (double y = -0.5; y < 1.0; y += 0.5) {
+                for (double z = -0.5; z < 1.0; z += 0.5) {
+                    double add = Math.abs(x) + Math.abs(y) + Math.abs(z);
+                    TestRayTracing.runCenterRays(rt, middle[0] + x, middle[1] + y, middle[2] + z, 2.0 + add, intense ? 10000 : 1000, true, false, true);
+                }
+            }
+        }
+        rt.cleanup();
+        bc.cleanup();
+    }
+
 }

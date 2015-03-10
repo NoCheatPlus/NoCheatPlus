@@ -1,5 +1,8 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.Location;
+
+
 
 /**
  * Rough ray-tracing for interaction with something. This does not do any smart end-point guessing.
@@ -25,11 +28,13 @@ public class InteractRayTracing extends RayTracing {
 
     protected int lastBx, lastBy, lastBz;
 
-    public InteractRayTracing(){
+    protected int targetX, targetY, targetZ;
+
+    public InteractRayTracing() {
         super();
     }
 
-    public InteractRayTracing(boolean strict){
+    public InteractRayTracing(boolean strict) {
         super();
         this.strict = strict;
     }
@@ -42,27 +47,43 @@ public class InteractRayTracing extends RayTracing {
         this.blockCache = blockCache;
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.utilities.RayTracing#set(double, double, double, double, double, double)
-     */
-    @Override
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
+        set(x0, y0, z0, x1, y1, z1, Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1));
+        // Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    /**
+     * 
+     * @param x0
+     * @param y0
+     * @param z0
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param targetX The block clicked/interacted with (can be different to the end point of ray-tracing, or ignored with Integer.MAX_VALUE).
+     * @param targetY
+     * @param targetZ
+     */
+    public void set(double x0, double y0, double z0, double x1, double y1, double z1, int targetX, int targetY, int targetZ) {
         super.set(x0, y0, z0, x1, y1, z1);
         collides = false;
         lastBx = blockX;
         lastBy = blockY;
         lastBz = blockZ;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.targetZ = targetZ;
     }
 
-    public boolean collides(){
+    public boolean collides() {
         return collides;
     }
 
     /**
      * Remove reference to BlockCache.
      */
-    public void cleanup(){
-        if (blockCache != null){
+    public void cleanup() {
+        if (blockCache != null) {
             blockCache = null;
         }
     }
@@ -74,49 +95,75 @@ public class InteractRayTracing extends RayTracing {
      * @param blockZ
      * @return
      */
-    private final boolean doesCollide(int blockX, int blockY, int blockZ){
+    private final boolean doesCollide(final int blockX, final int blockY, final int blockZ) {
         final int id = blockCache.getTypeId(blockX, blockY, blockZ);
         final long flags = BlockProperties.getBlockFlags(id);
-        if ((flags & BlockProperties.F_SOLID) == 0){
+        if ((flags & BlockProperties.F_SOLID) == 0) {
             // Ignore non solid blocks anyway.
             return false;
         }
-        if ((flags & (BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE | BlockProperties.F_STAIRS | BlockProperties.F_VARIABLE)) != 0){
+        if ((flags & (BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE | BlockProperties.F_STAIRS | BlockProperties.F_VARIABLE)) != 0) {
             // Special cases.
             // TODO: F_VARIABLE: Bounding boxes are roughly right ?
             return false;
         }
-        if (!blockCache.isFullBounds(blockX, blockY, blockZ)) return false;
+        if (!blockCache.isFullBounds(blockX, blockY, blockZ)) {
+            return false;
+        }
         return true;
     }
 
     /**
+     * Test if the primary line is on the block interacted with (may be a
+     * different one that the end point of ray-tracing).
+     * 
+     * @return
+     */
+    public boolean isTargetBlock() {
+        return targetX != Integer.MAX_VALUE && blockX == targetX && blockY == targetY && blockZ == targetZ;
+    }
+
+    /**
      * Check if the block may be interacted through by use of some workaround.
+     * 
      * @param blockX
      * @param blockY
      * @param blockZ
      * @return
      */
     private final boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
-        // TODO: This allows some bypasses for "strange" setups.
+        
+        // TODO: Recode this/other.
+        
+        // TODO: This could allow some bypasses for "strange" setups.
         // TODO: Consider using distance to target as heuristic ? [should not get smaller !?]
+        // TODO: Consider (min/max) offset for distance.
         final int dX = blockX - lastBx;
         final int dY = blockY - lastBy;
         final int dZ = blockZ - lastBz;
         final double dSq = dX * dX + dY * dY + dZ * dZ;
-        for (int i = 0; i < 6; i++){
+        // TODO: Limit distance more here !? 
+        for (int i = 0; i < 6; i++) {
             final int[] dir = incr[i];
             final int rX = blockX + dir[0];
-            if (Math.abs(lastBx - rX) > 1) continue;
+            if (Math.abs(lastBx - rX) > 1) {
+                continue;
+            }
             final int rY = blockY + dir[1];
-            if (Math.abs(lastBy - rY) > 1) continue;
+            if (Math.abs(lastBy - rY) > 1) {
+                continue;
+            }
             final int rZ = blockZ + dir[2];
-            if (Math.abs(lastBz - rZ) > 1) continue;
+            if (Math.abs(lastBz - rZ) > 1) {
+                continue;
+            }
             final int dRx = rX - lastBx;
             final int dRy = rY - lastBy;
             final int dRz = rZ - lastBz;
-            if (dRx * dRx + dRy * dRy + dRz * dRz <= dSq) continue;
-            if (!doesCollide(rX, rY, rZ)){
+            if (dRx * dRx + dRy * dRy + dRz * dRz <= dSq) {
+                continue;
+            }
+            if (!doesCollide(rX, rY, rZ)) {
                 // NOTE: Don't check "rX == targetBx && rZ == targetBz && rY == targetBy".
                 return true;
             }
@@ -125,22 +172,24 @@ public class InteractRayTracing extends RayTracing {
     }
 
     @Override
-    protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, final boolean isPrimary) {
+    protected boolean step(final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dT, final boolean isPrimary) {
         // TODO: Make an optional, more precise check (like passable) ?
-        // TODO: Account for primary line vs. secondary.
         // TODO: isEndBlock -> blockInteractedWith, because the offset edge might be on the next block.
-        if (isEndBlock() || !doesCollide(blockX, blockY, blockZ)){
-            lastBx = blockX;
-            lastBy = blockY;
-            lastBz = blockZ;
+        // TODO: isTargetBlock checks the primary line (!, might be ok.).
+        if (isTargetBlock() || !doesCollide(blockX, blockY, blockZ)) {
+            if (isPrimary) {
+                lastBx = blockX;
+                lastBy = blockY;
+                lastBz = blockZ;
+            }
             return true;
         }
-        if (strict || blockX == lastBx && blockZ == lastBz && blockY == lastBy){
+        if (strict || blockX == lastBx && blockZ == lastBz && blockY == lastBy) {
             collides = true;
             return false;
         }
         // Check workarounds...
-        if (allowsWorkaround(blockX, blockY, blockZ)){
+        if (isPrimary && allowsWorkaround(blockX, blockY, blockZ)) {
             lastBx = blockX;
             lastBy = blockY;
             lastBz = blockZ;
