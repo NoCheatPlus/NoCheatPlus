@@ -33,19 +33,20 @@ public class Angle extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final boolean worldChanged, final FightData data, final FightConfig cc) {
-        
+
         if (worldChanged){
-        	// TODO: clear some data.
-        	data.angleHits.clear();
+            // TODO: clear some data.
+            data.angleHits.clear();
         }
 
         boolean cancel = false;
 
         // Remove the old locations from the map.
+        // TODO: Use a linked list and make one iteration only (remove with Iterator). 
         for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet()) {
-        	if (System.currentTimeMillis() - time > 1000L) {
-        		data.angleHits.remove(time);
-        	}
+            if (System.currentTimeMillis() - time > 1000L) {
+                data.angleHits.remove(time);
+            }
         }
 
         // Add the new location to the map.
@@ -69,7 +70,7 @@ public class Angle extends Check {
             final Location location = data.angleHits.get(time);
             // We need a previous location to calculate deltas.
             if (previousLocation != null){ // && location.getWorld().getName().equals(previousLocation.getWorld().getName())) {
-            	// (Risks exceptions on reloading).
+                // (Risks exceptions on reloading).
                 // Calculate the distance between the two locations.
                 deltaMove += previousLocation.distanceSquared(location);
                 // Calculate the time elapsed between the two hits.
@@ -114,7 +115,7 @@ public class Angle extends Check {
         if (violation > cc.angleThreshold) {
             // Has the server lagged?
             if (TickTask.getLag(1000, true) < 1.5f){
-            	// TODO: 1.5 is a fantasy value.
+                // TODO: 1.5 is a fantasy value.
                 // If it hasn't, increment the violation level.
                 data.angleVL += violation;
             }
