@@ -45,7 +45,7 @@ public class MCAccessSpigotCB1_8 implements MCAccess{
 
     @Override
     public String getServerVersionTag() {
-        return "Spigot-CB-DEV";
+        return "Spigot-CB-1.8";
     }
 
     @Override

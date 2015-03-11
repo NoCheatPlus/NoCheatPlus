@@ -1,19 +1,19 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import net.minecraft.server.v1_8_R1.AxisAlignedBB;
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.DamageSource;
-import net.minecraft.server.v1_8_R1.EntityComplexPart;
-import net.minecraft.server.v1_8_R1.EntityPlayer;
-import net.minecraft.server.v1_8_R1.MobEffectList;
+import net.minecraft.server.v1_8_R2.AxisAlignedBB;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.DamageSource;
+import net.minecraft.server.v1_8_R2.EntityComplexPart;
+import net.minecraft.server.v1_8_R2.EntityPlayer;
+import net.minecraft.server.v1_8_R2.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_8_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,17 +30,17 @@ public class MCAccessCBDev implements MCAccess{
      */
     public MCAccessCBDev() {
         getCommandMap();
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R1.", new String[] {"Entity" , "dead"});
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R2.", new String[] {"Entity" , "dead"});
         // block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R1.Block.class, 
-                new String[]{"z", "A", "B", "C", "D", "E"}, double.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R2.Block.class, 
+                new String[]{"B", "C", "D", "E", "F", "G"}, double.class);
         // TODO: Nail it down further.
     }
 
     @Override
     public String getMCVersion() {
-        // 1_8_R1
-        return "1.8";
+        // 1_8_R2
+        return "1.8.3";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class MCAccessCBDev implements MCAccess{
 
     @Override
     public double getHeight(final Entity entity) {
-        final net.minecraft.server.v1_8_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
+        final net.minecraft.server.v1_8_R2.Entity mcEntity = ((CraftEntity) entity).getHandle();
         AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
         final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
         if (entity instanceof LivingEntity) {

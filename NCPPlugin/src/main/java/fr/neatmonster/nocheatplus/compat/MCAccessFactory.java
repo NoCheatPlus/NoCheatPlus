@@ -103,13 +103,13 @@ public class MCAccessFactory {
 
         // TEMP //
         // Only add as long as no stable module has been added.
-        // TODO:  1.8.3 (Spigot)
-//        try{
-//            return new fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev();
-//        }
-//        catch(Throwable t) {
-//            throwables.add(t);
-//        };
+        // 1.8.3 (Spigot)
+        try{
+            return new fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev();
+        }
+        catch(Throwable t) {
+            throwables.add(t);
+        };
         // TEMP END //
 
         // 1.8
