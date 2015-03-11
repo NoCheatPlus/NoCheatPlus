@@ -65,6 +65,7 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final ActionList againstActions;
 
     public final boolean    autoSignCheck;
+    public final boolean    autoSignSkipEmpty;
     public final ActionList autoSignActions;
 
     public final boolean    directionCheck;
@@ -100,6 +101,7 @@ public class BlockPlaceConfig extends ACheckConfig {
         againstActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, Permissions.BLOCKPLACE_AGAINST);
 
         autoSignCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
+        autoSignSkipEmpty = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_SKIPEMPTY);
         autoSignActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
 
 

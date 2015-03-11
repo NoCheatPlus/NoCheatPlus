@@ -128,6 +128,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, "cancel");
 
         set(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_AUTOSIGN_SKIPEMPTY, false);
         set(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, "cancel vl>10 log:bautosign:0:3:if cancel");
 
         set(ConfPaths.BLOCKPLACE_DIRECTION_CHECK, true);

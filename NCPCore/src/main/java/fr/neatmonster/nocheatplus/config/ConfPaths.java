@@ -23,42 +23,42 @@ public abstract class ConfPaths {
 
     // Configuration version.
     @GlobalConfig // TODO: Per file versions should also be supported. Better with per-path comparison?
-    public static final String CONFIGVERSION							 = "configversion.";
-    public static final String CONFIGVERSION_NOTIFY						 = CONFIGVERSION + "notify";
+    public static final String CONFIGVERSION                             = "configversion.";
+    public static final String CONFIGVERSION_NOTIFY                      = CONFIGVERSION + "notify";
     /** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with first save. */
-    public static final String CONFIGVERSION_CREATED					 = CONFIGVERSION + "created";
+    public static final String CONFIGVERSION_CREATED                     = CONFIGVERSION + "created";
     /** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with each save. */
-    public static final String CONFIGVERSION_SAVED						 = CONFIGVERSION + "saved";
+    public static final String CONFIGVERSION_SAVED                       = CONFIGVERSION + "saved";
 
     @GlobalConfig
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
     public static final String  LOGGING_MAXQUEUESIZE                     = LOGGING + "maxqueuesize";
 
-    private static final String LOGGING_BACKEND							 = LOGGING + "backend.";
-    private static final String LOGGING_BACKEND_CONSOLE					 = LOGGING_BACKEND + "console.";
+    private static final String LOGGING_BACKEND                          = LOGGING + "backend.";
+    private static final String LOGGING_BACKEND_CONSOLE                  = LOGGING_BACKEND + "console.";
     public static final String  LOGGING_BACKEND_CONSOLE_ACTIVE           = LOGGING_BACKEND_CONSOLE + "active";
-    public static final String  LOGGING_BACKEND_CONSOLE_PREFIX			 = LOGGING_BACKEND_CONSOLE + "prefix";
+    public static final String  LOGGING_BACKEND_CONSOLE_PREFIX           = LOGGING_BACKEND_CONSOLE + "prefix";
     public static final String  LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS     = LOGGING_BACKEND_CONSOLE + "asynchronous";
-    private static final String LOGGING_BACKEND_FILE					 = LOGGING_BACKEND + "file.";
-    public static final String  LOGGING_BACKEND_FILE_ACTIVE	        	 = LOGGING_BACKEND_FILE + "active";
-    public static final String  LOGGING_BACKEND_FILE_FILENAME	         = LOGGING_BACKEND_FILE + "filename";
-    public static final String  LOGGING_BACKEND_FILE_PREFIX				 = LOGGING_BACKEND_FILE + "prefix";
-    private static final String LOGGING_BACKEND_INGAMECHAT				 = LOGGING_BACKEND + "ingamechat.";
-    public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE      	 = LOGGING_BACKEND_INGAMECHAT + "active";
+    private static final String LOGGING_BACKEND_FILE                     = LOGGING_BACKEND + "file.";
+    public static final String  LOGGING_BACKEND_FILE_ACTIVE              = LOGGING_BACKEND_FILE + "active";
+    public static final String  LOGGING_BACKEND_FILE_FILENAME            = LOGGING_BACKEND_FILE + "filename";
+    public static final String  LOGGING_BACKEND_FILE_PREFIX              = LOGGING_BACKEND_FILE + "prefix";
+    private static final String LOGGING_BACKEND_INGAMECHAT               = LOGGING_BACKEND + "ingamechat.";
+    public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE        = LOGGING_BACKEND_INGAMECHAT + "active";
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
-    public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
+    public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX        = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
     private static final String LOGGING_EXTENDED                         = LOGGING + "extended.";
     public static final String  LOGGING_EXTENDED_STATUS                  = LOGGING_EXTENDED + "status";
 
     @GlobalConfig
     private static final String MISCELLANEOUS = "miscellaneous.";
-    //public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
-    //public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
+    //public static final String  MISCELLANEOUS_CHECKFORUPDATES                = MISCELLANEOUS + "checkforupdates";
+    //public static final String  MISCELLANEOUS_UPDATETIMEOUT                    = MISCELLANEOUS + "updatetimeout";
 
     /** TEMP: hidden flag to disable all lag adaption with one flag. */
-    public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
+    public static final String MISCELLANEOUS_LAG                         = MISCELLANEOUS + "lag";
 
     // Extended data-related settings.
     @GlobalConfig
@@ -70,10 +70,10 @@ public abstract class ConfPaths {
     public static final String  DATA_EXPIRATION_DATA                     = DATA_EXPIRATION + "data";
     public static final String  DATA_EXPIRATION_HISTORY                  = DATA_EXPIRATION + "history";
     // Consistency checking.
-    private static final String DATA_CONSISTENCYCHECKS					 = DATA + "consistencychecks.";
-    public static final  String DATA_CONSISTENCYCHECKS_CHECK			 = DATA_CONSISTENCYCHECKS + "active";
-    public static final  String DATA_CONSISTENCYCHECKS_INTERVAL			 = DATA_CONSISTENCYCHECKS + "interval";
-    public static final  String DATA_CONSISTENCYCHECKS_MAXTIME			 = DATA_CONSISTENCYCHECKS + "maxtime";
+    private static final String DATA_CONSISTENCYCHECKS                   = DATA + "consistencychecks.";
+    public static final  String DATA_CONSISTENCYCHECKS_CHECK             = DATA_CONSISTENCYCHECKS + "active";
+    public static final  String DATA_CONSISTENCYCHECKS_INTERVAL          = DATA_CONSISTENCYCHECKS + "interval";
+    public static final  String DATA_CONSISTENCYCHECKS_MAXTIME           = DATA_CONSISTENCYCHECKS + "maxtime";
     /**
      * This might not might not be used by checks. <br>
      * Used by: DataMan/Player-instances
@@ -81,39 +81,39 @@ public abstract class ConfPaths {
      */
     public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
 
-    private static final String PROTECT									 = "protection.";
+    private static final String PROTECT                                  = "protection.";
     // Clients settings.
-    private static final String PROTECT_CLIENTS							 = PROTECT + "clients.";
+    private static final String PROTECT_CLIENTS                          = PROTECT + "clients.";
     @GlobalConfig
-    private static final String PROTECT_CLIENTS_MOTD					 = PROTECT_CLIENTS + "motd.";
-    public static final String  PROTECT_CLIENTS_MOTD_ACTIVE				 = PROTECT_CLIENTS_MOTD + "active";
-    public static final String  PROTECT_CLIENTS_MOTD_ALLOWALL			 = PROTECT_CLIENTS_MOTD + "allowall";
+    private static final String PROTECT_CLIENTS_MOTD                     = PROTECT_CLIENTS + "motd.";
+    public static final String  PROTECT_CLIENTS_MOTD_ACTIVE              = PROTECT_CLIENTS_MOTD + "active";
+    public static final String  PROTECT_CLIENTS_MOTD_ALLOWALL            = PROTECT_CLIENTS_MOTD + "allowall";
     // Other commands settings
     @GlobalConfig
-    private static final String PROTECT_COMMANDS						 = PROTECT + "commands.";
-    private static final String PROTECT_COMMANDS_CONSOLEONLY			 = PROTECT_COMMANDS + "consoleonly.";
-    public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE		 = PROTECT_COMMANDS_CONSOLEONLY + "active";
-    public  static final String PROTECT_COMMANDS_CONSOLEONLY_MSG		 = PROTECT_COMMANDS_CONSOLEONLY + "message";
-    public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS		 = PROTECT_COMMANDS_CONSOLEONLY + "commands";
+    private static final String PROTECT_COMMANDS                         = PROTECT + "commands.";
+    private static final String PROTECT_COMMANDS_CONSOLEONLY             = PROTECT_COMMANDS + "consoleonly.";
+    public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE      = PROTECT_COMMANDS_CONSOLEONLY + "active";
+    public  static final String PROTECT_COMMANDS_CONSOLEONLY_MSG         = PROTECT_COMMANDS_CONSOLEONLY + "message";
+    public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS        = PROTECT_COMMANDS_CONSOLEONLY + "commands";
     // Plugins settings.
-    private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
+    private static final String PROTECT_PLUGINS                          = PROTECT + "plugins.";
     @GlobalConfig
-    private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
-    public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
-    private static final String PROTECT_PLUGINS_HIDE_NOCOMMAND			 = PROTECT_PLUGINS_HIDE + "unknowncommand.";
-    public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "message";
-    public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "commands";
-    private static final String PROTECT_PLUGINS_HIDE_NOPERMISSION		 = PROTECT_PLUGINS_HIDE + "nopermission.";
-    public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "message";
-    public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "commands";
+    private static final String PROTECT_PLUGINS_HIDE                     = PROTECT_PLUGINS + "hide.";
+    public static  final String PROTECT_PLUGINS_HIDE_ACTIVE              = PROTECT_PLUGINS_HIDE + "active";
+    private static final String PROTECT_PLUGINS_HIDE_NOCOMMAND           = PROTECT_PLUGINS_HIDE + "unknowncommand.";
+    public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG       = PROTECT_PLUGINS_HIDE_NOCOMMAND + "message";
+    public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS      = PROTECT_PLUGINS_HIDE_NOCOMMAND + "commands";
+    private static final String PROTECT_PLUGINS_HIDE_NOPERMISSION        = PROTECT_PLUGINS_HIDE + "nopermission.";
+    public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG    = PROTECT_PLUGINS_HIDE_NOPERMISSION + "message";
+    public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS   = PROTECT_PLUGINS_HIDE_NOPERMISSION + "commands";
 
     // Checks!
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
-    public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
+    public static final  String CHECKS_DEBUG                             = CHECKS + SUB_DEBUG;
     public static final String  BLOCKBREAK                               = CHECKS + "blockbreak.";
 
-    public static final String  BLOCKBREAK_DEBUG						 = BLOCKBREAK + "debug";
+    public static final String  BLOCKBREAK_DEBUG                         = BLOCKBREAK + "debug";
 
 
     private static final String BLOCKBREAK_DIRECTION                     = BLOCKBREAK + "direction.";
@@ -122,7 +122,7 @@ public abstract class ConfPaths {
 
     private static final String BLOCKBREAK_FASTBREAK                     = BLOCKBREAK + "fastbreak.";
     public static final String  BLOCKBREAK_FASTBREAK_CHECK               = BLOCKBREAK_FASTBREAK + "active";
-    public static final String  BLOCKBREAK_FASTBREAK_STRICT				 = BLOCKBREAK_FASTBREAK + "strict";
+    public static final String  BLOCKBREAK_FASTBREAK_STRICT                 = BLOCKBREAK_FASTBREAK + "strict";
     private static final String BLOCKBREAK_FASTBREAK_BUCKETS             = BLOCKBREAK + "buckets.";
     public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION  = BLOCKBREAK_FASTBREAK_BUCKETS + "contention";
     @GlobalConfig
@@ -163,7 +163,7 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_WRONGBLOCK_LEVEL              = BLOCKBREAK_WRONGBLOCK + "level";
     public static final String  BLOCKBREAK_WRONGBLOCK_ACTIONS            = BLOCKBREAK_WRONGBLOCK + "actions";
 
-    public static final String BLOCKINTERACT                            = CHECKS + "blockinteract.";
+    public static final String BLOCKINTERACT                             = CHECKS + "blockinteract.";
 
     private static final String BLOCKINTERACT_DIRECTION                  = BLOCKINTERACT + "direction.";
     public static final String  BLOCKINTERACT_DIRECTION_CHECK            = BLOCKINTERACT_DIRECTION + "active";
@@ -173,26 +173,27 @@ public abstract class ConfPaths {
     public static final String  BLOCKINTERACT_REACH_CHECK                = BLOCKINTERACT_REACH + "active";
     public static final String  BLOCKINTERACT_REACH_ACTIONS              = BLOCKINTERACT_REACH + "actions";
 
-    private static final String BLOCKINTERACT_SPEED						 = BLOCKINTERACT + "speed.";
-    public static final String BLOCKINTERACT_SPEED_CHECK				 = BLOCKINTERACT_SPEED + "active";
-    public static final String BLOCKINTERACT_SPEED_INTERVAL				 = BLOCKINTERACT_SPEED + "interval";
-    public static final String BLOCKINTERACT_SPEED_LIMIT				 = BLOCKINTERACT_SPEED + "limit";
-    public static final String BLOCKINTERACT_SPEED_ACTIONS				 = BLOCKINTERACT_SPEED + "actions";
+    private static final String BLOCKINTERACT_SPEED                      = BLOCKINTERACT + "speed.";
+    public static final String BLOCKINTERACT_SPEED_CHECK                 = BLOCKINTERACT_SPEED + "active";
+    public static final String BLOCKINTERACT_SPEED_INTERVAL              = BLOCKINTERACT_SPEED + "interval";
+    public static final String BLOCKINTERACT_SPEED_LIMIT                 = BLOCKINTERACT_SPEED + "limit";
+    public static final String BLOCKINTERACT_SPEED_ACTIONS               = BLOCKINTERACT_SPEED + "actions";
 
-    private static final String BLOCKINTERACT_VISIBLE					 = BLOCKINTERACT + "visible.";
-    public static final String  BLOCKINTERACT_VISIBLE_CHECK				 = BLOCKINTERACT_VISIBLE + "active";
-    public static final String  BLOCKINTERACT_VISIBLE_ACTIONS			 = BLOCKINTERACT_VISIBLE + "actions";
+    private static final String BLOCKINTERACT_VISIBLE                    = BLOCKINTERACT + "visible.";
+    public static final String  BLOCKINTERACT_VISIBLE_CHECK              = BLOCKINTERACT_VISIBLE + "active";
+    public static final String  BLOCKINTERACT_VISIBLE_ACTIONS            = BLOCKINTERACT_VISIBLE + "actions";
 
     // BLOCKPLACE
     public static final String  BLOCKPLACE                               = CHECKS + "blockplace.";
 
-    private static final String BLOCKPLACE_AGAINST						 = BLOCKPLACE + "against.";
-    public static final String  BLOCKPLACE_AGAINST_CHECK				 = BLOCKPLACE_AGAINST + "active";
-    public static final String BLOCKPLACE_AGAINST_ACTIONS				 = BLOCKPLACE_AGAINST + "actions";
+    private static final String BLOCKPLACE_AGAINST                       = BLOCKPLACE + "against.";
+    public static final String  BLOCKPLACE_AGAINST_CHECK                 = BLOCKPLACE_AGAINST + "active";
+    public static final String BLOCKPLACE_AGAINST_ACTIONS                = BLOCKPLACE_AGAINST + "actions";
 
-    private static final String BLOCKPLACE_AUTOSIGN						 = BLOCKPLACE + "autosign.";
-    public static final String  BLOCKPLACE_AUTOSIGN_CHECK				 = BLOCKPLACE_AUTOSIGN + "active";
-    public static final String  BLOCKPLACE_AUTOSIGN_ACTIONS				 = BLOCKPLACE_AUTOSIGN + "actions";
+    private static final String BLOCKPLACE_AUTOSIGN                         = BLOCKPLACE + "autosign.";
+    public static final String  BLOCKPLACE_AUTOSIGN_CHECK                = BLOCKPLACE_AUTOSIGN + "active";
+    public static final String  BLOCKPLACE_AUTOSIGN_SKIPEMPTY            = BLOCKPLACE_AUTOSIGN + "skipempty";
+    public static final String  BLOCKPLACE_AUTOSIGN_ACTIONS              = BLOCKPLACE_AUTOSIGN + "actions";
 
     private static final String BLOCKPLACE_DIRECTION                     = BLOCKPLACE + "direction.";
     public static final String  BLOCKPLACE_DIRECTION_CHECK               = BLOCKPLACE_DIRECTION + "active";
@@ -201,14 +202,14 @@ public abstract class ConfPaths {
     private static final String BLOCKPLACE_FASTPLACE                     = BLOCKPLACE + "fastplace.";
     public static final String  BLOCKPLACE_FASTPLACE_CHECK               = BLOCKPLACE_FASTPLACE + "active";
     public static final String  BLOCKPLACE_FASTPLACE_LIMIT               = BLOCKPLACE_FASTPLACE + "limit";
-    private static final String BLOCKPLACE_FASTPLACE_SHORTTERM			 = BLOCKPLACE_FASTPLACE + "shortterm.";
-    public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS	 = BLOCKPLACE_FASTPLACE_SHORTTERM + "ticks";
-    public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT	 = BLOCKPLACE_FASTPLACE_SHORTTERM + "limit";
+    private static final String BLOCKPLACE_FASTPLACE_SHORTTERM           = BLOCKPLACE_FASTPLACE + "shortterm.";
+    public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS     = BLOCKPLACE_FASTPLACE_SHORTTERM + "ticks";
+    public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT     = BLOCKPLACE_FASTPLACE_SHORTTERM + "limit";
     public static final String  BLOCKPLACE_FASTPLACE_ACTIONS             = BLOCKPLACE_FASTPLACE + "actions";
 
     private static final String BLOCKPLACE_NOSWING                       = BLOCKPLACE + "noswing.";
     public static final String  BLOCKPLACE_NOSWING_CHECK                 = BLOCKPLACE_NOSWING + "active";
-    public static final String  BLOCKPLACE_NOSWING_EXCEPTIONS			 = BLOCKPLACE_NOSWING + "exceptions";
+    public static final String  BLOCKPLACE_NOSWING_EXCEPTIONS            = BLOCKPLACE_NOSWING + "exceptions";
     public static final String  BLOCKPLACE_NOSWING_ACTIONS               = BLOCKPLACE_NOSWING + "actions";
 
     private static final String BLOCKPLACE_REACH                         = BLOCKPLACE + "reach.";
@@ -222,14 +223,14 @@ public abstract class ConfPaths {
 
     public static final String  CHAT                                     = CHECKS + "chat.";
 
-    private static final String CHAT_CAPTCHA                    = CHAT + "captcha.";
-    public static final String  CHAT_CAPTCHA_CHECK              = CHAT_CAPTCHA + "active";
-    public static final String  CHAT_CAPTCHA_CHARACTERS         = CHAT_CAPTCHA + "characters";
-    public static final String  CHAT_CAPTCHA_LENGTH             = CHAT_CAPTCHA + "length";
-    public static final String  CHAT_CAPTCHA_QUESTION           = CHAT_CAPTCHA + "question";
-    public static final String  CHAT_CAPTCHA_SUCCESS            = CHAT_CAPTCHA + "success";
-    public static final String  CHAT_CAPTCHA_TRIES              = CHAT_CAPTCHA + "tries";
-    public static final String  CHAT_CAPTCHA_ACTIONS            = CHAT_CAPTCHA + "actions";
+    private static final String CHAT_CAPTCHA                             = CHAT + "captcha.";
+    public static final String  CHAT_CAPTCHA_CHECK                       = CHAT_CAPTCHA + "active";
+    public static final String  CHAT_CAPTCHA_CHARACTERS                  = CHAT_CAPTCHA + "characters";
+    public static final String  CHAT_CAPTCHA_LENGTH                      = CHAT_CAPTCHA + "length";
+    public static final String  CHAT_CAPTCHA_QUESTION                    = CHAT_CAPTCHA + "question";
+    public static final String  CHAT_CAPTCHA_SUCCESS                     = CHAT_CAPTCHA + "success";
+    public static final String  CHAT_CAPTCHA_TRIES                       = CHAT_CAPTCHA + "tries";
+    public static final String  CHAT_CAPTCHA_ACTIONS                     = CHAT_CAPTCHA + "actions";
 
     private static final String CHAT_COLOR                               = CHAT + "color.";
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
@@ -248,24 +249,24 @@ public abstract class ConfPaths {
     public static final String  CHAT_COMMANDS_ACTIONS                    = CHAT_COMMANDS + "actions";
 
     // Text
-    private static final String CHAT_TEXT                                 = CHAT + "text.";
-    public static final String CHAT_TEXT_CHECK                            = CHAT_TEXT + "active";
-    public static final String CHAT_TEXT_DEBUG                       = CHAT_TEXT + "debug";
-    public static final String CHAT_TEXT_ENGINE_MAXIMUM              = CHAT_TEXT + "maximum";
-    public static final String CHAT_TEXT_ALLOWVLRESET				 = CHAT_TEXT + "allowvlreset";
-    public static final String CHAT_TEXT_FREQ                        = CHAT_TEXT + "frequency.";
-    public static final String CHAT_TEXT_FREQ_NORM                   = CHAT_TEXT_FREQ + "normal.";
-    public static final String CHAT_TEXT_FREQ_NORM_FACTOR            = CHAT_TEXT_FREQ_NORM + "factor";
-    public static final String CHAT_TEXT_FREQ_NORM_LEVEL             = CHAT_TEXT_FREQ_NORM + "level";
-    public static final String CHAT_TEXT_FREQ_NORM_WEIGHT            = CHAT_TEXT_FREQ_NORM + "weight";
-    public static final String CHAT_TEXT_FREQ_NORM_MIN               = CHAT_TEXT_FREQ_NORM + "minimum";
-    public static final String CHAT_TEXT_FREQ_NORM_ACTIONS           = CHAT_TEXT_FREQ_NORM + "actions";
-    private static final String CHAT_TEXT_FREQ_SHORTTERM             = CHAT_TEXT_FREQ + "shortterm.";
-    public static final String CHAT_TEXT_FREQ_SHORTTERM_FACTOR       = CHAT_TEXT_FREQ_SHORTTERM + "factor";
-    public static final String CHAT_TEXT_FREQ_SHORTTERM_LEVEL        = CHAT_TEXT_FREQ_SHORTTERM + "level";
-    public static final String CHAT_TEXT_FREQ_SHORTTERM_WEIGHT       = CHAT_TEXT_FREQ_SHORTTERM + "weight";
-    public static final String  CHAT_TEXT_FREQ_SHORTTERM_MIN         = CHAT_TEXT_FREQ_SHORTTERM + "minimum";
-    public static final String CHAT_TEXT_FREQ_SHORTTERM_ACTIONS      = CHAT_TEXT_FREQ_SHORTTERM + "actions";
+    private static final String CHAT_TEXT                                = CHAT + "text.";
+    public static final String CHAT_TEXT_CHECK                           = CHAT_TEXT + "active";
+    public static final String CHAT_TEXT_DEBUG                           = CHAT_TEXT + "debug";
+    public static final String CHAT_TEXT_ENGINE_MAXIMUM                  = CHAT_TEXT + "maximum";
+    public static final String CHAT_TEXT_ALLOWVLRESET                    = CHAT_TEXT + "allowvlreset";
+    public static final String CHAT_TEXT_FREQ                            = CHAT_TEXT + "frequency.";
+    public static final String CHAT_TEXT_FREQ_NORM                       = CHAT_TEXT_FREQ + "normal.";
+    public static final String CHAT_TEXT_FREQ_NORM_FACTOR                = CHAT_TEXT_FREQ_NORM + "factor";
+    public static final String CHAT_TEXT_FREQ_NORM_LEVEL                 = CHAT_TEXT_FREQ_NORM + "level";
+    public static final String CHAT_TEXT_FREQ_NORM_WEIGHT                = CHAT_TEXT_FREQ_NORM + "weight";
+    public static final String CHAT_TEXT_FREQ_NORM_MIN                   = CHAT_TEXT_FREQ_NORM + "minimum";
+    public static final String CHAT_TEXT_FREQ_NORM_ACTIONS               = CHAT_TEXT_FREQ_NORM + "actions";
+    private static final String CHAT_TEXT_FREQ_SHORTTERM                 = CHAT_TEXT_FREQ + "shortterm.";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_FACTOR           = CHAT_TEXT_FREQ_SHORTTERM + "factor";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_LEVEL            = CHAT_TEXT_FREQ_SHORTTERM + "level";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_WEIGHT           = CHAT_TEXT_FREQ_SHORTTERM + "weight";
+    public static final String  CHAT_TEXT_FREQ_SHORTTERM_MIN             = CHAT_TEXT_FREQ_SHORTTERM + "minimum";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_ACTIONS          = CHAT_TEXT_FREQ_SHORTTERM + "actions";
 
     // (Some of the following paths must be public for generic config reading.)
     // Per message checks.
@@ -341,20 +342,20 @@ public abstract class ConfPaths {
      */
     public static final String  COMBINED                                 = CHECKS + "combined.";
 
-    private static final String COMBINED_BEDLEAVE						 = COMBINED + "bedleave.";
-    public static final String  COMBINED_BEDLEAVE_CHECK					 = COMBINED_BEDLEAVE + "active";
-    public static final String  COMBINED_BEDLEAVE_ACTIONS				 = COMBINED_BEDLEAVE + "actions";
+    private static final String COMBINED_BEDLEAVE                        = COMBINED + "bedleave.";
+    public static final String  COMBINED_BEDLEAVE_CHECK                  = COMBINED_BEDLEAVE + "active";
+    public static final String  COMBINED_BEDLEAVE_ACTIONS                = COMBINED_BEDLEAVE + "actions";
 
-    private static final String COMBINED_ENDERPEARL						 = COMBINED + "enderpearl.";
-    public static final String  COMBINED_ENDERPEARL_CHECK				 = COMBINED_ENDERPEARL + "active";
-    public static final String  COMBINED_ENDERPEARL_PREVENTCLICKBLOCK	 = COMBINED_ENDERPEARL + "preventclickblock";
+    private static final String COMBINED_ENDERPEARL                      = COMBINED + "enderpearl.";
+    public static final String  COMBINED_ENDERPEARL_CHECK                = COMBINED_ENDERPEARL + "active";
+    public static final String  COMBINED_ENDERPEARL_PREVENTCLICKBLOCK    = COMBINED_ENDERPEARL + "preventclickblock";
 
     private static final String COMBINED_IMPROBABLE                      = COMBINED + "improbable.";
     public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
     public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";
 
-    //	private static final String COMBINED_IMPROBABLE_CHECKS               = COMBINED_IMPROBABLE + "options.";               
-    //	public static final String  COMBINED_IMPROBABLE_FASTBREAK_CHECK      = COMBINED_IMPROBABLE_CHECKS + "fastbreak";
+    //    private static final String COMBINED_IMPROBABLE_CHECKS               = COMBINED_IMPROBABLE + "options.";               
+    //    public static final String  COMBINED_IMPROBABLE_FASTBREAK_CHECK      = COMBINED_IMPROBABLE_CHECKS + "fastbreak";
 
     public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";
 
@@ -369,8 +370,8 @@ public abstract class ConfPaths {
     public static final String  COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE = COMBINED_INVULNERABLE_TRIGGERS + "falldistance";
 
     public static final String COMBINED_MUNCHHAUSEN                         = COMBINED + "munchhausen.";
-    public static final String COMBINED_MUNCHHAUSEN_CHECK				 	= COMBINED_MUNCHHAUSEN + "active";
-    public static final String COMBINED_MUNCHHAUSEN_ACTIONS					= COMBINED_MUNCHHAUSEN + "actions";
+    public static final String COMBINED_MUNCHHAUSEN_CHECK                   = COMBINED_MUNCHHAUSEN + "active";
+    public static final String COMBINED_MUNCHHAUSEN_ACTIONS                 = COMBINED_MUNCHHAUSEN + "actions";
 
     private static final String COMBINED_YAWRATE                         = COMBINED + "yawrate.";
     public static final String  COMBINED_YAWRATE_RATE                    = COMBINED_YAWRATE + "rate";
@@ -399,20 +400,20 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_DIRECTION                          = FIGHT + "direction.";
     public static final String  FIGHT_DIRECTION_CHECK                    = FIGHT_DIRECTION + "active";
-    public static final String  FIGHT_DIRECTION_STRICT					 = FIGHT_DIRECTION + "strict";
+    public static final String  FIGHT_DIRECTION_STRICT                   = FIGHT_DIRECTION + "strict";
     public static final String  FIGHT_DIRECTION_PENALTY                  = FIGHT_DIRECTION + "penalty";
     public static final String  FIGHT_DIRECTION_ACTIONS                  = FIGHT_DIRECTION + "actions";
 
-    private static final String FIGHT_FASTHEAL							 = FIGHT + "fastheal.";
-    public static final String  FIGHT_FASTHEAL_CHECK					 = FIGHT_FASTHEAL + "active";
-    public static final String  FIGHT_FASTHEAL_INTERVAL					 = FIGHT_FASTHEAL + "interval";
-    public static final String  FIGHT_FASTHEAL_BUFFER					 = FIGHT_FASTHEAL + "buffer";
-    public static final String  FIGHT_FASTHEAL_ACTIONS					 = FIGHT_FASTHEAL + "actions";
+    private static final String FIGHT_FASTHEAL                           = FIGHT + "fastheal.";
+    public static final String  FIGHT_FASTHEAL_CHECK                     = FIGHT_FASTHEAL + "active";
+    public static final String  FIGHT_FASTHEAL_INTERVAL                  = FIGHT_FASTHEAL + "interval";
+    public static final String  FIGHT_FASTHEAL_BUFFER                    = FIGHT_FASTHEAL + "buffer";
+    public static final String  FIGHT_FASTHEAL_ACTIONS                   = FIGHT_FASTHEAL + "actions";
 
     private static final String FIGHT_GODMODE                            = FIGHT + "godmode.";
     public static final String  FIGHT_GODMODE_CHECK                      = FIGHT_GODMODE + "active";
-    public static final String  FIGHT_GODMODE_LAGMINAGE					 = FIGHT_GODMODE + "minage";
-    public static final String  FIGHT_GODMODE_LAGMAXAGE 				 = FIGHT_GODMODE + "maxage";
+    public static final String  FIGHT_GODMODE_LAGMINAGE                  = FIGHT_GODMODE + "minage";
+    public static final String  FIGHT_GODMODE_LAGMAXAGE                  = FIGHT_GODMODE + "maxage";
     public static final String  FIGHT_GODMODE_ACTIONS                    = FIGHT_GODMODE + "actions";
 
     private static final String FIGHT_NOSWING                            = FIGHT + "noswing.";
@@ -421,12 +422,12 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_REACH                              = FIGHT + "reach.";
     public static final String  FIGHT_REACH_CHECK                        = FIGHT_REACH + "active";
-    public static final String  FIGHT_REACH_SURVIVALDISTANCE			 = FIGHT_REACH + "survivaldistance";
+    public static final String  FIGHT_REACH_SURVIVALDISTANCE             = FIGHT_REACH + "survivaldistance";
     public static final String  FIGHT_REACH_PENALTY                      = FIGHT_REACH + "penalty";
     public static final String  FIGHT_REACH_PRECISION                    = FIGHT_REACH + "precision";
     public static final String  FIGHT_REACH_REDUCE                       = FIGHT_REACH + "reduce";
-    public static final String  FIGHT_REACH_REDUCEDISTANCE				 = FIGHT_REACH + "reducedistance";
-    public static final String  FIGHT_REACH_REDUCESTEP					 = FIGHT_REACH + "reducestep";
+    public static final String  FIGHT_REACH_REDUCEDISTANCE               = FIGHT_REACH + "reducedistance";
+    public static final String  FIGHT_REACH_REDUCESTEP                   = FIGHT_REACH + "reducestep";
     public static final String  FIGHT_REACH_ACTIONS                      = FIGHT_REACH + "actions";
 
     public static final String FIGHT_SELFHIT                             = FIGHT + "selfhit.";
@@ -462,18 +463,18 @@ public abstract class ConfPaths {
     private static final String INVENTORY_FASTCLICK                      = INVENTORY + "fastclick.";
     public static final String  INVENTORY_FASTCLICK_CHECK                = INVENTORY_FASTCLICK + "active";
     public static final String  INVENTORY_FASTCLICK_SPARECREATIVE        = INVENTORY_FASTCLICK + "sparecreative";
-    public static final String  INVENTORY_FASTCLICK_TWEAKS1_5			 = INVENTORY_FASTCLICK + "tweaks1_5";
-    private static final String INVENTORY_FASTCLICK_LIMIT				 = INVENTORY_FASTCLICK + "limit.";
-    public static final String  INVENTORY_FASTCLICK_LIMIT_SHORTTERM		 = INVENTORY_FASTCLICK_LIMIT + "shortterm";
-    public static final String  INVENTORY_FASTCLICK_LIMIT_NORMAL		 = INVENTORY_FASTCLICK_LIMIT + "normal";
+    public static final String  INVENTORY_FASTCLICK_TWEAKS1_5            = INVENTORY_FASTCLICK + "tweaks1_5";
+    private static final String INVENTORY_FASTCLICK_LIMIT                = INVENTORY_FASTCLICK + "limit.";
+    public static final String  INVENTORY_FASTCLICK_LIMIT_SHORTTERM      = INVENTORY_FASTCLICK_LIMIT + "shortterm";
+    public static final String  INVENTORY_FASTCLICK_LIMIT_NORMAL         = INVENTORY_FASTCLICK_LIMIT + "normal";
     public static final String  INVENTORY_FASTCLICK_ACTIONS              = INVENTORY_FASTCLICK + "actions";
 
-    private static final String INVENTORY_FASTCONSUME					 = INVENTORY + "fastconsume.";
-    public static final String  INVENTORY_FASTCONSUME_CHECK				 = INVENTORY_FASTCONSUME + "active";
-    public static final String  INVENTORY_FASTCONSUME_DURATION			 = INVENTORY_FASTCONSUME + "duration";
-    public static final String  INVENTORY_FASTCONSUME_WHITELIST			 = INVENTORY_FASTCONSUME + "whitelist";
-    public static final String  INVENTORY_FASTCONSUME_ITEMS				 = INVENTORY_FASTCONSUME + "items";
-    public static final String  INVENTORY_FASTCONSUME_ACTIONS			 = INVENTORY_FASTCONSUME + "actions";
+    private static final String INVENTORY_FASTCONSUME                    = INVENTORY + "fastconsume.";
+    public static final String  INVENTORY_FASTCONSUME_CHECK              = INVENTORY_FASTCONSUME + "active";
+    public static final String  INVENTORY_FASTCONSUME_DURATION           = INVENTORY_FASTCONSUME + "duration";
+    public static final String  INVENTORY_FASTCONSUME_WHITELIST          = INVENTORY_FASTCONSUME + "whitelist";
+    public static final String  INVENTORY_FASTCONSUME_ITEMS              = INVENTORY_FASTCONSUME + "items";
+    public static final String  INVENTORY_FASTCONSUME_ACTIONS            = INVENTORY_FASTCONSUME + "actions";
 
     private static final String INVENTORY_GUTENBERG                      = INVENTORY + "gutenberg.";
     public static final String  INVENTORY_GUTENBERG_CHECK                = INVENTORY_GUTENBERG + "active";
@@ -481,7 +482,7 @@ public abstract class ConfPaths {
 
     private static final String INVENTORY_INSTANTBOW                     = INVENTORY + "instantbow.";
     public static final String  INVENTORY_INSTANTBOW_CHECK               = INVENTORY_INSTANTBOW + "active";
-    public static final String  INVENTORY_INSTANTBOW_STRICT				 = INVENTORY_INSTANTBOW + "strict";
+    public static final String  INVENTORY_INSTANTBOW_STRICT              = INVENTORY_INSTANTBOW + "strict";
     public static final String  INVENTORY_INSTANTBOW_DELAY               = INVENTORY_INSTANTBOW + "delay";
     public static final String  INVENTORY_INSTANTBOW_ACTIONS             = INVENTORY_INSTANTBOW + "actions";
 
@@ -492,11 +493,11 @@ public abstract class ConfPaths {
     private static final String INVENTORY_ITEMS                          = INVENTORY + "items.";
     public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + "active";
 
-    private static final String INVENTORY_OPEN							 = INVENTORY + "open.";
-    public static final  String INVENTORY_OPEN_CHECK					 = INVENTORY_OPEN + "active";
+    private static final String INVENTORY_OPEN                           = INVENTORY + "open.";
+    public static final  String INVENTORY_OPEN_CHECK                     = INVENTORY_OPEN + "active";
     // TODO: close and cancelother on open-section-level are temporary.
-    public static final  String INVENTORY_OPEN_CLOSE					 = INVENTORY_OPEN + "close";
-    public static final  String INVENTORY_OPEN_CANCELOTHER				 = INVENTORY_OPEN + "cancelother";
+    public static final  String INVENTORY_OPEN_CLOSE                     = INVENTORY_OPEN + "close";
+    public static final  String INVENTORY_OPEN_CANCELOTHER               = INVENTORY_OPEN + "cancelother";
 
     public static final String  MOVING                                   = CHECKS + "moving.";
 
@@ -509,13 +510,13 @@ public abstract class ConfPaths {
 
     private static final String MOVING_MOREPACKETS                       = MOVING + "morepackets.";
     public static final String  MOVING_MOREPACKETS_CHECK                 = MOVING_MOREPACKETS + "active";
-    public static final String  MOVING_MOREPACKETS_SECONDS				 = MOVING_MOREPACKETS + "seconds";
-    public static final String  MOVING_MOREPACKETS_EPSIDEAL				 = MOVING_MOREPACKETS + "epsideal";
-    public static final String  MOVING_MOREPACKETS_EPSMAX				 = MOVING_MOREPACKETS + "epsmax";
-    private static final String MOVING_MOREPACKETS_BURST				 = MOVING_MOREPACKETS + "burst.";
-    public static final String  MOVING_MOREPACKETS_BURST_PACKETS		 = MOVING_MOREPACKETS_BURST + "packets";
-    public static final String  MOVING_MOREPACKETS_BURST_DIRECT			 = MOVING_MOREPACKETS_BURST + "directviolation";
-    public static final String  MOVING_MOREPACKETS_BURST_EPM			 = MOVING_MOREPACKETS_BURST + "epmviolation";
+    public static final String  MOVING_MOREPACKETS_SECONDS               = MOVING_MOREPACKETS + "seconds";
+    public static final String  MOVING_MOREPACKETS_EPSIDEAL              = MOVING_MOREPACKETS + "epsideal";
+    public static final String  MOVING_MOREPACKETS_EPSMAX                = MOVING_MOREPACKETS + "epsmax";
+    private static final String MOVING_MOREPACKETS_BURST                 = MOVING_MOREPACKETS + "burst.";
+    public static final String  MOVING_MOREPACKETS_BURST_PACKETS         = MOVING_MOREPACKETS_BURST + "packets";
+    public static final String  MOVING_MOREPACKETS_BURST_DIRECT          = MOVING_MOREPACKETS_BURST + "directviolation";
+    public static final String  MOVING_MOREPACKETS_BURST_EPM             = MOVING_MOREPACKETS_BURST + "epmviolation";
     public static final String  MOVING_MOREPACKETS_ACTIONS               = MOVING_MOREPACKETS + "actions";
 
     private static final String MOVING_MOREPACKETSVEHICLE                = MOVING + "morepacketsvehicle.";
@@ -525,10 +526,10 @@ public abstract class ConfPaths {
     private static final String MOVING_NOFALL                            = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                      = MOVING_NOFALL + "active";
     public static final String  MOVING_NOFALL_DEALDAMAGE                 = MOVING_NOFALL + "dealdamage";
-    public static final String  MOVING_NOFALL_RESETONVL  				 = MOVING_NOFALL + "resetonviolation";
-    public static final String  MOVING_NOFALL_RESETONTP 				 = MOVING_NOFALL + "resetonteleport";
-    public static final String  MOVING_NOFALL_RESETONVEHICLE			 = MOVING_NOFALL + "resetonvehicle";
-    public static final String  MOVING_NOFALL_ANTICRITICALS				 = MOVING_NOFALL + "anticriticals";
+    public static final String  MOVING_NOFALL_RESETONVL                  = MOVING_NOFALL + "resetonviolation";
+    public static final String  MOVING_NOFALL_RESETONTP                  = MOVING_NOFALL + "resetonteleport";
+    public static final String  MOVING_NOFALL_RESETONVEHICLE             = MOVING_NOFALL + "resetonvehicle";
+    public static final String  MOVING_NOFALL_ANTICRITICALS              = MOVING_NOFALL + "anticriticals";
     public static final String  MOVING_NOFALL_ACTIONS                    = MOVING_NOFALL + "actions";
 
     public static final String  MOVING_PASSABLE                             = MOVING + "passable.";
@@ -545,83 +546,83 @@ public abstract class ConfPaths {
     public static final String  MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT   = MOVING_PASSABLE_UNTRACKED_CMD + "tryteleport";
     public static final String  MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES      = MOVING_PASSABLE_UNTRACKED_CMD + "prefixes";
 
-    private static final String MOVING_SURVIVALFLY						= MOVING + "survivalfly.";
-    public static final String MOVING_SURVIVALFLY_CHECK 				= MOVING_SURVIVALFLY + "active";
-    public static final String MOVING_SURVIVALFLY_BLOCKINGSPEED			= MOVING_SURVIVALFLY + "blockingspeed";
-    public static final String MOVING_SURVIVALFLY_SNEAKINGSPEED			= MOVING_SURVIVALFLY + "sneakingspeed";
-    public static final String MOVING_SURVIVALFLY_SPEEDINGSPEED			= MOVING_SURVIVALFLY + "speedingspeed";
-    public static final String MOVING_SURVIVALFLY_SPRINTINGSPEED		= MOVING_SURVIVALFLY + "sprintingspeed";
-    public static final String MOVING_SURVIVALFLY_SWIMMINGSPEED			= MOVING_SURVIVALFLY + "swimmingspeed";
-    public static final String MOVING_SURVIVALFLY_WALKINGSPEED			= MOVING_SURVIVALFLY + "walkingspeed";
-    public static final String MOVING_SURVIVALFLY_COBWEBHACK			= MOVING_SURVIVALFLY + "cobwebhack";
-    private static final String MOVING_SURVIVALFLY_EXTENDED				= MOVING_SURVIVALFLY + "extended.";
-    public static final String MOVING_SURVIVALFLY_EXTENDED_HACC			= MOVING_SURVIVALFLY_EXTENDED + "horizontal-accounting";
-    public static final String MOVING_SURVIVALFLY_EXTENDED_VACC			= MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
-    public static final String MOVING_SURVIVALFLY_FALLDAMAGE			= MOVING_SURVIVALFLY + "falldamage";
-    public static final String MOVING_SURVIVALFLY_VLFREEZE				= MOVING_SURVIVALFLY + "vlfreeze";
-    public static final String MOVING_SURVIVALFLY_ACTIONS				= MOVING_SURVIVALFLY + "actions";
+    private static final String MOVING_SURVIVALFLY                          = MOVING + "survivalfly.";
+    public static final String MOVING_SURVIVALFLY_CHECK                     = MOVING_SURVIVALFLY + "active";
+    public static final String MOVING_SURVIVALFLY_BLOCKINGSPEED             = MOVING_SURVIVALFLY + "blockingspeed";
+    public static final String MOVING_SURVIVALFLY_SNEAKINGSPEED             = MOVING_SURVIVALFLY + "sneakingspeed";
+    public static final String MOVING_SURVIVALFLY_SPEEDINGSPEED             = MOVING_SURVIVALFLY + "speedingspeed";
+    public static final String MOVING_SURVIVALFLY_SPRINTINGSPEED            = MOVING_SURVIVALFLY + "sprintingspeed";
+    public static final String MOVING_SURVIVALFLY_SWIMMINGSPEED             = MOVING_SURVIVALFLY + "swimmingspeed";
+    public static final String MOVING_SURVIVALFLY_WALKINGSPEED              = MOVING_SURVIVALFLY + "walkingspeed";
+    public static final String MOVING_SURVIVALFLY_COBWEBHACK                = MOVING_SURVIVALFLY + "cobwebhack";
+    private static final String MOVING_SURVIVALFLY_EXTENDED                 = MOVING_SURVIVALFLY + "extended.";
+    public static final String MOVING_SURVIVALFLY_EXTENDED_HACC             = MOVING_SURVIVALFLY_EXTENDED + "horizontal-accounting";
+    public static final String MOVING_SURVIVALFLY_EXTENDED_VACC             = MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
+    public static final String MOVING_SURVIVALFLY_FALLDAMAGE                = MOVING_SURVIVALFLY + "falldamage";
+    public static final String MOVING_SURVIVALFLY_VLFREEZE                  = MOVING_SURVIVALFLY + "vlfreeze";
+    public static final String MOVING_SURVIVALFLY_ACTIONS                   = MOVING_SURVIVALFLY + "actions";
 
-    private static final String MOVING_SURVIVALFLY_HOVER			    = MOVING_SURVIVALFLY + "hover.";
-    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK			= MOVING_SURVIVALFLY_HOVER + "active";
+    private static final String MOVING_SURVIVALFLY_HOVER                    = MOVING_SURVIVALFLY + "hover.";
+    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK              = MOVING_SURVIVALFLY_HOVER + "active";
     @GlobalConfig
-    public static final String  MOVING_SURVIVALFLY_HOVER_STEP			= MOVING_SURVIVALFLY_HOVER + "step";
-    public static final String  MOVING_SURVIVALFLY_HOVER_TICKS			= MOVING_SURVIVALFLY_HOVER + "ticks";
-    public static final String  MOVING_SURVIVALFLY_HOVER_LOGINTICKS		= MOVING_SURVIVALFLY_HOVER + "loginticks";
-    public static final String  MOVING_SURVIVALFLY_HOVER_FALLDAMAGE		= MOVING_SURVIVALFLY_HOVER + "falldamage";
-    public static final String  MOVING_SURVIVALFLY_HOVER_SFVIOLATION	= MOVING_SURVIVALFLY_HOVER + "sfviolation";
+    public static final String  MOVING_SURVIVALFLY_HOVER_STEP               = MOVING_SURVIVALFLY_HOVER + "step";
+    public static final String  MOVING_SURVIVALFLY_HOVER_TICKS              = MOVING_SURVIVALFLY_HOVER + "ticks";
+    public static final String  MOVING_SURVIVALFLY_HOVER_LOGINTICKS         = MOVING_SURVIVALFLY_HOVER + "loginticks";
+    public static final String  MOVING_SURVIVALFLY_HOVER_FALLDAMAGE         = MOVING_SURVIVALFLY_HOVER + "falldamage";
+    public static final String  MOVING_SURVIVALFLY_HOVER_SFVIOLATION        = MOVING_SURVIVALFLY_HOVER + "sfviolation";
 
     // Special (to be sorted in or factored out).
-    private static final String MOVING_VELOCITY							= MOVING + "velocity.";
-    public static final String  MOVING_VELOCITY_GRACETICKS				= MOVING_VELOCITY + "graceticks";
-    public static final String  MOVING_VELOCITY_ACTIVATIONCOUNTER		= MOVING_VELOCITY + "activationcounter";
-    public static final String  MOVING_VELOCITY_ACTIVATIONTICKS			= MOVING_VELOCITY + "activationticks";
-    public static final String	MOVING_VELOCITY_STRICTINVALIDATION		= MOVING_VELOCITY + "strictinvalidation";
+    private static final String MOVING_VELOCITY                             = MOVING + "velocity.";
+    public static final String  MOVING_VELOCITY_GRACETICKS                  = MOVING_VELOCITY + "graceticks";
+    public static final String  MOVING_VELOCITY_ACTIVATIONCOUNTER           = MOVING_VELOCITY + "activationcounter";
+    public static final String  MOVING_VELOCITY_ACTIVATIONTICKS             = MOVING_VELOCITY + "activationticks";
+    public static final String    MOVING_VELOCITY_STRICTINVALIDATION        = MOVING_VELOCITY + "strictinvalidation";
 
-    public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
-    public static final String  MOVING_YONGROUND                         = MOVING + "yonground";
-    public static final String  MOVING_SURVIVALFLY_YSTEP                 = MOVING_SURVIVALFLY + "ystep";
+    public static final String  MOVING_NOFALL_YONGROUND                     = MOVING_NOFALL + "yonground";
+    public static final String  MOVING_YONGROUND                            = MOVING + "yonground";
+    public static final String  MOVING_SURVIVALFLY_YSTEP                    = MOVING_SURVIVALFLY + "ystep";
 
     // General.
-    public static final String  MOVING_TEMPKICKILLEGAL					 = MOVING + "tempkickillegal";
-    private static final String MOVING_LOADCHUNKS						 = MOVING + "loadchunks.";
-    public static final String  MOVING_LOADCHUNKS_JOIN					 = MOVING_LOADCHUNKS + "join";
-    public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
-    public static final String  MOVING_ASSUMESPRINT						 = MOVING + "assumesprint";
-    public static final String  MOVING_SPEEDGRACE					 	 = MOVING + "speedgrace";
-    public static final String  MOVING_ENFORCELOCATION					 = MOVING + "enforcelocation";
+    public static final String  MOVING_TEMPKICKILLEGAL                      = MOVING + "tempkickillegal";
+    private static final String MOVING_LOADCHUNKS                           = MOVING + "loadchunks.";
+    public static final String  MOVING_LOADCHUNKS_JOIN                      = MOVING_LOADCHUNKS + "join";
+    public static final String  MOVING_SPRINTINGGRACE                       = MOVING + "sprintinggrace";
+    public static final String  MOVING_ASSUMESPRINT                         = MOVING + "assumesprint";
+    public static final String  MOVING_SPEEDGRACE                           = MOVING + "speedgrace";
+    public static final String  MOVING_ENFORCELOCATION                      = MOVING + "enforcelocation";
 
-    private static final String MOVING_VEHICLES							 = MOVING + "vehicles.";
-    public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
-    public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
+    private static final String MOVING_VEHICLES                             = MOVING + "vehicles.";
+    public static final String  MOVING_VEHICLES_ENFORCELOCATION             = MOVING_VEHICLES + "enforcelocation";
+    public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN           = MOVING_VEHICLES + "preventdestroyown";
 
-    private static final String MOVING_TRACE							 = MOVING + "trace.";
-    public  static final String MOVING_TRACE_SIZE						 = MOVING_TRACE + "size";
-    public  static final String MOVING_TRACE_MERGEDIST					 = MOVING_TRACE + "mergedist";
+    private static final String MOVING_TRACE                                = MOVING + "trace.";
+    public  static final String MOVING_TRACE_SIZE                           = MOVING_TRACE + "size";
+    public  static final String MOVING_TRACE_MERGEDIST                      = MOVING_TRACE + "mergedist";
 
-    public static final String  NET                                      = CHECKS + "net.";
+    public static final String  NET                                         = CHECKS + "net.";
 
-    private static final String NET_FLYINGFREQUENCY                      = NET + "flyingfrequency.";
-    public static final String  NET_FLYINGFREQUENCY_ACTIVE               = NET_FLYINGFREQUENCY + "active";
+    private static final String NET_FLYINGFREQUENCY                         = NET + "flyingfrequency.";
+    public static final String  NET_FLYINGFREQUENCY_ACTIVE                  = NET_FLYINGFREQUENCY + "active";
     @GlobalConfig
-    public static final String  NET_FLYINGFREQUENCY_SECONDS              = NET_FLYINGFREQUENCY + "seconds";
+    public static final String  NET_FLYINGFREQUENCY_SECONDS                 = NET_FLYINGFREQUENCY + "seconds";
     @GlobalConfig
-    public static final String  NET_FLYINGFREQUENCY_PACKETSPERSECOND     = NET_FLYINGFREQUENCY + "packetspersecond";
-    public static final String  NET_FLYINGFREQUENCY_ACTIONS              = NET_FLYINGFREQUENCY + "actions";
-    private static final String NET_FLYINGFREQUENCY_REDUNDANT            = NET_FLYINGFREQUENCY + "reduceredundant.";
-    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE     = NET_FLYINGFREQUENCY_REDUNDANT + "active";
+    public static final String  NET_FLYINGFREQUENCY_PACKETSPERSECOND        = NET_FLYINGFREQUENCY + "packetspersecond";
+    public static final String  NET_FLYINGFREQUENCY_ACTIONS                 = NET_FLYINGFREQUENCY + "actions";
+    private static final String NET_FLYINGFREQUENCY_REDUNDANT               = NET_FLYINGFREQUENCY + "reduceredundant.";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE        = NET_FLYINGFREQUENCY_REDUNDANT + "active";
     @GlobalConfig
-    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_SECONDS    = NET_FLYINGFREQUENCY_REDUNDANT + "seconds";
-    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS    = NET_FLYINGFREQUENCY_REDUNDANT + "actions";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_SECONDS       = NET_FLYINGFREQUENCY_REDUNDANT + "seconds";
+    public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS       = NET_FLYINGFREQUENCY_REDUNDANT + "actions";
 
-    private static final String NET_KEEPALIVEFREQUENCY                   = NET + "keepalivefrequency.";
-    public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE            = NET_KEEPALIVEFREQUENCY + "active";
-    public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS           = NET_KEEPALIVEFREQUENCY + "actions";
+    private static final String NET_KEEPALIVEFREQUENCY                      = NET + "keepalivefrequency.";
+    public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE               = NET_KEEPALIVEFREQUENCY + "active";
+    public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS              = NET_KEEPALIVEFREQUENCY + "actions";
 
-    private static final String NET_SOUNDDISTANCE                        = NET + "sounddistance.";
-    public static final String  NET_SOUNDDISTANCE_ACTIVE                 = NET_SOUNDDISTANCE + "active";
-    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE            = NET_SOUNDDISTANCE + "maxdistance";
+    private static final String NET_SOUNDDISTANCE                           = NET + "sounddistance.";
+    public static final String  NET_SOUNDDISTANCE_ACTIVE                    = NET_SOUNDDISTANCE + "active";
+    public static final String  NET_SOUNDDISTANCE_MAXDISTANCE               = NET_SOUNDDISTANCE + "maxdistance";
 
-    public static final String  STRINGS                                  = "strings";
+    public static final String  STRINGS                                     = "strings";
 
     // Compatibility section (possibly temporary).
     @GlobalConfig
@@ -630,7 +631,7 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE           = COMPATIBILITY_EXEMPTIONS + "remove.";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN      = COMPATIBILITY_EXEMPTIONS_REMOVE + "join";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE     = COMPATIBILITY_EXEMPTIONS_REMOVE + "leave";
-    public static final String COMPATIBILITY_MANAGELISTENERS			 = COMPATIBILITY + "managelisteners";
+    public static final String COMPATIBILITY_MANAGELISTENERS             = COMPATIBILITY + "managelisteners";
     public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
 
