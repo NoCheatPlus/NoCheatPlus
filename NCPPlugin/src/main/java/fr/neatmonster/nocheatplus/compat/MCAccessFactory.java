@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026;
 import fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043;
 import fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
+import fr.neatmonster.nocheatplus.compat.spigotcb1_8.MCAccessSpigotCB1_8;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -97,20 +98,28 @@ public class MCAccessFactory {
      * @return Valid MCAccess instance or null.
      */
     private MCAccess getMCAccessCraftBukkit(List<Throwable> throwables) {
-        
+
         // TODO: Quick return check (note special forks and package info not being usable).
 
         // TEMP //
         // Only add as long as no stable module has been added.
-        // 1.8 (Spigot)
+        // TODO:  1.8.3 (Spigot)
+//        try{
+//            return new fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev();
+//        }
+//        catch(Throwable t) {
+//            throwables.add(t);
+//        };
+        // TEMP END //
+
+        // 1.8
         try{
-            return new fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev();
+            return new MCAccessSpigotCB1_8();
         }
         catch(Throwable t) {
             throwables.add(t);
         };
-        // TEMP END //
-        
+
         // 1.7.10
         try{
             return new MCAccessCB3100();
@@ -118,7 +127,7 @@ public class MCAccessFactory {
         catch(Throwable t) {
             throwables.add(t);
         };
-        
+
         // 1.7.8|1.7.9
         try{
             return new MCAccessCB3043();

@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpcompatspigotcb1_8</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPCompatSpigotCB1_8</name>
+  <version>1.1-SNAPSHOT</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>craftbukkit</artifactId>
+    	<version>1.8-R0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <description>Compatibility for Minecraft 1.8 with CraftBukkit/Spigot.
+</description>
+</project>
