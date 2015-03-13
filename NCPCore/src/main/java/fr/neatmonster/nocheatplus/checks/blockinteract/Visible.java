@@ -1,23 +1,26 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.InteractRayTracing;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class Visible extends Check {
-
-    /** Offset from bounds to estimate some reference end position for ray-tracing. */
-    private static final double offset = 0.0001;
 
     private BlockCache blockCache;
 
@@ -25,6 +28,8 @@ public class Visible extends Check {
      * Strict set to false, due to false positives.
      */
     private final InteractRayTracing rayTracing = new InteractRayTracing(false);
+
+    private final List<String> tags = new ArrayList<String>();
 
     public Visible() {
         super(CheckType.BLOCKINTERACT_VISIBLE);
@@ -42,27 +47,6 @@ public class Visible extends Check {
         blockCache = mcAccess.getBlockCache(null);
     }
 
-    private static final double getEnd(final double[] bounds, final int index, final int mod){
-        if (bounds == null){
-            return 0.5 + (0.5 + offset) * mod;
-        }
-        if (mod == 0){
-            // Middle.
-            return (bounds[index] + bounds[index + 3]) / 2.0;
-        }
-        else if (mod == 1){
-            // TODO: Slightly outside or dependent on exact position (inside, exact edge, outside)?
-            return Math.min(1.0, bounds[index + 3]) + offset;
-        }
-        else if (mod == -1){
-            // TODO: Slightly outside or dependent on exact position (inside, exact edge, outside)?
-            return Math.max(0.0, bounds[index]) - offset;
-        }
-        else{
-            throw new IllegalArgumentException("BlockFace.getModX|Y|Z must be 0, 1 or -1.");
-        }
-    }
-
     public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
         // TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
         // TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
@@ -74,36 +58,45 @@ public class Visible extends Check {
         final double eyeY = loc.getY() + player.getEyeHeight();
         final double eyeZ = loc.getZ();
 
-        // TODO: Add tags for fail_passable, fail_raytracing, (fail_face).
-        // TODO: Reachable face check ?
-
-        if (blockX == Location.locToBlock(eyeX) && blockZ == Location.locToBlock(eyeZ) && block.getY() == Location.locToBlock(eyeY)){
+        tags.clear();
+        if (TrigUtil.isSameBlock(blockX, blockY, blockZ, eyeX, eyeY, eyeZ)) {
             // Player is interacting with the block their head is in.
             // TODO: Should the reachable-face-check be done here too (if it is added at all)?
             collides = false;
         }
         else{
+            // Ray-tracing.
+            final Vector direction = loc.getDirection();
             // Initialize.
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
-
-            collides = checkRayTracing(eyeX, eyeY, eyeZ, blockX, blockY, blockZ, face);
-
+            collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags);
             // Cleanup.
             rayTracing.cleanup();
             blockCache.cleanup();
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            // TODO: Tags
-            player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
-        }
+        //        if (data.debug) {//  && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        //            // TODO: Log more useful information to the trace file instead, probably depending on the block type?
+        //            // TODO: Tags
+        //            final float moveYaw = MovingData.getData(player).toYaw;
+        //            String refYaw = "";
+        //            if (moveYaw != loc.getYaw()) {
+        //                refYaw = " (moved-yaw=" + moveYaw + ")";
+        //            }
+        //            player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " yaw=" + loc.getYaw() + refYaw + " pitch=" + loc.getPitch() + " collide=" + collides);
+        //        }
 
         // Actions ?
         boolean cancel = false;
         if (collides){
             data.visibleVL += 1;
-            if (executeActions(player, data.visibleVL, 1, cc.visibleActions)){
+            final ViolationData vd = new ViolationData(this, player, data.visibleVL, 1, cc.visibleActions);
+            if (data.debug || vd.needsParameters()) {
+                // TODO: Consider adding the start/end/block-type information if debug is set.
+                vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+            }
+            if (executeActions(vd)){
                 cancel = true;
             }
         }
@@ -114,108 +107,139 @@ public class Visible extends Check {
         return cancel;
     }
 
-    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final int blockX, final int blockY, final int blockZ, final BlockFace face){
+    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final double dirX, final double dirY, final double dirZ, final int blockX, final int blockY, final int blockZ, final BlockFace face, final List<String> tags){
+        // Block of eyes.
+        final int eyeBlockX = Location.locToBlock(eyeX);
+        final int eyeBlockY = Location.locToBlock(eyeY);
+        final int eyeBlockZ = Location.locToBlock(eyeZ);
+        // Distance in blocks from eyes to clicked block.
+        final int bdX = blockX - eyeBlockX;
+        final int bdY = blockY - eyeBlockY;
+        final int bdZ = blockZ - eyeBlockZ;
 
+        // Coarse orientation check.
+        if (bdX != 0 && dirX * bdX <= 0.0 || bdY != 0 && dirY * bdY <= 0.0 || bdZ != 0 && dirZ * bdZ <= 0.0) {
+            // TODO: There seem to be false positives, do add debug logging with/before violation handling.
+            tags.add("coarse_orient");
+            return true;
+        }
+
+        // TODO: If medium strict, check if the given BlockFace seems acceptable.
+
+        // Time windows for coordinates passing through the target block.
+        final double tMinX = getMinTime(eyeX, eyeBlockX, dirX, bdX);
+        final double tMinY = getMinTime(eyeY, eyeBlockY, dirY, bdY);
+        final double tMinZ = getMinTime(eyeZ, eyeBlockZ, dirZ, bdZ);
+        final double tMaxX = getMaxTime(eyeX, eyeBlockX, dirX, tMinX);
+        final double tMaxY = getMaxTime(eyeY, eyeBlockY, dirY, tMinY);
+        final double tMaxZ = getMaxTime(eyeZ, eyeBlockZ, dirZ, tMinZ);
+
+        // Check if the the block is hit by the direction at all (timing interval).
+        if (tMinX > tMaxY && tMinX > tMaxZ || 
+                tMinY > tMaxX && tMinY > tMaxZ || 
+                tMinZ > tMaxX && tMaxZ > tMaxY) {
+            // TODO: Option to tolerate a minimal difference in t and use a corrected position then.
+            tags.add("block_miss");
+//            Bukkit.getServer().broadcastMessage("visible: " + tMinX + "," + tMaxX + " | " + tMinY + "," + tMaxY + " | " + tMinZ + "," + tMaxZ);
+            return true;
+        }
+
+        // Point of time of collision.
+        final double tCollide = Math.max(tMinX, Math.max(tMinY, tMinZ));
+
+        // Collision location (corrected to be on the clicked block).
+        double collideX = toBlock(eyeX + dirX * tCollide, blockX);
+        double collideY = toBlock(eyeY + dirY * tCollide, blockY);
+        double collideZ = toBlock(eyeZ + dirZ * tCollide, blockZ);
+        // Correct the last-on-block to be on the edge (could be two).
+        if (tMinX == tCollide) {
+            collideX = Math.round(collideX);
+        }
+        if (tMinY == tCollide) {
+            collideY = Math.round(collideY);
+        }
+        if (tMinZ == tCollide) {
+            collideZ = Math.round(collideZ);
+        }
         /*
-         * TODO: Always use the exact looking direction first (calculate where
-         * it hits the target block, and which faces are exposed then, estimate
-         * alternative positions based on that, get rid of the workaround).
+         * TODO: Still false positives on transitions between blocks. Could
+         * correcting towards the eye location rather than just rounding solve
+         * it?
          */
-        /*
-         * TODO: Consider using (slightly less than) full block bounds always ?
-         * (alt: 2,3 classes of size)
-         */
-        // Estimated target-middle-position (does it for most cases).
-        @SuppressWarnings("deprecation")
-        final double[] bounds = BlockProperties.getCorrectedBounds(blockCache, blockX, blockY, blockZ);
-        final int modX = face.getModX();
-        final int modY = face.getModY();
-        final int modZ = face.getModZ();
-        final double estX = (double) blockX + getEnd(bounds, 0, modX);
-        final double estY = (double) blockY + getEnd(bounds, 1, modY);
-        final double estZ = (double) blockZ + getEnd(bounds, 2, modZ);
-        final int bEstX = Location.locToBlock(estX);
-        final int bEstY = Location.locToBlock(estY);
-        final int bEstZ = Location.locToBlock(estZ);
-        final int estId = blockCache.getTypeId(bEstX, bEstY, bEstZ);
 
-        // Ignore passable if the estimate is on the clicked block.
-        final boolean skipPassable = blockX == bEstX && blockY == bEstY && blockZ == bEstZ;
-
-        // TODO: Might also use looking direction (test how accurate).
-        return checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ, estId, bounds, modX, modY, modZ, skipPassable, blockX, blockY, blockZ);
-
+        // Perform ray-tracing.
+        rayTracing.set(eyeX, eyeY, eyeZ, collideX, collideY, collideZ, blockX, blockY, blockZ);
+        rayTracing.loop();
+        if (rayTracing.collides()) {
+            tags.add("raytracing");
+            return true;
+        }
+        else if (rayTracing.getStepsDone() > rayTracing.getMaxSteps()) {
+            tags.add("raytracing_maxsteps");
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
-     * Recursively check alternate positions.
-     * @param eyeX
-     * @param eyeY
-     * @param eyeZ
-     * @param estX
-     * @param estY
-     * @param estZ
-     * @param estId
-     * @param modX
-     * @param modY
-     * @param modZ
-     * @param skipPassable
+     * Time until on the block (time = steps of dir).
+     * @param eye
+     * @param eyeBlock
+     * @param dir
+     * @param blockDiff
      * @return
      */
-    private boolean checkCollision(final double eyeX, final double eyeY, final double eyeZ, final double estX, final double estY, final double estZ, final int estId, final double[] bounds, final int modX, final int modY, final int modZ, final boolean skipPassable, final int clickedX, final int clickedY, final int clickedZ) {
-        // Check current position.
-        if (skipPassable || BlockProperties.isPassable(blockCache, estX, estY, estZ, estId)){
-            // Perform ray-tracing.
-            rayTracing.set(eyeX, eyeY, eyeZ, estX, estY, estZ, clickedX, clickedY, clickedZ);
-            rayTracing.loop();
-            if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()){
-                return false;
-            }
+    private final double getMinTime(final double eye, final int eyeBlock, final double dir, final int blockDiff) {
+        if (blockDiff == 0) {
+            // Already on the block.
+            return 0.0;
         }
-        // Note: Center of bounds is used for mod == 0.
-        // TODO: Could "sort" positions by setting signum of d by which is closer to the player.
-        // TODO: Could consider slightly in-set positions.
-        if (modX == 0){
-            // TODO: Might ensure to check if it is the same block?
-            final double d = bounds == null ? 0.5 : (bounds[3] - bounds[0]) / 2.0;
-            if (d >= 0.05){
-                // Recursion with adapted x position (if differs enough from bounds.
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX - d, estY, estZ, estId, bounds, 1, modY, modZ, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX + d, estY, estZ, estId, bounds, 1, modY, modZ, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-            }
-        }
-        if (modZ == 0){
-            // TODO: Might ensure to check if it is the same block?
-            final double d = bounds == null ? 0.5 : (bounds[5] - bounds[2]) / 2.0;
-            if (d >= 0.05){
-                // Recursion with adapted x position (if differs enough from bounds.
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ - d, estId, bounds, 1, modY, 1, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ + d, estId, bounds, 1, modY, 1, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-            }
-        }
-        if (modY == 0){
-            // TODO: Might ensure to check if it is the same block?
-            final double d = bounds == null ? 0.5 : (bounds[4] - bounds[1]) / 2.0;
-            if (d >= 0.05){
-                // Recursion with adapted x position (if differs enough from bounds.
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY - d, estZ, estId, bounds, 1, 1, 1, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-                if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY + d, estZ, estId, bounds, 1, 1, 1, skipPassable, clickedX, clickedY, clickedZ)){
-                    return false;
-                }
-            }
-        }
+        // Calculate the time needed to be on the (close edge of the block coordinate).
+        final double eyeOffset = Math.abs(eye - eyeBlock); // (abs not needed)
+        return ((dir < 0.0 ? eyeOffset : 1.0 - eyeOffset) + (double) (Math.abs(blockDiff) - 1)) / Math.abs(dir);
+    }
 
-        return true;
+    /**
+     * Time when not on the block anymore (after having hit it, time = steps of dir).
+     * @param eye
+     * @param eyeBlock
+     * @param dir
+     * @param blockDiff
+     * @param tMin Result of getMinTime for this coordinate.
+     * @return
+     */
+    private final double getMaxTime(final double eye, final int eyeBlock, final double dir, final double tMin) {
+        if (dir == 0.0) {
+            // Always on (blockDiff == 0 as well).
+            return Double.MAX_VALUE;
+        }
+        if (tMin == 0.0) {
+            //  Already on the block, return "rest on block".
+            final double eyeOffset = Math.abs(eye - eyeBlock); // (abs not needed)
+            return (dir < 0.0 ? eyeOffset : 1.0 - eyeOffset) / Math.abs(dir);
+        }
+        // Just the time within range.
+        return tMin + 1.0 /  Math.abs(dir);
+    }
+    
+    /**
+     * Correct the coordinate to be on the block (only if outside, for
+     * correcting inside-block to edge tMin has to be checked.
+     * 
+     * @param coord
+     * @param block
+     * @return
+     */
+    private final double toBlock(final double coord, final int block) {
+        final int blockDiff = block - Location.locToBlock(coord);
+        if (blockDiff == 0) {
+            return coord;
+        }
+        else {
+            return Math.round(coord);
+        }
     }
 
 }

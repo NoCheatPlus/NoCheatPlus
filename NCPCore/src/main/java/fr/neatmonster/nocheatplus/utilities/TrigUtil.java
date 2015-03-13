@@ -492,7 +492,7 @@ public class TrigUtil {
     }
 
     /**
-     * Test if the location has the given coordinates.
+     * Test if the location is on the same block as the given coordinates.
      * @param loc
      * @param x
      * @param y
@@ -506,11 +506,33 @@ public class TrigUtil {
         return loc.getX() == x && loc.getZ() == z && loc.getY() == y;
     }
 
+    /**
+     * Test if the given double-coordinates are on the same block as specified by the int-coordinates.
+     * @param loc
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     public static boolean isSameBlock(final Location loc, final double x, final double y, final double z) {
         if (loc == null) {
             return false;
         }
         return loc.getBlockX() == Location.locToBlock(x) && loc.getBlockZ() == Location.locToBlock(z) && loc.getBlockY() == Location.locToBlock(y);
+    }
+
+    /**
+     * 
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @return
+     */
+    public static boolean isSameBlock(final int x1, final int y1, final int z1, final double x2, final double y2, final double z2) {
+        return x1 == Location.locToBlock(x2) && z1 == Location.locToBlock(z2) && y1 == Location.locToBlock(y2);
     }
 
 }

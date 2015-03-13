@@ -81,9 +81,9 @@ public abstract class RayTracing {
         endBlockX = Location.locToBlock(x1);
         endBlockY = Location.locToBlock(y1);
         endBlockZ = Location.locToBlock(z1);
-        oX = (double) (x0 - blockX);
-        oY = (double) (y0 - blockY);
-        oZ = (double) (z0 - blockZ);
+        oX = x0 - (double) blockX;
+        oY = y0 - (double) blockY;
+        oZ = z0 - (double) blockZ;
         t = 0.0;
         step = 0;
     }

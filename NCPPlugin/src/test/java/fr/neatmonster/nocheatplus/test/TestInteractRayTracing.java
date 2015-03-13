@@ -70,8 +70,8 @@ public class TestInteractRayTracing {
             }
         }
         // TODO: Make work with strict set to false.
-        InteractRayTracing rt = new InteractRayTracing(true);
-        //InteractRayTracing rt = new InteractRayTracing(false);
+        //InteractRayTracing rt = new InteractRayTracing(true);
+        InteractRayTracing rt = new InteractRayTracing(false);
         rt.setBlockCache(bc);
         // TODO: More Directions, also just behind the corner.
         double[][] setups = new double[][] {
@@ -99,7 +99,7 @@ public class TestInteractRayTracing {
         // TODO: More cases, head inside block itself, angles, ...
         double[][] noCollision = new double[][] {
                 {8.5, 66.75, 1.2  ,  8.5, 65.8, 1.0},
-                {8.5, 66.75, 1.2  ,  8.5, 69.0, 0.0}, // "Above enough".
+                {8.5, 66.75, 1.2  ,  8.5, 70.0, 0.9},
         };
         TestRayTracing.runCoordinates(rt, noCollision, false, true, 3.0, true);
         double[][] shouldCollide = new double[][] {
@@ -119,8 +119,8 @@ public class TestInteractRayTracing {
         // Note that reversed checks are slightly different with the centered version, but start + end blocks are air anyway.
         double[] middle = new double[] {0.5, 65.5, 0.5}; // Free spot.
         // TODO: Must work with strict set to false.
-        //CenteredInteractRayTracing rt = new CenteredInteractRayTracing(false, 0, 65, 0);
-        CenteredInteractRayTracing rt = new CenteredInteractRayTracing(true, 0, 65, 0);
+        CenteredInteractRayTracing rt = new CenteredInteractRayTracing(false, 0, 65, 0);
+        //CenteredInteractRayTracing rt = new CenteredInteractRayTracing(true, 0, 65, 0);
         rt.setBlockCache(bc);
         double[][] pastFailures = new double[][] {
                 {2.1393379885667643, 67.18197661625649, 1.7065201483677281  ,  0.0, 65.0, 0.0},
