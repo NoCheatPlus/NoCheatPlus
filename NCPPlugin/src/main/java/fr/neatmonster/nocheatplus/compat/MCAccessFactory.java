@@ -105,7 +105,7 @@ public class MCAccessFactory {
         // Only add as long as no stable module has been added.
         // 1.8.3 (Spigot)
         try{
-            return new fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev();
+            return (MCAccess) Class.forName("fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev").newInstance();
         }
         catch(Throwable t) {
             throwables.add(t);
