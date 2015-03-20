@@ -6,21 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
-import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
-import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
-import fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602;
-import fr.neatmonster.nocheatplus.compat.cb2645.MCAccessCB2645;
-import fr.neatmonster.nocheatplus.compat.cb2691.MCAccessCB2691;
-import fr.neatmonster.nocheatplus.compat.cb2763.MCAccessCB2763;
-import fr.neatmonster.nocheatplus.compat.cb2794.MCAccessCB2794;
-import fr.neatmonster.nocheatplus.compat.cb2808.MCAccessCB2808;
-import fr.neatmonster.nocheatplus.compat.cb2882.MCAccessCB2882;
-import fr.neatmonster.nocheatplus.compat.cb2922.MCAccessCB2922;
-import fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026;
-import fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043;
-import fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
-import fr.neatmonster.nocheatplus.compat.spigotcb1_8.MCAccessSpigotCB1_8;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -101,128 +87,36 @@ public class MCAccessFactory {
 
         // TODO: Quick return check (note special forks and package info not being usable).
 
-        // TEMP //
-        // Only add as long as no stable module has been added.
-        // 1.8.3 (Spigot)
-        try{
-            return (MCAccess) Class.forName("fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev").newInstance();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-        // TEMP END //
-
-        // 1.8
-        try{
-            return new MCAccessSpigotCB1_8();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.7.10
-        try{
-            return new MCAccessCB3100();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
+        final String[] classNames = new String[] {
+                // Current DEV / LATEST: CB (SPigot)
+                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // 1.8.3
+                // Dedicated: CB (Spigot)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_8.MCAccessSpigotCB1_8", // 1.8
+                // Dedicated CB (original)
+                "fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100", // 1.7.10
+                "fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043", // 1.7.8|1.7.9
+                "fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026", // 1.7.5
+                "fr.neatmonster.nocheatplus.compat.cb2922.MCAccessCB2922", // 1.7.2
+                "fr.neatmonster.nocheatplus.compat.cb2882.MCAccessCB2882", // 1.6.4
+                "fr.neatmonster.nocheatplus.compat.cb2808.MCAccessCB2808", // 1.6.2
+                "fr.neatmonster.nocheatplus.compat.cb2794.MCAccessCB2794", // 1.6.1
+                "fr.neatmonster.nocheatplus.compat.cb2763.MCAccessCB2763", // 1.5.2
+                "fr.neatmonster.nocheatplus.compat.cb2691.MCAccessCB2691", // 1.5.1
+                "fr.neatmonster.nocheatplus.compat.cb2645.MCAccessCB2645", // 1.5
+                "fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602", // 1.4.7
+                "fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545", // 1.4.6
+                "fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512", // 1.4.5-R1.0
         };
 
-        // 1.7.8|1.7.9
-        try{
-            return new MCAccessCB3043();
+        for (String className : classNames) {
+            try{
+                return (MCAccess) Class.forName(className).newInstance();
+            }
+            catch(Throwable t) {
+                throwables.add(t);
+            };
         }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.7.5
-        try{
-            return new MCAccessCB3026();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.7.2
-        try{
-            return new MCAccessCB2922();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.6.4
-        try{
-            return new MCAccessCB2882();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.6.2
-        try{
-            return new MCAccessCB2808();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.6.1
-        try{
-            return new MCAccessCB2794();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.5.2
-        try{
-            return new MCAccessCB2763();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.5.1 (cb beta)
-        try{
-            return new MCAccessCB2691();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.5
-        try{
-            return new MCAccessCB2645();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.4.7
-        try{
-            return new MCAccessCB2602();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.4.6
-        try{
-            return new MCAccessCB2545();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
-
-        // 1.4.5-R1.0
-        try{
-            return new MCAccessCB2512();
-        }
-        catch(Throwable t) {
-            throwables.add(t);
-        };
+        // None worked.
         return null;
     }
 
