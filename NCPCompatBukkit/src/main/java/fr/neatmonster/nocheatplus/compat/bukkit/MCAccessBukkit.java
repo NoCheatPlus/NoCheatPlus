@@ -181,7 +181,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
                     return 0.5f;
                 case HORSE: // this.a(1.4F, 1.6F);
                     return 1.4f;
-                // 1.8
+                    // 1.8
                 case ENDERMITE: // this.setSize(0.4F, 0.3F);
                     return 0.4f;
                 case ARMOR_STAND: // this.setSize(0.5F, 1.975F);
