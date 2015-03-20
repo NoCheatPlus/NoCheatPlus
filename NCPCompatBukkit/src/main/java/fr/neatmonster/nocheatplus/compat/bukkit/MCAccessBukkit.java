@@ -178,9 +178,18 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
         try {
             switch (type) {
                 case LEASH_HITCH: // hanging: this.a(0.5F, 0.5F);
-                    return 0.5;
+                    return 0.5f;
                 case HORSE: // this.a(1.4F, 1.6F);
                     return 1.4f;
+                // 1.8
+                case ENDERMITE: // this.setSize(0.4F, 0.3F);
+                    return 0.4f;
+                case ARMOR_STAND: // this.setSize(0.5F, 1.975F);
+                    return 0.5f;
+                case RABBIT: // this.setSize(0.6F, 0.7F);
+                    return 0.6f;
+                case GUARDIAN: // this.setSize(0.85F, 0.85F);
+                    return 0.95f;
                 default:
                     break;
             }
