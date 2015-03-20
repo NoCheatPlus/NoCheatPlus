@@ -88,7 +88,7 @@ public class MCAccessFactory {
         // TODO: Quick return check (note special forks and package info not being usable).
 
         final String[] classNames = new String[] {
-                // Current DEV / LATEST: CB (SPigot)
+                // Current DEV / LATEST: CB (Spigot)
                 "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // 1.8.3
                 // Dedicated: CB (Spigot)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8.MCAccessSpigotCB1_8", // 1.8
