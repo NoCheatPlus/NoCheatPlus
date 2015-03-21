@@ -113,39 +113,41 @@ public class Angle extends Check {
         if (data.angleHits.size() < 2) {
             return false;
         }
+        
+        final double n = (double) (data.angleHits.size() - 1);
 
         // Let's calculate the average move.
-        final double averageMove = deltaMove / (data.angleHits.size() - 1);
+        final double averageMove = deltaMove / n;
 
         // And the average time elapsed.
-        final double averageTime = deltaTime / (data.angleHits.size() - 1);
+        final double averageTime = (double) deltaTime / n;
 
         // And the average yaw delta.
-        final double averageYaw = deltaYaw / (data.angleHits.size() - 1);
+        final double averageYaw = (double) deltaYaw / n;
 
         // Average target switching.
-        final double averageSwitching = (double) deltaSwitchTarget / (data.angleHits.size() - 1);
+        final double averageSwitching = (double) deltaSwitchTarget / n;
 
         // Declare the variable.
-        double violation = 0D;
+        double violation = 0.0;
 
         // If the average move is between 0 and 0.2 block(s), add it to the violation.
-        if (averageMove > 0D && averageMove < 0.2D) {
-            violation += 20D * (0.2D - averageMove) / 0.2D;
+        if (averageMove >= 0.0 && averageMove < 0.2D) {
+            violation += 20.0 * (0.2 - averageMove) / 0.2;
         }
 
         // If the average time elapsed is between 0 and 150 millisecond(s), add it to the violation.
-        if (averageTime > 0L && averageTime < 150L) {
-            violation += 30D * (150L - averageTime) / 150L;
+        if (averageTime >= 0.0 && averageTime < 150.0) {
+            violation += 30.0 * (150.0 - averageTime) / 150.0;
         }
 
         // If the average difference of yaw is superior to 50 degrees, add it to the violation.
-        if (averageYaw > 50f) {
-            violation += 30D * averageYaw / 180;
+        if (averageYaw > 50.0) {
+            violation += 30.0 * averageYaw / 180.0;
         }
 
         if (averageSwitching > 0.0) {
-            violation += 20D * averageSwitching;
+            violation += 20.0 * averageSwitching;
         }
 
         // Is the violation is superior to the threshold defined in the configuration?
