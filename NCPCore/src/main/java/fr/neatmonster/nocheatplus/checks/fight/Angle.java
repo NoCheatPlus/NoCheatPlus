@@ -1,8 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import java.util.TreeMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -17,6 +19,43 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  */
 public class Angle extends Check {
 
+    public static class AttackLocation {
+        public final double x, y, z;
+        public final float yaw;
+        public long time;
+        public final UUID damagedId;
+        /** Squared distance to the last location (0 if none given). */
+        public final double distSqLast;
+        /** Difference in yaw to the last location (0 if none given). */
+        public final double yawDiffLast;
+        /** Time difference to the last location (0 if none given). */
+        public final long timeDiff;
+        /** If the id differs from the last damaged entity (true if no lastLoc is given). */
+        public final boolean idDiffLast;
+        public AttackLocation(final Location loc, final UUID damagedId, final long time, final AttackLocation lastLoc) {
+            x = loc.getX();
+            y = loc.getY();
+            z = loc.getZ();
+            yaw = loc.getYaw();
+            this.time = time;
+            this.damagedId = damagedId;
+
+            if (lastLoc != null) {
+                distSqLast = TrigUtil.distanceSquared(x, y, z, lastLoc.x, lastLoc.y, lastLoc.z);
+                yawDiffLast = TrigUtil.yawDiff(yaw, lastLoc.yaw);
+                timeDiff = Math.max(0L, time - lastLoc.time);
+                idDiffLast = !damagedId.equals(lastLoc.damagedId);
+            } else {
+                distSqLast = 0.0;
+                yawDiffLast = 0f;
+                timeDiff = 0L;
+                idDiffLast = true;
+            }
+        }
+    }
+
+    public static long maxTimeDiff = 1000L;
+
     /**
      * Instantiates a new angle check.
      */
@@ -25,63 +64,54 @@ public class Angle extends Check {
     }
 
     /**
-     * Checks a player.
-     * 
+     * The Angle check.
      * @param player
-     *            the player
-     * @param worldChanged 
-     * @return true, if successful
+     * @param loc Location of the player.
+     * @param worldChanged
+     * @param data
+     * @param cc
+     * @return
      */
-    public boolean check(final Player player, final boolean worldChanged, final FightData data, final FightConfig cc) {
+    public boolean check(final Player player, final Location loc, final Entity damagedEntity, final boolean worldChanged, final FightData data, final FightConfig cc) {
 
         if (worldChanged){
-            // TODO: clear some data.
             data.angleHits.clear();
         }
 
         boolean cancel = false;
 
-        // Remove the old locations from the map.
-        // TODO: Use a linked list and make one iteration only (remove with Iterator). 
-        for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet()) {
-            if (System.currentTimeMillis() - time > 1000L) {
-                data.angleHits.remove(time);
-            }
+        // Quick check for expiration of all entries.
+        final long time = System.currentTimeMillis();
+        AttackLocation lastLoc = data.angleHits.isEmpty() ? null : data.angleHits.getLast();
+        if (lastLoc != null && time - lastLoc.time > maxTimeDiff) {
+            data.angleHits.clear();
+            lastLoc = null;
         }
 
-        // Add the new location to the map.
-        // TODO: Alter method to store something less fat.
-        data.angleHits.put(System.currentTimeMillis(), player.getLocation()); // This needs to be a copy at present.
+        // Add the new location.
+        data.angleHits.add(new AttackLocation(loc, damagedEntity.getUniqueId(), System.currentTimeMillis(), lastLoc));
 
-        // Not enough data to calculate deltas.
-        if (data.angleHits.size() < 2)
-            return false;
-
-        // Declare variables.
+        // Calculate the sums of differences.
         double deltaMove = 0D;
         long deltaTime = 0L;
         float deltaYaw = 0f;
-
-        // Browse the locations of the map.
-        long previousTime = 0L;
-        // TODO: Don't store locations, but yaws ?
-        Location previousLocation = null;
-        for (final long time : data.angleHits.descendingKeySet()) {
-            final Location location = data.angleHits.get(time);
-            // We need a previous location to calculate deltas.
-            if (previousLocation != null){ // && location.getWorld().getName().equals(previousLocation.getWorld().getName())) {
-                // (Risks exceptions on reloading).
-                // Calculate the distance between the two locations.
-                deltaMove += previousLocation.distanceSquared(location);
-                // Calculate the time elapsed between the two hits.
-                deltaTime += previousTime - time;
-                // Calculate the difference of the yaw between the two locations.
-                final float dYaw = TrigUtil.yawDiff(previousLocation.getYaw(), location.getYaw());
-                deltaYaw += Math.abs(dYaw);
+        int deltaSwitchTarget = 0;
+        final Iterator<AttackLocation> it = data.angleHits.iterator();
+        while (it.hasNext()) {
+            final AttackLocation refLoc = it.next();
+            if (time - refLoc.time > maxTimeDiff) {
+                it.remove();
+                continue;
             }
-            // Remember the current time and location.
-            previousTime = time;
-            previousLocation = location;
+            deltaMove += refLoc.distSqLast;
+            deltaYaw += Math.abs(refLoc.yawDiffLast);
+            deltaTime += refLoc.timeDiff;
+            deltaSwitchTarget += refLoc.idDiffLast ? 1 : 0;
+        }
+
+        // Check if there is enough data present.
+        if (data.angleHits.size() < 2) {
+            return false;
         }
 
         // Let's calculate the average move.
@@ -93,28 +123,35 @@ public class Angle extends Check {
         // And the average yaw delta.
         final double averageYaw = deltaYaw / (data.angleHits.size() - 1);
 
+        // Average target switching.
+        final double averageSwitching = (double) deltaSwitchTarget / (data.angleHits.size() - 1);
+
         // Declare the variable.
         double violation = 0D;
 
         // If the average move is between 0 and 0.2 block(s), add it to the violation.
-        if (averageMove > 0D && averageMove < 0.2D)
-            violation += 200D * (0.2D - averageMove) / 0.2D;
+        if (averageMove > 0D && averageMove < 0.2D) {
+            violation += 20D * (0.2D - averageMove) / 0.2D;
+        }
 
         // If the average time elapsed is between 0 and 150 millisecond(s), add it to the violation.
-        if (averageTime > 0L && averageTime < 150L)
-            violation += 500D * (150L - averageTime) / 150L;
+        if (averageTime > 0L && averageTime < 150L) {
+            violation += 30D * (150L - averageTime) / 150L;
+        }
 
         // If the average difference of yaw is superior to 50 degrees, add it to the violation.
-        if (averageYaw > 50f)
-            violation += 300D * (360f - averageYaw) / 360f;
+        if (averageYaw > 50f) {
+            violation += 30D * averageYaw / 180;
+        }
 
-        // Transform the violation into a percentage.
-        violation /= 10D;
+        if (averageSwitching > 0.0) {
+            violation += 20D * averageSwitching;
+        }
 
         // Is the violation is superior to the threshold defined in the configuration?
         if (violation > cc.angleThreshold) {
             // Has the server lagged?
-            if (TickTask.getLag(1000, true) < 1.5f){
+            if (TickTask.getLag(maxTimeDiff, true) < 1.5f){
                 // TODO: 1.5 is a fantasy value.
                 // If it hasn't, increment the violation level.
                 data.angleVL += violation;
@@ -123,9 +160,10 @@ public class Angle extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.angleVL, violation, cc.angleActions);
-        } else
+        } else {
             // Reward the player by lowering their violation level.
-            data.angleVL *= 0.98D;
+            data.angleVL *= 0.98D;            
+        }
 
         return cancel;
     }

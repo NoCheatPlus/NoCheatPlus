@@ -258,7 +258,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 cancelled = true;
             }
             // Angle check.
-            if (angle.check(player, worldChanged, data, cc)) {
+            if (angle.check(player, loc, damaged, worldChanged, data, cc)) {
                 if (!cancelled && data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " fight.angle cancel without yawrate cancel.");
                 }

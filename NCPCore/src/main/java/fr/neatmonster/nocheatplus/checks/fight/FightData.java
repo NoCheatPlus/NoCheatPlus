@@ -2,10 +2,9 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -85,11 +84,11 @@ public class FightData extends ACheckData {
             throw new IllegalArgumentException("Can only return a CheckDataFactory for the check group FIGHT.");
         }
         switch(checkType) {
-        // Note that CheckType does need adaption for new entries (!).
-        case FIGHT_SELFHIT:
-            return selfHitDataFactory;
-        default:
-            return factory;
+            // Note that CheckType does need adaption for new entries (!).
+            case FIGHT_SELFHIT:
+                return selfHitDataFactory;
+            default:
+                return factory;
         }
     }
 
@@ -146,7 +145,7 @@ public class FightData extends ACheckData {
     public long damageTakenByEntityTick;
 
     // Data of the angle check.
-    public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
+    public LinkedList<Angle.AttackLocation> angleHits = new LinkedList<Angle.AttackLocation>();
 
     // FastHeal
     public long					   fastHealRefTime = 0;
