@@ -327,25 +327,14 @@ public class SurvivalFly extends Check {
             else {
                 maxJumpPhase = 6;
             }
-            // TODO: consider tags for jumping as well (!).
-            if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0) {
-                // Could use dirty flag here !
-                // TODO: Could move to a method.
-                if (data.sfDirty || yDistance < 0 || resetFrom) {
-                    if (data.getSetBackY() > to.getY()) {
-                        if (data.sfJumpPhase > 2 * maxJumpPhase) {
-                            // Ignore it for falling.
-                        }
-                        else{
-                            vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
-                        }
-                    }
-                    else{
-                        // TODO: (This allows the one tick longer jump (resetTo)).
-                        vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
-                    }
+            if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0 && !data.sfDirty) {
+                if (yDistance < 0) {
+                    // Ignore falling, and let accounting deal with it.
                 }
-                else if (!data.sfDirty) {
+                else if (resetFrom) {
+                    // Ignore bunny etc.
+                }
+                else {
                     // Violation (Too high jumping or step).
                     tags.add("maxphase");
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.max(yDistance, 0.15));

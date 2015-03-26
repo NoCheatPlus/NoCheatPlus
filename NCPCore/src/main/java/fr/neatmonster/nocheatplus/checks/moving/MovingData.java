@@ -844,7 +844,8 @@ public class MovingData extends ACheckData {
 
         // Set dirty flag here.
         if (used) {
-            sfDirty = true; // TODO: Only needed for vertical velocity? Get rid anyway :p.
+            // TODO: Detect when actually used? More complicated, some internal adding needs setting it here.
+            sfDirty = true;
             sfNoLowJump = true;
         }
         // TODO: clear accounting here ?
