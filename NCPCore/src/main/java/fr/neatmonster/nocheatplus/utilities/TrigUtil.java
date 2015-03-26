@@ -18,8 +18,10 @@ public class TrigUtil {
     private static final Vector vec2 = new Vector();
     /** Multiply to get grad from rad. */
     public static final double fRadToGrad = 360.0 / (2.0 * Math.PI);
-    /** Some default precision value for the directionCheck method. */
+    /** Some default precision value for the classic fight.direction check. */
     public static final double DIRECTION_PRECISION = 2.6;
+    /** Precision for the fight.direction check within the LocationTrace loop. */
+    public static final double DIRECTION_LOOP_PRECISION = 0.5;
 
     private static final Location useLoc = new Location(null, 0, 0, 0);
 

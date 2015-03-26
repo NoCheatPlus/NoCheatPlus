@@ -134,11 +134,11 @@ public class Direction extends Check {
 
         final double off;
         if (cc.directionStrict){
-            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION, 80.0);
+            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
         }
         else{
             // Also take into account the angle.
-            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION);
+            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
         if (off > 0.1) {

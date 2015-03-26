@@ -798,9 +798,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (player.isInsideVehicle()) {
                 // TODO: refine (!).
                 final Location ref = player.getVehicle().getLocation(useLoc);
-                mData.resetPositions(ref);
+                mData.resetPositions(ref); // TODO: Consider using to and intercept cheat attempts in another way.
                 useLoc.setWorld(null);
-                mData.updateTrace(player, ref, time);
+                mData.updateTrace(player, to, time); // TODO: Can you become invincible by sending special moves?
             }
             else if (!fromWorldName.equals(toWorldName)) {
                 mData.resetPositions(to);
