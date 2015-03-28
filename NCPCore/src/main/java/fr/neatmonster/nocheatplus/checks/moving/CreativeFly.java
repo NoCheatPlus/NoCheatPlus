@@ -143,11 +143,12 @@ public class CreativeFly extends Check {
         //        final double resultV = (vDistanceAboveLimit - limitV) * 100D;
         //        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
         // Old handling.
-        final double resultV = (yDistance - data.verticalFreedom - limitV) * 100D;
+        final double verticalFreedom = data.getVerticalFreedom();
+        final double resultV = (yDistance - verticalFreedom - limitV) * 100D;
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         if (cc.debug) {
-            outpuDebugMove(player, hDistance, limitH, yDistance, data.verticalFreedom, limitV);
+            outpuDebugMove(player, hDistance, limitH, yDistance, verticalFreedom, limitV);
         }
 
         // The player went to far, either horizontal or vertical.

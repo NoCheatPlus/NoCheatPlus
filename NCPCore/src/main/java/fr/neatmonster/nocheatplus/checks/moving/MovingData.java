@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -118,10 +119,10 @@ public class MovingData extends ACheckData {
     // TODO: consider resetting these with clearFlyData and onSetBack.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
     //private final AxisVelocity verVel = new AxisVelocity();
-    public int            verticalVelocityCounter;
-    public double         verticalFreedom;
-    public double         verticalVelocity;
-    public int            verticalVelocityUsed = 0;
+    private int            verticalVelocityCounter;
+    private double         verticalFreedom;
+    private double         verticalVelocity;
+    private int            verticalVelocityUsed = 0;
 
     /** Horizontal velocity modeled as an axis (always positive) */
     private final AxisVelocity horVel = new AxisVelocity();
@@ -182,7 +183,7 @@ public class MovingData extends ACheckData {
     public int			lostSprintCount = 0;
     public int 			sfJumpPhase = 0;
     /** "Dirty" flag, for receiving velocity and similar while in air. */
-    public boolean      sfDirty = false;
+    private boolean      sfDirty = false;
 
     /** Indicate low jumping descending phase (likely cheating). */
     public boolean sfLowJump = false;
@@ -561,7 +562,8 @@ public class MovingData extends ACheckData {
      */
     public void removeAllVelocity() {
         horVel.clear();
-        //        verVel.clear();
+        clearActiveVerVel(); // Until we have a better method.
+        sfDirty = false;
     }
 
     /**
@@ -581,19 +583,22 @@ public class MovingData extends ACheckData {
         horVel.clearActive();
     }
 
-    /**
-     * Clear only active horizontal velocity.
-     */
-    public void clearActiveVerVel() {
-        horVel.clearActive();
-    }
-
     public boolean hasActiveHorVel() {
         return horVel.hasActive();
     }
 
     public boolean hasQueuedHorVel() {
         return horVel.hasQueued();
+    }
+
+    /**
+     * Clear active vertical velocity (until recoded, this will remove all vertical velocity).
+     */
+    public void clearActiveVerVel() {
+        verticalFreedom = 0.0;
+        verticalVelocity = 0.0;
+        verticalVelocityCounter = 0;
+        verticalVelocityUsed = 0;
     }
 
     //    public boolean hasActiveVerVel() {
@@ -634,6 +639,10 @@ public class MovingData extends ACheckData {
                 verticalVelocityUsed ++;
                 verticalFreedom *= 0.93D;
             }
+        }
+        if (horVel.hasActive() || horVel.hasQueued() || verticalFreedom > 0.001) {
+            // Renew the dirty phase.
+            sfDirty = true;
         }
     }
 
@@ -849,6 +858,86 @@ public class MovingData extends ACheckData {
             sfNoLowJump = true;
         }
         // TODO: clear accounting here ?
+    }
+
+    /**
+     * Refactoring stage: Test if velocity has affected the in-air
+     * jumping phase. Use clearActiveVerVel to force end velocity jump phase.
+     * 
+     * @return
+     */
+    public boolean isVelocityJumpPhase() {
+        return sfDirty;
+    }
+
+    /**
+     * Refactoring state: Get the classic verticalFreedom.
+     * @return
+     */
+    public double getVerticalFreedom() {
+        return verticalFreedom;
+    }
+
+    /**
+     * Refactoring stage: Fake/override vertical velocity.
+     * @param velocity
+     * @param freedom
+     * @param counter
+     */
+    public void fakeVerticalFreedom(final double velocity, final double freedom, final int counter) {
+        verticalVelocity = velocity;
+        verticalFreedom = freedom;
+        verticalVelocityCounter = counter;
+        verticalVelocityUsed = 0;
+    }
+
+    /**
+     * Refactoring stage: Test which value sfDirty should have and set
+     * accordingly. This should only be called, if the player reached ground.
+     * 
+     * @return If the velocity jump phase is still active (sfDirty).
+     */
+    public boolean resetVelocityJumpPhase() {
+        if (verticalFreedom > 0.001 || horVel.hasActive() || horVel.hasQueued()) {
+            sfDirty = true;
+        } else {
+            sfDirty = false;
+        }
+        return sfDirty;
+    }
+
+    /**
+     * Add to builder with a leading newline, if counter or counter or freedom
+     * is above threshold (0 / 0.001).
+     * 
+     * @param builder
+     */
+    public void logVerticalFreedom(StringBuilder builder) {
+        if (verticalVelocityCounter > 0 || verticalFreedom >= 0.001) {
+            builder.append("\n vertical freedom: " +  StringUtil.fdec3.format(verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(verticalVelocity) + "/counter=" + verticalVelocityCounter +"/used=" + verticalVelocityUsed);
+        }
+    }
+
+    /**
+     * Refactoring stage: Invalidate vertical velocity based on checking vs.
+     * configured grace ticks.
+     * 
+     * @param velocityGraceTicks Ticks to check used ticks vs.
+     * @param removeFreedom If to reset verticalFreedom and use count as well.
+     * @return If actually reset.
+     */
+    public boolean invalidateVerVelGrace(final int velocityGraceTicks, final boolean removeFreedom) {
+        if (verticalVelocityUsed > velocityGraceTicks) {
+            verticalVelocityCounter = 0;
+            verticalVelocity = 0;
+            if (removeFreedom) {
+                verticalVelocityUsed = 0;
+                verticalFreedom = 0;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

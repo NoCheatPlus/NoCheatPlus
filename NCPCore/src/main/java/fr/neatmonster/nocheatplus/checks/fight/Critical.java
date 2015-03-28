@@ -58,9 +58,9 @@ public class Critical extends Check {
         if (mcFallDistance > 0.0 && !player.isInsideVehicle() && !player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
             // Might be a violation.
             final MovingData dataM = MovingData.getData(player);
-            
+
             // TODO: Skip near the highest jump height (needs check if head collided with something solid, which also detects low jump).
-            if (!dataM.sfDirty && (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.mediumLiftOff == MediumLiftOff.GROUND
+            if (!dataM.isVelocityJumpPhase() && (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.mediumLiftOff == MediumLiftOff.GROUND
                     || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
                 if (MovingUtil.shouldCheckSurvivalFly(player, dataM, ccM)) {

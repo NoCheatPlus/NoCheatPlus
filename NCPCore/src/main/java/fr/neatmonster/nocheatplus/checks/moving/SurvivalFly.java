@@ -261,6 +261,10 @@ public class SurvivalFly extends Check {
                 }
             }
         } else {
+            /*
+             * TODO: Consider to log and/or remember when this was last time
+             * cleared [add time distance to tags/log on violations].
+             */
             data.clearActiveHorVel();
         }
 
@@ -270,14 +274,18 @@ public class SurvivalFly extends Check {
         //////////////////////////
 
         // Account for "dirty"-flag (allow less for normal jumping).
-        if (data.sfDirty) {
-            if (resetFrom || resetTo) {
-                // Not resetting for data.noFallAssumeOnGround, currently.
-                data.sfDirty = false;
-            }
-            else{
+        final boolean sfDirty;
+        if (data.isVelocityJumpPhase()) {
+            if (!resetFrom && !resetTo || data.resetVelocityJumpPhase()) {
+                // TODO: If resetTo && !resetfrom -> too early reset ?
+                sfDirty = true;
                 tags.add("dirty");
             }
+            else {
+                sfDirty = false;
+            }
+        } else {
+            sfDirty = false;
         }
 
         // Calculate the vertical speed limit based on the current jump phase.
@@ -297,11 +305,11 @@ public class SurvivalFly extends Check {
                 return data.getSetBack(to);
             }
         }
-        else if (data.verticalFreedom <= 0.001 && from.isOnClimbable()) {
+        else if (!sfDirty && from.isOnClimbable()) {
             // Ladder types.
             vDistanceAboveLimit = vDistClimbable(from, fromOnGround, toOnGround, yDistance, data);
         }
-        else if (data.verticalFreedom <= 0.001 && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())) {
+        else if (!sfDirty && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())) {
             // Swimming...
             final double[] res = vDistLiquid(from, to, toOnGround, yDistance, data);
             vAllowedDistance = res[0];
@@ -310,7 +318,7 @@ public class SurvivalFly extends Check {
         else{
             // Check y-distance for normal jumping, like in air.
             // TODO: Can it be easily transformed to a more accurate max. absolute height?
-            vAllowedDistance = 1.35D + data.verticalFreedom;
+            vAllowedDistance = 1.35D + data.getVerticalFreedom();
             int maxJumpPhase;
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP) {
                 // TODO: In normal water this is 0. Could set higher for special cases only (needs efficient data + flags collection?).
@@ -327,7 +335,7 @@ public class SurvivalFly extends Check {
             else {
                 maxJumpPhase = 6;
             }
-            if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0 && !data.sfDirty) {
+            if (data.sfJumpPhase > maxJumpPhase && data.getVerticalFreedom() <= 0 && !data.isVelocityJumpPhase()) {
                 if (yDistance < 0) {
                     // Ignore falling, and let accounting deal with it.
                 }
@@ -453,11 +461,10 @@ public class SurvivalFly extends Check {
 
         // Invalidation of vertical velocity.
         // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
-        if (data.verticalVelocityUsed > cc.velocityGraceTicks && yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE) {
-            //        	data.verticalFreedom = 0; // TODO: <- why?
-            data.verticalVelocityCounter = 0;
-            data.verticalVelocity = 0;
-            tags.add("invalidate_vvel"); // TODO: Test / validate by logs.
+        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
+                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
+            // (Only prevent counting further up, leaves the freedom.)
+            tags.add("cap_vvel"); // TODO: Test / validate by logs.
         }
 
         // Apply reset conditions.
@@ -470,11 +477,8 @@ public class SurvivalFly extends Check {
                     tags.add("resetbunny");
                 }
                 // TODO: Experimental: reset vertical velocity.
-                if (data.verticalVelocityUsed > cc.velocityGraceTicks && yDistance < 0) {
-                    data.verticalVelocityCounter = 0;
-                    data.verticalFreedom = 0;
-                    data.verticalVelocity = 0;
-                    data.verticalVelocityUsed = 0;
+                if (yDistance < 0.0 && data.invalidateVerVelGrace(cc.velocityGraceTicks, true)) {
+                    tags.add("rem_vvel");
                 }
             }
             // Reset data.
@@ -538,7 +542,7 @@ public class SurvivalFly extends Check {
         // multiple times if necessary.
         double hAllowedDistance = 0D;
 
-        final boolean sfDirty = data.sfDirty;
+        final boolean sfDirty = data.isVelocityJumpPhase();
 
         if (from.isInWeb()) {
             data.sfOnIce = 0;
@@ -694,7 +698,7 @@ public class SurvivalFly extends Check {
                 // Allow adding 0.
                 data.vDistAcc.add((float) yDistance);
             }
-            else if (data.verticalFreedom <= 0.001D) {
+            else if (!data.isVelocityJumpPhase()) {
                 // Here yDistance can be negative and positive.
                 if (yDistance != 0D) {
                     data.vDistAcc.add((float) yDistance);
@@ -786,7 +790,7 @@ public class SurvivalFly extends Check {
             }
             else {
                 // Moving upwards after falling without having touched the ground.
-                if (data.verticalFreedom <= 0.001 && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)) {
+                if (!data.isVelocityJumpPhase() && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)) {
                     // TODO: adjust limit for bunny-hop.
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
                     tags.add("ychincfly");
@@ -801,7 +805,7 @@ public class SurvivalFly extends Check {
             tags.add("ychdec");
             // Detect low jumping.
             // TODO: sfDirty: Account for actual velocity (demands consuming queued for dir-change(!))!
-            if (!data.sfNoLowJump && !data.sfDirty && data.mediumLiftOff == MediumLiftOff.GROUND) {
+            if (!data.sfNoLowJump && data.mediumLiftOff == MediumLiftOff.GROUND && !data.isVelocityJumpPhase()) {
                 final double setBackYDistance = to.getY() - data.getSetBackY();
                 if (setBackYDistance > 0.0) {
                     // Only count it if the player has actually been jumping (higher than setback).
@@ -1455,9 +1459,7 @@ public class SurvivalFly extends Check {
         builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
         final String dHDist = (BuildParameters.debugLevel > 0 && data.sfLastHDist != Double.MAX_VALUE && Math.abs(data.sfLastHDist - hDistance) > 0.0005) ? ("(" + (hDistance > data.sfLastHDist ? "+" : "") + StringUtil.fdec3.format(hDistance - data.sfLastHDist) + ")") : "";
         builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
-        if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001) {
-            builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
-        }
+        data.logVerticalFreedom(builder);
         //		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001) {
         //			builder.append("\n" + player.getName() + " horizontal freedom: " +  StringUtil.fdec3.format(data.horizontalFreedom) + " (counter=" + data.horizontalVelocityCounter +"/used="+data.horizontalVelocityUsed);
         //		}

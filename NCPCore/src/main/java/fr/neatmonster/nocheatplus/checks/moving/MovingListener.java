@@ -1482,10 +1482,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Give some freedom to allow the "exiting move".
         data.removeAllVelocity();
         data.addHorizontalVelocity(new Velocity(0.9, 1, 1));
-        data.verticalVelocityCounter = 1;
-        data.verticalFreedom = 1.2;
-        data.verticalVelocity = 0.15;
-        data.verticalVelocityUsed = 0;
+        data.fakeVerticalFreedom(0.15, 1.2, 1);
         useLoc.setWorld(null);
     }
 
