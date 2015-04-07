@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.logging;
+package fr.neatmonster.nocheatplus.logging.debug;
 
 import java.util.Arrays;
 
@@ -10,6 +10,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
