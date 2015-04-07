@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /**
@@ -46,14 +47,6 @@ public class DebugUtil {
         StringBuilder builder = new StringBuilder(128);
         DebugUtil.addMove(from, to, null, builder);
         return builder.toString();
-    }
-
-    public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
-        return x1 == x2 && y1 == y2 && z1 == z2;
-    }
-
-    public static boolean isSamePos(final Location loc1, final Location loc2){
-        return isSamePos(loc1.getX(), loc1.getY(), loc1.getZ(), loc2.getX(), loc2.getY(), loc2.getZ());
     }
 
     public static void addLocation(final double x, final double y, final double z, final StringBuilder builder){
@@ -156,7 +149,7 @@ public class DebugUtil {
      * @return
      */
     public static void addFormattedMove(final Location from, final Location to, final Location loc, final StringBuilder builder){
-        if (loc != null && !isSamePos(from, loc)){
+        if (loc != null && !TrigUtil.isSamePos(from, loc)){
             builder.append("(");
             addFormattedLocation(loc, builder);
             builder.append(") ");
@@ -171,7 +164,7 @@ public class DebugUtil {
      * @param builder
      */
     public static void addMove(final Location from, final Location to, final Location loc, final StringBuilder builder){
-        if (loc != null && !isSamePos(from, loc)){
+        if (loc != null && !TrigUtil.isSamePos(from, loc)){
             builder.append("Location: ");
             addLocation(loc, builder);
             builder.append("\n");

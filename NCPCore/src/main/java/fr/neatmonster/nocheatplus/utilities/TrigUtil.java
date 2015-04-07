@@ -494,7 +494,7 @@ public class TrigUtil {
     }
 
     /**
-     * Test if the location is on the same block as the given coordinates.
+     * Test if the coordinates represent the same position.
      * @param loc
      * @param x
      * @param y
@@ -506,6 +506,20 @@ public class TrigUtil {
             return false;
         }
         return loc.getX() == x && loc.getZ() == z && loc.getY() == y;
+    }
+
+    /**
+     * Test if the coordinates represent the same position.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @return
+     */
+    public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
+        return x1 == x2 && y1 == y2 && z1 == z2;
     }
 
     /**
