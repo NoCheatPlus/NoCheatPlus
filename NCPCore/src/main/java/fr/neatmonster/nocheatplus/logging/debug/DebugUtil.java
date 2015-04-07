@@ -289,4 +289,32 @@ public class DebugUtil {
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 
+    public static String toJava(final double[] doubles) {
+        final StringBuilder builder = new StringBuilder(20 + doubles.length * 20);
+        toJava(doubles, builder);
+        return builder.toString();
+    }
+
+    /**
+     * 
+     * @param doubles
+     * @param builder
+     */
+    public static void toJava(final double[] doubles, final StringBuilder builder) {
+        if (doubles == null) {
+            builder.append("null");
+            return;
+        }
+        builder.append("new double[] {");
+        if (doubles.length > 0) {
+            builder.append(doubles[0]);
+        }
+        for (int i = 1; i < doubles.length; i++) {
+            builder.append(", " + doubles[i]);
+        }
+        builder.append("}");
+    }
+    
+    // TODO: method to log raytracing/recorder directly with prefix message.
+
 }

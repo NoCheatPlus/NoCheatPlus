@@ -70,7 +70,7 @@ public class Visible extends Check {
             // Initialize.
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
-            collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags);
+            collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);
             // Cleanup.
             rayTracing.cleanup();
             blockCache.cleanup();
@@ -107,7 +107,7 @@ public class Visible extends Check {
         return cancel;
     }
 
-    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final double dirX, final double dirY, final double dirZ, final int blockX, final int blockY, final int blockZ, final BlockFace face, final List<String> tags){
+    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final double dirX, final double dirY, final double dirZ, final int blockX, final int blockY, final int blockZ, final BlockFace face, final List<String> tags, final boolean debug){
         // Block of eyes.
         final int eyeBlockX = Location.locToBlock(eyeX);
         final int eyeBlockY = Location.locToBlock(eyeY);
@@ -170,17 +170,27 @@ public class Visible extends Check {
         // Perform ray-tracing.
         rayTracing.set(eyeX, eyeY, eyeZ, collideX, collideY, collideZ, blockX, blockY, blockZ);
         rayTracing.loop();
+        
+        final boolean collides;
         if (rayTracing.collides()) {
             tags.add("raytracing");
-            return true;
+            collides = true;
         }
         else if (rayTracing.getStepsDone() > rayTracing.getMaxSteps()) {
             tags.add("raytracing_maxsteps");
-            return true;
+            collides = true;
         }
         else {
-            return false;
+            collides = false;
         }
+        if (collides && debug) {
+            /*
+             * Consider using a configuration setting for extended debugging
+             * (e.g. make DEBUG_LEVEL accessible by API and config).
+             */
+            // TODO: public static void InteractRayTracing.logTestCase(...).
+        }
+        return collides;
     }
 
     /**

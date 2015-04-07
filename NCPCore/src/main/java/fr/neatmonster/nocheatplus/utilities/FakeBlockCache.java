@@ -1,10 +1,14 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.Iterator;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
+import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
+import fr.neatmonster.nocheatplus.utilities.ds.CoordMap.Entry;
 
 /**
  * Stand-alone BlockCache for setting data by access methods, for testing purposes.
@@ -88,10 +92,32 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /**
+     * Fill the entire cuboid.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param type
+     */
     public void fill(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         fill(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
+    /**
+     * Fill the entire cuboid.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param typeId
+     * @param data
+     * @param bounds
+     */
     public void fill(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
@@ -102,10 +128,32 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /**
+     * Horizontal walls.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param type
+     */
     public void walls(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         walls(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
+    /**
+     * Horizontal walls.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param typeId
+     * @param data
+     * @param bounds
+     */
     public void walls(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
@@ -118,10 +166,32 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /**
+     * Walls, floor, ceiling.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param type
+     */
     public void room(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         room(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
+    /**
+     * Walls, floor, ceiling.
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param typeId
+     * @param data
+     * @param bounds
+     */
     public void room(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
@@ -129,6 +199,53 @@ public class FakeBlockCache extends BlockCache {
                     if (x == x1 || x == x2 || z == z1 || z == z2 || y == y1 || y == y2) {
                         set(x, y, z, typeId, data, bounds);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Test if any an id is set for this block position.
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public boolean hasIdEntry(int x, int y, int z) {
+        return idMapStored.contains(x, y, z);
+    }
+
+    /**
+     * Return a line of java code to construct a new FakeBlockCache with the same content (no newlines).
+     * @param builder
+     * @param fbcName Variable name of the FakeBlockCache instance.
+     */
+    public void toJava(final StringBuilder builder, final String fbcName) {
+        builder.append("FakeBlockCache " + fbcName + " = new FakeBlockCache();");
+        // Assume id is always set.
+        final Iterator<Entry<Integer>> it = idMapStored.iterator();
+        final int airId = BlockProperties.getId(Material.AIR);
+        while (it.hasNext()) {
+            Entry<Integer> entry = it.next();
+            final int x = entry.getX();
+            final int y = entry.getY();
+            final int z = entry.getZ();
+            final Integer id = entry.getValue();
+            if (id == airId) {
+                builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
+            } else {
+                final Integer data = dataMapStored.get(x, y, z);
+                final double[] bounds = boundsMapStored.get(x, y, z);
+                if (bounds == null) {
+                    if (data == null) { // Consider 0 too.
+                        builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
+                    } else {
+                        builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ");");
+                    }
+                } else {
+                    builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ", ");
+                    DebugUtil.toJava(bounds, builder);
+                    builder.append(");");
                 }
             }
         }
@@ -171,6 +288,14 @@ public class FakeBlockCache extends BlockCache {
             double minZ, double maxX, double maxY, double maxZ) {
         // TODO: Consider adding cuboids which mean "ground" if the foot location is inside.
         return false;
+    }
+
+    @Override
+    public void cleanup() {
+        super.cleanup();
+        idMapStored.clear();
+        dataMapStored.clear();
+        boundsMapStored.clear();
     }
 
 }
