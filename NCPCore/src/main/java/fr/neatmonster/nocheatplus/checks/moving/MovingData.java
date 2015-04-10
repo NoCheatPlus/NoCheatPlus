@@ -618,16 +618,19 @@ public class MovingData extends ACheckData {
 
         // Vertical velocity (new concept).
         //        verVel.tick();
-        if (verticalVelocity <= 0.09D) {
+        if (verticalVelocity <= 0.09) {
             verticalVelocityUsed ++;
             verticalVelocityCounter--;
         }
-        else if (verticalVelocityCounter > 0) {
-            verticalVelocityUsed ++;
+
+        if (verticalVelocityCounter > 0) {
+            if (verticalVelocity > 0.09) {
+                verticalVelocityUsed ++;
+            }
             verticalFreedom += verticalVelocity;
             verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
             // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
-        } else if (verticalFreedom > 0.001D) {
+        } else if (verticalFreedom > 0.001) {
             if (verticalVelocityUsed == 1 && verticalVelocity > 1.0) {
                 // Workarounds.
                 verticalVelocityUsed = 0;
@@ -637,10 +640,10 @@ public class MovingData extends ACheckData {
             else{
                 // Counter has run out, now reduce the vertical freedom over time.
                 verticalVelocityUsed ++;
-                verticalFreedom *= 0.93D;
+                verticalFreedom *= 0.5;
             }
         }
-        if (horVel.hasActive() || horVel.hasQueued() || verticalFreedom > 0.001) {
+        if (!sfDirty && (horVel.hasActive() || horVel.hasQueued() || verticalFreedom > 0.001)) {
             // Renew the dirty phase.
             sfDirty = true;
         }
