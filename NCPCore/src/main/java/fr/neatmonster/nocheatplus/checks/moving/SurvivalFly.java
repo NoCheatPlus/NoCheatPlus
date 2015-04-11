@@ -825,6 +825,10 @@ public class SurvivalFly extends Check {
                         if ((aboveFlags & (BlockProperties.F_GROUND | BlockProperties.F_SOLID)) == 0) {
                             tags.add("lowjump");
                             data.sfLowJump = true;
+                        } else if (setBackYDistance < 0.36) {
+                            // TODO: "Exact" parameters.
+                            data.bunnyhopDelay = 0;
+                            tags.add("resetbunny_lowjump");
                         }
                     }
                 }
@@ -960,7 +964,7 @@ public class SurvivalFly extends Check {
         }
         // Check hop:
         if (allowHop && hDistance >= walkSpeed) { // if (sprinting) {
-            // Check activation of bunny hop,
+            // Check activation of bunlowny hop,
             // Roughly twice the sprinting speed is reached.
             // TODO: Allow slightly higher speed on lost ground.
             if (hDistanceAboveLimit > (sprinting ? 0.005 : 0.0016) && hDistanceAboveLimit <= hAllowedDistance + someThreshold
