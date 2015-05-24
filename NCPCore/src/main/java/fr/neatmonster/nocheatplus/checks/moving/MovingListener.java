@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
@@ -1496,6 +1497,27 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (!event.isSprinting()) {
             MovingData.getData(event.getPlayer()).timeSprinting = 0;
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onToggleFlight(final PlayerToggleFlightEvent event) {
+        // (ignoreCancelled = false: we track the bit of vertical extra momentum/thing).
+        final Player player = event.getPlayer();
+        if (player.isFlying() || event.isFlying() && !event.isCancelled()) {
+            return;
+        }
+        final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        // TODO: data.isVelocityJumpPhase() might be too harsh, but prevents too easy abuse.
+        if (!MovingUtil.shouldCheckSurvivalFly(player, data, cc) || data.isVelocityJumpPhase() ||
+                BlockProperties.isOnGroundOrResetCond(player, player.getLocation(useLoc), cc.yOnGround)) {
+            useLoc.setWorld(null);
+            return;
+        }
+        useLoc.setWorld(null);
+        // TODO: Configurable.
+        // TODO: Confine to minimum activation ticks.
+        data.addVelocity(player, cc, 0.0, 0.0, 0.3);
     }
 
     @Override
