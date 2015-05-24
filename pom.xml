@@ -33,6 +33,7 @@
     <module>NCPCompatCB3100</module>
     <module>NCPCompatSpigotCB1_8_R1</module>
     <module>NCPCompatSpigotCB1_8_R2</module>
+    <module>NCPCompatSpigotCB1_8_R3</module>
     <module>NCPCompatCBDev</module>
     <module>NCPCompatProtocolLib</module>
     <module>NCPCompatGlowstone</module>
