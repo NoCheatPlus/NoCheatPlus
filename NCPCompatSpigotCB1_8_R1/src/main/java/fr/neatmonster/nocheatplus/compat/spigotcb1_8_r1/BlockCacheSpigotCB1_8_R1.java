@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.spigotcb1_8;
+package fr.neatmonster.nocheatplus.compat.spigotcb1_8_r1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,12 +18,12 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
-public class BlockCacheSpigotCB1_8 extends BlockCache implements IBlockAccess{
+public class BlockCacheSpigotCB1_8_R1 extends BlockCache implements IBlockAccess{
 
     protected net.minecraft.server.v1_8_R1.WorldServer world;
     protected World bukkitWorld; // WHACKS
 
-    public BlockCacheSpigotCB1_8(World world) {
+    public BlockCacheSpigotCB1_8_R1(World world) {
         setAccess(world);
     }
 

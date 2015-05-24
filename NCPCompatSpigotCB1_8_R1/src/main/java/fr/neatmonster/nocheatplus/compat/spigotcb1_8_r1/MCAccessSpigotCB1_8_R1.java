@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.spigotcb1_8;
+package fr.neatmonster.nocheatplus.compat.spigotcb1_8_r1;
 
 import net.minecraft.server.v1_8_R1.AxisAlignedBB;
 import net.minecraft.server.v1_8_R1.Block;
@@ -23,12 +23,12 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-public class MCAccessSpigotCB1_8 implements MCAccess{
+public class MCAccessSpigotCB1_8_R1 implements MCAccess{
 
     /**
      * Constructor to let it fail.
      */
-    public MCAccessSpigotCB1_8() {
+    public MCAccessSpigotCB1_8_R1() {
         getCommandMap();
         ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R1.", new String[] {"Entity" , "dead"});
         // block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
@@ -45,7 +45,7 @@ public class MCAccessSpigotCB1_8 implements MCAccess{
 
     @Override
     public String getServerVersionTag() {
-        return "Spigot-CB-1.8";
+        return "Spigot-CB-1.8_R1";
     }
 
     @Override
@@ -55,7 +55,7 @@ public class MCAccessSpigotCB1_8 implements MCAccess{
 
     @Override
     public BlockCache getBlockCache(final World world) {
-        return new BlockCacheSpigotCB1_8(world);
+        return new BlockCacheSpigotCB1_8_R1(world);
     }
 
     @Override

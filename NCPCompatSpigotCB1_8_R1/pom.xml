@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatspigotcb1_8</artifactId>
+  <artifactId>ncpcompatspigotcb1_8_r1</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatSpigotCB1_8</name>
+  <name>NCPCompatSpigotCB1_8_R1</name>
   <version>1.1-SNAPSHOT</version>
 
   <parent>
@@ -26,6 +26,5 @@
     </dependency>
   </dependencies>
 
-  <description>Compatibility for Minecraft 1.8 with CraftBukkit/Spigot.
-</description>
+  <description>Compatibility for Minecraft 1.8 with CraftBukkit/Spigot (R1).</description>
 </project>

@@ -92,7 +92,7 @@
     </dependency>
     <dependency>
         <groupId>fr.neatmonster</groupId>
-        <artifactId>ncpcompatspigotcb1_8</artifactId>
+        <artifactId>ncpcompatspigotcb1_8_r1</artifactId>
         <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
