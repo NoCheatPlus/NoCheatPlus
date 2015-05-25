@@ -1500,7 +1500,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
-    public void onToggleFlight(final PlayerToggleFlightEvent event) {
+    public void onPlayerToggleFlight(final PlayerToggleFlightEvent event) {
         // (ignoreCancelled = false: we track the bit of vertical extra momentum/thing).
         final Player player = event.getPlayer();
         if (player.isFlying() || event.isFlying() && !event.isCancelled()) {
@@ -1517,7 +1517,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         useLoc.setWorld(null);
         // TODO: Configurable.
         // TODO: Confine to minimum activation ticks.
-        data.addVelocity(player, cc, 0.0, 0.0, 0.3);
+        data.addVelocity(player, cc, 0.0, 0.3, 0.0);
     }
 
     @Override
