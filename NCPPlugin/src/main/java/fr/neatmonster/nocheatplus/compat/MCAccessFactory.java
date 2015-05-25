@@ -91,9 +91,9 @@ public class MCAccessFactory {
                 // Current DEV / LATEST: CB (Spigot)
 //                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // future / tests.
                 // Dedicated: CB (Spigot)
-                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_r3.MCAccessSpigotCB1_8_R3", // 1.8.4|1.8.5 (1_8_R3)
-                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_r2.MCAccessSpigotCB1_8_R2", // 1.8.3 (1_8_R2)
-                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_r1.MCAccessSpigotCB1_8_R1", // 1.8 (1_8_R1)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3.MCAccessSpigotCB1_8_R3", // 1.8.4|1.8.5 (1_8_R3)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R2.MCAccessSpigotCB1_8_R2", // 1.8.3 (1_8_R2)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R1.MCAccessSpigotCB1_8_R1", // 1.8 (1_8_R1)
                 // Dedicated CB (original)
                 "fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100", // 1.7.10
                 "fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043", // 1.7.8|1.7.9

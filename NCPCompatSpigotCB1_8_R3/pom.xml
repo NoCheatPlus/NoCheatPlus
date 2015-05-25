@@ -26,5 +26,5 @@
     </dependency>
   </dependencies>
 
-  <description>Compatibility for Minecraft 1.8.4 with CraftBukkit/Spigot (1_8_R3).</description>
+  <description>Compatibility for Minecraft 1.8.4-1.8.6 with CraftBukkit/Spigot (1_8_R3).</description>
 </project>
