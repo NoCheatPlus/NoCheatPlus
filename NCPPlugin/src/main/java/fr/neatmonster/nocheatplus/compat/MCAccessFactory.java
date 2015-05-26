@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.compat;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -57,6 +58,9 @@ public class MCAccessFactory {
             }
             StaticLog.logWarning(msg);
             final MCAccess mcAccess = new MCAccessBukkit();
+//            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
+//                log(throwables); // Maybe later activate with TRACE explicitly set
+//            }
             StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
             return mcAccess;
         }
@@ -71,11 +75,15 @@ public class MCAccessFactory {
             StaticLog.logSevere(msg);
         }
         StaticLog.logSevere("[NoCheatPlus] >>> Failed to set up MCAccess <<<");
+        log(throwables);
+        // TODO: Schedule disabling the plugin or running in circles.
+        throw new RuntimeException("Could not set up native access to the server mod, neither to the Bukkit-API.");
+    }
+
+    private static void log(Collection<Throwable> throwables) {
         for (Throwable t : throwables ) {
             StaticLog.logSevere(t);
         }
-        // TODO: Schedule disabling the plugin or running in circles.
-        throw new RuntimeException("Could not set up native access to the server mod, neither to the Bukkit-API.");
     }
 
     /**
@@ -89,7 +97,7 @@ public class MCAccessFactory {
 
         final String[] classNames = new String[] {
                 // Current DEV / LATEST: CB (Spigot)
-//                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // future / tests.
+                //                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // future / tests.
                 // Dedicated: CB (Spigot)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3.MCAccessSpigotCB1_8_R3", // 1.8.4|1.8.5 (1_8_R3)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R2.MCAccessSpigotCB1_8_R2", // 1.8.3 (1_8_R2)
