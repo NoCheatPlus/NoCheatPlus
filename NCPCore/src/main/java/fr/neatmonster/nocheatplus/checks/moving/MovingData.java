@@ -205,6 +205,10 @@ public class MovingData extends ACheckData {
 
     // Accounting info.
     public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
+    /** Rough friction factor estimate, 0.0 is the reset value (maximum with lift-off/burst speed is used). */
+    public double lastFriction = 0.0;
+    /** Used during processing, no resetting necessary.*/
+    public double nextFriction = 0.0;
 
 
     // HOT FIX
@@ -240,6 +244,7 @@ public class MovingData extends ACheckData {
         sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
         vehicleConsistency = MoveConsistency.INCONSISTENT;
+        lastFriction = 0.0;
     }
 
     /**
@@ -272,6 +277,7 @@ public class MovingData extends ACheckData {
         mediumLiftOff = defaultMediumLiftOff;
         removeAllVelocity();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
+        lastFriction = 0.0;
     }
 
     /**
@@ -337,6 +343,7 @@ public class MovingData extends ACheckData {
         sfDirty = false;
         sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
+        lastFriction = 0.0;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
     }

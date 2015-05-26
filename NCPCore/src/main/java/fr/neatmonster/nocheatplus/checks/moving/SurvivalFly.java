@@ -520,6 +520,11 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
+        if (hasHdist) {
+            data.lastFriction = data.nextFriction;
+        } else {
+            data.lastFriction = 0.0;
+        }
         return null;
     }
 
@@ -533,6 +538,7 @@ public class SurvivalFly extends Check {
      * @param hAllowedDistance
      * @param data
      * @param cc
+     * @param checkPermissions If to check permissions, allowing to speed up a little bit. Only set to true after having failed with it set to false.
      * @return
      */
     private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final double walkSpeed, final MovingData data, final MovingConfig cc, boolean checkPermissions)
@@ -543,12 +549,14 @@ public class SurvivalFly extends Check {
         double hAllowedDistance = 0D;
 
         final boolean sfDirty = data.isVelocityJumpPhase();
-
+        double friction = data.lastFriction; // Friction to use with this move. Set data.nextFriction for next one.
+        data.nextFriction = 0.0;
         if (from.isInWeb()) {
             data.sfOnIce = 0;
             // TODO: if (from.isOnIce()) <- makes it even slower !
             // Does include sprinting by now (would need other accounting methods).
             hAllowedDistance = modWeb * walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+            friction = 0.0; // Ensure friction can't be used to speed.
         } else if (from.isInLiquid() && to.isInLiquid()) {
             // Check all liquids (lava might demand even slower speed though).
             // TODO: Test how to go with only checking from (less dolphins).
@@ -562,11 +570,14 @@ public class SurvivalFly extends Check {
                     hAllowedDistance *= modSprint;
                 }
             }
+            data.nextFriction = 0.89;
         } else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
+            friction = 0.0; // Ensure friction can't be used to speed.
         }
         else if (!sfDirty && from.isOnGround() && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
             hAllowedDistance = modBlock * walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
+            friction = 0.0; // Ensure friction can't be used to speed.
         }
         else {
             if (!sprinting) {
@@ -575,7 +586,9 @@ public class SurvivalFly extends Check {
             else {
                 hAllowedDistance = walkSpeed * modSprint * cc.survivalFlySprintingSpeed / 100D;
             }
+            friction = 0.0; // Ensure friction can't be used to speed. TODO: Set.
         }
+        // TODO: Reset friction on too big change of direction.
 
         // Account for flowing liquids (only if needed).
         // Assume: If in liquids this would be placed right here.
@@ -588,9 +601,14 @@ public class SurvivalFly extends Check {
         // TODO: Check if a) early return makes sense and b) do it for each of the following parts.
         // TODO: Should debug really make a difference? Do early return before permission check only?
         // TODO: Consider logging early vs. full.
-        if (hDistance <= hAllowedDistance && !data.debug) {
+        final double hDistWithFriction = data.sfLastHDist == Double.MAX_VALUE ? hAllowedDistance : Math.max(hAllowedDistance, data.sfLastHDist * friction);
+        if (hDistance <= hDistWithFriction && !data.debug) {
             // Shortcut for debug disabled.
-            return hAllowedDistance;
+            if (hDistance <= hAllowedDistance) {
+                // Move is within lift-off/burst envelope, allow next time.
+                data.nextFriction = 1.0;
+            }
+            return hDistWithFriction;
         }
 
         // If the player is on ice, give them a higher maximum speed.
@@ -610,8 +628,11 @@ public class SurvivalFly extends Check {
         if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
             hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
         }
-
-        return hAllowedDistance;
+        if (hDistance <= hAllowedDistance) {
+            // Move is within lift-off/burst envelope, allow next time.
+            data.nextFriction = 1.0;
+        }
+        return Math.max(hAllowedDistance, hDistWithFriction); // Still the maximum due to debug flag.
     }
 
     /**
