@@ -60,13 +60,13 @@ public class SurvivalFly extends Check {
     public static final double hBufMax			= 1.0;
 
     // Vertical speeds/modifiers. 
-    public static final double climbSpeed		= walkSpeed * modSprint; // TODO.
+    public static final double climbSpeed		= walkSpeed * modSprint; // TODO..
 
     // Other.
     /** Bunny-hop delay. */
     private static final int   bunnyHopMax = 10;
     /** Divisor vs. last hDist for minimum slow down. */
-    private static final double bunnyDivFriction = 130.0;
+    private static final double bunnyDivFriction = 160.0; // Rather in-air, blocks would differ by friction.
 
     /** To join some tags with moving check violations. */
     private final ArrayList<String> tags = new ArrayList<String>(15);
