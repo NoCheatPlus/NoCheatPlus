@@ -67,6 +67,15 @@ public class SurvivalFly extends Check {
     private static final int   bunnyHopMax = 10;
     /** Divisor vs. last hDist for minimum slow down. */
     private static final double bunnyDivFriction = 160.0; // Rather in-air, blocks would differ by friction.
+    
+    // Gravity.
+    public static final double gravity = 0.0774; // TODO: Model / check.
+    
+    // Friction by medium.
+    public static final double FRICTION_MEDIUM_AIR = 0.98; // TODO: Check
+    public static final double FRICTION_MEDIUM_LIQUID = 0.89; // Rough estimate for horizontal move sprint-jump into water.
+    
+    // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
     /** To join some tags with moving check violations. */
     private final ArrayList<String> tags = new ArrayList<String>(15);
@@ -168,6 +177,8 @@ public class SurvivalFly extends Check {
         else{
             sprinting = false;
         }
+        
+        setNextFriction(from, to, data, cc);
 
         /////////////////////////////////
         // Mixed checks (lost ground).
@@ -520,12 +531,39 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
-        if (hasHdist) {
-            data.lastFriction = data.nextFriction;
-        } else {
-            data.lastFriction = 0.0;
-        }
+        data.lastFrictionHorizontal = data.nextFrictionHorizontal;
+        data.lastFrictionVertical = data.nextFrictionVertical;
         return null;
+    }
+    
+    /**
+     * Set data.nextFriction according to media.
+     * @param from
+     * @param to
+     * @param data
+     * @param cc
+     */
+    private void setNextFriction(final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+        // NOTE: Other methods might still override nextFriction to 1.0 due to burst/lift-off envelope.
+        // TODO: Other media / medium transitions / friction by block.
+        if (from.isInWeb() || to.isInWeb()) {
+            data.nextFrictionHorizontal = data.nextFrictionVertical = 0.0;
+        }
+        else if (from.isOnClimbable() || to.isOnClimbable()) {
+            // TODO: Not sure about horizontal (!).
+            data.nextFrictionHorizontal = data.nextFrictionVertical = 0.0;
+        }
+        else if (from.isInLiquid() && to.isInLiquid()) {
+            // TODO: Lava ?
+            data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_LIQUID;
+        }
+        else if (!from.isOnGround() && ! to.isOnGround()) {
+            data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_AIR;
+        }
+        else {
+            // TODO: Friction for walking on blocks (!).
+        }
+        
     }
 
     /**
@@ -549,8 +587,7 @@ public class SurvivalFly extends Check {
         double hAllowedDistance = 0D;
 
         final boolean sfDirty = data.isVelocityJumpPhase();
-        double friction = data.lastFriction; // Friction to use with this move. Set data.nextFriction for next one.
-        data.nextFriction = 0.0;
+        double friction = data.lastFrictionHorizontal; // Friction to use with this move.
         if (from.isInWeb()) {
             data.sfOnIce = 0;
             // TODO: if (from.isOnIce()) <- makes it even slower !
@@ -570,7 +607,7 @@ public class SurvivalFly extends Check {
                     hAllowedDistance *= modSprint;
                 }
             }
-            data.nextFriction = 0.89;
+            // (Friction is used as is.)
         } else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
@@ -606,7 +643,7 @@ public class SurvivalFly extends Check {
             // Shortcut for debug disabled.
             if (hDistance <= hAllowedDistance) {
                 // Move is within lift-off/burst envelope, allow next time.
-                data.nextFriction = 1.0;
+                data.nextFrictionHorizontal = 1.0;
             }
             return hDistWithFriction;
         }
@@ -630,7 +667,7 @@ public class SurvivalFly extends Check {
         }
         if (hDistance <= hAllowedDistance) {
             // Move is within lift-off/burst envelope, allow next time.
-            data.nextFriction = 1.0;
+            data.nextFrictionHorizontal = 1.0;
         }
         return Math.max(hAllowedDistance, hDistWithFriction); // Still the maximum due to debug flag.
     }
