@@ -113,6 +113,11 @@ public class MCAccessCB2512 implements MCAccess{
     }
 
     @Override
+    public double getSpeedAttributeMultiplier(Player player) {
+        return 1.0;
+    }
+
+    @Override
     public int getInvulnerableTicks(final Player player) {
         return ((CraftPlayer) player).getHandle().invulnerableTicks;
     }
@@ -148,11 +153,11 @@ public class MCAccessCB2512 implements MCAccess{
     @Override
     public boolean hasGravity(final Material mat) {
         switch(mat){
-        case SAND:
-        case GRAVEL:
-            return true;
-        default:
-            return false;
+            case SAND:
+            case GRAVEL:
+                return true;
+            default:
+                return false;
         }
     }
 

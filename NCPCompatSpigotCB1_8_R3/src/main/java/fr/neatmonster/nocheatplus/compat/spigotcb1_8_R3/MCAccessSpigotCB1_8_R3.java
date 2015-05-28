@@ -1,10 +1,12 @@
 package fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3;
 
+import net.minecraft.server.v1_8_R3.AttributeInstance;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.DamageSource;
 import net.minecraft.server.v1_8_R3.EntityComplexPart;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.GenericAttributes;
 import net.minecraft.server.v1_8_R3.MobEffectList;
 
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -136,6 +139,12 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
         else {
             return Double.NEGATIVE_INFINITY;
         }
+    }
+
+    @Override
+    public double getSpeedAttributeMultiplier(Player player) {
+        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED);
+        return attr.getValue() / attr.b();
     }
 
     @Override

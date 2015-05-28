@@ -142,7 +142,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2);
+        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player);
 
         // Determine if the player is actually sprinting.
         final boolean sprinting;

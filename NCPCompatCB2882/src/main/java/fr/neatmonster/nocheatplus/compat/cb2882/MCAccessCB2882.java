@@ -117,6 +117,12 @@ public class MCAccessCB2882 implements MCAccess{
     }
 
     @Override
+    public double getSpeedAttributeMultiplier(Player player) {
+        // TODO: Implement.
+        return 1.0;
+    }
+
+    @Override
     public int getInvulnerableTicks(final Player player) {
         return ((CraftPlayer) player).getHandle().invulnerableTicks;
     }

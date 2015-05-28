@@ -1,10 +1,12 @@
 package fr.neatmonster.nocheatplus.compat.cb3100;
 
+import net.minecraft.server.v1_7_R4.AttributeInstance;
 import net.minecraft.server.v1_7_R4.AxisAlignedBB;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.DamageSource;
 import net.minecraft.server.v1_7_R4.EntityComplexPart;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
+import net.minecraft.server.v1_7_R4.GenericAttributes;
 import net.minecraft.server.v1_7_R4.MobEffectList;
 
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -135,6 +138,12 @@ public class MCAccessCB3100 implements MCAccess{
         else {
             return Double.NEGATIVE_INFINITY;
         }
+    }
+
+    @Override
+    public double getSpeedAttributeMultiplier(final Player player) {
+        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
+        return attr.getValue() / attr.b();
     }
 
     @Override
