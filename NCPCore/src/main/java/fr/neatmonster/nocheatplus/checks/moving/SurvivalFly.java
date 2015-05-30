@@ -474,13 +474,13 @@ public class SurvivalFly extends Check {
             // TODO: Is above stairs ?
         }
 
-        // Invalidation of vertical velocity.
-        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
-        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
-                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
-            // (Only prevent counting further up, leaves the freedom.)
-            tags.add("cap_vvel"); // TODO: Test / validate by logs.
-        }
+//        // Invalidation of vertical velocity.
+//        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
+//        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
+//                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
+//            // (Only prevent counting further up, leaves the freedom.)
+//            tags.add("cap_vvel"); // TODO: Test / validate by logs.
+//        }
 
         // Apply reset conditions.
         if (resetTo) {
