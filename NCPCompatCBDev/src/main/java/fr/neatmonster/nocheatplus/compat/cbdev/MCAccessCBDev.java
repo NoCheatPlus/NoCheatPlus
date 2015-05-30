@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
 import net.minecraft.server.v1_8_R3.AttributeInstance;
+import net.minecraft.server.v1_8_R3.AttributeModifier;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.DamageSource;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -145,6 +147,16 @@ public class MCAccessCBDev implements MCAccess{
     public double getSpeedAttributeMultiplier(Player player) {
         final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED);
         return attr.getValue() / attr.b();
+    }
+
+    @Override
+    public double getSprintAttributeMultiplier(Player player) {
+        final AttributeModifier mod = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return 1.0;
+        } else {
+            return AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override

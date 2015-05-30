@@ -118,6 +118,11 @@ public class MCAccessCB2545 implements MCAccess{
     }
 
     @Override
+    public double getSprintAttributeMultiplier(Player player) {
+        return player.isSprinting() ? 1.3 : 1.0;
+    }
+
+    @Override
     public int getInvulnerableTicks(final Player player) {
         return ((CraftPlayer) player).getHandle().invulnerableTicks;
     }

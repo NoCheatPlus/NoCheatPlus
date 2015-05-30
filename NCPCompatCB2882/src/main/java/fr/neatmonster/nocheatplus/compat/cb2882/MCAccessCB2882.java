@@ -6,6 +6,9 @@ import net.minecraft.server.v1_6_R3.DamageSource;
 import net.minecraft.server.v1_6_R3.EntityComplexPart;
 import net.minecraft.server.v1_6_R3.EntityPlayer;
 import net.minecraft.server.v1_6_R3.MobEffectList;
+import net.minecraft.server.v1_6_R3.AttributeInstance;
+import net.minecraft.server.v1_6_R3.AttributeModifier;
+import net.minecraft.server.v1_6_R3.GenericAttributes;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,12 +17,14 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_6_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_6_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_6_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -118,8 +123,18 @@ public class MCAccessCB2882 implements MCAccess{
 
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
-        // TODO: Implement.
-        return 1.0;
+        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
+        return attr.getValue() / attr.b();
+    }
+
+    @Override
+    public double getSprintAttributeMultiplier(Player player) {
+        final AttributeModifier mod = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d).a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return 1.0;
+        } else {
+            return AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override

@@ -38,7 +38,7 @@ public class SurvivalFly extends Check {
     public static final double walkSpeed            = 0.221D;
 
     public static final double modSneak             = 0.13D / walkSpeed;
-    public static final double modSprint            = 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
+    //    public static final double modSprint            = 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
 
     public static final double modBlock             = 0.16D / walkSpeed;
     public static final double modSwim              = 0.115D / walkSpeed;
@@ -60,21 +60,21 @@ public class SurvivalFly extends Check {
     public static final double hBufMax			= 1.0;
 
     // Vertical speeds/modifiers. 
-    public static final double climbSpeed		= walkSpeed * modSprint; // TODO..
+    public static final double climbSpeed		= walkSpeed * 1.3; // TODO: Check if the factor is needed!  
 
     // Other.
     /** Bunny-hop delay. */
     private static final int   bunnyHopMax = 10;
     /** Divisor vs. last hDist for minimum slow down. */
     private static final double bunnyDivFriction = 160.0; // Rather in-air, blocks would differ by friction.
-    
+
     // Gravity.
     public static final double gravity = 0.0774; // TODO: Model / check.
-    
+
     // Friction by medium.
     public static final double FRICTION_MEDIUM_AIR = 0.98; // TODO: Check
     public static final double FRICTION_MEDIUM_LIQUID = 0.89; // Rough estimate for horizontal move sprint-jump into water.
-    
+
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
     /** To join some tags with moving check violations. */
@@ -139,11 +139,6 @@ public class SurvivalFly extends Check {
         final boolean resetTo = toOnGround || to.isResetCond();
         final boolean resetFrom;
 
-        // Use the player-specific walk speed.
-        // TODO: Might get from listener.
-        // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player);
-
         // Determine if the player is actually sprinting.
         final boolean sprinting;
         if (data.lostSprintCount > 0) {
@@ -156,13 +151,13 @@ public class SurvivalFly extends Check {
                 tags.add("invalidate_lostsprint");
                 sprinting = false;
             }
-            else{
+            else {
                 tags.add("lostsprint");
                 sprinting = true;
                 if (data.lostSprintCount < 3 && to.isOnGround() || to.isResetCond()) {
                     data.lostSprintCount = 0;
                 }
-                else{
+                else {
                     data.lostSprintCount --;
                 }
             }
@@ -174,10 +169,15 @@ public class SurvivalFly extends Check {
             }
             sprinting = true;
         }
-        else{
+        else {
             sprinting = false;
         }
-        
+
+        // Use the player-specific walk speed.
+        // TODO: Might get from listener.
+        // TODO: Use in lostground?
+        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player) * (sprinting ? 1.0 / data.multSprinting : 1.0);
+
         setNextFriction(from, to, data, cc);
 
         /////////////////////////////////
@@ -193,7 +193,7 @@ public class SurvivalFly extends Check {
         else if (isSamePos) {
             resetFrom = false;
         }
-        else{
+        else {
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
             // Check lost-ground workarounds.
@@ -241,7 +241,7 @@ public class SurvivalFly extends Check {
                 hDistanceAboveLimit = res[1];
                 hFreedom = res[2];
             }
-            else{
+            else {
                 data.clearActiveHorVel();
                 hFreedom = 0.0;
                 if (resetFrom && data.bunnyhopDelay <= 6) {
@@ -326,7 +326,7 @@ public class SurvivalFly extends Check {
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
         }
-        else{
+        else {
             // Check y-distance for normal jumping, like in air.
             // TODO: Can it be easily transformed to a more accurate max. absolute height?
             vAllowedDistance = 1.35D + data.getVerticalFreedom();
@@ -408,7 +408,7 @@ public class SurvivalFly extends Check {
             final Location vLoc = handleViolation(now, result, player, from, to, data, cc);
             if (vLoc != null) return vLoc;
         }
-        else{
+        else {
             // Slowly reduce the level with each event, if violations have not recently happened.
             if (now - data.sfVLTime > cc.survivalFlyVLFreeze) {
                 data.survivalFlyVL *= 0.95D;
@@ -436,7 +436,7 @@ public class SurvivalFly extends Check {
                 // Consent with ground.
                 data.mediumLiftOff = MediumLiftOff.GROUND;
             } 
-            else{
+            else {
                 data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
             }
         }
@@ -454,7 +454,7 @@ public class SurvivalFly extends Check {
             else if (to.isNextToGround(0.15, 0.4)) {
                 data.mediumLiftOff = MediumLiftOff.GROUND;
             }
-            else{
+            else {
                 data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
             }
         }
@@ -465,7 +465,7 @@ public class SurvivalFly extends Check {
             // TODO: Where exactly to put noFallAssumeGround ?
             data.mediumLiftOff = MediumLiftOff.GROUND;
         }
-        else{
+        else {
             // Keep medium.
             // TODO: Is above stairs ?
         }
@@ -510,7 +510,7 @@ public class SurvivalFly extends Check {
             data.sfLowJump = false;
             // not resetting nolowjump (?)...
         }
-        else{
+        else {
             data.sfJumpPhase++;
         }
 
@@ -535,7 +535,7 @@ public class SurvivalFly extends Check {
         data.lastFrictionVertical = data.nextFrictionVertical;
         return null;
     }
-    
+
     /**
      * Set data.nextFriction according to media.
      * @param from
@@ -563,7 +563,7 @@ public class SurvivalFly extends Check {
         else {
             // TODO: Friction for walking on blocks (!).
         }
-        
+
     }
 
     /**
@@ -604,7 +604,7 @@ public class SurvivalFly extends Check {
                 // The hard way.
                 hAllowedDistance *= modDepthStrider[level];
                 if (sprinting) {
-                    hAllowedDistance *= modSprint;
+                    hAllowedDistance *= data.multSprinting;
                 }
             }
             // (Friction is used as is.)
@@ -621,7 +621,7 @@ public class SurvivalFly extends Check {
                 hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             }
             else {
-                hAllowedDistance = walkSpeed * modSprint * cc.survivalFlySprintingSpeed / 100D;
+                hAllowedDistance = walkSpeed * data.multSprinting * cc.survivalFlySprintingSpeed / 100D;
             }
             friction = 0.0; // Ensure friction can't be used to speed. TODO: Set.
         }
@@ -766,7 +766,7 @@ public class SurvivalFly extends Check {
                     }
                 }
             }
-            else{
+            else {
                 // TODO: Just to exclude source of error, might be redundant.
                 data.vDistAcc.clear();
             }
@@ -796,7 +796,7 @@ public class SurvivalFly extends Check {
         //			i1 = 0;
         //			i2 = 1;
         //		}
-        //		else{
+        //		else {
         i1 = 1;
         i2 = 2;
         //		}
@@ -822,7 +822,7 @@ public class SurvivalFly extends Check {
                     // Note: aDiff should be < 0.0625 here.
                     return Math.max(Math.abs(-0.0625 - diff), 0.001);
                 }
-                else{
+                else {
                     return 0.0625 + diff;
                 }
             }
@@ -858,7 +858,7 @@ public class SurvivalFly extends Check {
                 }
             }
         }
-        else{
+        else {
             // Decrease
             tags.add("ychdec");
             // Detect low jumping.
@@ -1163,13 +1163,13 @@ public class SurvivalFly extends Check {
                     tags.add("web_step");
                 }
             }
-            else{
+            else {
                 // TODO: Could prevent not moving down if not on ground (or on ladder or in liquid?).
                 vAllowedDistance = from.isOnGround() ? 0.1D : 0;
             }
             vDistanceAboveLimit = yDistance - vAllowedDistance;
         }
-        else{
+        else {
             // Descending in web.
             // TODO: Implement something (at least for being in web with the feet or block above)?
         }
@@ -1352,7 +1352,7 @@ public class SurvivalFly extends Check {
         if (setBackSafe) {
             data.setSetBack(from);
         }
-        else{
+        else {
             // Keep Set-back.
         }
 
@@ -1395,7 +1395,7 @@ public class SurvivalFly extends Check {
             // Set-back + view direction of to (more smooth).
             return data.getSetBack(to);
         }
-        else{
+        else {
             data.clearAccounting();
             data.sfJumpPhase = 0;
             // Cancelled by other plugin, or no cancel set by configuration.
@@ -1429,12 +1429,12 @@ public class SurvivalFly extends Check {
                 data.prepareSetBack(newTo);
                 player.teleport(newTo, TeleportCause.PLUGIN);
             }
-            else{
+            else {
                 // Solve by extra actions ? Special case (probably never happens)?
                 player.kickPlayer("Hovering?");
             }
         }
-        else{
+        else {
             // Ignore.
         }
     }

@@ -244,6 +244,11 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
     }
 
     @Override
+    public double getSprintAttributeMultiplier(Player player) {
+        return player.isSprinting() ? 1.3 : 1.0; 
+    }
+
+    @Override
     public int getInvulnerableTicks(final Player player) {
         // TODO: Ahhh...
         return player.getNoDamageTicks();

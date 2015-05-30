@@ -99,6 +99,13 @@ public interface MCAccess {
      */
     public double getSpeedAttributeMultiplier(Player player);
 
+    /**
+     * Modifier for sprinting.
+     * @param player
+     * @return
+     */
+    public double getSprintAttributeMultiplier(Player player);
+
     public int getInvulnerableTicks(Player player);
 
     public void setInvulnerableTicks(Player player, int ticks);

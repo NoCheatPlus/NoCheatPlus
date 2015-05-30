@@ -8,6 +8,7 @@ import net.minecraft.server.v1_7_R4.EntityComplexPart;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.GenericAttributes;
 import net.minecraft.server.v1_7_R4.MobEffectList;
+import net.minecraft.server.v1_7_R4.AttributeModifier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -144,6 +146,16 @@ public class MCAccessCB3100 implements MCAccess{
     public double getSpeedAttributeMultiplier(final Player player) {
         final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
         return attr.getValue() / attr.b();
+    }
+
+    @Override
+    public double getSprintAttributeMultiplier(Player player) {
+        final AttributeModifier mod = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d).a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return 1.0;
+        } else {
+            return AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override
