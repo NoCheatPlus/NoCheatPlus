@@ -398,8 +398,12 @@ public class SurvivalFly extends Check {
         // TODO: on ground -> on ground improvements
 
         // Debug output.
+        final int tagsLength;
         if (data.debug) {
             outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+            tagsLength = tags.size();
+        } else {
+            tagsLength = 0; // JIT vs. IDE.
         }
 
         // Handle violations.
@@ -533,6 +537,9 @@ public class SurvivalFly extends Check {
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
+        if (data.debug && tags.size() > tagsLength) {
+            logPostViolationTags(player);
+        }
         return null;
     }
 
@@ -1538,6 +1545,10 @@ public class SurvivalFly extends Check {
         builder.append("\n");
         //		builder.append(data.stats.getStatsStr(false));
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
+    }
+
+    private void logPostViolationTags(final Player player) {
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " SurvivalFly Post violation handling tag update:\n" + StringUtil.join(tags, "+"));
     }
 
 }
