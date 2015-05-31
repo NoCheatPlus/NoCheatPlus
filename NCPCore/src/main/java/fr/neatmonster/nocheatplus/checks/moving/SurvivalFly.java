@@ -128,9 +128,20 @@ public class SurvivalFly extends Check {
             }
         }
 
-        // Ensure we have a set-back location set.
+        // Ensure we have a set-back location set, plus allow moving from upwards with respawn/login.
         if (!data.hasSetBack()) {
             data.setSetBack(from);
+        }
+        else if (data.joinOrRespawn && from.getY() > data.getSetBackY() && 
+                TrigUtil.isSamePos(from.getX(), from.getZ(), data.getSetBackX(), data.getSetBackZ()) &&
+                (from.isOnGround() || from.isResetCond())) {
+            // TODO: Move most to a method?
+            // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
+            if (cc.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " SurvivalFly\nAdjust set-back after join/respawn: " + from.getLocation());
+            }
+            data.setSetBack(from);
+            data.resetPositions(from);
         }
 
         // Set some flags.
@@ -474,13 +485,13 @@ public class SurvivalFly extends Check {
             // TODO: Is above stairs ?
         }
 
-//        // Invalidation of vertical velocity.
-//        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
-//        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
-//                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
-//            // (Only prevent counting further up, leaves the freedom.)
-//            tags.add("cap_vvel"); // TODO: Test / validate by logs.
-//        }
+        //        // Invalidation of vertical velocity.
+        //        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
+        //        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
+        //                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
+        //            // (Only prevent counting further up, leaves the freedom.)
+        //            tags.add("cap_vvel"); // TODO: Test / validate by logs.
+        //        }
 
         // Apply reset conditions.
         if (resetTo) {

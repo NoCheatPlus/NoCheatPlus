@@ -523,6 +523,18 @@ public class TrigUtil {
     }
 
     /**
+     * Test if the coordinates represent the same position (2D).
+     * @param x1
+     * @param z1
+     * @param x2
+     * @param z2
+     * @return
+     */
+    public static boolean isSamePos(final double x1, final double z1, final double x2, final double z2){
+        return x1 == x2 && z1 == z2;
+    }
+
+    /**
      * Test if the given double-coordinates are on the same block as specified by the int-coordinates.
      * @param loc
      * @param x

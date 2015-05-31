@@ -366,6 +366,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Reset positions? enforceLocation?
                 event.setTo(newTo);
             }
+            data.joinOrRespawn = false;
             return;
         }
         // newTo should be null here.
@@ -625,6 +626,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Cleanup.
+        data.joinOrRespawn = false;
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
@@ -1285,6 +1287,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.clearFlyData();
             data.setSetBack(loc);
             data.resetPositions(loc);
+            data.joinOrRespawn = true;
         } else {
             // TODO: Check consistency/distance.
             //final Location setBack = data.getSetBack(loc);

@@ -220,6 +220,8 @@ public class MovingData extends ACheckData {
     /** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
     public boolean wasInVehicle = false;
     public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT;
+    /** Set to true after login/respawn, only if the set-back is reset there. Reset in MovingListener after handling PlayerMoveEvent */
+    public boolean joinOrRespawn = false;
 
     public MovingData(final MovingConfig config) {
         super(config);
