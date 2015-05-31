@@ -21,6 +21,7 @@ public class Angle extends Check {
 
     public static class AttackLocation {
         public final double x, y, z;
+        /** Yaw of the attacker. */
         public final float yaw;
         public long time;
         public final UUID damagedId;
@@ -104,16 +105,20 @@ public class Angle extends Check {
                 continue;
             }
             deltaMove += refLoc.distSqLast;
-            deltaYaw += Math.abs(refLoc.yawDiffLast);
+            final double yawDiff = Math.abs(refLoc.yawDiffLast);
+            deltaYaw += yawDiff;
             deltaTime += refLoc.timeDiff;
-            deltaSwitchTarget += refLoc.idDiffLast ? 1 : 0;
+            if (refLoc.idDiffLast && yawDiff > 30.0) {
+                // TODO: Configurable sensitivity ? Scale with yawDiff?
+                deltaSwitchTarget += 1;
+            }
         }
 
         // Check if there is enough data present.
         if (data.angleHits.size() < 2) {
             return false;
         }
-        
+
         final double n = (double) (data.angleHits.size() - 1);
 
         // Let's calculate the average move.

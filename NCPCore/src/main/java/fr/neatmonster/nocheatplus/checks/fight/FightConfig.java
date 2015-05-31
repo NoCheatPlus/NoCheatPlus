@@ -115,7 +115,7 @@ public class FightConfig extends ACheckConfig {
     public final boolean    yawRateCheck;
     public final boolean    cancelDead;
     public final boolean    knockBackVelocityPvP;
-    
+
     /** Maximum latency counted in ticks for the loop checks (reach, direction). */
     public final long       loopMaxLatencyTicks = 15; // TODO: Configurable,  sections for players and entities.
 
