@@ -10,13 +10,13 @@ import org.bukkit.entity.Player;
 public interface JoinLeaveListener {
 	
 	/**
-	 * Called on join (monitor level).
+	 * Called on join (priority level: low).
 	 * @param player
 	 */
 	public void playerJoins(final Player player);
 	
 	/**
-	 * Called both on quit/kick (monitor level).
+	 * Called both on quit/kick (priority level: monitor). Might get called twice on some server implementations.
 	 * @param player
 	 */
 	public void playerLeaves(final Player player);
