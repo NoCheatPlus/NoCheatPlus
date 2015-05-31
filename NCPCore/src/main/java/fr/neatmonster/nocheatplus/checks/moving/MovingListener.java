@@ -874,6 +874,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingData data = MovingData.getData(player);
         final Location teleported = data.getTeleported();
 
+        // Invalidate first-move thing.
+        data.joinOrRespawn = false;
+
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
         Location to = event.getTo();
         final Location ref;
@@ -1094,6 +1097,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (!from.getWorld().equals(to.getWorld())) return;
 
         final MovingData data = MovingData.getData(player);
+        data.joinOrRespawn = false;
         data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation(useLoc));
         switch (data.vehicleConsistency) {
             case FROM:
@@ -1400,7 +1404,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVehicleExit(final VehicleExitEvent event) {
         final Entity entity = event.getExited();
-        if (!(entity instanceof Player)) return;
+        if (!(entity instanceof Player)) {
+            return;
+        }
         onPlayerVehicleLeave((Player) entity, event.getVehicle());
     }
 
@@ -1434,6 +1440,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         final Player player = (Player) entity;
         final MovingData data = MovingData.getData(player);
+        data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
         data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
@@ -1449,6 +1456,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void onPlayerVehicleLeave(final Player player, final Entity vehicle) {
         final MovingData data = MovingData.getData(player);
         data.wasInVehicle = false;
+        data.joinOrRespawn = false;
         //    	if (data.morePacketsVehicleTaskId != -1) {
         //    		// Await set-back.
         //    		// TODO: might still set ordinary set-backs ?
