@@ -846,9 +846,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onPlayerDeath(final PlayerDeathEvent event) {
         final Player player = event.getEntity();
         final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
         data.clearFlyData();
         data.clearMorePacketsData();
         data.setSetBack(player.getLocation(useLoc)); // TODO: Monitor this change (!).
+        if (cc.debug) {
+            // Log location.
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " death: " + player.getLocation(useLoc));
+        }
         useLoc.setWorld(null);
     }
 
@@ -1242,12 +1247,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearFlyData();
         data.resetSetBack(); // To force dataOnJoin to set it to loc.
         // Handle respawn like join.
-        dataOnJoin(player, event.getRespawnLocation(), data, MovingConfig.getConfig(player));
+        dataOnJoin(player, event.getRespawnLocation(), data, MovingConfig.getConfig(player), true);
     }
 
     @Override
     public void playerJoins(final Player player) {
-        dataOnJoin(player, player.getLocation(useLoc), MovingData.getData(player), MovingConfig.getConfig(player));
+        dataOnJoin(player, player.getLocation(useLoc), MovingData.getData(player), MovingConfig.getConfig(player), false);
         // Cleanup.
         useLoc.setWorld(null);
     }
@@ -1262,15 +1267,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      * @param cc
      */
-    private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc) {
+    private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc, boolean isRespawn) {
 
         final int tick = TickTask.getTick();
+        final String tag = isRespawn ? "respawn" : "join";
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
             final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
             if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
                 // DEBUG
-                StaticLog.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+                StaticLog.logInfo("[NoCheatPlus] Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
 
@@ -1310,6 +1316,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         //		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
         //			DataManager.getPlayerData(player).task.correctDirection();
         //		}
+        if (cc.debug) {
+            // Log location.
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " + tag + ": " + loc);
+        }
     }
 
     /**
