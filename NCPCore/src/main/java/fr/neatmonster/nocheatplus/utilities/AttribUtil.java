@@ -8,11 +8,12 @@ public class AttribUtil {
     /**
      * Get a multiplier for an AttributeModifier.
      * @param operator Exclusively allows operator 2. Otherwise will throw an IllegalArgumentException.
-     * @param value
+     * @param value The modifier value (AttributeModifier).
      * @throws IllegalArgumentException if the modifier is not 2.
-     * @return
+     * @return A multiplier for direct use.
      */
-    public static double getMultiplier(int operator, double value) {
+    public static double getMultiplier(final int operator, final double value) {
+        // TODO: Might allow 1 too, as it should "work", despite less accurate.
         switch(operator) {
             case 2:
                 return 1.0 + value;
@@ -20,4 +21,5 @@ public class AttribUtil {
                 throw new IllegalArgumentException("Unsupported operator: " + operator);
         }
     }
+
 }
