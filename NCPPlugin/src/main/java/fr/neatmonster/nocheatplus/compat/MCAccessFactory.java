@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
+import fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -33,10 +34,19 @@ public class MCAccessFactory {
 
         // Try to set up native access.
         if (!bukkitOnly) {
+            // CraftBukkit (dedicated).
             MCAccess mcAccess = getMCAccessCraftBukkit(throwables);
             if (mcAccess != null) {
                 return mcAccess;
             }
+            // CraftBukkit (reflection).
+            try {
+                return new MCAccessCBReflect();
+            }
+            catch (Throwable t) {
+                throwables.add(t);
+            }
+            // Glowstone.
             try {
                 return new MCAccessGlowstone();
             } catch(Throwable t) {
@@ -58,9 +68,9 @@ public class MCAccessFactory {
             }
             StaticLog.logWarning(msg);
             final MCAccess mcAccess = new MCAccessBukkit();
-//            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
-//                log(throwables); // Maybe later activate with TRACE explicitly set
-//            }
+            //            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
+            //                log(throwables); // Maybe later activate with TRACE explicitly set
+            //            }
             StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
             return mcAccess;
         }
@@ -87,7 +97,7 @@ public class MCAccessFactory {
     }
 
     /**
-     * Must not throw anything.
+     * Get MCaccess for CraftBukkit (dedicated only). Must not throw anything.
      * @param throwables
      * @return Valid MCAccess instance or null.
      */
@@ -117,8 +127,6 @@ public class MCAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602", // 1.4.7
                 "fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545", // 1.4.6
                 "fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512", // 1.4.5-R1.0
-                // Reflection (all of the above)
-                "fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect", // ALL, TODO: Configuration.
         };
 
         for (String className : classNames) {
@@ -129,6 +137,7 @@ public class MCAccessFactory {
                 throwables.add(t);
             };
         }
+
         // None worked.
         return null;
     }
