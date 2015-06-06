@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.MCAccessConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
@@ -1033,7 +1034,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public MCAccess initMCAccess(final ConfigFile config) {
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(config.getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig());
         setMCAccess(mcAccess);
         return mcAccess;
     }

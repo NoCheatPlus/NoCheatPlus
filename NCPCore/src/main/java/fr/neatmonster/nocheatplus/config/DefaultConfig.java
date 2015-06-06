@@ -529,10 +529,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
         // Compatibility settings.
+        set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN, true);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE, true);
-        set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);
-        set(ConfPaths.COMPATIBILITY_BUKKITONLY, false);
+        set(ConfPaths.COMPATIBILITY_SERVER_CBDEDICATED_ENABLE, true);
+        set(ConfPaths.COMPATIBILITY_SERVER_CBREFLECT_ENABLE, true);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
                 Material.TRAP_DOOR.name(),

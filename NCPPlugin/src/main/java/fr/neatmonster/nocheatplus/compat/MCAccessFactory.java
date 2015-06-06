@@ -20,7 +20,7 @@ public class MCAccessFactory {
 
     private final String[] updateLocs = new String[]{
             "[NoCheatPlus]  Check for updates and support at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
-            "[NoCheatPlus]  Development builds (unsupported by the Bukkit Staff, at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
+            "[NoCheatPlus]  Development builds (unsupported by the Bukkit Staff, use at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
     };
 
     /**
@@ -29,49 +29,49 @@ public class MCAccessFactory {
      * @return
      * @throws RuntimeException if no access can be set.
      */
-    public MCAccess getMCAccess(final boolean bukkitOnly) {
+    public MCAccess getMCAccess(final MCAccessConfig config) {
         final List<Throwable> throwables = new ArrayList<Throwable>();
-
+        MCAccess mcAccess = null;
         // Try to set up native access.
-        if (!bukkitOnly) {
-            // CraftBukkit (dedicated).
-            MCAccess mcAccess = getMCAccessCraftBukkit(throwables);
+
+        // CraftBukkit (dedicated).
+        if (config.enableCBDedicated) {
+            mcAccess = getMCAccessCraftBukkit(throwables);
             if (mcAccess != null) {
                 return mcAccess;
             }
-            // CraftBukkit (reflection).
+        }
+
+        // CraftBukkit (reflection).
+        if (config.enableCBReflect) {
             try {
                 return new MCAccessCBReflect();
             }
             catch (Throwable t) {
                 throwables.add(t);
             }
-            // Glowstone.
-            try {
-                return new MCAccessGlowstone();
-            } catch(Throwable t) {
-                throwables.add(t);
-            };
         }
 
+        // Glowstone.
+        try {
+            return new MCAccessGlowstone();
+        } catch(Throwable t) {
+            throwables.add(t);
+        };
+
         // Try to set up api-only access (since 1.4.6).
-        try{
+        try {
+            mcAccess = new MCAccessBukkit();
             final String msg;
-            if (bukkitOnly) {
-                msg = "[NoCheatPlus] The plugin is configured for Bukkit-API-only access.";
-            }
-            else{
-                msg = "[NoCheatPlus] Could not set up native access for the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.";
-                for (String uMsg : updateLocs) {
-                    StaticLog.logWarning(uMsg);
-                }
-            }
+            msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
             StaticLog.logWarning(msg);
-            final MCAccess mcAccess = new MCAccessBukkit();
+            for (String uMsg : updateLocs) {
+                StaticLog.logWarning(uMsg);
+            }
             //            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
             //                log(throwables); // Maybe later activate with TRACE explicitly set
             //            }
-            StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
+            StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only mode: Some features will likely not function properly, performance might suffer.");
             return mcAccess;
         }
         catch(Throwable t) {
