@@ -122,7 +122,13 @@ public class MCAccessCB2794 implements MCAccess{
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
         final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().a(GenericAttributes.d);
-        return attr.e() / attr.b();
+        double val = attr.e() / attr.b();
+        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return val;
+        } else {
+            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override
@@ -176,7 +182,7 @@ public class MCAccessCB2794 implements MCAccess{
 
     @Override
     public AlmostBoolean dealFallDamageFiresAnEvent() {
-        return AlmostBoolean.MAYBE;
+        return AlmostBoolean.NO;
     }
 
     //	@Override

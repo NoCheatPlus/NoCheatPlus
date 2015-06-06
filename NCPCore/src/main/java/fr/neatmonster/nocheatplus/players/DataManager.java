@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -469,7 +468,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * Initializing with online players.
      */
     public void onEnable() {
-        for (final Player player : Bukkit.getOnlinePlayers()) {
+        for (final Player player : BridgeMisc.getOnlinePlayers()) {
             addOnlinePlayer(player);
         }
     }

@@ -145,7 +145,13 @@ public class MCAccessCB3100 implements MCAccess{
     @Override
     public double getSpeedAttributeMultiplier(final Player player) {
         final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
-        return attr.getValue() / attr.b();
+        final double val = attr.getValue() / attr.b();
+        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return val;
+        } else {
+            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override

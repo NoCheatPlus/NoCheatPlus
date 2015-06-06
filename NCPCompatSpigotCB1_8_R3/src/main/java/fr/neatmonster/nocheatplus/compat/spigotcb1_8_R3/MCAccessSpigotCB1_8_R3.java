@@ -31,21 +31,41 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 public class MCAccessSpigotCB1_8_R3 implements MCAccess{
 
     /**
-     * Constructor to let it fail.
+     * Test for availability in constructor.
      */
     public MCAccessSpigotCB1_8_R3() {
         getCommandMap();
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R3.", new String[] {"Entity" , "dead"});
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R3.", 
+                new String[] {"Entity" , "length", "width", "locY"});
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R3.", 
+                new String[] {"EntityPlayer" , "dead", "deathTicks", "invulnerableTicks"});
         // block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.EntityLiving.class, 
+                new String[]{"getHeadHeight"}, float.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.EntityPlayer.class, 
+                new String[]{"getHealth"}, float.class);
         ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Block.class, 
                 new String[]{"B", "C", "D", "E", "F", "G"}, double.class);
-        // TODO: Nail it down further.
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeInstance.class, 
+                new String[]{"b"}, double.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeModifier.class, 
+                new String[]{"c"}, int.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeModifier.class, 
+                new String[]{"d"}, double.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Material.class, 
+                new String[]{"isSolid", "isLiquid"}, boolean.class);
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Block.class, 
+                new String[]{"getMaterial"}, net.minecraft.server.v1_8_R3.Material.class);
+        // obc: getHandle() for CraftWorld, CraftPlayer, CraftEntity.
+        // nms: Several: AxisAlignedBB, WorldServer
+        // nms: Block.getById(int), BlockPosition(int, int, int), WorldServer.getEntities(Entity, AxisAlignedBB)
+        // nms: AttributeInstance.a(UUID), EntityComplexPart, EntityPlayer.getAttributeInstance(IAttribute).
     }
 
     @Override
     public String getMCVersion() {
         // 1.8.4-1.8.6 (1_8_R3)
-        return "1.8.4-1.8.6";
+        return "1.8.4-1.8.7";
     }
 
     @Override
@@ -146,7 +166,13 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
         final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED);
-        return attr.getValue() / attr.b();
+        final double val = attr.getValue() / attr.b();
+        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return val;
+        } else {
+            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override

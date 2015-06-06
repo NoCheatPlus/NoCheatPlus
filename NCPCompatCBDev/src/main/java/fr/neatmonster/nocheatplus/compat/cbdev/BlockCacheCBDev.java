@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 
     protected net.minecraft.server.v1_8_R3.WorldServer world;
-    protected World bukkitWorld; // WHACKS
+    protected World bukkitWorld;
 
     public BlockCacheCBDev(World world) {
         setAccess(world);

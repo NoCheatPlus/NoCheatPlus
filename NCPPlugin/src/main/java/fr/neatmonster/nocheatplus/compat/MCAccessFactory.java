@@ -97,9 +97,10 @@ public class MCAccessFactory {
 
         final String[] classNames = new String[] {
                 // Current DEV / LATEST: CB (Spigot)
-                //                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // future / tests.
+                //"fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // future / tests.
+                //"fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect", // TEST
                 // Dedicated: CB (Spigot)
-                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3.MCAccessSpigotCB1_8_R3", // 1.8.4|1.8.5 (1_8_R3)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3.MCAccessSpigotCB1_8_R3", // 1.8.4-1.8.7 (1_8_R3)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R2.MCAccessSpigotCB1_8_R2", // 1.8.3 (1_8_R2)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R1.MCAccessSpigotCB1_8_R1", // 1.8 (1_8_R1)
                 // Dedicated CB (original)
@@ -116,6 +117,8 @@ public class MCAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602", // 1.4.7
                 "fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545", // 1.4.6
                 "fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512", // 1.4.5-R1.0
+                // Reflection (all of the above)
+                "fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect", // ALL, TODO: Configuration.
         };
 
         for (String className : classNames) {

@@ -109,7 +109,7 @@ public class MovingData extends ACheckData {
     public double         jumpAmplifier;
     /** Last time the player was actually sprinting. */
     public long           timeSprinting = 0;
-    public double         multSprinting = 1.3; // Multiplier at the last time sprinting.
+    public double         multSprinting = 1.30000002; // Multiplier at the last time sprinting.
 
     /** Tick at which walk/fly speeds got changed last time. */
     public int speedTick = 0;

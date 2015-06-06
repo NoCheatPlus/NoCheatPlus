@@ -103,8 +103,9 @@ public class NoFall extends Check {
             }
         }
 
-        // TODO: let this be done by the damage event (!).
-        //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
+        // Currently resetting is done from within the damage event handler.
+        // TODO: MUST detect if event fired at all (...) and override, if necessary. Best probe once per class (with YES).
+        //        data.clearNoFallData();
         player.setFallDistance(0);
     }
 

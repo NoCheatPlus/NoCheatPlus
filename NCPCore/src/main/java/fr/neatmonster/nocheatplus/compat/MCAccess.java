@@ -95,7 +95,8 @@ public interface MCAccess {
     /**
      * 
      * @param player
-     * @return A multiplier for the allowed speed, should be 1.0 if not possible to determine.
+     * @return A multiplier for the allowed speed, excluding the sprint boost
+     *         modifier (!). If not possible to determine, it should be 1.0.
      */
     public double getSpeedAttributeMultiplier(Player player);
 
@@ -106,6 +107,11 @@ public interface MCAccess {
      */
     public double getSprintAttributeMultiplier(Player player);
 
+    /**
+     * 
+     * @param player
+     * @return Integer.MAX_VALUE if not available (!).
+     */
     public int getInvulnerableTicks(Player player);
 
     public void setInvulnerableTicks(Player player, int ticks);

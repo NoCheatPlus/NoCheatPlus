@@ -60,7 +60,7 @@ public class GodMode extends Check {
 
         // Invulnerable or inconsistent.
         // TODO: might check as well if NCP has taken over invulnerable ticks of this player.
-        if (invulnerabilityTicks > 0 && noDamageTicks != invulnerabilityTicks || tick < data.lastDamageTick){
+        if (invulnerabilityTicks != Integer.MAX_VALUE && invulnerabilityTicks > 0 || tick < data.lastDamageTick){
             // (Second criteria is for MCAccessBukkit.)
             legit = set = resetAcc = true;
         }

@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
-public class BlockCacheBukkit extends BlockCache{
+public class BlockCacheBukkit extends BlockCache {
 
     protected World world;
 

@@ -1,13 +1,14 @@
 package fr.neatmonster.nocheatplus.compat.cb3026;
 
+import net.minecraft.server.v1_7_R2.AttributeInstance;
+import net.minecraft.server.v1_7_R2.AttributeModifier;
 import net.minecraft.server.v1_7_R2.AxisAlignedBB;
 import net.minecraft.server.v1_7_R2.Block;
 import net.minecraft.server.v1_7_R2.DamageSource;
 import net.minecraft.server.v1_7_R2.EntityComplexPart;
 import net.minecraft.server.v1_7_R2.EntityPlayer;
-import net.minecraft.server.v1_7_R2.MobEffectList;
-import net.minecraft.server.v1_7_R2.AttributeModifier;
 import net.minecraft.server.v1_7_R2.GenericAttributes;
+import net.minecraft.server.v1_7_R2.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,8 +16,8 @@ import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_7_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_7_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_7_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -122,8 +123,14 @@ public class MCAccessCB3026 implements MCAccess{
 
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
-        // TODO: Implement.
-        return 1.0;
+        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
+        final double val = attr.getValue() / attr.b();
+        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
+        if (mod == null) {
+            return val;
+        } else {
+            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
+        }
     }
 
     @Override

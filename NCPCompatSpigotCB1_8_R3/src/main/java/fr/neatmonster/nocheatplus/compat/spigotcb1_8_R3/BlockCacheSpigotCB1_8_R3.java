@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess{
 
     protected net.minecraft.server.v1_8_R3.WorldServer world;
-    protected World bukkitWorld; // WHACKS
+    protected World bukkitWorld;
 
     public BlockCacheSpigotCB1_8_R3(World world) {
         setAccess(world);
@@ -53,7 +53,7 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
 
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
-        final int id = getTypeId(x, y, z);		
+        final int id = getTypeId(x, y, z);
         final net.minecraft.server.v1_8_R3.Block block = net.minecraft.server.v1_8_R3.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null bounds -> full ?

@@ -56,9 +56,14 @@ public class CombinedListener extends CheckListener {
         
         if (cc.invulnerableCheck && (cc.invulnerableTriggerAlways || cc.invulnerableTriggerFallDistance && player.getFallDistance() > 0)){
             // TODO: maybe make a heuristic for small fall distances with ground under feet (prevents future abuse with jumping) ?
-            final int ticks = cc.invulnerableInitialTicksJoin >= 0 ? cc.invulnerableInitialTicksJoin : mcAccess.getInvulnerableTicks(player);
-            data.invulnerableTick = TickTask.getTick() + ticks;
-            mcAccess.setInvulnerableTicks(player, 0);
+            final int invulnerableTicks = mcAccess.getInvulnerableTicks(player);
+            if (invulnerableTicks == Integer.MAX_VALUE) {
+                // TODO: Maybe log a warning.
+            } else {
+                final int ticks = cc.invulnerableInitialTicksJoin >= 0 ? cc.invulnerableInitialTicksJoin : invulnerableTicks;
+                data.invulnerableTick = TickTask.getTick() + ticks;
+                mcAccess.setInvulnerableTicks(player, 0);
+            }
         }
     }
     

@@ -187,7 +187,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player) * (sprinting ? 1.0 / data.multSprinting : 1.0);
+        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player);
 
         setNextFriction(from, to, data, cc);
 
@@ -670,8 +670,6 @@ public class SurvivalFly extends Check {
         if (data.sfOnIce > 0) {
             hAllowedDistance *= modIce;
         }
-
-        // TODO: Attributes
 
         // Speed amplifier.
         final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);

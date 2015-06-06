@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.compat;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.bukkit.Bukkit;
@@ -8,6 +9,8 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 
 /**
@@ -24,7 +27,9 @@ public class BridgeMisc {
         return null;
     }
 
-    public static final GameMode GAME_MODE_SPECTATOR = getSpectatorGameMode(); 
+    public static final GameMode GAME_MODE_SPECTATOR = getSpectatorGameMode();
+    
+    private static final Method Bukkit_getOnlinePlayers = ReflectionUtil.getMethodNoArgs(Bukkit.class, "getOnlinePlayers");
 
     /**
      * Return a shooter of a projectile if we get an entity, null otherwise.
@@ -71,17 +76,18 @@ public class BridgeMisc {
      * @return
      */
     public static Player[] getOnlinePlayers() {
-        Object obj = Bukkit.getOnlinePlayers();
-        if (obj instanceof Collection<?>) {
-            @SuppressWarnings("unchecked")
-            Collection<? extends Player> players = (Collection<? extends Player>) obj;
-            return players.toArray(new Player[players.size()]);
+        try {
+            Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+            return players.isEmpty() ? new Player[0] : players.toArray(new Player[players.size()]);
         }
-        else if (obj instanceof Player[]) {
-            return (Player[]) obj;
-        } else {
-            return new Player[0];
+        catch (NoSuchMethodError e) {}
+        if (Bukkit_getOnlinePlayers != null) {
+            Object obj = ReflectionUtil.invokeMethodNoArgs(Bukkit_getOnlinePlayers, null);
+            if (obj != null && (obj instanceof Player[])) {
+                return (Player[]) obj;
+            }
         }
+        return new Player[0];
     }
 
 }
