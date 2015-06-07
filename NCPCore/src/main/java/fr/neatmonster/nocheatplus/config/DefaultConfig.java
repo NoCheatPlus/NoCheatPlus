@@ -40,6 +40,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_MAXQUEUESIZE, 5000);
         set(ConfPaths.LOGGING_EXTENDED_STATUS, false);
+        set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_TRACE, false);
+        set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_NOTIFY, false);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, true);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_PREFIX, "[NoCheatPlus] ");
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS, true);

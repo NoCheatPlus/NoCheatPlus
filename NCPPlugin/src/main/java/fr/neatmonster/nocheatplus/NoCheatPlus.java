@@ -74,6 +74,9 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
+import fr.neatmonster.nocheatplus.hooks.allviolations.AllViolationsConfig;
+import fr.neatmonster.nocheatplus.hooks.allviolations.AllViolationsHook;
 import fr.neatmonster.nocheatplus.logging.BukkitLogManager;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -187,6 +190,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     /** Feature tags by keys, for features that might not be available. */
     private final LinkedHashMap<String, LinkedHashSet<String>> featureTags = new LinkedHashMap<String, LinkedHashSet<String>>();
+
+    /** Hook for logging all violations. */
+    protected final AllViolationsHook allViolationsHook = new AllViolationsHook();
 
     /** Tick listener that is only needed sometimes (component registration). */
     protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
@@ -603,6 +609,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         sched.cancelTasks(this);
 
+        // Remove hooks.
+        allViolationsHook.unregister();
+        NCPHookManager.removeAllHooks();
+
         // Exemptions cleanup.
         if (verbose) {
             logManager.info(Streams.INIT, "[NoCheatPlus] Reset ExemptionManager...");
@@ -893,6 +903,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Set up consistency checking.
         scheduleConsistencyCheckers();
 
+        // Setup allViolationsHook
+        allViolationsHook.setConfig(new AllViolationsConfig(config));
+
         //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
         //            // Is a new update available?
         //        	final int timeout = config.getInt(ConfPaths.MISCELLANEOUS_UPDATETIMEOUT, 4) * 1000;
@@ -987,7 +1000,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // (Re-) schedule consistency checking.
         scheduleConsistencyCheckers();
-        // Cache some things.
+        // Cache some things. TODO: Where is this comment from !?
+        // Re-setup allViolationsHook.
+        allViolationsHook.setConfig(new AllViolationsConfig(config));
     }
 
     /**

@@ -147,6 +147,8 @@ public class ViolationData implements IViolationInfo, ActionData {
                 return player.getUniqueId().toString();
             case VIOLATIONS:
                 return String.valueOf((long) Math.round(vL));
+            case WORLD:
+                return player.getWorld().getName();
             default:
                 break;
         }
