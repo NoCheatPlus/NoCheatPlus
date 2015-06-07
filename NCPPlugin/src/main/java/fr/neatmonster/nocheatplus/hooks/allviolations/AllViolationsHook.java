@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.hooks.ILast;
 import fr.neatmonster.nocheatplus.hooks.IStats;
@@ -30,7 +32,7 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
 
     private AllViolationsConfig config;
     private Integer hookId = null;
-    
+
     /** White list. */
     private final ParameterName[] parameters;
     private final String[] noParameterTexts;
@@ -88,7 +90,23 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
         if (config == null) {
             return false;
         }
-        // Generate message.
+        if (config.debugOnly) {
+            // TODO: Better mix the debug flag into IViolationInfo, for best performance.
+            final CheckDataFactory factory = checkType.getDataFactory();
+            if (factory == null) {
+                return false;
+            }
+            final ICheckData data = factory.getData(player);
+            if (data == null || !data.getDebug()) {
+                return false;
+            }
+        }
+        log(checkType, player, info, config);
+        return false;
+    }
+
+    private void log(final CheckType checkType, final Player player, final IViolationInfo info, final AllViolationsConfig config) {
+        // Generate the message.
         // TODO: More colors?
         final StringBuilder builder = new StringBuilder(300);
         final String playerName = player.getName();
@@ -110,7 +128,7 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
             }
         }
         final String message = builder.toString();
-        // Send to where it is appropriate.
+        // Send the message.
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
         if (config.allToNotify) {
             logManager.info(Streams.NOTIFY_INGAME, message);
@@ -118,7 +136,6 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
         if (config.allToTrace) {
             logManager.info(Streams.TRACE_FILE, ChatColor.stripColor(message));
         }
-        return false;
     }
 
 }

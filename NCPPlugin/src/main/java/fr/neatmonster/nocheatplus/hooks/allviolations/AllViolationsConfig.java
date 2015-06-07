@@ -15,13 +15,17 @@ public class AllViolationsConfig {
 
     /** Log all violations to the in-game notification channel. */
     public final boolean allToNotify;
+    
+    /** Only log if the player is being "debugged". Currently incomplete. */
+    public final boolean debugOnly;
 
     // TODO: More config on what to print (uuid, etc., default tags). 
     // TODO: More filtering like in TestNCP.
 
     public AllViolationsConfig(ConfigFile config) {
-        allToTrace = config.getBoolean(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_TRACE);
-        allToNotify = config.getBoolean(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_NOTIFY);
+        debugOnly = config.getBoolean(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_DEBUGONLY);
+        allToTrace = config.getBoolean(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_TRACE);
+        allToNotify = config.getBoolean(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_NOTIFY);
     }
 
     public boolean doesLogAnything() {

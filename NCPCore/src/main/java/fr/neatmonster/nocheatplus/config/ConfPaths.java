@@ -52,8 +52,10 @@ public abstract class ConfPaths {
     private static final String LOGGING_EXTENDED                         = LOGGING + "extended.";
     public static final String  LOGGING_EXTENDED_STATUS                  = LOGGING_EXTENDED + "status";
     private static final String LOGGING_EXTENDED_ALLVIOLATIONS           = LOGGING_EXTENDED + "allviolations.";
-    public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_TRACE     = LOGGING_EXTENDED_ALLVIOLATIONS + "trace";
-    public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_NOTIFY    = LOGGING_EXTENDED_ALLVIOLATIONS + "notify";
+    public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_DEBUGONLY = LOGGING_EXTENDED_ALLVIOLATIONS + "debugonly";
+    private static final String LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND   = LOGGING_EXTENDED_ALLVIOLATIONS + "backend.";
+    public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_TRACE     = LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND + "trace";
+    public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_NOTIFY    = LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND + "notify";
 
     @GlobalConfig
     private static final String MISCELLANEOUS = "miscellaneous.";
