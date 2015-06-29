@@ -140,7 +140,7 @@ public class Visible extends Check {
                 tMinZ > tMaxX && tMaxZ > tMaxY) {
             // TODO: Option to tolerate a minimal difference in t and use a corrected position then.
             tags.add("block_miss");
-//            Bukkit.getServer().broadcastMessage("visible: " + tMinX + "," + tMaxX + " | " + tMinY + "," + tMaxY + " | " + tMinZ + "," + tMaxZ);
+            //            Bukkit.getServer().broadcastMessage("visible: " + tMinX + "," + tMaxX + " | " + tMinY + "," + tMaxY + " | " + tMinZ + "," + tMaxZ);
             return true;
         }
 
@@ -170,7 +170,7 @@ public class Visible extends Check {
         // Perform ray-tracing.
         rayTracing.set(eyeX, eyeY, eyeZ, collideX, collideY, collideZ, blockX, blockY, blockZ);
         rayTracing.loop();
-        
+
         final boolean collides;
         if (rayTracing.collides()) {
             tags.add("raytracing");
@@ -188,7 +188,8 @@ public class Visible extends Check {
              * Consider using a configuration setting for extended debugging
              * (e.g. make DEBUG_LEVEL accessible by API and config).
              */
-            // TODO: public static void InteractRayTracing.logTestCase(...).
+            // TEST: Log as a false positive (!).
+            //NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "blockinteract.visible test case:\n" + rayTracing.getTestCase(1.05, false));
         }
         return collides;
     }
@@ -233,7 +234,7 @@ public class Visible extends Check {
         // Just the time within range.
         return tMin + 1.0 /  Math.abs(dir);
     }
-    
+
     /**
      * Correct the coordinate to be on the block (only if outside, for
      * correcting inside-block to edge tMin has to be checked.

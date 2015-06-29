@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Iterator;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -25,6 +26,42 @@ public class FakeBlockCache extends BlockCache {
 
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMapStored = new CoordMap<double[]>(23);
+
+    /**
+     * Convenience method to copy a cuboid region given by two endpoints without any order specified.
+     * @param other
+     * @param x0
+     * @param y0
+     * @param z0
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param margin
+     */
+    public void set(BlockCache other, double x0, double y0, double z0, double x1, double y1, double z1, double margin) {
+        set(other, Location.locToBlock(Math.min(x0, x1) - margin), Location.locToBlock(Math.min(y0,  y1) - margin), Location.locToBlock(Math.min(z0,  z1) - margin),
+                Location.locToBlock(Math.max(x0, x1) + margin), Location.locToBlock(Math.max(y0, y1) + margin), Location.locToBlock(Math.max(z0, z1) + margin));
+    }
+
+    /**
+     * Copy a cuboid region from the other BlockCache instance.
+     * @param other
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     */
+    public void set(BlockCache other, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y ++) {
+                for (int z = minZ; z <= maxZ; z ++) {
+                    set(x, y, z, other.getTypeId(x, y, z), other.getData(x, y, z), other.getBounds(x, y, z));
+                }
+            }
+        }
+    }
 
     /**
      * Set with data=0 and bounds=full.
@@ -79,7 +116,7 @@ public class FakeBlockCache extends BlockCache {
      * @param z
      * @param typeId
      * @param data
-     * @param bounds
+     * @param bounds Stores the given bounds directly.
      */
     public void set(int x, int y, int z, int typeId, int data, double[] bounds) {
         idMapStored.put(x, y, z, typeId);
@@ -219,9 +256,17 @@ public class FakeBlockCache extends BlockCache {
      * Return a line of java code to construct a new FakeBlockCache with the same content (no newlines).
      * @param builder
      * @param fbcName Variable name of the FakeBlockCache instance.
+     * @param boundsPrefix A prefix for bounds variables for the case of repeated content. If set to null, no optimization will be performed. 
      */
-    public void toJava(final StringBuilder builder, final String fbcName) {
+    public void toJava(final StringBuilder builder, final String fbcName, final String boundsPrefix) {
         builder.append("FakeBlockCache " + fbcName + " = new FakeBlockCache();");
+        final String fullBounds;
+        if (boundsPrefix != null) {
+            fullBounds = boundsPrefix + "_fb";
+            builder.append(" double[] " + fullBounds + " = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0};" );
+        } else {
+            fullBounds = null;
+        }
         // Assume id is always set.
         final Iterator<Entry<Integer>> it = idMapStored.iterator();
         final int airId = BlockProperties.getId(Material.AIR);
@@ -233,16 +278,22 @@ public class FakeBlockCache extends BlockCache {
             final Integer id = entry.getValue();
             if (id == airId) {
                 builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
-            } else {
+            }
+            else {
                 final Integer data = dataMapStored.get(x, y, z);
                 final double[] bounds = boundsMapStored.get(x, y, z);
                 if (bounds == null) {
                     if (data == null) { // Consider 0 too.
                         builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
-                    } else {
+                    }
+                    else {
                         builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ");");
                     }
-                } else {
+                }
+                else if (boundsPrefix != null && BlockCache.isFullBounds(bounds)) {
+                    builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ", " + fullBounds + ");");;
+                }
+                else {
                     builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ", ");
                     DebugUtil.toJava(bounds, builder);
                     builder.append(");");

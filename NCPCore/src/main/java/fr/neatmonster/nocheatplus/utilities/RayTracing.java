@@ -10,7 +10,7 @@ import org.bukkit.Location;
 public abstract class RayTracing {
 
     //	/** End point coordinates (from, to) */
-    //	protected double x0, y0, z0, x1, y1, z1;
+    protected double x0, y0, z0; // x1, y1, z1;
 
     //	/** Total distance between end points. */
     //	protected double d;
@@ -32,6 +32,9 @@ public abstract class RayTracing {
 
     /** Tolerance for time, for checking the abort condition: 1.0 - t <= tol . */
     protected double tol = 0.0;
+
+    /** Force calling step at the end position, for the case it is reached with block transitions. */
+    protected boolean forceStepEndPos = true;
 
     /**
      * Counting the number of steps along the primary line. Step is incremented
@@ -65,9 +68,9 @@ public abstract class RayTracing {
      * @param z1
      */
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
-        //		this.x0 = x0;
-        //		this.y0 = y0;
-        //		this.z0 = z0;
+        this.x0 = x0;
+        this.y0 = y0;
+        this.z0 = z0;
         //		this.x1 = x1;
         //		this.y1 = y1;
         //		this.z1 = z1;
@@ -136,7 +139,7 @@ public abstract class RayTracing {
          * "off by x-th digit" or "t=0 transition"). Consider correcting t on
          * base of the block coordinates in use.
          */
-        while (1.0 - t > tol) {
+        while (t + tol < 1.0) {
             // Determine smallest time to block edge, per axis.
             tX = tDiff(dX, oX, blockX == endBlockX);
             tY = tDiff(dY, oY, blockY == endBlockY);
@@ -167,7 +170,7 @@ public abstract class RayTracing {
             }
 
             // Abort if arrived.
-            if (t + tMin >= 1.0 - tol && isEndBlock()) {
+            if (t + tMin + tol >= 1.0 && isEndBlock()) {
                 break;
             }
 
@@ -201,10 +204,18 @@ public abstract class RayTracing {
                 if (!handleTransitions(transitions, transX, transY, transZ, tMin)) {
                     break;
                 }
+                // Check conditions for abort/end.
+                if (forceStepEndPos && t + tol >= 1.0) {
+                    // Reached the end with transitions, ensure we check the end block.
+                    step(blockX, blockY, blockZ, oX, oY, oZ, 0.0, true);
+                    break;
+                }
+            } else {
+                // No transitions, finished.
+                break;
             }
-
-            // Abort if done or exceeded maxSteps.
-            if (transitions == 0 || step >= maxSteps) {
+            // Ensure not to go beyond maxSteps.
+            if (step >= maxSteps) {
                 break;
             }
         }
@@ -228,36 +239,48 @@ public abstract class RayTracing {
         }
 
         // Apply all transitions to the primary line.
+        double tcMin = 1.0; // Corrected absolute time to reach the resulting block position.
         if (transX) {
             if (dX > 0.0) {
                 blockX ++;
                 oX = 0.0;
+                tcMin = Math.min(tcMin, ((double) blockX - x0) / dX);
             }
             else {
                 blockX --;
                 oX = 1.0;
+                tcMin = Math.min(tcMin, (1.0 + (double) blockX - x0) / dX);
             }
         }
         if (transY) {
             if (dY > 0.0) {
                 blockY ++;
                 oY = 0.0;
+                tcMin = Math.min(tcMin, ((double) blockY - y0) / dY);
             }
             else {
                 blockY --;
                 oY = 1.0;
+                tcMin = Math.min(tcMin, (1.0 + (double) blockY - y0) / dY);
             }
         }
         if (transZ) {
             if (dZ > 0.0) {
                 blockZ ++;
                 oZ = 0.0;
+                tcMin = Math.min(tcMin, ((double) blockZ - z0) / dZ);
             }
             else {
                 blockZ --;
                 oZ = 1.0;
+                tcMin = Math.min(tcMin, (1.0 + (double) blockZ - z0) / dZ);
             }
         }
+        // Correct time and offsets based on tcMin.
+        oX = x0 + tcMin * dX - (double) blockX;
+        oY = y0 + tcMin * dY - (double) blockY;
+        oZ = z0 + tcMin * dZ - (double) blockZ;
+        t = tcMin;
         return true; // Continue loop.
     }
 

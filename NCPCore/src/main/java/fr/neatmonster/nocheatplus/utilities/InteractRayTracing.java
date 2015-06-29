@@ -11,32 +11,33 @@ import org.bukkit.Location;
  */
 public class InteractRayTracing extends RayTracing {
 
-//    private static final int[][] incr = new int[][]{
-//        {1, 0, 0},
-//        {0, 1, 0},
-//        {0, 0, 1},
-//        {-1, 0, 0},
-//        {0, -1, 0},
-//        {0, 0, -1},
-//    };
+    //    private static final int[][] incr = new int[][]{
+    //        {1, 0, 0},
+    //        {0, 1, 0},
+    //        {0, 0, 1},
+    //        {-1, 0, 0},
+    //        {0, -1, 0},
+    //        {0, 0, -1},
+    //    };
 
     protected BlockCache blockCache = null;
 
     protected boolean collides = false;
 
-    protected boolean strict = false;
+    protected final boolean strict;
 
     protected int lastBx, lastBy, lastBz;
 
     protected int targetX, targetY, targetZ;
 
     public InteractRayTracing() {
-        super();
+        this(false);
     }
 
     public InteractRayTracing(boolean strict) {
         super();
         this.strict = strict;
+        this.forceStepEndPos = false; // Not needed here.
     }
 
     public BlockCache getBlockCache() {
@@ -123,53 +124,53 @@ public class InteractRayTracing extends RayTracing {
         return targetX != Integer.MAX_VALUE && blockX == targetX && blockY == targetY && blockZ == targetZ;
     }
 
-//    /**
-//     * Check if the block may be interacted through by use of some workaround.
-//     * 
-//     * @param blockX
-//     * @param blockY
-//     * @param blockZ
-//     * @return
-//     */
-//    private final boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
-//        
-//        // TODO: Recode this/other.
-//        
-//        // TODO: This could allow some bypasses for "strange" setups.
-//        // TODO: Consider using distance to target as heuristic ? [should not get smaller !?]
-//        // TODO: Consider (min/max) offset for distance.
-//        final int dX = blockX - lastBx;
-//        final int dY = blockY - lastBy;
-//        final int dZ = blockZ - lastBz;
-//        final double dSq = dX * dX + dY * dY + dZ * dZ;
-//        // TODO: Limit distance more here !? 
-//        for (int i = 0; i < 6; i++) {
-//            final int[] dir = incr[i];
-//            final int rX = blockX + dir[0];
-//            if (Math.abs(lastBx - rX) > 1) {
-//                continue;
-//            }
-//            final int rY = blockY + dir[1];
-//            if (Math.abs(lastBy - rY) > 1) {
-//                continue;
-//            }
-//            final int rZ = blockZ + dir[2];
-//            if (Math.abs(lastBz - rZ) > 1) {
-//                continue;
-//            }
-//            final int dRx = rX - lastBx;
-//            final int dRy = rY - lastBy;
-//            final int dRz = rZ - lastBz;
-//            if (dRx * dRx + dRy * dRy + dRz * dRz <= dSq) {
-//                continue;
-//            }
-//            if (!doesCollide(rX, rY, rZ)) {
-//                // NOTE: Don't check "rX == targetBx && rZ == targetBz && rY == targetBy".
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    //    /**
+    //     * Check if the block may be interacted through by use of some workaround.
+    //     * 
+    //     * @param blockX
+    //     * @param blockY
+    //     * @param blockZ
+    //     * @return
+    //     */
+    //    private final boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
+    //        
+    //        // TODO: Recode this/other.
+    //        
+    //        // TODO: This could allow some bypasses for "strange" setups.
+    //        // TODO: Consider using distance to target as heuristic ? [should not get smaller !?]
+    //        // TODO: Consider (min/max) offset for distance.
+    //        final int dX = blockX - lastBx;
+    //        final int dY = blockY - lastBy;
+    //        final int dZ = blockZ - lastBz;
+    //        final double dSq = dX * dX + dY * dY + dZ * dZ;
+    //        // TODO: Limit distance more here !? 
+    //        for (int i = 0; i < 6; i++) {
+    //            final int[] dir = incr[i];
+    //            final int rX = blockX + dir[0];
+    //            if (Math.abs(lastBx - rX) > 1) {
+    //                continue;
+    //            }
+    //            final int rY = blockY + dir[1];
+    //            if (Math.abs(lastBy - rY) > 1) {
+    //                continue;
+    //            }
+    //            final int rZ = blockZ + dir[2];
+    //            if (Math.abs(lastBz - rZ) > 1) {
+    //                continue;
+    //            }
+    //            final int dRx = rX - lastBx;
+    //            final int dRy = rY - lastBy;
+    //            final int dRz = rZ - lastBz;
+    //            if (dRx * dRx + dRy * dRy + dRz * dRz <= dSq) {
+    //                continue;
+    //            }
+    //            if (!doesCollide(rX, rY, rZ)) {
+    //                // NOTE: Don't check "rX == targetBx && rZ == targetBz && rY == targetBy".
+    //                return true;
+    //            }
+    //        }
+    //        return false;
+    //    }
 
     @Override
     protected boolean step(final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dT, final boolean isPrimary) {
@@ -184,20 +185,43 @@ public class InteractRayTracing extends RayTracing {
             }
             return true;
         }
-//        if (strict || blockX == lastBx && blockZ == lastBz && blockY == lastBy) {
-//            collides = true;
-//            return false;
-//        }
-//        // Check workarounds...
-//        if (isPrimary && allowsWorkaround(blockX, blockY, blockZ)) {
-//            lastBx = blockX;
-//            lastBy = blockY;
-//            lastBz = blockZ;
-//            return true;
-//        }
+        //        if (strict || blockX == lastBx && blockZ == lastBz && blockY == lastBy) {
+        //            collides = true;
+        //            return false;
+        //        }
+        //        // Check workarounds...
+        //        if (isPrimary && allowsWorkaround(blockX, blockY, blockZ)) {
+        //            lastBx = blockX;
+        //            lastBy = blockY;
+        //            lastBz = blockZ;
+        //            return true;
+        //        }
         // No workaround found.
         collides = true;
         return false;
+    }
+
+    /**
+     * Get a directly usable test case (in a closure), for copy and paste to TestInteractRayTracing.
+     * @param captureMargin
+     * @param expectCollide
+     * @return
+     */
+    public String getTestCase(double captureMargin, boolean expectCollide) {
+        FakeBlockCache recorder = new FakeBlockCache();
+        recorder.set(this.blockCache, x0, y0, z0, x0 + dX, y0 + dY, z0 + dZ, captureMargin);
+        StringBuilder builder = new StringBuilder(10000);
+        // Add everything inside a closure for direct copy and paste.
+        builder.append('{');
+        // Set up the block cache.
+        recorder.toJava(builder, "fbc", "");
+        // Add the test case code.
+        builder.append("InteractRayTracing rt = new CenteredInteractRayTracing(false, " + targetX + ", " + targetY + ", " + targetZ + "); rt.setBlockCache(fbc);");
+        builder.append("TestRayTracing.runCoordinates(rt, new double[]{" + x0 + ", " + y0 + ", " + z0 + ", " + (x0 + dX) + ", " + (y0 + dY) + ", " + (z0 + dZ) + "}, " + expectCollide + ", " + !expectCollide + ", 0.0, false, \"ingame\");");
+        builder.append("rt.cleanup(); fbc.cleanup();");
+        builder.append('}');
+        recorder.cleanup();
+        return builder.toString();
     }
 
 }

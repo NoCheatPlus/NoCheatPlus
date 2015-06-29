@@ -111,16 +111,16 @@ public class TestRayTracing {
                     doFail("dT < 0 at t = " + StringUtil.fdec3.format(t), coords);
                 }
 
-                // TODO: Check if this check makes sense at all (dT=0 happens during multi-transitions.)l.
+                // TODO: Check if this check makes sense at all (dT=0 happens during multi-transitions).
                 //                if (dT == 0.0 && 1.0 - (t + dT) > tol) {
                 //                    if (!ignEdge(oX, dX) && !ignEdge(oY, dY) && !ignEdge(oZ, dZ)) {
                 //                        doFail("Premature dT = 0 at t = " + StringUtil.fdec3.format(t), coords);
                 //                    }
                 //                }
 
-                checkOffset(oX, "x");
-                checkOffset(oY, "y");
-                checkOffset(oZ, "z");
+//                checkOffset(oX, "x");
+//                checkOffset(oY, "y");
+//                checkOffset(oZ, "z");
 
                 // TODO: check with last block coordinates
                 if (lbx == blockX && lby == blockY && lbz == blockZ) {
@@ -143,11 +143,11 @@ public class TestRayTracing {
                 return true;
             }
 
-            private void checkOffset(double offset, String name) {
-                if (offset < 0.0 || offset > 1.0) {
-                    doFail("Bad " + name + "-offset: " + offset, coords);
-                }
-            }
+//            private void checkOffset(double offset, String name) {
+//                if (offset < 0.0 || offset > 1.0) {
+//                    doFail("Bad " + name + "-offset: " + offset, coords);
+//                }
+//            }
 
             @Override
             public void loop() {
@@ -193,17 +193,17 @@ public class TestRayTracing {
         return crt;
     }
 
-    public static void dump(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double t, double dT) {
+    public static void dump(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double t, double dT, boolean isPrimary) {
         String sdt = StringUtil.fdec3.format(dT);
         if ("0".equals(sdt) && dT > 0) sdt = "0.X";
-        System.out.println(StringUtil.fdec3.format(t) + " (+" + sdt + "): " + blockX + ", "+blockY + ", " + blockZ + " / " + StringUtil.fdec3.format(oX) + ", " + StringUtil.fdec3.format(oY)+ ", " + StringUtil.fdec3.format(oZ));
+        System.out.println(StringUtil.fdec3.format(t) + " (+" + sdt + "): " + blockX + ", "+blockY + ", " + blockZ + " / " + StringUtil.fdec3.format(oX) + ", " + StringUtil.fdec3.format(oY)+ ", " + StringUtil.fdec3.format(oZ) + (isPrimary ? " (primary)" : ""));
     }
 
     public static RayTracing dumpRawRayTracing(final double[] coords) {
         RayTracing rt = new RayTracing(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]) {
             @Override
             protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, boolean isPrimary) {
-                dump(blockX, blockY, blockZ, oX, oY, oZ, t, dT);
+                dump(blockX, blockY, blockZ, oX, oY, oZ, t, dT, isPrimary);
                 if (step > maxSteps(dX, dY, dZ)) {
                     System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
                     return false;
