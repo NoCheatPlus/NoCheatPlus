@@ -158,9 +158,12 @@ public class SurvivalFly extends Check {
             if (resetTo && (fromOnGround || from.isResetCond()) || hDistance <= walkSpeed) {
                 // Invalidate.
                 data.lostSprintCount = 0;
-                // TODO: Check fp with this very one.
                 tags.add("invalidate_lostsprint");
-                sprinting = false;
+                if (now <= data.timeSprinting + cc.sprintingGrace) {
+                    sprinting = true;
+                } else {
+                    sprinting = false;
+                }
             }
             else {
                 tags.add("lostsprint");
