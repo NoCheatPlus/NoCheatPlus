@@ -437,18 +437,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Hard to confine assumesprint further (some logics change with hdist or sprinting).
             if (player.getFoodLevel() > 5) {
                 data.timeSprinting = time;
+                // TODO: Server side is inconsistent, so the multiplier might be plain wrong (1.0).
                 data.multSprinting = mcAccess.getSprintAttributeMultiplier(player);
             }
             else if (time < data.timeSprinting) {
-                // TODO: Ensure that its not reset within latency/cooldown.
                 data.timeSprinting = 0;
             }
             else {
                 // keep sprinting time.
             }
         }
-        else{
-            // Reset if not actually sprinting.
+        else if (time < data.timeSprinting) {
             data.timeSprinting = 0;
         }
 
