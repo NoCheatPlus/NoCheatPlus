@@ -394,6 +394,30 @@ public abstract class RayTracing {
     }
 
     /**
+     * Current block coordinate (main line).
+     * @return
+     */
+    public int getBlockX() {
+        return blockX;
+    }
+
+    /**
+     * Current block coordinate (main line).
+     * @return
+     */
+    public int getBlockY() {
+        return blockY;
+    }
+
+    /**
+     * Current block coordinate (main line).
+     * @return
+     */
+    public int getBlockZ() {
+        return blockZ;
+    }
+
+    /**
      * One step in the loop.
      * 
      * @param blockX
