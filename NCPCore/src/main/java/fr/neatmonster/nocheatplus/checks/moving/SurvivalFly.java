@@ -148,7 +148,6 @@ public class SurvivalFly extends Check {
         final boolean fromOnGround = from.isOnGround();
         final boolean toOnGround = to.isOnGround();
         final boolean resetTo = toOnGround || to.isResetCond();
-        final boolean resetFrom;
 
         // Determine if the player is actually sprinting.
         final boolean sprinting;
@@ -199,7 +198,7 @@ public class SurvivalFly extends Check {
         /////////////////////////////////
 
 
-        // "Lost ground" workaround.
+        final boolean resetFrom;
         if (fromOnGround || from.isResetCond()) {
             resetFrom = true;
         }
@@ -208,6 +207,7 @@ public class SurvivalFly extends Check {
             resetFrom = false;
         }
         else {
+            // "Lost ground" workaround.
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
             // Check lost-ground workarounds.
@@ -400,12 +400,10 @@ public class SurvivalFly extends Check {
 
             // Simple-step blocker.
             // TODO: Complex step blocker: distance to set-back + low jump + accounting info
-            if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D) {
-                // Preconditions checked, further check jump effect and permission.
-                if (yDistance > 0.52 + data.jumpAmplifier * 0.2 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
-                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-                    tags.add("step");
-                }
+            if ((resetFrom || data.noFallAssumeGround) && resetTo && vDistanceAboveLimit <= 0D && 
+                    yDistance > 0.52 + data.jumpAmplifier * 0.2 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
+                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - 0.52 + data.jumpAmplifier * 0.2)); // Could adjust if on ladders etc.
+                tags.add("step");
             }
         }
 
@@ -1004,13 +1002,14 @@ public class SurvivalFly extends Check {
      */
     private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
-        final double someThreshold = hAllowedDistance / 3.3;
+        final double someThreshold = hAllowedDistance / 3.14;
         boolean allowHop = true;
         if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
             allowHop = false; // Magic!
-
+            final int hopTime = bunnyHopMax - data.bunnyhopDelay; 
+            
             // 2x horizontal speed increase detection.
-            if (data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && data.bunnyhopDelay == bunnyHopMax - 1) {
+            if (data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && hopTime == 1) {
                 if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
                     // TODO: Confine to last was hop (according to so far input on this topic).
                     tags.add(DOUBLE_BUNNY);
@@ -1019,21 +1018,26 @@ public class SurvivalFly extends Check {
             }
 
             // Increase buffer if hDistance is decreasing properly.
-            if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / bunnyDivFriction && hDistanceAboveLimit <= someThreshold) {
-                // Speed must decrease by "a lot" at first, then by some minimal amount per event.
-                // TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
-                //if (!(data.toWasReset && from.isOnGround() && to.isOnGround())) { // FISHY
-                // TODO: Confine further (max. amount)?
-                // Allow the move.
-                hDistanceAboveLimit = 0.0;
-                if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()) {
-                    // ... one move between toonground and liftoff remains for hbuf ...
-                    data.bunnyhopDelay ++;
-                    tags.add("bunnyfly(keep)");
-                } else {
-                    tags.add("bunnyfly(" + data.bunnyhopDelay +")");
+            // TODO: Why not (!allowHop && ... ?
+            if (data.sfLastHDist != Double.MAX_VALUE) {
+                final double hDistDiff = data.sfLastHDist - hDistance;
+                if ((hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 31.4) && 
+                        hDistanceAboveLimit <= someThreshold) {
+                    // Speed must decrease by "a lot" at first, then by some minimal amount per event.
+                    // TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
+                    //if (!(data.toWasReset && from.isOnGround() && to.isOnGround())) { // FISHY
+                    // TODO: Confine further (max. amount)?
+                    // Allow the move.
+                    hDistanceAboveLimit = 0.0;
+                    if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()) {
+                        // ... one move between toonground and liftoff remains for hbuf ...
+                        data.bunnyhopDelay ++;
+                        tags.add("bunnyfly(keep)");
+                    } else {
+                        tags.add("bunnyfly(" + data.bunnyhopDelay +")");
+                    }
+                    //}
                 }
-                //}
             }
             if (data.bunnyhopDelay <= 6 && (from.isOnGround() || data.noFallAssumeGround)) {
                 allowHop = true;
@@ -1137,17 +1141,23 @@ public class SurvivalFly extends Check {
         final double jumpHeight = 1.35 + (data.jumpAmplifier > 0 ? (0.6 + data.jumpAmplifier - 1.0) : 0.0);
         // TODO: ladders are ground !
         // TODO: yDistance < 0.0 ?
-        if (yDistance > climbSpeed && !from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)) {
-            // Ignore ladders. TODO: Check for false positives...
-            tags.add("climbspeed");
-            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
+        if (Math.abs(yDistance) > climbSpeed) {
+            if (from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)) {
+                if (yDistance > 0.52 + 0.2 * data.jumpAmplifier) {
+                    tags.add("climbstep");
+                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - climbSpeed);
+                }
+            } else {
+                tags.add("climbspeed");
+                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - climbSpeed);
+            }
         }
         if (yDistance > 0) {
             if (!fromOnGround && !toOnGround && !data.noFallAssumeGround) {
                 // Check if player may climb up.
                 // (This does exclude ladders.)
                 if (!from.canClimbUp(jumpHeight)) {
-                    tags.add("climbup");
+                    tags.add("climbdetached");
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance);
                 }
             }

@@ -148,7 +148,6 @@ public class MovingConfig extends ACheckConfig {
     public final boolean	velocityStrictInvalidation;
     public final double     noFallyOnGround;
     public final double     yOnGround;
-    public final double     yStep;
 
     // General things.
     public final boolean tempKickIllegal;
@@ -243,8 +242,6 @@ public class MovingConfig extends ACheckConfig {
         velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
         yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
-        // ystep is set to 0.45 by default, for stairs / steps.
-        yStep = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
 
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);

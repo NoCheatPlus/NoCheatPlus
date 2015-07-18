@@ -10,42 +10,54 @@ import java.util.List;
  *
  */
 public class AxisVelocity {
-    
+
     /** Velocity with a smaller absolute amount is removed. */
     private static final double minValue = 0.001;
-    
-    private static final double frictionFactor = 0.93;
-    
+
+    private static final double defaultFrictionFactor = 0.93;
+
     private final List<Velocity> queued = new ArrayList<Velocity>();
     private final List<Velocity> active = new ArrayList<Velocity>();
-    
+
     public void add(Velocity vel) {
         // TODO: Merging behavior?
         if (Math.abs(vel.value) != 0.0) {
             queued.add(vel);
         }
     }
-    
+
     public boolean hasActive() {
         return !active.isEmpty();
     }
-    
+
     public boolean hasQueued() {
         return !queued.isEmpty();
     }
-    
+
     /**
-     * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
+     * Tick the velocity entries with a moving event, no invalidation takes
+     * place here. This method uses the defaultFrictionFactor.
      */
     public void tick() {
-     // Decrease counts for active.
+        tick(defaultFrictionFactor);
+    }
+
+    /**
+     * Tick the velocity entries with a moving event, no invalidation takes
+     * place here.
+     * 
+     * @param frictionFactor
+     *            The friction to use with active entries this tick.
+     */
+    public void tick(final double frictionFactor) {
+        // Decrease counts for active.
         // TODO: Actual friction. Could pass as an argument (special value for not to be used).
         // TODO: Consider removing already invalidated here.
         // TODO: Consider working removeInvalid into this ?
         for (final Velocity vel : active) {
             vel.valCount --;
             vel.sum += vel.value;
-            vel.value *= frictionFactor; // vel.frictionFactor;
+            vel.value *= frictionFactor;
             // (Altered entries should be kept, since they get used right away.)
         }
         // Decrease counts for queued.
@@ -54,7 +66,7 @@ public class AxisVelocity {
             it.next().actCount --;
         }
     }
-    
+
     /**
      * Remove all velocity entries that are invalid. Checks both active and queued.
      * <br>(This does not catch invalidation by speed / direction changing.)
@@ -70,7 +82,7 @@ public class AxisVelocity {
             // TODO: 0.001 can be stretched somewhere else, most likely...
             // TODO: Somehow use tick here too (actCount, valCount)?
             if (vel.valCount <= 0 || Math.abs(vel.value) <= minValue) {
-//              System.out.prsintln("Invalidate active: " + vel);
+                //              System.out.prsintln("Invalidate active: " + vel);
                 it.remove();
             }
         }
@@ -80,12 +92,12 @@ public class AxisVelocity {
             // TODO: Could check for alternating signum (error).
             final Velocity vel = it.next();
             if (vel.actCount <= 0 || vel.tick < tick) {
-//              NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Invalidate queued: " + vel);
+                //              NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Invalidate queued: " + vel);
                 it.remove();
             }
         }
     }
-    
+
     /**
      * Get the sum of active velocity values.
      * @return Can be positive or negative.
@@ -98,7 +110,7 @@ public class AxisVelocity {
         }
         return f;
     }
-    
+
     /**
      * Use all queued velocity until at least amount is matched.
      * Amount is the horizontal distance that is to be covered by velocity (active has already been checked).
@@ -135,11 +147,11 @@ public class AxisVelocity {
         // TODO: Add to sum.
         return used;
     }
-    
+
     public void clearActive() {
         active.clear();
     }
-    
+
     /**
      * Clear active and queued velocity entries.
      */
@@ -147,7 +159,7 @@ public class AxisVelocity {
         queued.clear();
         active.clear();
     }
-    
+
     /**
      * Debugging.
      * @param builder
@@ -155,7 +167,7 @@ public class AxisVelocity {
     public void AddQueued(StringBuilder builder) {
         addVeloctiy(builder, queued);
     }
-    
+
     /**
      * Debugging.
      * @param builder
@@ -163,7 +175,7 @@ public class AxisVelocity {
     public void addActive(StringBuilder builder) {
         addVeloctiy(builder, active);
     }
-    
+
     /**
      * Debugging.
      * @param builder
@@ -171,9 +183,9 @@ public class AxisVelocity {
      */
     private void addVeloctiy(final StringBuilder builder, final List<Velocity> entries) {
         for (final Velocity vel: entries) {
-             builder.append(" ");
-             builder.append(vel);
+            builder.append(" ");
+            builder.append(vel);
         }
     }
-    
+
 }
