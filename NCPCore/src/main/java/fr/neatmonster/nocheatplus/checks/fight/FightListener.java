@@ -491,9 +491,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onEntityDamageMonitor(final EntityDamageEvent event) {
-        // TODO: Do rule out events that don't count (ndt) !
         final Entity damaged = event.getEntity();
         if (damaged instanceof Player){
             final Player damagedPlayer = (Player) damaged;
@@ -503,14 +502,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // Plugin compatibility thing.
                 damagedData.lastNoDamageTicks = ndt;
             }
-            //            // Skip events that would not count.
-            //            if (ndt >= damagedPlayer.getMaximumNoDamageTicks() / 2) { // TODO: Exact bounds.
-            //                final EntityDamageEvent lastDamage = damaged.getLastDamageCause();
-            //                if (lastDamage != null && BridgeHealth.getFinalDamage(lastDamage) <= BridgeHealth.getFinalDamage(event)) {
-            //                    return;
-            //                }
-            //            }
-            // Knock-back calculation (1.8: events only fire if they would count).
+            // Knock-back calculation (1.8: events only fire if they would count by ndt).
             switch (event.getCause()) {
                 case ENTITY_ATTACK:
                     if (event instanceof EntityDamageByEntityEvent) {
