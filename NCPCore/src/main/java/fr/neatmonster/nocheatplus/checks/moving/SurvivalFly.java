@@ -189,7 +189,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2) * mcAccess.getSpeedAttributeMultiplier(player);
+        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2);
 
         setNextFriction(from, to, data, cc);
 
@@ -653,6 +653,9 @@ public class SurvivalFly extends Check {
             hAllowedDistance *= modDownStream;
         }
 
+        // Attributes in here.
+        hAllowedDistance *= mcAccess.getSpeedAttributeMultiplier(player);
+
         // Short cut.
         // TODO: Check if a) early return makes sense and b) do it for each of the following parts.
         // TODO: Should debug really make a difference? Do early return before permission check only?
@@ -1007,7 +1010,7 @@ public class SurvivalFly extends Check {
         if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay; 
-            
+
             // 2x horizontal speed increase detection.
             if (data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && hopTime == 1) {
                 if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
@@ -1021,7 +1024,7 @@ public class SurvivalFly extends Check {
             // TODO: Why not (!allowHop && ... ?
             if (data.sfLastHDist != Double.MAX_VALUE) {
                 final double hDistDiff = data.sfLastHDist - hDistance;
-                if ((hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 31.4) && 
+                if ((hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 33.3 || hDistance <= data.sfLastHDist * SurvivalFly.FRICTION_MEDIUM_AIR) && 
                         hDistanceAboveLimit <= someThreshold) {
                     // Speed must decrease by "a lot" at first, then by some minimal amount per event.
                     // TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
