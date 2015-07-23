@@ -36,7 +36,7 @@ public class NoFall extends Check {
      * @param fallDistance
      * @return
      */
-    protected static final double getDamage(final float fallDistance){
+    protected static final double getDamage(final float fallDistance) {
         return fallDistance - 3.0;
     }
 
@@ -52,7 +52,7 @@ public class NoFall extends Check {
         //        final int yD = getDamage((float) (data.noFallMaxY - y));
         //        final int maxD = Math.max(Math.max(pD, nfD), yD);
         final double maxD = estimateDamage(player, y, data);
-        if (maxD >= 1.0){
+        if (maxD >= 1.0) {
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
             if (data.debug) {
@@ -62,7 +62,10 @@ public class NoFall extends Check {
             data.noFallSkipAirCheck = true;
             dealFallDamage(player, maxD);
         }
-        else data.clearNoFallData();
+        else {
+            data.clearNoFallData();
+            player.setFallDistance(0);
+        }
     }
 
     /**
@@ -78,9 +81,9 @@ public class NoFall extends Check {
 
     private final void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         final float noFallFallDistance = Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY));
-        if (noFallFallDistance >= 3.0){
+        if (noFallFallDistance >= 3.0) {
             final float fallDistance = player.getFallDistance();
-            if (noFallFallDistance - fallDistance >= 0.5f || noFallFallDistance >= 3.5f && noFallFallDistance < 3.5f){
+            if (noFallFallDistance - fallDistance >= 0.5f || noFallFallDistance >= 3.5f && noFallFallDistance < 3.5f) {
                 player.setFallDistance(noFallFallDistance);
             }
         }
@@ -96,7 +99,7 @@ public class NoFall extends Check {
         else {
             final EntityDamageEvent event = BridgeHealth.getEntityDamageEvent(player, DamageCause.FALL, damage);
             Bukkit.getPluginManager().callEvent(event);
-            if (!event.isCancelled()){
+            if (!event.isCancelled()) {
                 // TODO: account for no damage ticks etc.
                 player.setLastDamageCause(event);
                 mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
@@ -151,29 +154,37 @@ public class NoFall extends Check {
         final double pY =  loc.getY();
         final double minY = Math.min(fromY, Math.min(toY, pY));
 
-        if (fromReset){
+        if (fromReset) {
             // Just reset.
             data.clearNoFallData();
         }
-        else if (fromOnGround || data.noFallAssumeGround){
+        else if (fromOnGround || data.noFallAssumeGround) {
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) handleOnGround(player, minY, true, data, cc);
-            else adjustFallDistance(player, minY, true, data, cc);
+            if (cc.noFallDealDamage) {
+                handleOnGround(player, minY, true, data, cc);
+            }
+            else {
+                adjustFallDistance(player, minY, true, data, cc);
+            }
         }
-        else if (toReset){
+        else if (toReset) {
             // Just reset.
             data.clearNoFallData();
         }
-        else if (toOnGround){
+        else if (toOnGround) {
             // Check if to deal damage.
-            if (yDiff < 0){
+            if (yDiff < 0) {
                 // In this case the player has traveled further: add the difference.
                 data.noFallFallDistance -= yDiff;
             }
-            if (cc.noFallDealDamage) handleOnGround(player, minY, true, data, cc);
-            else adjustFallDistance(player, minY, true, data, cc);
+            if (cc.noFallDealDamage) {
+                handleOnGround(player, minY, true, data, cc);
+            }
+            else {
+                adjustFallDistance(player, minY, true, data, cc);
+            }
         }
-        else{
+        else {
             // Ensure fall distance is correct, or "anyway"?
         }
 
@@ -187,25 +198,25 @@ public class NoFall extends Check {
         data.noFallFallDistance = Math.max(mcFallDistance, data.noFallFallDistance);
 
         // Add y distance.
-        if (!toReset && !toOnGround && yDiff < 0){
+        if (!toReset && !toOnGround && yDiff < 0) {
             data.noFallFallDistance -= yDiff;
         }
-        else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)){
+        else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)) {
             final double max = Math.max(data.noFallFallDistance, mcFallDistance);
-            if (max > 0.0 && max < 0.75){ // (Ensure this does not conflict with deal-damage set to false.) 
-                if (data.debug){
+            if (max > 0.0 && max < 0.75) { // (Ensure this does not conflict with deal-damage set to false.) 
+                if (data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: Reset fall distance (anticriticals): mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance);
                 }
-                if (data.noFallFallDistance > 0){
+                if (data.noFallFallDistance > 0) {
                     data.noFallFallDistance = 0;
                 }
-                if (mcFallDistance > 0){
-                    player.setFallDistance(0);
+                if (mcFallDistance > 0f) {
+                    player.setFallDistance(0f);
                 }
             }
         }
 
-        if (data.debug){
+        if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance + (oldNFDist < data.noFallFallDistance ? " (+" + (data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + data.noFallMaxY);
         }
 
@@ -218,10 +229,10 @@ public class NoFall extends Check {
      * @param cc
      */
     private void adjustYonGround(final PlayerLocation from, final PlayerLocation to, final double yOnGround) {
-        if (!from.isOnGround()){
+        if (!from.isOnGround()) {
             from.setyOnGround(yOnGround);
         }
-        if (!to.isOnGround()){
+        if (!to.isOnGround()) {
             to.setyOnGround(yOnGround);
         }
     }
