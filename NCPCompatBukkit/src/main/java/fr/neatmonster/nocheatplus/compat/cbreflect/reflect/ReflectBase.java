@@ -19,7 +19,7 @@ public class ReflectBase {
         // obc
         Class<?> clazz = server.getClass();
         String name = clazz.getPackage().getName();
-        if (name.indexOf("org.") == 0 && name.indexOf(".bukkit.") != -1 && name.indexOf(".craftbukkit.") != -1) {
+        if (name.equals("org.bukkit.craftbukkit") || name.indexOf("org.") == 0 && name.indexOf(".bukkit.") != -1 && name.indexOf(".craftbukkit.") != -1) {
             obcPackageName = name;
         } else {
             obcPackageName = null;
@@ -28,7 +28,7 @@ public class ReflectBase {
         Object obj = ReflectionUtil.invokeMethodNoArgs(server, "getHandle");
         clazz = obj.getClass();
         name = clazz.getPackage().getName();
-        if (name.indexOf("net.") == 0 && name.indexOf(".minecraft.") != -1 && name.indexOf(".server.") != -1) {
+        if (name.equals("net.minecraft.server") || name.indexOf("net.") == 0 && name.indexOf(".minecraft.") != -1 && name.indexOf(".server.") != -1) {
             nmsPackageName = name;
         } else {
             nmsPackageName = null;
