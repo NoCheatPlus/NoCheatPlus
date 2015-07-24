@@ -118,12 +118,12 @@ public class MCAccessCB2691 implements MCAccess{
 
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
-        return 1.0;
+        return Double.MAX_VALUE;
     }
 
     @Override
     public double getSprintAttributeMultiplier(Player player) {
-        return player.isSprinting() ? 1.3 : 1.0;
+        return Double.MAX_VALUE;
     }
 
     @Override

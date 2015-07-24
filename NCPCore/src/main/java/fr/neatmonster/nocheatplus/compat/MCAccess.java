@@ -93,17 +93,21 @@ public interface MCAccess {
     public double getFasterMovementAmplifier(Player player);
 
     /**
+     * Generic speed modifier as a multiplier.
      * 
      * @param player
      * @return A multiplier for the allowed speed, excluding the sprint boost
-     *         modifier (!). If not possible to determine, it should be 1.0.
+     *         modifier (!). If not possible to determine, it should
+     *         Double.MAX_VALUE.
      */
     public double getSpeedAttributeMultiplier(Player player);
 
     /**
-     * Modifier for sprinting.
+     * Sprint boost modifier as a multiplier.
+     * 
      * @param player
-     * @return
+     * @return The sprint boost modifier as a multiplier. If not possible to
+     *         determine, it should be Double.MAX_VALUE.
      */
     public double getSprintAttributeMultiplier(Player player);
 

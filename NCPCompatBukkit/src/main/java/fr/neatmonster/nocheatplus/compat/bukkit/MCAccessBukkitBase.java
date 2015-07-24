@@ -231,12 +231,12 @@ public class MCAccessBukkitBase implements MCAccess {
 
     @Override
     public double getSpeedAttributeMultiplier(Player player) {
-        return 1.0;
+        return Double.MAX_VALUE;
     }
 
     @Override
     public double getSprintAttributeMultiplier(Player player) {
-        return player.isSprinting() ? 1.30000002 : 1.0;
+        return Double.MAX_VALUE;
     }
 
     @Override

@@ -654,7 +654,10 @@ public class SurvivalFly extends Check {
         }
 
         // Attributes in here.
-        hAllowedDistance *= mcAccess.getSpeedAttributeMultiplier(player);
+        final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
+        if (attrMod != Double.MAX_VALUE) {
+            hAllowedDistance *= attrMod;
+        }
 
         // Short cut.
         // TODO: Check if a) early return makes sense and b) do it for each of the following parts.
