@@ -600,9 +600,7 @@ public class SurvivalFly extends Check {
      */
     private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final double walkSpeed, final MovingData data, final MovingConfig cc, boolean checkPermissions)
     {
-        // TODO: Cleanup pending for what is applied when (check again).
-        // TODO: re-arrange for fastest checks first (check vs. allowed distance
-        // multiple times if necessary.
+        // TODO: Optimize for double checking?
         double hAllowedDistance = 0D;
 
         final boolean sfDirty = data.isVelocityJumpPhase();
@@ -613,7 +611,8 @@ public class SurvivalFly extends Check {
             // Does include sprinting by now (would need other accounting methods).
             hAllowedDistance = modWeb * walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
-        } else if (from.isInLiquid() && to.isInLiquid()) {
+        }
+        else if (from.isInLiquid() && to.isInLiquid()) {
             // Check all liquids (lava might demand even slower speed though).
             // TODO: Test how to go with only checking from (less dolphins).
             // TODO: Sneaking and blocking applies to when in water !
@@ -627,7 +626,8 @@ public class SurvivalFly extends Check {
                 }
             }
             // (Friction is used as is.)
-        } else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
+        }
+        else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
@@ -636,15 +636,28 @@ public class SurvivalFly extends Check {
             friction = 0.0; // Ensure friction can't be used to speed.
         }
         else {
-            if (!sprinting) {
-                hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
-            }
-            else {
+            if (sprinting) {
                 hAllowedDistance = walkSpeed * data.multSprinting * cc.survivalFlySprintingSpeed / 100D;
             }
-            friction = 0.0; // Ensure friction can't be used to speed. TODO: Set.
+            else {
+                hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+            }
+            // Count in speed changes (attributes, speed potion).
+            // Note: Attributes count in slowness potions, thus leaving out isn't possible.
+            final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
+            if (attrMod == Double.MAX_VALUE) {
+                // Count in speed potions.
+                final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
+                if (speedAmplifier != Double.NEGATIVE_INFINITY) {
+                    hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
+                }
+            } else {
+                hAllowedDistance *= attrMod;
+            }
+            // Ensure friction can't be used to speed.
+            friction = 0.0; 
         }
-        // TODO: Reset friction on too big change of direction.
+        // TODO: Reset friction on too big change of direction?
 
         // Account for flowing liquids (only if needed).
         // Assume: If in liquids this would be placed right here.
@@ -653,46 +666,32 @@ public class SurvivalFly extends Check {
             hAllowedDistance *= modDownStream;
         }
 
-        // Attributes in here.
-        final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
-        if (attrMod != Double.MAX_VALUE) {
-            hAllowedDistance *= attrMod;
-        }
-
-        // Short cut.
-        // TODO: Check if a) early return makes sense and b) do it for each of the following parts.
-        // TODO: Should debug really make a difference? Do early return before permission check only?
-        // TODO: Consider logging early vs. full.
-        final double hDistWithFriction = data.sfLastHDist == Double.MAX_VALUE ? hAllowedDistance : Math.max(hAllowedDistance, data.sfLastHDist * friction);
-        if (hDistance <= hDistWithFriction && !data.debug) {
-            // Shortcut for debug disabled.
-            if (hDistance <= hAllowedDistance) {
-                // Move is within lift-off/burst envelope, allow next time.
-                data.nextFrictionHorizontal = 1.0;
-            }
-            return hDistWithFriction;
-        }
-
         // If the player is on ice, give them a higher maximum speed.
         if (data.sfOnIce > 0) {
             hAllowedDistance *= modIce;
-        }
-
-        // Speed amplifier.
-        final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
-        if (speedAmplifier != Double.NEGATIVE_INFINITY) {
-            hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
         }
 
         // Speeding bypass permission (can be combined with other bypasses).
         if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
             hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
         }
+
+        // Friction mechanics (next move).
         if (hDistance <= hAllowedDistance) {
             // Move is within lift-off/burst envelope, allow next time.
+            // TODO: This probably is the wrong place (+ bunny, + buffer)?
             data.nextFrictionHorizontal = 1.0;
         }
-        return Math.max(hAllowedDistance, hDistWithFriction); // Still the maximum due to debug flag.
+
+        // Friction or not (this move).
+        if (data.sfLastHDist != Double.MAX_VALUE) {
+            // Consider friction.
+            // TODO: Invalidation mechanics.
+            // TODO: Friction model for high speeds?
+            return Math.max(hAllowedDistance, data.sfLastHDist * friction);
+        } else {
+            return hAllowedDistance;
+        }
     }
 
     /**
