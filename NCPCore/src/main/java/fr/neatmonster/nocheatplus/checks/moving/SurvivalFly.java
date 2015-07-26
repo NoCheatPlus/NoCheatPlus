@@ -402,8 +402,11 @@ public class SurvivalFly extends Check {
             // TODO: Complex step blocker: distance to set-back + low jump + accounting info
             if ((resetFrom || data.noFallAssumeGround) && resetTo && vDistanceAboveLimit <= 0D && 
                     yDistance > 0.52 + data.jumpAmplifier * 0.2 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
-                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - 0.52 + data.jumpAmplifier * 0.2)); // Could adjust if on ladders etc.
-                tags.add("step");
+                // Exclude a lost-ground case.
+                if (!data.noFallAssumeGround || data.sfLastYDist == Double.MAX_VALUE || data.sfLastYDist > 0.0 || yDistance + Math.abs(data.sfLastYDist) > 2.0 * (0.52 + 0.2 * data.jumpAmplifier)) {
+                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - 0.52 + data.jumpAmplifier * 0.2)); // Could adjust if on ladders etc.
+                    tags.add("step");
+                }
             }
         }
 
