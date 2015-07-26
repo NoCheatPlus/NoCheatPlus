@@ -71,7 +71,7 @@ public class SurvivalFly extends Check {
     // Gravity.
     public static final double gravity = 0.0774; // TODO: Model / check.
 
-    // Friction by medium.
+    // Friction factor by medium.
     public static final double FRICTION_MEDIUM_AIR = 0.98; // TODO: Check
     public static final double FRICTION_MEDIUM_LIQUID = 0.89; // Rough estimate for horizontal move sprint-jump into water.
 
@@ -222,7 +222,7 @@ public class SurvivalFly extends Check {
         // TODO: Account for lift-off medium / if in air [i.e. account for medium + friction]?
 
         // Alter some data / flags.
-        data.bunnyhopDelay--; // TODO: Design to do the changing at the bottom?
+        data.bunnyhopDelay--; // TODO: Design to do the changing at the bottom? [if change: check limits in bunnyHop(...)]
 
         // Set flag for swimming with the flowing direction of liquid.
         final boolean downStream = hDistance > walkSpeed * modSwim && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
@@ -579,6 +579,7 @@ public class SurvivalFly extends Check {
             // TODO: Lava ?
             data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_LIQUID;
         }
+        // TODO: consider setting minimum friction last (air), do add ground friction.
         else if (!from.isOnGround() && ! to.isOnGround()) {
             data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_AIR;
         }
@@ -658,7 +659,8 @@ public class SurvivalFly extends Check {
                 hAllowedDistance *= attrMod;
             }
             // Ensure friction can't be used to speed.
-            friction = 0.0; 
+            // TODO: Model bunny hop as a one time peak + friction. Allow medium based friction.
+            friction = 0.0;
         }
         // TODO: Reset friction on too big change of direction?
 
@@ -687,7 +689,7 @@ public class SurvivalFly extends Check {
         }
 
         // Friction or not (this move).
-        if (data.sfLastHDist != Double.MAX_VALUE) {
+        if (data.sfLastHDist != Double.MAX_VALUE && friction > 0.0) {
             // Consider friction.
             // TODO: Invalidation mechanics.
             // TODO: Friction model for high speeds?
@@ -1010,8 +1012,14 @@ public class SurvivalFly extends Check {
      */
     private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
-        final double someThreshold = hAllowedDistance / 3.14;
+        if (data.sfLastHDist == Double.MAX_VALUE) {
+            // Might lead to more edge cases (right after join / after removing data, very improbable).
+            return hDistanceAboveLimit;
+        }
         boolean allowHop = true;
+        boolean double_bunny = false;
+
+        // Fly phase.
         if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay; 
@@ -1019,58 +1027,83 @@ public class SurvivalFly extends Check {
             // 2x horizontal speed increase detection.
             if (data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && hopTime == 1) {
                 if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
-                    // TODO: Confine to last was hop (according to so far input on this topic).
+                    // TODO: Confine to increasing set back y ?
                     tags.add(DOUBLE_BUNNY);
-                    allowHop = true; // ?, how to mix in with below...
+                    allowHop = double_bunny = true;
                 }
             }
 
+            // Not sure :p.
+            if (data.bunnyhopDelay <= 6 && (from.isOnGround() || data.noFallAssumeGround)) {
+                // TODO: Effectively reduces the delay (...).
+                tags.add("ediblebunny");
+                allowHop = true;
+            }
+
             // Increase buffer if hDistance is decreasing properly.
-            // TODO: Why not (!allowHop && ... ?
-            if (data.sfLastHDist != Double.MAX_VALUE) {
+            if (!allowHop && data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > hDistance) {
                 final double hDistDiff = data.sfLastHDist - hDistance;
-                if ((hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 33.3 || hDistance <= data.sfLastHDist * SurvivalFly.FRICTION_MEDIUM_AIR) && 
-                        hDistanceAboveLimit <= someThreshold) {
+
+                // Bunny slope (downwards, directly after hop but before friction).
+                if (data.bunnyhopDelay == bunnyHopMax - 1) {
+                    // Ensure relative speed decrease vs. hop is met somehow.
+                    if (hDistDiff >= 0.66 * (data.sfLastHDist - hAllowedDistance)) {
+                        tags.add("bunnyslope");
+                        hDistanceAboveLimit = 0.0;
+                    }
+                }
+
+                // TODO: Cleanup / remove some redundant conditions / model hop + antihop by an extra property:).
+                else if (
+                        hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 33.3 || 
+                        hDistDiff >= (hDistance - hAllowedDistance) * (1.0 - SurvivalFly.FRICTION_MEDIUM_AIR)
+                        ) {
+                    // TODO: Confine friction by medium ?
+                    // TODO: Also calculate an absolute (minimal) speed decrease over the whole time, at least max - count?
+                    tags.add("bunnyfriction");
+                    //if (hDistanceAboveLimit <= someThreshold) { // To be covered by bunnyslope.
                     // Speed must decrease by "a lot" at first, then by some minimal amount per event.
-                    // TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
+                    // TODO: Confine buffer to only be used during low jump phase !?
                     //if (!(data.toWasReset && from.isOnGround() && to.isOnGround())) { // FISHY
-                    // TODO: Confine further (max. amount)?
+
                     // Allow the move.
                     hDistanceAboveLimit = 0.0;
                     if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()) {
                         // ... one move between toonground and liftoff remains for hbuf ...
                         data.bunnyhopDelay ++;
                         tags.add("bunnyfly(keep)");
-                    } else {
+                    }
+                    else {
                         tags.add("bunnyfly(" + data.bunnyhopDelay +")");
                     }
                     //}
+                    //}
                 }
             }
-            if (data.bunnyhopDelay <= 6 && (from.isOnGround() || data.noFallAssumeGround)) {
-                allowHop = true;
-            }
         }
-        // Check hop:
-        if (allowHop && hDistance >= walkSpeed) { // if (sprinting) {
-            // Check activation of bunlowny hop,
-            // Roughly twice the sprinting speed is reached.
-            // TODO: Allow slightly higher speed on lost ground.
-            if (hDistanceAboveLimit > (sprinting ? 0.005 : 0.0016) && hDistanceAboveLimit <= hAllowedDistance + someThreshold
-                    && (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
-                    && (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
+
+        // Check hop (singular peak up to roughly two times the allowed distance).
+        if (allowHop && hDistance >= walkSpeed && 
+                hDistance > 1.314 * Math.max(hAllowedDistance, data.sfLastHDist) && // max = strict
+                hDistance < 2.15 * Math.max(data.sfLastHDist, hAllowedDistance) // max = lenient TODO: adjust factor(s) so min works
+                ) { // if (sprinting) {
+            // TODO: Test bunny spike over all sorts of speeds + attributes.
+            // TODO: Allow slightly higher speed on lost ground?
+            tags.add("bunnyenv");
+            if (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
                     && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
                     && !from.isResetCond() && !to.isResetCond()
-                    || tags.contains(DOUBLE_BUNNY))
+                    || double_bunny
                     ) {
                 // TODO: Jump effect might allow more strictness. 
                 // TODO: Expected minimum gain depends on last speed (!).
                 // TODO: Speed effect affects hDistanceAboveLimit?
                 data.bunnyhopDelay = bunnyHopMax;
                 hDistanceAboveLimit = 0D;
-                tags.add("bunnyhop"); // TODO: Which here...
+                tags.add("bunnyhop");
             }
         }
+
         return hDistanceAboveLimit;
     }
 
