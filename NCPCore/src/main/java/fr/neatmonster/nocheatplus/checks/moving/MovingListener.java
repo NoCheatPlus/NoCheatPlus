@@ -390,8 +390,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             DebugUtil.outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
         }
         // Check for illegal move and bounding box etc.
-        if (moveInfo.from.isIllegal() || moveInfo.to.isIllegal()) {
-            MovingUtil.handleIllegalMove(event, player, data);
+        if ((moveInfo.from.hasIllegalCoords() || moveInfo.to.hasIllegalCoords()) ||
+                !cc.ignoreStance && (moveInfo.from.hasIllegalStance() || moveInfo.to.hasIllegalStance())) {
+            MovingUtil.handleIllegalMove(event, player, data, cc);
             moveInfo.cleanup();
             parkedInfo.add(moveInfo);
             return;

@@ -589,6 +589,8 @@ public abstract class ConfPaths {
 
     // General.
     public static final String  MOVING_TEMPKICKILLEGAL                      = MOVING + "tempkickillegal";
+    public static final String  MOVING_IGNORESTANCE                         = MOVING + "ignorestance";
+    // TODO: Might add a section for illegal move.
     private static final String MOVING_LOADCHUNKS                           = MOVING + "loadchunks.";
     public static final String  MOVING_LOADCHUNKS_JOIN                      = MOVING_LOADCHUNKS + "join";
     public static final String  MOVING_SPRINTINGGRACE                       = MOVING + "sprintinggrace";

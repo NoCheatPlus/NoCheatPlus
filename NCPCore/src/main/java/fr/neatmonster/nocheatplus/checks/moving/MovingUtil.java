@@ -54,7 +54,7 @@ public class MovingUtil {
      * @param player
      * @param data
      */
-    public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data)
+    public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data, final MovingConfig cc)
     {
         // This might get extended to a check-like thing.
         boolean restored = false;
@@ -64,7 +64,7 @@ public class MovingUtil {
         if (!restored && data.hasSetBack()) {
             final Location setBack = data.getSetBack(loc); 
             pLoc.set(setBack, player);
-            if (!pLoc.isIllegal()) {
+            if (!pLoc.hasIllegalCoords() && (cc.ignoreStance || !pLoc.hasIllegalStance())) {
                 event.setFrom(setBack);
                 event.setTo(setBack);
                 restored = true;
@@ -75,7 +75,7 @@ public class MovingUtil {
         } 
         if (!restored) {
             pLoc.set(loc, player);
-            if (!pLoc.isIllegal()) {
+            if (!pLoc.hasIllegalCoords() && (cc.ignoreStance || !pLoc.hasIllegalStance())) {
                 event.setFrom(loc);
                 event.setTo(loc);
                 restored = true;

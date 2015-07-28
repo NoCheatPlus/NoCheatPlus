@@ -433,6 +433,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION, true);
 
         // General.
+        set(ConfPaths.MOVING_IGNORESTANCE, "default");
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);

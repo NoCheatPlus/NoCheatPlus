@@ -109,7 +109,8 @@ public class CheckUtils {
      */
     public static boolean isBadCoordinate(double ... doubles) {
         for (int i = 0; i < doubles.length; i++) {
-            if (Double.isNaN(doubles[i]) || Double.isInfinite(doubles[i])) {
+            final double x = doubles[i];
+            if (Double.isNaN(x) || Double.isInfinite(x) || Math.abs(x) > 3.2E7D) {
                 return true;
             }
         }

@@ -150,6 +150,7 @@ public class MovingConfig extends ACheckConfig {
     public final double     yOnGround;
 
     // General things.
+    public final boolean ignoreStance;
     public final boolean tempKickIllegal;
     public final boolean loadChunksOnJoin;
     public final long sprintingGrace;
@@ -243,6 +244,8 @@ public class MovingConfig extends ACheckConfig {
         yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
 
+        // TODO: Ignore the stance, once it is known that the server catches such.
+        ignoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.NO).decide();
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.

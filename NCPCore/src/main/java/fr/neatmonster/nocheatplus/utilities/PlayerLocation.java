@@ -6,7 +6,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
 /**
@@ -833,15 +832,30 @@ public class PlayerLocation {
      * Attempt to check for some exploits (!).
      * 
      * @return
+     * @deprecated Legacy method.
      */
     public boolean isIllegal() {
-        final AlmostBoolean spec = mcAccess.isIllegalBounds(player);
-        if (spec != AlmostBoolean.MAYBE) {
-            return spec.decide();
+        if (hasIllegalCoords()) {
+            return true;
+        } else {
+            return hasIllegalStance();
         }
-        else if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
-        // if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;
-        else return false;
+    }
+
+    /**
+     * Check for bounding box properties that might crash the server (if available, not the absolute coordinates).
+     * @return
+     */
+    public boolean hasIllegalStance() {
+        return mcAccess.isIllegalBounds(player).decide(); // MAYBE = NO
+    }
+
+    /**
+     * Quick check for really bad coordinates (actual problem, if true is returned.).
+     * @return
+     */
+    public boolean hasIllegalCoords() {
+        return CheckUtils.isBadCoordinate(minX, maxX, minY, maxY, minZ, maxZ);
     }
 
     /**
