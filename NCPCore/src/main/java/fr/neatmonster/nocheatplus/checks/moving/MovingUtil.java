@@ -84,7 +84,7 @@ public class MovingUtil {
         pLoc.cleanup();
         if (!restored) {
             // TODO: reset the bounding box of the player ?
-            if (MovingConfig.getConfig(player).tempKickIllegal) {
+            if (cc.tempKickIllegal) {
                 NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
                 StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them and deny login for 24 hours");
             } else {
