@@ -178,4 +178,16 @@ public class MovingUtil {
         }
     }
 
+    /**
+     * Estimated lift-off distance for jumping, considering the stored jump
+     * effect.
+     * 
+     * @param player
+     * @param data
+     * @return
+     */
+    public static double estimateJumpLiftOff(final Player player, final MovingData data, final double add) {
+        return Math.max(0.0, 0.42 + add + 0.2 * data.jumpAmplifier);
+    }
+
 }

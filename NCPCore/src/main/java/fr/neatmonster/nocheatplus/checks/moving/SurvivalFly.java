@@ -332,7 +332,7 @@ public class SurvivalFly extends Check {
         }
         else if (!sfDirty && from.isOnClimbable()) {
             // Ladder types.
-            vDistanceAboveLimit = vDistClimbable(from, fromOnGround, toOnGround, yDistance, data);
+            vDistanceAboveLimit = vDistClimbable(player, from, fromOnGround, toOnGround, yDistance, data);
         }
         else if (!sfDirty && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())) {
             // Swimming...
@@ -374,16 +374,6 @@ public class SurvivalFly extends Check {
                 }
             }
 
-            //            // Check maximal absolute distance (jumping).
-            //            if (!data.sfDirty && yDistance > 0.57 + data.jumpAmplifier * 0.2 && !toOnGround && from.isPassable()) {
-            //            	// TODO: Side conditions... from.isPassable is checked because of pistons.
-            //            	// TODO: Pistons don't work.
-            //            	vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - 0.53 + data.jumpAmplifier * 0.2);
-            //            	tags.add("fastascend");
-            //            }
-
-            // TODO: Velocity handling here [concept: set vdistAbove.. almost always]?
-
             // TODO: This might need max(0, for ydiff)
             vDistanceAboveLimit = Math.max(vDistanceAboveLimit, to.getY() - data.getSetBackY() - vAllowedDistance);
             if (vDistanceAboveLimit > 0) {
@@ -401,10 +391,10 @@ public class SurvivalFly extends Check {
             // Simple-step blocker.
             // TODO: Complex step blocker: distance to set-back + low jump + accounting info
             if ((resetFrom || data.noFallAssumeGround) && resetTo && vDistanceAboveLimit <= 0D && 
-                    yDistance > 0.52 + data.jumpAmplifier * 0.2 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
+                    yDistance > MovingUtil.estimateJumpLiftOff(player, data, 0.1) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
                 // Exclude a lost-ground case.
-                if (!data.noFallAssumeGround || data.sfLastYDist == Double.MAX_VALUE || data.sfLastYDist > 0.0 || yDistance + Math.abs(data.sfLastYDist) > 2.0 * (0.52 + 0.2 * data.jumpAmplifier)) {
-                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - 0.52 + data.jumpAmplifier * 0.2)); // Could adjust if on ladders etc.
+                if (!data.noFallAssumeGround || data.sfLastYDist == Double.MAX_VALUE || data.sfLastYDist > 0.0 || yDistance + Math.abs(data.sfLastYDist) > 2.0 * (MovingUtil.estimateJumpLiftOff(player, data, 0.1))) {
+                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - MovingUtil.estimateJumpLiftOff(player, data, 0.1) )); // Could adjust if on ladders etc.
                     tags.add("step");
                 }
             }
@@ -722,11 +712,11 @@ public class SurvivalFly extends Check {
      */
     private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: Confine by max y distance and max/min xz-distance?
-        if (yDistance >= -0.5 && yDistance <= 0.594 + data.jumpAmplifier * 0.2) {
+        if (yDistance >= -0.5 && yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.174)) {
             // "Mild" Ascending / descending.
             // Stairs.
             // TODO: More safety guards.
-            if (yDistance <= 0.52 + data.jumpAmplifier * 0.2 && from.isAboveStairs()) {
+            if (yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.1)  && from.isAboveStairs()) {
                 applyLostGround(player, from, true, data, "stairs");
                 return true;
             }
@@ -1170,7 +1160,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return vDistanceAboveLimit
      */
-    private double vDistClimbable(final PlayerLocation from, final boolean fromOnGround, final boolean toOnGround, final double yDistance, final MovingData data) {
+    private double vDistClimbable(final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean toOnGround, final double yDistance, final MovingData data) {
         double vDistanceAboveLimit = 0.0;
         data.sfNoLowJump = true;
         // TODO: bring in in-medium accounting.
@@ -1184,7 +1174,7 @@ public class SurvivalFly extends Check {
         // TODO: yDistance < 0.0 ?
         if (Math.abs(yDistance) > climbSpeed) {
             if (from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)) {
-                if (yDistance > 0.52 + 0.2 * data.jumpAmplifier) {
+                if (yDistance > MovingUtil.estimateJumpLiftOff(player, data, 0.1)) {
                     tags.add("climbstep");
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - climbSpeed);
                 }
@@ -1276,7 +1266,7 @@ public class SurvivalFly extends Check {
         final double setBackYDistance = to.getY() - data.getSetBackY();
 
         // Half block step up.
-        if (yDistance <= (sprinting ? 0.594 : 0.5) && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.2 * data.jumpAmplifier && to.isOnGround()) {
+        if (yDistance <= (sprinting ? 0.594 : 0.5) && hDistance < 0.5 && setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
             if (data.sfLastYDist < 0.0 || yDistance <= 0.5 && from.isOnGround(0.5 - Math.abs(yDistance))) {
                 return applyLostGround(player, from, true, data, "step");
             }
@@ -1290,7 +1280,7 @@ public class SurvivalFly extends Check {
         //  && data.sfJumpPhase > 3 <- Seems to be a problem with cake on a block + jump over both mini edges (...).
         if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0.0 && !to.isOnGround()) {
             // TODO: Check if last-y-dist or sprinting should be considered.
-            if (setBackYDistance > 0.0 && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0.0 && Math.abs(setBackYDistance) < 3.0) {
+            if (setBackYDistance > 0.0 && setBackYDistance <= Math.max(0.0, 1.5D + 0.2 * data.jumpAmplifier) || setBackYDistance < 0.0 && Math.abs(setBackYDistance) < 3.0) {
                 // Interpolate from last to-coordinates to the from
                 // coordinates (with some safe-guard).
                 final double dX = from.getX() - data.fromX;
@@ -1351,7 +1341,7 @@ public class SurvivalFly extends Check {
             }
 
             // Check for jumping up strange blocks like flower pots on top of other blocks.
-            if (yDistance == 0.0 && data.sfLastYDist > 0.0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3.0 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()) {
+            if (yDistance == 0.0 && data.sfLastYDist > 0.0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= Math.max(0, 6 + data.jumpAmplifier * 3.0) && setBackYDistance > 1.0 && setBackYDistance < Math.max(0.0, 1.5 + 0.2 * data.jumpAmplifier) && !to.isOnGround()) {
                 // TODO: confine by block types ?
                 if (from.isOnGround(0.25, 0.4, 0, 0L) ) {
                     // Temporary "fix".
