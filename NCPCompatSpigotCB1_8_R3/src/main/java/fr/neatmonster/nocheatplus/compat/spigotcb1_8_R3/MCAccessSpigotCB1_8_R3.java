@@ -64,8 +64,8 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
 
     @Override
     public String getMCVersion() {
-        // 1.8.4-1.8.6 (1_8_R3)
-        return "1.8.4-1.8.7";
+        // 1.8.4-1.8.8 (1_8_R3)
+        return "1.8.4-1.8.8";
     }
 
     @Override
