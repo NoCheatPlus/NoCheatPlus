@@ -25,6 +25,16 @@
     	<version>1.8.4-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+            <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <description>Compatibility for Minecraft 1.8.4-1.8.6 with CraftBukkit/Spigot (1_8_R3).</description>
 </project>

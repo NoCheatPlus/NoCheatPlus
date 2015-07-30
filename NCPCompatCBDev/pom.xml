@@ -36,4 +36,17 @@ To add a new compat module three other pom.xml files have to be modified:
 - NoCheatPlus: Add as include (source).
 
 The NCPPlugin sub-project contains the MCAccessFactory.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+            <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

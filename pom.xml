@@ -63,4 +63,28 @@ The naming of the native compatibility modules mostly follows NCPCompat + shortc
 NCPCompatBukkit provides compatibility for the Bukkit-API only (no native module available), aiming at keeping NCP up for a new MC version for if no native module is available . Tendency is to use the latest Bukkit version rather, but since it is used for some &quot;unknown mods&quot; as well, it is not compiled with the latest Bukkit version always.
 
 TODO: Better place for descriptions like this?</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+            <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+    <distributionManagement>
+    <repository>
+      <id>md_5-releases</id>
+      <url>http://repo.md-5.net/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>md_5-snapshots</id>
+      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 </project>
