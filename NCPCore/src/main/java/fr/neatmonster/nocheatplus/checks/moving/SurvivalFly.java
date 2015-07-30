@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
@@ -391,9 +392,21 @@ public class SurvivalFly extends Check {
             // Simple-step blocker.
             // TODO: Complex step blocker: distance to set-back + low jump + accounting info
             if ((resetFrom || data.noFallAssumeGround) && resetTo && vDistanceAboveLimit <= 0D && 
-                    yDistance > MovingUtil.estimateJumpLiftOff(player, data, 0.1) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
+                    yDistance > MovingUtil.estimateJumpLiftOff(player, data, 0.1)) {
+                boolean step = true;
                 // Exclude a lost-ground case.
-                if (!data.noFallAssumeGround || data.sfLastYDist == Double.MAX_VALUE || data.sfLastYDist > 0.0 || yDistance + Math.abs(data.sfLastYDist) > 2.0 * (MovingUtil.estimateJumpLiftOff(player, data, 0.1))) {
+                if (data.noFallAssumeGround && data.sfLastYDist != Double.MAX_VALUE && data.sfLastYDist <= 0.0 && yDistance > 0.0 && 
+                        yDistance + Math.abs(data.sfLastYDist) <= 2.0 * (MovingUtil.estimateJumpLiftOff(player, data, 0.1))) {
+                    step = false;
+                }
+                // Exclude 1.8 beds.
+                // TODO: Add feature flag (bedstep) and check here.
+                // TODO: Quick check the distance and offset parameters (!). 
+                if (yDistance <= 0.5625 && cc.sfBedStep && to.standsOnBlock(BlockProperties.getId(Material.BED_BLOCK))) {
+                    step = false;
+                }
+                // Check bypass permission last.
+                if (step && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - MovingUtil.estimateJumpLiftOff(player, data, 0.1) )); // Could adjust if on ladders etc.
                     tags.add("step");
                 }

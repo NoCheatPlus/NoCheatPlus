@@ -585,6 +585,21 @@ public class PlayerLocation {
     }
 
     /**
+     * Check if the location is on ground and if it is hitting the bounding box
+     * of a block with the given id. Currently this is coarse (not checking if
+     * it is really possible to stand on such a block).
+     * 
+     * @param id
+     * @return
+     */
+    public boolean standsOnBlock(final int id) {
+        if (!isOnGround()) {
+            return false;
+        }
+        return BlockProperties.collidesBlock(this.blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, id);
+    }
+
+    /**
      * Simple check with custom margins (Boat, Minecart). 
      * @param yOnGround Margin below the player.
      * @param xzMargin

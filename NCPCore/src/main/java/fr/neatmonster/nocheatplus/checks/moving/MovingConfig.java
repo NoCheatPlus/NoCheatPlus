@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.versions.Bugs;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -131,6 +132,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    survivalFlyAccountingH;
     public final boolean    survivalFlyAccountingV;
     public final boolean    sfFallDamage;
+    public final boolean    sfBedStep;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
 
@@ -228,6 +230,12 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyAccountingH = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         survivalFlyAccountingV = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         sfFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
+        AlmostBoolean bedStep = config.getAlmostBoolean(ConfPaths.MOVING_SURVIVALFLY_BEDSTEP, AlmostBoolean.MAYBE);
+        if (bedStep == AlmostBoolean.MAYBE) {
+            sfBedStep = ServerVersion.select("1.8", false, true, true, true);
+        } else {
+            sfBedStep = bedStep.decide();
+        }
         survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
 

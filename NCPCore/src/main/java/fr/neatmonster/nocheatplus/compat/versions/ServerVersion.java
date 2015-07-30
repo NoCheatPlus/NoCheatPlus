@@ -216,6 +216,15 @@ public class ServerVersion {
         return num;
     }
 
+    /**
+     * Select a value based on the Minecraft version.
+     * @param cmpVersion Version to compare to, comparison of server version vs. given version.
+     * @param valueLT Server has an earlier version.
+     * @param valueEQ Same versions.
+     * @param valueGT The server version is later.
+     * @param valueUnknown Value to return, if the server version could not be determined.
+     * @return
+     */
     public static <V> V select(final String cmpVersion, final V valueLT, final V valueEQ, final V valueGT, final V valueUnknown) {
         final String mcVersion = ServerVersion.getMinecraftVersion();
         if (mcVersion == ServerVersion.UNKNOWN_VERSION) {
