@@ -1015,15 +1015,12 @@ public class SurvivalFly extends Check {
      */
     private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
-        if (data.sfLastHDist == Double.MAX_VALUE) {
-            // Might lead to more edge cases (right after join / after removing data, very improbable).
-            return hDistanceAboveLimit;
-        }
         boolean allowHop = true;
         boolean double_bunny = false;
 
         // Fly phase.
-        if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
+        if (data.sfLastHDist != Double.MAX_VALUE && data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
+            // (sfLastHDist may be reset on commands.)
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay; 
 
@@ -1087,8 +1084,8 @@ public class SurvivalFly extends Check {
 
         // Check hop (singular peak up to roughly two times the allowed distance).
         if (allowHop && hDistance >= walkSpeed && 
-                hDistance > 1.314 * Math.max(hAllowedDistance, data.sfLastHDist) && // max = strict
-                hDistance < 2.15 * Math.max(data.sfLastHDist, hAllowedDistance) // max = lenient TODO: adjust factor(s) so min works
+                hDistance > 1.314 * hAllowedDistance && hDistance < 2.15 * hAllowedDistance ||
+                data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?

@@ -1344,7 +1344,7 @@ public class BlockProperties {
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
-        final boolean res = pLoc.isOnGround() || pLoc.isResetCond();
+        final boolean res = pLoc.isOnGroundOrResetCond();
         blockCache.cleanup();
         pLoc.cleanup();
         return res;

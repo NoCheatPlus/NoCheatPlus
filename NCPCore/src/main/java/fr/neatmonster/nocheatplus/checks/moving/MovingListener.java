@@ -145,6 +145,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         super(CheckType.MOVING);
     }
 
+    private MoveInfo useMoveInfo() {
+        if (parkedInfo.isEmpty()) {
+            return new MoveInfo(mcAccess);
+        }
+        else {
+            return parkedInfo.remove(parkedInfo.size() - 1);
+        }
+    }
+
+    /**
+     * Cleanup and add to parked.
+     * @param moveInfo
+     */
+    private void returnMoveInfo(final MoveInfo moveInfo) {
+        moveInfo.cleanup();
+        parkedInfo.add(moveInfo);
+    }
+
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.
      * 
@@ -373,13 +391,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // TODO: Order this to above "early return"?
         // Set up data / caching.
-        final MoveInfo moveInfo;
-        if (parkedInfo.isEmpty()) {
-            moveInfo = new MoveInfo(mcAccess);
-        }
-        else {
-            moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
-        }
+        final MoveInfo moveInfo = useMoveInfo();
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
         // TODO: Data resetting above ?
@@ -634,8 +646,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Cleanup.
         data.joinOrRespawn = false;
-        moveInfo.cleanup();
-        parkedInfo.add(moveInfo);
+        returnMoveInfo(moveInfo);
     }
 
     /**
@@ -1178,13 +1189,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(useLoc);
         boolean allowReset = true;
         if (!data.noFallSkipAirCheck) {
-            final MoveInfo moveInfo;
-            if (parkedInfo.isEmpty()) {
-                moveInfo = new MoveInfo(mcAccess);
-            }
-            else {
-                moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
-            }
+            final MoveInfo moveInfo = useMoveInfo();
             moveInfo.set(player, loc, null, cc.noFallyOnGround);
             // NOTE: No isIllegal check here.
             final PlayerLocation pLoc = moveInfo.from;
@@ -1207,8 +1212,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Also reset other properties.
                 // TODO: Also reset in other cases (moved too quickly)?
             }
-            moveInfo.cleanup();
-            parkedInfo.add(moveInfo);
+            returnMoveInfo(moveInfo);
         }
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
@@ -1315,7 +1319,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // More resetting.
         data.vDistAcc.clear();
-        data.toWasReset = BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround);
+        final MoveInfo moveInfo = useMoveInfo();
+        moveInfo.set(player, loc, null, cc.yOnGround);
+        data.toWasReset = moveInfo.from.isOnGroundOrResetCond();
+        if (data.toWasReset && moveInfo.from.isOnGround() && !moveInfo.from.isResetCond()) {
+            data.mediumLiftOff = MediumLiftOff.GROUND;
+        }
+        returnMoveInfo(moveInfo);
         data.fromWasReset = data.toWasReset;
 
         // Enforcing the location.
@@ -1582,13 +1592,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Only check every so and so ticks.
             return;
         }
-        final MoveInfo info;
-        if (parkedInfo.isEmpty()) {
-            info = new MoveInfo(mcAccess);
-        }
-        else {
-            info = parkedInfo.remove(parkedInfo.size() - 1);
-        }
+        final MoveInfo info = useMoveInfo();
         for (final String playerName : hoverTicks) {
             // TODO: put players into the set (+- one tick would not matter ?)
             // TODO: might add an online flag to data !
@@ -1631,8 +1635,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         hoverTicks.removeAll(rem);
         rem.clear();
-        info.cleanup();
-        parkedInfo.add(info);
+        returnMoveInfo(info);
         useLoc.setWorld(null);
     }
 
@@ -1673,7 +1676,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // DEBUG
             StaticLog.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
         }
-        if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()) {
+        if (info.from.isOnGroundOrResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()) {
             res = true;
             data.sfHoverTicks = 0;
         }

@@ -641,6 +641,14 @@ public class PlayerLocation {
         return isInLiquid()  || isOnClimbable() || isInWeb();
     }
 
+    /**
+     * Convenience method for testing for either.
+     * @return
+     */
+    public boolean isOnGroundOrResetCond() {
+        return isOnGround() || isResetCond();
+    }
+
     public double getyOnGround() {
         return yOnGround;
     }
@@ -908,7 +916,9 @@ public class PlayerLocation {
         this.inLava = other.isInLava();
         this.inWeb = other.isInWeb();
         this.onClimbable = other.isOnClimbable();
-        if (!onGround && !isResetCond()) this.aboveStairs = other.isAboveStairs();
+        if (!onGround && !isResetCond()) {
+            this.aboveStairs = other.isAboveStairs();
+        }
         this.onIce = other.isOnIce();
         this.typeId = other.getTypeId();
         this.typeIdBelow = other.getTypeIdBelow();
