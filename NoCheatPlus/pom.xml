@@ -1,109 +1,102 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <!-- Informations -->
-  <artifactId>nocheatplus</artifactId>
-  <name>NoCheatPlus</name>
-  <version>3.12.1-SNAPSHOT</version>
-  <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
-  <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
-  
-  <packaging>jar</packaging>
-  
-  <dependencies>
-    <dependency>
-    	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpplugin</artifactId>
-    	<version>1.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-  
-  <distributionManagement>
-    <repository>
-      <id>md_5-releases</id>
-      <url>http://repo.md-5.net/content/repositories/releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>md_5-snapshots</id>
-      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
-  
-  <!-- Building -->
-  <build>
-    <defaultGoal>clean package</defaultGoal>
-    <directory>../target</directory> <!-- Build it one level up, because it is the one we care about -->
-    <finalName>NoCheatPlus</finalName>
-    <resources>
-      <resource>
-        <targetPath>.</targetPath>
-        <filtering>true</filtering>
-        <directory>..</directory>
-        <includes>
-          <include>LICENSE.txt</include>
-        </includes>
-      </resource>
-      <!-- plugin.yml here to fill in the correct content. -->
-      <resource>
-        <targetPath>.</targetPath>
-        <filtering>true</filtering>
-        <directory>../NCPPlugin/src/main/resources</directory>
-        <includes>
-          <include>plugin.yml</include>
-        </includes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>fr.neatmonster:*</include>
-                </includes>
-                <!-- Clearly not sure about excludes... -->
-                <excludes>
-                  <exclude>fr.neatmonster:nocheatplus-parent</exclude>
-                  <exclude>fr.neatmonster:nocheatplus</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-            <!-- <skip>true</skip> -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
-  <!-- Properties -->
-  <properties>
-  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  <BUILD_NUMBER>?</BUILD_NUMBER>
-  <BUILD_SERIES>?</BUILD_SERIES>
-  </properties>
-  
-  <groupId>fr.neatmonster</groupId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Informations -->
+	<groupId>fr.neatmonster</groupId>
+	<artifactId>nocheatplus</artifactId>
+	<name>NoCheatPlus</name>
+	<version>3.12.1-SNAPSHOT</version>
+	<description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
+	<url>http://dev.bukkit.org/server-mods/nocheatplus</url>
+
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpplugin</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<distributionManagement>
+		<repository>
+			<id>md_5-releases</id>
+			<url>http://repo.md-5.net/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>md_5-snapshots</id>
+			<url>http://repo.md-5.net/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<!-- Building -->
+	<build>
+		<defaultGoal>clean package</defaultGoal>
+		<directory>../target</directory> <!-- Build it one level up, because it is the one we care about -->
+		<finalName>NoCheatPlus</finalName>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>..</directory>
+				<includes>
+					<include>LICENSE.txt</include>
+				</includes>
+			</resource>
+			<!-- plugin.yml here to fill in the correct content. -->
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>../NCPPlugin/src/main/resources</directory>
+				<includes>
+					<include>plugin.yml</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>fr.neatmonster:*</include>
+								</includes>
+								<!-- Clearly not sure about excludes... -->
+	<!-- 							<excludes>
+									<exclude>fr.neatmonster:nocheatplus-parent</exclude>
+								</excludes> -->
+							</artifactSet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<!-- <skip>true</skip> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

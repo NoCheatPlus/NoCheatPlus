@@ -1,62 +1,95 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.neatmonster</groupId>
-  <artifactId>nocheatplus-parent</artifactId>
-  <packaging>pom</packaging>
-  <version>1.1-SNAPSHOT</version>
-  <name>NoCheatPlus Parent</name>
-  <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
-    <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
-  </properties>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.neatmonster</groupId>
+	<artifactId>nocheatplus-parent</artifactId>
+	<packaging>pom</packaging>
+	<version>1.1-SNAPSHOT</version>
+	<name>NoCheatPlus Parent</name>
+	<url>http://dev.bukkit.org/server-mods/nocheatplus</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
+		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
+		<BUILD_NUMBER>?</BUILD_NUMBER>
+		<BUILD_SERIES>?</BUILD_SERIES>
+	</properties>
 
-  <modules>
-    <module>NCPBuildBase</module>
-    <module>NCPCommons</module>
-    <module>NCPCore</module>
-    <module>NCPCompatBukkit</module>
-    <module>NCPCompatCB2512</module>
-    <module>NCPCompatCB2545</module>
-    <module>NCPCompatCB2602</module>
-    <module>NCPCompatCB2645</module>
-    <module>NCPCompatCB2691</module>
-    <module>NCPCompatCB2763</module>
-    <module>NCPCompatCB2794</module>
-    <module>NCPCompatCB2808</module>
-    <module>NCPCompatCB2882</module>
-    <module>NCPCompatCB2922</module>
-    <module>NCPCompatCB3026</module>
-    <module>NCPCompatCB3043</module>
-    <module>NCPCompatCB3100</module>
-    <module>NCPCompatSpigotCB1_8_R1</module>
-    <module>NCPCompatSpigotCB1_8_R2</module>
-    <module>NCPCompatSpigotCB1_8_R3</module>
-    <module>NCPCompatCBDev</module>
-    <module>NCPCompatProtocolLib</module>
-    <module>NCPCompatGlowstone</module>
-    <module>NCPPlugin</module>
-    <module>NoCheatPlus</module>
-  </modules>
 
-  <repositories>
-    <repository>
-      <id>bukkit</id>
-      <url>http://repo.bukkit.org/content/groups/public/</url>
-    </repository>
-    <repository>
-      <id>md_5-releases</id>
-      <url>http://repo.md-5.net/content/repositories/releases/</url>
-    </repository>
-    <repository>
-      <id>md_5-snapshots</id>
-      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-    </repository>
-  </repositories>
 
-  <description>The initial pom design had been taken from mbax (GitHub).
+	<profiles>
+		<profile>
+			<id>all</id>
+			<activation>
+				<property>
+					<name>cbdedicated</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<module>NCPBuildBase</module>
+				<module>NCPCommons</module>
+				<module>NCPCore</module>
+				<module>NCPCompatBukkit</module>
+				<!-- Non minimal below. -->
+				<module>NCPCompatCB2512</module>
+				<module>NCPCompatCB2545</module>
+				<module>NCPCompatCB2602</module>
+				<module>NCPCompatCB2645</module>
+				<module>NCPCompatCB2691</module>
+				<module>NCPCompatCB2763</module>
+				<module>NCPCompatCB2794</module>
+				<module>NCPCompatCB2808</module>
+				<module>NCPCompatCB2882</module>
+				<module>NCPCompatCB2922</module>
+				<module>NCPCompatCB3026</module>
+				<module>NCPCompatCB3043</module>
+				<module>NCPCompatCB3100</module>
+				<module>NCPCompatSpigotCB1_8_R1</module>
+				<module>NCPCompatSpigotCB1_8_R2</module>
+				<module>NCPCompatSpigotCB1_8_R3</module>
+				<module>NCPCompatCBDev</module>
+				<!-- Non minimal above. -->
+				<module>NCPCompatProtocolLib</module>
+				<module>NCPCompatGlowstone</module>
+				<module>NCPPlugin</module>
+				<module>NoCheatPlus</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>minimal</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>NCPBuildBase</module>
+				<module>NCPCommons</module>
+				<module>NCPCore</module>
+				<module>NCPCompatBukkit</module>
+				<module>NCPCompatProtocolLib</module>
+				<module>NCPCompatGlowstone</module>
+				<module>NCPPlugin</module>
+				<module>NoCheatPlus</module>
+			</modules>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>bukkit</id>
+			<url>http://repo.bukkit.org/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>md_5-releases</id>
+			<url>http://repo.md-5.net/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>md_5-snapshots</id>
+			<url>http://repo.md-5.net/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+
+	<description>The initial pom design had been taken from mbax (GitHub).
 
 The naming of the native compatibility modules mostly follows NCPCompat + shortcut of server mod name + earliest build/version that the module would run with (though it should be compiled with the latest available build rather, latest build also can be used, if it is the first module depicting an API incompatibility transition).
 
@@ -64,16 +97,16 @@ NCPCompatBukkit provides compatibility for the Bukkit-API only (no native module
 
 TODO: Better place for descriptions like this?</description>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-            <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
