@@ -53,7 +53,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     @Override
     public String getMCVersion() {
         // Potentially all :p.
-        return "1.4.5-1.8.6|?";
+        return "1.4.5-1.8.8|?";
     }
 
     @Override
