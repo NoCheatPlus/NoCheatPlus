@@ -30,10 +30,9 @@
 
   <description>Compatibility for the development version (latest of the supported Minecraft versions).
 
-To add a new compat module three other pom.xml files have to be modified:
+To add a new compat module two other pom.xml files have to be modified:
 - Root pom (parent): Add as module.
 - NCPPlugin: Add as dependency.
-- NoCheatPlus: Add as include (source).
 
 The NCPPlugin sub-project contains the MCAccessFactory.</description>
 

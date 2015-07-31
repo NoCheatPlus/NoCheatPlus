@@ -76,32 +76,13 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>fr.neatmonster:ncpbuildbase</include>
-                  <include>fr.neatmonster:ncpcommons</include>
-                  <include>fr.neatmonster:ncpcore</include>
-                  <include>fr.neatmonster:ncpcompatbukkit</include>
-                  <include>fr.neatmonster:ncpcompatcb2512</include>
-                  <include>fr.neatmonster:ncpcompatcb2545</include>
-                  <include>fr.neatmonster:ncpcompatcb2602</include>
-                  <include>fr.neatmonster:ncpcompatcb2645</include>
-                  <include>fr.neatmonster:ncpcompatcb2691</include>
-                  <include>fr.neatmonster:ncpcompatcb2763</include>
-                  <include>fr.neatmonster:ncpcompatcb2794</include>
-                  <include>fr.neatmonster:ncpcompatcb2808</include>
-                  <include>fr.neatmonster:ncpcompatcb2882</include>
-                  <include>fr.neatmonster:ncpcompatcb2922</include>
-                  <include>fr.neatmonster:ncpcompatcb3026</include>
-                  <include>fr.neatmonster:ncpcompatcb3043</include>
-                  <include>fr.neatmonster:ncpcompatcb3100</include>
-                  <include>fr.neatmonster:ncpcompatspigotcb1_8_r1</include>
-                  <include>fr.neatmonster:ncpcompatspigotcb1_8_r2</include>
-                  <include>fr.neatmonster:ncpcompatspigotcb1_8_r3</include>
-                  <include>fr.neatmonster:ncpcompatcbdev</include>
-                  <include>fr.neatmonster:ncpcompatprotocollib</include>
-                  <include>fr.neatmonster:ncpcompatglowstone</include>
-                  <include>fr.neatmonster:ncpplugin</include>
-<!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
+                  <include>fr.neatmonster:*</include>
                 </includes>
+                <!-- Clearly not sure about excludes... -->
+                <excludes>
+                  <exclude>fr.neatmonster:nocheatplus-parent</exclude>
+                  <exclude>fr.neatmonster:nocheatplus</exclude>
+                </excludes>
               </artifactSet>
             </configuration>
           </execution>
