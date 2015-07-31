@@ -1,52 +1,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatprotocollib</artifactId>
-  <packaging>jar</packaging>
-  <name>NCPCompatProtocolLib</name>
-  <version>1.1-SNAPSHOT</version>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.neatmonster</groupId>
+	<artifactId>ncpcompatprotocollib</artifactId>
+	<packaging>jar</packaging>
+	<name>NCPCompatProtocolLib</name>
+	<version>1.1-SNAPSHOT</version>
 
-  <parent>
-    <groupId>fr.neatmonster</groupId>
-    <artifactId>nocheatplus-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
-  </parent>
-  
-  <repositories>
-  <repository>
-    <id>comphenix-rep</id>
-    <name>Comphenix Repository</name>
-    <url>http://repo.comphenix.net/content/groups/public</url>
-  </repository>
-  </repositories>
+	<parent>
+		<groupId>fr.neatmonster</groupId>
+		<artifactId>nocheatplus-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
 
-  <dependencies>
-    <dependency>
-    	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcore</artifactId>
-    	<version>1.1-SNAPSHOT</version>
-    </dependency>
-	<dependency>
-	  <groupId>com.comphenix.protocol</groupId>
-	  <artifactId>ProtocolLib</artifactId>
-	  <version>LATEST</version>
-	</dependency>
-  </dependencies>
+	<repositories>
+		<repository>
+			<id>comphenix-rep</id>
+			<name>Comphenix Repository</name>
+			<url>http://repo.comphenix.net/content/groups/public</url>
+		</repository>
+	</repositories>
 
-  <description>Features using the plugin ProtocolLib:
+	<dependencies>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcore</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.comphenix.protocol</groupId>
+			<artifactId>ProtocolLib</artifactId>
+			<version>LATEST</version>
+		</dependency>
+	</dependencies>
+
+	<description>Features using the plugin ProtocolLib:
 http://dev.bukkit.org/bukkit-plugins/protocollib/</description>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-            <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
