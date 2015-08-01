@@ -661,8 +661,7 @@ public class PlayerLocation {
      * @return
      */
     public boolean isHeadObstructed(double marginAboveHeight) {
-        // TODO: Use collides instead (rather relevant with half slabs placed on the top side)?
-        return BlockProperties.hasAnyFlags(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+        return BlockProperties.collides(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
     }
 
     /**

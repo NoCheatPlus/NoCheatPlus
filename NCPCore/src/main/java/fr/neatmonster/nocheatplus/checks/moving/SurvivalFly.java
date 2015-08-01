@@ -906,7 +906,8 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        if (!from.isHeadObstructed(0.25) && !to.isHeadObstructed(0.25)) {
+                        final double headBumpMargin = Math.max(0.0, 2.0 - from.getEyeHeight()) + from.getyOnGround();
+                        if (!from.isHeadObstructed(headBumpMargin) && !to.isHeadObstructed(headBumpMargin)) {
                             tags.add("lowjump");
                             data.sfLowJump = true;
                         }
@@ -1010,31 +1011,16 @@ public class SurvivalFly extends Check {
         boolean allowHop = true;
         boolean double_bunny = false;
 
+        // TODO: A more state-machine like modeling (hop, slope, states, low-edge).
+
         // Fly phase.
         if (data.sfLastHDist != Double.MAX_VALUE && data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
             // (sfLastHDist may be reset on commands.)
             allowHop = false; // Magic!
-            final int hopTime = bunnyHopMax - data.bunnyhopDelay; 
-
-            // 2x horizontal speed increase detection.
-            if (data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && hopTime == 1) {
-                if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
-                    // TODO: Confine to increasing set back y ?
-                    tags.add(DOUBLE_BUNNY);
-                    allowHop = double_bunny = true;
-                }
-            }
-
-            // Allow hop for special cases.
-            if (!allowHop && !data.sfLowJump && (from.isOnGround() || data.noFallAssumeGround) &&
-                (data.bunnyhopDelay <= 6 || from.isHeadObstructed(0.25) || to.isHeadObstructed(0.25))) {
-                // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
-                tags.add("ediblebunny");
-                allowHop = true;
-            }
+            final int hopTime = bunnyHopMax - data.bunnyhopDelay;
 
             // Increase buffer if hDistance is decreasing properly.
-            if (!allowHop && data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > hDistance) {
+            if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > hDistance) {
                 final double hDistDiff = data.sfLastHDist - hDistance;
 
                 // Bunny slope (downwards, directly after hop but before friction).
@@ -1045,8 +1031,6 @@ public class SurvivalFly extends Check {
                         hDistanceAboveLimit = 0.0;
                     }
                 }
-
-                // TODO: Cleanup / remove some redundant conditions / model hop + antihop by an extra property:).
                 else if (
                         hDistDiff >= data.sfLastHDist / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 33.3 || 
                         hDistDiff >= (hDistance - hAllowedDistance) * (1.0 - SurvivalFly.FRICTION_MEDIUM_AIR)
@@ -1073,16 +1057,35 @@ public class SurvivalFly extends Check {
                     //}
                 }
             }
+
+            // 2x horizontal speed increase detection.
+            if (!allowHop && data.sfLastHDist != Double.MAX_VALUE && hDistance - data.sfLastHDist >= walkSpeed * 0.5 && hopTime == 1) {
+                if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
+                    // TODO: Confine to increasing set back y ?
+                    tags.add(DOUBLE_BUNNY);
+                    allowHop = double_bunny = true;
+                }
+            }
+
+            // Allow hop for special cases.
+            if (!allowHop && (from.isOnGround() || data.noFallAssumeGround)) {
+                final double headBumpMargin = Math.max(0.0, 2.0 - from.getEyeHeight()) + from.getyOnGround();
+                if (data.bunnyhopDelay <= 6 || from.isHeadObstructed(headBumpMargin) || to.isHeadObstructed(headBumpMargin)) {
+                    // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
+                    tags.add("ediblebunny");
+                    allowHop = true;
+                }
+            }
         }
 
         // Check hop (singular peak up to roughly two times the allowed distance).
+        // TODO: Needs better modeling.
         if (allowHop && hDistance >= walkSpeed && 
-                hDistance > 1.314 * hAllowedDistance && hDistance < 2.15 * hAllowedDistance ||
-                data.sfLastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
+                hDistance > 1.314 * hAllowedDistance && hDistance < 2.15 * hAllowedDistance
+                || (yDistance > from.getyOnGround() || hDistance < 2.6 * walkSpeed) && data.sfLastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
-            tags.add("bunnyenv");
             if (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
                     && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
                     && !from.isResetCond() && !to.isResetCond()
@@ -1094,6 +1097,9 @@ public class SurvivalFly extends Check {
                 data.bunnyhopDelay = bunnyHopMax;
                 hDistanceAboveLimit = 0D;
                 tags.add("bunnyhop");
+            }
+            else {
+                tags.add("bunnyenv");
             }
         }
 
