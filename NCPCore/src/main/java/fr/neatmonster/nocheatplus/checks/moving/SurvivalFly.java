@@ -894,7 +894,7 @@ public class SurvivalFly extends Check {
             // Detect low jumping.
             // TODO: sfDirty: Account for actual velocity (demands consuming queued for dir-change(!))!
             if (!data.sfNoLowJump && data.mediumLiftOff == MediumLiftOff.GROUND && !data.isVelocityJumpPhase()) {
-                final double setBackYDistance = to.getY() - data.getSetBackY();
+                final double setBackYDistance = from.getY() - data.getSetBackY();
                 if (setBackYDistance > 0.0) {
                     // Only count it if the player has actually been jumping (higher than setback).
                     final Player player = from.getPlayer();
@@ -906,17 +906,9 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        // TODO: Might provide access methods in PlayerLoction instead.
-                        final double width = Math.round(from.getWidth() * 500.0) / 1000.0;
-                        final double eyeHeight = player.getEyeHeight();
-                        final long aboveFlags = BlockProperties.collectFlagsSimple(from.getBlockCache(), from.getX() - width, from.getY() + eyeHeight, from.getZ() - width, from.getX() + width, from.getY() + eyeHeight + 0.25, from.getZ() + width);
-                        if ((aboveFlags & (BlockProperties.F_GROUND | BlockProperties.F_SOLID)) == 0) {
+                        if (!from.isHeadObstructed(0.25) && !to.isHeadObstructed(0.25)) {
                             tags.add("lowjump");
                             data.sfLowJump = true;
-                        } else if (setBackYDistance < 0.36) {
-                            // TODO: "Exact" parameters.
-                            data.bunnyhopDelay = 0;
-                            tags.add("resetbunny_lowjump");
                         }
                     }
                 }
@@ -1033,9 +1025,10 @@ public class SurvivalFly extends Check {
                 }
             }
 
-            // Not sure :p.
-            if (data.bunnyhopDelay <= 6 && (from.isOnGround() || data.noFallAssumeGround)) {
-                // TODO: Effectively reduces the delay (...).
+            // Allow hop for special cases.
+            if (!allowHop && !data.sfLowJump && (from.isOnGround() || data.noFallAssumeGround) &&
+                (data.bunnyhopDelay <= 6 || from.isHeadObstructed(0.25) || to.isHeadObstructed(0.25))) {
+                // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
                 tags.add("ediblebunny");
                 allowHop = true;
             }
@@ -1085,7 +1078,7 @@ public class SurvivalFly extends Check {
         // Check hop (singular peak up to roughly two times the allowed distance).
         if (allowHop && hDistance >= walkSpeed && 
                 hDistance > 1.314 * hAllowedDistance && hDistance < 2.15 * hAllowedDistance ||
-                data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
+                data.sfLastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?

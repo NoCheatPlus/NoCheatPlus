@@ -32,6 +32,10 @@ public class PlayerLocation {
 
     private double width;
 
+    private double height;
+
+    private double eyeHeight;
+
     /** Bounding box of the player. */
     private double minX, maxX, minY, maxY, minZ, maxZ;
 
@@ -177,6 +181,14 @@ public class PlayerLocation {
 
     public double getWidth() {
         return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getEyeHeight() {
+        return eyeHeight;
     }
 
     public int getBlockX() {
@@ -413,7 +425,7 @@ public class PlayerLocation {
                 return true;
             }
             // Check the block at head height.
-            final int headY = Location.locToBlock(y + player.getEyeHeight());
+            final int headY = Location.locToBlock(y + eyeHeight);
             if (headY > blockY) {
                 for (int cy = blockY + 1; cy <= headY; cy ++) {
                     if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)) {
@@ -642,6 +654,18 @@ public class PlayerLocation {
     }
 
     /**
+     * Test if something solid/ground-like collides within the given margin
+     * above the height of the player.
+     * 
+     * @param marginAboveHeight
+     * @return
+     */
+    public boolean isHeadObstructed(double marginAboveHeight) {
+        // TODO: Use collides instead (rather relevant with half slabs placed on the top side)?
+        return BlockProperties.hasAnyFlags(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+    }
+
+    /**
      * Convenience method for testing for either.
      * @return
      */
@@ -784,12 +808,14 @@ public class PlayerLocation {
 
         // Set bounding box.
         this.width = mcAccess.getWidth(player);
+        this.height = mcAccess.getHeight(player);
+        this.eyeHeight = player.getEyeHeight();
         final double dxz = Math.round(this.width * 500.0) / 1000.0; // this.width / 2; // 0.3;
         minX = x - dxz;
         minY = y;
         minZ = z - dxz;
         maxX = x + dxz;
-        maxY = y + player.getEyeHeight();
+        maxY = y + eyeHeight;
         maxZ = z + dxz;
         // TODO: With current bounding box the stance is never checked.
 
@@ -852,10 +878,10 @@ public class PlayerLocation {
     }
 
     /**
-     * Attempt to check for some exploits (!).
+     * Check absolute coordinates and stance for (typical) exploits.
      * 
      * @return
-     * @deprecated Legacy method.
+     * @deprecated Not used anymore (hasIllegalCoords and hasIllegalStance are used individually instead).
      */
     public boolean isIllegal() {
         if (hasIllegalCoords()) {
