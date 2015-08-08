@@ -131,7 +131,8 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    survivalFlyCobwebHack;
     public final boolean    survivalFlyAccountingH;
     public final boolean    survivalFlyAccountingV;
-    public final boolean    sfFallDamage;
+    public final boolean    sfSetBackPolicyVoid;
+    public final boolean    sfSetBackPolicyFallDamage;
     public final boolean    sfBedStep;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
@@ -229,7 +230,8 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyCobwebHack = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
         survivalFlyAccountingH = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         survivalFlyAccountingV = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
-        sfFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
+        sfSetBackPolicyFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE);
+        sfSetBackPolicyVoid = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID);
         AlmostBoolean bedStep = config.getAlmostBoolean(ConfPaths.MOVING_SURVIVALFLY_BEDSTEP, AlmostBoolean.MAYBE);
         if (bedStep == AlmostBoolean.MAYBE) {
             sfBedStep = ServerVersion.select("1.8", false, true, true, true);

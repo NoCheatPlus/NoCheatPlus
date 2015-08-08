@@ -252,7 +252,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
                 target = LocUtil.clone(loc);
             }
-            if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)) {
+            if (sfCheck && cc.sfSetBackPolicyFallDamage && noFall.isEnabled(player)) {
                 // Check if to deal damage.
                 double y = loc.getY();
                 if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
@@ -586,7 +586,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }
             else{
-                if (checkNf && cc.sfFallDamage) {
+                if (checkNf && cc.sfSetBackPolicyFallDamage) {
                     if (noFall.estimateDamage(player, from.getY(), data) < 1.0) {
                         // TODO: Consider making this / damage amount configurable.
                         mightSkipNoFall = true;

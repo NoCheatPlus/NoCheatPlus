@@ -563,7 +563,9 @@ public abstract class ConfPaths {
     private static final String MOVING_SURVIVALFLY_EXTENDED                 = MOVING_SURVIVALFLY + "extended.";
     public static final String MOVING_SURVIVALFLY_EXTENDED_HACC             = MOVING_SURVIVALFLY_EXTENDED + "horizontal-accounting";
     public static final String MOVING_SURVIVALFLY_EXTENDED_VACC             = MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
-    public static final String MOVING_SURVIVALFLY_FALLDAMAGE                = MOVING_SURVIVALFLY + "falldamage";
+    private static final String MOVING_SURVIVALFLY_SETBACKPOLICY            = MOVING_SURVIVALFLY + "setbackpolicy.";
+    public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE  = MOVING_SURVIVALFLY_SETBACKPOLICY + "falldamage";
+    public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID  = MOVING_SURVIVALFLY_SETBACKPOLICY + "voidtovoid";
     public static final String MOVING_SURVIVALFLY_BEDSTEP                   = MOVING_SURVIVALFLY + "bedstep";
     public static final String MOVING_SURVIVALFLY_VLFREEZE                  = MOVING_SURVIVALFLY + "vlfreeze";
     public static final String MOVING_SURVIVALFLY_ACTIONS                   = MOVING_SURVIVALFLY + "actions";
@@ -650,7 +652,7 @@ public abstract class ConfPaths {
 
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
 
-    // Deprecated (don't use fields from above).
+    // Moved paths.
     @Moved(newPath = LOGGING_BACKEND_CONSOLE_ACTIVE)
     public static final String  LOGGING_CONSOLE                          = "logging.console";
     @Moved(newPath = LOGGING_BACKEND_FILE_ACTIVE)
@@ -685,6 +687,9 @@ public abstract class ConfPaths {
     public static final String  MOVING_CREATIVEFLY_VERTICALSPEED         = "checks.moving.creativefly.verticalspeed";
     @Moved(newPath = MOVING_CREATIVEFLY_MODEL + "creative." + SUB_MAXHEIGHT)
     public static final String  MOVING_CREATIVEFLY_MAXHEIGHT             = "checks.moving.creativefly.maxheight";
+    @Moved(newPath = MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE)
+    public static final String MOVING_SURVIVALFLY_FALLDAMAGE             = "checks.moving.survivalfly.falldamage";
+    // Deprecated paths (just removed).
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
     @Deprecated

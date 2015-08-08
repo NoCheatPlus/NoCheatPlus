@@ -534,6 +534,9 @@ public class SurvivalFly extends Check {
         }
         else {
             data.sfJumpPhase++;
+            if (to.getY() < 0.0 && cc.sfSetBackPolicyVoid) {
+                data.setSetBack(to);
+            }
         }
 
         // Horizontal velocity invalidation.
