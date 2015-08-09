@@ -765,6 +765,10 @@ public class SurvivalFly extends Check {
     private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final MovingData data, final MovingConfig cc) {
         double vDistanceAboveLimit = 0;
 
+        if (data.sfLowJump) {
+            tags.add("lowjump");
+        }
+
         // y direction change detection.
         // TODO: Consider using accounting for y-change detection. <- Nope :).
         final boolean yDirChange = data.sfLastYDist != Double.MAX_VALUE && data.sfLastYDist != yDistance && (yDistance <= 0 && data.sfLastYDist >= 0 || yDistance >= 0 && data.sfLastYDist <= 0 ); 
@@ -889,7 +893,8 @@ public class SurvivalFly extends Check {
             tags.add("ychdec");
             // Detect low jumping.
             // TODO: sfDirty: Account for actual velocity (demands consuming queued for dir-change(!))!
-            if (!data.sfNoLowJump && data.mediumLiftOff == MediumLiftOff.GROUND && !data.isVelocityJumpPhase()) {
+            if (!data.sfLowJump && !data.sfNoLowJump && data.mediumLiftOff == MediumLiftOff.GROUND &&
+                    data.sfLastYDist != Double.MAX_VALUE && data.sfLastYDist > 0.0 && !data.isVelocityJumpPhase()) {
                 final double setBackYDistance = from.getY() - data.getSetBackY();
                 if (setBackYDistance > 0.0) {
                     // Only count it if the player has actually been jumping (higher than setback).
@@ -904,7 +909,7 @@ public class SurvivalFly extends Check {
                         // Low jump, further check if there might have been a reason for low jumping.
                         final double headBumpMargin = Math.max(0.0, 2.0 - from.getEyeHeight()) + from.getyOnGround();
                         if (!from.isHeadObstructed(headBumpMargin) && !to.isHeadObstructed(headBumpMargin)) {
-                            tags.add("lowjump");
+                            tags.add("lowjump_set");
                             data.sfLowJump = true;
                         }
                     }
