@@ -566,7 +566,7 @@ public abstract class ConfPaths {
     private static final String MOVING_SURVIVALFLY_SETBACKPOLICY            = MOVING_SURVIVALFLY + "setbackpolicy.";
     public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE  = MOVING_SURVIVALFLY_SETBACKPOLICY + "falldamage";
     public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID  = MOVING_SURVIVALFLY_SETBACKPOLICY + "voidtovoid";
-    public static final String MOVING_SURVIVALFLY_BEDSTEP                   = MOVING_SURVIVALFLY + "bedstep";
+    public static final String MOVING_SURVIVALFLY_STEPHEIGHT                = MOVING_SURVIVALFLY + "stepheight";
     public static final String MOVING_SURVIVALFLY_VLFREEZE                  = MOVING_SURVIVALFLY + "vlfreeze";
     public static final String MOVING_SURVIVALFLY_ACTIONS                   = MOVING_SURVIVALFLY + "actions";
 
@@ -710,5 +710,7 @@ public abstract class ConfPaths {
     public static final String NET_FLYINGFREQUENCY_MAXPACKETS            = "checks.net.flyingfrequency.maxpackets";
     @Deprecated
     public static final String COMPATIBILITY_BUKKITONLY                  = "compatibility.bukkitapionly";
+    @Deprecated
+    public static final String MOVING_SURVIVALFLY_BEDSTEP                ="checks.moving.survivalfly.bedstep";
 
 }

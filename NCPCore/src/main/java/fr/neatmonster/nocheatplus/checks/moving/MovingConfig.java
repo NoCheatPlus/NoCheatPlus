@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -133,7 +134,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    survivalFlyAccountingV;
     public final boolean    sfSetBackPolicyVoid;
     public final boolean    sfSetBackPolicyFallDamage;
-    public final boolean    sfBedStep;
+    public final double     sfStepHeight;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
 
@@ -232,11 +233,18 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyAccountingV = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         sfSetBackPolicyFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE);
         sfSetBackPolicyVoid = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID);
-        AlmostBoolean bedStep = config.getAlmostBoolean(ConfPaths.MOVING_SURVIVALFLY_BEDSTEP, AlmostBoolean.MAYBE);
-        if (bedStep == AlmostBoolean.MAYBE) {
-            sfBedStep = ServerVersion.select("1.8", false, true, true, true);
+        final double sfStepHeight = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_STEPHEIGHT, Double.MAX_VALUE);
+        if (sfStepHeight == Double.MAX_VALUE) {
+            final String ref;
+            if (Bukkit.getVersion().toLowerCase().indexOf("spigot") != -1) {
+                // Assume 1.8 clients being supported.
+                ref = "1.7.10";
+            } else {
+                ref = "1.8";
+            }
+            this.sfStepHeight = ServerVersion.select(ref, 0.5, 0.6, 0.6, 0.5).doubleValue();
         } else {
-            sfBedStep = bedStep.decide();
+            this.sfStepHeight = sfStepHeight;
         }
         survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
