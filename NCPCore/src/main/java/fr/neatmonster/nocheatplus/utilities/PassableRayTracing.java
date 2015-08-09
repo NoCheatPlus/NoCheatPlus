@@ -67,7 +67,7 @@ public class PassableRayTracing extends RayTracing{
     @Override
     protected boolean step(final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dT, final boolean isPrimary) {
         // Just delegate.
-        if (step == 1 && ignorefirst){
+        if (isPrimary && step == 1 && ignorefirst){
             return true;
         }
         if (BlockProperties.isPassableRay(blockCache, blockX, blockY, blockZ, oX, oY, oZ, dX, dY, dZ, dT)){
