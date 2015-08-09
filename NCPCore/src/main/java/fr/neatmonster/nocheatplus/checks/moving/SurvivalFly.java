@@ -1276,8 +1276,8 @@ public class SurvivalFly extends Check {
         final double setBackYDistance = to.getY() - data.getSetBackY();
 
         // Half block step up.
-        if (yDistance <= (sprinting ? 0.594 : 0.5) && hDistance < 0.5 && setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
-            if (data.sfLastYDist < 0.0 || yDistance <= 0.5 && from.isOnGround(0.5 - Math.abs(yDistance))) {
+        if (yDistance <= cc.sfStepHeight && hDistance < 0.5 && setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
+            if (data.sfLastYDist < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
                 return applyLostGround(player, from, true, data, "step");
             }
         }
@@ -1287,6 +1287,9 @@ public class SurvivalFly extends Check {
         // TODO: Check if the set-back distance still has relevance.
         // TODO: Check use of jump-amplifier.
         // TODO: Might check fall distance.
+        
+        // TODO: Consider hDistance decrease demanded ?
+        
         //  && data.sfJumpPhase > 3 <- Seems to be a problem with cake on a block + jump over both mini edges (...).
         if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0.0 && !to.isOnGround()) {
             // TODO: Check if last-y-dist or sprinting should be considered.
