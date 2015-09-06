@@ -51,11 +51,10 @@ public class FlyingFrequency extends BaseAdapter {
         // PacketPlayInFlying[3, legacy: 10]
         super(plugin, ListenerPriority.LOW, new PacketType[] {
                 PacketType.Play.Client.FLYING,
-                // TODO: What with the other packets (specifically on player-join, compare PlayerMoveEvent)?
-//                PacketType.Play.Client.LOOK,
-//                PacketType.Play.Client.POSITION,
-//                PacketType.Play.Client.POSITION_LOOK
-                });
+                PacketType.Play.Client.LOOK,
+                PacketType.Play.Client.POSITION,
+                PacketType.Play.Client.POSITION_LOOK
+        });
     }
 
     @Override
@@ -78,7 +77,7 @@ public class FlyingFrequency extends BaseAdapter {
 
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time; // Update without much of a contract.
-        
+
         // Counting all packets.
         // TODO: Consider using the NetStatic check.
         data.flyingFrequencyAll.add(time, 1f);
