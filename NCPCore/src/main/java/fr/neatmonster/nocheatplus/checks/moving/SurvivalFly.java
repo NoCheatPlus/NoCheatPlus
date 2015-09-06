@@ -1270,52 +1270,29 @@ public class SurvivalFly extends Check {
      * @return
      */
     private boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
-        // TODO: re-organize for faster exclusions (hDistance, yDistance).
-        // TODO: more strict conditions ?
-
         final double setBackYDistance = to.getY() - data.getSetBackY();
-
-        // Half block step up.
-        if (yDistance <= cc.sfStepHeight && hDistance < 0.5 && setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
-            if (data.sfLastYDist < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
-                return applyLostGround(player, from, true, data, "step");
+        // Step height related.
+        // TODO: Combine / refine preconditions for step height related.
+        // TODO: || yDistance <= jump estimate? 
+        if (yDistance <= cc.sfStepHeight) {
+            // Half block step up (definitive).
+            // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
+            if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
+                if (data.sfLastYDist < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
+                    return applyLostGround(player, from, true, data, "step");
+                }
             }
-        }
-
-        // Interpolation check.
-        // (Still needed, unless a faster workaround is found.)
-        // TODO: Check if the set-back distance still has relevance.
-        // TODO: Check use of jump-amplifier.
-        // TODO: Might check fall distance.
-        
-        // TODO: Consider hDistance decrease demanded ?
-        
-        //  && data.sfJumpPhase > 3 <- Seems to be a problem with cake on a block + jump over both mini edges (...).
-        if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0.0 && !to.isOnGround()) {
-            // TODO: Check if last-y-dist or sprinting should be considered.
-            if (setBackYDistance > 0.0 && setBackYDistance <= Math.max(0.0, 1.5D + 0.2 * data.jumpAmplifier) || setBackYDistance < 0.0 && Math.abs(setBackYDistance) < 3.0) {
-                // Interpolate from last to-coordinates to the from
-                // coordinates (with some safe-guard).
-                final double dX = from.getX() - data.fromX;
-                final double dY = from.getY() - data.fromY;
-                final double dZ = from.getZ() - data.fromZ;
-                if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
-                    // TODO: adjust limit according to ... speed etc ?
-                    // Check full bounding box since last from.
-                    final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-                    final double iY = minY; // TODO ...
-                    final double r = Math.round(from.getWidth() * 500.0) / 1000.0 / 2.0; // TODO: check + 0.35;
-                    double yMargin = cc.yOnGround;
-                    // TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
-                    // TODO: check with iY + 0.25 removed.
-                    // TODO: Slime blocks ?
-                    if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
-                        return applyLostGround(player, from, true, data, "interpolate");
-                    }
+            // Could step up (but does something else, potentially).
+            if (data.sfLastYDist < 0.0) { // TODO: <= ?
+                // TODO: Possibly confine margin depending on side, moving direction (see client code).
+                // TODO: Consider player.getLocation too (!).
+                final double xzMargin = 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0;
+                if (BlockProperties.isOnGround(to.getBlockCache(), Math.min(from.getX(), to.getX()) - xzMargin, Math.min(to.getY(), from.getY() + cc.sfStepHeight) - to.getyOnGround(), Math.min(from.getZ(), to.getZ()) - xzMargin, 
+                        Math.max(from.getX(), to.getX()) + xzMargin, Math.max(to.getY(), from.getY() + cc.sfStepHeight), Math.max(from.getZ(), to.getZ()) + xzMargin)) {
+                    return applyLostGround(player, from, false, data, "couldstep");
                 }
             }
         }
-
         // Nothing found.
         return false;
     }

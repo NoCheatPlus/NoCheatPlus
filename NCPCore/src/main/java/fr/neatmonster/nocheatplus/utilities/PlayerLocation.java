@@ -30,6 +30,7 @@ public class PlayerLocation {
 
     private float yaw, pitch;
 
+    /** Full bounding box width. */
     private double width;
 
     private double height;
