@@ -551,6 +551,8 @@ public class SurvivalFly extends Check {
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
+        data.sfLastAllowBunny = data.sfThisAllowBunny;
+        data.sfThisAllowBunny = false;
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);
         }
@@ -1088,7 +1090,8 @@ public class SurvivalFly extends Check {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
             if (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
-                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
+                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround
+                    || data.sfLastAllowBunny) // TODO: Should probably still confine y-dist to set-back.
                     && !from.isResetCond() && !to.isResetCond()
                     || double_bunny
                     ) {
@@ -1335,6 +1338,7 @@ public class SurvivalFly extends Check {
                 // TODO: confine by block types ?
                 if (from.isOnGround(0.25, 0.4, 0, 0L) ) {
                     // Temporary "fix".
+                    data.sfThisAllowBunny = true;
                     return applyLostGround(player, from, true, data, "ministep");
                 }
             }

@@ -195,6 +195,8 @@ public class MovingData extends ACheckData {
      */
     public double		sfLastYDist = Double.MAX_VALUE;
     public double		sfLastHDist = Double.MAX_VALUE;
+    public boolean      sfLastAllowBunny = false;
+    public boolean      sfThisAllowBunny = false;
     /** Counting while the player is not on ground and not moving. A value <0 means not hovering at all. */
     public int 			sfHoverTicks = -1;
     /** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
@@ -252,6 +254,7 @@ public class MovingData extends ACheckData {
         mediumLiftOff = defaultMediumLiftOff;
         vehicleConsistency = MoveConsistency.INCONSISTENT;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        sfLastAllowBunny = sfThisAllowBunny = false;
     }
 
     /**
@@ -285,6 +288,7 @@ public class MovingData extends ACheckData {
         removeAllVelocity();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        sfLastAllowBunny = sfThisAllowBunny = false;
     }
 
     /**
