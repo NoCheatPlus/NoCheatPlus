@@ -2373,6 +2373,24 @@ public class BlockProperties {
     }
 
     /**
+     * Like isOnGround, just with minimum and maximum coordinates in arbitrary order.
+     * @param access
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param xzMargin Subtracted from minima and added to maxima.
+     * @param yBelow Subtracted from the minimum of y.
+     * @param yAbove Added to the maximum of y.
+     * @return
+     */
+    public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove) {
+        return isOnGroundShuffled(access, x1, y1, z1, x2, y2, z2, xzMargin, yBelow, yAbove, 0L);
+    }
+
+    /**
      * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
      * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
      * @param access
@@ -2386,6 +2404,25 @@ public class BlockProperties {
      */
     public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
         return isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 0L);
+    }
+
+    /**
+     * Like isOnGround, just with minimum and maximum coordinates in arbitrary order.
+     * @param access
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param xzMargin Subtracted from minima and added to maxima.
+     * @param yBelow Subtracted from the minimum of y.
+     * @param yAbove Added to the maximum of y.
+     * @param ignoreFlags
+     * @return
+     */
+    public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove, final long ignoreFlags) {
+        return isOnGround(access, Math.min(x1, x2) - xzMargin, Math.min(y1, y2) - yBelow, Math.min(z1, z2) - xzMargin, Math.max(x1, x2) + xzMargin, Math.max(y1, y2) + yAbove, Math.max(z1, z2) + xzMargin, ignoreFlags);
     }
 
     /**

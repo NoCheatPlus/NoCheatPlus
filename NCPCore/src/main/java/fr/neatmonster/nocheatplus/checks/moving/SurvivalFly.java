@@ -1277,7 +1277,7 @@ public class SurvivalFly extends Check {
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
         // TODO: || yDistance <= jump estimate? 
-        if (yDistance <= cc.sfStepHeight) {
+        if (yDistance <= cc.sfStepHeight && hDistance <= 1.5) { // hDistance is arbitrary, just to confine.
             // Half block step up (definitive).
             // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
             if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
@@ -1285,14 +1285,20 @@ public class SurvivalFly extends Check {
                     return applyLostGround(player, from, true, data, "step");
                 }
             }
-            // Could step up (but does something else, potentially).
+            // Could step up (but might move to another direction, potentially).
             if (data.sfLastYDist < 0.0) { // TODO: <= ?
+                // Generic could step.
                 // TODO: Possibly confine margin depending on side, moving direction (see client code).
                 // TODO: Consider player.getLocation too (!).
-                final double xzMargin = 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0;
-                if (BlockProperties.isOnGround(to.getBlockCache(), Math.min(from.getX(), to.getX()) - xzMargin, Math.min(to.getY(), from.getY() + cc.sfStepHeight) - to.getyOnGround(), Math.min(from.getZ(), to.getZ()) - xzMargin, 
-                        Math.max(from.getX(), to.getX()) + xzMargin, Math.max(to.getY(), from.getY() + cc.sfStepHeight), Math.max(from.getZ(), to.getZ()) + xzMargin)) {
+                if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
                     return applyLostGround(player, from, false, data, "couldstep");
+                }
+                // Close by ground miss.
+                // TODO: Confine to the part in direction of last from?
+                // TODO: Confine by fall distance ?
+                // TODO: Confine by other envelope (always bunny?).
+                if (!to.isOnGround() && from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
+                    return applyLostGround(player, from, false, data, "edgeasc");
                 }
             }
         }
@@ -1344,13 +1350,13 @@ public class SurvivalFly extends Check {
             }
         }
         // Lost ground while falling onto/over edges of blocks.
-        if (yDistance < 0 && hDistance <= 0.5 && data.sfLastYDist < 0.0 && yDistance > data.sfLastYDist && !to.isOnGround()) {
+        if (yDistance < 0 && hDistance <= 1.5 && data.sfLastYDist < 0.0 && yDistance > data.sfLastYDist && !to.isOnGround()) {
             // TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
             // TODO: yDistance <= 0 might be better.
             // Also clear accounting data.
             //			if (to.isOnGround(0.5) || from.isOnGround(0.5)) {
             if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))) {
-                return applyLostGround(player, from, true, data, "edge");
+                return applyLostGround(player, from, true, data, "edgedesc");
             }
         }
 
@@ -1393,18 +1399,18 @@ public class SurvivalFly extends Check {
     /**
      * Apply lost-ground workaround, 
      * @param player
-     * @param from
+     * @param refLoc
      * @param setBackSafe If to use from as set-back (if set to false: currently nothing changed).
      * @param data
      * @param tag Tag extra to "lostground"
      * @return Always true.
      */
-    private boolean applyLostGround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data, final String tag) {
+    private boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MovingData data, final String tag) {
         // Set the new setBack and reset the jumpPhase.
         // TODO: Some interpolated position ?
         // TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
         if (setBackSafe) {
-            data.setSetBack(from);
+            data.setSetBack(refLoc);
         }
         else {
             // Keep Set-back.
