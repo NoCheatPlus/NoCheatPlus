@@ -1293,12 +1293,47 @@ public class SurvivalFly extends Check {
                 if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
                     return applyLostGround(player, from, false, data, "couldstep");
                 }
-                // Close by ground miss.
-                // TODO: Confine to the part in direction of last from?
-                // TODO: Confine by fall distance ?
-                // TODO: Confine by other envelope (always bunny?).
-                if (!to.isOnGround() && from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
-                    return applyLostGround(player, from, false, data, "edgeasc");
+                // Close by ground miss (client side blocks y move, but allows h move fully/mostly, missing the edge on server side).
+                // Possibly confine by more criteria.
+                if (!to.isOnGround()) { // TODO: Note, that there may be cases with to on ground (!).
+                    if (data.fromX != Double.MAX_VALUE && data.sfLastHDist != Double.MAX_VALUE && data.sfLastYDist != Double.MAX_VALUE) {
+                        // (Use covered area to last from.)
+                        // TODO: Plausible: last to is about this from?
+                        // TODO: Otherwise cap max. amount (seems not really possible, could confine by passable checking).
+                        // TODO: Might estimate by the yDist from before last from (cap x2 and y2).
+                        // TODO: A ray-tracing version of isOnground?
+                        final double x1 = from.getX();
+                        final double y1 = from.getY();
+                        final double z1 = from.getZ();
+                        // First: calculate vector towards last from.
+                        double x2 = data.fromX - x1;
+                        double z2 = data.fromZ - z1;
+                        // double y2 = data.fromY - y1; // Just for consistency checks (sfLastYDist).
+                        // Second: cap the size of the extra box (at least horizontal).
+                        double fMin = 1.0; // Factor for capping.
+                        if (Math.abs(x2) > data.sfLastHDist) {
+                            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(x2));
+                        }
+                        if (Math.abs(z2) > data.sfLastHDist) {
+                            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(z2));
+                        }
+                        // TODO: Further / more precise ?
+                        // Third: calculate end points.
+                        x2 += x1;
+                        z2 += z1;
+                        // Finally test for ground.
+                        final double xzMargin = Math.round(from.getWidth() * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
+                        // (We don't add another xz-margin here, as the move should cover ground.)
+                        if (BlockProperties.isOnGroundShuffled(from.getBlockCache(), x1, y1, z1, x2, y1, z2, xzMargin, from.getyOnGround(), 0.0)) {
+                            data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
+                            return applyLostGround(player, from, false, data, "edgeasc1"); // Maybe true ?
+                        }
+                    }
+                    else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
+                        // (Minimal margin.)
+                        data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
+                        return applyLostGround(player, from, false, data, "edgeasc2"); // Maybe true ?
+                    }
                 }
             }
         }
