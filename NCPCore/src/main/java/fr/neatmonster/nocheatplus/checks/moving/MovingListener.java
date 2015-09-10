@@ -433,8 +433,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
 
-        // The players location.
-        final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
+
 
         // Check for location consistency.
         if (cc.enforceLocation && playersEnforce.contains(playerName)) {
@@ -495,18 +494,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.removeInvalidVelocity(tick - cc.velocityActivationTicks);
         data.velocityTick();
 
-        // Check passable first to prevent set-back override.
-        // TODO: Redesign to set set-backs later (queue + invalidate).
-        boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
-        if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
-            // Passable is checked first to get the original set-back locations from the other checks, if needed. 
-            newTo = passable.check(player, loc, pFrom, pTo, data, cc);
-            if (newTo != null) {
-                // Check if to skip the nofall check.
-                mightSkipNoFall = true;
-            }
-        }
-
         // Check which fly check to use.
         final boolean checkCf;
         final boolean checkSf;
@@ -541,6 +528,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
 
+        // The players location.
+        final Location loc = (cc.passableCheck || checkNf || checkSf) ? player.getLocation(moveInfo.useLoc) : null;
+
+        // Check passable first to prevent set-back override.
+        // TODO: Redesign to set set-backs later (queue + invalidate).
+        boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
+        if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+            // Passable is checked first to get the original set-back locations from the other checks, if needed. 
+            newTo = passable.check(player, loc, pFrom, pTo, data, cc);
+            if (newTo != null) {
+                // Check if to skip the nofall check.
+                mightSkipNoFall = true;
+            }
+        }
+
         // Flying checks.
         if (checkSf) {
             // SurvivalFly
@@ -563,7 +565,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, loc, pTo, isSamePos, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {

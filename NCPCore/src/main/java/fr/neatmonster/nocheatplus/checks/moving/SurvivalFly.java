@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
@@ -18,6 +19,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -105,7 +107,7 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
 
         // Calculate some distances.
@@ -211,7 +213,7 @@ public class SurvivalFly extends Check {
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
             // Check lost-ground workarounds.
-            resetFrom = lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc);
+            resetFrom = lostGround(player, from, loc, to, hDistance, yDistance, sprinting, data, cc);
             // Note: if not setting resetFrom, other places have to check assumeGround...
         }
 
@@ -728,16 +730,16 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return If touching the ground was lost.
      */
-    private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
-        // TODO: Confine by max y distance and max/min xz-distance?
+    private boolean lostGround(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+        // TODO: Regroup with appropriate conditions (toOnGround first?).
         // TODO: Some workarounds allow step height (0.6 on MC 1.8).
-        if (yDistance >= -0.5 && yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.174)) {
+        if (yDistance >= -0.5 && yDistance <= Math.max(cc.sfStepHeight, MovingUtil.estimateJumpLiftOff(player, data, 0.174))) {
             // "Mild" Ascending / descending.
-            // Stairs.
-            // TODO: More safety guards.
-            if (yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.1)  && from.isAboveStairs()) {
-                applyLostGround(player, from, true, data, "stairs");
-                return true;
+            //Ascending
+            if (yDistance >= 0) {
+                if (lostGroundAscend(player, from, loc, to, hDistance, yDistance, sprinting, data, cc)) {
+                    return true;
+                }
             }
             // Descending.
             if (yDistance <= 0) {
@@ -745,11 +747,11 @@ public class SurvivalFly extends Check {
                     return true;	
                 }
             }
-            //Ascending
-            if (yDistance >= 0) {
-                if (lostGroundAscend(player, from, to, hDistance, yDistance, sprinting, data, cc)) {
-                    return true;
-                }
+            // Stairs.
+            // TODO: Stairs should be obsolete by now.
+            if (yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.1)  && from.isAboveStairs()) {
+                applyLostGround(player, from, true, data, "stairs");
+                return true;
             }
         }
         else if (yDistance < -0.5) {
@@ -1093,7 +1095,7 @@ public class SurvivalFly extends Check {
         // TODO: Needs better modeling.
         if (allowHop && hDistance >= walkSpeed && 
                 (hDistance > (((data.sfLastHDist == Double.MAX_VALUE || data.sfLastHDist == 0.0 && data.sfLastYDist == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
-                    && hDistance < 2.15 * hAllowedDistance
+                && hDistance < 2.15 * hAllowedDistance
                 || (yDistance > from.getyOnGround() || hDistance < 2.6 * walkSpeed) && data.sfLastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
@@ -1272,6 +1274,7 @@ public class SurvivalFly extends Check {
      * This is for ascending only (yDistance >= 0).
      * @param player
      * @param from
+     * @param loc 
      * @param to
      * @param hDistance
      * @param yDistance
@@ -1280,7 +1283,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGroundAscend(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         final double setBackYDistance = to.getY() - data.getSetBackY();
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
@@ -1311,33 +1314,16 @@ public class SurvivalFly extends Check {
                         // TODO: Otherwise cap max. amount (seems not really possible, could confine by passable checking).
                         // TODO: Might estimate by the yDist from before last from (cap x2 and y2).
                         // TODO: A ray-tracing version of isOnground?
-                        final double x1 = from.getX();
-                        final double y1 = from.getY();
-                        final double z1 = from.getZ();
-                        // First: calculate vector towards last from.
-                        double x2 = data.fromX - x1;
-                        double z2 = data.fromZ - z1;
-                        // double y2 = data.fromY - y1; // Just for consistency checks (sfLastYDist).
-                        // Second: cap the size of the extra box (at least horizontal).
-                        double fMin = 1.0; // Factor for capping.
-                        if (Math.abs(x2) > data.sfLastHDist) {
-                            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(x2));
+                        if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), from.getX(), from.getY(), from.getZ(), from.getWidth(), from.getyOnGround(), data, "asc1")) {
+                            return true;
                         }
-                        if (Math.abs(z2) > data.sfLastHDist) {
-                            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(z2));
+                        // Micro-moves.
+                        if (!from.isSamePos(loc)) {
+                            // Re-check with loc instead of from.
+                            // TODO: These belong checked as extra moves. The untracked nature of this means potential exploits. 
+                            return lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), loc.getX(), loc.getY(), loc.getZ(), from.getWidth(), from.getyOnGround(), data, "asc3");
                         }
-                        // TODO: Further / more precise ?
-                        // Third: calculate end points.
-                        x2 = fMin * x2 + x1;
-                        z2 = fMin * z2 + z1;
-                        // Finally test for ground.
-                        final double xzMargin = Math.round(from.getWidth() * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
-                        // (We don't add another xz-margin here, as the move should cover ground.)
-                        if (BlockProperties.isOnGroundShuffled(from.getBlockCache(), x1, y1, z1, x2, y1, z2, xzMargin, from.getyOnGround(), 0.0)) {
-                            //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
-                            // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
-                            return applyLostGround(player, new Location(from.getWorld(), data.fromX, data.fromY, data.fromZ), true, data, "edgeasc1"); // Maybe true ?
-                        }
+
                     }
                     else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
                         // (Minimal margin.)
@@ -1349,6 +1335,49 @@ public class SurvivalFly extends Check {
         }
         // Nothing found.
         return false;
+    }
+
+    /**
+     * Vertical collision with ground on client side, shifting over an edge with the horizontal move.
+     * @param player
+     * @param blockCache
+     * @param world
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param width
+     * @param yOnGround
+     * @param data
+     * @param tag
+     * @return
+     */
+    private final boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MovingData data, final String tag) {
+        // First: calculate vector towards last from.
+        double x2 = data.fromX - x1;
+        double z2 = data.fromZ - z1;
+        // double y2 = data.fromY - y1; // Just for consistency checks (sfLastYDist).
+        // Second: cap the size of the extra box (at least horizontal).
+        double fMin = 1.0; // Factor for capping.
+        if (Math.abs(x2) > data.sfLastHDist) {
+            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(x2));
+        }
+        if (Math.abs(z2) > data.sfLastHDist) {
+            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(z2));
+        }
+        // TODO: Further / more precise ?
+        // Third: calculate end points.
+        x2 = fMin * x2 + x1;
+        z2 = fMin * z2 + z1;
+        // Finally test for ground.
+        final double xzMargin = Math.round(width * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
+        // (We don't add another xz-margin here, as the move should cover ground.)
+        if (BlockProperties.isOnGroundShuffled(blockCache, x1, y1, z1, x2, y1, z2, xzMargin, yOnGround, 0.0)) {
+            //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
+            // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
+            return applyLostGround(player, new Location(world, data.fromX, data.fromY, data.fromZ), true, data, "edge" + tag); // Maybe true ?
+        } else {
+            return false;
+        }
     }
 
     /**
