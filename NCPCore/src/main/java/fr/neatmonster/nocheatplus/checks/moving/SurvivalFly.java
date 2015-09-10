@@ -551,8 +551,6 @@ public class SurvivalFly extends Check {
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
-        data.sfLastAllowBunny = data.sfThisAllowBunny;
-        data.sfThisAllowBunny = false;
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);
         }
@@ -1090,8 +1088,7 @@ public class SurvivalFly extends Check {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
             if (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
-                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround
-                    || data.sfLastAllowBunny) // TODO: Should probably still confine y-dist to set-back.
+                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
                     && !from.isResetCond() && !to.isResetCond()
                     || double_bunny
                     ) {
@@ -1291,6 +1288,7 @@ public class SurvivalFly extends Check {
                 // TODO: Possibly confine margin depending on side, moving direction (see client code).
                 // TODO: Consider player.getLocation too (!).
                 if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
+                    // TODO: Set a data property, so vdist does not trigger (currently: scan for tag)
                     return applyLostGround(player, from, false, data, "couldstep");
                 }
                 // Close by ground miss (client side blocks y move, but allows h move fully/mostly, missing the edge on server side).
@@ -1325,13 +1323,14 @@ public class SurvivalFly extends Check {
                         final double xzMargin = Math.round(from.getWidth() * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
                         // (We don't add another xz-margin here, as the move should cover ground.)
                         if (BlockProperties.isOnGroundShuffled(from.getBlockCache(), x1, y1, z1, x2, y1, z2, xzMargin, from.getyOnGround(), 0.0)) {
-                            data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
-                            return applyLostGround(player, from, false, data, "edgeasc1"); // Maybe true ?
+                            //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
+                            // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
+                            return applyLostGround(player, new Location(from.getWorld(), data.fromX, data.fromY, data.fromZ), true, data, "edgeasc1"); // Maybe true ?
                         }
                     }
                     else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
                         // (Minimal margin.)
-                        data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
+                        //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
                         return applyLostGround(player, from, false, data, "edgeasc2"); // Maybe true ?
                     }
                 }
@@ -1379,7 +1378,7 @@ public class SurvivalFly extends Check {
                 // TODO: confine by block types ?
                 if (from.isOnGround(0.25, 0.4, 0, 0L) ) {
                     // Temporary "fix".
-                    data.sfThisAllowBunny = true;
+                    //data.sfThisAllowBunny = true;
                     return applyLostGround(player, from, true, data, "ministep");
                 }
             }
@@ -1432,27 +1431,56 @@ public class SurvivalFly extends Check {
     }
 
     /**
-     * Apply lost-ground workaround, 
+     * Apply lost-ground workaround.
      * @param player
      * @param refLoc
-     * @param setBackSafe If to use from as set-back (if set to false: currently nothing changed).
+     * @param setBackSafe If to use the given location as set-back.
      * @param data
-     * @param tag Tag extra to "lostground"
+     * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MovingData data, final String tag) {
-        // Set the new setBack and reset the jumpPhase.
-        // TODO: Some interpolated position ?
-        // TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
+    private boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MovingData data, final String tag) {
         if (setBackSafe) {
             data.setSetBack(refLoc);
         }
         else {
             // Keep Set-back.
         }
+        return applyLostGround(player, data, tag);
+    }
 
-        // data.ground ?
-        // ? set jumpphase to height / 0.15 ?
+    /**
+     * Apply lost-ground workaround.
+     * @param player
+     * @param refLoc
+     * @param setBackSafe If to use the given location as set-back.
+     * @param data
+     * @param tag Added to "lostground_" as tag.
+     * @return Always true.
+     */
+    private boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MovingData data, final String tag) {
+        // Set the new setBack and reset the jumpPhase.
+        if (setBackSafe) {
+            data.setSetBack(refLoc);
+        }
+        else {
+            // Keep Set-back.
+        }
+        return applyLostGround(player, data, tag);
+    }
+
+    /**
+     * Apply lost-ground workaround (data adjustments and tag).
+     * @param player
+     * @param refLoc
+     * @param setBackSafe If to use the given location as set-back.
+     * @param data
+     * @param tag Added to "lostground_" as tag.
+     * @return Always true.
+     */
+    private boolean applyLostGround(final Player player, final MovingData data, final String tag) {
+        // Reset the jumpPhase.
+        // ? set jumpphase to 1 / other, depending on stuff ?
         data.sfJumpPhase = 0;
         data.jumpAmplifier = getJumpAmplifier(player);
         data.clearAccounting();
