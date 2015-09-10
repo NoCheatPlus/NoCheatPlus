@@ -1319,8 +1319,8 @@ public class SurvivalFly extends Check {
                         }
                         // TODO: Further / more precise ?
                         // Third: calculate end points.
-                        x2 += x1;
-                        z2 += z1;
+                        x2 = fMin * x2 + x1;
+                        z2 = fMin * z2 + z1;
                         // Finally test for ground.
                         final double xzMargin = Math.round(from.getWidth() * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
                         // (We don't add another xz-margin here, as the move should cover ground.)
