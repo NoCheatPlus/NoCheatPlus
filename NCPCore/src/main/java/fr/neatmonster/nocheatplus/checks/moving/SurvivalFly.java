@@ -374,8 +374,17 @@ public class SurvivalFly extends Check {
                 }
             }
 
+            // Y-distance to set back.
             // TODO: This might need max(0, for ydiff)
-            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, to.getY() - data.getSetBackY() - vAllowedDistance);
+            final double totalVDistViolation =  to.getY() - data.getSetBackY() - vAllowedDistance;
+            if (totalVDistViolation > 0.0) {
+                // Skip if the player could step up.
+                if (yDistance < 0.0 || yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
+                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, totalVDistViolation);
+                }
+            }
+
+            // Add vdist tag.
             if (vDistanceAboveLimit > 0) {
                 // Tag only for speed / travel-distance checking.
                 tags.add("vdist");
@@ -721,6 +730,7 @@ public class SurvivalFly extends Check {
      */
     private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: Confine by max y distance and max/min xz-distance?
+        // TODO: Some workarounds allow step height (0.6 on MC 1.8).
         if (yDistance >= -0.5 && yDistance <= MovingUtil.estimateJumpLiftOff(player, data, 0.174)) {
             // "Mild" Ascending / descending.
             // Stairs.
@@ -1082,7 +1092,8 @@ public class SurvivalFly extends Check {
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
         if (allowHop && hDistance >= walkSpeed && 
-                hDistance > 1.314 * hAllowedDistance && hDistance < 2.15 * hAllowedDistance
+                (hDistance > (((data.sfLastHDist == Double.MAX_VALUE || data.sfLastHDist == 0.0 && data.sfLastYDist == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
+                    && hDistance < 2.15 * hAllowedDistance
                 || (yDistance > from.getyOnGround() || hDistance < 2.6 * walkSpeed) && data.sfLastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.sfLastHDist && hDistance < 2.15 * data.sfLastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
