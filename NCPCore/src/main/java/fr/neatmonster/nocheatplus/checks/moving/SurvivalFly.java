@@ -206,7 +206,13 @@ public class SurvivalFly extends Check {
         }
         // TODO: Extra workarounds for toOnGround (step-up is a case with to on ground)?
         else if (isSamePos) {
-            resetFrom = false;
+            // TODO: This isn't correct, needs redesign.
+            if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist > 0.0 && data.sfLastYDist < -0.3) {
+                // Note that to is not on ground either.
+                resetFrom = lostGroundStill(player, from, loc, to, hDistance, yDistance, sprinting, data, cc);
+            } else {
+                resetFrom = false;
+            }
         }
         else {
             // "Lost ground" workaround.
@@ -733,7 +739,8 @@ public class SurvivalFly extends Check {
     private boolean lostGround(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: Regroup with appropriate conditions (toOnGround first?).
         // TODO: Some workarounds allow step height (0.6 on MC 1.8).
-        if (yDistance >= -0.5 && yDistance <= Math.max(cc.sfStepHeight, MovingUtil.estimateJumpLiftOff(player, data, 0.174))) {
+        // TODO: yDistance limit does not seem to be appropriate.
+        if (yDistance >= -0.7 && yDistance <= Math.max(cc.sfStepHeight, MovingUtil.estimateJumpLiftOff(player, data, 0.174))) {
             // "Mild" Ascending / descending.
             //Ascending
             if (yDistance >= 0) {
@@ -754,8 +761,9 @@ public class SurvivalFly extends Check {
                 return true;
             }
         }
-        else if (yDistance < -0.5) {
+        else if (yDistance < -0.7) {
             // Clearly descending.
+            // TODO: Might want to remove this one.
             if (hDistance <= 0.5) {
                 if (lostGroundFastDescend(player, from, to, hDistance, yDistance, sprinting, data, cc)) {
                     return true;
@@ -1292,6 +1300,7 @@ public class SurvivalFly extends Check {
             // Half block step up (definitive).
             // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
             if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
+                // TODO: hDistance > 0.0
                 if (data.sfLastYDist < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
                     return applyLostGround(player, from, true, data, "step");
                 }
@@ -1301,8 +1310,10 @@ public class SurvivalFly extends Check {
                 // Generic could step.
                 // TODO: Possibly confine margin depending on side, moving direction (see client code).
                 // TODO: Consider player.getLocation too (!).
+                // TODO: Should this also be checked vs. last from?
                 if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
                     // TODO: Set a data property, so vdist does not trigger (currently: scan for tag)
+                    // TODO: !to.isOnGround?
                     return applyLostGround(player, from, false, data, "couldstep");
                 }
                 // Close by ground miss (client side blocks y move, but allows h move fully/mostly, missing the edge on server side).
@@ -1317,13 +1328,25 @@ public class SurvivalFly extends Check {
                         if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), from.getX(), from.getY(), from.getZ(), from.getWidth(), from.getyOnGround(), data, "asc1")) {
                             return true;
                         }
-                        // Micro-moves.
-                        if (!from.isSamePos(loc)) {
-                            // Re-check with loc instead of from.
-                            // TODO: These belong checked as extra moves. The untracked nature of this means potential exploits. 
-                            return lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), loc.getX(), loc.getY(), loc.getZ(), from.getWidth(), from.getyOnGround(), data, "asc3");
-                        }
 
+                        // Special cases.
+                        if (!from.isSamePos(loc)) {
+                            // Micro-moves: Re-check with loc instead of from.
+                            // TODO: These belong checked as extra moves. The untracked nature of this means potential exploits. 
+                            if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), loc.getX(), loc.getY(), loc.getZ(), from.getWidth(), from.getyOnGround(), data, "asc3")) {
+                                return true;
+                            }
+                        }
+                        else if (yDistance == 0.0 && data.sfLastYDist <= -0.3 && (hDistance <= data.sfLastHDist * 1.1)) {
+                            // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
+                            // TODO: (hDistance <= data.sfLastHDist || hDistance <= hAllowedDistance)
+                            // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
+                            // TODO: Temporary test (should probably be covered by one of the above instead).
+                            // TODO: Code duplication with edgeasc7 below.
+                            if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc5")) {
+                                return true;
+                            }
+                        }
                     }
                     else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
                         // (Minimal margin.)
@@ -1338,11 +1361,34 @@ public class SurvivalFly extends Check {
     }
 
     /**
-     * Vertical collision with ground on client side, shifting over an edge with the horizontal move.
+     * Preconditions move dist is 0, not on ground, last h dist > 0, last y dist < 0.
+     * @param player
+     * @param from
+     * @param loc
+     * @param to
+     * @param hDistance
+     * @param yDistance
+     * @param sprinting
+     * @param data
+     * @param cc
+     * @return
+     */
+    private boolean lostGroundStill(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+        if (data.sfLastYDist <= -0.3) {
+            // TODO: Code duplication with edgeasc5 above.
+            if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc7")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Vertical collision with ground on client side, shifting over an edge with the horizontal move. Using last from from MovingData.
      * @param player
      * @param blockCache
      * @param world
-     * @param x1
+     * @param x1 Target position.
      * @param y1
      * @param z1
      * @param width
@@ -1352,17 +1398,21 @@ public class SurvivalFly extends Check {
      * @return
      */
     private final boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MovingData data, final String tag) {
+        return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, data.fromX, data.fromY, data.fromZ, data.sfLastHDist, width, yOnGround, data, tag);
+    }
+
+    private final boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, double x2, final double y2, double z2, final double hDistance2, final double width, final double yOnGround, final MovingData data, final String tag) {
         // First: calculate vector towards last from.
-        double x2 = data.fromX - x1;
-        double z2 = data.fromZ - z1;
+        x2 -= x1;
+        z2 -= z1;
         // double y2 = data.fromY - y1; // Just for consistency checks (sfLastYDist).
         // Second: cap the size of the extra box (at least horizontal).
         double fMin = 1.0; // Factor for capping.
-        if (Math.abs(x2) > data.sfLastHDist) {
-            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(x2));
+        if (Math.abs(x2) > hDistance2) {
+            fMin = Math.min(fMin, hDistance2 / Math.abs(x2));
         }
-        if (Math.abs(z2) > data.sfLastHDist) {
-            fMin = Math.min(fMin, data.sfLastHDist / Math.abs(z2));
+        if (Math.abs(z2) > hDistance2) {
+            fMin = Math.min(fMin, hDistance2 / Math.abs(z2));
         }
         // TODO: Further / more precise ?
         // Third: calculate end points.
@@ -1374,7 +1424,7 @@ public class SurvivalFly extends Check {
         if (BlockProperties.isOnGroundShuffled(blockCache, x1, y1, z1, x2, y1, z2, xzMargin, yOnGround, 0.0)) {
             //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
             // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
-            return applyLostGround(player, new Location(world, data.fromX, data.fromY, data.fromZ), true, data, "edge" + tag); // Maybe true ?
+            return applyLostGround(player, new Location(world, x2, y2, z2), true, data, "edge" + tag); // Maybe true ?
         } else {
             return false;
         }
