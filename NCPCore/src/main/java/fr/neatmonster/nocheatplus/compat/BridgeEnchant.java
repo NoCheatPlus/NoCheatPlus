@@ -21,16 +21,22 @@ public final class BridgeEnchant {
     /**
      * 
      * @param player
-     * @return Level of DEPTH_STRIDER capped at 3. Will return 0 if not available.
+     * @return Maximum level of DEPTH_STRIDER found on armor items, capped at 3. Will return 0 if not available.
      */
     public static int getDepthStriderLevel(Player player) {
+        int level = 0;
         if (DEPTH_STRIDER != null) {
-            final ItemStack boots = player.getInventory().getBoots();
-            if (!BlockProperties.isAir(boots)) {
-                return Math.min(3, boots.getEnchantmentLevel(BridgeEnchant.DEPTH_STRIDER));
+            // Find the maximum level of depth strider.
+            ItemStack[] armor = player.getInventory().getArmorContents();
+            for (int i = 0; i < armor.length; i++) {
+                final ItemStack item = armor[i];
+                if (!BlockProperties.isAir(item)) {
+                    level = Math.max(item.getEnchantmentLevel(DEPTH_STRIDER), level);
+                }
             }
         }
-        return 0;
+        // Cap at three.
+        return Math.min(3, level);
     }
 
     public static boolean hasDepthStrider() {
