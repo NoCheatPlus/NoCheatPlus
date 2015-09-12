@@ -1337,7 +1337,7 @@ public class SurvivalFly extends Check {
                                 return true;
                             }
                         }
-                        else if (yDistance == 0.0 && data.sfLastYDist <= -0.3 && (hDistance <= data.sfLastHDist * 1.1)) {
+                        else if (yDistance == 0.0 && data.sfLastYDist <= -0.23 && (hDistance <= data.sfLastHDist * 1.1)) {
                             // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
                             // TODO: (hDistance <= data.sfLastHDist || hDistance <= hAllowedDistance)
                             // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
@@ -1374,7 +1374,7 @@ public class SurvivalFly extends Check {
      * @return
      */
     private boolean lostGroundStill(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
-        if (data.sfLastYDist <= -0.3) {
+        if (data.sfLastYDist <= -0.23) {
             // TODO: Code duplication with edgeasc5 above.
             if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc7")) {
                 return true;
