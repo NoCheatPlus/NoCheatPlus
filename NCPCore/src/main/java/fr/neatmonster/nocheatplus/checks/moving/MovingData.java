@@ -606,6 +606,22 @@ public class MovingData extends ACheckData {
     }
 
     /**
+     * Active or queued.
+     * @return
+     */
+    public boolean hasAnyHorVel() {
+        return horVel.hasAny();
+    }
+
+    /**
+     * Active or queued.
+     * @return
+     */
+    public boolean hasAnyVerVel() {
+        return verticalFreedom >= 0.001 || verticalVelocityCounter > 0;
+    }
+
+    /**
      * Clear active vertical velocity (until recoded, this will remove all vertical velocity).
      */
     public void clearActiveVerVel() {
@@ -878,8 +894,10 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Refactoring stage: Test if velocity has affected the in-air
-     * jumping phase. Use clearActiveVerVel to force end velocity jump phase.
+     * Test if velocity has affected the in-air jumping phase. Keeps set until
+     * reset on-ground or otherwise. Use clearActiveVerVel to force end velocity
+     * jump phase. Use hasAnyVerVel() to test if active or queued vertical
+     * velocity should still be able to influence the in-air jump phase.
      * 
      * @return
      */

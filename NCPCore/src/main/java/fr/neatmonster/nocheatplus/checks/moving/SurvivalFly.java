@@ -806,11 +806,11 @@ public class SurvivalFly extends Check {
                 // Allow adding 0.
                 data.vDistAcc.add((float) yDistance);
             }
-            else if (!data.isVelocityJumpPhase()) {
+            else if (!data.hasAnyVerVel()) {
                 // Here yDistance can be negative and positive.
                 if (yDistance != 0D) {
                     data.vDistAcc.add((float) yDistance);
-                    final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc");
+                    final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc" + (data.isVelocityJumpPhase() ? "dirty" : ""));
                     if (accAboveLimit > vDistanceAboveLimit) {
                         vDistanceAboveLimit = accAboveLimit;
                     }
@@ -898,7 +898,7 @@ public class SurvivalFly extends Check {
             }
             else {
                 // Moving upwards after falling without having touched the ground.
-                if (!data.isVelocityJumpPhase() && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)) {
+                if (!data.hasAnyVerVel() && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)) {
                     // TODO: adjust limit for bunny-hop.
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
                     tags.add("ychincfly");

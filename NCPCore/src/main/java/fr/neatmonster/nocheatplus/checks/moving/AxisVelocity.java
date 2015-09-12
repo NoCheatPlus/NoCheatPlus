@@ -35,6 +35,14 @@ public class AxisVelocity {
     }
 
     /**
+     * Queued or active.
+     * @return
+     */
+    public boolean hasAny() {
+        return !active.isEmpty() || !queued.isEmpty();
+    }
+
+    /**
      * Tick the velocity entries with a moving event, no invalidation takes
      * place here. This method uses the defaultFrictionFactor.
      */
