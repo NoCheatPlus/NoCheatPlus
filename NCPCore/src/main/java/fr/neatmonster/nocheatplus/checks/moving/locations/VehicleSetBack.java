@@ -1,9 +1,10 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.locations;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 

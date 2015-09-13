@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import org.bukkit.Location;
 

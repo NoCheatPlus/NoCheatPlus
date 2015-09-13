@@ -15,6 +15,8 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -837,43 +839,30 @@ public class SurvivalFly extends Check {
      * @return A violation value > 0.001, to be interpreted like a moving violation.
      */
     private static final double verticalAccounting(final double yDistance, final ActionAccumulator acc, final ArrayList<String> tags, final String tag) {
-        // TODO: distinguish near-ground moves somehow ?
-        // Determine which buckets to check:
-        // TODO: One state is checked 3 times vs. different yDiff !?
-        final int i1, i2;
-        // TODO: use 1st vs. 2nd whenever possible (!) (logics might need to distinguish falling from other ?...).
-        //		if (acc.bucketCount(0) == acc.bucketCapacity() &&) {
-        //			i1 = 0;
-        //			i2 = 1;
-        //		}
-        //		else {
-        i1 = 1;
-        i2 = 2;
-        //		}
-        // TODO: One move earlier: count first vs. second once first is full.
-        // TODO: Can all three be related if first one is full ?
-        if (acc.bucketCount(i1) > 0 && acc.bucketCount(i2) > 0) {
-            final float sc1 = acc.bucketScore(i1);
-            final float sc2 = acc.bucketScore(i2);
-            final double diff = sc1 - sc2;
-            final double aDiff = Math.abs(diff);
-            // TODO: Relate this to the fall distance !
-            // TODO: sharpen later.
-            if (diff >= 0.0 || yDistance > -1.05 && aDiff < 0.0625) {
-                // TODO: check vs. sc1 !
-                if (yDistance <= -1.05 && sc2 < -10.0 && sc1 < -10.0) { // (aDiff < Math.abs(yDistance) || sc2 < - 10.0f)) {
-                    // High falling speeds may pass.
-                    // TODO:  high falling speeds may pass within some bounds (!).
-                    tags.add(tag + "grace");
-                    return 0.0;
+        // TODO: Add air friction and do it per move anyway !?
+        final int count0 = acc.bucketCount(0);
+        if (count0 > 0) {
+            final int count1 = acc.bucketCount(1);
+            if (count1 > 0) {
+                final int cap = acc.bucketCapacity();
+                final float minAmount = 0.0625f;
+                final float sc0;
+                if (count0 == cap) {
+                    sc0 = acc.bucketScore(0);
+                } else {
+                    // Catch extreme changes quick.
+                    sc0 = acc.bucketScore(0) * (float) cap / (float) count0 - minAmount * (float) (cap - count0);
                 }
-                tags.add(tag); // Specific tags?
-                if (diff < 0.0 ) {
-                    // Note: aDiff should be < 0.0625 here.
-                    return Math.max(Math.abs(-0.0625 - diff), 0.001);
-                }
-                else {
-                    return 0.0625 + diff;
+                final float sc1 = acc.bucketScore(1);
+                if (sc0 > sc1 - 3.0 * minAmount) {
+                    // TODO: Velocity downwards fails here !!!
+                    if (yDistance <= -1.05 && sc1 < -8.0 && sc0 < -8.0) { // (aDiff < Math.abs(yDistance) || sc2 < - 10.0f)) {
+                        // High falling speeds may pass.
+                        tags.add(tag + "grace");
+                        return 0.0;
+                    }
+                    tags.add(tag);
+                    return sc0 - (sc1 - 3.0 * minAmount);
                 }
             }
         }

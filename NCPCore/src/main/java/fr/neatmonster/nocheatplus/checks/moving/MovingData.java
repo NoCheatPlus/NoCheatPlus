@@ -11,6 +11,12 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
@@ -119,14 +125,14 @@ public class MovingData extends ACheckData {
     // Velocity handling.
     // TODO: consider resetting these with clearFlyData and onSetBack.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
-    //private final AxisVelocity verVel = new AxisVelocity();
+    //private final FrictionAxisVelocity verVel = new FrictionAxisVelocity();
     private int            verticalVelocityCounter;
     private double         verticalFreedom;
     private double         verticalVelocity;
     private int            verticalVelocityUsed = 0;
 
     /** Horizontal velocity modeled as an axis (always positive) */
-    private final AxisVelocity horVel = new AxisVelocity();
+    private final FrictionAxisVelocity horVel = new FrictionAxisVelocity();
 
     // Coordinates.
     /** Last from coordinates. X is at Double.MAX_VALUE, if not set. */
@@ -567,7 +573,7 @@ public class MovingData extends ACheckData {
      * Add horizontal velocity (distance). <br>
      * @param vel Assumes positive values always.
      */
-    public void addHorizontalVelocity(final Velocity vel) {
+    public void addHorizontalVelocity(final AccountEntry vel) {
         horVel.add(vel);
     }
 
@@ -880,7 +886,7 @@ public class MovingData extends ACheckData {
         if (vx != 0.0 || vz != 0.0) {
             final double newVal = Math.sqrt(vx * vx + vz * vz);
             used = true;
-            final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
+            final AccountEntry vel = new AccountEntry(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
             addHorizontalVelocity(vel);
         }
 

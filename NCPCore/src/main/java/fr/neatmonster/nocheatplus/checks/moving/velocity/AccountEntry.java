@@ -1,14 +1,16 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.velocity;
 
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 
 /**
- * One entry of velocity for a player. Might be used per axis or for horizontal/vertical.
+ * One entry of velocity for a player, including fields for maintaining margins
+ * and effects per entry.
+ * 
  * @author mc_dev
  *
  */
-public class Velocity {
+public class AccountEntry {
 
     /** Tick at which velocity got added. */
     public final int tick;
@@ -16,17 +18,17 @@ public class Velocity {
     /** The amount of velocity, decreasing with use. */
     public double value;
 
-
-    /** "Some sum" for general purpose. 
-     * <li> For vertical entries this is used to alter the allowed y-distance to the set-back point. </li>
+    /**
+     * "Some sum" for general purpose. <li>For vertical entries this is used to
+     * alter the allowed y-distance to the set-back point.</li>
      */
-    public double sum;
+    public double sum = 0.0;
 
     ///////////////////////////
     // Activation conditions.
     ///////////////////////////
 
-    // TODO: Add more conditions (ticks, ?real time)
+    // TODO: Add more conditions (max tick, real time?)
 
     /**
      * Maximum count before activation.
@@ -37,41 +39,29 @@ public class Velocity {
     // Invalidation conditions.
     ///////////////////////////
 
-    // TODO: Add more conditions (ticks, ?real time)
+    // TODO: Add more conditions (max tick, real time?)
 
     /**
      * Count .
      */
     public int valCount;
 
-
-
-
-
-    public Velocity(double value, int actCount, int valCount){
-
+    public AccountEntry(double value, int actCount, int valCount){
         this.tick = TickTask.getTick();
-
         this.value = value;
-
         this.actCount = actCount;
-
         this.valCount = valCount;
     }
 
-    public Velocity(int tick, double value, int actCount, int valCount){
-
+    public AccountEntry(int tick, double value, int actCount, int valCount){
         this.tick = tick;
-
         this.value = value;
-
         this.actCount = actCount;
-
         this.valCount = valCount;
     }
 
     public String toString(){
-        return "Velocity(tick=" + tick + " sum=" + sum + " value=" + value + " valid=" + valCount + " activate=" + actCount + ")";
+        return "AccountEntry(tick=" + tick + " sum=" + sum + " value=" + value + " valid=" + valCount + " activate=" + actCount + ")";
     }
 
 }

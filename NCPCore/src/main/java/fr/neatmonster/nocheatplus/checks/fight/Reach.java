@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;

@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.model;
 
 /**
  * This is for tracking what medium a player has been in before lift-off.

@@ -51,6 +51,13 @@ import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
+import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.IData;
@@ -1525,7 +1532,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.setSetBack(loc);
         // Give some freedom to allow the "exiting move".
         data.removeAllVelocity();
-        data.addHorizontalVelocity(new Velocity(0.9, 1, 1));
+        data.addHorizontalVelocity(new AccountEntry(0.9, 1, 1));
         data.fakeVerticalFreedom(0.15, 1.2, 1);
         useLoc.setWorld(null);
     }

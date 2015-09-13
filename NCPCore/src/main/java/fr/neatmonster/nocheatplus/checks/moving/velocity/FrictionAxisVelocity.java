@@ -1,25 +1,27 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.velocity;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Velocity accounting for one axis (positive + negative direction).
+ * Velocity accounting for one axis (positive + negative direction) with
+ * maintaining some kind of friction effects and maximum distance gained.
+ * 
  * @author dev1mc
  *
  */
-public class AxisVelocity {
+public class FrictionAxisVelocity {
 
     /** Velocity with a smaller absolute amount is removed. */
     private static final double minValue = 0.001;
 
     private static final double defaultFrictionFactor = 0.93;
 
-    private final List<Velocity> queued = new ArrayList<Velocity>();
-    private final List<Velocity> active = new ArrayList<Velocity>();
+    private final List<AccountEntry> queued = new LinkedList<AccountEntry>();
+    private final List<AccountEntry> active = new LinkedList<AccountEntry>();
 
-    public void add(Velocity vel) {
+    public void add(AccountEntry vel) {
         // TODO: Merging behavior?
         if (Math.abs(vel.value) != 0.0) {
             queued.add(vel);
@@ -62,14 +64,14 @@ public class AxisVelocity {
         // TODO: Actual friction. Could pass as an argument (special value for not to be used).
         // TODO: Consider removing already invalidated here.
         // TODO: Consider working removeInvalid into this ?
-        for (final Velocity vel : active) {
+        for (final AccountEntry vel : active) {
             vel.valCount --;
             vel.sum += vel.value;
             vel.value *= frictionFactor;
             // (Altered entries should be kept, since they get used right away.)
         }
         // Decrease counts for queued.
-        final Iterator<Velocity> it = queued.iterator();
+        final Iterator<AccountEntry> it = queued.iterator();
         while (it.hasNext()) {
             it.next().actCount --;
         }
@@ -81,12 +83,13 @@ public class AxisVelocity {
      * @param tick All velocity added before this tick gets removed.
      */
     public void removeInvalid(final int tick) {
+        // Note: Adding unused entries to a collection should later be supported.
         // TODO: Also merge entries here, or just on adding?
-        Iterator<Velocity> it;
+        Iterator<AccountEntry> it;
         // Active.
         it = active.iterator();
         while (it.hasNext()) {
-            final Velocity vel = it.next();
+            final AccountEntry vel = it.next();
             // TODO: 0.001 can be stretched somewhere else, most likely...
             // TODO: Somehow use tick here too (actCount, valCount)?
             if (vel.valCount <= 0 || Math.abs(vel.value) <= minValue) {
@@ -98,7 +101,7 @@ public class AxisVelocity {
         it = queued.iterator();
         while (it.hasNext()) {
             // TODO: Could check for alternating signum (error).
-            final Velocity vel = it.next();
+            final AccountEntry vel = it.next();
             if (vel.actCount <= 0 || vel.tick < tick) {
                 //              NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Invalidate queued: " + vel);
                 it.remove();
@@ -113,7 +116,7 @@ public class AxisVelocity {
     public double getFreedom() {
         // TODO: model/calculate it as accurate as possible...
         double f = 0;
-        for (final Velocity vel : active) {
+        for (final AccountEntry vel : active) {
             f += vel.value;
         }
         return f;
@@ -134,10 +137,10 @@ public class AxisVelocity {
                 active.clear();
             }
         }
-        final Iterator<Velocity> it = queued.iterator();
+        final Iterator<AccountEntry> it = queued.iterator();
         double used = 0;
         while (it.hasNext()) {
-            final Velocity vel = it.next();
+            final AccountEntry vel = it.next();
             if (vel.value * amount < 0.0) {
                 // Not aligned.
                 // TODO: This could be a problem with small amounts of velocity.
@@ -189,8 +192,8 @@ public class AxisVelocity {
      * @param builder
      * @param entries
      */
-    private void addVeloctiy(final StringBuilder builder, final List<Velocity> entries) {
-        for (final Velocity vel: entries) {
+    private void addVeloctiy(final StringBuilder builder, final List<AccountEntry> entries) {
+        for (final AccountEntry vel: entries) {
             builder.append(" ");
             builder.append(vel);
         }
