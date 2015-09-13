@@ -808,7 +808,7 @@ public class SurvivalFly extends Check {
                 // Allow adding 0.
                 data.vDistAcc.add((float) yDistance);
             }
-            else if (!data.hasAnyVerVel()) {
+            else if (!data.isVelocityJumpPhase()) { // TODO: !data.hasAnyVerVel()) {
                 // Here yDistance can be negative and positive.
                 if (yDistance != 0D) {
                     data.vDistAcc.add((float) yDistance);
