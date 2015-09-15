@@ -27,12 +27,12 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
-import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
-import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -282,7 +282,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) < 4.5){
             final MovingData mData = MovingData.getData(player);
             // Check if fly checks is an issue at all, re-check "real sprinting".
-            if (mData.fromX != Double.MAX_VALUE && mData.mediumLiftOff != MediumLiftOff.LIMIT_JUMP){
+            if (mData.fromX != Double.MAX_VALUE && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
                 final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.

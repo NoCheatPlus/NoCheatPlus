@@ -131,25 +131,29 @@ public class CreativeFly extends Check {
 
         resultH *= 100D;
 
-        final double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
-
-        // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
+        double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
 
-        // TODO:_ signum considerations (aligned ...).
-        //        double vDistanceAboveLimit = yDistance - data.getVerticalFreedom() - limitV;
-        //        if (vDistanceAboveLimit > 0.0) {
-        //            // TODO: consume / use vvel
-        //        }
-        //        final double resultV = (vDistanceAboveLimit - limitV) * 100D;
-        //        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
-        // Old handling.
-        final double verticalFreedom = data.getVerticalFreedom();
-        final double resultV = (yDistance - verticalFreedom - limitV) * 100D;
+        if (data.lastYDist != Double.MAX_VALUE) {
+            // (Disregard gravity.)
+            double frictionDist = data.lastYDist * SurvivalFly.FRICTION_MEDIUM_AIR;
+            if (!flying) {
+                frictionDist -= SurvivalFly.GRAVITY_MIN;
+            }
+            limitV = Math.max(frictionDist, limitV);
+        }
+
+        final double resultV;
+        if (yDistance > limitV && data.getOrUseVerticalVelocity(yDistance) != null) {
+            resultV = 0.0;
+        } else {
+            resultV = (yDistance - limitV) * 100D;
+        }
+
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         if (cc.debug) {
-            outpuDebugMove(player, hDistance, limitH, yDistance, verticalFreedom, limitV);
+            outpuDebugMove(player, hDistance, limitH, yDistance, limitV, data);
         }
 
         // The player went to far, either horizontal or vertical.
@@ -182,15 +186,21 @@ public class CreativeFly extends Check {
         // Slowly reduce the violation level with each event.
         data.creativeFlyVL *= 0.97D;
 
-        // If the event did not get cancelled, define a new setback point.
+        // Adjust the set-back and other last distances.
         data.setSetBack(to);
+        data.lastHDist = hDistance;
+        data.lastYDist = yDistance;
         return null;
     }
 
-    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double verticalFreedom, final double limitV) {
+    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final MovingData data) {
         StringBuilder builder = new StringBuilder(350);
         builder.append(player.getName());
-        builder.append(" CreativeFly hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vfreedom=" + verticalFreedom + " vlimit=" + limitV);
+        builder.append(" CreativeFly hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vlimit=" + limitV);
+        if (data.verVelUsed != null) {
+            builder.append(" vvel_use=" + data.verVelUsed);
+        }
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
+
 }

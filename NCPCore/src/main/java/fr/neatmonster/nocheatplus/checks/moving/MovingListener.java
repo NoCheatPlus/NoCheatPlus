@@ -54,10 +54,11 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
-import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.IData;
@@ -498,8 +499,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Velocity tick (decrease + invalidation).
         // TODO: Rework to generic (?) queued velocity entries: activation + invalidation
         final int tick = TickTask.getTick();
-        data.removeInvalidVelocity(tick - cc.velocityActivationTicks);
-        data.velocityTick();
+        data.velocityTick(tick - cc.velocityActivationTicks);
 
         // Check which fly check to use.
         final boolean checkCf;
@@ -606,7 +606,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             mightSkipNoFall = false;
                         }
                     }
-                    if (!mightSkipNoFall) {
+                    if (!mightSkipNoFall && (!pTo.isResetCond() || !pFrom.isResetCond())) {
+                        // (Don't deal damage where no fall damage is possible.)
                         noFall.checkDamage(player, data, Math.min(Math.min(from.getY(), to.getY()), loc.getY()));
                     }
                 }
@@ -724,6 +725,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Reset some data.
         data.prepareSetBack(newTo);
         data.resetPositions(newTo); // TODO: Might move into prepareSetBack, experimental here.
+        adjustLiftOffEnvelope(player, newTo, data, cc);
 
         // Set new to-location.
         event.setTo(newTo);
@@ -907,6 +909,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
         Location to = event.getTo();
         final Location ref;
+        final MovingConfig cc = MovingConfig.getConfig(player);
         if (teleported != null && teleported.equals(to)) {
             // Teleport by NCP.
             // Prevent cheaters getting rid of flying data (morepackets, other).
@@ -923,8 +926,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             // TODO: This could be done on MONITOR.
             data.onSetBack(teleported);
+            adjustLiftOffEnvelope(player, teleported, data, cc);
         } else {
-            final MovingConfig cc = MovingConfig.getConfig(player);
             // Only if it wasn't NoCheatPlus, drop data from more packets check.
             if (to != null && !event.isCancelled()) {
                 // Normal teleport.
@@ -988,6 +991,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
                         ref = data.getSetBack(to);
                         event.setTo(ref);
+                        adjustLiftOffEnvelope(player, ref, data, cc);
                     }
                     else{
                         ref = from; // Player.getLocation ?
@@ -1014,16 +1018,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     // "real" teleport
                     ref = to;
                     double fallDistance = data.noFallFallDistance;
-                    final MediumLiftOff oldMLO = data.mediumLiftOff; // Remember for workarounds.
+                    final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
                     data.clearMorePacketsData();
                     data.clearFlyData();
                     data.resetPositions(to);
                     if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
                         // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
-                        // Keep old MediumLiftOff.
-                        data.mediumLiftOff = oldMLO;
+                        // Keep old lift-off envelope.
+                        data.liftOffEnvelope = oldEnv;
                     }
                     data.setSetBack(to);
+                    adjustLiftOffEnvelope(player, to, data, cc);
                     // TODO: How to account for plugins that reset the fall distance here?
                     if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
                         // Reset fall distance if set so in the config.
@@ -1057,8 +1062,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Reset stuff.
         Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
         data.resetTeleported();
+        data.resetLastDistances();
         // Prevent further moving processing for nested events.
         processingEvents.remove(player.getName());
+    }
+
+    /**
+     * Simple adjustment after set-back and similar.
+     * @param player
+     * @param loc
+     * @param data
+     * @param cc
+     */
+    private void adjustLiftOffEnvelope(final Player player, final Location loc, final MovingData data, final MovingConfig cc) {
+        final MoveInfo info = useMoveInfo();
+        info.set(player, loc, null, cc.yOnGround);
+        data.adjustLiftOffEnvelope(info.from);
+        info.cleanup();
+        returnMoveInfo(info);
     }
 
     /**
@@ -1320,8 +1341,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.resetPositions(loc); // TODO: See above.
         }
 
-        // Always reset position to this one.
-        // TODO: more fine grained reset?
+        data.resetLastDistances();
         data.clearMorePacketsData();
         data.removeAllVelocity();
         data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist); // Might reset to loc instead of set-back ?
@@ -1332,7 +1352,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         moveInfo.set(player, loc, null, cc.yOnGround);
         data.toWasReset = moveInfo.from.isOnGroundOrResetCond();
         if (data.toWasReset && moveInfo.from.isOnGround() && !moveInfo.from.isResetCond()) {
-            data.mediumLiftOff = MediumLiftOff.GROUND;
+            data.liftOffEnvelope = LiftOffEnvelope.NORMAL;
         }
         returnMoveInfo(moveInfo);
         data.fromWasReset = data.toWasReset;
@@ -1532,8 +1552,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.setSetBack(loc);
         // Give some freedom to allow the "exiting move".
         data.removeAllVelocity();
+        // TODO: Use-once entries usually are intended to allow one offset, but not jumping/flying on.
         data.addHorizontalVelocity(new AccountEntry(0.9, 1, 1));
-        data.fakeVerticalFreedom(0.15, 1.2, 1);
+        data.addVerticalVelocity(new SimpleEntry(0.6, 1)); // TODO: Typical margin?
         useLoc.setWorld(null);
     }
 

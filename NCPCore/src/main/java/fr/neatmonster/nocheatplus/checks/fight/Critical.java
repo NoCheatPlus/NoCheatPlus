@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -60,8 +60,9 @@ public class Critical extends Check {
             final MovingData dataM = MovingData.getData(player);
 
             // TODO: Skip near the highest jump height (needs check if head collided with something solid, which also detects low jump).
-            if (!dataM.isVelocityJumpPhase() && (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.mediumLiftOff == MediumLiftOff.GROUND
-                    || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
+            if (!dataM.isVelocityJumpPhase() && 
+                    (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.liftOffEnvelope == LiftOffEnvelope.NORMAL
+                        || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
                 if (MovingUtil.shouldCheckSurvivalFly(player, dataM, ccM)) {
                     data.criticalVL += 1.0;

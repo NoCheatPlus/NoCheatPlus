@@ -175,7 +175,7 @@ public class FrictionAxisVelocity {
      * Debugging.
      * @param builder
      */
-    public void AddQueued(StringBuilder builder) {
+    public void addQueued(StringBuilder builder) {
         addVeloctiy(builder, queued);
     }
 

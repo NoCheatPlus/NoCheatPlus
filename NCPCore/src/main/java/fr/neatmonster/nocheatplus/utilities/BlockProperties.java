@@ -1302,17 +1302,39 @@ public class BlockProperties {
     }
 
     /**
-     * @deprecated Checks for lava and water and only stationary. Long outdated. Subject to removal.
-     * @param blockId
+     * Simple checking method, heavy. No isIllegal check.
+     * @param player
+     * @param location
+     * @param yOnGround
      * @return
      */
-    public static boolean isInWater(final int blockId) {
-        if (blockId == Material.STATIONARY_WATER.getId() || blockId == Material.STATIONARY_LAVA.getId()) {
-            return true;
-        }
-        // TODO: count in water height ?
-        // TODO: lava ?
-        return false;
+    public static boolean isInLiquid(final Player player, final Location location, final double yOnGround) {
+        // Bit fat workaround, maybe put the object through from check listener ?
+        blockCache.setAccess(location.getWorld());
+        pLoc.setBlockCache(blockCache);
+        pLoc.set(location, player, yOnGround);
+        final boolean res = pLoc.isInLiquid();
+        blockCache.cleanup();
+        pLoc.cleanup();
+        return res;
+    }
+
+    /**
+     * Simple checking method, heavy. No isIllegal check.
+     * @param player
+     * @param location
+     * @param yOnGround
+     * @return
+     */
+    public static boolean isInWeb(final Player player, final Location location, final double yOnGround) {
+        // Bit fat workaround, maybe put the object through from check listener ?
+        blockCache.setAccess(location.getWorld());
+        pLoc.setBlockCache(blockCache);
+        pLoc.set(location, player, yOnGround);
+        final boolean res = pLoc.isInWeb();
+        blockCache.cleanup();
+        pLoc.cleanup();
+        return res;
     }
 
     /**
@@ -1327,10 +1349,10 @@ public class BlockProperties {
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
-        final boolean onGround = pLoc.isOnGround();
+        final boolean res = pLoc.isOnGround();
         blockCache.cleanup();
         pLoc.cleanup();
-        return onGround;
+        return res;
     }
 
     /**

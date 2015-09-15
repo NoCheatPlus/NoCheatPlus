@@ -13,28 +13,22 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
-import fr.neatmonster.nocheatplus.checks.moving.model.MediumLiftOff;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
-import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * Player specific data for the moving checks.
  */
 public class MovingData extends ACheckData {
-
-    /**
-     * Assume the player has to move on ground or so to lift off. TODO: Test, might be better ground.
-     */
-    private static final MediumLiftOff defaultMediumLiftOff = MediumLiftOff.LIMIT_JUMP;
-
-    //	private static final long IGNORE_SETBACK_Y = BlockProperties.F_SOLID | BlockProperties.F_GROUND | BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID;
 
     /** The factory creating data. */
     public static final CheckDataFactory factory = new CheckDataFactory() {
@@ -59,7 +53,7 @@ public class MovingData extends ACheckData {
 
     /**
      * Gets the data of a specified player.
-     * 
+     * final CheckDataFactory factory = new CheckDataFactory(
      * @param player
      *            the player
      * @return the data
@@ -99,6 +93,19 @@ public class MovingData extends ACheckData {
         }
     }
 
+    // Check specific.
+
+    /**
+     * Default lift-off envelope, used after resetting. <br>
+     * TODO: Test, might be better ground.
+     */
+    private static final LiftOffEnvelope defaultLiftOffEnvelope = LiftOffEnvelope.NO_JUMP;
+    
+    /** Tolerance value for using vertical velocity (the client sends different values than received with fight damage). */
+    private static final double TOL_VVEL = 0.0625;
+
+    //  private static final long IGNORE_SETBACK_Y = BlockProperties.F_SOLID | BlockProperties.F_GROUND | BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID;
+
     /////////////////
     // Not static.
     /////////////////
@@ -112,10 +119,20 @@ public class MovingData extends ACheckData {
 
     // Data shared between the fly checks -----
     public int            bunnyhopDelay;
-    public double         jumpAmplifier;
+    public double         jumpAmplifier = 0;
     /** Last time the player was actually sprinting. */
     public long           timeSprinting = 0;
     public double         multSprinting = 1.30000002; // Multiplier at the last time sprinting.
+    /**
+     * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
+     */
+    public double       lastYDist = Double.MAX_VALUE;
+    /**
+     * Last valid horizontal distance covered by a move. Integer.MAX_VALUE indicates "not set".
+     */
+    public double       lastHDist = Double.MAX_VALUE;
+    /** Only used during processing, to keep track of sub-checks using velocity. Reset in velocityTick, before checks run. */
+    public SimpleEntry  verVelUsed = null;
 
     /** Tick at which walk/fly speeds got changed last time. */
     public int speedTick = 0;
@@ -123,13 +140,8 @@ public class MovingData extends ACheckData {
     public float flySpeed = 0.0f;
 
     // Velocity handling.
-    // TODO: consider resetting these with clearFlyData and onSetBack.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
-    //private final FrictionAxisVelocity verVel = new FrictionAxisVelocity();
-    private int            verticalVelocityCounter;
-    private double         verticalFreedom;
-    private double         verticalVelocity;
-    private int            verticalVelocityUsed = 0;
+    private final SimpleAxisVelocity verVel = new SimpleAxisVelocity();
 
     /** Horizontal velocity modeled as an axis (always positive) */
     private final FrictionAxisVelocity horVel = new FrictionAxisVelocity();
@@ -147,7 +159,8 @@ public class MovingData extends ACheckData {
     // sf rather
     /** To/from was ground or web or assumed to be etc. */
     public boolean		  toWasReset, fromWasReset;
-    public MediumLiftOff  mediumLiftOff = defaultMediumLiftOff;
+    /** Basic envelope constraints for switching into air. */
+    public LiftOffEnvelope liftOffEnvelope = defaultLiftOffEnvelope; 
 
     // Locations shared between all checks.
     private Location    setBack = null;
@@ -185,22 +198,17 @@ public class MovingData extends ACheckData {
     public double 	      passableVL;
 
     // Data of the survival fly check.
-    public double 		sfHorizontalBuffer = 0.0; // ineffective: SurvivalFly.hBufMax / 2.0;
+    public double       sfHorizontalBuffer = 0.0; // ineffective: SurvivalFly.hBufMax / 2.0;
     /** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
-    public int			lostSprintCount = 0;
-    public int 			sfJumpPhase = 0;
+    public int          lostSprintCount = 0;
+    public int          sfJumpPhase = 0;
     /** "Dirty" flag, for receiving velocity and similar while in air. */
-    private boolean      sfDirty = false;
+    private boolean     sfDirty = false;
 
     /** Indicate low jumping descending phase (likely cheating). */
     public boolean sfLowJump = false;
     public boolean sfNoLowJump = false; // Hacks.
 
-    /**
-     * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
-     */
-    public double		sfLastYDist = Double.MAX_VALUE;
-    public double		sfLastHDist = Double.MAX_VALUE;
     /** Counting while the player is not on ground and not moving. A value <0 means not hovering at all. */
     public int 			sfHoverTicks = -1;
     /** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
@@ -243,7 +251,7 @@ public class MovingData extends ACheckData {
         sfJumpPhase = 0;
         jumpAmplifier = 0;
         setBack = null;
-        sfLastYDist = sfLastHDist = Double.MAX_VALUE;
+        lastYDist = lastHDist = Double.MAX_VALUE;
         fromX = toX = Double.MAX_VALUE;
         toYaw = Float.MAX_VALUE;
         clearAccounting();
@@ -255,9 +263,10 @@ public class MovingData extends ACheckData {
         sfHoverTicks = sfHoverLoginTicks = -1;
         sfDirty = false;
         sfLowJump = false;
-        mediumLiftOff = defaultMediumLiftOff;
+        liftOffEnvelope = defaultLiftOffEnvelope;
         vehicleConsistency = MoveConsistency.INCONSISTENT;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        verVelUsed = null;
     }
 
     /**
@@ -287,7 +296,7 @@ public class MovingData extends ACheckData {
         sfHoverTicks = -1; // 0 ?
         sfDirty = false;
         sfLowJump = false;
-        mediumLiftOff = defaultMediumLiftOff;
+        liftOffEnvelope = defaultLiftOffEnvelope;
         removeAllVelocity();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
@@ -299,7 +308,7 @@ public class MovingData extends ACheckData {
     public void prepareSetBack(final Location loc) {
         clearAccounting();
         sfJumpPhase = 0;
-        sfLastYDist = sfLastHDist = Double.MAX_VALUE;
+        lastYDist = lastHDist = Double.MAX_VALUE;
         toWasReset = false;
         fromWasReset = false;
         // Remember where we send the player to.
@@ -352,13 +361,17 @@ public class MovingData extends ACheckData {
         fromZ = toZ = z;
         toYaw = yaw;
         toPitch = pitch;
-        sfLastYDist = sfLastHDist = Double.MAX_VALUE;
+        lastYDist = lastHDist = Double.MAX_VALUE;
         sfDirty = false;
         sfLowJump = false;
-        mediumLiftOff = defaultMediumLiftOff;
+        liftOffEnvelope = defaultLiftOffEnvelope;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
+    }
+
+    public void resetLastDistances() {
+        lastHDist = lastYDist = 0.0;
     }
 
     /**
@@ -570,8 +583,47 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Add horizontal velocity (distance). <br>
-     * @param vel Assumes positive values always.
+     * Add velocity to internal book-keeping.
+     * @param player
+     * @param data
+     * @param cc
+     * @param vx
+     * @param vy
+     * @param vz
+     */
+    public void addVelocity(final Player player, final MovingConfig cc, final double vx, final double vy, final double vz) {
+
+        final int tick = TickTask.getTick();
+        removeInvalidVelocity(tick  - cc.velocityActivationTicks);
+
+        if (debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " new velocity: " + vx + ", " + vy + ", " + vz);
+        }
+
+        // Always add vertical velocity.
+        verVel.add(new SimpleEntry(tick, vy, cc.velocityActivationCounter));
+
+        // TODO: Should also switch to adding always.
+        if (vx != 0.0 || vz != 0.0) {
+            final double newVal = Math.sqrt(vx * vx + vz * vz);
+            horVel.add(new AccountEntry(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0))));
+        }
+
+        // Set dirty flag here.
+        sfDirty = true; // TODO: Set on using the velocity, due to latency !
+        sfNoLowJump = true; // TODO: Set on using the velocity, due top latency !
+
+    }
+
+    public void addVerticalVelocity(final SimpleEntry entry) {
+        verVel.add(entry);
+    }
+
+    /**
+     * Add horizontal velocity directly to horizontal-only bookkeeping.
+     * 
+     * @param vel
+     *            Assumes positive values always.
      */
     public void addHorizontalVelocity(final AccountEntry vel) {
         horVel.add(vel);
@@ -582,7 +634,7 @@ public class MovingData extends ACheckData {
      */
     public void removeAllVelocity() {
         horVel.clear();
-        clearActiveVerVel(); // Until we have a better method.
+        verVel.clear();
         sfDirty = false;
     }
 
@@ -593,7 +645,7 @@ public class MovingData extends ACheckData {
      */
     public void removeInvalidVelocity(final int tick) {
         horVel.removeInvalid(tick);
-        //        verVel.removeInvalid(tick);
+        verVel.removeInvalid(tick);
     }
 
     /**
@@ -624,17 +676,7 @@ public class MovingData extends ACheckData {
      * @return
      */
     public boolean hasAnyVerVel() {
-        return verticalFreedom >= 0.001 || verticalVelocityCounter > 0;
-    }
-
-    /**
-     * Clear active vertical velocity (until recoded, this will remove all vertical velocity).
-     */
-    public void clearActiveVerVel() {
-        verticalFreedom = 0.0;
-        verticalVelocity = 0.0;
-        verticalVelocityCounter = 0;
-        verticalVelocityUsed = 0;
+        return verVel.hasQueued();
     }
 
     //    public boolean hasActiveVerVel() {
@@ -646,43 +688,24 @@ public class MovingData extends ACheckData {
     //    }
 
     /**
-     * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
+     * Called for moving events. Remove invalid entries, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
      */
-    public void velocityTick() {
+    public void velocityTick(final int invalidateBeforeTick) {
+        // Remove invalid velocity.
+        removeInvalidVelocity(invalidateBeforeTick);
+
         // Horizontal velocity (intermediate concept).
         horVel.tick();
 
-        // Vertical velocity (new concept).
-        //        verVel.tick();
-        if (verticalVelocity <= 0.09) {
-            verticalVelocityUsed ++;
-            verticalVelocityCounter--;
-        }
+        // (Vertical velocity does not tick.)
 
-        if (verticalVelocityCounter > 0) {
-            if (verticalVelocity > 0.09) {
-                verticalVelocityUsed ++;
-            }
-            verticalFreedom += verticalVelocity;
-            verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
-            // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
-        } else if (verticalFreedom > 0.001) {
-            if (verticalVelocityUsed == 1 && verticalVelocity > 1.0) {
-                // Workarounds.
-                verticalVelocityUsed = 0;
-                verticalVelocity = 0;
-                verticalFreedom = 0;
-            }
-            else{
-                // Counter has run out, now reduce the vertical freedom over time.
-                verticalVelocityUsed ++;
-                verticalFreedom *= 0.5;
-            }
-        }
-        if (!sfDirty && (horVel.hasActive() || horVel.hasQueued() || verticalFreedom > 0.001)) {
-            // Renew the dirty phase.
+        // Renew the dirty phase.
+        if (!sfDirty && (horVel.hasActive() || horVel.hasQueued())) {
             sfDirty = true;
         }
+
+        // Reset the "just used" velocity.
+        verVelUsed = null;
     }
 
     /**
@@ -698,11 +721,15 @@ public class MovingData extends ACheckData {
      * Amount is the horizontal distance that is to be covered by velocity (active has already been checked).
      * <br>
      * If the modeling changes (max instead of sum or similar), then this will be affected.
-     * @param amount The amount used.
+     * @param amount The amount demanded, must be positive.
      * @return
      */
     public double useHorizontalVelocity(final double amount) {
-        return horVel.use(amount);
+        final double available = horVel.use(amount);
+        if (available >= amount) {
+            sfDirty = true;
+        }
+        return available;
     }
 
     /**
@@ -716,7 +743,50 @@ public class MovingData extends ACheckData {
         }
         if (horVel.hasQueued()) {
             builder.append("\n" + " horizontal velocity (queued):");
-            horVel.AddQueued(builder);
+            horVel.addQueued(builder);
+        }
+    }
+
+    /**
+     * Get the first matching velocity entry (invalidate others). Sets
+     * verVelUsed if available.
+     * 
+     * @param amount
+     * @return
+     */
+    public SimpleEntry useVerticalVelocity(final double amount) {
+        final SimpleEntry available = verVel.use(amount, TOL_VVEL);
+        if (available != null) {
+            sfDirty = true;
+            verVelUsed = available;
+        }
+        return available;
+    }
+
+    /**
+     * Check the verVelUsed field and return that if appropriate. Otherwise
+     * call useVerticalVelocity(amount). 
+     * 
+     * @param amount
+     * @return
+     */
+    public SimpleEntry getOrUseVerticalVelocity(final double amount) {
+        if (verVelUsed != null) {
+            if (verVel.matchesEntry(verVelUsed, amount, TOL_VVEL)) {
+                return verVelUsed;
+            }
+        }
+        return useVerticalVelocity(amount);
+    }
+
+    /**
+     * Debugging.
+     * @param builder
+     */
+    public void addVerticalVelocity(final StringBuilder builder) {
+        if (verVel.hasQueued()) {
+            builder.append("\n" + " vertical velocity (queued):");
+            verVel.addQueued(builder);
         }
     }
 
@@ -790,6 +860,27 @@ public class MovingData extends ACheckData {
     }
 
     /**
+     * Adjust on set back and similar.
+     * @param loc
+     */
+    public void adjustLiftOffEnvelope(final PlayerLocation loc) {
+        // Simplified.
+        if (loc.isInWeb()) {
+            liftOffEnvelope = LiftOffEnvelope.NO_JUMP;
+        }
+        else if (loc.isInLiquid()) {
+            // TODO: Distinguish strong limit.
+            liftOffEnvelope = LiftOffEnvelope.LIMIT_LIQUID;
+        }
+        else if (loc.isOnGround()) {
+            liftOffEnvelope = LiftOffEnvelope.NORMAL;
+        }
+        else {
+            liftOffEnvelope = defaultLiftOffEnvelope;
+        }
+    }
+
+    /**
      * This tests for a LocationTrace instance being set at all, not for locations having been added.
      * @return
      */
@@ -853,53 +944,6 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Add velocity to internal book-keeping.
-     * @param player
-     * @param data
-     * @param cc
-     * @param vx
-     * @param vy
-     * @param vz
-     */
-    public void addVelocity(final Player player, final MovingConfig cc, final double vx, final double vy, final double vz) {
-
-        final int tick = TickTask.getTick();
-        removeInvalidVelocity(tick  - cc.velocityActivationTicks);
-
-        if (debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " new velocity: " + vx + ", " + vy + ", " + vz);
-        }
-
-        boolean used = false;
-        if (vy > 0D) {
-            used = true;
-            if (verticalFreedom <= 0.001 && verticalVelocityCounter >= 0) {
-                verticalVelocity = 0;
-            }
-            verticalVelocity += vy;
-            verticalFreedom += verticalVelocity;
-            verticalVelocityCounter = Math.min(100, Math.max(verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(vy * 10.0)); // 50;
-            verticalVelocityUsed = 0;
-        }
-
-
-        if (vx != 0.0 || vz != 0.0) {
-            final double newVal = Math.sqrt(vx * vx + vz * vz);
-            used = true;
-            final AccountEntry vel = new AccountEntry(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
-            addHorizontalVelocity(vel);
-        }
-
-        // Set dirty flag here.
-        if (used) {
-            // TODO: Detect when actually used? More complicated, some internal adding needs setting it here.
-            sfDirty = true;
-            sfNoLowJump = true;
-        }
-        // TODO: clear accounting here ?
-    }
-
-    /**
      * Test if velocity has affected the in-air jumping phase. Keeps set until
      * reset on-ground or otherwise. Use clearActiveVerVel to force end velocity
      * jump phase. Use hasAnyVerVel() to test if active or queued vertical
@@ -912,34 +956,14 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Refactoring state: Get the classic verticalFreedom.
-     * @return
-     */
-    public double getVerticalFreedom() {
-        return verticalFreedom;
-    }
-
-    /**
-     * Refactoring stage: Fake/override vertical velocity.
-     * @param velocity
-     * @param freedom
-     * @param counter
-     */
-    public void fakeVerticalFreedom(final double velocity, final double freedom, final int counter) {
-        verticalVelocity = velocity;
-        verticalFreedom = freedom;
-        verticalVelocityCounter = counter;
-        verticalVelocityUsed = 0;
-    }
-
-    /**
      * Refactoring stage: Test which value sfDirty should have and set
      * accordingly. This should only be called, if the player reached ground.
      * 
      * @return If the velocity jump phase is still active (sfDirty).
      */
     public boolean resetVelocityJumpPhase() {
-        if (verticalFreedom > 0.001 || horVel.hasActive() || horVel.hasQueued()) {
+        if (horVel.hasActive() || horVel.hasQueued()) {
+            // TODO: What with vertical ?
             sfDirty = true;
         } else {
             sfDirty = false;
@@ -948,37 +972,12 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Add to builder with a leading newline, if counter or counter or freedom
-     * is above threshold (0 / 0.001).
-     * 
-     * @param builder
+     * Force set the move to be affected by previous speed. Currently
+     * implemented as setting velocity jump phase.
      */
-    public void logVerticalFreedom(StringBuilder builder) {
-        if (verticalVelocityCounter > 0 || verticalFreedom >= 0.001) {
-            builder.append("\n vertical freedom: " +  StringUtil.fdec3.format(verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(verticalVelocity) + "/counter=" + verticalVelocityCounter +"/used=" + verticalVelocityUsed);
-        }
-    }
-
-    /**
-     * Refactoring stage: Invalidate vertical velocity based on checking vs.
-     * configured grace ticks.
-     * 
-     * @param velocityGraceTicks Ticks to check used ticks vs.
-     * @param removeFreedom If to reset verticalFreedom and use count as well.
-     * @return If actually reset.
-     */
-    public boolean invalidateVerVelGrace(final int velocityGraceTicks, final boolean removeFreedom) {
-        if (verticalVelocityUsed > velocityGraceTicks) {
-            verticalVelocityCounter = 0;
-            verticalVelocity = 0;
-            if (removeFreedom) {
-                verticalVelocityUsed = 0;
-                verticalFreedom = 0;
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public void setFrictionJumpPhase() {
+        // TODO: Better and more reliable modeling.
+        sfDirty = true;
     }
 
 }

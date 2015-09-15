@@ -10,11 +10,11 @@ public class NoobsTest {
     public void testSmallDoubles() {
         double x;
         x = Double.MIN_VALUE;
-        if (x <= 0.0) {
+        if (x <= 0.0 || !(x > 0.0)) {
             fail("noob");
         }
         x = -Double.MIN_VALUE;
-        if (x >= 0.0) {
+        if (x >= 0.0 || !(x < 0.0)) {
             fail("noob");
         }
     }

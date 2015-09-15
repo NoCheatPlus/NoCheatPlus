@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Simple per-axis velocity (positive + negative), only accounting for queuing
- * and invalidation. Since entries just store values for one time use, no extra
+ * and invalidation. Since entries just wrap values for one time use, no extra
  * ticking is done, invalidation mechanics and activation count decreasing takes
  * place in removeInvalid.
  * 
@@ -14,6 +14,9 @@ import java.util.List;
  *
  */
 public class SimpleAxisVelocity {
+
+    /** Margin for accepting a demanded 0.0 amount, regardless sign. */
+    private static final double marginAcceptZero = 0.005;
 
     private final List<SimpleEntry> queued = new LinkedList<SimpleEntry>();
 
@@ -26,51 +29,49 @@ public class SimpleAxisVelocity {
     }
 
     /**
-     * The value of the first matching entry. Returns 0.0 if no entry
-     * is available. This will directly invalidate leading entries with the
-     * wrong sign.
+     * Use the next matching entry.
      * 
      * @param amount
-     * @return
+     * @param tolerance
+     *            Allow using entries with less amount (still sign-specific).
+     *            Must be equal or greater than 0.0.
+     * @return The first matching entry. Returns null if no entry is available.
+     *         This will directly invalidate leading entries with the wrong
+     *         sign.
      */
-    public double use(final double amount) {
+    public SimpleEntry use(final double amount, final double tolerance) {
         final Iterator<SimpleEntry> it = queued.iterator();
-        final double absAmount = Math.abs(amount);
         while (it.hasNext()) {
             final SimpleEntry entry = it.next();
             it.remove();
-            if (absAmount <= Math.abs(entry.value)) {
-                if (amount > 0.0 && entry.value > 0.0 || amount < 0.0 && entry.value < 0.0) {
-                    // Success. Note that 0.0 Entries are ignored (should not exist anyway).
-                    return entry.value;
-                } // else: Wrong sign.
-            } // else: Value too small.
+            if (matchesEntry(entry, amount, tolerance)) {
+                // Success.
+                return entry;
+            } 
             // (Entry can not be used.)
             // TODO: Note unused velocity.
         }
         // None found.
-        return 0.0;
+        return null;
     }
 
     /**
+     * Check if the demanded amount can be covered by this velocity entry. Might
+     * return an entry with a small value with a different sign, if amount is
+     * set to 0.0. Needed also for testing stored entries.
      * 
-     * @return The value of the first matching positive entry. Returns 0.0 if no
-     *         entry is available. This will directly invalidate leading entries
-     *         with the wrong sign.
+     * @param entry
+     * @param amount
+     * @param tolerance
+     *            Allow using entries with less amount (still sign-specific).
+     *            Must be equal or greater than 0.0.
+     * @return
      */
-    public double usePositive() {
-        return use(Double.MIN_VALUE);
-    }
-
-    /**
-     * Use any negative amount.
-     * 
-     * @return The value of the first matching negative entry. Returns 0.0 if no
-     *         entry is available. This will directly invalidate leading entries
-     *         with the wrong sign.
-     */
-    public double useNegative() {
-        return use(-Double.MIN_VALUE);
+    public boolean matchesEntry(final SimpleEntry entry, final double amount, final double tolerance) {
+        return Math.abs(amount) <= Math.abs(entry.value) + tolerance && 
+                (amount > 0.0 && entry.value > 0.0 && amount <= entry.value + tolerance 
+                || amount < 0.0 && entry.value < 0.0 && entry.value - tolerance <= amount 
+                || amount == 0.0 && Math.abs(entry.value) <= marginAcceptZero);
     }
 
     /**
@@ -78,6 +79,7 @@ public class SimpleAxisVelocity {
      * @param tick
      */
     public void removeInvalid(final int tick) {
+        // Note: clear invalidated here, append unused to invalidated.
         final Iterator<SimpleEntry> it = queued.iterator();
         while (it.hasNext()) {
             final SimpleEntry entry = it.next();
@@ -90,6 +92,17 @@ public class SimpleAxisVelocity {
 
     public void clear() {
         queued.clear();
+    }
+
+    /**
+     * Debugging.
+     * @param builder
+     */
+    public void addQueued(final StringBuilder builder) {
+        for (final SimpleEntry vel: queued) {
+            builder.append(" ");
+            builder.append(vel);
+        }
     }
 
 }

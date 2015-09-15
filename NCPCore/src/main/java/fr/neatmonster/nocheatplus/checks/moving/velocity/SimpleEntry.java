@@ -20,13 +20,13 @@ public class SimpleEntry {
 
     // TODO: Add more conditions (max tick, real time ?)
 
-    public SimpleEntry(double value, int actCount, int valCount){
+    public SimpleEntry(double value, int actCount){
         this.tick = TickTask.getTick();
         this.value = value;
         this.actCount = actCount;
     }
 
-    public SimpleEntry(int tick, double value, int actCount, int valCount){
+    public SimpleEntry(int tick, double value, int actCount){
         this.tick = tick;
         this.value = value;
         this.actCount = actCount;

@@ -666,6 +666,17 @@ public class PlayerLocation {
     }
 
     /**
+     * Test if something solid/ground-like collides within a default margin
+     * above the height of the player. Margin is yOnGround + max(0.0, 2.0 - eyeHeight).
+     * 
+     * @param marginAboveHeight
+     * @return
+     */
+    public boolean isHeadObstructed() {
+        return isHeadObstructed(Math.max(0.0, 2.0 - eyeHeight) + yOnGround);
+    }
+
+    /**
      * Convenience method for testing for either.
      * @return
      */
@@ -951,6 +962,21 @@ public class PlayerLocation {
         this.notOnGroundMaxY = other.notOnGroundMaxY;
         this.onGroundMinY = other.onGroundMinY;
         this.blockFlags = other.blockFlags; //  Assume set.
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder(128);
+        builder.append("PlayerLocation(");
+        builder.append(world == null ? "null" : world.getName());
+        builder.append('/');
+        builder.append(Double.toString(x));
+        builder.append(", ");
+        builder.append(Double.toString(y));
+        builder.append(", ");
+        builder.append(Double.toString(z));
+        builder.append(')');
+        return builder.toString();
     }
 
 }
