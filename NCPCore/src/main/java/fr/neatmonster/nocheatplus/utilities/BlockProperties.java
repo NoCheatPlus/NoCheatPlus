@@ -736,11 +736,12 @@ public class BlockProperties {
         blocks[Material.WOODEN_DOOR.getId()] = woodDoorType;
         blocks[Material.TRAP_DOOR.getId()] = woodDoorType;
         for (Material mat : new Material[]{
-                Material.ENDER_STONE, Material.DRAGON_EGG, Material.COAL_ORE,
+                Material.ENDER_STONE, Material.COAL_ORE,
 
         }) {
             blocks[mat.getId()] =  coalType;
         }
+        blocks[Material.DRAGON_EGG.getId()] = new BlockProps(noTool, 3f, secToMs(4.5)); // Former: coalType.
         final long[] ironTimes = secToMs(15, 15, 1.15, 0.75, 0.6, 15);
         final BlockProps ironType = new BlockProps(stonePickaxe, 3, ironTimes);
         for (Material mat : new Material[]{
