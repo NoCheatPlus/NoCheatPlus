@@ -111,7 +111,7 @@ public class PlayerLocation {
     }
 
     /**
-     * Gets the location.
+     * Gets a new Location instance representing this position.
      * 
      * @return the location
      * @throws NullPointerException, if the world stored internally is null.
@@ -120,7 +120,7 @@ public class PlayerLocation {
         if (this.world == null) {
             throw new NullPointerException("World is null.");
         }
-        return new Location(world, x, y, z);
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     /**
