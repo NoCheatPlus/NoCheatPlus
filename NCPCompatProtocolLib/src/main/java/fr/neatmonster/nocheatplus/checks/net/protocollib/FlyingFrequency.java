@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -34,6 +35,11 @@ public class FlyingFrequency extends BaseAdapter {
     public static final int indexOnGround = 0;
     public static final int indexhasPos = 1;
     public static final int indexhasLook = 2;
+    public static final int indexX = 0;
+    public static final int indexY = 1;
+    public static final int indexZ = 2;
+    public static final int indexYaw = 0;
+    public static final int indexPitch = 1;
 
     // Thresholds for firing moving events (CraftBukkit).
     public static final double minMoveDistSq = 1f / 256; // PlayerConnection magic.
@@ -45,7 +51,8 @@ public class FlyingFrequency extends BaseAdapter {
     private final int idHandled = counters.registerKey("packet.flying.handled");
     private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
 
-    private boolean cancelRedundant = true;
+    /** Set to true, if a packet can't be interpreted, assuming compatibility to be broken. */
+    private boolean packetMismatch = false;
 
     public FlyingFrequency(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
@@ -78,7 +85,29 @@ public class FlyingFrequency extends BaseAdapter {
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time; // Update without much of a contract.
 
-        // Counting all packets.
+        final boolean primaryThread = !event.isAsync();
+        if (!primaryThread) {
+            // Count all asynchronous events.
+            counters.addSynchronized(idAsyncFlying, 1);
+            // TODO: Detect game phase for the player and warn if it is PLAY.
+        }
+
+        // Interpret the packet content.
+        final DataPacketFlying packetData = packetMismatch ? null : interpretPacket(event, time);
+
+        // Prevent processing packets with obviously malicious content.
+        if (isInvalidContent(packetData)) {
+            // TODO: More specific, log and kick or log once [/limited] ?
+            event.setCancelled(true);
+            return;
+        }
+
+        // TODO: Counters for hasPos, hasLook, both, none.
+        // TODO: Avoid counters setting?
+
+        // TODO: Compare to stored outgoing teleport packets and skip processing/cancel, if this is a tp-ack packet.
+
+        // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
         data.flyingFrequencyAll.add(time, 1f);
         final float allScore = data.flyingFrequencyAll.score(1f);
@@ -87,46 +116,113 @@ public class FlyingFrequency extends BaseAdapter {
             return;
         }
 
-        if (event.isAsync()) {
-            // Count all asynchronous events.
-            counters.add(idAsyncFlying, 1);
-            // TODO: Detect game phase for the player and warn if it is PLAY.
+        // TODO: Run other checks based on the packet content.
+
+        // Cancel redundant packets, when frequency is high anyway.
+        // TODO: Recode to detect cheating in a more reliable way, normally this is not the primary thread.
+        //        if (primaryThread && !packetMismatch && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, packetData, allScore, time, data, cc)) {
+        //            event.setCancelled(true);
+        //        }
+
+        if (data.debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " + packetData + (event.isCancelled() ? " CANCEL" : ""));
         }
-        else {
-            // Cancel redundant packets, when frequency is high anyway.
-            if (cancelRedundant && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, event, allScore, time, data, cc)) {
-                event.setCancelled(true);
-            }
-        }
+
     }
 
-    private boolean checkRedundantPackets(final Player player, final PacketEvent event, final float allScore, final long time, final NetData data, final NetConfig cc) {
-        // TODO: Consider quick return conditions.
-        // TODO: Debug logging (better with integration into DataManager).
-        // TODO: Consider to compare to moving data directly, skip keeping track extra.
+    private boolean isInvalidContent(final DataPacketFlying packetData) {
+        if (packetData.hasPos && CheckUtils.isBadCoordinate(packetData.x, packetData.y, packetData.z)) {
+            return true;
+        }
+        if (packetData.hasLook && CheckUtils.isBadCoordinate(packetData.yaw, packetData.pitch)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Interpret the packet content and do with it whatever is suitable.
+     * @param player
+     * @param event
+     * @param allScore
+     * @param time
+     * @param data
+     * @param cc
+     * @return Packet data if successful, or null on packet mismatch.
+     */
+    private DataPacketFlying interpretPacket(final PacketEvent event, final long time) {
 
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
         if (booleans.size() != FlyingFrequency.numBooleans) {
-            return packetMismatch();
+            packetMismatch();
+            return null;
         }
+        final boolean hasPos = booleans.get(FlyingFrequency.indexhasPos).booleanValue();
+        final boolean hasLook = booleans.get(FlyingFrequency.indexhasLook).booleanValue();
+        final boolean onGround = booleans.get(FlyingFrequency.indexOnGround).booleanValue();
+
+        if (!hasPos && !hasLook) {
+            return new DataPacketFlying(onGround, time);
+        } else {
+            final List<Double> doubles;
+            final List<Float> floats;
+
+            if (hasPos) {
+                doubles = packet.getDoubles().getValues();
+                if (doubles.size() != 3) {
+                    packetMismatch();
+                    return null;
+                }
+            }
+            else {
+                doubles = null;
+            }
+
+            if (hasLook) {
+                floats = packet.getFloat().getValues();
+                if (floats.size() != 2) {
+                    packetMismatch();
+                    return null;
+                }
+            }
+            else {
+                floats = null;
+            }
+            if (hasPos && hasLook) {
+                return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), floats.get(indexYaw), floats.get(indexPitch), time);
+            }
+            else if (hasLook) {
+                return new DataPacketFlying(onGround, floats.get(indexYaw), floats.get(indexPitch), time);
+            }
+            else if (hasPos) {
+                return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), time);
+            }
+            else {
+                throw new IllegalStateException("Can't be, it can't be!");
+            }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private boolean checkRedundantPackets(final Player player, final DataPacketFlying packetData, final float allScore, final long time, final NetData data, final NetConfig cc) {
+        // TODO: Debug logging (better with integration into DataManager).
+        // TODO: Consider to compare to moving data directly, skip keeping track extra.
 
         final MovingData mData = MovingData.getData(player);
         if (mData.toX == Double.MAX_VALUE && mData.toYaw == Float.MAX_VALUE) {
             // Can not check.
             return false;
         }
-        final boolean hasPos = booleans.get(FlyingFrequency.indexhasPos).booleanValue();
-        final boolean hasLook = booleans.get(FlyingFrequency.indexhasLook).booleanValue();
-        final boolean onGround = booleans.get(FlyingFrequency.indexOnGround).booleanValue();
+
         boolean onGroundSkip = false;
 
         // Allow at least one on-ground change per state and second.
         // TODO: Consider to verify on ground somehow (could tell MovingData the state).
-        if (onGround != data.flyingFrequencyOnGround) {
+        if (packetData.onGround != data.flyingFrequencyOnGround) {
             // Regard as not redundant only if sending the same state happened at least a second ago.
             final long lastTime;
-            if (onGround) {
+            if (packetData.onGround) {
                 lastTime = data.flyingFrequencyTimeOnGround;
                 data.flyingFrequencyTimeOnGround = time;
             } else {
@@ -138,38 +234,16 @@ public class FlyingFrequency extends BaseAdapter {
                 onGroundSkip = true;
             }
         }
-        data.flyingFrequencyOnGround = onGround;
+        data.flyingFrequencyOnGround = packetData.onGround;
 
-        if (hasPos) {
-            final List<Double> doubles = packet.getDoubles().getValues();
-            if (doubles.size() != 3) {
-                return packetMismatch();
-            }
-            final double x = doubles.get(0).doubleValue();
-            final double y = doubles.get(1).doubleValue();
-            final double z = doubles.get(2).doubleValue();
-            if (CheckUtils.isBadCoordinate(x, y, z)) {
-                // TODO: Alert, counters, kick.
-                return true;
-            }
-            if (TrigUtil.distanceSquared(x, y, z, mData.toX, mData.toY, mData.toZ) > minMoveDistSq) {
+        if (packetData.hasPos) {
+            if (TrigUtil.distanceSquared(packetData.x, packetData.y, packetData.z, mData.toX, mData.toY, mData.toZ) > minMoveDistSq) {
                 return false;
             }
         }
 
-        if (hasLook) {
-            final List<Float> floats = packet.getFloat().getValues();
-            if (floats.size() != 2) {
-                return packetMismatch();
-            }
-            final float yaw = floats.get(0).floatValue();
-            final float pitch = floats.get(1).floatValue();
-            // TODO: Consider to detect bad pitch too.
-            if (CheckUtils.isBadCoordinate(yaw, pitch)) {
-                // TODO: Alert, counters, kick.
-                return true;
-            }
-            if (Math.abs(TrigUtil.yawDiff(yaw, mData.toYaw)) > minLookChange || Math.abs(TrigUtil.yawDiff(pitch, mData.toPitch)) > minLookChange) {
+        if (packetData.hasLook) {
+            if (Math.abs(TrigUtil.yawDiff(packetData.yaw, mData.toYaw)) > minLookChange || Math.abs(TrigUtil.yawDiff(packetData.pitch, mData.toPitch)) > minLookChange) {
                 return false;
             }
         }
@@ -190,13 +264,11 @@ public class FlyingFrequency extends BaseAdapter {
     }
 
     /**
-     * Log warning to console, halt checking for redundant packets.
-     * @return Always returns false;
+     * Log warning to console, stop interpreting packet content.
      */
-    private boolean packetMismatch() {
-        cancelRedundant = false;
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Data mismatch: disable cancelling of redundant packets.");
-        return false;
+    private void packetMismatch() {
+        packetMismatch = true;
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Data mismatch: disable interpretation of flying packets.");
     }
 
 }
