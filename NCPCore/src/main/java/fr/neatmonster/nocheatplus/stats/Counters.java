@@ -148,25 +148,20 @@ public class Counters {
     }
 
     /**
-     * Reset all counters to 0, potentially heavy by acquiring all locks for
-     * syCounts where entries are greater than 0.<br>
+     * Reset all counters to 0.<br>
      * Calling this and getting the counts or string compilation should be
      * arranged in a consistent way, e.g. only calling those from the primary
-     * thread, because the latter methods don't acquire any locks.
+     * thread, because the latter methods don't acquire any locks while
+     * iterating.
      */
     public void resetAll() {
         globalLock.lock();
 
         for (int i = 0; i < ptCounts.length; i ++) {
-            ptCounts[i].count = 0;
+            ptCounts[i] = new CountEntry();
         }
         for (int i = 0; i < syCounts.length; i ++) {
-            if (syCounts[i].count > 0) {
-                // Lock must be there.
-                syLocks[i].lock();
-                syCounts[i].count = 0;
-                syLocks[i].unlock();
-            }
+            syCounts[i] = new CountEntry();
         }
 
         globalLock.unlock();
