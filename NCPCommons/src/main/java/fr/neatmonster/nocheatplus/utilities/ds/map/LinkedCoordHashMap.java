@@ -186,7 +186,7 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     public V get(final int x, final int y, final int z, final MoveOrder order) {
         // TODO: Optimized.
         final V value = super.get(x, y ,z);
-        if (order != MoveOrder.NOT) {
+        if (value != null && order != MoveOrder.NOT) {
             move(x, y, z, order);
         }
         return value;

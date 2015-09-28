@@ -335,6 +335,9 @@ public class TestCoordMap {
             testNext(it, coords, i);
             i--;
         }
+
+        // TODO: Specific tests with iterator.remove.
+
     }
 
     private void testNext(Iterator<Entry<Integer>> it, int[][] coords, int matchIndex) {
