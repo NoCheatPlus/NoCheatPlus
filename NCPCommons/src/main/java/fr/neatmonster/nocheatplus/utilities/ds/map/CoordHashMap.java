@@ -30,6 +30,9 @@ public class CoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonster.noch
      * @param <V>
      */
     public static class HashIterator<V> implements Iterator<Entry<V>> {
+
+        // TODO: Switch to store an iterator?
+
         private final CoordHashMap<V> map;
         private final List<HashEntry<V>>[] entries;
 

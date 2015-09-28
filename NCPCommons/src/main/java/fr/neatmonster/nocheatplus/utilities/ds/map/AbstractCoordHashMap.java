@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities.ds.map;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -143,14 +144,15 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
             return null;
         }
         else {
-            for (int i = 0; i < bucket.size(); i++) {
-                final E entry = bucket.get(i);
+            final Iterator<E> it = bucket.iterator(); 
+            while (it.hasNext()) {
+                final E entry = it.next();
                 if (entry.hash == hash && x == entry.x && z == entry.z && y == entry.y) {
-                    bucket.remove(entry);
+                    it.remove();
+                    size--;
                     if (bucket.isEmpty()) {
                         entries[slot] = null;
                     }
-                    size--;
                     return entry.value;
                 }
             }
