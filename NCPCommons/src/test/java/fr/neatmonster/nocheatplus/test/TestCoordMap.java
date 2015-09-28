@@ -12,8 +12,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
-import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
-import fr.neatmonster.nocheatplus.utilities.ds.CoordMap.Entry;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry;
 
 public class TestCoordMap {
 	
@@ -208,33 +209,33 @@ public class TestCoordMap {
 		CoordMap<Integer> map; 
 		
 		// Fill and check
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		matchAll(map, coords);
 		
 		// Fill and check with iterator.
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		matchAllIterator(map, indexMap);
 		
 		// Normal removing
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		removeAll(map, coords);
 		assertSize(map, 0);
 		
 		// Removing with iterator.
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		removeAllIterator(map, indexMap);
 		assertSize(map, 0);
 		
 		// Fill twice.
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		fillMap(map, coords);
@@ -244,7 +245,7 @@ public class TestCoordMap {
 		assertSize(map, 0);
 		
 		// Fill twice iterator.
-		map = new CoordMap<Integer>(initialSize, loadFactor);
+		map = new CoordHashMap<Integer>(initialSize, loadFactor);
 		fillMap(map, coords);
 		assertSize(map, indexMap.size());
 		fillMap(map, coords);

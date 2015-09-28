@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
-import fr.neatmonster.nocheatplus.utilities.ds.ManagedMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.ManagedMap;
 
 /**
  * Store EnginePlayerData. Expire data on get(String, Chatonfig).

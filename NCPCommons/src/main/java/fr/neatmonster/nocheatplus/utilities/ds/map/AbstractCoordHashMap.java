@@ -1,0 +1,221 @@
+package fr.neatmonster.nocheatplus.utilities.ds.map;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Intended for Minecraft coordinates, probably not for too high values.<br>
+ * This implementation is not thread safe, though changing values and
+ * get/contains should work if the map stays unchanged.
+ * 
+ * <br>
+ * Abstract base implementation for a hash map version.
+ * 
+ * @author asofold
+ *
+ */
+public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatplus.utilities.ds.map.AbstractCoordHashMap.HashEntry<V>> implements CoordMap<V> {
+
+    private static final int p1 = 73856093;
+    private static final int p2 = 19349663;
+    private static final int p3 = 83492791;
+
+    protected static final int getHash(final int x, final int y, final int z) {
+        return p1 * x ^ p2 * y ^ p3 * z;
+    }
+
+    public static class HashEntry<V> implements Entry<V>{
+        protected final int x;
+        protected final int y;
+        protected final int z;
+        protected V value;
+        protected final int hash;
+
+        public HashEntry(final int x, final int y, final int z, final V value, final int hash) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.value = value;
+            this.hash = hash;
+        }
+        @Override
+        public final int getX(){
+            return x;
+        }
+        @Override
+        public final int getY(){
+            return y;
+        }
+        @Override
+        public final int getZ(){
+            return z;
+        }
+        @Override
+        public final V getValue(){
+            return value;
+        }
+    }
+
+    // Core data.
+    private final float loadFactor;
+    protected List<E>[] entries;
+    /** Current size. */
+    protected int size = 0;
+
+    public AbstractCoordHashMap() {
+        this(10, 0.75f);
+    }
+
+    public AbstractCoordHashMap(final int initialCapacity) {
+        this(initialCapacity, 0.75f);
+    }
+
+    /**
+     * 
+     * @param initialCapacity
+     *            Initial internal array size. <br>
+     *            TODO: change to expected number of elements (len = cap/load).
+     * @param loadFactor
+     */
+    @SuppressWarnings("unchecked")
+    public AbstractCoordHashMap(final int initialCapacity, float loadFactor) {
+        this.loadFactor = loadFactor;
+        entries = new List[initialCapacity];
+    }
+
+    @Override
+    public boolean contains(final int x, final int y, final int z) {
+        return get(x, y, z) != null;
+    }
+
+    @Override
+    public V get(final int x, final int y, final int z) {
+        final int hash = getHash(x, y, z);
+        final int slot = Math.abs(hash) % entries.length;
+        final List<E> bucket = entries[slot];
+        if (bucket == null) {
+            return null;
+        }
+        for (final E entry : bucket) {
+            if (hash == entry.hash && x == entry.x && z == entry.z && y == entry.y) {
+                return entry.value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean put(final int x, final int y, final int z, final V value) {
+        final int hash = getHash(x, y, z);
+        final int absHash = Math.abs(hash);
+        int slot = absHash % entries.length;
+        List<E> bucket = entries[slot];
+        if (bucket != null) {
+            for (final E entry : bucket) {
+                if (hash == entry.hash && x == entry.x && z == entry.z && y == entry.y) {
+                    entry.value = value;
+                    return true;
+                }
+            }
+        } else if (size + 1 > entries.length * loadFactor) {
+            resize(size + 1);
+            slot = absHash % entries.length;
+            bucket = entries[slot];
+        }
+        if (bucket == null) {
+            // TODO: use array list ?
+            bucket = new LinkedList<E>();
+            entries[slot] = bucket;
+        }
+        bucket.add(newEntry(x, y, z, value, hash));
+        size++;
+        return false;
+    }
+
+    @Override
+    public V remove(final int x, final int y, final int z) {
+        final int hash = getHash(x, y, z);
+        final int absHash = Math.abs(hash);
+        int slot = absHash % entries.length;
+        final List<E> bucket = entries[slot];
+        if (bucket == null) {
+            return null;
+        }
+        else {
+            for (int i = 0; i < bucket.size(); i++) {
+                final E entry = bucket.get(i);
+                if (entry.hash == hash && x == entry.x && z == entry.z && y == entry.y) {
+                    bucket.remove(entry);
+                    if (bucket.isEmpty()) {
+                        entries[slot] = null;
+                    }
+                    size--;
+                    return entry.value;
+                }
+            }
+            return null;
+        }
+    }
+
+    private void resize(final int size) {
+        // TODO: other capacity / allow to set strategy [also for reducing for long time use]
+        final int newCapacity =  Math.min(Math.max((int) ((size + 4) / loadFactor), entries.length + entries.length / 4), 4);
+        @SuppressWarnings("unchecked")
+        final List<E>[] newEntries = new List[newCapacity];
+        int used = -1; //  Fill old buckets to front of old array.
+        for (int oldSlot = 0; oldSlot < entries.length; oldSlot++) {
+            final List<E> oldBucket = entries[oldSlot];
+            if (oldBucket == null) {
+                continue;
+            }
+            for (final E entry : oldBucket) {
+                final int newSlot = Math.abs(entry.hash) % newCapacity;
+                List<E> newBucket = newEntries[newSlot];
+                if (newBucket == null) {
+                    if (used < 0) {
+                        newBucket = new LinkedList<E>();
+                    }
+                    else{
+                        newBucket = entries[used];
+                        entries[used] = null;
+                        used--;
+                    }
+                    newEntries[newSlot] = newBucket;
+                }
+                newBucket.add(entry);
+            }
+            oldBucket.clear();
+            entries[oldSlot] = null;
+            entries[++used] = oldBucket;
+        }
+        entries = newEntries;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public void clear() {
+        size = 0;
+        Arrays.fill(entries, null);
+        // TODO: resize ?
+    }
+
+    /**
+     * Get a new entry. This method can have side effects (linked structures
+     * etc.), it exists solely for the purpose of adding new entries within
+     * put(...).
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param value
+     * @param hash
+     * @return
+     */
+    protected abstract E newEntry(int x, int y, int z, V value, int hash);
+
+}

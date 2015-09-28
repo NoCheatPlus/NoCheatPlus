@@ -7,7 +7,8 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 
 /**
  * Access to type-ids and data using caching techniques.
@@ -67,13 +68,13 @@ public abstract class BlockCache {
     }
 
     /** Cached type-ids. */
-    private final CoordMap<Integer> idMap = new CoordMap<Integer>(23);
+    private final CoordMap<Integer> idMap = new CoordHashMap<Integer>(23);
 
     /** Cached data values. */
-    private final CoordMap<Integer> dataMap = new CoordMap<Integer>(23);
+    private final CoordMap<Integer> dataMap = new CoordHashMap<Integer>(23);
 
     /** Cached shape values. */
-    private final CoordMap<double[]> boundsMap = new CoordMap<double[]>(23);
+    private final CoordMap<double[]> boundsMap = new CoordHashMap<double[]>(23);
 
     protected int maxBlockY =  255;
 

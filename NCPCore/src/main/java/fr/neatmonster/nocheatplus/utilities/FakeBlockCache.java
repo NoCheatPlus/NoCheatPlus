@@ -8,8 +8,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
-import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
-import fr.neatmonster.nocheatplus.utilities.ds.CoordMap.Entry;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry;
 
 /**
  * Stand-alone BlockCache for setting data by access methods, for testing purposes.
@@ -19,13 +20,13 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap.Entry;
 public class FakeBlockCache extends BlockCache {
 
     /** Cached type-ids. */
-    private final CoordMap<Integer> idMapStored = new CoordMap<Integer>(23);
+    private final CoordMap<Integer> idMapStored = new CoordHashMap<Integer>(23);
 
     /** Cached data values. */
-    private final CoordMap<Integer> dataMapStored = new CoordMap<Integer>(23);
+    private final CoordMap<Integer> dataMapStored = new CoordHashMap<Integer>(23);
 
     /** Cached shape values. */
-    private final CoordMap<double[]> boundsMapStored = new CoordMap<double[]>(23);
+    private final CoordMap<double[]> boundsMapStored = new CoordHashMap<double[]>(23);
 
     /**
      * Convenience method to copy a cuboid region given by two endpoints without any order specified.
