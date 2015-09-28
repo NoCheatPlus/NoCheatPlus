@@ -704,7 +704,7 @@ public class SurvivalFly extends Check {
             }
             // Descending.
             if (yDistance <= 0) {
-                if (lostGroundDescend(player, from, to, hDistance, yDistance, sprinting, data, cc)) {
+                if (lostGroundDescend(player, from, loc, to, hDistance, yDistance, sprinting, data, cc)) {
                     return true;	
                 }
             }
@@ -1828,11 +1828,25 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGroundDescend(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
 
         final double setBackYDistance = to.getY() - data.getSetBackY();
+
+        // Collides vertically.
+        // Note: checking loc should make sense, rather if loc is higher than from?
+        if (!to.isOnGround() && from.isOnGround(from.getY() - to.getY() + 0.001)) {
+            // Test for passability of the entire box, roughly from feet downwards.
+            // TODO: Efficiency with Location instances.
+            // TODO: Full bounds check (!).
+            final Location ref = from.getLocation();
+            ref.setY(to.getY());
+            if (BlockProperties.isPassable(from.getLocation(), ref)) {
+                // TODO: Needs new model (store detailed on-ground properties).
+                return applyLostGround(player, from, false, data, "vcollide");
+            }
+        }
 
         if (data.sfJumpPhase <= 7) {
             // Check for sprinting down blocks etc.
@@ -1844,6 +1858,7 @@ public class SurvivalFly extends Check {
                 if (from.isOnGround(0.6, 0.4, 0.0, 0L) ) {
                     // TODO: further narrow down bounds ?
                     // Temporary "fix".
+                    // TODO: Seems to virtually always be preceded by a "vcollide" move.
                     return applyLostGround(player, from, true, data, "pyramid");
                 }
             }
