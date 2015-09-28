@@ -907,14 +907,15 @@ public class SurvivalFly extends Check {
         }
 
         // Absolute y-distance to set back.
-        if (!data.isVelocityJumpPhase()) {
+        if (yDistance > 0.0 && !data.isVelocityJumpPhase() 
+                && !((fromOnGround || data.noFallAssumeGround) && toOnGround && yDistance <= cc.sfStepHeight)) {
             // TODO: Maintain a value in data, adjusting to velocity?
             // TODO: LIMIT_JUMP
             final double vAllowedAbsoluteDistance = data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier);
             final double totalVDistViolation =  to.getY() - data.getSetBackY() - vAllowedAbsoluteDistance;
             if (totalVDistViolation > 0.0) {
                 // Skip if the player could step up.
-                if (yDistance < 0.0 || yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
+                if (yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
                     if (data.getOrUseVerticalVelocity(yDistance) == null) {
                         vDistanceAboveLimit = Math.max(vDistanceAboveLimit, totalVDistViolation);
                         tags.add("vdistsb");
@@ -1836,7 +1837,7 @@ public class SurvivalFly extends Check {
 
         // Collides vertically.
         // Note: checking loc should make sense, rather if loc is higher than from?
-        if (!to.isOnGround() && from.isOnGround(from.getY() - to.getY() + 0.001)) {
+        if (yDistance < 0.0 && !to.isOnGround() && from.isOnGround(from.getY() - to.getY() + 0.001)) {
             // Test for passability of the entire box, roughly from feet downwards.
             // TODO: Efficiency with Location instances.
             // TODO: Full bounds check (!).
