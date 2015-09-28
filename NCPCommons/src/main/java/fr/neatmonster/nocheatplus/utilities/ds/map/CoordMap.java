@@ -51,9 +51,9 @@ public interface CoordMap<V> {
      * Add value with the coordinates + hash from the last contains call.
      * 
      * @param value
-     * @return If a value was replaced.
+     * @return The replaced value. If no value is present, null is returned.
      */
-    public boolean put(final int x, final int y, final int z, final V value);
+    public V put(final int x, final int y, final int z, final V value);
 
     /**
      * Remove an entry.
@@ -80,7 +80,10 @@ public interface CoordMap<V> {
      * Iterator over all elements (default order to be specified).
      * <hr>
      * There is no guarantee that any checks for concurrent modification are
-     * performed.
+     * performed. The iterator might not follow standard behavior (current
+     * implementations would throw NoSuchElementException on next(), but
+     * remove() might remove the first element if next() has not yet been
+     * called, or do nothing in other cases.
      * 
      * @return
      */

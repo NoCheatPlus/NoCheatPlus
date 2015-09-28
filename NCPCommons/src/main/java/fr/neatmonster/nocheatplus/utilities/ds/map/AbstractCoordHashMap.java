@@ -92,6 +92,18 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
 
     @Override
     public V get(final int x, final int y, final int z) {
+        final E entry = getEntry(x, y ,z);
+        return entry == null ? null : entry.value;
+    }
+
+    /**
+     * Just get an entry.
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    protected E getEntry(final int x, final int y, final int z) {
         final int hash = getHash(x, y, z);
         final int slot = Math.abs(hash) % entries.length;
         final List<E> bucket = entries[slot];
@@ -100,14 +112,14 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
         }
         for (final E entry : bucket) {
             if (hash == entry.hash && x == entry.x && z == entry.z && y == entry.y) {
-                return entry.value;
+                return entry;
             }
         }
         return null;
     }
 
     @Override
-    public boolean put(final int x, final int y, final int z, final V value) {
+    public V put(final int x, final int y, final int z, final V value) {
         final int hash = getHash(x, y, z);
         final int absHash = Math.abs(hash);
         int slot = absHash % entries.length;
@@ -115,8 +127,9 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
         if (bucket != null) {
             for (final E entry : bucket) {
                 if (hash == entry.hash && x == entry.x && z == entry.z && y == entry.y) {
+                    final V previousValue = entry.value;
                     entry.value = value;
-                    return true;
+                    return previousValue;
                 }
             }
         } else if (size + 1 > entries.length * loadFactor) {
@@ -131,7 +144,7 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
         }
         bucket.add(newEntry(x, y, z, value, hash));
         size++;
-        return false;
+        return null;
     }
 
     @Override
@@ -153,6 +166,7 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
                     if (bucket.isEmpty()) {
                         entries[slot] = null;
                     }
+                    removeEntry(entry);
                     return entry.value;
                 }
             }
@@ -219,5 +233,14 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
      * @return
      */
     protected abstract E newEntry(int x, int y, int z, V value, int hash);
+
+    /**
+     * Called after removing an entry from the internal storage.
+     * 
+     * @param entry
+     */
+    protected void removeEntry(E entry) {
+        // Override if needed.
+    }
 
 }
