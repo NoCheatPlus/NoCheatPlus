@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -101,8 +102,10 @@ public class BlockPlaceListener extends CheckListener {
         final Block block = event.getBlockPlaced();
         final Block blockAgainst = event.getBlockAgainst();
         // Skip any null blocks.
-        if (block == null || blockAgainst == null)
+        if (block == null || blockAgainst == null) {
             return;
+        }
+        // TODO: What if same block?
 
         // TODO: Revise material use (not block.get... ?)
         //final Material mat = block.getType();
@@ -154,6 +157,11 @@ public class BlockPlaceListener extends CheckListener {
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
             event.setCancelled(cancelled);
+        } else {
+            // Debug log (only if not cancelled, to avoid spam).
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+            }
         }
         // Cleanup
         // Reminder(currently unused): useLoc.setWorld(null);
