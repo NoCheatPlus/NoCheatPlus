@@ -78,6 +78,11 @@ public class MovingConfig extends ACheckConfig {
         return ccNew;
     }
 
+    public static final double Y_ON_GROUND_MIN = 0.00001;
+    public static final double Y_ON_GROUND_MAX = 0.0626;
+    // TODO: Model workarounds as lost ground ?
+    public static final double Y_ON_GROUND_DEFAULT = 0.016; // TODO: Jumping upwards while placing blocks (otherwise use MIN).
+
 
     public final boolean    ignoreCreative;
     public final boolean    ignoreAllowFlight;
@@ -260,8 +265,8 @@ public class MovingConfig extends ACheckConfig {
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
         velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
-        yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
-        noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
+        yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, Y_ON_GROUND_DEFAULT); // sqrt(1/256), see: NetServerHandler.
+        noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, yOnGround);
 
         // TODO: Ignore the stance, once it is known that the server catches such.
         ignoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.NO).decide();
