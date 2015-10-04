@@ -559,6 +559,7 @@ public class BlockProperties {
                 //        		Material.ENDER_PORTAL_FRAME,
                 Material.BREWING_STAND,
                 Material.PISTON_EXTENSION,
+                Material.SOIL, // Server reports the visible shape 0.9375, client moves on full block height.
         }) {
             blockFlags[mat.getId()] |= F_HEIGHT100;
         }
