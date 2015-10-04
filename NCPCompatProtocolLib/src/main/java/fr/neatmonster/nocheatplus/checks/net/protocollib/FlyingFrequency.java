@@ -96,7 +96,7 @@ public class FlyingFrequency extends BaseAdapter {
         final DataPacketFlying packetData = packetMismatch ? null : interpretPacket(event, time);
 
         // Prevent processing packets with obviously malicious content.
-        if (isInvalidContent(packetData)) {
+        if (packetData != null && isInvalidContent(packetData)) {
             // TODO: More specific, log and kick or log once [/limited] ?
             event.setCancelled(true);
             return;
