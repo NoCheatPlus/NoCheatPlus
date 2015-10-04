@@ -708,12 +708,6 @@ public class SurvivalFly extends Check {
                     return true;	
                 }
             }
-            // Stairs.
-            // TODO: Stairs should be obsolete by now.
-            if (yDistance <= LiftOffEnvelope.NORMAL.getMaxJumpGain(data.jumpAmplifier) + 0.1 && from.isAboveStairs()) {
-                applyLostGround(player, from, true, data, "stairs");
-                return true;
-            }
         }
         else if (yDistance < -0.7) {
             // Clearly descending.
@@ -1417,8 +1411,8 @@ public class SurvivalFly extends Check {
 
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
-        if (allowHop && hDistance >= walkSpeed && 
-                (hDistance > (((data.lastHDist == Double.MAX_VALUE || data.lastHDist == 0.0 && data.lastYDist == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
+        if (allowHop && hDistance >= walkSpeed
+                && (hDistance > (((data.lastHDist == Double.MAX_VALUE || data.lastHDist == 0.0 && data.lastYDist == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
                 && hDistance < 2.15 * hAllowedDistance
                 || (yDistance > from.getyOnGround() || hDistance < 2.6 * walkSpeed) && data.lastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.lastHDist && hDistance < 2.15 * data.lastHDist
                 ) { // if (sprinting) {
@@ -1426,9 +1420,9 @@ public class SurvivalFly extends Check {
             // TODO: Allow slightly higher speed on lost ground?
             // TODO: LiftOffEnvelope.allowBunny ?
             if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL // && yDistance >= 0.4 
-                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
-                    && !from.isResetCond() && !to.isResetCond()
-                    || double_bunny
+                    && !data.sfLowJump || data.sfNoLowJump
+                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround || double_bunny)
+                    && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
                     ) {
                 // TODO: Jump effect might allow more strictness. 
                 // TODO: Expected minimum gain depends on last speed (!).
