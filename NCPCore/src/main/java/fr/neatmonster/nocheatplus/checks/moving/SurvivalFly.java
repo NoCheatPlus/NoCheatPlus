@@ -1066,33 +1066,34 @@ public class SurvivalFly extends Check {
                         || data.lastYDist < 0.0 && data.toWasReset // TODO: Also assumeGround? Should have more precise flags.
                         && yDistance >= -GRAVITY_MAX - GRAVITY_SPAN && yDistance <= GRAVITY_MIN
                         )
-                        // Jump-effect-specific
-                        || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX
-                        && yDistance > -2.0 * GRAVITY_MAX - GRAVITY_MIN && yDistance < GRAVITY_MIN
-                        && yDistChange > -3.0 * GRAVITY_MAX - GRAVITY_SPAN && yDistChange < -0.5 * GRAVITY_MIN
-                        // Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
-                        || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
-                        && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
-                        // Reduced jumping envelope.
-                        || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
-                        && (
-                                // Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
-                                data.lastYDist > -10.0 * GRAVITY_ODD / 2.0 && data.lastYDist < 10.0 * GRAVITY_ODD
-                                && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX
-                                // 
-                                || data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
-                                && yDistance > 0.4 * GRAVITY_ODD && yDistance - data.lastYDist < -GRAVITY_ODD / 2.0
-                                // 
-                                || data.lastYDist < 0.2 && data.lastYDist >= 0.0 && yDistance > -0.2 && yDistance < 2.0 * GRAVITY_MAX
-                                // 
-                                || data.lastYDist > 0.4 * GRAVITY_ODD && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
-                                // Too small decrease, right after lift off.
-                                || data.sfJumpPhase == 1 && data.lastYDist > -GRAVITY_ODD && data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN
-                                && yDistance - data.lastYDist < 0.0114
-                                // Any leaving liquid and keeping distance once.
-                                || data.sfJumpPhase == 1 
-                                && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == data.lastYDist
-                                )
+                // Jump-effect-specific
+                // TODO: Jump effect at reduced lift off envelope -> skip this?
+                || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
+                && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < GRAVITY_MIN
+                && yDistChange < -GRAVITY_SPAN
+                // Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
+                || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
+                && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
+                // Reduced jumping envelope.
+                || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
+                && (
+                        // Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
+                        data.lastYDist > -10.0 * GRAVITY_ODD / 2.0 && data.lastYDist < 10.0 * GRAVITY_ODD
+                        && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX
+                        // 
+                        || data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
+                        && yDistance > 0.4 * GRAVITY_ODD && yDistance - data.lastYDist < -GRAVITY_ODD / 2.0
+                        // 
+                        || data.lastYDist < 0.2 && data.lastYDist >= 0.0 && yDistance > -0.2 && yDistance < 2.0 * GRAVITY_MAX
+                        // 
+                        || data.lastYDist > 0.4 * GRAVITY_ODD && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
+                        // Too small decrease, right after lift off.
+                        || data.sfJumpPhase == 1 && data.lastYDist > -GRAVITY_ODD && data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN
+                        && yDistance - data.lastYDist < 0.0114
+                        // Any leaving liquid and keeping distance once.
+                        || data.sfJumpPhase == 1 
+                        && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == data.lastYDist
+                        )
                                 ;
     }
 
