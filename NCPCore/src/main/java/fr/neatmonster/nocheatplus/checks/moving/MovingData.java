@@ -371,7 +371,7 @@ public class MovingData extends ACheckData {
     }
 
     public void resetLastDistances() {
-        lastHDist = lastYDist = 0.0;
+        lastHDist = lastYDist = Double.MAX_VALUE;
     }
 
     /**
