@@ -45,10 +45,23 @@ public enum LiftOffEnvelope {
     public double getMaxJumpHeight(double jumpAmplifier) {
         // TODO: Count in effect level.
         if (jumpEffectApplies && jumpAmplifier > 0.0) {
-            return 1.35 + 0.6 + jumpAmplifier - 1.0;
+            // Note: The jumpAmplifier value is one higher than the MC level.
+            if (jumpAmplifier < 10.0) {
+                // Classic.
+                // TODO: Can be confined more.
+                return maxJumpHeight + 0.6 + jumpAmplifier - 1.0;
+            }
+            else if (jumpAmplifier < 19){
+                // Quadratic, without accounting for gravity.
+                return 0.6 + (jumpAmplifier + 3.2) * (jumpAmplifier + 3.2) / 16.0;
+            }
+            else {
+                // Quadratic, with some amount of gravity counted in.
+                return 0.6 + (jumpAmplifier + 3.2) * (jumpAmplifier + 3.2) / 16.0 - (jumpAmplifier * (jumpAmplifier - 1.0) / 2.0) * (0.0625 / 2.0);
+            }
+
         } // TODO: < 0.0 ?
         else {
-
             return maxJumpHeight;
         }
     }
