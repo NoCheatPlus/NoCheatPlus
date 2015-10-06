@@ -1078,7 +1078,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MoveInfo info = useMoveInfo();
         info.set(player, loc, null, cc.yOnGround);
         data.adjustLiftOffEnvelope(info.from);
-        info.cleanup();
         returnMoveInfo(info);
     }
 
