@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -13,6 +14,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -216,6 +218,10 @@ public class DebugUtil {
         }
         if (speed != Double.NEGATIVE_INFINITY){
             builder.append("(e_speed=" + (speed + 1) + ")");
+        }
+        final double slow = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SLOW);
+        if (slow != Double.NEGATIVE_INFINITY) {
+            builder.append("(e_slow=" + (slow + 1) + ")");
         }
         if (jump != Double.NEGATIVE_INFINITY){
             builder.append("(e_jump=" + (jump + 1) + ")");
