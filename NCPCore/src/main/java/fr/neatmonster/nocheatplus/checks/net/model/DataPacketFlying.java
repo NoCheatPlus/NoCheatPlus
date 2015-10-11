@@ -79,4 +79,31 @@ public class DataPacketFlying {
         return builder.toString();
     }
 
+    /**
+     * Test if this is the same location (coordinates + pitch + yaw) as the
+     * other given data.
+     * 
+     * @param other
+     * @return False if either packet is lacking hasPos or hasLook, or if any of
+     *         x/y/z/pitch/yaw differ, true if all of those match.
+     */
+    public boolean containsSameLocation(final DataPacketFlying other) {
+        return hasPos && other.hasPos && hasLook && other.hasLook 
+                && y == other.y && x == other.x && z == other.z && pitch == other.pitch && yaw == other.yaw;
+    }
+
+    /**
+     * Quick test if position and look is contained and match.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param yaw
+     * @param pitch
+     * @return
+     */
+    public boolean matches(final double x, final double y, final double z, final float yaw, final float pitch) {
+        return hasPos && hasLook && x == this.x && y == this.y && z == this.z && yaw == this.yaw && pitch == this.pitch;
+    }
+
 }

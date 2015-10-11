@@ -95,17 +95,40 @@ public class FlyingFrequency extends BaseAdapter {
         // Interpret the packet content.
         final DataPacketFlying packetData = packetMismatch ? null : interpretPacket(event, time);
 
-        // Prevent processing packets with obviously malicious content.
-        if (packetData != null && isInvalidContent(packetData)) {
-            // TODO: More specific, log and kick or log once [/limited] ?
-            event.setCancelled(true);
-            return;
+        // Early return tests, if the packet can be interpreted.
+        if (packetData != null) {
+            // Prevent processing packets with obviously malicious content.
+            if (isInvalidContent(packetData)) {
+                // TODO: More specific, log and kick or log once [/limited] ?
+                event.setCancelled(true);
+                if (data.debug) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " sends a flying packet with malicious content.");
+                }
+                return;
+            }
+            switch(data.teleportQueue.processAck(packetData)) {
+                case CANCEL: {
+                    // TODO: Configuration for cancel (or implement skipping violation level escalation)?
+                    event.setCancelled(true);
+                    if (data.debug) {
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " wait for ACK on teleport, cancel packet: " + packetData);
+                    }
+                    return;
+                }
+                case ACK: {
+                    // Skip processing ACK packets, no cancel.
+                    if (data.debug) {
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " interpret as ACK for a teleport: " + packetData);
+                    }
+                    return;
+                }
+                default: {
+                    // Continue.
+                }
+            }
         }
 
         // TODO: Counters for hasPos, hasLook, both, none.
-        // TODO: Avoid counters setting?
-
-        // TODO: Compare to stored outgoing teleport packets and skip processing/cancel, if this is a tp-ack packet.
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.

@@ -5,6 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.ProtocolLibrary;
@@ -13,8 +20,14 @@ import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -27,12 +40,15 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author dev1mc
  *
  */
-public class ProtocolLibComponent implements DisableListener, INotifyReload {
+public class ProtocolLibComponent implements DisableListener, INotifyReload, JoinLeaveListener, Listener {
 
     // TODO: Static reference is problematic (needs a static and accessible Counters instance?). 
     public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.flying.nullplayer");
 
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
+
+    protected final NetConfigCache configFactory = (NetConfigCache) CheckType.NET.getConfigFactory();
+    protected final NetDataFactory dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
 
     public ProtocolLibComponent(Plugin plugin) {
         register(plugin);
@@ -47,6 +63,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.OutgoingPosition", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE) || ConfigManager.isTrueForAnyConfig(ConfPaths.FIGHT_GODMODE_CHECK)) {
             // (Set lastKeepAlive if this or fight.godmode is enabled.)
@@ -116,9 +133,48 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
                 api.removeComponent(adapter); // Bit heavy, but consistent.
             } catch (Throwable t) {
                 StaticLog.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
-            }
+            }// TODO Auto-generated method stub
+
         }
         registeredPacketAdapters.clear();
+    }
+
+    @Override
+    public void playerJoins(final Player player) {
+        if (!registeredPacketAdapters.isEmpty()) {
+            dataFactory.getData(player).onJoin(player);
+        }
+    }
+
+    @Override
+    public void playerLeaves(final Player player) {
+        if (!registeredPacketAdapters.isEmpty()) {
+            dataFactory.getData(player).onLeave(player);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onPlayerRespawn(final PlayerRespawnEvent event) {
+        if (!registeredPacketAdapters.isEmpty()) {
+            final Player player = event.getPlayer();
+            dataFactory.getData(player).onJoin(player);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onPlayerTeleport(final PlayerTeleportEvent event) {
+        // TODO: Might move to MovingListener.
+        final Location to = event.getTo();
+        if (to == null) {
+            return;
+        }
+        final Player player = event.getPlayer();
+        final NetConfig cc = configFactory.getConfig(player);
+        if (cc.flyingFrequencyActive) {
+            final NetData data = dataFactory.getData(player);
+            // Register expected location for comparison with outgoing packets.
+            data.teleportQueue.onTeleportEvent(new DataPacketFlying(false, to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch(), System.currentTimeMillis()));
+        }
     }
 
 }

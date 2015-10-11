@@ -1,6 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.net;
 
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
+import fr.neatmonster.nocheatplus.checks.net.model.TeleportQueue;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /**
@@ -29,15 +32,25 @@ public class NetData extends ACheckData {
      * time of the last event. System.currentTimeMillis() is used.
      */
     public ActionFrequency keepAliveFreq = new ActionFrequency(20, 1000);
-    
+
     // Shared.
     /** Last time some action was received (keep alive or flying). Also maintained for fight.godmode. */
     public long lastKeepAliveTime = 0L;
+
+    public final TeleportQueue teleportQueue = new TeleportQueue(); // TODO: Consider using one lock per data instance and pass here.
 
     public NetData(final NetConfig config) {
         super(config);
         flyingFrequencyAll = new ActionFrequency(config.flyingFrequencySeconds, 1000L);
         flyingFrequencyRedundantFreq = new ActionFrequency(config.flyingFrequencyRedundantSeconds, 1000L);
+    }
+
+    public void onJoin(final Player player) {
+        teleportQueue.clear();
+    }
+
+    public void onLeave(Player player) {
+        teleportQueue.clear();
     }
 
 }

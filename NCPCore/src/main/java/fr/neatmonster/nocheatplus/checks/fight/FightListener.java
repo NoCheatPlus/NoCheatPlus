@@ -508,6 +508,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     if (event instanceof EntityDamageByEntityEvent) {
                         final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
                         if ((entity instanceof Player) && !damagedPlayer.isInsideVehicle() && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
+                            // TODO: Use the velocity event that is sent anyway and replace x/z if 0 (queue max. values).
                             applyKnockBack((Player) entity, damagedPlayer, damagedData);
                         }
                     }
