@@ -769,7 +769,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
             NCPAPIProvider.setNoCheatPlusAPI(this);
         }
-        if (ServerVersion.getMinecraftVersion() == ServerVersion.UNKNOWN_VERSION) {
+        if (ServerVersion.getMinecraftVersion().equals(ServerVersion.UNKNOWN_VERSION)) {
             BukkitVersion.init();
         }
         if (!ConfigManager.isInitialized()) {
