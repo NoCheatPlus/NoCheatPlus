@@ -1134,8 +1134,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             @EventHandler(priority = EventPriority.LOWEST)
             public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
             {
-                final Player player = event.getPlayer();
-                updatePermStateReceivers(player);
+                updatePermStateReceivers(event.getPlayer());
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
