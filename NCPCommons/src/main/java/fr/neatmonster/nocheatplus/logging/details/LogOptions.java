@@ -26,7 +26,7 @@ public class LogOptions {
         ASYNCHRONOUS_DIRECT,
         /** Always schedule to execute within a (more or less) dedicated asynchronous task. */
         ASYNCHRONOUS_TASK,
-        /** Ensure it's logged asynchronously. */
+        /** Only log if it is not the primary thread. */
         ASYNCHRONOUS_ONLY,
         
         // CUSTOM_THREAD_DIRECT|TASK // Needs a variable (Thread, methods to sync into a specific thread would have to be registered in LogManager).

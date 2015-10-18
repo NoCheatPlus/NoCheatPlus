@@ -102,7 +102,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         // TODO: Might attempt to detect if a thread-safe logging framework is in use ("default" instead of false/true).
         boolean bukkitLoggerAsynchronous = config.getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS);
         // TODO: Do keep considering: AYNCHRONOUS_DIRECT -> ASYNCHRONOUS_TASK (not to delay async. event handling).
-        CallContext defaultAsynchronousContext = CallContext.ASYNCHRONOUS_DIRECT; // Plugin runtime + asynchronous.
+        CallContext defaultAsynchronousContext = CallContext.ASYNCHRONOUS_TASK; // Plugin runtime + asynchronous.
 
         // Server logger.
         tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? defaultAsynchronousContext : CallContext.PRIMARY_THREAD_TASK));
