@@ -618,7 +618,7 @@ public abstract class ConfPaths {
     @GlobalConfig
     public static final String  NET_FLYINGFREQUENCY_PACKETSPERSECOND        = NET_FLYINGFREQUENCY + "packetspersecond";
     public static final String  NET_FLYINGFREQUENCY_ACTIONS                 = NET_FLYINGFREQUENCY + "actions";
-    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS            = NET_FLYINGFREQUENCY + "straypackets";
+    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS            = NET_FLYINGFREQUENCY + "straypackets.";
     public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL     = NET_FLYINGFREQUENCY_STRAYPACKETS + "cancel";
     // TODO: Reduceredundant has been removed (implement or remove config).
     private static final String NET_FLYINGFREQUENCY_REDUNDANT               = NET_FLYINGFREQUENCY + "reduceredundant.";
