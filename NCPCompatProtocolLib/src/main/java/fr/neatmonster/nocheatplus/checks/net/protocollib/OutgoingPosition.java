@@ -10,6 +10,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -37,14 +38,15 @@ public class OutgoingPosition extends BaseAdapter {
         }
         final long time = System.currentTimeMillis();
 
-        // TODO: Configurability.
         final Player player = event.getPlayer();
-        final NetData data = dataFactory.getData(player);
-        final DataPacketFlying packetData = interpretPacket(event.getPacket(), time, data);
-        if (packetData != null && data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Expect ACK on outgoing position: " + packetData);
+        final NetConfig cc = configFactory.getConfig(player);
+        if (cc.flyingFrequencyActive && cc.flyingFrequencyStrayPacketsCancel) {
+            final NetData data = dataFactory.getData(player);
+            final DataPacketFlying packetData = interpretPacket(event.getPacket(), time, data);
+            if (packetData != null && data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Expect ACK on outgoing position: " + packetData);
+            }
         }
-
     }
 
     private DataPacketFlying interpretPacket(final PacketContainer packet, final long time, final NetData data) {

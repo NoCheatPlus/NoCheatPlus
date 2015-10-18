@@ -450,6 +450,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_FLYINGFREQUENCY_SECONDS, 5);
         set(ConfPaths.NET_FLYINGFREQUENCY_PACKETSPERSECOND, 60);
         set(ConfPaths.NET_FLYINGFREQUENCY_ACTIONS, "cancel"); // TODO: Log actions.
+        set(ConfPaths.NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL, true);
         set(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE, true);
         set(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_SECONDS, 3);
         set(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS, "cancel"); // TODO: Log actions.

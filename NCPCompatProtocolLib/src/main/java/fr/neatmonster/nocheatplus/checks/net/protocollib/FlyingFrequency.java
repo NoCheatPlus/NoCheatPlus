@@ -106,24 +106,26 @@ public class FlyingFrequency extends BaseAdapter {
                 }
                 return;
             }
-            switch(data.teleportQueue.processAck(packetData)) {
-                case CANCEL: {
-                    // TODO: Configuration for cancel (or implement skipping violation level escalation)?
-                    event.setCancelled(true);
-                    if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " wait for ACK on teleport, cancel packet: " + packetData);
+            if (cc.flyingFrequencyStrayPacketsCancel) {
+                switch(data.teleportQueue.processAck(packetData)) {
+                    case CANCEL: {
+                        // TODO: Configuration for cancel (or implement skipping violation level escalation)?
+                        event.setCancelled(true);
+                        if (data.debug) {
+                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " wait for ACK on teleport, cancel packet: " + packetData);
+                        }
+                        return;
                     }
-                    return;
-                }
-                case ACK: {
-                    // Skip processing ACK packets, no cancel.
-                    if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " interpret as ACK for a teleport: " + packetData);
+                    case ACK: {
+                        // Skip processing ACK packets, no cancel.
+                        if (data.debug) {
+                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " interpret as ACK for a teleport: " + packetData);
+                        }
+                        return;
                     }
-                    return;
-                }
-                default: {
-                    // Continue.
+                    default: {
+                        // Continue.
+                    }
                 }
             }
         }
