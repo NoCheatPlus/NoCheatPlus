@@ -943,7 +943,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
                 final TeleportCause cause = event.getCause();
                 if (cause == TeleportCause.UNKNOWN) {
-                    // Check special small range teleports (moved too quickly).
+                    // Check special small range teleports (server moves players out of blocks).
                     if (from != null && from.getWorld().equals(to.getWorld())) {
                         if (TrigUtil.distance(from, to) < margin) {
                             smallRange = true;
@@ -953,6 +953,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             if (TrigUtil.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin) {
                                 smallRange = true;
                             }
+                        }
+                        // Override smallRange, if the teleport seems ok.
+                        if (smallRange && BlockProperties.isOnGroundOrResetCond(player, to, cc.yOnGround) && BlockProperties.isPassable(to)) {
+                            // TODO: Consider to remove the smallRange workaround and re-evaluate [Block jump on protected region into fence].
+                            smallRange = false;
                         }
                     }
                 }
