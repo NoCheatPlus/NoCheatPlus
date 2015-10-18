@@ -524,6 +524,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (checkSf || checkCf) {
             // Check jumping on things like slime blocks.
             // The center of the player must be above the block.
+            // TODO: Apply effects later, if the move has not been not cancelled.
             if (to.getY() < from.getY() && player.getFallDistance() > 1f 
                     && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
                     && to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)) {
@@ -669,10 +670,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void processTrampoline(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-
-        // TODO: Consider making this just a checking method (use result for applying effects).
         // CHEATING: Add velocity.
-        // TODO: 1. Confine for direct use (no latency here). 2. Hard set velocity? 3.. Switch to friction based.
         if (!survivalFly.isReallySneaking(player)) {
             final double fallDistance;
             if (noFall.isEnabled(player, cc)) {
@@ -685,12 +683,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             } else {
                 fallDistance = player.getFallDistance() + from.getY() - to.getY();
             }
-            final double effect = Math.min(3.14, Math.sqrt(fallDistance) / 3.3); // Ancient Greek technology.
-            // (Actually observed max. is near 3.5.)
+            final double effect = Math.min(3.14, Math.sqrt(fallDistance) / 3.3 + SurvivalFly.GRAVITY_MAX); // Ancient Greek technology with gravity added.
+            // (Actually observed max. is near 3.5.) TODO: Why 3.14 then?
             if (cc.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect (dY=" + fallDistance + "): " + effect); 
             }
-            data.addVelocity(player, cc, 0.0, effect, 0.0);
+            data.addVerticalVelocity(new SimpleEntry(effect, 2)); // Not logged at present.
         } else {
             if (cc.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect (sneaking)."); 

@@ -594,6 +594,7 @@ public class MovingData extends ACheckData {
     public void addVelocity(final Player player, final MovingConfig cc, final double vx, final double vy, final double vz) {
 
         final int tick = TickTask.getTick();
+        // TODO: Slightly odd to call this each time, might switch to a counter-strategy (move - remove). 
         removeInvalidVelocity(tick  - cc.velocityActivationTicks);
 
         if (debug) {
@@ -611,7 +612,7 @@ public class MovingData extends ACheckData {
 
         // Set dirty flag here.
         sfDirty = true; // TODO: Set on using the velocity, due to latency !
-        sfNoLowJump = true; // TODO: Set on using the velocity, due top latency !
+        sfNoLowJump = true; // TODO: Set on using the velocity, due to latency !
 
     }
 
@@ -757,8 +758,9 @@ public class MovingData extends ACheckData {
     public SimpleEntry useVerticalVelocity(final double amount) {
         final SimpleEntry available = verVel.use(amount, TOL_VVEL);
         if (available != null) {
-            sfDirty = true;
             verVelUsed = available;
+            sfDirty = true;
+            // TODO: Consider sfNoLowJump = true;
         }
         return available;
     }

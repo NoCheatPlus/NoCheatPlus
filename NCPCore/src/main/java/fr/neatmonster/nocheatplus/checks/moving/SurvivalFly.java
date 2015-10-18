@@ -74,7 +74,7 @@ public class SurvivalFly extends Check {
     public static final double GRAVITY_MAX = 0.0834;
     public static final double GRAVITY_MIN = 0.0624; // TODO: Special cases go down to 0.05.
     public static final double GRAVITY_SPAN = GRAVITY_MAX - GRAVITY_MIN;
-    public static final double GRAVITY_ODD = 0.0519; // TODO: This should probably be min. / cleanup.
+    public static final double GRAVITY_ODD = 0.05; // 19; // TODO: This should probably be min. / cleanup.
     /** Assumed minimal average decrease per move, suitable for regarding 3 moves. */
     public static final float GRAVITY_VACC = (float) (GRAVITY_MIN * 0.6);
 
@@ -1056,16 +1056,29 @@ public class SurvivalFly extends Check {
                         // Too big chunk of change, but within reasonable bounds (should be contained in some other generic case?).
                         data.lastYDist < 3.0 * GRAVITY_MAX + GRAVITY_MIN && yDistChange < -GRAVITY_MIN && yDistChange > -2.5 * GRAVITY_MAX -GRAVITY_MIN
                         // Transition to 0.0 yDistance.
-                        || data.lastYDist > GRAVITY_MAX / 2.0 && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
+                        || data.lastYDist > GRAVITY_ODD / 2.0 && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
                         // yDist inversion near 0 (almost). TODO: This actually happens near liquid, but NORMAL env!?
-                        || data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
+                        // lastYDist < Gravity max + min happens with dirty phase (slimes),. previously: max + span
+                        // TODO: Can all cases be reduced to change sign with max. neg. gain of max + span ?
+                        || data.lastYDist <= GRAVITY_MAX + GRAVITY_MIN && data.lastYDist > GRAVITY_ODD
                         && yDistance < GRAVITY_ODD && yDistance > -2.0 * GRAVITY_MAX - GRAVITY_ODD / 2.0
                         // Head is obstructed. TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
                         || data.lastYDist >= 0.0 && (from.isHeadObstructed(from.getyOnGround()) || data.fromWasReset && from.isHeadObstructed())
                         // Break the block underneath.
                         || data.lastYDist < 0.0 && data.toWasReset // TODO: Also assumeGround? Should have more precise flags.
                         && yDistance >= -GRAVITY_MAX - GRAVITY_SPAN && yDistance <= GRAVITY_MIN
+                        // Slope with slimes (also near ground without velocityJumpPhase, rather lowjump but not always).
+                        || data.lastYDist < -GRAVITY_MAX && yDistChange < - GRAVITY_ODD / 2.0 && yDistChange > -GRAVITY_MIN
                         )
+                || data.isVelocityJumpPhase()
+                && (
+                    // Near zero inversion with slimes (rather dirty phase).
+                    data.lastYDist > GRAVITY_ODD && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN
+                    && yDistance <= -data.lastYDist && yDistance > -data.lastYDist - GRAVITY_MAX - GRAVITY_ODD
+                    // Odd mini-decrease with dirty phase (slime).
+                    || data.lastYDist < -0.204 && yDistance > -0.26
+                    && yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD / 4.0
+                    )
                 // Jump-effect-specific
                 // TODO: Jump effect at reduced lift off envelope -> skip this?
                 || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
