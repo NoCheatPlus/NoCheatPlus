@@ -143,7 +143,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Commands that were changed for protecting them against tab complete or
      * use.
      */
-    protected List<CommandProtectionEntry> changedCommands = null;
+    protected List<CommandProtectionEntry> changedCommands = new ArrayList<CommandProtectionEntry>();
 
 
     private final ListenerManager listenerManager = new ListenerManager(this, false);
@@ -681,10 +681,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         featureTags.clear();
 
         // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
-        if (changedCommands != null){
-            changedCommands.clear();
-            changedCommands = null;
-        }
+        changedCommands.clear();
         //		// Restore changed commands.
         //		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
         //		undoCommandChanges();
@@ -716,12 +713,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
      */
     public void undoCommandChanges() {
-        if (changedCommands != null){
-            while (!changedCommands.isEmpty()){
-                final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
-                entry.restore();
-            }
-            changedCommands = null;
+        while (!changedCommands.isEmpty()){
+            final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
+            entry.restore();
         }
     }
 
@@ -745,12 +739,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
         }
         // Add to changes history for undoing.
-        if (this.changedCommands == null) {
-            this.changedCommands = changedCommands;
-        }
-        else {
-            this.changedCommands.addAll(changedCommands);
-        }
+        this.changedCommands.addAll(changedCommands);
     }
 
     /* (non-Javadoc)
