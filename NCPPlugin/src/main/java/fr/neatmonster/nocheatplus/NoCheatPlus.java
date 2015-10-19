@@ -235,7 +235,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final List<String> rem = new LinkedList<String>();
         synchronized (denyLoginNames) {
             for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
-                if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
+                if (entry.getValue() < ts)  rem.add(entry.getKey());
             }
             for (final String name : rem){
                 denyLoginNames.remove(name);
@@ -269,7 +269,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         playerName = playerName.trim().toLowerCase();
         synchronized (denyLoginNames) {
             final Long oldTs = denyLoginNames.get(playerName);
-            if (oldTs != null && ts < oldTs.longValue()) return;
+            if (oldTs != null && ts < oldTs) return;
             denyLoginNames.put(playerName, ts);
             // TODO: later maybe save these ?
         }
@@ -294,7 +294,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         playerName = playerName.trim().toLowerCase();
         final Long oldTs = denyLoginNames.get(playerName);
         if (oldTs == null) return false; 
-        else return time < oldTs.longValue();
+        else return time < oldTs;
     }
 
     @Override
