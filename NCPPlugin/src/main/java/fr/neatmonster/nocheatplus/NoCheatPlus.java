@@ -713,8 +713,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /**
-     * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
-     * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
+     * Does not undo 100%, but restores 
+     * <ul>
+     *      <li>old permission</li> 
+     *      <li>permission-message</li>
+     *      <li>label (unlikely to be changed)</li>
+     *      <li>permission default</li>
+     * </ul>
+     * 
+     * @deprecated Leads to compatibility issues with NPC plugins, such as Citizens 2, due to recalculation of permissions (specifically during disabling).
      */
     public void undoCommandChanges() {
         Iterator<CommandProtectionEntry> i = changedCommands.iterator();
