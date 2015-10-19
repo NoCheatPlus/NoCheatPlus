@@ -308,7 +308,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
-    private final boolean hasTurnedOffNotifications(final String playerName){
+    private boolean hasTurnedOffNotifications(final String playerName){
         final PlayerData data = DataManager.getPlayerData(playerName, false);
         return data != null && data.getNotifyOff();
     }
