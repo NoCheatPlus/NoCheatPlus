@@ -1261,8 +1261,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // (The index might be bigger than size by now.)
 
-        final boolean debug = config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
-
         // If not finished, schedule further checks.
         if (consistencyCheckerIndex < consistencyCheckers.size()){
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -1271,7 +1269,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                     runConsistencyChecks();
                 }
             });
-            if (debug){
+            if (config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)){
                 logManager.info(Streams.STATUS, "[NoCheatPlus] Interrupted consistency checking until next tick.");
             }
         }
