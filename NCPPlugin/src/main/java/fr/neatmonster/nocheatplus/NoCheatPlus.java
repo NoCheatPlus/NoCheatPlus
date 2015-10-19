@@ -652,9 +652,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) {
             logManager.info(Streams.INIT, "[NoCheatPlus] Unregister all registered components...");
         }
+        
         final ArrayList<Object> components = new ArrayList<Object>(this.allComponents);
-        for (int i = components.size() - 1; i >= 0; i--){
-            removeComponent(components.get(i));
+        //Remove components in reverse order
+        Collections.reverse(components);
+        for (Object component : components) {
+            removeComponent(component);
         }
 
         // Cleanup BlockProperties.
