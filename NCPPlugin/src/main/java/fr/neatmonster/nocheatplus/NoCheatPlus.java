@@ -721,7 +721,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     protected void setupCommandProtection() {
         // TODO: Might re-check with plugins enabling during runtime (!).
-        final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
+        
         // Read lists and messages from config.
         final ConfigFile config = ConfigManager.getConfigFile();
         // (Might add options to invert selection.)
@@ -730,16 +730,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
         if (noPerm != null && !noPerm.isEmpty()){
             final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
+            // Add to changes history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
         }
         // "Unknown command", override the other option.
         final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
         if (noCommand != null && !noCommand.isEmpty()){
             final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
+            // Add to changes history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
         }
-        // Add to changes history for undoing.
-        this.changedCommands.addAll(changedCommands);
     }
 
     /* (non-Javadoc)
