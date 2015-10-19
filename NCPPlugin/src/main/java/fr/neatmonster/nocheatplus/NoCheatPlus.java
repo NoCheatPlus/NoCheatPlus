@@ -680,8 +680,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         genericInstances.clear();
         // Feature tags.
         featureTags.clear();
-
         // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
+        
         changedCommands.clear();
         //		// Restore changed commands.
         //		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
