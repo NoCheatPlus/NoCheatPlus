@@ -80,8 +80,9 @@ public class MovingConfig extends ACheckConfig {
 
     public static final double Y_ON_GROUND_MIN = 0.00001;
     public static final double Y_ON_GROUND_MAX = 0.0626;
-    // TODO: Model workarounds as lost ground ?
-    public static final double Y_ON_GROUND_DEFAULT = 0.016; // TODO: Jumping upwards while placing blocks (otherwise use MIN).
+    // TODO: Model workarounds as lost ground, use Y_ON_GROUND_MIN?
+    public static final double Y_ON_GROUND_DEFAULT = 0.016; // Jump upwards, while placing blocks.
+//    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
 
 
     public final boolean    ignoreCreative;

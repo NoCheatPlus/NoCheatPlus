@@ -100,7 +100,7 @@ public class MovingData extends ACheckData {
      * TODO: Test, might be better ground.
      */
     private static final LiftOffEnvelope defaultLiftOffEnvelope = LiftOffEnvelope.NO_JUMP;
-    
+
     /** Tolerance value for using vertical velocity (the client sends different values than received with fight damage). */
     private static final double TOL_VVEL = 0.0625;
 
@@ -133,6 +133,9 @@ public class MovingData extends ACheckData {
     public double       lastHDist = Double.MAX_VALUE;
     /** Only used during processing, to keep track of sub-checks using velocity. Reset in velocityTick, before checks run. */
     public SimpleEntry  verVelUsed = null;
+
+    /** Compatibility entry for bouncing of slime blocks and the like. */
+    public SimpleEntry verticalBounce = null;
 
     /** Tick at which walk/fly speeds got changed last time. */
     public int speedTick = 0;
@@ -267,6 +270,7 @@ public class MovingData extends ACheckData {
         vehicleConsistency = MoveConsistency.INCONSISTENT;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verVelUsed = null;
+        verticalBounce = null;
     }
 
     /**
@@ -300,6 +304,7 @@ public class MovingData extends ACheckData {
         removeAllVelocity();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        verticalBounce = null;
     }
 
     /**
@@ -311,6 +316,7 @@ public class MovingData extends ACheckData {
         lastYDist = lastHDist = Double.MAX_VALUE;
         toWasReset = false;
         fromWasReset = false;
+        verticalBounce = null;
         // Remember where we send the player to.
         setTeleported(loc);
         // TODO: sfHoverTicks ?
@@ -366,6 +372,7 @@ public class MovingData extends ACheckData {
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        verticalBounce = null;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
     }
@@ -614,6 +621,10 @@ public class MovingData extends ACheckData {
         sfDirty = true; // TODO: Set on using the velocity, due to latency !
         sfNoLowJump = true; // TODO: Set on using the velocity, due to latency !
 
+    }
+
+    public void prependVerticalVelocity(final SimpleEntry entry) {
+        verVel.addToFront(entry);
     }
 
     public void addVerticalVelocity(final SimpleEntry entry) {
@@ -980,6 +991,16 @@ public class MovingData extends ACheckData {
     public void setFrictionJumpPhase() {
         // TODO: Better and more reliable modeling.
         sfDirty = true;
+    }
+
+    public void useVerticalBounce(final Player player) {
+        // CHEATING: Ensure fall distance is reset.
+        player.setFallDistance(0f);
+        noFallMaxY = 0.0;
+        noFallFallDistance = 0f;
+        noFallSkipAirCheck = true;
+        prependVerticalVelocity(verticalBounce);
+        verticalBounce = null;
     }
 
 }

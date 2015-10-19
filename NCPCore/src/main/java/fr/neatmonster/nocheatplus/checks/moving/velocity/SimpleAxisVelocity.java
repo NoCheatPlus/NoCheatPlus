@@ -20,6 +20,18 @@ public class SimpleAxisVelocity {
 
     private final List<SimpleEntry> queued = new LinkedList<SimpleEntry>();
 
+    /**
+     * Add to the front of the queue.
+     * @param entry
+     */
+    public void addToFront(SimpleEntry entry) {
+        queued.add(0, entry);
+    }
+
+    /**
+     * Add to the end of the queue.
+     * @param entry
+     */
     public void add(SimpleEntry entry) {
         queued.add(entry);
     }

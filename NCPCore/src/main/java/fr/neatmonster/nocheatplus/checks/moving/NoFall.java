@@ -122,7 +122,7 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final Location loc, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public void check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
 
         final double fromY = from.getY();
         final double toY = to.getY();
@@ -151,8 +151,7 @@ public class NoFall extends Check {
 
         // TODO: early returns (...) 
 
-        final double pY =  loc.getY();
-        final double minY = Math.min(fromY, Math.min(toY, pY));
+        final double minY = Math.min(fromY, toY);
 
         if (fromReset) {
             // Just reset.
@@ -190,7 +189,7 @@ public class NoFall extends Check {
 
         // Set reference y for nofall (always).
         // TODO: Consider setting this before handleOnGround (at least for resetTo).
-        data.noFallMaxY = Math.max(Math.max(fromY, Math.max(toY, pY)), data.noFallMaxY);
+        data.noFallMaxY = Math.max(Math.max(fromY, toY), data.noFallMaxY);
 
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?

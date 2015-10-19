@@ -74,7 +74,7 @@ public class SoundDistance extends BaseAdapter {
         final Location loc = player.getLocation(useLoc);
         final StructureModifier<Integer> ints = packetContainer.getIntegers();
         final double dSq = TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(2) / 8, loc.getX(), loc.getZ());
-        //        if (cc.debug) {
+        //        if (data.debug) {
         //            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " SoundDistance(" + soundName + "): " + StringUtil.fdec1.format(Math.sqrt(dSq)));
         //        }
         if (dSq > cc.soundDistanceSq) {

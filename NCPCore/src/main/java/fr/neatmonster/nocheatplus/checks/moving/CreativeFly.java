@@ -152,7 +152,7 @@ public class CreativeFly extends Check {
 
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
-        if (cc.debug) {
+        if (data.debug) {
             outpuDebugMove(player, hDistance, limitH, yDistance, limitV, data);
         }
 

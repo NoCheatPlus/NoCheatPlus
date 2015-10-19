@@ -481,7 +481,19 @@ public class TrigUtil {
     }
 
     /**
-     * Test if both locations have the exact same coordinates. Does not check yaw/pitch.
+     * Compare position and looking direction.
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePosAndLook(final Location loc1, final Location loc2) {
+        return isSamePos(loc1, loc2) && loc1.getPitch() == loc2.getPitch() && loc1.getYaw() == loc2.getYaw();
+    }
+
+    /**
+     * Test if both locations have the exact same coordinates. Does not check
+     * yaw/pitch.
+     * 
      * @param loc1
      * @param loc2
      * @return Returns false if either is null.

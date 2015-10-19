@@ -112,7 +112,7 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
 
         // Calculate some distances.
@@ -144,7 +144,7 @@ public class SurvivalFly extends Check {
                 (from.isOnGround() || from.isResetCond())) {
             // TODO: Move most to a method?
             // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
-            if (cc.debug) {
+            if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " SurvivalFly\nAdjust set-back after join/respawn: " + from.getLocation());
             }
             data.setSetBack(from);
@@ -214,7 +214,7 @@ public class SurvivalFly extends Check {
             // TODO: This isn't correct, needs redesign.
             if (data.lastHDist != Double.MAX_VALUE && data.lastHDist > 0.0 && data.lastYDist < -0.3) {
                 // Note that to is not on ground either.
-                resetFrom = lostGroundStill(player, from, loc, to, hDistance, yDistance, sprinting, data, cc);
+                resetFrom = lostGroundStill(player, from, to, hDistance, yDistance, sprinting, data, cc);
             } else {
                 resetFrom = false;
             }
@@ -224,7 +224,7 @@ public class SurvivalFly extends Check {
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
             // Check lost-ground workarounds.
-            resetFrom = lostGround(player, from, loc, to, hDistance, yDistance, sprinting, data, cc);
+            resetFrom = lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc);
             // Note: if not setting resetFrom, other places have to check assumeGround...
         }
 
@@ -381,7 +381,9 @@ public class SurvivalFly extends Check {
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
         if (result > 0D) {
             final Location vLoc = handleViolation(now, result, player, from, to, data, cc);
-            if (vLoc != null) return vLoc;
+            if (vLoc != null) {
+                return vLoc;
+            }
         }
         else {
             // Slowly reduce the level with each event, if violations have not recently happened.
@@ -690,7 +692,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return If touching the ground was lost.
      */
-    private boolean lostGround(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: Regroup with appropriate conditions (toOnGround first?).
         // TODO: Some workarounds allow step height (0.6 on MC 1.8).
         // TODO: yDistance limit does not seem to be appropriate.
@@ -698,13 +700,13 @@ public class SurvivalFly extends Check {
             // "Mild" Ascending / descending.
             //Ascending
             if (yDistance >= 0) {
-                if (lostGroundAscend(player, from, loc, to, hDistance, yDistance, sprinting, data, cc)) {
+                if (lostGroundAscend(player, from, to, hDistance, yDistance, sprinting, data, cc)) {
                     return true;
                 }
             }
             // Descending.
             if (yDistance <= 0) {
-                if (lostGroundDescend(player, from, loc, to, hDistance, yDistance, sprinting, data, cc)) {
+                if (lostGroundDescend(player, from, to, hDistance, yDistance, sprinting, data, cc)) {
                     return true;	
                 }
             }
@@ -741,6 +743,7 @@ public class SurvivalFly extends Check {
         // TODO: Cleanup pending.
         final boolean strictVdistRel;
         final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
+        final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain).
         if (fallingEnvelope(yDistance, data.lastYDist, 0.0)) {
             // Less headache: Always allow falling. 
             vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
@@ -753,7 +756,7 @@ public class SurvivalFly extends Check {
             } else {
                 // Code duplication with the absolute limit below.
                 if (yDistance < 0.0 || yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
-                    vAllowedDistance = maxJumpGain + 0.05; // TODO: Margin
+                    vAllowedDistance = maxJumpGain + jumpGainMargin;
                 } else {
                     // lostground_couldstep
                     vAllowedDistance = yDistance;
@@ -768,7 +771,7 @@ public class SurvivalFly extends Check {
                 }
                 else {
                     // TODO: Needs more precise confinement + setting set back or distance to ground or estYDist.
-                    vAllowedDistance = maxJumpGain + 0.05; // TODO: Margin
+                    vAllowedDistance = maxJumpGain + jumpGainMargin;
                 }
                 strictVdistRel = false;
             } else {
@@ -821,7 +824,7 @@ public class SurvivalFly extends Check {
             else if (oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, data)) {
                 // Jump after leaving the liquid near ground.
             }
-            else if (oddGravity(from, yDistance, yDistChange, data)) {
+            else if (oddGravity(from, to, yDistance, yDistChange, data)) {
                 // Starting to fall / gravity effects.
             }
             else if (oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, data)) {
@@ -837,7 +840,7 @@ public class SurvivalFly extends Check {
                 // Allow jumping less high unless within "strict envelope".
                 // TODO: Extreme anti-jump effects, perhaps.
             }
-            else if (oddGravity(from, yDistance, yDistChange, data)) {
+            else if (oddGravity(from, to, yDistance, yDistChange, data)) {
                 // Starting to fall.
             }
             else if (oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, data)) {
@@ -882,7 +885,7 @@ public class SurvivalFly extends Check {
                         ) {
                     // LIMIT_LIQUID, vDist inversion (!).
                 }
-                else if (oddGravity(from, yDistance, yDistChange, data)) {
+                else if (oddGravity(from, to, yDistance, yDistChange, data)) {
                     // Starting to fall.
                 }
                 else {
@@ -1042,7 +1045,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return If the condition applies, i.e. if to exempt.
      */
-    private static boolean oddGravity(final PlayerLocation from, final double yDistance, final double yDistChange, final MovingData data) {
+    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final MovingData data) {
         // TODO: Identify spots only to apply with limited LiftOffEnvelope (some guards got removed before switching to that).
         // TODO: Cleanup pending.
         // Old condition (normal lift-off envelope).
@@ -1069,44 +1072,53 @@ public class SurvivalFly extends Check {
                         && yDistance >= -GRAVITY_MAX - GRAVITY_SPAN && yDistance <= GRAVITY_MIN
                         // Slope with slimes (also near ground without velocityJumpPhase, rather lowjump but not always).
                         || data.lastYDist < -GRAVITY_MAX && yDistChange < - GRAVITY_ODD / 2.0 && yDistChange > -GRAVITY_MIN
+                        // Near ground (slime block).
+                        || data.lastYDist == 0.0 && yDistance < -GRAVITY_ODD / 2.5 && yDistance > -GRAVITY_MIN && to.isOnGround(GRAVITY_MIN)
                         )
-                || data.isVelocityJumpPhase()
-                && (
-                    // Near zero inversion with slimes (rather dirty phase).
-                    data.lastYDist > GRAVITY_ODD && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN
-                    && yDistance <= -data.lastYDist && yDistance > -data.lastYDist - GRAVITY_MAX - GRAVITY_ODD
-                    // Odd mini-decrease with dirty phase (slime).
-                    || data.lastYDist < -0.204 && yDistance > -0.26
-                    && yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD / 4.0
-                    )
-                // Jump-effect-specific
-                // TODO: Jump effect at reduced lift off envelope -> skip this?
-                || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
-                && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < GRAVITY_MIN
-                && yDistChange < -GRAVITY_SPAN
-                // Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
-                || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
-                && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
-                // Reduced jumping envelope.
-                || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
-                && (
-                        // Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
-                        data.lastYDist > -10.0 * GRAVITY_ODD / 2.0 && data.lastYDist < 10.0 * GRAVITY_ODD
-                        && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX
-                        // 
-                        || data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
-                        && yDistance > 0.4 * GRAVITY_ODD && yDistance - data.lastYDist < -GRAVITY_ODD / 2.0
-                        // 
-                        || data.lastYDist < 0.2 && data.lastYDist >= 0.0 && yDistance > -0.2 && yDistance < 2.0 * GRAVITY_MAX
-                        // 
-                        || data.lastYDist > 0.4 * GRAVITY_ODD && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
-                        // Too small decrease, right after lift off.
-                        || data.sfJumpPhase == 1 && data.lastYDist > -GRAVITY_ODD && data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN
-                        && yDistance - data.lastYDist < 0.0114
-                        // Any leaving liquid and keeping distance once.
-                        || data.sfJumpPhase == 1 
-                        && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == data.lastYDist
-                        )
+                        // With velocity.
+                        || data.isVelocityJumpPhase()
+                        && (
+                                // Near zero inversion with slimes (rather dirty phase).
+                                data.lastYDist > GRAVITY_ODD && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN
+                                && yDistance <= -data.lastYDist && yDistance > -data.lastYDist - GRAVITY_MAX - GRAVITY_ODD
+                                // Odd mini-decrease with dirty phase (slime).
+                                || data.lastYDist < -0.204 && yDistance > -0.26
+                                && yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD / 4.0
+                                // Lot's of decrease near zero TODO: merge later.
+                                || data.lastYDist < -GRAVITY_ODD && data.lastYDist > -GRAVITY_MIN
+                                && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < -GRAVITY_MAX
+                                // Odd decrease less near zero.
+                                || yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD 
+                                && data.lastYDist < 0.5 && data.lastYDist > 0.4
+                                )
+                        // Jump-effect-specific
+                        // TODO: Jump effect at reduced lift off envelope -> skip this?
+                        || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
+                        && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < GRAVITY_MIN
+                        && yDistChange < -GRAVITY_SPAN
+                        // Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
+                        || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
+                        && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
+                        // Reduced jumping envelope.
+                        || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
+                        && (
+                                // Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
+                                data.lastYDist > -10.0 * GRAVITY_ODD / 2.0 && data.lastYDist < 10.0 * GRAVITY_ODD
+                                && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX
+                                // 
+                                || data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
+                                && yDistance > 0.4 * GRAVITY_ODD && yDistance - data.lastYDist < -GRAVITY_ODD / 2.0
+                                // 
+                                || data.lastYDist < 0.2 && data.lastYDist >= 0.0 && yDistance > -0.2 && yDistance < 2.0 * GRAVITY_MAX
+                                // 
+                                || data.lastYDist > 0.4 * GRAVITY_ODD && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
+                                // Too small decrease, right after lift off.
+                                || data.sfJumpPhase == 1 && data.lastYDist > -GRAVITY_ODD && data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN
+                                && yDistance - data.lastYDist < 0.0114
+                                // Any leaving liquid and keeping distance once.
+                                || data.sfJumpPhase == 1 
+                                && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == data.lastYDist
+                                )
                                 ;
     }
 
@@ -1688,7 +1700,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private boolean lostGroundAscend(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         final double setBackYDistance = to.getY() - data.getSetBackY();
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
@@ -1727,14 +1739,7 @@ public class SurvivalFly extends Check {
                         }
 
                         // Special cases.
-                        if (!from.isSamePos(loc)) {
-                            // Micro-moves: Re-check with loc instead of from.
-                            // TODO: These belong checked as extra moves. The untracked nature of this means potential exploits. 
-                            if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), loc.getX(), loc.getY(), loc.getZ(), from.getWidth(), from.getyOnGround(), data, "asc3")) {
-                                return true;
-                            }
-                        }
-                        else if (yDistance == 0.0 && data.lastYDist <= -0.23 && (hDistance <= data.lastHDist * 1.1)) {
+                        if (yDistance == 0.0 && data.lastYDist <= -0.23 && (hDistance <= data.lastHDist * 1.1)) {
                             // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
                             // TODO: (hDistance <= data.sfLastHDist || hDistance <= hAllowedDistance)
                             // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
@@ -1770,7 +1775,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private boolean lostGroundStill(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGroundStill(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         if (data.lastYDist <= -0.23) {
             // TODO: Code duplication with edgeasc5 above.
             if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc7")) {
@@ -1840,7 +1845,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private boolean lostGroundDescend(final Player player, final PlayerLocation from, final Location loc, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+    private boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
 
