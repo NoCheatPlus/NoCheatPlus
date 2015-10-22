@@ -180,4 +180,28 @@ public class MovingUtil {
         }
     }
 
+    /**
+     * Convenience method for the case that the server has already reset the
+     * fall distance, e.g. with micro moves.
+     * 
+     * @param player
+     * @param fromY
+     * @param toY
+     * @param data
+     * @return
+     */
+    public static double getRealisticFallDistance(final Player player, final double fromY, final double toY, final MovingData data) {
+        if (CheckType.MOVING_NOFALL.isEnabled(player)) { // Not optimal
+            // (NoFall will not be checked, if this method is called.)
+            if (data.noFallMaxY >= fromY ) {
+                return Math.max(0.0, data.noFallMaxY - toY);
+            } else {
+                return Math.max(0.0, fromY - toY); // Skip to avoid exploits: + player.getFallDistance()
+            }
+        } else {
+            // TODO: This would ignore the first split move, if this is the second one.
+            return (double) player.getFallDistance() + Math.max(0.0, fromY - toY);
+        }
+    }
+
 }

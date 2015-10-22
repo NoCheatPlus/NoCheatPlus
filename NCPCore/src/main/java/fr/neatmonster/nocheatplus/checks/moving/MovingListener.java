@@ -579,33 +579,45 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (checkSf || checkCf) {
             // Check jumping on things like slime blocks.
             // Detect potential bounce.
-            if (
-                    // Common conditions.
-                    to.getY() < from.getY()
-                    && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
-                    && !survivalFly.isReallySneaking(player)
-                    && (
-                            // Normal envelope (forestall NoFall).
-                            to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)
-                            && player.getFallDistance() > 1f
-                            // Within wobble-distance.
-                            || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
-                            && to.getY() - from.getY() < -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_SPAN
-                            && !pTo.isOnGround()
-                            )
-                    ) {
-                // Prepare bounce: The center of the player must be above the block.
-                // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
-                verticalBounce = true;
-                // Skip NoFall.
-                checkNf = false;
+            if (to.getY() < from.getY()) {
+                if (
+                        // Common conditions.   
+                        (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
+                        && !survivalFly.isReallySneaking(player)
+                        && (
+                                // Normal envelope (forestall NoFall).
+                                to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)
+                                && MovingUtil.getRealisticFallDistance(player, pFrom.getY(), pTo.getY(), data) > 1.0
+                                // Within wobble-distance.
+                                || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
+                                && to.getY() - from.getY() < -SurvivalFly.GRAVITY_MIN
+                                && !pTo.isOnGround()
+                                )
+                        ) {
+                    // Prepare bounce: The center of the player must be above the block.
+                    // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
+                    verticalBounce = true;
+                    // Skip NoFall.
+                    checkNf = false;
+                }
             }
             else if (data.verticalBounce != null) {
                 // Prepared bounce support.
-                if (to.getY() > from.getY()) {
+                if (to.getY() > from.getY() || to.getY() == from.getY() && data.verticalBounce.value < 0.13) {
                     // Apply bounce.
+                    if (to.getY() == from.getY()) {
+                        // Fake use velocity here.
+                        data.prependVerticalVelocity(new SimpleEntry(tick, 0.0, 1));
+                        data.getOrUseVerticalVelocity(0.0);
+                        if (data.lastYDist < 0.0) {
+                            // Renew the bounce effect.
+                            data.verticalBounce = new SimpleEntry(tick, data.verticalBounce.value, 1);
+                        }
+                    } else {
+                        data.useVerticalBounce(player);
+                    }
                     checkNf = false;
-                    data.useVerticalBounce(player);
+                    // TODO: Find % of verticalBounce.value or abs. value for X: yDistance > 0, deviation from effect < X -> set sfNoLowJump
                 } else {
                     data.verticalBounce = null;
                 }
@@ -724,7 +736,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.setPositions(from, to);
             // Bounce effects.
             if (verticalBounce) {
-                processBounce(player, pFrom, pTo, data, cc);
+                processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
             }
             return false;
         }
@@ -746,21 +758,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      * @param cc
      */
-    private void processBounce(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-        // CHEATING: Prepare velocity.
-        final double fallDistance;
-        if (noFall.isEnabled(player, cc)) {
-            // (NoFall will not be checked, if this method is called.)
-            if (data.noFallMaxY >= from.getY() ) {
-                fallDistance = data.noFallMaxY - to.getY();
-            } else {
-                fallDistance = from.getY() - to.getY(); // Skip to avoid exploits: + player.getFallDistance()
-            }
-        } else {
-            // TODO: This would ignore the first split move, if this is the second one.
-            fallDistance = player.getFallDistance() + from.getY() - to.getY();
-        }
-        final double effect = Math.min(3.14, Math.sqrt(fallDistance) / 3.3 + SurvivalFly.GRAVITY_MAX); // Ancient Greek technology with gravity added.
+    private void processBounce(final Player player,final double fromY, final double toY, final MovingData data, final MovingConfig cc) {
+        // Prepare velocity.
+        final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
+        final double base =  Math.sqrt(fallDistance) / 3.3;
+        final double effect = Math.min(3.14, base + Math.min(base / 10.0, SurvivalFly.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
         // (Actually observed max. is near 3.5.) TODO: Why 3.14 then?
         if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Bounce effect (dY=" + fallDistance + "): " + effect); 
