@@ -263,7 +263,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (sfCheck && cc.sfSetBackPolicyFallDamage && noFall.isEnabled(player)) {
                 // Check if to deal damage.
                 double y = loc.getY();
-                if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
+                if (data.hasSetBack()) {
+                    y = Math.min(y, data.getSetBackY());
+                }
                 noFall.checkDamage(player, data, y);
             }
             // Cleanup
@@ -417,7 +419,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Split move 1 (from -> loc):");
             }
             moveInfo.set(player, from, loc, cc.yOnGround);
-            if (!checkPlayerMove(player, from, loc, true, moveInfo, data, cc, event) && processingEvents.containsKey(event)) {
+            if (!checkPlayerMove(player, from, loc, true, moveInfo, data, cc, event) && processingEvents.containsKey(player.getName())) {
                 // Between -> set data accordingly (compare: onPlayerMoveMonitor).
                 onMoveMonitorNotCancelled(player, from, loc, System.currentTimeMillis(), TickTask.getTick(), CombinedData.getData(player), data);
                 data.joinOrRespawn = false;
@@ -576,11 +578,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean verticalBounce = false;
         if (checkSf || checkCf) {
             // Check jumping on things like slime blocks.
-            if (to.getY() < from.getY() 
+            // Detect potential bounce.
+            if (
+                    // Common conditions.
+                    to.getY() < from.getY()
                     && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
                     && !survivalFly.isReallySneaking(player)
-                    && (to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) && player.getFallDistance() > 1f 
-                    || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5 && to.getY() - from.getY() < -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_SPAN && !pTo.isOnGround())
+                    && (
+                            // Normal envelope (forestall NoFall).
+                            to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)
+                            && player.getFallDistance() > 1f
+                            // Within wobble-distance.
+                            || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
+                            && to.getY() - from.getY() < -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_SPAN
+                            && !pTo.isOnGround()
+                            )
                     ) {
                 // Prepare bounce: The center of the player must be above the block.
                 // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
@@ -589,6 +601,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 checkNf = false;
             }
             else if (data.verticalBounce != null) {
+                // Prepared bounce support.
                 if (to.getY() > from.getY()) {
                     // Apply bounce.
                     checkNf = false;
@@ -741,9 +754,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (data.noFallMaxY >= from.getY() ) {
                 fallDistance = data.noFallMaxY - to.getY();
             } else {
-                fallDistance = from.getY() - to.getY();
+                fallDistance = from.getY() - to.getY(); // Skip to avoid exploits: + player.getFallDistance()
             }
         } else {
+            // TODO: This would ignore the first split move, if this is the second one.
             fallDistance = player.getFallDistance() + from.getY() - to.getY();
         }
         final double effect = Math.min(3.14, Math.sqrt(fallDistance) / 3.3 + SurvivalFly.GRAVITY_MAX); // Ancient Greek technology with gravity added.

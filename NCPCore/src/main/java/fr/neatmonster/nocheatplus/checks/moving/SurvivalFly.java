@@ -1091,6 +1091,10 @@ public class SurvivalFly extends Check {
                                 || yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD 
                                 && data.lastYDist < 0.5 && data.lastYDist > 0.4
                                 )
+//                        // Small distance to set.back. .
+//                        || data.hasSetBack() && Math.abs(data.getSetBackY() - from.getY()) < 1.0
+//                        // Bounce without velocity set.
+//                        && data.lastYDist == 0.0 && yDistance > -GRAVITY_MIN && yDistance < GRAVITY_SPAN
                         // Jump-effect-specific
                         // TODO: Jump effect at reduced lift off envelope -> skip this?
                         || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
@@ -1718,7 +1722,6 @@ public class SurvivalFly extends Check {
             if (data.lastYDist < 0.0) { // TODO: <= ?
                 // Generic could step.
                 // TODO: Possibly confine margin depending on side, moving direction (see client code).
-                // TODO: Consider player.getLocation too (!).
                 // TODO: Should this also be checked vs. last from?
                 if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
                     // TODO: Set a data property, so vdist does not trigger (currently: scan for tag)

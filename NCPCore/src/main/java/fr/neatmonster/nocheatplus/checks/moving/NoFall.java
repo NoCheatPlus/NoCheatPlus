@@ -127,7 +127,6 @@ public class NoFall extends Check {
         final double fromY = from.getY();
         final double toY = to.getY();
 
-        // TODO: account for player.getLocation.getY (how exactly ?)
         final double yDiff = toY - fromY;
 
         final double oldNFDist = data.noFallFallDistance;
