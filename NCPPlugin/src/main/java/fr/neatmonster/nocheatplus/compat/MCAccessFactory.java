@@ -31,7 +31,7 @@ public class MCAccessFactory {
      */
     public MCAccess getMCAccess(final MCAccessConfig config) {
         final List<Throwable> throwables = new ArrayList<Throwable>();
-        MCAccess mcAccess = null;
+        MCAccess mcAccess;
         // Try to set up native access.
 
         // CraftBukkit (dedicated).
