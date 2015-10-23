@@ -14,6 +14,18 @@ This is a quick go, not covering all the areas.
 
 Do comply with the [GPLv3 License] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt) of the project, ensure contributed code can be used in a GPLv3 project.
 
+Pull request conventions:
+* Do provide some reason for a pull request, if that feels better, we don't currently demand anything in terms of elaboration/formatting. This may change with receiving more pull requests.
+* We prefer you to compile and test code changes.
+* Split off larger unrelated chunks of changes into separate pull requests for better discussion.
+* Cosmetic changes (e.g. code conventions) should be a separate PR, so discussion can be focused.
+
+Conventions for commits:
+* Related changes should rather be in one commit, especially if the whole would not compile or not make sense with either commit removed. Exception may be splitting extensive amount of changes for readability, larger changes of different sub-systems, provided the pull requests is confined to one overall topic/change.
+* Split off formatting larger areas into extra commits. Formatting several files without changing any logic is ok.
+* Split off (unrelated) java-doc/comment changes into extra commits.
+* In general split off unrelated changes into separate commits.
+
 Code conventions haven't really been followed, however we try to go with some rules and change existing files once touching them.
 
 Indentation, braces, split statements:
@@ -27,6 +39,7 @@ Comments:
 * Document special cases and purpose, where necessary, especially for workarounds.
 * For special case conditions place a comment between split lines, if there is a lot of cases in one statement.
 * Don't format/split single line comments automatically.
+* Do use auto-format for java-doc comments. 
 
 Other:
-* We do use "final" modifiers, especially for variables in lengthy method bodies, but also for not-to-be-changed instance members. Occasionally for very often used static methods, rather not for instance methods.
+* We do use 'final' modifiers, especially for variables in lengthy method bodies, but also for not-to-be-changed instance members. Occasionally for very often used static methods, rather not for instance methods.
