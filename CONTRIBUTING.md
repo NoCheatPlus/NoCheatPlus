@@ -30,7 +30,7 @@ Code conventions haven't really been followed, however we try to go with some ru
 
 Indentation, braces, split statements:
 * Use spaces, 4 for a level of indentation, no tab characters.
-* Curly braces rather like the Stoustrup variant of K&R indentation style (see wikipedia). Exceptions may be empty bodies for try-catch (compact). Open brace in the same line of a method signature or a condition, close in a separate line, place "else if" on the same level as "if" in a separate line.
+* Curly braces rather like the Stoustrup variant of the K&R indentation style (see wikipedia). Exceptions may be empty bodies for try-catch (compact). Open brace in the same line of a method signature or a condition, close in a separate line, place "else if" on the same level as "if" in a separate line.
 * Splitting long lines only when semantically appealing. Don't use magic on splitting. Keep a (too) long line, rather than obfuscating the logic by splitting it.
 * Indentation of split lines is out of our reach (use auto-indent), is that even configurable (eclipse)?
 * In order to not mess everything up, we use auto-indentation but not auto-format, until decided.
