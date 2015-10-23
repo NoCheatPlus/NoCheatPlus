@@ -964,7 +964,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 CombinedData.getData(player).wasInBed = true;
             }
         }
-        if (onlinePlayers.length > 0) logManager.info(Streams.INIT, "[NCP] Updated " + onlinePlayers.length + "players (post-enable).");
+        if (onlinePlayers.length > 0) {
+            logManager.info(Streams.INIT, "[NCP] Updated " + onlinePlayers.length + "players (post-enable).");
+        
+        }
         logManager.info(Streams.INIT, "[NoCheatPlus] Post-enable finished.");
         logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
