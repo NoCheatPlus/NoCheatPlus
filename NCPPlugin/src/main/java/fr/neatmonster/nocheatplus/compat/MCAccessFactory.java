@@ -62,8 +62,7 @@ public class MCAccessFactory {
         // Try to set up api-only access (since 1.4.6).
         try {
             mcAccess = new MCAccessBukkit();
-            final String msg;
-            msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
+            final String msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
             StaticLog.logWarning(msg);
             for (String uMsg : updateLocs) {
                 StaticLog.logWarning(uMsg);
