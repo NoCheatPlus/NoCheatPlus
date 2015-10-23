@@ -96,6 +96,7 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
@@ -724,9 +725,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * @deprecated Leads to compatibility issues with NPC plugins, such as Citizens 2, due to recalculation of permissions (specifically during disabling).
      */
     public void undoCommandChanges() {
-        Iterator<CommandProtectionEntry> i = changedCommands.iterator();
-        while (i.hasNext()){
-            i.next().restore();
+        ListIterator<CommandProtectionEntry> i = changedCommands.listIterator(changedCommands.size());
+        while (i.hasPrevious()){
+            i.previous().restore();
             i.remove();
         }
     }
