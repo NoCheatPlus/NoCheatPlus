@@ -57,7 +57,7 @@ public class MCAccessFactory {
             return new MCAccessGlowstone();
         } catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // Try to set up api-only access (since 1.4.6).
         try {
@@ -76,7 +76,7 @@ public class MCAccessFactory {
         }
         catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // All went wrong.
         // TODO: Fall-back solution (disable plugin, disable checks).
@@ -135,7 +135,7 @@ public class MCAccessFactory {
             }
             catch(Throwable t) {
                 throwables.add(t);
-            };
+            }
         }
 
         // None worked.
