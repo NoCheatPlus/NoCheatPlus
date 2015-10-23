@@ -48,7 +48,7 @@ Support and Documentation
 Developers
 * [License (GPLv3)] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
 * [API] (https://github.com/NoCheatPlus/Docs/wiki/API)
-* [Contribute] (https://github.com/NoCheatPlus/NoCheatPlus/CONTRIBUTING.md)
+* [Contribute] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
 
 Related
 * [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
