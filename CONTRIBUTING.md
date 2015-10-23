@@ -23,7 +23,7 @@ Indentation, braces, split statements:
 * Indentation of split lines is out of our reach (use auto-indent), is that even configurable (eclipse)?
 * In order to not mess everything up, we use auto-indentation but not auto-format, until decided.
 
-* Comments:
+Comments:
 * Document special cases and purpose, where necessary, especially for workarounds.
 * For special case conditions place a comment between split lines, if there is a lot of cases in one statement.
 * Don't format/split single line comments automatically.
