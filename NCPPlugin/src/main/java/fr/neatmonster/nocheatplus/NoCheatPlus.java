@@ -144,7 +144,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Commands that were changed for protecting them against tab complete or
      * use.
      */
-    protected List<CommandProtectionEntry> changedCommands = new ArrayList<CommandProtectionEntry>();
+    protected final List<CommandProtectionEntry> changedCommands = new ArrayList<CommandProtectionEntry>();
 
 
     private final ListenerManager listenerManager = new ListenerManager(this, false);
