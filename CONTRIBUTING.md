@@ -15,22 +15,22 @@ This is a quick go, not covering all the areas.
 Do comply with the [GPLv3 License] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt) of the project, ensure contributed code can be used in a GPLv3 project.
 
 Pull request conventions:
-* Do provide some reason for a pull request, if that feels better, we don't currently demand anything in terms of elaboration/formatting. This may change with receiving more pull requests.
+* Do provide some reason for a pull request, if that feels better. Currently, we don't demand anything in terms of elaboration and formatting. This may change with receiving more pull requests.
 * We prefer you to compile and test code changes.
 * Split off larger unrelated chunks of changes into separate pull requests for better discussion.
-* Cosmetic changes (e.g. code conventions) should be a separate PR, so discussion can be focused.
+* Cosmetic changes (e.g. code conventions, not changing the logic) should be a separate PR, so discussion can be focused, especially if those are a matter of taste.
 
 Conventions for commits:
 * Related changes should rather be in one commit, especially if the whole would not compile or not make sense with either commit removed. Exception may be splitting extensive amount of changes for readability, larger changes of different sub-systems, provided the pull requests is confined to one overall topic/change.
-* Split off formatting larger areas into extra commits. Formatting several files without changing any logic is ok.
-* Split off (unrelated) java-doc/comment changes into extra commits.
+* Split off formatting larger areas into separate commits. Formatting several files without changing any logic is ok.
+* Split off (unrelated) java-doc/comment changes into separate commits.
 * In general split off unrelated changes into separate commits.
 
 Code conventions haven't really been followed, however we try to go with some rules and change existing files once touching them.
 
 Indentation, braces, split statements:
 * Use spaces, 4 for a level of indentation, no tab characters.
-* Curly braces rather like the Stoustrup variant of K&R indentation style (see wikipedia). Exceptions may be empty bodies for try-catch (compact). Open brace in the same line of a method signature or a condition, close in an extra line, place "else if" on the same level as "if" in an extra line.
+* Curly braces rather like the Stoustrup variant of K&R indentation style (see wikipedia). Exceptions may be empty bodies for try-catch (compact). Open brace in the same line of a method signature or a condition, close in a separate line, place "else if" on the same level as "if" in a separate line.
 * Splitting long lines only when semantically appealing. Don't use magic on splitting. Keep a (too) long line, rather than obfuscating the logic by splitting it.
 * Indentation of split lines is out of our reach (use auto-indent), is that even configurable (eclipse)?
 * In order to not mess everything up, we use auto-indentation but not auto-format, until decided.
