@@ -1054,7 +1054,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public MCAccess initMCAccess(final ConfigFile config) {
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig());
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig(config));
         setMCAccess(mcAccess);
         return mcAccess;
     }
