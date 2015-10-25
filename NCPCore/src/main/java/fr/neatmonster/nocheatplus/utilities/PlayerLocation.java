@@ -957,6 +957,7 @@ public class PlayerLocation {
             this.aboveStairs = other.isAboveStairs();
         }
         this.onIce = other.isOnIce();
+        this.passable = other.passable;
         this.typeId = other.getTypeId();
         this.typeIdBelow = other.getTypeIdBelow();
         this.notOnGroundMaxY = other.notOnGroundMaxY;
