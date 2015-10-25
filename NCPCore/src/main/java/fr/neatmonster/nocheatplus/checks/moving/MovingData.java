@@ -131,9 +131,8 @@ public class MovingData extends ACheckData {
      * Last valid horizontal distance covered by a move. Integer.MAX_VALUE indicates "not set".
      */
     public double       lastHDist = Double.MAX_VALUE;
-    /** Only used during processing, to keep track of sub-checks using velocity. Reset in velocityTick, before checks run. */
+    /** Just used velocity, during processing of moving checks. */
     public SimpleEntry  verVelUsed = null;
-
     /** Compatibility entry for bouncing of slime blocks and the like. */
     public SimpleEntry verticalBounce = null;
 
@@ -205,6 +204,10 @@ public class MovingData extends ACheckData {
     /** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
     public int          lostSprintCount = 0;
     public int          sfJumpPhase = 0;
+    /** Count how many times in a row v-dist has been zero, at very low h-dist (aimed at in-air checks). */
+    public int          sfZeroVdist = 0;
+    /** Only used during processing, to keep track of sub-checks using velocity. Reset in velocityTick, before checks run. */
+
     /** "Dirty" flag, for receiving velocity and similar while in air. */
     private boolean     sfDirty = false;
 
@@ -255,6 +258,7 @@ public class MovingData extends ACheckData {
         jumpAmplifier = 0;
         setBack = null;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        sfZeroVdist = 0;
         fromX = toX = Double.MAX_VALUE;
         toYaw = Float.MAX_VALUE;
         clearAccounting();
@@ -314,6 +318,7 @@ public class MovingData extends ACheckData {
         clearAccounting();
         sfJumpPhase = 0;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        sfZeroVdist = 0;
         toWasReset = false;
         fromWasReset = false;
         verticalBounce = null;
@@ -368,6 +373,7 @@ public class MovingData extends ACheckData {
         toYaw = yaw;
         toPitch = pitch;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        sfZeroVdist = 0;
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;

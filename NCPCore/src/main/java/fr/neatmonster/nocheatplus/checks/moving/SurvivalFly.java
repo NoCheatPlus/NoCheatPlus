@@ -523,6 +523,13 @@ public class SurvivalFly extends Check {
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
+        if (yDistance == 0.0 && hDistance < 0.125) {
+            // TODO: Check h-dist envelope.
+            data.sfZeroVdist ++;
+        } else {
+            data.sfZeroVdist = 0;
+        }
+        // Log tags added after violation handling.
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);
         }
@@ -732,6 +739,19 @@ public class SurvivalFly extends Check {
         double vAllowedDistance = 0.0;
         double vDistanceAboveLimit = 0.0;
 
+        // Change seen from last yDistance.
+        final double yDistChange = data.lastYDist == Double.MAX_VALUE ? Double.MAX_VALUE : yDistance - data.lastYDist;
+
+        // Hacks.
+        final boolean envelopeHack;
+        if (!resetFrom && !resetTo && venvHacks(from, to, yDistance, yDistChange, data)) {
+            envelopeHack = true;
+            tags.add("hack_venv");
+        }
+        else{
+            envelopeHack = false;
+        }
+
         // Relative distance (friction, lift-off).
         // Estimate expected yDistance.
         // TODO: Friction might need same treatment as with horizontal (medium transitions: data.lastFrictionVertical).
@@ -743,7 +763,7 @@ public class SurvivalFly extends Check {
         // TODO: Cleanup pending.
         final boolean strictVdistRel;
         final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
-        final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain).
+        final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain). 
         if (fallingEnvelope(yDistance, data.lastYDist, 0.0)) {
             // Less headache: Always allow falling. 
             vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
@@ -788,11 +808,13 @@ public class SurvivalFly extends Check {
         // Compare yDistance to expected, use velocity on violation.
         // TODO: data.noFallAssumeGround  needs more precise flags (refactor to per move data objects, store 123)
         boolean vDistRelVL = false;
-        // Change seen from last yDistance.
-        final double yDistChange = data.lastYDist == Double.MAX_VALUE ? Double.MAX_VALUE : yDistance - data.lastYDist;
         // Difference from vAllowedDistance to yDistance.
         final double yDistDiffEx = yDistance - vAllowedDistance;
-        if (yDistDiffEx > 0.0) { // Upper bound violation.
+        if (envelopeHack) {
+            vDistRelVL = false;
+            //vAllowedDistance = yDistance;
+        }
+        else if (yDistDiffEx > 0.0) { // Upper bound violation.
             // && (yDistance > 0.0 || (!resetTo && !data.noFallAssumeGround))
             if (yDistance <= 0.0 && (resetTo || data.noFallAssumeGround)) {
                 // Allow falling shorter than expected, if onto ground.
@@ -921,9 +943,13 @@ public class SurvivalFly extends Check {
             }
         }
 
+        if (data.sfLowJump) {
+            tags.add("lowjump");
+        }
+
         // More in air checks.
         // TODO: move into the in air checking above !?
-        if (!resetFrom && !resetTo) {
+        if (!envelopeHack && !resetFrom && !resetTo) {
             // "On-air" checks (vertical, already use velocity if needed).
             vDistanceAboveLimit = Math.max(vDistanceAboveLimit, inAirChecks(now, from, to, hDistance, yDistance, data, cc));
         }
@@ -951,7 +977,7 @@ public class SurvivalFly extends Check {
         // Air-stay-time.
         // TODO: max-phase only when from is not reset !?
         final int maxJumpPhase = data.liftOffEnvelope.getMaxJumpPhase(data.jumpAmplifier);
-        if (data.sfJumpPhase > maxJumpPhase && !data.isVelocityJumpPhase()) {
+        if (!envelopeHack && data.sfJumpPhase > maxJumpPhase && !data.isVelocityJumpPhase()) {
             if (yDistance < 0) {
                 // Ignore falling, and let accounting deal with it.
             }
@@ -967,6 +993,40 @@ public class SurvivalFly extends Check {
             }
         }
         return new double[]{vAllowedDistance, vDistanceAboveLimit};
+    }
+
+    /**
+     * Vertical envelope "hacks". Directly check for certain transitions, on
+     * match, skip sub-checks: vdistrel, maxphase, inAirChecks.
+     * 
+     * @param from
+     * @param to
+     * @param yDistance
+     * @param data
+     * @return If to skip those sub-checks.
+     */
+    private static boolean venvHacks(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final MovingData data) {
+        return 
+                // Intended for cobweb.
+                // TODO: Bounding box issue ?
+                data.liftOffEnvelope == LiftOffEnvelope.NO_JUMP && data.sfJumpPhase < 60
+                && (
+                        data.lastYDist < 0.0 
+                        && (
+                                // Switch to 0 y-Dist on early jump phase.
+                                yDistance == 0.0 && data.lastYDist < -GRAVITY_ODD / 3.0 && data.lastYDist > -GRAVITY_MIN
+                                // Decrease too few.
+                                || yDistChange < -GRAVITY_MIN / 3.0 && yDistChange > -GRAVITY_MAX
+                                // Keep negative y-distance (very likely a player height issue).
+                                || yDistChange == 0.0 && data.lastYDist > -GRAVITY_MAX && data.lastYDist < -GRAVITY_ODD / 3.0
+                                )
+                                // Keep yDist == 0.0 on first falling.
+                                // TODO: Do test if hdist == 0.0 or something small can be assumed.
+                                || yDistance == 0.0 && data.sfZeroVdist > 0 && data.sfZeroVdist < 10
+                        )
+                        // Jumping on slimes, change viewing direction at the max. height.
+                        || yDistance == 0.0 && data.sfZeroVdist == 1 
+                        && (data.isVelocityJumpPhase() || data.hasSetBack() && to.getY() - data.getSetBackY() < 1.35);
     }
 
     /**
@@ -1145,10 +1205,6 @@ public class SurvivalFly extends Check {
      */
     private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final MovingData data, final MovingConfig cc) {
         double vDistanceAboveLimit = 0;
-
-        if (data.sfLowJump) {
-            tags.add("lowjump");
-        }
 
         // y direction change detection.
         // TODO: Consider using accounting for y-change detection. <- Nope :).
