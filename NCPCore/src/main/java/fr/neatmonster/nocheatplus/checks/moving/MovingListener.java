@@ -399,9 +399,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // newTo should be null here.
 
         // Fire one or two moves here.
-        final Location loc = player.getLocation(useLoc);
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MoveInfo moveInfo = useMoveInfo();
+        final Location loc = player.getLocation(moveInfo.useLoc);
         if (TrigUtil.isSamePos(from, loc) 
                 || TrigUtil.isSamePos(loc, data.fromX, data.fromY, data.fromZ)
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
@@ -434,7 +434,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Cleanup.
         data.joinOrRespawn = false;
         returnMoveInfo(moveInfo);
-        useLoc.setWorld(null);
     }
 
     /**
@@ -864,7 +863,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * Monitor level PlayerMoveEvent.
+     * Monitor level PlayerMoveEvent. Uses useLoc.
      * @param event
      */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
@@ -893,7 +892,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingData mData = MovingData.getData(player);
         final long tick = TickTask.getTick();
         if (!event.isCancelled()) {
-            final Location pLoc = player.getLocation();
+            final Location pLoc = player.getLocation(useLoc);
             onMoveMonitorNotCancelled(player, TrigUtil.isSamePosAndLook(pLoc, from) ? from : pLoc, event.getTo(), now, tick, data, mData);
             useLoc.setWorld(null);
         }
@@ -907,10 +906,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * Overrides useLoc if in vehicle.
+     * Uses useLoc if in vehicle.
      * @param player
-     * @param from
-     * @param to
+     * @param from Might use useLoc, but will reset it, if in vehicle.
+     * @param to Do not use useLoc for this.
      * @param now
      * @param tick
      * @param data
