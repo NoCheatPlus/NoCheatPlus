@@ -3,38 +3,50 @@ package fr.neatmonster.nocheatplus.checks.moving.locations;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /**
- * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
+ * Coupling from and to PlayerLocation objects with a block cache for easy
+ * storage and reuse.
+ * 
  * @author mc_dev
  *
  */
 public class MoveInfo {
-	
-	/** For temporary use. Might need cloning for passing to external API. Only use after calling MoveInfo.set! */
+
+    /**
+     * Might need cloning for passing to external API. This is not initialized
+     * in set. World is set to null on cleanup!
+     */
     public final Location useLoc = new Location(null, 0, 0, 0);
-	public final BlockCache cache;
+    public final BlockCache cache;
     public final PlayerLocation from;
     public final PlayerLocation to;
-    
+    /** Not initialized in set. */
+    public final MoveData data = new MoveData();
+
     public MoveInfo(final MCAccess mcAccess){
-    	cache = mcAccess.getBlockCache(null);
-    	from = new PlayerLocation(mcAccess, null);
-    	to = new PlayerLocation(mcAccess, null);
+        cache = mcAccess.getBlockCache(null);
+        from = new PlayerLocation(mcAccess, null);
+        to = new PlayerLocation(mcAccess, null);
     }
-    
+
     /**
-     * Initialize from, and if given to. Note that useLoc is left untouched (!).
+     * Initialize from, and if given to. Note that useLoc and data are left
+     * untouched.
+     * 
      * @param player
-     * @param from Must not be null.
-     * @param to Can be null.
+     * @param from
+     *            Must not be null.
+     * @param to
+     *            Can be null.
      * @param yOnGround
      */
     public final void set(final Player player, final Location from, final Location to, final double yOnGround){
-    	this.cache.setAccess(from.getWorld());
+        this.cache.setAccess(from.getWorld());
         this.from.set(from, player, yOnGround);
         this.from.setBlockCache(cache);
         if (to != null){
@@ -43,15 +55,17 @@ public class MoveInfo {
         }
         // Note: using set to reset to by passing null won't work. 
     }
-    
+
     /**
-     * Clear caches and remove World references and such. Also resets the world of useLoc.
+     * Clear caches and remove World references and such. Also resets the world
+     * of useLoc.
      */
     public final void cleanup(){
-    	useLoc.setWorld(null);
+        useLoc.setWorld(null);
         from.cleanup();
         to.cleanup();
         cache.cleanup();
+        data.reset();
     }
-    
+
 }

@@ -301,6 +301,17 @@ public class TrigUtil {
     }
 
     /**
+     * 2D-distance in x-z plane.
+     * @param location1
+     * @param location2
+     * @return
+     */
+    public static final double xzDistance(final PlayerLocation location1, final PlayerLocation location2)
+    {
+        return distance(location1.getX(), location1.getZ(), location2.getX(), location2.getZ());
+    }
+
+    /**
      * 2D-distance.
      * @param x1
      * @param z1

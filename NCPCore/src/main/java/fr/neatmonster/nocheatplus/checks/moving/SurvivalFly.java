@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -112,7 +113,7 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MoveData moveData, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
 
         // Calculate some distances.
@@ -124,14 +125,14 @@ public class SurvivalFly extends Check {
             hasHdist = false;
         } else {
             xDistance = to.getX() - from.getX();
-            yDistance = to.getY() - from.getY();
+            yDistance = moveData.yDistance;
             zDistance = to.getZ() - from.getZ();
             if (xDistance == 0.0 && zDistance == 0.0) {
                 hDistance = 0.0;
                 hasHdist = false;
             } else {
-                hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
                 hasHdist = true;
+                hDistance = moveData.hDistance;
             }
         }
 
@@ -517,8 +518,6 @@ public class SurvivalFly extends Check {
             //        }
         }
         // Adjust data.
-        data.lastHDist = hDistance;
-        data.lastYDist = yDistance;
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;

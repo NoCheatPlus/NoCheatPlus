@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -40,7 +41,7 @@ public class CreativeFly extends Check {
      * @param time Millis.
      * @return
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MoveData moveData, final MovingData data, final MovingConfig cc, final long time) {
 
         // Ensure we have a set-back location.
         if (!data.hasSetBack()) {
@@ -58,12 +59,8 @@ public class CreativeFly extends Check {
         }
 
         // Calculate some distances.
-        final double xDistance = to.getX() - from.getX();
-        final double yDistance = to.getY() - from.getY();
-        final double zDistance = to.getZ() - from.getZ();
-
-        // How far did the player move horizontally?
-        final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+        final double yDistance = moveData.yDistance;
+        final double hDistance = moveData.hDistance;
 
         // Sprinting.
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
@@ -188,8 +185,6 @@ public class CreativeFly extends Check {
 
         // Adjust the set-back and other last distances.
         data.setSetBack(to);
-        data.lastHDist = hDistance;
-        data.lastYDist = yDistance;
         return null;
     }
 

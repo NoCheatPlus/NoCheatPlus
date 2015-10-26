@@ -542,6 +542,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             onVehicleLeaveMiss(player, data, cc);
         }
 
+        // Set some data for this move.
+        moveInfo.data.set(pFrom, pTo);
+
         // Potion effect "Jump".
         final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
         if (jumpAmplifier > data.jumpAmplifier) {
@@ -657,7 +660,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, moveInfo.data, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
@@ -701,7 +704,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else if (checkCf) {
             // CreativeFly
             if (newTo == null) {
-                newTo = creativeFly.check(player, pFrom, pTo, data, cc, time);
+                newTo = creativeFly.check(player, pFrom, pTo, moveInfo.data, data, cc, time);
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
@@ -730,13 +733,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
 
         if (newTo == null) {
-            // Set positions.
-            // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
-            data.setPositions(from, to);
             // Bounce effects.
             if (verticalBounce) {
                 processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
             }
+            // Set positions.
+            // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
+            data.setPositions(from, to);
+            data.lastHDist = moveInfo.data.hDistance;
+            data.lastYDist = moveInfo.data.yDistance;
             return false;
         }
         else {
@@ -749,7 +754,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     /**
      * Adjust data to allow bouncing back and/or removing fall damage.<br>
      * yDistance is < 0, the middle of the player is above a slime block (to) +
-     * on ground.
+     * on ground. This might be a micro-move onto ground.
      * 
      * @param player
      * @param from
@@ -761,7 +766,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Prepare velocity.
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
-        final double effect = Math.min(3.14, base + Math.min(base / 10.0, SurvivalFly.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
+        double effect = Math.min(3.5, base + Math.min(base / 10.0, SurvivalFly.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
+        if (effect > 0.42) {
+            // Extra cap by last y distance(s).
+            final double max_gain = Math.abs(data.lastYDist < 0.0 ? Math.min(data.lastYDist, toY - fromY) : (toY - fromY)) - SurvivalFly.GRAVITY_SPAN;
+            if (max_gain < effect) {
+                effect = max_gain;
+                if (data.debug) {
+                    DebugUtil.debug(player.getName() + " Cap bounce effect by recent y-distances.");
+                }
+            }
+        }
         // (Actually observed max. is near 3.5.) TODO: Why 3.14 then?
         if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Bounce effect (dY=" + fallDistance + "): " + effect); 
