@@ -403,7 +403,6 @@ public class SurvivalFly extends Check {
 
         // Check lift-off medium.
         // TODO: Web before liquid? Climbable?
-        // TODO: Web might be NO_JUMP !
         // TODO: isNextToGround(0.15, 0.4) allows a little much (yMargin), but reduces false positives.
         // TODO: nextToGround: Shortcut with block-flags ?
         if (to.isInLiquid()) {

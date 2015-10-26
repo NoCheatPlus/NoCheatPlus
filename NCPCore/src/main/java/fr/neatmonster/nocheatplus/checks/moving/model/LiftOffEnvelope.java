@@ -12,11 +12,13 @@ public enum LiftOffEnvelope {
     /** Weak or no limit moving off liquid near ground. */
     LIMIT_NEAR_GROUND(0.42, 1.35, 6, false), // TODO: 0.385 / not jump on top of 1 high wall from water.
     /** Simple calm water surface. */
-    LIMIT_LIQUID(0.1, 0.27, 3, false), // TODO:
+    LIMIT_LIQUID(0.1, 0.27, 3, false),
     //    /** Flowing water / strong(-est) limit. */
     //    LIMIT_LIQUID_STRONG(...), // TODO
-    /** No jumping at all. */
-    NO_JUMP(0.0, 0.0, 0, false); // TODO
+    /** No jumping at all (web). */
+    NO_JUMP(0.0, 0.0, 0, false),
+    /** Like NO_JUMP, just to distinguish from being in web. */
+    UNKNOWN(0.0, 0.0, 0, false);
     ;
 
     private double maxJumpGain;

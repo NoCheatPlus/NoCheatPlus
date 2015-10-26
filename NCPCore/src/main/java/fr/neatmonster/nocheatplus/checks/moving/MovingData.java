@@ -99,7 +99,7 @@ public class MovingData extends ACheckData {
      * Default lift-off envelope, used after resetting. <br>
      * TODO: Test, might be better ground.
      */
-    private static final LiftOffEnvelope defaultLiftOffEnvelope = LiftOffEnvelope.NO_JUMP;
+    private static final LiftOffEnvelope defaultLiftOffEnvelope = LiftOffEnvelope.UNKNOWN;
 
     /** Tolerance value for using vertical velocity (the client sends different values than received with fight damage). */
     private static final double TOL_VVEL = 0.0625;
@@ -895,7 +895,7 @@ public class MovingData extends ACheckData {
             liftOffEnvelope = LiftOffEnvelope.NORMAL;
         }
         else {
-            liftOffEnvelope = defaultLiftOffEnvelope;
+            liftOffEnvelope = LiftOffEnvelope.UNKNOWN;
         }
     }
 
