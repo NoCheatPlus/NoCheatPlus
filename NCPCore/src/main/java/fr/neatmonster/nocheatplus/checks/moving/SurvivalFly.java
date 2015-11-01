@@ -810,6 +810,7 @@ public class SurvivalFly extends Check {
             tags.add("data_missing");
         }
         // Compare yDistance to expected, use velocity on violation.
+        // TODO: Quick detect valid envelope and move workaround code into a method.
         // TODO: data.noFallAssumeGround  needs more precise flags (refactor to per move data objects, store 123)
         boolean vDistRelVL = false;
         // Difference from vAllowedDistance to yDistance.
@@ -882,6 +883,11 @@ public class SurvivalFly extends Check {
                 // Too strong decrease with velocity.
                 // TODO: Observed when moving off water, might be confined by that.
             }
+            else if (to.isHeadObstructed() 
+                    // TODO: Not sure about the second case:
+                    || data.lastYDist > 0.0 && yDistance ==  0.0 && from.isHeadObstructed()) {
+                // Head is blocked, thus a shorter move.
+            }
             else {
                 vDistRelVL = true;
             }
@@ -913,6 +919,9 @@ public class SurvivalFly extends Check {
                 }
                 else if (oddGravity(from, to, yDistance, yDistChange, data)) {
                     // Starting to fall.
+                }
+                else if (data.lastYDist >= 0.0 && yDistance <= 0.0 && yDistance > -GRAVITY_MAX - GRAVITY_SPAN && from.isHeadObstructed()) {
+                    // Head was blocked, thus faster decrease than expected.
                 }
                 else {
                     // Violation.
