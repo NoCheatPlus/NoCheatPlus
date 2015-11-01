@@ -586,6 +586,7 @@ public class SurvivalFly extends Check {
         final boolean sfDirty = data.isVelocityJumpPhase();
         double friction = data.lastFrictionHorizontal; // Friction to use with this move.
         // TODO: sfDirty: Better friction/envelope-based.
+        boolean useBaseModifiers = false;
         if (from.isInWeb()) {
             data.sfOnIce = 0;
             // TODO: if (from.isOnIce()) <- makes it even slower !
@@ -602,9 +603,8 @@ public class SurvivalFly extends Check {
             if (level > 0) {
                 // The hard way.
                 hAllowedDistance *= modDepthStrider[level];
-                if (sprinting) {
-                    hAllowedDistance *= data.multSprinting;
-                }
+                // Modifiers: Most speed seems to be reached on ground, but couldn't nail down.
+                useBaseModifiers = true;
             }
             // (Friction is used as is.)
         }
@@ -618,13 +618,22 @@ public class SurvivalFly extends Check {
             friction = 0.0; // Ensure friction can't be used to speed.
         }
         else {
+            useBaseModifiers = true;
             if (sprinting) {
-                hAllowedDistance = walkSpeed * data.multSprinting * cc.survivalFlySprintingSpeed / 100D;
+                hAllowedDistance = walkSpeed * cc.survivalFlySprintingSpeed / 100D;
             }
             else {
                 hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             }
-            // Count in speed changes (attributes, speed potion).
+            // Ensure friction can't be used to speed.
+            // TODO: Model bunny hop as a one time peak + friction. Allow medium based friction.
+            friction = 0.0;
+        }
+        // Apply modifiers (sprinting, attributes, ...).
+        if (useBaseModifiers) {
+            if (sprinting) {
+                hAllowedDistance *= data.multSprinting;
+            }
             // Note: Attributes count in slowness potions, thus leaving out isn't possible.
             final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
             if (attrMod == Double.MAX_VALUE) {
@@ -636,9 +645,6 @@ public class SurvivalFly extends Check {
             } else {
                 hAllowedDistance *= attrMod;
             }
-            // Ensure friction can't be used to speed.
-            // TODO: Model bunny hop as a one time peak + friction. Allow medium based friction.
-            friction = 0.0;
         }
         // TODO: Reset friction on too big change of direction?
 
