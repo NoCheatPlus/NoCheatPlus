@@ -541,7 +541,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // Aim at sqrt(vx * vx + vz * vz, 2), not the exact direction.
         final double vx = level / Math.sqrt(8.0);
         final double vz = vx;
-        final double vy = 0.365;
+        final double vy = 0.462; // TODO: (0.365) Needs other workarounds, to allow more when moving off ground (vel + GRAVITY_MAX or max jump gain + little?).
         useLoc1.setWorld(null); // Cleanup.
         if (damagedData.debug || mdata.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
