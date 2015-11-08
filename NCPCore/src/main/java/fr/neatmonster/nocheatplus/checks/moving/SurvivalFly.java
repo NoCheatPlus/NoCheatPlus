@@ -84,7 +84,7 @@ public class SurvivalFly extends Check {
     /** Friction for water (default). */
     public static final double FRICTION_MEDIUM_WATER = 0.89;
     /** Friction for lava. */
-    public static final double FRICTION_MEDIUM_LAVA = 0.25; // TODO
+    public static final double FRICTION_MEDIUM_LAVA = 0.25; // TODO: Rather 0.4 ?
 
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
@@ -1595,7 +1595,7 @@ public class SurvivalFly extends Check {
         data.sfNoLowJump = true;
 
         // Expected envelopes.
-        final double baseSpeed = swimBaseSpeedV();
+        final double baseSpeed = swimBaseSpeedV(); // TODO: Lava?
         final double yDistAbs = Math.abs(yDistance);
 
         // TODO: Later also cover things like a sudden stop.
@@ -1655,6 +1655,20 @@ public class SurvivalFly extends Check {
                     && yDistance < 0.0 && yDistance > -2.0 * GRAVITY_MAX - GRAVITY_MIN / 2.0
                     && data.isVelocityJumpPhase() && to.isInLiquid() // TODO: Might skip the liquid check, though.
                     && data.fromWasReset && data.toWasReset
+                    ) {
+                return new double[]{yDistance, 0.0};
+            }
+            // Lava rather.
+            else if (data.lastFrictionVertical < 0.65 // (Random, but smaller than water.) 
+                    && (
+                            // Moving downstream.
+                            data.lastYDist < 0.0 && yDistance > -0.5 && yDistance < data.lastYDist 
+                            && data.lastYDist - yDistance < GRAVITY_MIN && BlockProperties.isDownStream(from, to)
+                            // Mix of gravity and base speed [careful: relates to water base speed].
+                            || data.lastYDist < 0.0 && yDistance > -baseSpeed - GRAVITY_MAX && yDistance < data.lastYDist
+                            && data.lastYDist - yDistance > GRAVITY_SPAN
+                            && Math.abs(data.lastYDist + baseSpeed) < 0.25 * baseSpeed
+                            )
                     ) {
                 return new double[]{yDistance, 0.0};
             }

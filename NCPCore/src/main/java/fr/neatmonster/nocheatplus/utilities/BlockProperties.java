@@ -2659,6 +2659,20 @@ public class BlockProperties {
     }
 
     /**
+     * Check if the move given by from and to is leading downstream. Currently
+     * only the x-z move is regarded, no envelope/consistency checks are
+     * performed here, such as checking if the block is liquid at all, nor if
+     * the move makes sense. performed here.
+     * 
+     * @param from
+     * @param to
+     * @return
+     */
+    public static final boolean isDownStream(final PlayerLocation from, final PlayerLocation to) {
+        return isDownStream(from.getBlockCache(), from.getBlockX(), from.getBlockY(), from.getBlockZ(), from.getData(), to.getX() - from.getX(), to.getZ() - from.getZ());
+    }
+
+    /**
      * Check if a move determined by xDistance and zDistance is leading down stream.
      * @param access
      * @param x
