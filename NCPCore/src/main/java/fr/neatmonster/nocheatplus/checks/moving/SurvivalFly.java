@@ -606,12 +606,14 @@ public class SurvivalFly extends Check {
             // TODO: Test how to go with only checking from (less dolphins).
             // TODO: Sneaking and blocking applies to when in water !
             hAllowedDistance = modSwim * walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
-            final int level = BridgeEnchant.getDepthStriderLevel(player);
-            if (level > 0) {
-                // The hard way.
-                hAllowedDistance *= modDepthStrider[level];
-                // Modifiers: Most speed seems to be reached on ground, but couldn't nail down.
-                useBaseModifiers = true;
+            if (from.isInWater() || !from.isInLava()) { // (We don't really have other liquids, though.)
+                final int level = BridgeEnchant.getDepthStriderLevel(player);
+                if (level > 0) {
+                    // The hard way.
+                    hAllowedDistance *= modDepthStrider[level];
+                    // Modifiers: Most speed seems to be reached on ground, but couldn't nail down.
+                    useBaseModifiers = true;
+                }
             }
             // (Friction is used as is.)
         }
