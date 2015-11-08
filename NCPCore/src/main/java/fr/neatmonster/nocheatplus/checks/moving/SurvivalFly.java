@@ -79,9 +79,12 @@ public class SurvivalFly extends Check {
     /** Assumed minimal average decrease per move, suitable for regarding 3 moves. */
     public static final float GRAVITY_VACC = (float) (GRAVITY_MIN * 0.6);
 
-    // Friction factor by medium.
-    public static final double FRICTION_MEDIUM_AIR = 0.98; // TODO: Check
-    public static final double FRICTION_MEDIUM_LIQUID = 0.89; // Rough estimate for horizontal move sprint-jump into water.
+    // Friction factor by medium (move inside of).
+    public static final double FRICTION_MEDIUM_AIR = 0.98;
+    /** Friction for water (default). */
+    public static final double FRICTION_MEDIUM_WATER = 0.89;
+    /** Friction for lava. */
+    public static final double FRICTION_MEDIUM_LAVA = 0.25; // TODO
 
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
@@ -552,8 +555,12 @@ public class SurvivalFly extends Check {
             data.nextFrictionHorizontal = data.nextFrictionVertical = 0.0;
         }
         else if (from.isInLiquid() && to.isInLiquid()) {
-            // TODO: Lava ?
-            data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_LIQUID;
+            if (from.isInLava() && to.isInLava()) {
+                data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_LAVA;
+            }
+            else {
+                data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_WATER;
+            }
         }
         // TODO: consider setting minimum friction last (air), do add ground friction.
         else if (!from.isOnGround() && ! to.isOnGround()) {
@@ -770,6 +777,7 @@ public class SurvivalFly extends Check {
         final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain). 
         if (fallingEnvelope(yDistance, data.lastYDist, 0.0)) {
             // Less headache: Always allow falling. 
+            // TODO: Base should be data.lastFrictionVertical? Problem: "not set" detection?
             vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
             strictVdistRel = true;
         }
@@ -799,6 +807,7 @@ public class SurvivalFly extends Check {
                 }
                 strictVdistRel = false;
             } else {
+                // TODO: data.lastFrictionVertical (see above).
                 vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
                 strictVdistRel = true;
             }
@@ -1077,6 +1086,7 @@ public class SurvivalFly extends Check {
         if (lastYDist == Double.MAX_VALUE || yDistance >= lastYDist) {
             return false;
         }
+        // TODO: data.lastFrictionVertical (see vDistAir).
         final double frictDist = lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN;
         return yDistance <= frictDist + extraGravity && yDistance > frictDist - GRAVITY_SPAN - extraGravity;
     }
