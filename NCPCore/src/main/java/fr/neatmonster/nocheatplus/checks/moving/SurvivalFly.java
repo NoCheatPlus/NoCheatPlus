@@ -84,7 +84,7 @@ public class SurvivalFly extends Check {
     /** Friction for water (default). */
     public static final double FRICTION_MEDIUM_WATER = 0.89;
     /** Friction for lava. */
-    public static final double FRICTION_MEDIUM_LAVA = 0.25; // TODO: Rather 0.4 ?
+    public static final double FRICTION_MEDIUM_LAVA = FRICTION_MEDIUM_WATER; // TODO: Something smaller (problem: jump into).
 
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
