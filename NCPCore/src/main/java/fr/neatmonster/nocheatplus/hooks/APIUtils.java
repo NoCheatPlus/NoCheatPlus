@@ -116,9 +116,10 @@ public class APIUtils {
     }
 
     /**
-     * Return if the check type requires synchronization.
+     * Return if the check type requires synchronization. This indicates, if a
+     * check can be called off primary thread at all.
      * <hr>
-     * The should be chat checks, currently.
+     * That should be CHAT and NET checks, currently.
      * 
      * @param type
      *            the check type

@@ -99,6 +99,7 @@ public enum CheckType {
     MOVING_SURVIVALFLY(MOVING, Permissions.MOVING_SURVIVALFLY),
 
     NET(new NetConfigCache(), new NetDataFactory(), Permissions.NET),
+    NET_ATTACKFREQUENCY(NET, Permissions.NET_ATTACKFREQUENCY),
     NET_FLYINGFREQUENCY(NET, Permissions.NET_FLYINGFREQUENCY),
     NET_KEEPALIVEFREQUENCY(NET, Permissions.NET_KEEPALIVEFREQUENCY),
     NET_SOUNDDISTANCE(NET), // Can not exempt players from this one.

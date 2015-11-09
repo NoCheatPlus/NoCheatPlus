@@ -244,13 +244,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             priority = EventPriority.MONITOR)
     public void onPlayerBedLeave(final PlayerBedLeaveEvent event) {
         final Player player = event.getPlayer();
-
         if (bedLeave.isEnabled(player) && bedLeave.checkBed(player)) {
+            final MovingConfig cc = MovingConfig.getConfig(player);
             // Check if the player has to be reset.
             // To "cancel" the event, we teleport the player.
             final Location loc = player.getLocation(useLoc);
             final MovingData data = MovingData.getData(player);
-            final MovingConfig cc = MovingConfig.getConfig(player); 
             Location target = null;
             final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, data, cc);
             if (sfCheck) {
@@ -260,7 +259,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
                 target = LocUtil.clone(loc);
             }
-            if (sfCheck && cc.sfSetBackPolicyFallDamage && noFall.isEnabled(player)) {
+            if (sfCheck && cc.sfSetBackPolicyFallDamage && noFall.isEnabled(player, cc)) {
                 // Check if to deal damage.
                 double y = loc.getY();
                 if (data.hasSetBack()) {
@@ -1276,7 +1275,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             DebugUtil.outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
 
-        if (morePacketsVehicle.isEnabled(player)) {
+        if (morePacketsVehicle.isEnabled(player, data, cc)) {
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, from, to, data, cc);
         }
@@ -1314,7 +1313,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)) {
+        if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player, cc)) {
             data.clearNoFallData();
             return;
         }
@@ -1564,8 +1563,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Entity attacker = event.getAttacker();
         if (attacker instanceof Player && attacker.equals(event.getVehicle().getPassenger())) {
             final Player player = (Player) attacker;
-            if (survivalFly.isEnabled(player) || creativeFly.isEnabled(player)) {
-                if (MovingConfig.getConfig(player).vehiclePreventDestroyOwn) {
+            final MovingConfig cc = MovingConfig.getConfig(player);
+            if (survivalFly.isEnabled(player, cc) || creativeFly.isEnabled(player, cc)) {
+                if (cc.vehiclePreventDestroyOwn) {
                     event.setCancelled(true);
                     player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
                 }
@@ -1835,7 +1835,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
         // Check nofall damage (!).
-        if (cc.sfHoverFallDamage && noFall.isEnabled(player)) {
+        if (cc.sfHoverFallDamage && noFall.isEnabled(player, cc)) {
             // Consider adding 3/3.5 to fall distance if fall distance > 0?
             noFall.checkDamage(player, data, loc.getY());
         }

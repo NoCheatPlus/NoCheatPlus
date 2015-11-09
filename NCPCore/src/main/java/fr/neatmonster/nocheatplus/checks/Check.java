@@ -8,12 +8,14 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
+import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -115,6 +117,31 @@ public abstract class Check implements MCAccessHolder {
 
     /**
      * Checks both configuration flags and if the player is exempted from this
+     * check (hasBypass). Intended for higher efficiency with multiple calls.
+     * 
+     * @param player
+     * @param data
+     * @param cc
+     * @return
+     */
+    public boolean isEnabled(final Player player, final ICheckData data, final ICheckConfig cc) {
+        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, data);
+    }
+
+    /**
+     * Checks both configuration flags and if the player is exempted from this
+     * check (hasBypass). Intended for higher efficiency with multiple calls.
+     * 
+     * @param player
+     * @param cc
+     * @return
+     */
+    public boolean isEnabled(final Player player, final ICheckConfig cc) {
+        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, null);
+    }
+
+    /**
+     * Checks both configuration flags and if the player is exempted from this
      * check (hasBypass).
      * 
      * @param player
@@ -122,33 +149,18 @@ public abstract class Check implements MCAccessHolder {
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
-        if (!type.isEnabled(player)) {
-            return false;
-        }
-        return !hasBypass(player);
+        return type.isEnabled(player) && !CheckUtils.hasBypass(type, player, null);
     }
 
     /**
-     * Check if the player is exempted by permissions or otherwise.
+     * Check if the player is exempted by permissions or otherwise.<br>
+     * 
      * 
      * @param player
      * @return
      */
     public boolean hasBypass(final Player player) {
-        // TODO: Checking for the thread might be a temporary measure.
-        if (Bukkit.isPrimaryThread()) {
-            // Check permissions directly.
-            final String permission = type.getPermission();
-            if (permission != null && player.hasPermission(permission)) {
-                return true;
-            }
-        }
-        else if (type.hasCachedPermission(player)) {
-            // Assume asynchronously running check.
-            return true;
-        }
-        // TODO: ExemptionManager relies on initial setup (problematic).
-        return NCPExemptionManager.isExempted(player, type);
+        return CheckUtils.hasBypass(type, player, null);
     }
 
     @Override
