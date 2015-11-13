@@ -11,6 +11,7 @@ public enum ParameterName {
     DISTANCE("distance"),
     FALL_DISTANCE("falldistance"), // TODO: rather not deprecate ?
     FOOD("food"),
+    HEALTH("health"),
     IP("ip"),
     LIMIT("limit"),
     LOCATION_FROM("locationfrom"),

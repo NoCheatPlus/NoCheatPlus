@@ -136,6 +136,10 @@ public class ViolationData implements IViolationInfo, ActionData {
         switch (parameterName) {
             case CHECK:
                 return check.getClass().getSimpleName();
+            case HEALTH: {
+                String health = getParameter(ParameterName.HEALTH);
+                return health == null ? (player.getHealth() + "/" + player.getMaxHealth()) : health;
+            }
             case IP:
                 return player.getAddress().toString().substring(1).split(":")[0];
             case PLAYER:
@@ -148,7 +152,8 @@ public class ViolationData implements IViolationInfo, ActionData {
             case VIOLATIONS:
                 return String.valueOf((long) Math.round(vL));
             case WORLD:
-                return player.getWorld().getName();
+                String world = getParameterValue(ParameterName.WORLD);
+                return world == null ? player.getWorld().getName() : world;
             default:
                 break;
         }
@@ -158,6 +163,10 @@ public class ViolationData implements IViolationInfo, ActionData {
         }
         final String value = parameters.get(parameterName);
         return(value == null) ? ("[" + parameterName.getText() + "]") : value;
+    }
+    
+    private  String getParameterValue(ParameterName parameterName) {
+        return parameters == null ? null : parameters.get(parameterName);
     }
 
     @Override

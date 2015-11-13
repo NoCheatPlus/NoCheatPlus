@@ -491,7 +491,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in their inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastconsume", start + "consumes [food] [tags] too fast" + end);
-        set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual" + end);
+        set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual (health [health])" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
@@ -501,7 +501,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack with too high a frequency" + end);
         set(ConfPaths.STRINGS + ".gutenberg", start + "created a book with too many pages" + end);
-        set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
+        set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging (health [health])" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
