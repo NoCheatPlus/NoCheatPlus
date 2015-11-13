@@ -169,6 +169,7 @@ public class DefaultConfig extends ConfigFile {
 
         // Captcha.
         set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
+        set(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS, false);
         set(ConfPaths.CHAT_CAPTCHA_CHARACTERS, "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
         set(ConfPaths.CHAT_CAPTCHA_LENGTH, 6);
         set(ConfPaths.CHAT_CAPTCHA_QUESTION, "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");

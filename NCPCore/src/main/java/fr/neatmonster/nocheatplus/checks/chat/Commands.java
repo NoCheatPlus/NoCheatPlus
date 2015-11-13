@@ -14,19 +14,19 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  *
  */
 public class Commands extends Check {
-	public Commands() {
-		super(CheckType.CHAT_COMMANDS);
-	}
+    public Commands() {
+        super(CheckType.CHAT_COMMANDS);
+    }
 
     public boolean check(final Player player, final String message, final ICaptcha captcha) {
-        
+
         final long now = System.currentTimeMillis();
         final int tick = TickTask.getTick();
-        
+
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-        
-        final boolean captchaEnabled = CheckUtils.isEnabled(CheckType.CHAT_CAPTCHA, player, data, cc); 
+
+        final boolean captchaEnabled = !cc.captchaSkipCommands && CheckUtils.isEnabled(CheckType.CHAT_CAPTCHA, player, data, cc); 
         if (captchaEnabled){
             synchronized (data) {
                 if (captcha.shouldCheckCaptcha(cc, data)){
@@ -35,23 +35,23 @@ public class Commands extends Check {
                 }
             }
         }
-        
+
         // Rest of the check is done without sync, because the data is only used by this check.
-        
+
         // Weight might later be read from some prefix tree (also known / unknown).
         final float weight = 1f;
-        
+
         data.commandsWeights.add(now, weight);
         if (tick < data.commandsShortTermTick){
-        	// TickTask got reset.
+            // TickTask got reset.
             data.commandsShortTermTick = tick;
             data.commandsShortTermWeight = 1.0;
         }
         else if (tick - data.commandsShortTermTick < cc.commandsShortTermTicks){
-        	if (!cc.lag || TickTask.getLag(50L * (tick - data.commandsShortTermTick), true) < 1.3f){
+            if (!cc.lag || TickTask.getLag(50L * (tick - data.commandsShortTermTick), true) < 1.3f){
                 // Add up.
                 data.commandsShortTermWeight += weight;
-        	}
+            }
             else{
                 // Reset, too much lag.
                 data.commandsShortTermTick = tick;
@@ -63,10 +63,10 @@ public class Commands extends Check {
             data.commandsShortTermTick = tick;
             data.commandsShortTermWeight = 1.0;
         }
-        
+
         final float nw = data.commandsWeights.score(1f);
         final double violation = Math.max(nw - cc.commandsLevel, data.commandsShortTermWeight - cc.commandsShortTermLevel);
-        
+
         if (violation > 0.0){
             data.commandsVL += violation;
             // TODO: Evaluate if sync(data) is necessary or better for executeActions.

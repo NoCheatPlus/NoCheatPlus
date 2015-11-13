@@ -230,6 +230,8 @@ public abstract class ConfPaths {
 
     private static final String CHAT_CAPTCHA                             = CHAT + "captcha.";
     public static final String  CHAT_CAPTCHA_CHECK                       = CHAT_CAPTCHA + "active";
+    private static final String CHAT_CAPTCHA_SKIP                        = CHAT_CAPTCHA + "skip.";
+    public static final String  CHAT_CAPTCHA_SKIP_COMMANDS               = CHAT_CAPTCHA_SKIP + "commands";
     public static final String  CHAT_CAPTCHA_CHARACTERS                  = CHAT_CAPTCHA + "characters";
     public static final String  CHAT_CAPTCHA_LENGTH                      = CHAT_CAPTCHA + "length";
     public static final String  CHAT_CAPTCHA_QUESTION                    = CHAT_CAPTCHA + "question";

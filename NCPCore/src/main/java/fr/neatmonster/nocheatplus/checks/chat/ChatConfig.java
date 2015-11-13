@@ -65,6 +65,7 @@ public class ChatConfig extends ACheckConfig {
     }
 
     public final boolean      captchaCheck;
+    public final boolean      captchaSkipCommands;
     public final String       captchaCharacters;
     public final int          captchaLength;
     public final String       captchaQuestion;
@@ -153,6 +154,7 @@ public class ChatConfig extends ACheckConfig {
         });
 
         captchaCheck = config.getBoolean(ConfPaths.CHAT_CAPTCHA_CHECK);
+        captchaSkipCommands = config.getBoolean(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS);
         captchaCharacters = config.getString(ConfPaths.CHAT_CAPTCHA_CHARACTERS);
         captchaLength = config.getInt(ConfPaths.CHAT_CAPTCHA_LENGTH);
         captchaQuestion = config.getString(ConfPaths.CHAT_CAPTCHA_QUESTION);
