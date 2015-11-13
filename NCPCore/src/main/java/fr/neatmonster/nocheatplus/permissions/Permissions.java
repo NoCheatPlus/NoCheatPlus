@@ -115,6 +115,7 @@ public class Permissions {
     public static final String  INVENTORY_OPEN               = INVENTORY + ".open";
 
     public static final String  NET                          = CHECKS + ".net";
+    public static final String  NET_ATTACKFREQUENCY          = NET + ".attackfrequency";
     public static final String  NET_FLYINGFREQUENCY          = NET + ".flyingfrequency";
     public static final String  NET_KEEPALIVEFREQUENCY       = NET + ".keepalivefrequency";
 
