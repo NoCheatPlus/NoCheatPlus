@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,6 +30,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
@@ -65,6 +67,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     // Not static
     private int foundInconsistencies = 0;
 
+    // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting
     /** PlayerData storage. */
     protected final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
 
@@ -79,12 +82,11 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     private final Map<String, Long> lastLogout = new LinkedHashMap<String, Long>(50, 0.75f, true);
 
     /**
-     * Keeping track of online players.<br>
-     * Mappings:
-     * <li>exact player name -> Player instance</li>
-     * <li>lower case player name -> Player instance</li>
+     * Keeping track of online players. Currently id/name mappings are not kept
+     * on logout, but might be later.
      */
-    protected final Map<String, Player> onlinePlayers = new LinkedHashMap<String, Player>(100);
+    // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting the UUID.
+    protected final PlayerMap playerMap;
 
     /**
      * IRemoveData instances.
@@ -116,6 +118,14 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      */
     public DataManager() {
         instance = this;
+        final String version = ServerVersion.getMinecraftVersion();
+        if (ServerVersion.compareVersions(version, "1.8") >= 0 || version.equals("1.7.10") && Bukkit.getServer().getVersion().toLowerCase().indexOf("spigot") != -1) {
+            // Safe to assume Spigot, don't store Player instances.
+            playerMap = new PlayerMap(false);
+        } else {
+            // Likely an older version without efficient mapping.
+            playerMap = new PlayerMap(true);
+        }
     }
 
     /**
@@ -419,7 +429,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * @return
      */
     public static Player getPlayerExact(final String playerName) {
-        return instance.onlinePlayers.get(playerName);
+        return instance.playerMap.getPlayerExact(playerName);
     }
 
     /**
@@ -445,7 +455,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * @return
      */
     public static Player getPlayer(final String playerName) {
-        return instance.onlinePlayers.get(playerName.toLowerCase());
+        return instance.playerMap.getPlayer(playerName);
     }
 
     @Override
@@ -478,9 +488,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * @param player
      */
     private void addOnlinePlayer(final Player player) {
-        final String name = player.getName();
-        onlinePlayers.put(name, player);
-        onlinePlayers.put(name.toLowerCase(), player);
+        playerMap.updatePlayer(player);
     }
 
     /**
@@ -488,9 +496,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * @param player
      */
     private void removeOnlinePlayer(final Player player) {
-        final String name = player.getName();
-        onlinePlayers.remove(name);
-        onlinePlayers.remove(name.toLowerCase()); 
+        // TODO: Consider to only remove the Player instance?
+        playerMap.remove(player);
     }
 
     /**
@@ -503,7 +510,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         clearConfigs();
         lastLogout.clear();
         executionHistories.clear();
-        onlinePlayers.clear();
+        playerMap.clear();
         // Finally alert (summary) if inconsistencies found.
         if (foundInconsistencies > 0) {
             StaticLog.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
@@ -521,17 +528,16 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         // Check online player tracking consistency.
         int missing = 0;
         int changed = 0;
-        int expectedSize = 0;
         for (int i = 0; i < onlinePlayers.length; i++) {
             final Player player = onlinePlayers[i];
-            final String name = player.getName();
+            final UUID id = player.getUniqueId();
             //			if (player.isOnline()) {
-            expectedSize += 1 + (name.equals(name.toLowerCase()) ? 0 : 1);
-            if (!this.onlinePlayers.containsKey(name)) {
+            // TODO: Add a consistency check method !?
+            if (!playerMap.hasPlayerInfo(id)) {
                 missing ++;
                 // TODO: Add the player [problem: messy NPC plugins?]?
             }
-            if (player != this.onlinePlayers.get(name)) {
+            if (playerMap.storesPlayerInstances() && player != playerMap.getPlayer(id)) {
                 changed ++;
                 // Update the reference.
                 addOnlinePlayer(player);
@@ -541,17 +547,18 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
         // TODO: Consider checking lastLogout for too long gone players.
 
-        final int storedSize = this.onlinePlayers.size();
-        if (missing != 0 || changed != 0 || expectedSize != storedSize) {
+        // TODO: Later the map size will not work, if we keep name/id mappings after logout. Other checking methods are possible.
+        final int storedSize = this.playerMap.size();
+        if (missing != 0 || changed != 0 || onlinePlayers.length != storedSize) {
             foundInconsistencies ++;
             if (!ConfigManager.getConfigFile().getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS)) {
                 final List<String> details = new LinkedList<String>();
                 if (missing != 0) {
                     details.add("missing online players (" + missing + ")");
                 }
-                if (expectedSize != storedSize) {
+                if (onlinePlayers.length != storedSize) {
                     // TODO: Consider checking for not online players and remove them.
-                    details.add("wrong number of online players (" + storedSize + " instead of " + expectedSize + ")");
+                    details.add("wrong number of online players (" + storedSize + " instead of " + onlinePlayers.length + ")");
                 }
                 if (changed != 0) {
                     details.add("changed player instances (" + changed + ")");
