@@ -31,7 +31,7 @@ public class MCAccessFactory {
      */
     public MCAccess getMCAccess(final MCAccessConfig config) {
         final List<Throwable> throwables = new ArrayList<Throwable>();
-        MCAccess mcAccess = null;
+        MCAccess mcAccess;
         // Try to set up native access.
 
         // CraftBukkit (dedicated).
@@ -57,13 +57,12 @@ public class MCAccessFactory {
             return new MCAccessGlowstone();
         } catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // Try to set up api-only access (since 1.4.6).
         try {
             mcAccess = new MCAccessBukkit();
-            final String msg;
-            msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
+            final String msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
             StaticLog.logWarning(msg);
             for (String uMsg : updateLocs) {
                 StaticLog.logWarning(uMsg);
@@ -76,7 +75,7 @@ public class MCAccessFactory {
         }
         catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // All went wrong.
         // TODO: Fall-back solution (disable plugin, disable checks).
@@ -135,7 +134,7 @@ public class MCAccessFactory {
             }
             catch(Throwable t) {
                 throwables.add(t);
-            };
+            }
         }
 
         // None worked.

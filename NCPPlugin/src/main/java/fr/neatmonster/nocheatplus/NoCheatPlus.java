@@ -95,6 +95,8 @@ import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
@@ -143,7 +145,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Commands that were changed for protecting them against tab complete or
      * use.
      */
-    protected List<CommandProtectionEntry> changedCommands = null;
+    protected final List<CommandProtectionEntry> changedCommands = new ArrayList<CommandProtectionEntry>();
 
 
     private final ListenerManager listenerManager = new ListenerManager(this, false);
@@ -234,7 +236,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final List<String> rem = new LinkedList<String>();
         synchronized (denyLoginNames) {
             for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
-                if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
+                if (entry.getValue() < ts)  rem.add(entry.getKey());
             }
             for (final String name : rem){
                 denyLoginNames.remove(name);
@@ -268,7 +270,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         playerName = playerName.trim().toLowerCase();
         synchronized (denyLoginNames) {
             final Long oldTs = denyLoginNames.get(playerName);
-            if (oldTs != null && ts < oldTs.longValue()) return;
+            if (oldTs != null && ts < oldTs) return;
             denyLoginNames.put(playerName, ts);
             // TODO: later maybe save these ?
         }
@@ -293,7 +295,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         playerName = playerName.trim().toLowerCase();
         final Long oldTs = denyLoginNames.get(playerName);
         if (oldTs == null) return false; 
-        else return time < oldTs.longValue();
+        else return time < oldTs;
     }
 
     @Override
@@ -307,7 +309,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
-    private final boolean hasTurnedOffNotifications(final String playerName){
+    private boolean hasTurnedOffNotifications(final String playerName){
         final PlayerData data = DataManager.getPlayerData(playerName, false);
         return data != null && data.getNotifyOff();
     }
@@ -525,7 +527,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public void removeComponent(final Object obj) {
         if (obj instanceof Listener){
-            listeners.remove(obj);
+            listeners.remove((Listener) obj);
             listenerManager.remove((Listener) obj);
         }
         if (obj instanceof PermStateReceiver){
@@ -535,21 +537,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             TickTask.removeTickListener((TickListener) obj);
         }
         if (obj instanceof INotifyReload) {
-            notifyReload.remove(obj);
+            notifyReload.remove((INotifyReload) obj);
         }
         if (obj instanceof ConsistencyChecker){
-            consistencyCheckers.remove(obj);
+            consistencyCheckers.remove((ConsistencyChecker) obj);
         }
         if (obj instanceof JoinLeaveListener){
             joinLeaveListeners.remove((JoinLeaveListener) obj);
         }
         if (obj instanceof DisableListener) {
-            disableListeners.remove(obj);
+            disableListeners.remove((DisableListener) obj);
         }
 
         // Remove sub registries.
         if (obj instanceof ComponentRegistry<?>){
-            subRegistries.remove(obj);
+            subRegistries.remove((ComponentRegistry<?>) obj);
         }
         // Remove from present registries, order prevents to remove from itself.
         for (final ComponentRegistry<?> registry : subRegistries){
@@ -651,9 +653,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) {
             logManager.info(Streams.INIT, "[NoCheatPlus] Unregister all registered components...");
         }
-        final ArrayList<Object> allComponents = new ArrayList<Object>(this.allComponents);
-        for (int i = allComponents.size() - 1; i >= 0; i--){
-            removeComponent(allComponents.get(i));
+        
+        final ArrayList<Object> components = new ArrayList<Object>(this.allComponents);
+        //Remove components in reverse order
+        Collections.reverse(components);
+        for (Object component : components) {
+            removeComponent(component);
         }
 
         // Cleanup BlockProperties.
@@ -679,12 +684,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         genericInstances.clear();
         // Feature tags.
         featureTags.clear();
-
         // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
-        if (changedCommands != null){
-            changedCommands.clear();
-            changedCommands = null;
-        }
+        
+        changedCommands.clear();
         //		// Restore changed commands.
         //		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
         //		undoCommandChanges();
@@ -712,22 +714,27 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /**
-     * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
-     * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
+     * Does not undo 100%, but restores 
+     * <ul>
+     *      <li>old permission</li> 
+     *      <li>permission-message</li>
+     *      <li>label (unlikely to be changed)</li>
+     *      <li>permission default</li>
+     * </ul>
+     * 
+     * @deprecated Leads to compatibility issues with NPC plugins, such as Citizens 2, due to recalculation of permissions (specifically during disabling).
      */
     public void undoCommandChanges() {
-        if (changedCommands != null){
-            while (!changedCommands.isEmpty()){
-                final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
-                entry.restore();
-            }
-            changedCommands = null;
+        ListIterator<CommandProtectionEntry> i = changedCommands.listIterator(changedCommands.size());
+        while (i.hasPrevious()){
+            i.previous().restore();
+            i.remove();
         }
     }
 
     protected void setupCommandProtection() {
         // TODO: Might re-check with plugins enabling during runtime (!).
-        final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
+        
         // Read lists and messages from config.
         final ConfigFile config = ConfigManager.getConfigFile();
         // (Might add options to invert selection.)
@@ -736,20 +743,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
         if (noPerm != null && !noPerm.isEmpty()){
             final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
+            // Add to changes history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
         }
         // "Unknown command", override the other option.
         final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
         if (noCommand != null && !noCommand.isEmpty()){
             final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
+            // Add to changes history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
-        }
-        // Add to changes history for undoing.
-        if (this.changedCommands == null) {
-            this.changedCommands = changedCommands;
-        }
-        else {
-            this.changedCommands.addAll(changedCommands);
         }
     }
 
@@ -963,7 +965,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 CombinedData.getData(player).wasInBed = true;
             }
         }
-        // TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+        if (onlinePlayers.length > 0) {
+            logManager.info(Streams.INIT, "[NCP] Updated " + onlinePlayers.length + "players (post-enable).");
+        
+        }
         logManager.info(Streams.INIT, "[NoCheatPlus] Post-enable finished.");
         logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
@@ -1049,7 +1054,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public MCAccess initMCAccess(final ConfigFile config) {
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig());
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig(config));
         setMCAccess(mcAccess);
         return mcAccess;
     }
@@ -1132,10 +1137,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
 
             @EventHandler(priority = EventPriority.LOWEST)
-            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
-            {
-                final Player player = event.getPlayer();
-                updatePermStateReceivers(player);
+            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event) {
+                updatePermStateReceivers(event.getPlayer());
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1263,8 +1266,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // (The index might be bigger than size by now.)
 
-        final boolean debug = config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
-
         // If not finished, schedule further checks.
         if (consistencyCheckerIndex < consistencyCheckers.size()){
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -1273,7 +1274,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                     runConsistencyChecks();
                 }
             });
-            if (debug){
+            if (config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)){
                 logManager.info(Streams.STATUS, "[NoCheatPlus] Interrupted consistency checking until next tick.");
             }
         }
