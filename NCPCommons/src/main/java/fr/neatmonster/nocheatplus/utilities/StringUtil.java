@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,28 @@ public class StringUtil {
         fdec1.setDecimalFormatSymbols(sym);
         fdec1.setMaximumFractionDigits(1);
         fdec1.setMinimumIntegerDigits(1);
+    }
+
+    /**
+     * Join parts with link, starting from startIndex.
+     * @param input
+     * @param startIndex
+     * @param link
+     * @return
+     */
+    public static <O extends Object> String join(O[] input, int startIndex, String link) {
+        return join(Arrays.copyOfRange(input, startIndex, input.length), link);
+    }
+
+    /**
+     * Join parts with link.
+     * 
+     * @param input
+     * @param link
+     * @return
+     */
+    public static <O extends Object> String join(O[] input, String link) {
+        return join(Arrays.asList(input), link);
     }
 
     /**
@@ -66,14 +89,14 @@ public class StringUtil {
         for (final char c : chars){
             String hex = Integer.toHexString((int) c);
             switch (hex.length()){
-            case 1:
-                hex = "000" + hex;
-                break;
-            case 2:
-                hex = "00" + hex;
-                break;
-            case 3:
-                hex = "0" + hex;
+                case 1:
+                    hex = "000" + hex;
+                    break;
+                case 2:
+                    hex = "00" + hex;
+                    break;
+                case 3:
+                    hex = "0" + hex;
             }
             for (final String s : out){
                 final String[] split = s.split("\\u" + hex);
