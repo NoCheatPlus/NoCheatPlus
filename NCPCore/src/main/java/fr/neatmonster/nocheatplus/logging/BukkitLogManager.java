@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.logging.details.ContentLogger;
 import fr.neatmonster.nocheatplus.logging.details.FileLoggerAdapter;
 import fr.neatmonster.nocheatplus.logging.details.LogOptions;
 import fr.neatmonster.nocheatplus.logging.details.LogOptions.CallContext;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 
 /**
@@ -96,7 +97,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         }
 
         // Default prefixes.
-        final String prefixIngame = config.getString(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX);
+        final String prefixIngame = ColorUtil.replaceColors(config.getString(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX));
         final String prefixFile = config.getString(ConfPaths.LOGGING_BACKEND_FILE_PREFIX);
 
         // Variables for temporary use.
