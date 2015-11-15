@@ -137,7 +137,7 @@ public class ViolationData implements IViolationInfo, ActionData {
             case CHECK:
                 return check.getClass().getSimpleName();
             case HEALTH: {
-                String health = getParameter(ParameterName.HEALTH);
+                String health = getParameterValue(ParameterName.HEALTH);
                 return health == null ? (player.getHealth() + "/" + player.getMaxHealth()) : health;
             }
             case IP:
