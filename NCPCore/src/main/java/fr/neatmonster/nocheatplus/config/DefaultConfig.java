@@ -154,6 +154,16 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_SPEED_ACTIONS,
                 "cancel vl>150 log:bpspeed:3:5:if cancel vl>1000 log:bpspeed:3:5:cif cancel");
 
+        // Captcha.
+        set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
+        set(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS, false);
+        set(ConfPaths.CHAT_CAPTCHA_CHARACTERS, "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
+        set(ConfPaths.CHAT_CAPTCHA_LENGTH, 6);
+        set(ConfPaths.CHAT_CAPTCHA_QUESTION, "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
+        set(ConfPaths.CHAT_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
+        set(ConfPaths.CHAT_CAPTCHA_TRIES, 3);
+        set(ConfPaths.CHAT_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
+
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 
@@ -165,16 +175,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS, 18);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL, 3);
         set(ConfPaths.CHAT_COMMANDS_ACTIONS, "log:commands:0:5:cf cancel cmd:kickcommands vl>20 log:commands:0:5:cf cancel cmd:tempkick1");
-
-        // Captcha.
-        set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
-        set(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS, false);
-        set(ConfPaths.CHAT_CAPTCHA_CHARACTERS, "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
-        set(ConfPaths.CHAT_CAPTCHA_LENGTH, 6);
-        set(ConfPaths.CHAT_CAPTCHA_QUESTION, "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
-        set(ConfPaths.CHAT_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
-        set(ConfPaths.CHAT_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
 
         // Text (ordering on purpose).
         set(ConfPaths.CHAT_TEXT_CHECK, true);
