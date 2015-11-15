@@ -150,6 +150,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     private boolean manageListeners = true;
 
+    protected boolean lateListenerRegistered = false;
+
     /** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
 
@@ -578,6 +580,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         listenerManager.setRegisterDirectly(false);
         listenerManager.clear();
+        lateListenerRegistered = false;
 
         BukkitScheduler sched = getServer().getScheduler();
 
@@ -964,6 +967,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
         }
         // TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+        // Register late listener.
+        Bukkit.getPluginManager().registerEvents(getLateListener(), this);
+        lateListenerRegistered = true;
         logManager.info(Streams.INIT, "Post-enable finished.");
         logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
@@ -1095,6 +1101,20 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /**
+     * Listener to be registered in postEnable. Flag must be set elsewhere.
+     * 
+     * @return
+     */
+    private Listener getLateListener() {
+        return new NCPListener() {
+            @EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
+            public void onPlayerJoinLowestLate(final PlayerJoinEvent event) {
+                updatePermStateReceivers(event.getPlayer());
+            }
+        };
+    }
+
+    /**
      * Quick solution to hide the listener methods, expect refactoring.
      * @return
      */
@@ -1119,7 +1139,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             @EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
             public void onPlayerJoinLowest(final PlayerJoinEvent event) {
                 final Player player = event.getPlayer();
-                updatePermStateReceivers(player);
+                if (!lateListenerRegistered) {
+                    // Let's see if this gets logged with big servers :).
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Player " + player.getName() + " joins before the post-enable task has run.");
+                    // (Assume postEnable will run and call updatePermStateReceivers(player).)
+                } else {
+                    updatePermStateReceivers(player);
+                }
                 if (clearExemptionsOnJoin) {
                     NCPExemptionManager.unexempt(player);
                 }
