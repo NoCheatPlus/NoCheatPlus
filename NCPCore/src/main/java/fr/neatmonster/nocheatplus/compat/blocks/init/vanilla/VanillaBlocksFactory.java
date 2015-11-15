@@ -29,7 +29,7 @@ public class VanillaBlocksFactory {
                 // TODO: Do logging from here ?
             }
             catch(Throwable t){
-                StaticLog.logSevere("[NoCheatPlus] " + setup.getClass().getSimpleName() + ".setupBlockProperties could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                StaticLog.logSevere(setup.getClass().getSimpleName() + ".setupBlockProperties could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
                 StaticLog.logSevere(t);
                 // Abort further processing.
                 break;

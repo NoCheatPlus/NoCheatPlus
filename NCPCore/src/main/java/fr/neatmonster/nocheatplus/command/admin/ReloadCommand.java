@@ -22,23 +22,23 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class ReloadCommand extends BaseCommand {
-	
-	/** Components that need to be notified on reload */
-	private final List<INotifyReload> notifyReload;
 
-	public ReloadCommand(JavaPlugin plugin, List<INotifyReload> notifyReload) {
-		super(plugin, "reload", Permissions.COMMAND_RELOAD);
-		this.notifyReload = notifyReload;
-	}
+    /** Components that need to be notified on reload */
+    private final List<INotifyReload> notifyReload;
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label,
-			String[] args) {
-		if (args.length != 1) return false;
+    public ReloadCommand(JavaPlugin plugin, List<INotifyReload> notifyReload) {
+        super(plugin, "reload", Permissions.COMMAND_RELOAD);
+        this.notifyReload = notifyReload;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label,
+            String[] args) {
+        if (args.length != 1) return false;
         handleReloadCommand(sender);
         return true;
-	}
-	
+    }
+
     /**
      * Handle the '/nocheatplus reload' command.
      * 
@@ -51,7 +51,7 @@ public class ReloadCommand extends BaseCommand {
         if (!sender.equals(Bukkit.getConsoleSender())) {
             sender.sendMessage(TAG + "Reloading configuration...");
         }
-        logManager.info(Streams.INIT, "[NoCheatPlus] Reloading configuration...");
+        logManager.info(Streams.INIT, TAG + "Reloading configuration...");
 
         // Do the actual reload.
         ConfigManager.cleanup();
@@ -59,35 +59,35 @@ public class ReloadCommand extends BaseCommand {
         if (logManager instanceof INotifyReload) { // TODO: This is a band-aid.
             ((INotifyReload) logManager).onReload();
         }
-        
+
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
-        
+
         // Remove some checks data.
         // TODO: Better concept (INotifyReload).
         for (final CheckType checkType : new CheckType[]{
-        		CheckType.BLOCKBREAK, CheckType.FIGHT,
+                CheckType.BLOCKBREAK, CheckType.FIGHT,
         }){
-        	DataManager.clearData(checkType);
+            DataManager.clearData(checkType);
         }
-        
+
         // Reset debug flags to default (temp, heavy).
         DataManager.restoreDefaultDebugFlags();
-        
+
         // Tell the registered listeners to adapt to new config, first sort them (!).
         Collections.sort(notifyReload, Order.cmpSetupOrder);
         for (final INotifyReload component : notifyReload){
-        	component.onReload();
+            component.onReload();
         }
 
         // Say to the other plugins that we've reloaded the configuration.
         Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
-        
+
         // Log reloading done.
         if (!sender.equals(Bukkit.getConsoleSender())) {
             sender.sendMessage(TAG + "Configuration reloaded!");
         }
-        logManager.info(Streams.INIT, "[NoCheatPlus] Configuration reloaded.");
+        logManager.info(Streams.INIT, TAG + "Configuration reloaded.");
         logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
 

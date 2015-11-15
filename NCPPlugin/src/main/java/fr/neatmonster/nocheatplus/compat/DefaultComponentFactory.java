@@ -31,7 +31,7 @@ public class DefaultComponentFactory {
 
         // Add components (try-catch).
         // TODO: catch ClassNotFound, incompatibleXY rather !?
-        
+
         // Check: inventory.fastconsume.
         try{
             // TODO: Static test methods !?
@@ -42,9 +42,9 @@ public class DefaultComponentFactory {
             }
         }
         catch (Throwable t){
-            StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");
+            StaticLog.logInfo("Inventory checks: FastConsume is not available.");
         }
-        
+
         // Check: inventory.gutenberg.
         try {
             Gutenberg.testAvailability();
@@ -53,14 +53,14 @@ public class DefaultComponentFactory {
                 NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(Gutenberg.class.getSimpleName()));
             }
         } catch (Throwable t) {
-            StaticLog.logInfo("[NoCheatPlus] Inventory checks: Gutenberg is not available.");
+            StaticLog.logInfo("Inventory checks: Gutenberg is not available.");
         }
 
         // ProtocolLib dependencies.
         try {
             available.add(new ProtocolLibComponent(plugin));
         } catch (Throwable t){
-            StaticLog.logInfo("[NoCheatPlus] Packet level access: ProtocolLib is not available.");
+            StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
 
         return available;

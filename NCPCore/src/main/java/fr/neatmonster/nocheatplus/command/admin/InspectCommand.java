@@ -34,7 +34,7 @@ public class InspectCommand extends BaseCommand {
             if (sender instanceof Player) {
                 args = new String[]{args[0], sender.getName()};
             } else {
-                sender.sendMessage("[NoCheatPlus] Please specify a player to inspect.");
+                sender.sendMessage(TAG + "Please specify a player to inspect.");
                 return true;
             }
         }

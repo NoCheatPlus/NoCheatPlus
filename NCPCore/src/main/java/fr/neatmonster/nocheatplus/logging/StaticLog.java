@@ -64,7 +64,7 @@ public class StaticLog {
         if (useLogManager) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().log(streamID, level, msg);
         } else {
-            System.out.println("[" + level + "] " + new Date());
+            System.out.println("[" + level + "][NoCheatPlus] " + new Date());
             System.out.println(msg);
         }
     }

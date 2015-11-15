@@ -38,7 +38,7 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         } catch (final CommandException e) {
-            StaticLog.logWarning("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
+            StaticLog.logWarning("Failed to execute the command '" + command + "': " + e.getMessage()
                     + ", please check if everything is setup correct.");
         } catch (final Exception e) {
             // I don't care in this case, your problem if your command fails.

@@ -18,53 +18,53 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 public abstract class AbstractLogManager implements LogManager {
-    
+
     // TODO: Visibility of methods.
     // TODO: Add option for per stream prefixes.
     // TODO: Concept for adding in the time at the point of call/scheduling.
-    
+
     // TODO: Re-register with other options: Add methods for LoggerID + StreamID + options.
     // TODO: Hierarchical LogNode relations, to ensure other log nodes with the same logger are removed too [necessary to allow removing individual loggers].
-    
+
     // TODO: Temporary streams, e.g. for players, unregistering with command and/or logout.
     // TODO: Mechanics of removing temporary streams (flush stream, remove entries from queues, wait with removal until tasks have run once more).
-    
+
     // TODO: Consider generalizing the (internal) implementation right away (sub registry by content class).
     // TODO: Consider adding a global cache (good for re-mapping, contra: reload is not intended to happen on a regular basis).
-    
+
     private final LogNodeDispatcher dispatcher;
     private final String defaultPrefix;
-    
+
     /**
      * Fast streamID access map (runtime). Copy on write with registryLock.
      */
     private Map<StreamID, ContentStream<String>> idStreamMap = new IdentityHashMap<StreamID, ContentStream<String>>();
-    
+
     /** 
      * Map name to Stream. Copy on write with registryLock.
      */
     private Map<String, ContentStream<String>> nameStreamMap = new HashMap<String, ContentStream<String>>();
-    
+
     /**
      * Lower-case name to StreamID.
      */
     private Map<String, StreamID> nameStreamIDMap = new HashMap<String, StreamID>();
-    
+
     /**
      * LogNode registry by LoggerID. Copy on write with registryLock.
      */
     private Map<LoggerID, LogNode<String>> idNodeMap = new IdentityHashMap<LoggerID, LogNode<String>>();
-    
+
     /**
      * LogNode registry by lower-case name. Copy on write with registryLock.
      */
     private Map<String, LogNode<String>> nameNodeMap = new HashMap<String, LogNode<String>>();
-    
+
     /**
      * Lower-case name to LoggerID.
      */
     private Map<String, LoggerID> nameLoggerIDMap = new HashMap<String, LoggerID>();
-    
+
     /** Registry changes have to be done under this lock (copy on write) */
     protected final Object registryCOWLock = new Object();
     // TODO: Future: Only an init string stream or (later) always "the init stream" for all content types.
@@ -76,7 +76,7 @@ public abstract class AbstractLogManager implements LogManager {
      * fail.
      */
     private StreamID fallBackStreamID = voidStreamID;
-    
+
     /**
      * Wrapping logging to the init stream.
      */
@@ -86,7 +86,7 @@ public abstract class AbstractLogManager implements LogManager {
             AbstractLogManager.this.log(getInitStreamID(), level, content);
         }
     };
-    
+
     /**
      * 
      * @param dispatcher
@@ -101,9 +101,10 @@ public abstract class AbstractLogManager implements LogManager {
         registerInitLogger();
         dispatcher.setInitLogger(initLogger);
     }
-    
+
     /**
-     * Create stream if it does not exist.
+     * Create INIT stream for strings, if it does not exist. Does not set a
+     * prefix.
      */
     protected void createInitStream() {
         synchronized (registryCOWLock) {
@@ -112,61 +113,61 @@ public abstract class AbstractLogManager implements LogManager {
             }
         }
     }
-    
+
     /**
      * Create the minimal init logger(s). Synchronize over registryCOWLock. It's preferable not to duplicate loggers. Prefer LoggerID("init...").
      */
     protected abstract void registerInitLogger();
-    
+
     protected LogNodeDispatcher getLogNodeDispatcher() {
         return dispatcher;
     }
-    
+
     @Override
     public String getDefaultPrefix() {
         return defaultPrefix;
     }
-    
+
     @Override
     public StreamID getInitStreamID() {
         return initStreamID;
     }
-    
+
     @Override
     public StreamID getVoidStreamID() {
         return voidStreamID;
     }
-    
+
     @Override
     public StreamID getStreamID(String name) {
         return nameStreamIDMap.get(name.toLowerCase());
     }
-    
+
     @Override
     public LoggerID getLoggerID(String name) {
         return nameLoggerIDMap.get(name.toLowerCase());
     }
-    
+
     @Override
     public void debug(final StreamID streamID, final String message) {
         log(streamID, Level.FINE, message); // TODO: Not sure what happens with FINE and provided Logger instances.
     }
-    
+
     @Override
     public void info(final StreamID streamID, final String message) {
         log(streamID, Level.INFO, message);
     }
-    
+
     @Override
     public void warning(final StreamID streamID, final String message) {
         log(streamID, Level.WARNING, message);
     }
-    
+
     @Override
     public void severe(final StreamID streamID, final String message) {
         log(streamID, Level.SEVERE, message);
     }
-    
+
     @Override
     public void log(final StreamID streamID, final Level level, final String message) {
         if (streamID != voidStreamID) {
@@ -178,7 +179,7 @@ public abstract class AbstractLogManager implements LogManager {
             }
         }
     }
-    
+
     private void handleFallBack(final StreamID streamID, final Level level, final String message) {
         if (fallBackStreamID != null && streamID != fallBackStreamID) {
             log(fallBackStreamID, level, message);
@@ -186,22 +187,22 @@ public abstract class AbstractLogManager implements LogManager {
             throw new RuntimeException("Stream not registered: " + streamID);
         }
     }
-    
+
     @Override
     public void debug(final StreamID streamID, final Throwable t) {
         log(streamID, Level.FINE, t); // TODO: Not sure what happens with FINE and provided Logger instances.
     }
-    
+
     @Override
     public void info(final StreamID streamID, final Throwable t) {
         log(streamID, Level.INFO, t);
     }
-    
+
     @Override
     public void warning(final StreamID streamID, final Throwable t) {
         log(streamID, Level.WARNING, t);
     }
-    
+
     @Override
     public void severe(final StreamID streamID, final Throwable t) {
         log(streamID, Level.SEVERE, t);
@@ -212,17 +213,17 @@ public abstract class AbstractLogManager implements LogManager {
         // Not sure adding streams for Throwable would be better.
         log(streamID, level, StringUtil.throwableToString(t));
     }
-    
+
     @Override
     public boolean hasStream(final StreamID streamID) {
         return this.idStreamMap.containsKey(streamID) || this.nameStreamMap.containsKey(streamID.name.toLowerCase());
     }
-    
+
     @Override
     public boolean hasStream(String name) {
         return getStreamID(name) != null;
     }
-    
+
     /**
      * Call under lock.
      * @param streamID
@@ -241,7 +242,7 @@ public abstract class AbstractLogManager implements LogManager {
             throw new IllegalArgumentException("Stream already registered: " + streamID.name.toLowerCase());
         }
     }
-    
+
     protected ContentStream<String> createStringStream(final StreamID streamID) {
         ContentStream<String> stream;
         synchronized (registryCOWLock) {
@@ -256,21 +257,21 @@ public abstract class AbstractLogManager implements LogManager {
             this.idStreamMap = idStreamMap;
             this.nameStreamMap = nameStreamMap;
             this.nameStreamIDMap = nameStreamIDMap;
-            
+
         }
         return stream;
     }
-    
+
     @Override
     public boolean hasLogger(final LoggerID loggerID) {
         return this.idNodeMap.containsKey(loggerID) || this.nameNodeMap.containsKey(loggerID.name.toLowerCase());
     }
-    
+
     @Override
     public boolean hasLogger(String name) {
         return getLoggerID(name) != null;
     }
-    
+
     /**
      * Call under lock.
      * @param loggerID
@@ -286,7 +287,7 @@ public abstract class AbstractLogManager implements LogManager {
             throw new IllegalArgumentException("Logger already registered: " + loggerID.name.toLowerCase());
         }
     }
-    
+
     /**
      * Convenience method.
      * @param logger
@@ -298,7 +299,7 @@ public abstract class AbstractLogManager implements LogManager {
         registerStringLogger(loggerID, logger, options);
         return loggerID;
     }
-    
+
     /**
      * Convenience method.
      * @param logger
@@ -310,7 +311,7 @@ public abstract class AbstractLogManager implements LogManager {
         registerStringLogger(loggerID, logger, options);
         return loggerID;
     }
-    
+
     /**
      * Convenience method.
      * @param logger
@@ -318,11 +319,22 @@ public abstract class AbstractLogManager implements LogManager {
      * @return
      */
     protected LoggerID registerStringLogger(final File file, final LogOptions options) {
+        return registerStringLogger(file, null, options);
+    }
+
+    /**
+     * Convenience method.
+     * @param logger
+     * @param prefix Prefix for all log messages.
+     * @param options
+     * @return
+     */
+    protected LoggerID registerStringLogger(final File file, final String prefix, final LogOptions options) {
         LoggerID loggerID = new LoggerID(options.name);
-        registerStringLogger(loggerID, file, options);
+        registerStringLogger(loggerID, file, prefix, options);
         return loggerID;
     }
-    
+
     protected LogNode<String> registerStringLogger(final LoggerID loggerID, final ContentLogger<String> logger, final LogOptions options) {
         LogNode<String> node;
         synchronized (registryCOWLock) {
@@ -340,7 +352,7 @@ public abstract class AbstractLogManager implements LogManager {
         }
         return node;
     }
-    
+
     protected LogNode<String> registerStringLogger(LoggerID loggerID, Logger logger, LogOptions options) {
         LogNode<String> node;
         synchronized (registryCOWLock) {
@@ -350,13 +362,17 @@ public abstract class AbstractLogManager implements LogManager {
         }
         return node;
     }
-    
+
     protected LogNode<String> registerStringLogger(LoggerID loggerID, File file, LogOptions options) {
+        return registerStringLogger(loggerID, file, null, options);
+    }
+
+    protected LogNode<String> registerStringLogger(LoggerID loggerID, File file, String prefix, LogOptions options) {
         LogNode<String> node;
         synchronized (registryCOWLock) {
             testRegisterLogger(loggerID); // Redundant checking, because file loggers are expensive.
             // TODO: Detect duplicate loggers (register same logger with given id and options).
-            FileLoggerAdapter adapter = new FileLoggerAdapter(file);
+            FileLoggerAdapter adapter = new FileLoggerAdapter(file, prefix);
             if (adapter.isInoperable()) {
                 adapter.detachLogger();
                 throw new RuntimeException("Failed to set up file logger for id '" + loggerID + "': " + file);
@@ -371,7 +387,7 @@ public abstract class AbstractLogManager implements LogManager {
         }
         return node;
     }
-    
+
     /**
      * Attach a logger to a stream. Redundant attaching will mean no changes. 
      * @param loggerID Must exist.
@@ -401,13 +417,13 @@ public abstract class AbstractLogManager implements LogManager {
             idStreamMap.get(streamID).addNode(node);
         }
     }
-    
+
     // TODO: Methods to replace options for loggers (+ loggers themselves)
-    
+
     // TODO: Later: attach streams to streams ? [few loggers: attach loggers rather]
-    
+
     // TODO: logger/stream: allow id lookup logger, file, etc. ?
-    
+
     /**
      * Remove all loggers and streams including init, resulting in roughly the
      * same state as is after calling the AbstractLogger constructor. Call from
@@ -451,14 +467,14 @@ public abstract class AbstractLogManager implements LogManager {
             }
         }
     }
-    
-//    /**
-//     * Remove all registered streams and loggers, recreates init logger (and stream).
-//     */
-//    public void clear(final long msWaitFlush) {
-//        clear(msWaitFlush, true);
-//    }
-    
+
+    //    /**
+    //     * Remove all registered streams and loggers, recreates init logger (and stream).
+    //     */
+    //    public void clear(final long msWaitFlush) {
+    //        clear(msWaitFlush, true);
+    //    }
+
     /**
      * Rather a graceful shutdown, including waiting for the asynchronous task, if necessary. Clear the registry. Also removes the init logger [subject to change].
      * Call from the primary thread (policy pending).
@@ -466,5 +482,5 @@ public abstract class AbstractLogManager implements LogManager {
     public void shutdown() {
         clear(500, false); // TODO: Policy / making sense.
     }
-    
+
 }

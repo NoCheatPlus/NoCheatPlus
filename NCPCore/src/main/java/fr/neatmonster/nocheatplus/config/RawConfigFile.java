@@ -172,7 +172,7 @@ public class RawConfigFile  extends YamlConfiguration{
         for (final String entry : content){
             final Integer id = parseTypeId(entry);
             if (id == null){
-                StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+                StaticLog.logWarning("Bad material entry (" + path +"): " + entry);
             }
             else{
                 target.add(id);
@@ -196,7 +196,7 @@ public class RawConfigFile  extends YamlConfiguration{
         for (final String entry : content){
             final Material mat = parseMaterial(entry);
             if (mat == null){
-                StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+                StaticLog.logWarning("Bad material entry (" + path +"): " + entry);
             }
             else{
                 target.add(mat);

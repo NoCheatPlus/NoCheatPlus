@@ -16,48 +16,48 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 
 public class DenyLoginCommand extends BaseCommand {
 
-	public DenyLoginCommand(JavaPlugin plugin) {
-		super(plugin, "denylogin", Permissions.COMMAND_DENYLOGIN,
-				new String[]{"tempkick", "tkick", "tempban", "tban",});
-	}
+    public DenyLoginCommand(JavaPlugin plugin) {
+        super(plugin, "denylogin", Permissions.COMMAND_DENYLOGIN,
+                new String[]{"tempkick", "tkick", "tempban", "tban",});
+    }
 
-	@Override
-	public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
-		// Args contains sub command label as first arg.
-		if (args.length < 3) return false;
-		long base = 60000; // minutes (!)
-		final String name = args[1];
-		long duration = -1;
-		try{
-			// TODO: parse for abbreviations like 30s 30m 30h 30d, and set base...
-			duration = Integer.parseInt(args[2]);
-		}
-		catch( NumberFormatException e){};
-		if (duration <= 0) return false;
-		final long finalDuration = duration * base;
-		final String reason;
-		if (args.length > 3) reason = AbstractCommand.join(args, 3);
-		else reason = "";
-		denyLogin(sender, name, finalDuration, reason);
-		return true;
-	}
+    @Override
+    public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
+        // Args contains sub command label as first arg.
+        if (args.length < 3) return false;
+        long base = 60000; // minutes (!)
+        final String name = args[1];
+        long duration = -1;
+        try{
+            // TODO: parse for abbreviations like 30s 30m 30h 30d, and set base...
+            duration = Integer.parseInt(args[2]);
+        }
+        catch( NumberFormatException e){};
+        if (duration <= 0) return false;
+        final long finalDuration = duration * base;
+        final String reason;
+        if (args.length > 3) reason = AbstractCommand.join(args, 3);
+        else reason = "";
+        denyLogin(sender, name, finalDuration, reason);
+        return true;
+    }
 
-	
-	protected void denyLogin(CommandSender sender, String name, long duration, String reason){
-		Player player = DataManager.getPlayer(name);
-		NCPAPIProvider.getNoCheatPlusAPI().denyLogin(name, duration);
-		if (player == null) return;
-		player.kickPlayer(reason);
-		StaticLog.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " for " + duration/60000 +" minutes: " + reason);
-	}
 
-	/* (non-Javadoc)
-	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
-	 */
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command,
-			String alias, String[] args) {
-		return null;
-	}
-	
+    protected void denyLogin(CommandSender sender, String name, long duration, String reason){
+        Player player = DataManager.getPlayer(name);
+        NCPAPIProvider.getNoCheatPlusAPI().denyLogin(name, duration);
+        if (player == null) return;
+        player.kickPlayer(reason);
+        StaticLog.logInfo("(" + sender.getName() + ") Kicked " + player.getName() + " for " + duration/60000 +" minutes: " + reason);
+    }
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+     */
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command,
+            String alias, String[] args) {
+        return null;
+    }
+
 }

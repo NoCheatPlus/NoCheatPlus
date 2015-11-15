@@ -864,7 +864,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private void onVehicleLeaveMiss(final Player player, final MovingData data, final MovingConfig cc) {
         if (data.debug) {
-            StaticLog.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
+            StaticLog.logWarning("VehicleExitEvent missing for: " + player.getName());
         }
         onPlayerVehicleLeave(player, null);
         //		if (BlockProperties.isRails(pFrom.getTypeId())) {
@@ -1220,7 +1220,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // A little extra sweep to check for debug flags.
             normalVehicles.add(entityType);
             if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "VehicleMoveEvent fired for: " + entityType);
             }
         }
         // TODO: Might account for the case of a player letting the vehicle move but not themselves (do mind latency).
@@ -1424,7 +1424,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
             if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
                 // DEBUG
-                StaticLog.logInfo("[NoCheatPlus] Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+                StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
 
@@ -1504,7 +1504,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(useLoc);
         // Debug logout.
         if (data.debug) {
-            StaticLog.logInfo("[NoCheatPlus] Player " + player.getName() + " leaves at location: " + loc.toString());
+            StaticLog.logInfo("Player " + player.getName() + " leaves at location: " + loc.toString());
         }
         if (!player.isSleeping() && !player.isDead()) {
             // Check for missed moves.
@@ -1517,15 +1517,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         // TODO: Consider to always set back here. Might skip on big distances.
                         if (TrigUtil.manhattan(loc, refLoc) > 0 || BlockProperties.isPassable(refLoc)) {
                             if (passable.isEnabled(player)) {
-                                StaticLog.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " leaves, having moved into a block (not tracked by moving checks): " + player.getWorld().getName() + " / " + DebugUtil.formatMove(refLoc, loc));
+                                StaticLog.logWarning("Potential exploit: Player " + player.getName() + " leaves, having moved into a block (not tracked by moving checks): " + player.getWorld().getName() + " / " + DebugUtil.formatMove(refLoc, loc));
                                 // TODO: Actually trigger a passable violation (+tag).
                                 if (d > 1.25) {
-                                    StaticLog.logWarning("[NoCheatPlus] SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
+                                    StaticLog.logWarning("SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
                                 } else {
-                                    StaticLog.logInfo("[NoCheatPlus] Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
+                                    StaticLog.logInfo("Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
                                     data.prepareSetBack(refLoc);
                                     if (!player.teleport(refLoc)) {
-                                        StaticLog.logWarning("[NoCheatPlus] FAILED to set back player " + player.getName());
+                                        StaticLog.logWarning("FAILED to set back player " + player.getName());
                                     }
                                 }
                             }
@@ -1806,7 +1806,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final int loaded = info.from.ensureChunksLoaded();
         if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
             // DEBUG
-            StaticLog.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
+            StaticLog.logInfo("Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
         }
         if (info.from.isOnGroundOrResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()) {
             res = true;

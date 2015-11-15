@@ -11,10 +11,10 @@ import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public abstract class AbstractActionFactory <D extends ActionData, L extends AbstractActionList<D, L>>{
-	
-	// TODO: static ?
+
+    // TODO: static ?
     protected static final Map<String, Object> lib = new HashMap<String, Object>();
-	protected final ActionListFactory<D, L> listFactory;
+    protected final ActionListFactory<D, L> listFactory;
 
     /**
      * Instantiates a new action factory.
@@ -23,14 +23,14 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
      *            the library
      */
     public AbstractActionFactory(final Map<String, Object> library, final ActionListFactory<D, L> listFactory) {
-    	this.listFactory = listFactory;
+        this.listFactory = listFactory;
         lib.putAll(library);
     }
-    
-    
-	
-	public abstract Action<D, L> createAction(String actionDefinition);
-	
+
+
+
+    public abstract Action<D, L> createAction(String actionDefinition);
+
     /**
      * Creates a new Action object.
      * 
@@ -42,7 +42,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
      */
     public L createActionList(final String definition, final String permission) {
         final L list = listFactory.getNewActionList(permission);
-        
+
         // Do check for null, to allow removing default actions, for better robustness.
         if (definition == null) return list;
 
@@ -70,13 +70,13 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
                 }
                 list.setActions(vl, createActions(def.split("\\s+")));
             } catch (final Exception e) {
-                StaticLog.logWarning("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
+                StaticLog.logWarning("Couldn't parse action definition 'vl:" + s + "'.");
             }
         }
 
         return list;
     }
-    
+
     /**
      * Creates a new Action object.
      * 
@@ -84,8 +84,8 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
      *            the definitions
      * @return the action[]
      */
-	@SuppressWarnings("unchecked")
-	public Action<D, L>[] createActions(final String... definitions) {
+    @SuppressWarnings("unchecked")
+    public Action<D, L>[] createActions(final String... definitions) {
         final List<Action<D, L>> actions = new ArrayList<Action<D, L>>();
 
         for (final String def : definitions) {
@@ -94,14 +94,14 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
             try {
                 actions.add(createAction(def));
             } catch (final IllegalArgumentException e) {
-            	StaticLog.logWarning("[NoCheatPlus] Failed to create action: " + e.getMessage());
+                StaticLog.logWarning("Failed to create action: " + e.getMessage());
                 actions.add(new DummyAction<D, L>(def));
             }
         }
 
         return (Action<D, L>[]) actions.toArray(new Action<?, ?>[actions.size()]);
     }
-    
+
     /**
      * Parses the cmd action.
      * 
@@ -125,7 +125,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
                 delay = Integer.parseInt(parts[1]);
                 repeat = Integer.parseInt(parts[2]);
             } catch (final Exception e) {
-            	StaticLog.logWarning("[NoCheatPlus] Couldn't parse details of command '" + definition
+                StaticLog.logWarning("Couldn't parse details of command '" + definition
                         + "', will use default values instead.");
                 delay = 0;
                 repeat = 0;

@@ -15,6 +15,8 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
  */
 public class NetConfig extends ACheckConfig {
 
+    public final boolean attackFrequencyActive;
+
     public final boolean flyingFrequencyActive;
     public final int flyingFrequencySeconds;
     public final double flyingFrequencyPPS;
@@ -33,10 +35,16 @@ public class NetConfig extends ACheckConfig {
 
     public NetConfig(final ConfigFile config) {
         super(config, ConfPaths.NET, new String[] {
-                Permissions.NET_FLYINGFREQUENCY, Permissions.NET_KEEPALIVEFREQUENCY
+                Permissions.NET_ATTACKFREQUENCY,
+                Permissions.NET_FLYINGFREQUENCY, 
+                Permissions.NET_KEEPALIVEFREQUENCY,
         });
 
         final ConfigFile globalConfig = ConfigManager.getConfigFile();
+
+        attackFrequencyActive = config.getBoolean(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE);
+        // TODO: Others.
+
         flyingFrequencyActive = config.getBoolean(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE);
         flyingFrequencySeconds = Math.max(1, globalConfig.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
         flyingFrequencyPPS = Math.max(1.0, globalConfig.getDouble(ConfPaths.NET_FLYINGFREQUENCY_PACKETSPERSECOND));
@@ -59,6 +67,8 @@ public class NetConfig extends ACheckConfig {
     @Override
     public boolean isEnabled(final CheckType checkType) {
         switch(checkType) {
+            case NET_ATTACKFREQUENCY:
+                return attackFrequencyActive;
             case NET_FLYINGFREQUENCY:
                 return flyingFrequencyActive;
             case NET_SOUNDDISTANCE:

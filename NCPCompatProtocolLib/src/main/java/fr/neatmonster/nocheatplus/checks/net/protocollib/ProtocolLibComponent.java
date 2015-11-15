@@ -56,10 +56,16 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
 
     private void register(Plugin plugin) {
         StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
+        //Special purpose.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET + ConfPaths.SUB_DEBUG) || ConfigManager.isTrueForAnyConfig(ConfPaths.CHECKS_DEBUG) ) {
             // (Debug logging. Only activates if debug is set for checks or checks.net, not on the fly.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.DebugAdapter", plugin);
         }
+        // Actual checks.
+//        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE)) {
+//         // (Also sets lastKeepAliveTime, if enabled.)
+//            register("fr.neatmonster.nocheatplus.checks.net.protocollib.UseEntityAdapter", plugin);
+//        }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);
@@ -77,10 +83,10 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
             for (PacketAdapter adapter : registeredPacketAdapters) {
                 names.add(adapter.getClass().getSimpleName());
             }
-            StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
+            StaticLog.logInfo("Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
             NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", names);
         } else {
-            StaticLog.logInfo("[NoCheatPlus] No packet level hooks activated.");
+            StaticLog.logInfo("No packet level hooks activated.");
         }
     }
 
@@ -96,7 +102,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
         } catch (ClassCastException e) {
             t = e;
         }
-        StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + name);
+        StaticLog.logWarning("Could not register packet level hook: " + name);
         StaticLog.logWarning(t);
     }
 
@@ -107,7 +113,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
             ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
             registeredPacketAdapters.add(adapter);
         } catch (Throwable t) {
-            StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
+            StaticLog.logWarning("Could not register packet level hook: " + clazz.getSimpleName());
             StaticLog.logWarning(t);
         }
     }
@@ -132,7 +138,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
                 protocolManager.removePacketListener(adapter);
                 api.removeComponent(adapter); // Bit heavy, but consistent.
             } catch (Throwable t) {
-                StaticLog.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
+                StaticLog.logWarning("Failed to unregister packet level hook: " + adapter.getClass().getName());
             }// TODO Auto-generated method stub
 
         }

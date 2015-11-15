@@ -33,109 +33,109 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
  *
  */
 public class LetterEngine implements IRemoveData, IHaveCheckType, ConsistencyChecker{
-	
-	/** Global processors */
-	protected final List<WordProcessor> processors = new ArrayList<WordProcessor>();
-	
-	/**
-	 * Mapping players to data.
-	 */
-	protected final EnginePlayerDataMap dataMap;
-	
-	public LetterEngine(ConfigFile config){
-		// Add word processors.
-		// NOTE: These settings should be compared to the per player settings done in the EnginePlayerConfig constructor.
-		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_WORDS_CHECK, false)){
-			FlatWordsSettings settings = new FlatWordsSettings();
-			settings.maxSize = 1000;
-			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_WORDS);
-			processors.add(new FlatWords("glWords",settings));
-		}
-		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_PREFIXES_CHECK , false)){
-			WordPrefixesSettings settings = new WordPrefixesSettings();
-			settings.maxAdd = 2000;
-			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_PREFIXES);
-			processors.add(new WordPrefixes("glPrefixes", settings));
-		}
-		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_SIMILARITY_CHECK , false)){
-			SimilarWordsBKLSettings settings = new SimilarWordsBKLSettings();
-			settings.maxSize = 1000;
-			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_SIMILARITY);
-			processors.add(new SimilarWordsBKL("glSimilarity", settings));
-		}
-		// TODO: At least expiration duration configurable? (Entries expire after 10 minutes.)
-		dataMap = new EnginePlayerDataMap(600000L, 100, 0.75f);
-	}
-	
-	public Map<String, Float> process(final MessageLetterCount letterCount, final String playerName, final ChatConfig cc, final ChatData data){
-		
-		final Map<String, Float> result = new HashMap<String, Float>();
-		
-		// Global processors.
-		if (cc.textGlobalCheck){
-			for (final WordProcessor processor : processors){
-				try{
-					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textGlobalWeight);
-				}
-				catch( final Exception e){
-					StaticLog.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					StaticLog.logSevere(e);
-					continue;
-				}
-			}
-		}
-		
-		// Per player processors.
-		if (cc.textPlayerCheck){
-			final EnginePlayerData engineData = dataMap.get(playerName, cc); 
-			for (final WordProcessor processor : engineData.processors){
-				try{
-					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textPlayerWeight);
-				}
-				catch( final Exception e){
-					StaticLog.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					StaticLog.logSevere(e);
-					continue;
-				}
-			}
-		}
-		
-		return result;
-	}
 
-	public void clear() {
-		for (WordProcessor processor : processors){
-			processor.clear();
-		}
-		processors.clear();
-		dataMap.clear();
-	}
+    /** Global processors */
+    protected final List<WordProcessor> processors = new ArrayList<WordProcessor>();
 
-	@Override
-	public IData removeData(final String playerName) {
-		return dataMap.remove(playerName);
-	}
+    /**
+     * Mapping players to data.
+     */
+    protected final EnginePlayerDataMap dataMap;
 
-	@Override
-	public void removeAllData() {
-		dataMap.clear();
-	}
+    public LetterEngine(ConfigFile config){
+        // Add word processors.
+        // NOTE: These settings should be compared to the per player settings done in the EnginePlayerConfig constructor.
+        if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_WORDS_CHECK, false)){
+            FlatWordsSettings settings = new FlatWordsSettings();
+            settings.maxSize = 1000;
+            settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_WORDS);
+            processors.add(new FlatWords("glWords",settings));
+        }
+        if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_PREFIXES_CHECK , false)){
+            WordPrefixesSettings settings = new WordPrefixesSettings();
+            settings.maxAdd = 2000;
+            settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_PREFIXES);
+            processors.add(new WordPrefixes("glPrefixes", settings));
+        }
+        if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_SIMILARITY_CHECK , false)){
+            SimilarWordsBKLSettings settings = new SimilarWordsBKLSettings();
+            settings.maxSize = 1000;
+            settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_SIMILARITY);
+            processors.add(new SimilarWordsBKL("glSimilarity", settings));
+        }
+        // TODO: At least expiration duration configurable? (Entries expire after 10 minutes.)
+        dataMap = new EnginePlayerDataMap(600000L, 100, 0.75f);
+    }
 
-	@Override
-	public final CheckType getCheckType() {
-		return CheckType.CHAT_TEXT;
-	}
+    public Map<String, Float> process(final MessageLetterCount letterCount, final String playerName, final ChatConfig cc, final ChatData data){
 
-	@Override
-	public void checkConsistency(final Player[] onlinePlayers) {
-		// Use consistency checking to release some memory.
-		final long now = System.currentTimeMillis();
-		if (now < dataMap.lastExpired){
-			dataMap.clear();
-			return;
-		}
-		if (now - dataMap.lastExpired > dataMap.durExpire){
-			dataMap.expire(now - dataMap.durExpire);
-		}
-	}
+        final Map<String, Float> result = new HashMap<String, Float>();
+
+        // Global processors.
+        if (cc.textGlobalCheck){
+            for (final WordProcessor processor : processors){
+                try{
+                    result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textGlobalWeight);
+                }
+                catch( final Exception e){
+                    StaticLog.logSevere("chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                    StaticLog.logSevere(e);
+                    continue;
+                }
+            }
+        }
+
+        // Per player processors.
+        if (cc.textPlayerCheck){
+            final EnginePlayerData engineData = dataMap.get(playerName, cc); 
+            for (final WordProcessor processor : engineData.processors){
+                try{
+                    result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textPlayerWeight);
+                }
+                catch( final Exception e){
+                    StaticLog.logSevere("chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                    StaticLog.logSevere(e);
+                    continue;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void clear() {
+        for (WordProcessor processor : processors){
+            processor.clear();
+        }
+        processors.clear();
+        dataMap.clear();
+    }
+
+    @Override
+    public IData removeData(final String playerName) {
+        return dataMap.remove(playerName);
+    }
+
+    @Override
+    public void removeAllData() {
+        dataMap.clear();
+    }
+
+    @Override
+    public final CheckType getCheckType() {
+        return CheckType.CHAT_TEXT;
+    }
+
+    @Override
+    public void checkConsistency(final Player[] onlinePlayers) {
+        // Use consistency checking to release some memory.
+        final long now = System.currentTimeMillis();
+        if (now < dataMap.lastExpired){
+            dataMap.clear();
+            return;
+        }
+        if (now - dataMap.lastExpired > dataMap.durExpire){
+            dataMap.expire(now - dataMap.durExpire);
+        }
+    }
 }

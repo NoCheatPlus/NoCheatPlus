@@ -107,7 +107,7 @@ public class CombinedConfig extends ACheckConfig {
             }
             catch (final Exception e){
                 error = true;
-                StaticLog.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.ignore): " + input);
+                StaticLog.logWarning("Bad damage cause (combined.invulnerable.ignore): " + input);
             }
         }
         // Read modifiers for causes.
@@ -125,11 +125,11 @@ public class CombinedConfig extends ACheckConfig {
             }
             catch (final Exception e){
                 error = true;
-                StaticLog.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.modifiers): " + input);
+                StaticLog.logWarning("Bad damage cause (combined.invulnerable.modifiers): " + input);
             }
         }
         invulnerableModifierDefault = defaultMod;
-        if (error) StaticLog.logInfo("[NoCheatPlus] Damage causes can be: " + StringUtil.join(Arrays.asList(DamageCause.values()), ", "));
+        if (error) StaticLog.logInfo("Damage causes can be: " + StringUtil.join(Arrays.asList(DamageCause.values()), ", "));
         invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
         invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 

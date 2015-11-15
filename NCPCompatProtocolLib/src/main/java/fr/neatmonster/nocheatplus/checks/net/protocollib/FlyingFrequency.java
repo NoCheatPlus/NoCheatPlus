@@ -293,7 +293,7 @@ public class FlyingFrequency extends BaseAdapter {
      */
     private void packetMismatch() {
         packetMismatch = true;
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Data mismatch: disable interpretation of flying packets.");
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Data mismatch: disable interpretation of flying packets.");
     }
 
 }

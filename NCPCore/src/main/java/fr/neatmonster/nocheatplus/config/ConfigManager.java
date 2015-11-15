@@ -207,11 +207,11 @@ public class ConfigManager {
                         globalConfig.save(globalFile);
                     }
                 } catch (final Exception e) {
-                    StaticLog.logSevere("[NoCheatPlus] Could not save back config.yml (see exception below).");
+                    StaticLog.logSevere("Could not save back config.yml (see exception below).");
                     StaticLog.logSevere(e);
                 }
             } catch (final Exception e) {
-                StaticLog.logSevere("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
+                StaticLog.logSevere("Could not load config.yml (see exception below).  Continue with default settings...");
                 StaticLog.logSevere(e);
             }
         }
@@ -257,11 +257,11 @@ public class ConfigManager {
                 try{
                     if (worldConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) worldConfig.save(worldFile);
                 } catch (final Exception e){
-                    StaticLog.logSevere("[NoCheatPlus] Couldn't save back world-specific configuration for " + worldEntry.getKey() + " (see exception below).");
+                    StaticLog.logSevere("Couldn't save back world-specific configuration for " + worldEntry.getKey() + " (see exception below).");
                     StaticLog.logSevere(e);
                 }
             } catch (final Exception e) {
-                StaticLog.logSevere("[NoCheatPlus] Couldn't load world-specific configuration for " + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
+                StaticLog.logSevere("Couldn't load world-specific configuration for " + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
                 StaticLog.logSevere(e);
             }
             worldConfig.setDefaults(globalConfig);

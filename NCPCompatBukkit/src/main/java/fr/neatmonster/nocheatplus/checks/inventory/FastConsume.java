@@ -44,7 +44,7 @@ public class FastConsume extends Check implements Listener{
         super(CheckType.INVENTORY_FASTCONSUME);
         // Overrides the instant-eat check.
         ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
-        StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is available, disabled InstantEat.");
+        StaticLog.logInfo("Inventory checks: FastConsume is available, disabled InstantEat.");
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

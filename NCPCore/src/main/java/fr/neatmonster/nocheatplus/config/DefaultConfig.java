@@ -44,7 +44,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_TRACE, false);
         set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_NOTIFY, false);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, true);
-        set(ConfPaths.LOGGING_BACKEND_CONSOLE_PREFIX, "[NoCheatPlus] ");
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS, true);
         set(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE, true);
         set(ConfPaths.LOGGING_BACKEND_FILE_PREFIX, "");
@@ -445,6 +444,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_ENFORCELOCATION, "default");
 
         // NET
+
+        // AttackFrequency
+        set(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE, true);
 
         // FlyingFrequency
         set(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE, true);

@@ -222,7 +222,7 @@ public class BridgeHealth {
     private static void checkLogEntry(final String tag) {
         // New entry.
         if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)){
-            StaticLog.logInfo("[NoCheatPlus] Try old health API: " + tag);
+            StaticLog.logInfo("Try old health API: " + tag);
         }
     }
 

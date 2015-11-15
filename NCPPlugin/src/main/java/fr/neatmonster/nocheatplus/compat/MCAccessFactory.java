@@ -19,8 +19,8 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 public class MCAccessFactory {
 
     private final String[] updateLocs = new String[]{
-            "[NoCheatPlus]  Check for updates and support at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
-            "[NoCheatPlus]  Development builds (unsupported by the Bukkit Staff, use at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
+            " Check for updates and support at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
+            " Development builds (unsupported by the Bukkit Staff, use at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
     };
 
     /**
@@ -63,7 +63,7 @@ public class MCAccessFactory {
         try {
             mcAccess = new MCAccessBukkit();
             final String msg;
-            msg = "[NoCheatPlus] Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
+            msg = "Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
             StaticLog.logWarning(msg);
             for (String uMsg : updateLocs) {
                 StaticLog.logWarning(uMsg);
@@ -71,7 +71,7 @@ public class MCAccessFactory {
             //            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
             //                log(throwables); // Maybe later activate with TRACE explicitly set
             //            }
-            StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only mode: Some features will likely not function properly, performance might suffer.");
+            StaticLog.logWarning("Bukkit-API-only mode: Some features will likely not function properly, performance might suffer.");
             return mcAccess;
         }
         catch(Throwable t) {
@@ -80,11 +80,11 @@ public class MCAccessFactory {
 
         // All went wrong.
         // TODO: Fall-back solution (disable plugin, disable checks).
-        StaticLog.logSevere("[NoCheatPlus] Your version of NoCheatPlus is not compatible with the version of the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.");
+        StaticLog.logSevere("Your version of NoCheatPlus is not compatible with the version of the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.");
         for (String msg : updateLocs) {
             StaticLog.logSevere(msg);
         }
-        StaticLog.logSevere("[NoCheatPlus] >>> Failed to set up MCAccess <<<");
+        StaticLog.logSevere(">>> Failed to set up MCAccess <<<");
         log(throwables);
         // TODO: Schedule disabling the plugin or running in circles.
         throw new RuntimeException("Could not set up native access to the server mod, neither to the Bukkit-API.");

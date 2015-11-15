@@ -61,7 +61,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
         if (sender instanceof Player) {
             return true;
         } else {
-            sender.sendMessage("[NoCheatPlus] A player is required to run this command.");
+            sender.sendMessage("A player is required to run this command.");
             return false;
         }
     }
@@ -75,7 +75,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
         if (sender instanceof ConsoleCommandSender) {
             return true;
         } else {
-            sender.sendMessage("[NoCheatPlus] This command can only be run from the console.");
+            sender.sendMessage("This command can only be run from the console.");
             return false;
         }
     }

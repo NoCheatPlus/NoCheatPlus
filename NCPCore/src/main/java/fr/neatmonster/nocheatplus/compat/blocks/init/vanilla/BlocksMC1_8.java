@@ -131,7 +131,7 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
         // 197(DARK_OAK_DOOR
         BlockInit.setAs(197, Material.WOODEN_DOOR);
 
-        StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.8 blocks.");
+        StaticLog.logInfo("Added block-info for Minecraft 1.8 blocks.");
     }
 
 }

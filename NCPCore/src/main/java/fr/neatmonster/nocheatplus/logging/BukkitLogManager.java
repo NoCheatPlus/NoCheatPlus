@@ -39,6 +39,15 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
     // TODO: ingame logging [ingame needs api to keep track of players who receive notifications.].
     // TODO: Later: Custom loggers (file, other), per-player-streams (debug per player), custom ingame loggers (one or more players).
 
+    private static ContentLogger<String> serverLogger = new ContentLogger<String>() {
+        @Override
+        public void log(Level level, String content) {
+            try {
+                Bukkit.getLogger().log(level, "[NoCheatPlus] " + content);
+            } catch (Throwable t) {}
+        }
+    };
+
     protected final Plugin plugin;
 
     /**
@@ -65,16 +74,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
             }
             // Attach a new restrictive init logger.
             boolean bukkitLoggerAsynchronous = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS);
-            LoggerID initLoggerID = registerStringLogger(new ContentLogger<String>() {
-
-                @Override
-                public void log(Level level, String content) {
-                    try {
-                        Bukkit.getLogger().log(level, content);
-                    } catch (Throwable t) {}
-                }
-
-            }, new LogOptions(Streams.INIT.name, bukkitLoggerAsynchronous ? CallContext.ANY_THREAD_DIRECT : CallContext.PRIMARY_THREAD_ONLY));
+            LoggerID initLoggerID = registerStringLogger(serverLogger, new LogOptions(Streams.INIT.name, bukkitLoggerAsynchronous ? CallContext.ANY_THREAD_DIRECT : CallContext.PRIMARY_THREAD_ONLY));
             attachStringLogger(initLoggerID, Streams.INIT);
         }
     }
@@ -83,6 +83,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
      * Create default loggers and streams.
      */
     protected void createDefaultLoggers(ConfigFile config) {
+
         // Default streams.
         for (StreamID streamID : new StreamID[] {
                 Streams.STATUS,
@@ -93,6 +94,10 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         }) {
             createStringStream(streamID);
         }
+
+        // Default prefixes.
+        final String prefixIngame = config.getString(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX);
+        final String prefixFile = config.getString(ConfPaths.LOGGING_BACKEND_FILE_PREFIX);
 
         // Variables for temporary use.
         LoggerID tempID;
@@ -105,7 +110,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         CallContext defaultAsynchronousContext = CallContext.ASYNCHRONOUS_TASK; // Plugin runtime + asynchronous.
 
         // Server logger.
-        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? defaultAsynchronousContext : CallContext.PRIMARY_THREAD_TASK));
+        tempID = registerStringLogger(serverLogger, new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? defaultAsynchronousContext : CallContext.PRIMARY_THREAD_TASK));
         attachStringLogger(tempID, Streams.SERVER_LOGGER);
 
         // Plugin logger.
@@ -114,15 +119,16 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
 
         // Ingame logger (assume not thread-safe at first).
         // TODO: Thread-safe ProtocolLib-based implementation?
+        // TODO: Consider using a task.
         tempID = registerStringLogger(new ContentLogger<String>() {
 
             @Override
             public void log(Level level, String content) {
                 // Ignore level for now.
-                NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(content);
+                NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(prefixIngame == null ? content : (prefixIngame + content));
             }
 
-        }, new LogOptions(Streams.NOTIFY_INGAME.name, CallContext.PRIMARY_THREAD_DIRECT)); // TODO: Consider task.
+        }, new LogOptions(Streams.NOTIFY_INGAME.name, CallContext.PRIMARY_THREAD_DIRECT));
         attachStringLogger(tempID, Streams.NOTIFY_INGAME);
 
         // Abstract STATUS stream (efficient version of INIT during plugin runtime).
@@ -132,7 +138,7 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         String fileName = config.getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME).trim();
         ContentLogger<String> defaultFileLogger = null;
         if (!fileName.isEmpty() && !fileName.equalsIgnoreCase("none")) {
-            defaultFileLogger = newFileLogger(fileName, plugin.getDataFolder());
+            defaultFileLogger = newFileLogger(fileName, plugin.getDataFolder(), prefixFile);
         }
 
         ContentLogger<String> traceFileLogger = null;
@@ -169,17 +175,20 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
      * @param defaultDir
      *            This is used as a base, if fileName represents a relative
      *            path.
+     * @param prefix
+     *            A prefix to use for each message (can be null).
      * @return
      */
-    protected ContentLogger<String> newFileLogger(String fileName, File defaultDir) {
+    protected ContentLogger<String> newFileLogger(String fileName, File defaultDir, String prefix) {
         File file = new File(fileName);
         if (!file.isAbsolute()) {
             file = new File(defaultDir, file.getPath());
         }
         // TODO: Sanity check file+extensions and fall-back if not valid [make an auxiliary method doing all this at once]!
         try {
-            FileLoggerAdapter logger = new FileLoggerAdapter(file); // TODO: Method to get-or-create these (store logger by canonical abs paths).
+            FileLoggerAdapter logger = new FileLoggerAdapter(file, prefix); // TODO: Method to get-or-create these (store logger by canonical abs paths).
             if (logger.isInoperable()) {
+                // TODO: Might want to log this?
                 logger.detachLogger();
                 return null;
             } else {

@@ -124,7 +124,7 @@ public class ReflectHelper {
                 }
             }
             if (!parts.isEmpty()) {
-                parts.add(0, "[NoCheatPlus] CompatCBReflect: The following properties could not be set:");
+                parts.add(0, "CompatCBReflect: The following properties could not be set:");
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, StringUtil.join(parts, "\n"));
             }
         }

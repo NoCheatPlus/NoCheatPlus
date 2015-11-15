@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 /**
  * Central access point log manager with a bias towards String messages.
+ * 
  * @author dev1mc
  *
  */
@@ -11,33 +12,41 @@ public interface LogManager {
 
     /**
      * A stream that skips all messages. It's not registered officially.
+     * 
      * @return
      */
     public StreamID getVoidStreamID();
 
     /**
-     * This should be a fail-safe direct String-logger, that has the highest probability of working
-     * within the default context and rather skips messages instead of failing or scheduling tasks,
-     * typically the main application primary thread.
+     * This should be a fail-safe direct String-logger, that has the highest
+     * probability of working within the default context and rather skips
+     * messages instead of failing or scheduling tasks, typically the main
+     * application primary thread.
+     * 
      * @return
      */
     public StreamID getInitStreamID();
 
     /**
-     * Don't use this prefix for custom registrations with StreamID and LoggerID.
+     * Prefix for the names of the default streams. Don't use this prefix for
+     * custom registrations with StreamID and LoggerID.
+     * 
      * @return
      */
     public String getDefaultPrefix();
 
     /**
      * Case-insensitive lookup.
+     * 
      * @param name
      * @return
      */
     public boolean hasLogger(String name);
 
     /**
-     * A newly created id can be used here (case-insensitive comparison by name). For logging use existing ids always.
+     * A newly created id can be used here (case-insensitive comparison by
+     * name). For logging use existing ids always.
+     * 
      * @param loggerID
      * @return
      */
@@ -45,6 +54,7 @@ public interface LogManager {
 
     /**
      * Case-insensitive lookup.
+     * 
      * @param name
      * @return Returns the registered StreamID or null, if not registered.
      */
@@ -52,13 +62,16 @@ public interface LogManager {
 
     /**
      * Case-insensitive lookup.
+     * 
      * @param name
      * @return
      */
     public boolean hasStream(String name);
 
     /**
-     * A newly created id can be used here (case-insensitive comparison by name). For logging use existing ids always.
+     * A newly created id can be used here (case-insensitive comparison by
+     * name). For logging use existing ids always.
+     * 
      * @param streamID
      * @return
      */
@@ -66,6 +79,7 @@ public interface LogManager {
 
     /**
      * Case-insensitive lookup.
+     * 
      * @param name
      * @return Returns the registered StreamID or null, if not registered.
      */

@@ -56,7 +56,7 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
             BlockProperties.setBlockProps(BlockProperties.getId(mat), diamondType);
         }
 
-        StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.7.2 blocks.");
+        StaticLog.logInfo("Added block-info for Minecraft 1.7.2 blocks.");
     }
 
 }

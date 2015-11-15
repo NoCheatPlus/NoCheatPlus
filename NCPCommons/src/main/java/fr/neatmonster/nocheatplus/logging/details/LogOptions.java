@@ -1,7 +1,7 @@
 package fr.neatmonster.nocheatplus.logging.details;
 
 public class LogOptions {
-    
+
     /**
      * Describe the context in which the log method may be used.<br>
      * Policies:
@@ -28,24 +28,24 @@ public class LogOptions {
         ASYNCHRONOUS_TASK,
         /** Only log if it is not the primary thread. */
         ASYNCHRONOUS_ONLY,
-        
+
         // CUSTOM_THREAD_DIRECT|TASK // Needs a variable (Thread, methods to sync into a specific thread would have to be registered in LogManager).
         ;
-        
+
         // TODO: Can distinguish further: Call from where, log from where directly, schedule from where (allow to skip certain contexts).
     }
-    
-    public final String name; // TODO: Name necessary ?
+
+    public final String name;
     public final CallContext callContext;
-    
+
     public LogOptions(LogOptions options) {
         this(options.name, options.callContext);
     }
-    
+
     public LogOptions(String name, CallContext callContext) {
         this.name = name;
         this.callContext = callContext;
         // TODO: shutdown policy (clear, log), rather with per-world threads.
     }
-    
+
 }

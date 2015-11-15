@@ -238,7 +238,7 @@ public class TickTask implements Runnable {
                     }
                     catch(Throwable t) {
                         // Unlikely.
-                        StaticLog.logWarning("[NoCheatPlus] Failed to set OnDemandTickListener to unregistered state: " + t.getClass().getSimpleName());
+                        StaticLog.logWarning("Failed to set OnDemandTickListener to unregistered state: " + t.getClass().getSimpleName());
                         StaticLog.logWarning(t);
                     }
                 }
@@ -477,7 +477,7 @@ public class TickTask implements Runnable {
                 listener.onTick(tick, timeLast);
             }
             catch(Throwable t) {
-                StaticLog.logSevere("[NoCheatPlus] (TickTask) TickListener generated an exception:");
+                StaticLog.logSevere("(TickTask) TickListener generated an exception:");
                 StaticLog.logSevere(t);
             }
         }
@@ -498,7 +498,7 @@ public class TickTask implements Runnable {
 
         // Time running backwards check (not only players can!).
         if (timeLast > time) {
-            StaticLog.logWarning("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+            StaticLog.logWarning("System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
             DataManager.clearData(CheckType.ALL);
             lastDur = 50;
             for (int i = 0; i < spikeDurations.length; i++) {

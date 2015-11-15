@@ -75,7 +75,7 @@ public class ReflectBlock {
         // TODO: Test which is which [ALLOW to configure and also save used ones to config, by mc version].
         // TODO: Dynamically test these ? [needs an extra world/space to place blocks inside of...]
         if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.INIT, "[NoCheatPlus] ReflectBlock: Use methods for shape: " + StringUtil.join(Arrays.asList(names), ", "));
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.INIT, "ReflectBlock: Use methods for shape: " + StringUtil.join(Arrays.asList(names), ", "));
         }
         this.nmsGetMinX = methods[0];
         this.nmsGetMaxX = methods[1];

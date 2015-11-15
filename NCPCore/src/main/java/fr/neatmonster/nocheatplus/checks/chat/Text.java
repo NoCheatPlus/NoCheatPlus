@@ -120,7 +120,7 @@ public class Text extends Check implements INotifyReload {
         final List<String> debugParts;
         if (debug) {
             debugParts = new LinkedList<String>();
-            debugParts.add("[NoCheatPlus][chat.text] Message ("+player.getName()+"/"+message.length()+"): ");
+            debugParts.add("[chat.text] Message ("+player.getName()+"/"+message.length()+"): ");
         }
         else debugParts = null;
 

@@ -28,16 +28,16 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
         // Version Envelope tests (1.4.5-R1.0 ... 1.8.x is considered to be ok).
         final String mcVersion = ServerVersion.getMinecraftVersion();
         if (mcVersion == ServerVersion.UNKNOWN_VERSION) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "[NoCheatPlus] The Minecraft version could not be detected, Compat-CB-Reflect might or might not work.");
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version could not be detected, Compat-CB-Reflect might or might not work.");
             this.knownSupportedVersion = false;
         }
         else if (ServerVersion.compareVersions(mcVersion, "1.4.5") < 0) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "[NoCheatPlus] The Minecraft version seems to be older than what Compat-CB-Reflect can support.");
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be older than what Compat-CB-Reflect can support.");
             this.knownSupportedVersion = false;
         }
         else if (ServerVersion.compareVersions(mcVersion, "1.9") >= 0) {
             this.knownSupportedVersion = false;
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "[NoCheatPlus] The Minecraft version seems to be more recent than the one Compat-CB-Reflect has been built with - this might work, but there could be incompatibilities.");
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be more recent than the one Compat-CB-Reflect has been built with - this might work, but there could be incompatibilities.");
         } else {
             this.knownSupportedVersion = true;
         }

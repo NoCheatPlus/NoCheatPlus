@@ -38,7 +38,6 @@ public abstract class ConfPaths {
     private static final String LOGGING_BACKEND                          = LOGGING + "backend.";
     private static final String LOGGING_BACKEND_CONSOLE                  = LOGGING_BACKEND + "console.";
     public static final String  LOGGING_BACKEND_CONSOLE_ACTIVE           = LOGGING_BACKEND_CONSOLE + "active";
-    public static final String  LOGGING_BACKEND_CONSOLE_PREFIX           = LOGGING_BACKEND_CONSOLE + "prefix";
     public static final String  LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS     = LOGGING_BACKEND_CONSOLE + "asynchronous";
     private static final String LOGGING_BACKEND_FILE                     = LOGGING_BACKEND + "file.";
     public static final String  LOGGING_BACKEND_FILE_ACTIVE              = LOGGING_BACKEND_FILE + "active";
@@ -613,6 +612,10 @@ public abstract class ConfPaths {
 
     public static final String  NET                                         = CHECKS + "net.";
 
+    private static final String NET_ATTACKFREQUENCY                         = NET + "attackfrequency.";
+    public static final String  NET_ATTACKFREQUENCY_ACTIVE                  = NET_ATTACKFREQUENCY + "active";
+    // TODO: Parameters / concept.
+
     private static final String NET_FLYINGFREQUENCY                         = NET + "flyingfrequency.";
     public static final String  NET_FLYINGFREQUENCY_ACTIVE                  = NET_FLYINGFREQUENCY + "active";
     @GlobalConfig
@@ -717,5 +720,7 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_BUKKITONLY                  = "compatibility.bukkitapionly";
     @Deprecated
     public static final String MOVING_SURVIVALFLY_BEDSTEP                ="checks.moving.survivalfly.bedstep";
+    @Deprecated
+    public static final String  LOGGING_BACKEND_CONSOLE_PREFIX           = "logging.backend.console.prefix";
 
 }

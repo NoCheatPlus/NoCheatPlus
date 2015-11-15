@@ -110,7 +110,7 @@ public class PathUtils {
     protected static void warnPaths(final ConfigurationSection config, final CharPrefixTree<?, ?> paths, final String msgPrefix, final Set<String> warnedPaths) {
         for (final String path : config.getKeys(true)) {
             if (paths.hasPrefix(path)) {
-                StaticLog.logWarning("[NoCheatPlus] Config path '" + path + "'" + msgPrefix);
+                StaticLog.logWarning("Config path '" + path + "'" + msgPrefix);
                 if (warnedPaths != null) {
                     warnedPaths.add(path);
                 }
@@ -135,7 +135,7 @@ public class PathUtils {
                 }
                 catch(Throwable t) {
                     // Do log this one.
-                    StaticLog.logSevere("[NoCheatPlus] Failed to save configuration (" + configName + ") with changes: " + t.getClass().getSimpleName());
+                    StaticLog.logSevere("Failed to save configuration (" + configName + ") with changes: " + t.getClass().getSimpleName());
                     StaticLog.logSevere(t);
                 }
             }
@@ -266,7 +266,7 @@ public class PathUtils {
                     addPaths.put(newPath, value);
                     removePaths.add(path);
                 }
-                StaticLog.logWarning("[NoCheatPlus] Config path '" + path + "' (" + configName + ") has been moved" + to);
+                StaticLog.logWarning("Config path '" + path + "' (" + configName + ") has been moved" + to);
             }
         }
     }

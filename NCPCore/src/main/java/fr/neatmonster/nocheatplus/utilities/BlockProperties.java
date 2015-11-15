@@ -425,7 +425,7 @@ public class BlockProperties {
                 blocksFeatures.addAll(new VanillaBlocksFactory().setupVanillaBlocks(worldConfigProvider));
             }
             catch(Throwable t) {
-                StaticLog.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                StaticLog.logSevere("Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
                 StaticLog.logSevere(t);
             }
             // Allow mcAccess to setup block properties.
@@ -435,7 +435,7 @@ public class BlockProperties {
                     blocksFeatures.add(mcAccess.getClass().getSimpleName());
                 }
                 catch(Throwable t) {
-                    StaticLog.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                    StaticLog.logSevere("McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
                     StaticLog.logSevere(t);
                 }
             }
@@ -803,7 +803,7 @@ public class BlockProperties {
         List<String> missing = new LinkedList<String>();
         List<String> allBlocks = new LinkedList<String>();
         if (all) {
-            allBlocks.add("[NoCheatPlus] Dump block properties for fastbreak check:");
+            allBlocks.add("Dump block properties for fastbreak check:");
             allBlocks.add("--- Present entries -------------------------------");
         }
         List<String> tags = new ArrayList<String>();
@@ -839,7 +839,7 @@ public class BlockProperties {
         }
         if (!missing.isEmpty()) {
             missing.add(0, "--- Missing entries -------------------------------");
-            missing.add(0, "[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
+            missing.add(0, "The block breaking data is incomplete, default to allow instant breaking:");
             logManager.warning(Streams.INIT, StringUtil.join(missing,  "\n"));
         }
     }
@@ -1999,7 +1999,7 @@ public class BlockProperties {
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)) {
             final Integer id = RawConfigFile.parseTypeId(input);
             if (id == null || id < 0 || id >= 4096) {
-                StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+                StaticLog.logWarning("Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             }
             else {
                 blockFlags[id] |= F_IGN_PASSABLE;
@@ -2010,7 +2010,7 @@ public class BlockProperties {
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK)) {
             final Integer id = RawConfigFile.parseTypeId(input);
             if (id == null || id < 0 || id >= 4096) {
-                StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
+                StaticLog.logWarning("Bad block id (" + pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
             }
             else {
                 setBlockProps(id, instantType);
@@ -2026,12 +2026,12 @@ public class BlockProperties {
                 final String key = entry.getKey();
                 final Integer id = RawConfigFile.parseTypeId(key);
                 if (id == null || id < 0 || id >= 4096) {
-                    StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
+                    StaticLog.logWarning("Bad block id (" + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
                     continue;
                 }
                 final Object obj = entry.getValue();
                 if (!(obj instanceof String)) {
-                    StaticLog.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
+                    StaticLog.logWarning("Bad flags at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
                     hasErrors = true;
                     continue;
                 }
@@ -2050,7 +2050,7 @@ public class BlockProperties {
                     try{
                         flags |= parseFlag(input);
                     } catch(InputMismatchException e) {
-                        StaticLog.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
+                        StaticLog.logWarning("Bad flag at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
                         error = true;
                         hasErrors = true;
                         break;
@@ -2062,7 +2062,7 @@ public class BlockProperties {
                 blockFlags[id] = flags;
             }
             if (hasErrors) {
-                StaticLog.logInfo("[NoCheatPlus] Overriding block-flags was not entirely successful, all available flags: \n" + StringUtil.join(flagNameMap.values(), "|"));
+                StaticLog.logInfo("Overriding block-flags was not entirely successful, all available flags: \n" + StringUtil.join(flagNameMap.values(), "|"));
             }
         }
     }

@@ -513,7 +513,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         playerMap.clear();
         // Finally alert (summary) if inconsistencies found.
         if (foundInconsistencies > 0) {
-            StaticLog.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
+            StaticLog.logWarning("DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
             foundInconsistencies = 0;
         }
     }
@@ -564,7 +564,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
                     details.add("changed player instances (" + changed + ")");
                 }
 
-                StaticLog.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
+                StaticLog.logWarning("DataMan inconsistencies: " + StringUtil.join(details, " | "));
             }
         }
     }

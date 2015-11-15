@@ -87,7 +87,7 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
         // 95 Locked chest
         BlockProperties.setBlockProps(95, BlockProperties.instantType);
 
-        StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
+        StaticLog.logInfo("Added block-info for Minecraft 1.5 blocks.");
     }
 
 }

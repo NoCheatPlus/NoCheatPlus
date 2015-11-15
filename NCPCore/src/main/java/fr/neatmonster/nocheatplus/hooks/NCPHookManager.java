@@ -260,7 +260,7 @@ public final class NCPHookManager {
      *            the hook
      */
     private static final void logHookAdded(final NCPHook hook) {
-        Bukkit.getLogger().info("[NoCheatPlus] Added hook: " + getHookDescription(hook) + ".");
+        Bukkit.getLogger().info("Added hook: " + getHookDescription(hook) + ".");
     }
 
     /**
@@ -280,7 +280,7 @@ public final class NCPHookManager {
         // TODO: might accumulate failure rate and only log every so and so seconds or disable hook if spamming (leads
         // to NCP spam though)?
         final StringBuilder builder = new StringBuilder(1024);
-        builder.append("[NoCheatPlus] Hook " + getHookDescription(hook) + " encountered an unexpected exception:\n");
+        builder.append("Hook " + getHookDescription(hook) + " encountered an unexpected exception:\n");
         builder.append("Processing: ");
         if (checkType.getParent() != null)
             builder.append("Prent " + checkType.getParent() + " ");
@@ -301,7 +301,7 @@ public final class NCPHookManager {
      *            the hook
      */
     private static final void logHookRemoved(final NCPHook hook) {
-        Bukkit.getLogger().info("[NoCheatPlus] Removed hook: " + getHookDescription(hook) + ".");
+        Bukkit.getLogger().info("Removed hook: " + getHookDescription(hook) + ".");
     }
 
     /**

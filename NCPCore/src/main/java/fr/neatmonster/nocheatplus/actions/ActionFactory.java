@@ -29,12 +29,12 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
      *            the action definition
      * @return the action
      */
-	public Action<ViolationData, ActionList> createAction(String actionDefinition) {
+    public Action<ViolationData, ActionList> createAction(String actionDefinition) {
         actionDefinition = actionDefinition.toLowerCase();
 
         if (actionDefinition.equals("cancel"))
             return new CancelAction<ViolationData, ActionList>();
-        
+
         if (actionDefinition.startsWith("cmd:"))
             return parseCmdAction(actionDefinition.split(":", 2)[1]);
 
@@ -65,9 +65,9 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
         boolean toFile = true;
         boolean toChat = true;
 
-        if (message == null)
-            throw new IllegalArgumentException("NoCheatPlus doesn't know log message '" + name
-                    + "'. Have you forgotten to define it?");
+        if (message == null) {
+            throw new IllegalArgumentException("Can't log, due to entry missing in strings: '" + name);
+        }
 
         try {
             delay = Integer.parseInt(parts[1]);
@@ -76,9 +76,9 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
             toChat = parts[3].contains("i");
             toFile = parts[3].contains("f");
         } catch (final Exception e) {
-        	StaticLog.logWarning("[NoCheatPlus] Couldn't parse details of log action '" + definition
+            StaticLog.logWarning("Couldn't parse details of log action '" + definition
                     + "', will use default values instead.");
-        	StaticLog.logWarning(e);
+            StaticLog.logWarning(e);
             delay = 0;
             repeat = 1;
             toConsole = true;
