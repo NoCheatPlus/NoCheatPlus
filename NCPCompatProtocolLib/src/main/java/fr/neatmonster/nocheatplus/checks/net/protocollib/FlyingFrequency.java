@@ -76,14 +76,14 @@ public class FlyingFrequency extends BaseAdapter {
         }
 
         final NetConfig cc = configFactory.getConfig(player.getWorld());
+        // Always update last received time.
+        final NetData data = dataFactory.getData(player);
+        data.lastKeepAliveTime = time; // Update without much of a contract.
         if (!cc.flyingFrequencyActive) {
             return;
         }
 
         counters.add(idHandled, 1);
-
-        final NetData data = dataFactory.getData(player);
-        data.lastKeepAliveTime = time; // Update without much of a contract.
 
         final boolean primaryThread = !event.isAsync();
         if (!primaryThread) {
