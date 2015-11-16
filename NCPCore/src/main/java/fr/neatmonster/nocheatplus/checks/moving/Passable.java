@@ -193,11 +193,11 @@ public class Passable extends Check {
         // Always check y first.
         rayTracing.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
         rayTracing.loop();
-        if (!rayTracing.collides()) {
+        if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
             // horizontal second.
             rayTracing.set(from.getX(), to.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
             rayTracing.loop();
-            if (!rayTracing.collides()) {
+            if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
                 return true;
             }
         }
@@ -211,11 +211,11 @@ public class Passable extends Check {
 //            }
 //            rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
 //            rayTracing.loop();
-//            if (!rayTracing.collides()) {
+//            if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
 //                // y second.
 //                rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
 //                rayTracing.loop();
-//                if (!rayTracing.collides()) {
+//                if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
 //                    return true;
 //                }
 //            }
