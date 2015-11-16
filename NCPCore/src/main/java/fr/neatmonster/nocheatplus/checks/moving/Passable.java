@@ -189,37 +189,37 @@ public class Passable extends Check {
      * @param manhattan
      * @return
      */
-    private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, int manhattan) {
-        final double yDiff = to.getY() - from.getY() ;
-        if (manhattan <= 3 && yDiff > 0.0 && Math.abs(yDiff)  < 1.0) {
-            // Workaround for client-side calculations not being possible (y vs. horizontal move).
-            // TODO: Alternative: Test if "real" ray-tracing would fix it (might not!).
-            if (yDiff > 0.0) {
-                // y first.
-                rayTracing.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
-                rayTracing.loop();
-                if (!rayTracing.collides()) {
-                    // horizontal second.
-                    rayTracing.set(from.getX(), to.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
-                    rayTracing.loop();
-                    if (!rayTracing.collides()) {
-                        return true;
-                    }
-                }
-            } else {
-                // horizontal first.
-                rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
-                rayTracing.loop();
-                if (!rayTracing.collides()) {
-                    // y second.
-                    rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
-                    rayTracing.loop();
-                    if (!rayTracing.collides()) {
-                        return true;
-                    }
-                }
+    private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, final int manhattan) {
+        // Always check y first.
+        rayTracing.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
+        rayTracing.loop();
+        if (!rayTracing.collides()) {
+            // horizontal second.
+            rayTracing.set(from.getX(), to.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+            rayTracing.loop();
+            if (!rayTracing.collides()) {
+                return true;
             }
         }
+        // Horizontal first may be obsolete, due to splitting moves anyway and due to not having been called ever (!). 
+//        final double yDiff = to.getY() - from.getY() ;
+//        if (manhattan <= 3 && Math.abs(yDiff)  < 1.0 && yDiff < 0.0) {
+//            // Workaround for client-side calculations not being possible (y vs. horizontal move). Typically stairs.
+//            // horizontal first.
+//            if (data.debug) {
+//                DebugUtil.debug(from.getPlayer().getName() + " passable - Test horizontal move first.");
+//            }
+//            rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
+//            rayTracing.loop();
+//            if (!rayTracing.collides()) {
+//                // y second.
+//                rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
+//                rayTracing.loop();
+//                if (!rayTracing.collides()) {
+//                    return true;
+//                }
+//            }
+//        }
         return false;
     }
 
