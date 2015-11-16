@@ -2324,11 +2324,13 @@ public class BlockProperties {
                         bmaxY = 0.5;
                     }
                     else {
-                        bmaxY = 1.0; // - (double) data8 / 9.0;
+                        //bmaxY = 1.0; // - (double) data8 / 9.0;
+                        bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : 0.8;
                     }
                 }
                 else {
-                    bmaxY = 1.0;
+                    //bmaxY = 1.0;
+                    bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : 0.8;
                 }
             }
             else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
@@ -2361,6 +2363,31 @@ public class BlockProperties {
         }
         // Collision.
         return true;
+    }
+
+    /**
+     * Determine if the liquid block below has full height or not (provided it
+     * is max. level).
+     * 
+     * @param blockCache
+     * @param x
+     *            Coordinates of the block above the liquid block in question.
+     * @param y
+     * @param z
+     * @return
+     */
+    public static boolean shouldLiquidBelowBeFullHeight(final BlockCache access, final int x, final int y, final int z) {
+        final int id = access.getTypeId(x, y, z);
+        if (isLiquid(id)) {
+            return true;
+        }
+        if (!isSolid(id)) {
+            return false;
+        }
+        final double[] bounds = getCorrectedBounds(x, y, z, id, access.getBounds(x, y, z));
+        // TODO: Implement corrected bounds.
+        // TODO: Fences ~ test.
+        return bounds == null ? true : (bounds[1] == 0.0);
     }
 
     /**
