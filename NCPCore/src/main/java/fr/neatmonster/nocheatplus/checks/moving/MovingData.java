@@ -879,23 +879,27 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Adjust on set back and similar.
+     * Adjust liftOffEnvelope and nextFriction, called on set back and similar.
      * @param loc
      */
     public void adjustLiftOffEnvelope(final PlayerLocation loc) {
         // Simplified.
         if (loc.isInWeb()) {
             liftOffEnvelope = LiftOffEnvelope.NO_JUMP;
+            nextFrictionHorizontal = nextFrictionVertical = 0.0;
         }
         else if (loc.isInLiquid()) {
             // TODO: Distinguish strong limit.
             liftOffEnvelope = LiftOffEnvelope.LIMIT_LIQUID;
+            nextFrictionHorizontal = nextFrictionVertical = loc.isInLava() ? SurvivalFly.FRICTION_MEDIUM_LAVA : SurvivalFly.FRICTION_MEDIUM_WATER;
         }
         else if (loc.isOnGround()) {
             liftOffEnvelope = LiftOffEnvelope.NORMAL;
+            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
         }
         else {
             liftOffEnvelope = LiftOffEnvelope.UNKNOWN;
+            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
         }
     }
 

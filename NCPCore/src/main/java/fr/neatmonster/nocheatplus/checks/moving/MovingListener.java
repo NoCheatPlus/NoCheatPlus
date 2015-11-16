@@ -1452,9 +1452,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MoveInfo moveInfo = useMoveInfo();
         moveInfo.set(player, loc, null, cc.yOnGround);
         data.toWasReset = moveInfo.from.isOnGroundOrResetCond();
-        if (data.toWasReset && moveInfo.from.isOnGround() && !moveInfo.from.isResetCond()) {
-            data.liftOffEnvelope = LiftOffEnvelope.NORMAL;
-        }
+        data.adjustLiftOffEnvelope(moveInfo.from);
         returnMoveInfo(moveInfo);
         data.fromWasReset = data.toWasReset;
 

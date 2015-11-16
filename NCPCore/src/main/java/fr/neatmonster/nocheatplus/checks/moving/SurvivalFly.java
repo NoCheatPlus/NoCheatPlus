@@ -84,7 +84,7 @@ public class SurvivalFly extends Check {
     /** Friction for water (default). */
     public static final double FRICTION_MEDIUM_WATER = 0.89;
     /** Friction for lava. */
-    public static final double FRICTION_MEDIUM_LAVA = FRICTION_MEDIUM_WATER; // TODO: Something smaller (problem: jump into).
+    public static final double FRICTION_MEDIUM_LAVA = 0.535;
 
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
@@ -554,8 +554,9 @@ public class SurvivalFly extends Check {
             // TODO: Not sure about horizontal (!).
             data.nextFrictionHorizontal = data.nextFrictionVertical = 0.0;
         }
-        else if (from.isInLiquid() && to.isInLiquid()) {
-            if (from.isInLava() && to.isInLava()) {
+        else if (from.isInLiquid()) {
+            // TODO: Exact conditions ?!
+            if (from.isInLava()) {
                 data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_LAVA;
             }
             else {
@@ -567,7 +568,8 @@ public class SurvivalFly extends Check {
             data.nextFrictionHorizontal = data.nextFrictionVertical = FRICTION_MEDIUM_AIR;
         }
         else {
-            // TODO: Friction for walking on blocks (!).
+            data.nextFrictionHorizontal = 0.0; // TODO: Friction for walking on blocks (!).
+            data.nextFrictionVertical = FRICTION_MEDIUM_AIR;
         }
 
     }
@@ -777,10 +779,10 @@ public class SurvivalFly extends Check {
         final boolean strictVdistRel;
         final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
         final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain). 
-        if (fallingEnvelope(yDistance, data.lastYDist, 0.0)) {
+        if (fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, 0.0)) {
             // Less headache: Always allow falling. 
             // TODO: Base should be data.lastFrictionVertical? Problem: "not set" detection?
-            vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
+            vAllowedDistance = data.lastYDist * data.lastFrictionVertical - GRAVITY_MIN; // Upper bound.
             strictVdistRel = true;
         }
         else if (resetFrom) {
@@ -810,7 +812,7 @@ public class SurvivalFly extends Check {
                 strictVdistRel = false;
             } else {
                 // TODO: data.lastFrictionVertical (see above).
-                vAllowedDistance = data.lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN; // Upper bound.
+                vAllowedDistance = data.lastYDist * data.lastFrictionVertical - GRAVITY_MIN; // Upper bound.
                 strictVdistRel = true;
             }
         } else {
@@ -1084,12 +1086,12 @@ public class SurvivalFly extends Check {
      * @param extraGravity Extra amount to fall faster.
      * @return
      */
-    private static boolean fallingEnvelope(final double yDistance, final double lastYDist, final double extraGravity) {
+    private static boolean fallingEnvelope(final double yDistance, final double lastYDist, final double lastFrictionVertical, final double extraGravity) {
         if (lastYDist == Double.MAX_VALUE || yDistance >= lastYDist) {
             return false;
         }
         // TODO: data.lastFrictionVertical (see vDistAir).
-        final double frictDist = lastYDist * FRICTION_MEDIUM_AIR - GRAVITY_MIN;
+        final double frictDist = lastYDist * lastFrictionVertical - GRAVITY_MIN;
         return yDistance <= frictDist + extraGravity && yDistance > frictDist - GRAVITY_SPAN - extraGravity;
     }
 
@@ -1110,7 +1112,7 @@ public class SurvivalFly extends Check {
                         // Falling slightly too fast. Actually a friction envelope (bad).
                         // TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
                         || yDistDiffEx < 0.0 && (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
-                        && fallingEnvelope(yDistance, data.lastYDist, GRAVITY_ODD / 2.0)
+                        && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
                         // Falling slightly too slow.
                         || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
                         && data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
