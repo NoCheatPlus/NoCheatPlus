@@ -614,7 +614,14 @@ public abstract class ConfPaths {
 
     private static final String NET_ATTACKFREQUENCY                         = NET + "attackfrequency.";
     public static final String  NET_ATTACKFREQUENCY_ACTIVE                  = NET_ATTACKFREQUENCY + "active";
-    // TODO: Parameters / concept.
+    // TODO: Generic config for seconds.
+    public static final String  NET_ATTACKFREQUENCY_SECONDS                 = NET_ATTACKFREQUENCY + "limitforseconds.";
+    public static final String  NET_ATTACKFREQUENCY_SECONDS_HALF             = NET_ATTACKFREQUENCY_SECONDS + "half";
+    public static final String  NET_ATTACKFREQUENCY_SECONDS_ONE             = NET_ATTACKFREQUENCY_SECONDS + "one";
+    public static final String  NET_ATTACKFREQUENCY_SECONDS_TWO             = NET_ATTACKFREQUENCY_SECONDS + "two";
+    public static final String  NET_ATTACKFREQUENCY_SECONDS_FOUR            = NET_ATTACKFREQUENCY_SECONDS + "four";
+    public static final String  NET_ATTACKFREQUENCY_SECONDS_EIGHT           = NET_ATTACKFREQUENCY_SECONDS + "eight";
+    public static final String  NET_ATTACKFREQUENCY_ACTIONS                 = NET_ATTACKFREQUENCY + "actions";
 
     private static final String NET_FLYINGFREQUENCY                         = NET + "flyingfrequency.";
     public static final String  NET_FLYINGFREQUENCY_ACTIVE                  = NET_FLYINGFREQUENCY + "active";

@@ -62,10 +62,10 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.DebugAdapter", plugin);
         }
         // Actual checks.
-//        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE)) {
-//         // (Also sets lastKeepAliveTime, if enabled.)
-//            register("fr.neatmonster.nocheatplus.checks.net.protocollib.UseEntityAdapter", plugin);
-//        }
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE)) {
+            // (Also sets lastKeepAliveTime, if enabled.)
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.UseEntityAdapter", plugin);
+        }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);

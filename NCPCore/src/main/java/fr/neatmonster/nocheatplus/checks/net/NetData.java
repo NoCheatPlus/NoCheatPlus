@@ -16,6 +16,10 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class NetData extends ACheckData {
 
+    // AttackFrequency
+    public ActionFrequency attackFrequencySeconds = new ActionFrequency(16, 500);
+
+    // FlyingFrequency
     /** All flying packets, use System.currentTimeMillis() for time. */
     public final ActionFrequency flyingFrequencyAll;
     public boolean flyingFrequencyOnGround = false;
@@ -27,6 +31,7 @@ public class NetData extends ACheckData {
      */
     public final ActionFrequency flyingFrequencyRedundantFreq;
 
+    // KeepAliveFrequency
     /**
      * Last 20 seconds keep alive packets counting. Use lastUpdate() for the
      * time of the last event. System.currentTimeMillis() is used.
@@ -34,7 +39,10 @@ public class NetData extends ACheckData {
     public ActionFrequency keepAliveFreq = new ActionFrequency(20, 1000);
 
     // Shared.
-    /** Last time some action was received (keep alive or flying). Also maintained for fight.godmode. */
+    /**
+     * Last time some action was received (keep alive/flying/interaction). Also
+     * maintained for fight.godmode.
+     */
     public long lastKeepAliveTime = 0L;
 
     public final TeleportQueue teleportQueue = new TeleportQueue(); // TODO: Consider using one lock per data instance and pass here.

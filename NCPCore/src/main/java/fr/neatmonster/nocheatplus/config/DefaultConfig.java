@@ -447,6 +447,12 @@ public class DefaultConfig extends ConfigFile {
 
         // AttackFrequency
         set(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE, true);
+        set(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_HALF, 10);
+        set(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_ONE, 15);
+        set(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_TWO, 30);
+        set(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_FOUR, 60);
+        set(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_EIGHT, 100);
+        set(ConfPaths.NET_ATTACKFREQUENCY_ACTIONS, "cancel vl>30 cancel log:attackfrequency:0:5:if vl>160 cancel log:attackfrequency:0:0:cif cmd:kickattackfrequency");
 
         // FlyingFrequency
         set(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE, true);
@@ -472,6 +478,7 @@ public class DefaultConfig extends ConfigFile {
         final String end = ". VL [violations].";
         final String tell = "ncp tell [player] ";
         set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
+        set(ConfPaths.STRINGS + ".attackfrequency", start + "attacks with too high a frequency ([packets]/[limit], [tags])" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
         set(ConfPaths.STRINGS + ".bautosign", start + "failed autosign with [tags]" + end);
@@ -511,6 +518,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".keepalive", start + "spams keep-alive packets (god/freecam?)" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickalive", "ncp kick [player] Too many keep-alive packets.");
+        set(ConfPaths.STRINGS + ".kickattackfrequency", "ncp kick [player] Unlikely fast clicking.");
         set(ConfPaths.STRINGS + ".kickbedleave", "ncp delay ncp kick [player] Go find a bed!");
         set(ConfPaths.STRINGS + ".kickbspeed", "ncp kick [player] You interacted too fast!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");

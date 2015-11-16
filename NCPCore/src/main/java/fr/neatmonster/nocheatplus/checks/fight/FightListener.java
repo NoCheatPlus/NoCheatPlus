@@ -213,6 +213,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 cancelled = true;
             }
         }
+        // TODO: Consider to always check improbable (first?). At least if config.always or speed or net.attackfrequency are enabled.
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc)) {
             cancelled = true;

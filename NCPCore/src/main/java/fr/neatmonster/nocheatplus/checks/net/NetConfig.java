@@ -16,6 +16,12 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public class NetConfig extends ACheckConfig {
 
     public final boolean attackFrequencyActive;
+    public final float attackFrequencyLimitSecondsHalf;
+    public final float attackFrequencyLimitSecondsOne;
+    public final float attackFrequencyLimitSecondsTwo;
+    public final float attackFrequencyLimitSecondsFour;
+    public final float attackFrequencyLimitSecondsEight;
+    public final ActionList attackFrequencyActions;
 
     public final boolean flyingFrequencyActive;
     public final int flyingFrequencySeconds;
@@ -43,7 +49,12 @@ public class NetConfig extends ACheckConfig {
         final ConfigFile globalConfig = ConfigManager.getConfigFile();
 
         attackFrequencyActive = config.getBoolean(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE);
-        // TODO: Others.
+        attackFrequencyLimitSecondsHalf = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_HALF);
+        attackFrequencyLimitSecondsOne = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_ONE);
+        attackFrequencyLimitSecondsTwo = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_TWO);
+        attackFrequencyLimitSecondsFour= config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_FOUR);
+        attackFrequencyLimitSecondsEight = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_EIGHT);
+        attackFrequencyActions = config.getOptimizedActionList(ConfPaths.NET_ATTACKFREQUENCY_ACTIONS, Permissions.NET_ATTACKFREQUENCY);
 
         flyingFrequencyActive = config.getBoolean(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE);
         flyingFrequencySeconds = Math.max(1, globalConfig.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
