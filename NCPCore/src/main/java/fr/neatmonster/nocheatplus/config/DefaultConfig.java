@@ -313,7 +313,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
-        set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
+        set(ConfPaths.FIGHT_SPEED_ACTIONS, "cancel vl>50 log:fspeed:0:5:if cancel");
         set(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS, 7);
         set(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT, 6);
 
