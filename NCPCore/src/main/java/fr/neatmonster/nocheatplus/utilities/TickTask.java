@@ -1,10 +1,15 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -27,9 +33,9 @@ import fr.neatmonster.nocheatplus.players.DataManager;
  */
 public class TickTask implements Runnable {
 
-    protected static final class PermissionUpdateEntry{
-        public CheckType checkType;
-        public String playerName;
+    protected static final class PermissionUpdateEntry{ 
+        public final CheckType checkType;
+        public final String playerName;
         private final int hashCode;
         public PermissionUpdateEntry(final String playerName, final CheckType checkType) {
             this.playerName = playerName;
@@ -50,15 +56,25 @@ public class TickTask implements Runnable {
         }
     }
 
+    protected static final class ImprobableUpdateEntry {
+        public float addLevel;
+        public ImprobableUpdateEntry(float addLevel) {
+            this.addLevel = addLevel;
+        }
+    }
+
     public static final int lagMaxTicks = 80;
 
     /** Lock for accessing permissionUpdates. */
     private static final Object permissionLock = new Object();
     /** Permissions to update: player name -> check type. */
     private static Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
+    /** Improbable entries to update. */
+    private static Map<UUID, ImprobableUpdateEntry> improbableUpdates = new LinkedHashMap<UUID, TickTask.ImprobableUpdateEntry>(50);
+    private static final ReentrantLock improbableLock = new ReentrantLock();
 
     /** Lock for delayedActions. */
-    private static final Object actionLock = new Object();
+    private static final Object actionLock = new Object(); // TODO: Use a ReentrantLock?
     /** Actions to execute. */
     private static List<ViolationData> delayedActions = new LinkedList<ViolationData>();
 
@@ -147,6 +163,30 @@ public class TickTask implements Runnable {
         }
     }
 
+    /**
+     * Force update improbable levels.<br>
+     * Note: Only call from the main thread!
+     */
+    public static void updateImprobable() {
+        final Map<UUID, ImprobableUpdateEntry> updateMap;
+        improbableLock.lock();
+        if (improbableUpdates.isEmpty()) {
+            improbableLock.unlock();
+            return;
+        } else {
+            updateMap = improbableUpdates;
+            improbableUpdates = new LinkedHashMap<UUID, ImprobableUpdateEntry>(50);
+            improbableLock.unlock();
+            for (final Entry<UUID, ImprobableUpdateEntry> entry : updateMap.entrySet()) {
+                final Player player = DataManager.getPlayer(entry.getKey());
+                if (player != null) {
+                    Improbable.feed(player, entry.getValue().addLevel, System.currentTimeMillis());
+                }
+                // TODO: else: offline update or warn?
+            }
+        }
+    }
+
     // Public static access methods
     /**
      * Access method to request permission updates.<br>
@@ -175,6 +215,26 @@ public class TickTask implements Runnable {
             }
             delayedActions.add(actions);
         }
+    }
+
+    /**
+     * NOTE: Thread-safe.
+     * @param playerId
+     * @param amount
+     */
+    public static void requestImprobableUpdate(final UUID playerId, final float addLevel) {
+        if (playerId == null) {
+            throw new NullPointerException("The playerId may not be null.");
+        }
+        improbableLock.lock();
+        ImprobableUpdateEntry entry = improbableUpdates.get(playerId);
+        if (entry == null) {
+            entry = new ImprobableUpdateEntry(addLevel);
+            improbableUpdates.put(playerId, entry);
+        } else {
+            entry.addLevel += addLevel;
+        }
+        improbableLock.unlock();
     }
 
     /**
@@ -432,6 +492,9 @@ public class TickTask implements Runnable {
         synchronized (actionLock) {
             delayedActions.clear();
         }
+        improbableLock.lock();
+        improbableUpdates.clear();
+        improbableLock.unlock();
         synchronized (tickListeners) {
             tickListeners.clear();
         }
@@ -489,6 +552,8 @@ public class TickTask implements Runnable {
         executeActions();
         // Permissions.
         updatePermissions();
+        // Improbable.
+        updateImprobable();
         // Listeners.
         notifyListeners();
 

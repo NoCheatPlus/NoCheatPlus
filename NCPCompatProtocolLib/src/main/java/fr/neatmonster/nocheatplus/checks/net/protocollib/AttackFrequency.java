@@ -8,6 +8,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class AttackFrequency extends Check {
 
@@ -79,13 +80,8 @@ public class AttackFrequency extends Check {
             if (executeActions(vd)) {
                 cancel = true;
             }
-            //            // TODO: Still feed the improbable (needs TickTask extension ...)
-            //            if (data.speedVL > 50){
-            //                Improbable.check(player, 2f, now, "fight.speed");
-            //            }
-            //            else{
-            //                Improbable.feed(player, 2f, now);
-            //            }
+            // Feed Improbable.
+            TickTask.requestImprobableUpdate(player.getUniqueId(), 2f);
         }
 
         return cancel;

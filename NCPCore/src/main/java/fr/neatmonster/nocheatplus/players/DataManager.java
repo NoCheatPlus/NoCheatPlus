@@ -441,12 +441,21 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * @return
      */
     public static UUID getUUID(final String input) {
-        // TODO: Maintain a name-UUID mapping?
+        // TODO: Use player map.
         final Player player = getPlayer(input);
         if (player != null) {
             return player.getUniqueId();
         }
         return IdUtil.UUIDFromStringSafe(input);
+    }
+
+    /**
+     * Get an online player by UUID.
+     * @param id
+     * @return
+     */
+    public static Player getPlayer(final UUID id) {
+        return instance.playerMap.getPlayer(id);
     }
 
     /**
