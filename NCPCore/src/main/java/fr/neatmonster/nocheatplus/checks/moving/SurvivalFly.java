@@ -1115,10 +1115,18 @@ public class SurvivalFly extends Check {
                         && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
                         // Falling slightly too slow.
                         || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
-                        && data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
-                        && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
-                        && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
-                        // Falling too slow around 0 yDistance.
+                        &&
+                        (
+                                // Falling too slow around 0 yDistance.
+                                data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
+                                && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
+                                && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
+                                // Moving out of liquid with velocity.
+                                || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
+                                && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
+                                && data.lastYDist - yDistance > GRAVITY_MAX
+                                && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                                )
                         );
     }
 
