@@ -32,21 +32,21 @@ public class BlockInteractListener extends CheckListener {
 
     /** The reach-distance check. */
     private final Reach     reach     = addCheck(new Reach());
-    
+
     /** Interact with visible blocks. */
     private final Visible visible = addCheck(new Visible());
-    
+
     /** Speed of interaction. */
     private final Speed speed = addCheck(new Speed());
-    
+
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
-	private final Location useLoc = new Location(null, 0, 0, 0);
-    
-	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final Location useLoc = new Location(null, 0, 0, 0);
+
+    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
-	
-    public BlockInteractListener(){
-    	super(CheckType.BLOCKINTERACT);
+
+    public BlockInteractListener() {
+        super(CheckType.BLOCKINTERACT);
     }
 
     /**
@@ -58,80 +58,92 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
-    	final Player player = event.getPlayer();
-    	// Cancel interact events for dead players.
-    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
-    		// Auto-soup after death.
-    		event.setUseInteractedBlock(Result.DENY);
-    		event.setUseItemInHand(Result.DENY);
-    		event.setCancelled(true);
-    		counters.addPrimaryThread(idCancelDead, 1);
-    		return;
-    	}
-    	
-    	// TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
-    	final Action action = event.getAction();
-    	final Block block = event.getClickedBlock();
-        
-        if (block == null){
-        	return;
+        final Player player = event.getPlayer();
+        // Cancel interact events for dead players.
+        if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+            // Auto-soup after death.
+            event.setUseInteractedBlock(Result.DENY);
+            event.setUseItemInHand(Result.DENY);
+            event.setCancelled(true);
+            counters.addPrimaryThread(idCancelDead, 1);
+            return;
         }
-    	
-    	final BlockInteractData data = BlockInteractData.getData(player);
-    	data.setLastBlock(block, action);
-        switch(action){
-        case LEFT_CLICK_BLOCK:
-        	break;
-        case RIGHT_CLICK_BLOCK:
-        	final ItemStack stack = player.getItemInHand();
-    		if (stack != null && stack.getType() == Material.ENDER_PEARL){
-    			if (!BlockProperties.isPassable(block.getType())){
-    				final CombinedConfig ccc = CombinedConfig.getConfig(player);
-    				if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock){
-    					event.setUseItemInHand(Result.DENY);
-    				}
-    			}
-    		}
-        	break;
-    	default:
-    		return;
+
+        // TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
+        final Action action = event.getAction();
+        final Block block = event.getClickedBlock();
+
+        if (block == null) {
+            return;
         }
-        
-        if (event.isCancelled()){
-        	return;
+
+        final BlockInteractData data = BlockInteractData.getData(player);
+        data.setLastBlock(block, action);
+        switch(action) {
+            case LEFT_CLICK_BLOCK:
+                break;
+            case RIGHT_CLICK_BLOCK:
+                final ItemStack stack = player.getItemInHand();
+                if (stack != null && stack.getType() == Material.ENDER_PEARL) {
+                    if (!BlockProperties.isPassable(block.getType())) {
+                        final CombinedConfig ccc = CombinedConfig.getConfig(player);
+                        if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
+                            event.setUseItemInHand(Result.DENY);
+                        }
+                    }
+                }
+                break;
+            default:
+                return;
         }
-        
+
+        if (event.isCancelled() && event.useInteractedBlock() != Result.ALLOW) {
+            return;
+        }
+
         final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
         boolean cancelled = false;
-        
+
         final BlockFace face = event.getBlockFace();
         final Location loc = player.getLocation(useLoc);
-        
+
         // Interaction speed.
-        if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)){
-        	cancelled = true;
+        if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)) {
+            cancelled = true;
         }
 
         // First the reach check.
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)){
-        	cancelled = true;
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)) {
+            cancelled = true;
         }
 
         // Second the direction check
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)){
-        	cancelled = true;
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)) {
+            cancelled = true;
         }
 
         // Ray tracing for freecam use etc.
-        if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)){
-        	cancelled = true;
+        if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)) {
+            cancelled = true;
         }
-        
+
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
-        	event.setUseInteractedBlock(Result.DENY);
-        	event.setUseItemInHand(Result.DENY);
-        	event.setCancelled(true);
+            if (event.isCancelled()) {
+                // Just prevent using the block.
+                event.setUseInteractedBlock(Result.DENY);
+            } else {
+                event.setCancelled(true);
+                event.setUseInteractedBlock(Result.DENY);
+                final ItemStack stack = player.getItemInHand();
+                final Material mat = stack == null ? Material.AIR : stack.getType();
+                if (mat.isEdible() || mat == Material.POTION) {
+                    // TODO: Ender pearl?
+                    event.setUseItemInHand(Result.ALLOW);
+                } else {
+                    event.setUseItemInHand(Result.DENY);
+                }
+            }
         }
         useLoc.setWorld(null);
     }
