@@ -162,7 +162,9 @@ public class MovingData extends ACheckData {
     /** To/from was ground or web or assumed to be etc. */
     public boolean		  toWasReset, fromWasReset;
     /** Basic envelope constraints for switching into air. */
-    public LiftOffEnvelope liftOffEnvelope = defaultLiftOffEnvelope; 
+    public LiftOffEnvelope liftOffEnvelope = defaultLiftOffEnvelope;
+    /** Count how many moves have been made inside a medium (other than air). */
+    public int insideMediumCount = 0;
 
     // Locations shared between all checks.
     private Location    setBack = null;
@@ -271,6 +273,7 @@ public class MovingData extends ACheckData {
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
+        insideMediumCount = 0;
         vehicleConsistency = MoveConsistency.INCONSISTENT;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verVelUsed = null;
@@ -305,6 +308,7 @@ public class MovingData extends ACheckData {
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
+        insideMediumCount = 0;
         removeAllVelocity();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
@@ -328,36 +332,62 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Just reset the "last locations" references.
+     * Adjust properties that relate to the mediu, called on set back and
+     * similar. <br>
+     * Currently: liftOffEnvelope, nextFriction.
+     * 
      * @param loc
      */
-    public void resetPositions(final Location loc) {
-        if (loc == null) {
-            resetPositions();
+    public void adjustMediumProperties(final PlayerLocation loc) {
+        // Simplified.
+        if (loc.isInWeb()) {
+            liftOffEnvelope = LiftOffEnvelope.NO_JUMP;
+            nextFrictionHorizontal = nextFrictionVertical = 0.0;
+        }
+        else if (loc.isInLiquid()) {
+            // TODO: Distinguish strong limit.
+            liftOffEnvelope = LiftOffEnvelope.LIMIT_LIQUID;
+            if (loc.isInLava()) {
+                nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_LAVA;
+            } else {
+                nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_WATER;
+            }
+        }
+        else if (loc.isOnGround()) {
+            liftOffEnvelope = LiftOffEnvelope.NORMAL;
+            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
         }
         else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+            liftOffEnvelope = LiftOffEnvelope.UNKNOWN;
+            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
         }
+        insideMediumCount = 0;
     }
 
     /**
-     * Just reset the "last locations" references.
-     * @param loc
+     * Called when a player leaves the server.
      */
-    public void resetPositions(PlayerLocation loc) {
-        if (loc == null) {
-            resetPositions();
-        }
-        else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        }
+    public void onPlayerLeave() {
+        removeAllVelocity();
+        deleteTrace();
     }
 
     /**
-     * Reset the "last locations" to "not set".
+     * Clean up data related to worlds with the given name (not case-sensitive).
+     * @param worldName
      */
-    public void resetPositions() {
-        resetPositions(Double.MAX_VALUE, 0.0, 0.0, Float.MAX_VALUE, 0f);
+    public void onWorldUnload(final String worldName) {
+        // TODO: Unlink world references.
+        if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())) {
+            resetTeleported();
+        }
+        if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
+            clearFlyData();
+        }
+        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())) {
+            clearMorePacketsData();
+            clearNoFallData(); // just in case.
+        }
     }
 
     /**
@@ -377,10 +407,44 @@ public class MovingData extends ACheckData {
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
+        insideMediumCount = 0;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verticalBounce = null;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
+    }
+
+    /**
+     * Just reset the "last locations" references.
+     * @param loc
+     */
+    public void resetPositions(PlayerLocation loc) {
+        if (loc == null) {
+            resetPositions();
+        }
+        else {
+            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        }
+    }
+
+    /**
+     * Just reset the "last locations" references.
+     * @param loc
+     */
+    public void resetPositions(final Location loc) {
+        if (loc == null) {
+            resetPositions();
+        }
+        else {
+            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        }
+    }
+
+    /**
+     * Reset the "last locations" to "not set".
+     */
+    public void resetPositions() {
+        resetPositions(Double.MAX_VALUE, 0.0, 0.0, Float.MAX_VALUE, 0f);
     }
 
     public void resetLastDistances() {
@@ -824,32 +888,6 @@ public class MovingData extends ACheckData {
         return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
     }
 
-    /**
-     * Called when a player leaves the server.
-     */
-    public void onPlayerLeave() {
-        removeAllVelocity();
-        deleteTrace();
-    }
-
-    /**
-     * Clean up data related to worlds with the given name (not case-sensitive).
-     * @param worldName
-     */
-    public void onWorldUnload(final String worldName) {
-        // TODO: Unlink world references.
-        if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())) {
-            resetTeleported();
-        }
-        if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
-            clearFlyData();
-        }
-        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())) {
-            clearMorePacketsData();
-            clearNoFallData(); // just in case.
-        }
-    }
-
     public void adjustWalkSpeed(final float walkSpeed, final int tick, final int speedGrace) {
         if (walkSpeed > this.walkSpeed) {
             this.walkSpeed = walkSpeed;
@@ -875,31 +913,6 @@ public class MovingData extends ACheckData {
             }
         } else {
             this.speedTick = tick;
-        }
-    }
-
-    /**
-     * Adjust liftOffEnvelope and nextFriction, called on set back and similar.
-     * @param loc
-     */
-    public void adjustLiftOffEnvelope(final PlayerLocation loc) {
-        // Simplified.
-        if (loc.isInWeb()) {
-            liftOffEnvelope = LiftOffEnvelope.NO_JUMP;
-            nextFrictionHorizontal = nextFrictionVertical = 0.0;
-        }
-        else if (loc.isInLiquid()) {
-            // TODO: Distinguish strong limit.
-            liftOffEnvelope = LiftOffEnvelope.LIMIT_LIQUID;
-            nextFrictionHorizontal = nextFrictionVertical = loc.isInLava() ? SurvivalFly.FRICTION_MEDIUM_LAVA : SurvivalFly.FRICTION_MEDIUM_WATER;
-        }
-        else if (loc.isOnGround()) {
-            liftOffEnvelope = LiftOffEnvelope.NORMAL;
-            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
-        }
-        else {
-            liftOffEnvelope = LiftOffEnvelope.UNKNOWN;
-            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
         }
     }
 

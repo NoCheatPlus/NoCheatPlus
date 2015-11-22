@@ -1179,7 +1179,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void adjustLiftOffEnvelope(final Player player, final Location loc, final MovingData data, final MovingConfig cc) {
         final MoveInfo info = useMoveInfo();
         info.set(player, loc, null, cc.yOnGround);
-        data.adjustLiftOffEnvelope(info.from);
+        data.adjustMediumProperties(info.from);
         returnMoveInfo(info);
     }
 
@@ -1452,7 +1452,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MoveInfo moveInfo = useMoveInfo();
         moveInfo.set(player, loc, null, cc.yOnGround);
         data.toWasReset = moveInfo.from.isOnGroundOrResetCond();
-        data.adjustLiftOffEnvelope(moveInfo.from);
+        data.adjustMediumProperties(moveInfo.from);
         returnMoveInfo(moveInfo);
         data.fromWasReset = data.toWasReset;
 

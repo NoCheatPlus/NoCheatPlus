@@ -381,7 +381,10 @@ public class SurvivalFly extends Check {
             tagsLength = 0; // JIT vs. IDE.
         }
 
+        ///////////////////////
         // Handle violations.
+        ///////////////////////
+
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
         if (result > 0D) {
             final Location vLoc = handleViolation(now, result, player, from, to, data, cc);
@@ -402,12 +405,15 @@ public class SurvivalFly extends Check {
             }
         }
 
-        //  Set data for normal move or violation without cancel (cancel would have returned above)
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        //  Set data for normal move or violation without cancel (cancel would have returned above).
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
-        // Check lift-off medium.
+        // Check LiftOffEnvelope.
         // TODO: Web before liquid? Climbable?
         // TODO: isNextToGround(0.15, 0.4) allows a little much (yMargin), but reduces false positives.
         // TODO: nextToGround: Shortcut with block-flags ?
+        final LiftOffEnvelope oldLiftOffEnvelope = data.liftOffEnvelope;
         if (to.isInLiquid()) {
             if (fromOnGround && !toOnGround 
                     && data.liftOffEnvelope == LiftOffEnvelope.NORMAL
@@ -456,6 +462,12 @@ public class SurvivalFly extends Check {
             // Keep medium.
             // TODO: Is above stairs ?
         }
+        // Count how long one is moving inside of a medium.
+        if (!resetFrom || !resetTo || oldLiftOffEnvelope != data.liftOffEnvelope) {
+            data.insideMediumCount = 0;
+        } else {
+            data.insideMediumCount ++;
+        }
 
         //        // Invalidation of vertical velocity.
         //        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
@@ -501,7 +513,7 @@ public class SurvivalFly extends Check {
             //            }
         }
         else {
-            data.sfJumpPhase++;
+            data.sfJumpPhase ++;
             if (to.getY() < 0.0 && cc.sfSetBackPolicyVoid) {
                 data.setSetBack(to);
             }
@@ -1109,24 +1121,26 @@ public class SurvivalFly extends Check {
                         yDistDiffEx > 0.0 && data.liftOffEnvelope != LiftOffEnvelope.NORMAL
                         && data.lastYDist >= -GRAVITY_MAX - GRAVITY_MIN && data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN
                         && yDistance > data.lastYDist && yDistance < 0.84 * maxJumpGain
-                        // Falling slightly too fast. Actually a friction envelope (bad).
-                        // TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
-                        || yDistDiffEx < 0.0 && (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
-                        && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
-                        // Falling slightly too slow.
-                        || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
-                        &&
-                        (
-                                // Falling too slow around 0 yDistance.
-                                data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
-                                && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
-                                && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
-                                // Moving out of liquid with velocity.
-                                || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
-                                && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
-                                && data.lastYDist - yDistance > GRAVITY_MAX
-                                && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                        // Falling slightly too fast.
+                        || yDistDiffEx < 0.0 && (
+                                // Friction issue (bad). TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
+                                (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
+                                && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
                                 )
+                                // Falling slightly too slow.
+                                || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
+                                &&
+                                (
+                                        // Falling too slow around 0 yDistance.
+                                        data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
+                                        && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
+                                        && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
+                                        // Moving out of liquid with velocity.
+                                        || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
+                                        && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
+                                        && data.lastYDist - yDistance > GRAVITY_MAX
+                                        && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                                        )
                         );
     }
 
@@ -1651,7 +1665,7 @@ public class SurvivalFly extends Check {
             }
 
         }
-        else if (yDistance < 0.0) {
+        else {
             // Falling into water, mid-speed (second move after diving in).
             if (yDistance > -0.9 && data.lastYDist != Double.MAX_VALUE && yDistance < data.lastYDist 
                     && Math.abs(yDistance - data.lastYDist) <= GRAVITY_MAX + GRAVITY_MIN 
@@ -1678,6 +1692,10 @@ public class SurvivalFly extends Check {
                             || data.lastYDist < 0.0 && yDistance > -baseSpeed - GRAVITY_MAX && yDistance < data.lastYDist
                             && data.lastYDist - yDistance > GRAVITY_SPAN
                             && Math.abs(data.lastYDist + baseSpeed) < 0.25 * baseSpeed
+                            // Falling slightly too fast in lava.
+                            || data.insideMediumCount == 1 || data.insideMediumCount == 2 
+                            && data.lastYDist < 0.0 && yDistance < data.lastYDist 
+                            && yDistance - data.lastYDist > -GRAVITY_MIN && yDistance > -0.65
                             )
                     ) {
                 return new double[]{yDistance, 0.0};
@@ -2243,12 +2261,14 @@ public class SurvivalFly extends Check {
     }
 
     /**
-     * Syso debug output.
+     * Debug output.
      * @param player
+     * @param to
      * @param data
      * @param cc
      * @param hDistance
      * @param hAllowedDistance
+     * @param hFreedom
      * @param yDistance
      * @param vAllowedDistance
      * @param fromOnGround
@@ -2264,7 +2284,7 @@ public class SurvivalFly extends Check {
         final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
         final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
         final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
-        builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase + ", liftoff: " + data.liftOffEnvelope.name());
+        builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase + ", liftoff: " + data.liftOffEnvelope.name() + "(" + data.insideMediumCount + ")");
         final String dHDist = (data.lastHDist != Double.MAX_VALUE && Math.abs(data.lastHDist - hDistance) > 0.0005) ? ("(" + (hDistance > data.lastHDist ? "+" : "") + StringUtil.fdec3.format(hDistance - data.lastHDist) + ")") : "";
         builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " + StringUtil.fdec3.format(yDistance) + (data.lastYDist == Double.MAX_VALUE ? "" : (" (" + (yDistance > data.lastYDist ? "+" : "") + StringUtil.fdec3.format(yDistance - data.lastYDist) + ")")) + " / " + StringUtil.fdec3.format(vAllowedDistance) + ", sby=" + (data.hasSetBack() ? (data.getSetBackY() + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " + data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier) + ")") : "?"));
         if (data.verVelUsed != null) {
