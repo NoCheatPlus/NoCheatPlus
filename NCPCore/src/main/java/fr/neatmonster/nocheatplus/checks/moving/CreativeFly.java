@@ -131,6 +131,11 @@ public class CreativeFly extends Check {
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
         double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
 
+        if (flying && yDistance > 0.0) {
+            // Let fly speed apply with moving upwards.
+            limitV *= data.flySpeed / 0.1;
+        }
+
         if (data.lastYDist != Double.MAX_VALUE) {
             // (Disregard gravity.)
             double frictionDist = data.lastYDist * SurvivalFly.FRICTION_MEDIUM_AIR;
