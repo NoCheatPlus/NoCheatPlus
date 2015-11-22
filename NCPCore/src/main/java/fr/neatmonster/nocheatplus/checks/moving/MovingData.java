@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
@@ -131,6 +132,8 @@ public class MovingData extends ACheckData {
      * Last valid horizontal distance covered by a move. Integer.MAX_VALUE indicates "not set".
      */
     public double       lastHDist = Double.MAX_VALUE;
+    /** Last flying check used (creativefly, survivalfly, unknown), used for hacks. */
+    public CheckType    lastFlyCheck = CheckType.UNKNOWN;
     /** Just used velocity, during processing of moving checks. */
     public SimpleEntry  verVelUsed = null;
     /** Compatibility entry for bouncing of slime blocks and the like. */
@@ -260,6 +263,7 @@ public class MovingData extends ACheckData {
         jumpAmplifier = 0;
         setBack = null;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        lastFlyCheck = CheckType.UNKNOWN;
         sfZeroVdist = 0;
         fromX = toX = Double.MAX_VALUE;
         toYaw = Float.MAX_VALUE;
@@ -322,6 +326,7 @@ public class MovingData extends ACheckData {
         clearAccounting();
         sfJumpPhase = 0;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        lastFlyCheck = CheckType.UNKNOWN;
         sfZeroVdist = 0;
         toWasReset = false;
         fromWasReset = false;
@@ -403,6 +408,7 @@ public class MovingData extends ACheckData {
         toYaw = yaw;
         toPitch = pitch;
         lastYDist = lastHDist = Double.MAX_VALUE;
+        lastFlyCheck = CheckType.UNKNOWN;
         sfZeroVdist = 0;
         sfDirty = false;
         sfLowJump = false;
@@ -684,13 +690,23 @@ public class MovingData extends ACheckData {
         // TODO: Should also switch to adding always.
         if (vx != 0.0 || vz != 0.0) {
             final double newVal = Math.sqrt(vx * vx + vz * vz);
-            horVel.add(new AccountEntry(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0))));
+            horVel.add(new AccountEntry(tick, newVal, cc.velocityActivationCounter, getHorVelValCount(newVal)));
         }
 
         // Set dirty flag here.
         sfDirty = true; // TODO: Set on using the velocity, due to latency !
         sfNoLowJump = true; // TODO: Set on using the velocity, due to latency !
 
+    }
+
+    /**
+     * Std. value counter for horizontal velocity, based on the vlaue.
+     * 
+     * @param velocity
+     * @return
+     */
+    public static int getHorVelValCount(double velocity) {
+        return Math.max(20,  1 + (int) Math.round(velocity * 10.0));
     }
 
     public void prependVerticalVelocity(final SimpleEntry entry) {

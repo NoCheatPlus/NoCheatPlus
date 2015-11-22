@@ -563,7 +563,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             checkCf = false;
             checkSf = true;
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
-
         }
         else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
             checkCf = true;
@@ -656,6 +655,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 pTo.collectBlockFlags(maxYNoFall);
             }
 
+            // Hack: Add velocity for transitions between creativefly and survivalfly.
+            if (data.lastFlyCheck == CheckType.MOVING_CREATIVEFLY && data.lastHDist != Double.MAX_VALUE) {
+                workaroundFlyNoFlyTransition(tick, data);
+            }
+
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
@@ -699,6 +703,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
             }
+            data.lastFlyCheck = CheckType.MOVING_SURVIVALFLY;
         }
         else if (checkCf) {
             // CreativeFly
@@ -707,6 +712,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
+            data.lastFlyCheck = CheckType.MOVING_CREATIVEFLY;
         }
         else {
             // No fly checking :(.
@@ -748,6 +754,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             onSetBack(player, event, newTo, data, cc);
             return true;
         }
+    }
+
+    /**
+     * Add velocity, in order to work around issues with turning off flying,
+     * triggering SurvivalFly. Asserts last distances are set.
+     * 
+     * @param tick
+     * @param data
+     */
+    private static void workaroundFlyNoFlyTransition(final int tick, final MovingData data) {
+        final double amount = data.lastHDist * SurvivalFly.FRICTION_MEDIUM_AIR;
+        data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
+        data.addVerticalVelocity(new SimpleEntry(data.lastYDist, 2));
+        data.addVerticalVelocity(new SimpleEntry(0.0, 2));
+        data.setFrictionJumpPhase();
     }
 
     /**
@@ -1441,6 +1462,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: If to reset positions: relate to previous ones and set-back.
             data.resetPositions(loc); // TODO: See above.
         }
+        // (Note: resetPositions resets lastFlyCheck and other.)
 
         data.resetLastDistances();
         data.clearMorePacketsData();
