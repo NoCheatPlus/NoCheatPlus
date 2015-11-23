@@ -179,10 +179,12 @@ public class CheckUtils {
             }
             if (!APIUtils.needsSynchronization(checkType)) {
                 // Checking for exemption can cause harm now.
+                // TODO: Log once + examine stack (which plugin/component does it).
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Off primary thread call to hasByPass for " + checkType + ".");
             }
         }
         // TODO: ExemptionManager relies on the initial definition for which type can be checked off main thread.
+        // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
         return NCPExemptionManager.isExempted(player, checkType);
     }
 

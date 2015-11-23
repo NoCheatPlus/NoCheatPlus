@@ -68,7 +68,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             // (Also sets lastKeepAliveTime, if enabled.)
-            register("fr.neatmonster.nocheatplus.checks.net.protocollib.FlyingFrequency", plugin);
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.MovingFlying", plugin);
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.OutgoingPosition", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE) || ConfigManager.isTrueForAnyConfig(ConfPaths.FIGHT_GODMODE_CHECK)) {

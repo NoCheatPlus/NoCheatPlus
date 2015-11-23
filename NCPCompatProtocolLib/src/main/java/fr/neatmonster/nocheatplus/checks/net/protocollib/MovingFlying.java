@@ -11,24 +11,21 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.net.FlyingFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
- * Prevent extremely fast ticking by just sending packets that don't do anything
- * new and also don't trigger moving events in CraftBukkit. Also update lastKeepAliveTime.
+ * Run checks related to moving (pos/look/flying). Skip packets that shouldn't
+ * get processed anyway due to a teleport. Also update lastKeepAliveTime.
  * 
  * @author dev1mc
  *
  */
-public class FlyingFrequency extends BaseAdapter {
+public class MovingFlying extends BaseAdapter {
 
     // Setup for flying packets.
     public static final int numBooleans = 3;
@@ -41,12 +38,8 @@ public class FlyingFrequency extends BaseAdapter {
     public static final int indexYaw = 0;
     public static final int indexPitch = 1;
 
-    // Thresholds for firing moving events (CraftBukkit).
-    public static final double minMoveDistSq = 1f / 256; // PlayerConnection magic.
-    public static final float minLookChange = 10f;
-
     /** Dummy check for bypass checking and actions execution. */
-    private final Check frequency = new Check(CheckType.NET_FLYINGFREQUENCY) {};
+    private final FlyingFrequency flyingFrequency = new FlyingFrequency();
 
     private final int idHandled = counters.registerKey("packet.flying.handled");
     private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
@@ -54,7 +47,7 @@ public class FlyingFrequency extends BaseAdapter {
     /** Set to true, if a packet can't be interpreted, assuming compatibility to be broken. */
     private boolean packetMismatch = false;
 
-    public FlyingFrequency(Plugin plugin) {
+    public MovingFlying(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
         super(plugin, ListenerPriority.LOW, new PacketType[] {
                 PacketType.Play.Client.FLYING,
@@ -110,6 +103,7 @@ public class FlyingFrequency extends BaseAdapter {
                 switch(data.teleportQueue.processAck(packetData)) {
                     case CANCEL: {
                         // TODO: Configuration for cancel (or implement skipping violation level escalation)?
+                        // TODO: Checking FlyingFrequency might still make sense?
                         event.setCancelled(true);
                         if (data.debug) {
                             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " wait for ACK on teleport, cancel packet: " + packetData);
@@ -134,9 +128,7 @@ public class FlyingFrequency extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
-        data.flyingFrequencyAll.add(time, 1f);
-        final float allScore = data.flyingFrequencyAll.score(1f);
-        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !frequency.hasBypass(player) && frequency.executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions)) {
+        if (flyingFrequency.check(player, packetData, time, data, cc)) {
             event.setCancelled(true);
             return;
         }
@@ -179,13 +171,13 @@ public class FlyingFrequency extends BaseAdapter {
 
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
-        if (booleans.size() != FlyingFrequency.numBooleans) {
+        if (booleans.size() != MovingFlying.numBooleans) {
             packetMismatch();
             return null;
         }
-        final boolean hasPos = booleans.get(FlyingFrequency.indexhasPos).booleanValue();
-        final boolean hasLook = booleans.get(FlyingFrequency.indexhasLook).booleanValue();
-        final boolean onGround = booleans.get(FlyingFrequency.indexOnGround).booleanValue();
+        final boolean hasPos = booleans.get(MovingFlying.indexhasPos).booleanValue();
+        final boolean hasLook = booleans.get(MovingFlying.indexhasLook).booleanValue();
+        final boolean onGround = booleans.get(MovingFlying.indexOnGround).booleanValue();
 
         if (!hasPos && !hasLook) {
             return new DataPacketFlying(onGround, time);
@@ -227,65 +219,6 @@ public class FlyingFrequency extends BaseAdapter {
                 throw new IllegalStateException("Can't be, it can't be!");
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    private boolean checkRedundantPackets(final Player player, final DataPacketFlying packetData, final float allScore, final long time, final NetData data, final NetConfig cc) {
-        // TODO: Debug logging (better with integration into DataManager).
-        // TODO: Consider to compare to moving data directly, skip keeping track extra.
-
-        final MovingData mData = MovingData.getData(player);
-        if (mData.toX == Double.MAX_VALUE && mData.toYaw == Float.MAX_VALUE) {
-            // Can not check.
-            return false;
-        }
-
-        boolean onGroundSkip = false;
-
-        // Allow at least one on-ground change per state and second.
-        // TODO: Consider to verify on ground somehow (could tell MovingData the state).
-        if (packetData.onGround != data.flyingFrequencyOnGround) {
-            // Regard as not redundant only if sending the same state happened at least a second ago.
-            final long lastTime;
-            if (packetData.onGround) {
-                lastTime = data.flyingFrequencyTimeOnGround;
-                data.flyingFrequencyTimeOnGround = time;
-            } else {
-                lastTime = data.flyingFrequencyTimeNotOnGround;
-                data.flyingFrequencyTimeNotOnGround = time;
-            }
-            if (time < lastTime || time - lastTime > 1000) {
-                // Override 
-                onGroundSkip = true;
-            }
-        }
-        data.flyingFrequencyOnGround = packetData.onGround;
-
-        if (packetData.hasPos) {
-            if (TrigUtil.distanceSquared(packetData.x, packetData.y, packetData.z, mData.toX, mData.toY, mData.toZ) > minMoveDistSq) {
-                return false;
-            }
-        }
-
-        if (packetData.hasLook) {
-            if (Math.abs(TrigUtil.yawDiff(packetData.yaw, mData.toYaw)) > minLookChange || Math.abs(TrigUtil.yawDiff(packetData.pitch, mData.toPitch)) > minLookChange) {
-                return false;
-            }
-        }
-
-        if (onGroundSkip) {
-            return false;
-        }
-
-        // Packet is redundant, if more than 20 packets per second arrive.
-        if (allScore / cc.flyingFrequencySeconds > 20f && !frequency.hasBypass(player)) {
-            // (Must re-check bypass here.)
-            data.flyingFrequencyRedundantFreq.add(time, 1f);
-            if (frequency.executeActions(player, data.flyingFrequencyRedundantFreq.score(1f) / cc.flyingFrequencyRedundantSeconds, 1.0 / cc.flyingFrequencyRedundantSeconds, cc.flyingFrequencyRedundantActions)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
