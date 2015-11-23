@@ -150,7 +150,7 @@ public class FlyingFrequency extends BaseAdapter {
         //        }
 
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " + packetData + (event.isCancelled() ? " CANCEL" : ""));
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " +(packetData == null ? "(incompatible data)" : packetData) + (event.isCancelled() ? " CANCEL" : ""));
         }
 
     }
