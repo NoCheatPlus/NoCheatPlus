@@ -15,9 +15,8 @@
 
 	<repositories>
 		<repository>
-			<id>comphenix-rep</id>
-			<name>Comphenix Repository</name>
-			<url>http://repo.comphenix.net/content/groups/public</url>
+			<id>dmulloy2-repo</id>
+			<url>http://repo.dmulloy2.net/content/groups/public/</url>
 		</repository>
 	</repositories>
 
@@ -30,7 +29,7 @@
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
 			<artifactId>ProtocolLib</artifactId>
-			<version>LATEST</version>
+			<version>3.6.4</version>
 		</dependency>
 	</dependencies>
 
