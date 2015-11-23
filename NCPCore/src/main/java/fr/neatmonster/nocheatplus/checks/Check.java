@@ -19,7 +19,41 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
- * The parent class of all checks. Don't let this implement Listener without knowing that this might be registered as component with NCP before the check-listeners.
+ * The parent class of all checks. Don't let this implement Listener without
+ * knowing that this might be registered as component with NCP before the
+ * check-listeners.
+ * <hr>
+ * Note on enabling and bypassing:<br>
+ * <li>The full Check.isEnabled test will check the config flag
+ * (config.isEnabled) and test Check.hasBypass (permissions, exemption).</li>
+ * <li>Currently the code for isEnabled and hasBypasss is in
+ * fr.neatmonster.nocheatplus.utilities.CheckUtils .</li>
+ * <li>Currently the hasBypass check will test for a permission if in the main
+ * thread, or test for a cached permission if off the main thread, then check
+ * for exemption with fr.neatmonster.nocheatplus.hooks.NCPExemptionManager, for
+ * the case that no bypass permission is present.</li>
+ * <li>For checks run off the primary thread, permissions are cached. Updates
+ * must be requested with the TickTask explicitly, e.g. in the listener. This
+ * depends on the definition of which checks might run asynchronously, as given
+ * in fr.neatmonster.nocheatplus.hooks.APIUtils and the default permissions
+ * defined in ICheckConfig implementations.</li>
+ * <li>At present exemption checking is only thread-safe for the checks that are
+ * set to run off main thread (APIUtils).</li>
+ * <br>
+ * Note on performance:
+ * <li>You might check the configuration flag directly with a given
+ * configuration, which is equivalent to but supposedly faster than calling
+ * CheckType.isEnabled(player) or CheckConfig.isEnabled(player). Then call
+ * hasBypass extra to that.</li>
+ * <li>For very simple checks, you might skip checking hasBypass for the normal
+ * case, and check it lazily only in case of a violation.</li>
+ * <li>The method signatures that take ICheckData and ICheckConfig as extra
+ * arguments will perform better, they also allow to pass null for config and
+ * data (also see fr.neatmonster.nocheatplus.utilities.CheckUtils).</li>
+ * <li>In case simplicity of code is demanded, just check isEnabled(player) or
+ * for better performance isEnabled(player, data, config), before running the
+ * actual check.</li>
+ * 
  */
 public abstract class Check implements MCAccessHolder {
 
