@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Words mapped to ActionFrequency queues. 

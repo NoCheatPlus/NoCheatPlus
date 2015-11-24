@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.ds.count;
 
 /**
  * Keep track of frequency of some action, 

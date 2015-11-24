@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Player specific dataFactory for the block place checks.

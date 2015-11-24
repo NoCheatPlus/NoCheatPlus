@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.AsyncCheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Player specific data for the chat checks.

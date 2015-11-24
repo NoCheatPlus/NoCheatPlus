@@ -1,4 +1,6 @@
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.ds.count;
+
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * This class is meant to accumulate actions similar to ActionFrequency. In contrast to ActionFrequency, this class will accumulate values grouped by number of events instead of real-time intervals.

@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Task to run every tick, to update permissions and execute actions, and for lag measurement.

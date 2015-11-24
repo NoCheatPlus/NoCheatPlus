@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.net.model.TeleportQueue;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Data for net checks. Some data structures may not be thread-safe, but

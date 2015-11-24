@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 
 
 public class TestActionAccumulator {

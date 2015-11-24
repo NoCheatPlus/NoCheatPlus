@@ -2,8 +2,8 @@ package fr.neatmonster.nocheatplus.checks.net;
 
 import java.util.List;
 
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Static method utility for networking related stuff.
