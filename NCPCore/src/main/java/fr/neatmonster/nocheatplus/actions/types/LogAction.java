@@ -1,32 +1,24 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.actions.Action;
-import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
+import java.util.logging.Level;
+
 import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
-import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
- * Print a log message to various locations.
+ * Default log action for standard targets.
  */
-public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
+public class LogAction extends GenericLogAction {
 
-    // Some flags to decide where the log message should show up, based on the configuration file.
-    /** Log to chat? */
-    public final boolean toChat;
-
-    /** Log to console? */
-    public final boolean toConsole;
-
-    /** Log to file? */
-    public final boolean toFile;
+    protected static final GenericLogActionConfig configIngame = new GenericLogActionConfig(
+            ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, Streams.NOTIFY_INGAME, true, Level.INFO, "i");
+    protected static final GenericLogActionConfig configConsole = new GenericLogActionConfig(
+            ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, Streams.SERVER_LOGGER, false, Level.INFO, "c");
+    protected static final GenericLogActionConfig configFile = new GenericLogActionConfig(
+            ConfPaths.LOGGING_BACKEND_FILE_ACTIVE, Streams.DEFAULT_FILE, false, Level.INFO, "f");
 
     /**
-     * Instantiates a new log action.
+     * Instantiates a new log action (not optimized).
      * 
      * @param name
      *            the name
@@ -45,55 +37,7 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
      */
     public LogAction(final String name, final int delay, final int repeat, final boolean toChat,
             final boolean toConsole, final boolean toFile, final String message) {
-        super(name, delay, repeat, message);
-        // Might switch to only store the prefixes (null = deactivated).
-        this.toChat = toChat;
-        this.toConsole = toConsole;
-        this.toFile = toFile;
-    }
-
-    @Override
-    public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, ActionList> config, final Integer threshold) {
-        if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) {
-            return null;
-        }
-        return this;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus
-     * .checks.ViolationData)
-     */
-    @Override
-    public boolean execute(final ViolationData violationData) {
-        if (!violationData.player.hasPermission(violationData.getPermissionSilent())) {
-            final String message = super.getMessage(violationData);
-            final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
-            if (toChat) {
-                logManager.info(Streams.NOTIFY_INGAME, ColorUtil.replaceColors(message));
-            }
-            if (toConsole) {
-                logManager.info(Streams.SERVER_LOGGER, ColorUtil.removeColors(message));
-            }
-            if (toFile) {
-                logManager.info(Streams.DEFAULT_FILE, ColorUtil.removeColors(message));
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Create the string that's used to define the action in the logfile.
-     * 
-     * @return the string
-     */
-    @Override
-    public String toString() {
-        return "log:" + name + ":" + delay + ":" + repeat + ":" + (toConsole ? "c" : "") + (toChat ? "i" : "")
-                + (toFile ? "f" : "");
+        super(name, delay, repeat, message, true, toChat ? configIngame : null, toConsole ? configConsole : null, toFile ? configFile : null);
     }
 
 }
