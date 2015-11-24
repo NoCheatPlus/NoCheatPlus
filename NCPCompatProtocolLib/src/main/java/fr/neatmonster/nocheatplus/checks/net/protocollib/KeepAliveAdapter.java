@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
+import java.util.Arrays;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -7,10 +9,12 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketEvent;
 
-import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.net.KeepAliveFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 
 /**
  * Limit keep alive packet frequency, set lastKeepAliveTime (even if disabled,
@@ -19,13 +23,19 @@ import fr.neatmonster.nocheatplus.checks.net.NetData;
  * @author asofold
  *
  */
-public class KeepAliveFrequency extends BaseAdapter {
+public class KeepAliveAdapter extends BaseAdapter {
 
     /** Dummy check for bypass checking and actions execution. */
-    private final Check check = new Check(CheckType.NET_KEEPALIVEFREQUENCY) {};
+    private final KeepAliveFrequency frequencyCheck = new KeepAliveFrequency();
 
-    public KeepAliveFrequency(Plugin plugin) {
+    public KeepAliveAdapter(Plugin plugin) {
         super(plugin, ListenerPriority.LOW, PacketType.Play.Client.KEEP_ALIVE);
+
+        // Add feature tags for checks.
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE)) {
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(KeepAliveFrequency.class.getSimpleName()));
+        }
+        NCPAPIProvider.getNoCheatPlusAPI().addComponent(frequencyCheck);
     }
 
     @Override
@@ -40,21 +50,14 @@ public class KeepAliveFrequency extends BaseAdapter {
         // Always update last received time.
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time;
-        // Check activation.
         final NetConfig cc = configFactory.getConfig(player);
-        if (!cc.keepAliveFrequencyActive) {
-            return;
-        }
+
+        // Run check(s).
+        // TODO: Match vs. outgoing keep alive requests.
         // TODO: Better modeling of actual packet sequences (flying vs. keep alive vs. request/ping).
         // TODO: Better integration with god-mode check / trigger reset ndt.
-        data.keepAliveFreq.add(time, 1f);
-        final float first = data.keepAliveFreq.bucketScore(0);
-        if (first > 1f && !check.hasBypass(player)) {
-            // Trigger a violation.
-            final double vl = Math.max(first - 1f, data.keepAliveFreq.score(1f) - data.keepAliveFreq.numberOfBuckets());
-            if (check.executeActions(player, vl, 1.0, cc.keepAliveFrequencyActions)) {
-                event.setCancelled(true);
-            }
+        if (cc.keepAliveFrequencyActive && frequencyCheck.check(player, time, data, cc)) {
+            event.setCancelled(true);
         }
     }
 

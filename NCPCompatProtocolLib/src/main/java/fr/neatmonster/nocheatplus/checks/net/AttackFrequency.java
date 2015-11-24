@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.net.protocollib;
+package fr.neatmonster.nocheatplus.checks.net;
 
 import org.bukkit.entity.Player;
 

@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.entity.Player;
@@ -15,6 +16,8 @@ import fr.neatmonster.nocheatplus.checks.net.FlyingFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -55,6 +58,12 @@ public class MovingFlying extends BaseAdapter {
                 PacketType.Play.Client.POSITION,
                 PacketType.Play.Client.POSITION_LOOK
         });
+
+        // Add feature tags for checks.
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(FlyingFrequency.class.getSimpleName()));
+        }
+        NCPAPIProvider.getNoCheatPlusAPI().addComponent(flyingFrequency);
     }
 
     @Override

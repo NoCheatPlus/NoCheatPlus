@@ -73,7 +73,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE) || ConfigManager.isTrueForAnyConfig(ConfPaths.FIGHT_GODMODE_CHECK)) {
             // (Set lastKeepAlive if this or fight.godmode is enabled.)
-            register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveFrequency", plugin);
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveAdapter", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.SoundDistance", plugin);
@@ -84,7 +84,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
                 names.add(adapter.getClass().getSimpleName());
             }
             StaticLog.logInfo("Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
-            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", names);
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("packet-listeners", names);
         } else {
             StaticLog.logInfo("No packet level hooks activated.");
         }
