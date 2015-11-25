@@ -5,11 +5,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
 import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -58,7 +61,14 @@ public class DefaultComponentFactory {
 
         // ProtocolLib dependencies.
         try {
-            available.add(new ProtocolLibComponent(plugin));
+            if (ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false)) {
+                available.add(new ProtocolLibComponent(plugin));
+            } else {
+                if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
+                    StaticLog.logWarning("Can't tell if the packet level hooks are compatible to the version of ProtocolLib in use.");
+                }
+                StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
+            }
         } catch (Throwable t){
             StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
