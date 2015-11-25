@@ -23,6 +23,7 @@
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
 			<version>1.4.5-R1.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

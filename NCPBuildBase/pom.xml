@@ -18,6 +18,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<description>Very basic dependencies that have to be built before commons, no use of Bukkit.
