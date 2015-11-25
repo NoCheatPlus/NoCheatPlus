@@ -1,10 +1,12 @@
 package fr.neatmonster.nocheatplus.compat.versions;
 
 /**
- * Static utility that stores the Minecraft version, providing some parsing methods.
- * This has to be initialized from an external source (e.g. a plugin calling BukkitVersion.init).
+ * Static utility that stores the Minecraft version, providing some parsing
+ * methods. This has to be initialized from an external source (e.g. a plugin
+ * calling BukkitVersion.init).
  * <hr/>
  * Taken from the TrustCore plugin.
+ * 
  * @author mc_dev
  *
  */
@@ -19,8 +21,11 @@ public class ServerVersion {
     };
 
     /**
-     * Attempt to return the Minecraft version for a given server version string.
-     * @param serverVersion As returned by Bukkit.getServer().getVersion();
+     * Attempt to return the Minecraft version for a given server version
+     * string.
+     * 
+     * @param serverVersion
+     *            As returned by Bukkit.getServer().getVersion();
      * @return null if not known/parsable.
      */
     public static String parseMinecraftVersion(String... versionCandidates) {
@@ -42,6 +47,7 @@ public class ServerVersion {
 
     /**
      * Simple consistency check.
+     * 
      * @param minecraftVersion
      * @return
      */
@@ -51,6 +57,7 @@ public class ServerVersion {
 
     /**
      * Match directly versus hard coded examples. Not for direct use.
+     * 
      * @param serverVersion
      * @return
      */
@@ -65,8 +72,10 @@ public class ServerVersion {
     }
 
     /**
-     * Collect a version of the type X.Y.Z with X, Y, Z being numbers. Demands at least one number, 
-     * but allows an arbitrary amount of sections X....Y. Rigid character check, probably not fit for snapshots.
+     * Collect a version of the type X.Y.Z with X, Y, Z being numbers. Demands
+     * at least one number, but allows an arbitrary amount of sections X....Y.
+     * Rigid character check, probably not fit for snapshots.
+     * 
      * @param input
      * @param beginIndex
      * @return null if not successful.
@@ -124,6 +133,7 @@ public class ServerVersion {
 
     /**
      * Exact case, no trim.
+     * 
      * @param input
      * @param prefix
      * @param suffix
@@ -143,7 +153,9 @@ public class ServerVersion {
 
     /**
      * Sets lower-case Minecraft version - or UNKNOWN_VERSION, if null or empty.
-     * @param version Can be null (resulting in UNKNOWN_VERSION).
+     * 
+     * @param version
+     *            Can be null (resulting in UNKNOWN_VERSION).
      * @return The String that minecraftVersion has been set to.
      */
     public static String setMinecraftVersion(String version) {
@@ -169,9 +181,13 @@ public class ServerVersion {
     }
 
     /**
-     * Simple x.y.z versions. Returns 0 on equality, -1 if version 1 is smaller than version 2, 1 if version 1 is greater than version 2.
-     * @param version1 Can be unknown.
-     * @param version2 Must not be unknown.
+     * Simple x.y.z versions. Returns 0 on equality, -1 if version 1 is smaller
+     * than version 2, 1 if version 1 is greater than version 2.
+     * 
+     * @param version1
+     *            Can be unknown.
+     * @param version2
+     *            Must not be unknown.
      * @return
      */
     public static int compareVersions(String version1, String version2) {
@@ -207,6 +223,54 @@ public class ServerVersion {
         throw new IllegalArgumentException("Bad version input.");
     }
 
+    /**
+     * Convenience for compareVersions(getMinecraftVersion(), version).
+     * 
+     * @param version
+     *            Can not be UNKNOWN.
+     * @return 0 if equal, -1 if the Minecraft version is lower, 1 if the
+     *         Minecraft version is higher.
+     */
+    public static int compareMinecraftVersion(String toVersion) {
+        return compareVersions(getMinecraftVersion(), toVersion);
+    }
+
+    /**
+     * Test if the Minecraft version is between the two given ones.
+     * 
+     * @param versionLow
+     *            Can not be UNKNOWN.
+     * @param includeLow
+     *            If to allow equality for the low edge.
+     * @param versionHigh
+     *            Can not be UNKNOWN.
+     * @param includeHigh
+     *            If to allow equality for the high edge.
+     * @return
+     */
+    public static boolean isMinecraftVersionBetween(String versionLow, boolean includeLow, String versionHigh, boolean includeHigh) {
+        final String minecraftVersion = getMinecraftVersion();
+        if (includeLow) {
+            if (compareVersions(minecraftVersion, versionLow) == -1) {
+                return false;
+            }
+        } else {
+            if (compareVersions(minecraftVersion, versionLow) <= 0) {
+                return false;
+            }
+        }
+        if (includeHigh) {
+            if (compareVersions(minecraftVersion, versionHigh) == 1) {
+                return false;
+            }
+        } else {
+            if (compareVersions(minecraftVersion, versionHigh) >= 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static int[] versionToInt(String version) {
         String[] split = version.split("\\.");
         int[] num = new int[split.length];
@@ -218,11 +282,19 @@ public class ServerVersion {
 
     /**
      * Select a value based on the Minecraft version.
-     * @param cmpVersion Version to compare to, comparison of server version vs. given version.
-     * @param valueLT Server has an earlier version.
-     * @param valueEQ Same versions.
-     * @param valueGT The server version is later.
-     * @param valueUnknown Value to return, if the server version could not be determined.
+     * 
+     * @param cmpVersion
+     *            Version to compare to, comparison of server version vs. given
+     *            version.
+     * @param valueLT
+     *            Server has an earlier version.
+     * @param valueEQ
+     *            Same versions.
+     * @param valueGT
+     *            The server version is later.
+     * @param valueUnknown
+     *            Value to return, if the server version could not be
+     *            determined.
      * @return
      */
     public static <V> V select(final String cmpVersion, final V valueLT, final V valueEQ, final V valueGT, final V valueUnknown) {
