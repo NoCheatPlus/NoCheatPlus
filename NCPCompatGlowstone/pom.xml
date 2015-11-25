@@ -32,6 +32,7 @@
 			<groupId>fr.neatmonster</groupId>
 			<artifactId>ncpcore</artifactId>
 			<version>1.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.glowstone</groupId>
@@ -43,6 +44,7 @@
 			<groupId>fr.neatmonster</groupId>
 			<artifactId>ncpcompatbukkit</artifactId>
 			<version>1.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
