@@ -31,13 +31,14 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 public class MovingFlying extends BaseAdapter {
 
     // Setup for flying packets.
-    public static final int numBooleans = 3;
     public static final int indexOnGround = 0;
     public static final int indexhasPos = 1;
     public static final int indexhasLook = 2;
     public static final int indexX = 0;
     public static final int indexY = 1;
     public static final int indexZ = 2;
+    /** 1.7.10 */
+    public static final int indexStance = 3;
     public static final int indexYaw = 0;
     public static final int indexPitch = 1;
 
@@ -180,53 +181,54 @@ public class MovingFlying extends BaseAdapter {
 
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
-        if (booleans.size() != MovingFlying.numBooleans) {
+        if (booleans.size() != 3) {
             packetMismatch();
             return null;
         }
+        final boolean onGround = booleans.get(MovingFlying.indexOnGround).booleanValue();
         final boolean hasPos = booleans.get(MovingFlying.indexhasPos).booleanValue();
         final boolean hasLook = booleans.get(MovingFlying.indexhasLook).booleanValue();
-        final boolean onGround = booleans.get(MovingFlying.indexOnGround).booleanValue();
 
         if (!hasPos && !hasLook) {
             return new DataPacketFlying(onGround, time);
-        } else {
-            final List<Double> doubles;
-            final List<Float> floats;
+        }
+        final List<Double> doubles;
+        final List<Float> floats;
 
-            if (hasPos) {
-                doubles = packet.getDoubles().getValues();
-                if (doubles.size() != 3) {
-                    packetMismatch();
-                    return null;
-                }
+        if (hasPos) {
+            doubles = packet.getDoubles().getValues();
+            if (doubles.size() != 3 && doubles.size() != 4) {
+                // 3: 1.8, 4: 1.7.10 and before (stance).
+                packetMismatch();
+                return null;
             }
-            else {
-                doubles = null;
-            }
+            // TODO: before 1.8: stance (should make possible to reject in isInvalidContent).
+        }
+        else {
+            doubles = null;
+        }
 
-            if (hasLook) {
-                floats = packet.getFloat().getValues();
-                if (floats.size() != 2) {
-                    packetMismatch();
-                    return null;
-                }
+        if (hasLook) {
+            floats = packet.getFloat().getValues();
+            if (floats.size() != 2) {
+                packetMismatch();
+                return null;
             }
-            else {
-                floats = null;
-            }
-            if (hasPos && hasLook) {
-                return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), floats.get(indexYaw), floats.get(indexPitch), time);
-            }
-            else if (hasLook) {
-                return new DataPacketFlying(onGround, floats.get(indexYaw), floats.get(indexPitch), time);
-            }
-            else if (hasPos) {
-                return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), time);
-            }
-            else {
-                throw new IllegalStateException("Can't be, it can't be!");
-            }
+        }
+        else {
+            floats = null;
+        }
+        if (hasPos && hasLook) {
+            return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), floats.get(indexYaw), floats.get(indexPitch), time);
+        }
+        else if (hasLook) {
+            return new DataPacketFlying(onGround, floats.get(indexYaw), floats.get(indexPitch), time);
+        }
+        else if (hasPos) {
+            return new DataPacketFlying(onGround, doubles.get(indexX), doubles.get(indexY), doubles.get(indexZ), time);
+        }
+        else {
+            throw new IllegalStateException("Can't be, it can't be!");
         }
     }
 
