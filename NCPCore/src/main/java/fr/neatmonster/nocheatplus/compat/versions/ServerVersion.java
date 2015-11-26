@@ -98,10 +98,13 @@ public class ServerVersion {
     }
 
     /**
-     * Sets lower-case Minecraft version - or UNKNOWN_VERSION, if null or empty.
+     * Sets lower-case Minecraft version - or GenericVersion.UNKNOWN_VERSION, if
+     * null or empty.
      * 
      * @param version
-     *            Can be null (resulting in UNKNOWN_VERSION).
+     *            Passing null will yield GenericVersion.UNKNOWN_VERSION. If the
+     *            input equals GenericVersion.UNKNOWN_VERSION,
+     *            GenericVersion.UNKNOWN_VERSION is set.
      * @return The String that minecraftVersion has been set to.
      */
     public static String setMinecraftVersion(String version) {
@@ -109,7 +112,7 @@ public class ServerVersion {
             minecraftVersion = GenericVersion.UNKNOWN_VERSION;
         } else {
             version = version.trim().toLowerCase();
-            if (version.isEmpty()) {
+            if (version.isEmpty() || version.equals(GenericVersion.UNKNOWN_VERSION)) {
                 minecraftVersion = GenericVersion.UNKNOWN_VERSION;
             } else {
                 minecraftVersion = version;
@@ -130,7 +133,7 @@ public class ServerVersion {
      * Convenience for compareVersions(getMinecraftVersion(), version).
      * 
      * @param version
-     *            Can not be UNKNOWN.
+     *            Can not be GenericVersion.UNKNOWN_VERSION.
      * @return 0 if equal, -1 if the Minecraft version is lower, 1 if the
      *         Minecraft version is higher.
      */
@@ -142,11 +145,11 @@ public class ServerVersion {
      * Test if the Minecraft version is between the two given ones.
      * 
      * @param versionLow
-     *            Can not be UNKNOWN.
+     *            Can not be GenericVersion.UNKNOWN_VERSION.
      * @param includeLow
      *            If to allow equality for the low edge.
      * @param versionHigh
-     *            Can not be UNKNOWN.
+     *            Can not be GenericVersion.UNKNOWN_VERSION.
      * @param includeHigh
      *            If to allow equality for the high edge.
      * @return
