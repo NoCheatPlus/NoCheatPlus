@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
@@ -33,6 +32,7 @@ import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -395,23 +395,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
 
     /**
-     * Check if a player might return some damage due to the "thorns" enchantment.
-     * @param player
-     * @return
-     */
-    public static final boolean hasThorns(final Player player){
-        final PlayerInventory inv = player.getInventory();
-        final ItemStack[] contents = inv.getArmorContents();
-        for (int i = 0; i < contents.length; i++){
-            final ItemStack stack = contents[i];
-            if (stack != null && stack.getEnchantmentLevel(Enchantment.THORNS) > 0){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * We listen to EntityDamage events for obvious reasons.
      * 
      * @param event
@@ -450,7 +433,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (damagedPlayer != null && !damagedIsDead){
                 // TODO: check once more when to set this (!) in terms of order.
                 FightData.getData(damagedPlayer).damageTakenByEntityTick = tick;
-                if (hasThorns(damagedPlayer)){
+                if (BridgeEnchant.hasThorns(damagedPlayer)){
                     // TODO: Cleanup here.
                     // Remember the id of the attacker to allow counter damage.
                     damagedData.thornsId = damager.getEntityId();
