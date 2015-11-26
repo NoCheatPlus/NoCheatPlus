@@ -6,12 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
 import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
+import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -60,11 +62,14 @@ public class DefaultComponentFactory {
         }
 
         // ProtocolLib dependencies.
+        Plugin pluginProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
         try {
-            if (ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false)) {
+            if (ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) 
+                    || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false)
+                    && pluginProtocolLib != null && GenericVersion.compareVersions("3.6.4", pluginProtocolLib.getDescription().getVersion()) == 0) {
                 available.add(new ProtocolLibComponent(plugin));
             } else {
-                if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
+                if (pluginProtocolLib != null) {
                     StaticLog.logWarning("Can't tell if the packet level hooks are compatible to the version of ProtocolLib in use.");
                 }
                 StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
