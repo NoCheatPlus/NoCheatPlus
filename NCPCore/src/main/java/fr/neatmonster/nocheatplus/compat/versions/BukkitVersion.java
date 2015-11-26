@@ -4,10 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
 /**
- * Bukkit-specific static access API, adding initialization methods. Note that Bukkit.getVersion() should be used to get the version of Bukkit (...).
+ * Bukkit-specific static access API, adding initialization methods. After init,
+ * all the methods in ServerVersion can be used.
  * <hr/>
  * Taken from the TrustCore plugin.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
 public class BukkitVersion {
@@ -25,6 +27,7 @@ public class BukkitVersion {
         }
         // Initialize server version.
         final Server server = Bukkit.getServer();
+        // Note that Bukkit.getVersion() should be used to get the version of Bukkit (...)
         ServerVersion.setMinecraftVersion(ServerVersion.parseMinecraftVersion(server.getBukkitVersion(), server.getVersion()));
 
         // Test availability/reliability of certain features.
@@ -35,16 +38,16 @@ public class BukkitVersion {
         String mcVersion = ServerVersion.getMinecraftVersion();
         int cmp = -1;
         try {
-            cmp = ServerVersion.compareVersions(mcVersion, "1.7.5");
+            cmp = GenericVersion.compareVersions(mcVersion, "1.7.5");
         } catch (IllegalArgumentException e) {
-            mcVersion = ServerVersion.UNKNOWN_VERSION; // Fake but somewhat true :p.
+            mcVersion = GenericVersion.UNKNOWN_VERSION; // Fake but somewhat true :p.
         }
-        if (ServerVersion.UNKNOWN_VERSION.equals(mcVersion)) {
+        if (GenericVersion.UNKNOWN_VERSION.equals(mcVersion)) {
             // TODO: Might test for features.
         } else if (cmp == 1) {
             uuidOnline = true;
             uuidOffline = true;
-        } else if (ServerVersion.compareVersions(mcVersion, "1.7") == 1) {
+        } else if (GenericVersion.compareVersions(mcVersion, "1.7") == 1) {
             // 1.7.x
             uuidOnline = true; // TODO: Test, if REALLY.
             uuidOffline = false;
@@ -58,6 +61,7 @@ public class BukkitVersion {
 
     /**
      * Test if Player.getUniqueId be used for online players.
+     * 
      * @return
      */
     public static boolean uniqueIdOnline() {
@@ -69,10 +73,12 @@ public class BukkitVersion {
     }
 
     /**
-     * Test if OfflinePlayer.getUniqueId can be used for offline payers [provided it exists :p].<br>
+     * Test if OfflinePlayer.getUniqueId can be used for offline payers
+     * [provided it exists :p].<br>
      * Not sure this makes sense :p.
      * <hr>
      * IMPORTANT NOTE: DO NOT MIX UP WITH OFFLINE MODE!<br>
+     * 
      * @return
      */
     public static boolean uniqueIdOffline() {
@@ -85,6 +91,7 @@ public class BukkitVersion {
 
     /**
      * Delegating to ServerVersion.getMinecraftVersion.
+     * 
      * @return
      */
     public static String getMinecraftVersion() {

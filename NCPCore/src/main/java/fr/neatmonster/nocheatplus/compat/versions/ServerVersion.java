@@ -12,13 +12,18 @@ package fr.neatmonster.nocheatplus.compat.versions;
  */
 public class ServerVersion {
 
-    public static final String UNKNOWN_VERSION = "unknown";
-
-    private static String minecraftVersion = UNKNOWN_VERSION; 
+    private static String minecraftVersion = GenericVersion.UNKNOWN_VERSION; 
 
     private static final String[][] versionTagsMatch = {
         {"1.7.2-r", "1.7.2"}, // Example. Probably this method will just be removed.
     };
+
+    /**
+     * Test if the set Minecraft version is unknown.
+     */
+    public static boolean isMinecraftVersionUnknown() {
+        return GenericVersion.isVersionUnknown(minecraftVersion);
+    }
 
     /**
      * Attempt to return the Minecraft version for a given server version
@@ -32,7 +37,7 @@ public class ServerVersion {
         for (String serverVersion : versionCandidates) {
             serverVersion = serverVersion.trim();
             for (String minecraftVersion : new String[]{
-                    collectVersion(serverVersion, 0),
+                    GenericVersion.collectVersion(serverVersion, 0),
                     parseMinecraftVersionGeneric(serverVersion),
                     parseMinecraftVersionTokens(serverVersion)
             }) {
@@ -52,7 +57,7 @@ public class ServerVersion {
      * @return
      */
     private static boolean validateMinecraftVersion(String minecraftVersion) {
-        return collectVersion(minecraftVersion, 0) != null;
+        return GenericVersion.collectVersion(minecraftVersion, 0) != null;
     }
 
     /**
@@ -72,45 +77,6 @@ public class ServerVersion {
     }
 
     /**
-     * Collect a version of the type X.Y.Z with X, Y, Z being numbers. Demands
-     * at least one number, but allows an arbitrary amount of sections X....Y.
-     * Rigid character check, probably not fit for snapshots.
-     * 
-     * @param input
-     * @param beginIndex
-     * @return null if not successful.
-     */
-    private static String collectVersion(String input, int beginIndex) {
-        StringBuilder buffer = new StringBuilder(128);
-        // Rigid scan by character.
-        boolean numberFound = false;
-        char[] chars = input.toCharArray();
-        for (int i = beginIndex; i < input.length(); i++) {
-            char c = chars[i];
-            if (c == '.') {
-                if (numberFound) {
-                    // Reset, expecting a number to follow.
-                    numberFound = false;
-                } else {
-                    //  Failure.
-                    return null;
-                }
-            } else if (!Character.isDigit(c)) {
-                // Failure.
-                return null;
-            } else {
-                numberFound = true;
-            }
-            buffer.append(c);
-        }
-        if (numberFound) {
-            return buffer.toString();
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * 
      * @param serverVersion
      * @return
@@ -118,34 +84,14 @@ public class ServerVersion {
     private static String parseMinecraftVersionGeneric(String serverVersion) {
         String lcServerVersion = serverVersion.trim().toLowerCase();
         for (String candidate : new String[] {
-                parseVersionDelimiters(lcServerVersion, "(mc:", ")"),
-                parseVersionDelimiters(lcServerVersion, "mcpc-plus-", "-"),
-                parseVersionDelimiters(lcServerVersion, "git-bukkit-", "-r"),
-                parseVersionDelimiters(lcServerVersion, "", "-r"),
+                GenericVersion.parseVersionDelimiters(lcServerVersion, "(mc:", ")"),
+                GenericVersion.parseVersionDelimiters(lcServerVersion, "mcpc-plus-", "-"),
+                GenericVersion.parseVersionDelimiters(lcServerVersion, "git-bukkit-", "-r"),
+                GenericVersion.parseVersionDelimiters(lcServerVersion, "", "-r"),
                 // TODO: Other server mods + custom builds !?.
         }) {
             if (candidate != null) {
                 return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Exact case, no trim.
-     * 
-     * @param input
-     * @param prefix
-     * @param suffix
-     * @return
-     */
-    private static String parseVersionDelimiters(String input, String prefix, String suffix) {
-        int preIndex = prefix.isEmpty() ? 0 : input.indexOf(prefix);
-        if (preIndex != -1) {
-            String candidate = input.substring(preIndex + prefix.length());
-            int postIndex = suffix.isEmpty() ? candidate.length() : candidate.indexOf(suffix);
-            if (postIndex != -1) {
-                return collectVersion(candidate.substring(0, postIndex).trim(), 0);
             }
         }
         return null;
@@ -160,11 +106,11 @@ public class ServerVersion {
      */
     public static String setMinecraftVersion(String version) {
         if (version == null) {
-            minecraftVersion = UNKNOWN_VERSION;
+            minecraftVersion = GenericVersion.UNKNOWN_VERSION;
         } else {
             version = version.trim().toLowerCase();
             if (version.isEmpty()) {
-                minecraftVersion = UNKNOWN_VERSION;
+                minecraftVersion = GenericVersion.UNKNOWN_VERSION;
             } else {
                 minecraftVersion = version;
             }
@@ -181,49 +127,6 @@ public class ServerVersion {
     }
 
     /**
-     * Simple x.y.z versions. Returns 0 on equality, -1 if version 1 is smaller
-     * than version 2, 1 if version 1 is greater than version 2.
-     * 
-     * @param version1
-     *            Can be unknown.
-     * @param version2
-     *            Must not be unknown.
-     * @return
-     */
-    public static int compareVersions(String version1, String version2) {
-        if (version2.equals(UNKNOWN_VERSION)) {
-            throw new IllegalArgumentException("version2 must not be 'unknown'.");
-        } else if (version1.equals(UNKNOWN_VERSION)) {
-            // Assume smaller than any given version.
-            return -1;
-        }
-        if (version1.equals(version2)) {
-            return 0;
-        }
-        try {
-            int[] v1Int = versionToInt(version1);
-            int[] v2Int = versionToInt(version2);
-            for (int i = 0; i < Math.min(v1Int.length, v2Int.length); i++) {
-                if (v1Int[i] < v2Int[i]) {
-                    return -1;
-                } else if (v1Int[i] > v2Int[i]) {
-                    return 1;
-                }
-            }
-            // Support sub-sub-sub-...-....-marines.
-            if (v1Int.length < v2Int.length) {
-                return -1;
-            }
-            else if (v1Int.length > v2Int.length) {
-                return 1;
-            }
-        } catch (NumberFormatException e) {}
-
-        // Equality was tested above, so it would seem.
-        throw new IllegalArgumentException("Bad version input.");
-    }
-
-    /**
      * Convenience for compareVersions(getMinecraftVersion(), version).
      * 
      * @param version
@@ -232,7 +135,7 @@ public class ServerVersion {
      *         Minecraft version is higher.
      */
     public static int compareMinecraftVersion(String toVersion) {
-        return compareVersions(getMinecraftVersion(), toVersion);
+        return GenericVersion.compareVersions(getMinecraftVersion(), toVersion);
     }
 
     /**
@@ -251,33 +154,24 @@ public class ServerVersion {
     public static boolean isMinecraftVersionBetween(String versionLow, boolean includeLow, String versionHigh, boolean includeHigh) {
         final String minecraftVersion = getMinecraftVersion();
         if (includeLow) {
-            if (compareVersions(minecraftVersion, versionLow) == -1) {
+            if (GenericVersion.compareVersions(minecraftVersion, versionLow) == -1) {
                 return false;
             }
         } else {
-            if (compareVersions(minecraftVersion, versionLow) <= 0) {
+            if (GenericVersion.compareVersions(minecraftVersion, versionLow) <= 0) {
                 return false;
             }
         }
         if (includeHigh) {
-            if (compareVersions(minecraftVersion, versionHigh) == 1) {
+            if (GenericVersion.compareVersions(minecraftVersion, versionHigh) == 1) {
                 return false;
             }
         } else {
-            if (compareVersions(minecraftVersion, versionHigh) >= 0) {
+            if (GenericVersion.compareVersions(minecraftVersion, versionHigh) >= 0) {
                 return false;
             }
         }
         return true;
-    }
-
-    public static int[] versionToInt(String version) {
-        String[] split = version.split("\\.");
-        int[] num = new int[split.length];
-        for (int i = 0; i < split.length; i++) {
-            num[i] = Integer.parseInt(split[i]);
-        }
-        return num;
     }
 
     /**
@@ -299,10 +193,10 @@ public class ServerVersion {
      */
     public static <V> V select(final String cmpVersion, final V valueLT, final V valueEQ, final V valueGT, final V valueUnknown) {
         final String mcVersion = ServerVersion.getMinecraftVersion();
-        if (mcVersion == ServerVersion.UNKNOWN_VERSION) {
+        if (mcVersion == GenericVersion.UNKNOWN_VERSION) {
             return valueUnknown;
         } else {
-            final int cmp = ServerVersion.compareVersions(mcVersion, cmpVersion);
+            final int cmp = GenericVersion.compareVersions(mcVersion, cmpVersion);
             if (cmp == 0) {
                 return valueEQ;
             } else if (cmp < 0) {

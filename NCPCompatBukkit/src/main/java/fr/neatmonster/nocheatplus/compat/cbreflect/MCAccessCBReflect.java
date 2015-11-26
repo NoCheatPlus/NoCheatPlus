@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.compat.bukkit.BlockCacheBukkit;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkitBase;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
+import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -27,22 +28,22 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
         helper = new ReflectHelper();
         // Version Envelope tests (1.4.5-R1.0 ... 1.8.x is considered to be ok).
         final String mcVersion = ServerVersion.getMinecraftVersion();
-        if (mcVersion == ServerVersion.UNKNOWN_VERSION) {
+        if (mcVersion == GenericVersion.UNKNOWN_VERSION) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version could not be detected, Compat-CB-Reflect might or might not work.");
             this.knownSupportedVersion = false;
         }
-        else if (ServerVersion.compareVersions(mcVersion, "1.4.5") < 0) {
+        else if (GenericVersion.compareVersions(mcVersion, "1.4.5") < 0) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be older than what Compat-CB-Reflect can support.");
             this.knownSupportedVersion = false;
         }
-        else if (ServerVersion.compareVersions(mcVersion, "1.9") >= 0) {
+        else if (GenericVersion.compareVersions(mcVersion, "1.9") >= 0) {
             this.knownSupportedVersion = false;
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be more recent than the one Compat-CB-Reflect has been built with - this might work, but there could be incompatibilities.");
         } else {
             this.knownSupportedVersion = true;
         }
         // Fall damage / event. TODO: Tests between 1.8 and 1.7.2. How about spigot vs. CB?
-        if (mcVersion == ServerVersion.UNKNOWN_VERSION || ServerVersion.compareVersions(mcVersion, "1.8") < 0) {
+        if (mcVersion == GenericVersion.UNKNOWN_VERSION || GenericVersion.compareVersions(mcVersion, "1.8") < 0) {
             dealFallDamageFiresAnEvent = false;
         } else {
             // Assume higher versions to fire an event.

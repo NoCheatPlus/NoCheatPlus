@@ -52,6 +52,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
+import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
@@ -772,7 +773,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
             NCPAPIProvider.setNoCheatPlusAPI(this);
         }
-        if (ServerVersion.getMinecraftVersion() == ServerVersion.UNKNOWN_VERSION) {
+        if (ServerVersion.getMinecraftVersion() == GenericVersion.UNKNOWN_VERSION) {
             BukkitVersion.init();
         }
         if (!ConfigManager.isInitialized()) {

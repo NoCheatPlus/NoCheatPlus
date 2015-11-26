@@ -32,14 +32,14 @@ public class Bugs {
         }
         
         // First move exploit (classic CraftBukkit or Spigot before 1.7.5). 
-        if (mcVersion == ServerVersion.UNKNOWN_VERSION) {
+        if (mcVersion == GenericVersion.UNKNOWN_VERSION) {
             // Assume something where it's not an issue.
             enforceLocation = false;
         }
-        else if (ServerVersion.compareVersions(mcVersion, "1.8") >= 0) {
+        else if (GenericVersion.compareVersions(mcVersion, "1.8") >= 0) {
             // Assume Spigot + fixed.
             enforceLocation = false;
-        } else if (serverVersion.indexOf("spigot") >= 0 && ServerVersion.compareVersions(mcVersion, "1.7.5") >= 0) {
+        } else if (serverVersion.indexOf("spigot") >= 0 && GenericVersion.compareVersions(mcVersion, "1.7.5") >= 0) {
             // Fixed in Spigot just before 1.7.5.
             enforceLocation = false;
         } else if (serverVersion.indexOf("craftbukkit") != 0){
