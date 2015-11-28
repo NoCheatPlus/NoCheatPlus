@@ -429,7 +429,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, "default");
 
         // Velocity.
-        set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
         set(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION, true);

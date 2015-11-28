@@ -582,7 +582,6 @@ public abstract class ConfPaths {
 
     // Special (to be sorted in or factored out).
     private static final String MOVING_VELOCITY                             = MOVING + "velocity.";
-    public static final String  MOVING_VELOCITY_GRACETICKS                  = MOVING_VELOCITY + "graceticks";
     public static final String  MOVING_VELOCITY_ACTIVATIONCOUNTER           = MOVING_VELOCITY + "activationcounter";
     public static final String  MOVING_VELOCITY_ACTIVATIONTICKS             = MOVING_VELOCITY + "activationticks";
     public static final String    MOVING_VELOCITY_STRICTINVALIDATION        = MOVING_VELOCITY + "strictinvalidation";
@@ -729,5 +728,7 @@ public abstract class ConfPaths {
     public static final String MOVING_SURVIVALFLY_BEDSTEP                ="checks.moving.survivalfly.bedstep";
     @Deprecated
     public static final String  LOGGING_BACKEND_CONSOLE_PREFIX           = "logging.backend.console.prefix";
+    @Deprecated
+    public static final String  MOVING_VELOCITY_GRACETICKS               = "checks.moving.velocity.graceticks";
 
 }

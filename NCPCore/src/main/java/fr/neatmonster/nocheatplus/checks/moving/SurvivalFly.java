@@ -469,14 +469,6 @@ public class SurvivalFly extends Check {
             data.insideMediumCount ++;
         }
 
-        //        // Invalidation of vertical velocity.
-        //        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
-        //        if (yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE 
-        //                && data.invalidateVerVelGrace(cc.velocityGraceTicks, false)) {
-        //            // (Only prevent counting further up, leaves the freedom.)
-        //            tags.add("cap_vvel"); // TODO: Test / validate by logs.
-        //        }
-
         // Apply reset conditions.
         if (resetTo) {
             // The player has moved onto ground.
@@ -525,11 +517,6 @@ public class SurvivalFly extends Check {
             // Invalidate used horizontal velocity.
             //        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** INVALIDATE ON SPEED");
             data.clearActiveHorVel();
-            //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks) {
-            //        	data.horizontalFreedom = 0;
-            //        	data.horizontalVelocityCounter = 0;
-            //        	data.horizontalVelocityUsed = 0;
-            //        }
         }
         // Adjust data.
         data.toWasReset = resetTo || data.noFallAssumeGround;

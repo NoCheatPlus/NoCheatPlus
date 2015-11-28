@@ -152,9 +152,9 @@ public class MovingConfig extends ACheckConfig {
     public final double		sfHoverViolation;
 
     // Special tolerance values:
-    /** This is not strictly ticks, but packets, for now.*/
-    public final int 		velocityGraceTicks;
+    /** Number of moving packets until which a velocity entry must be activated, in order to not be removed.*/
     public final int		velocityActivationCounter;
+    /** Server ticks until invalidating queues velocity. */
     public final int		velocityActivationTicks;
     public final boolean	velocityStrictInvalidation;
     public final double     noFallyOnGround;
@@ -262,7 +262,6 @@ public class MovingConfig extends ACheckConfig {
         sfHoverFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
         sfHoverViolation = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
 
-        velocityGraceTicks = config.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
         velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
