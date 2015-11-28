@@ -90,22 +90,31 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
         if (config == null) {
             return false;
         }
-        if (config.debugOnly) {
+        boolean debugSet = false;
+        if (config.debugOnly || config.debug) {
             // TODO: Better mix the debug flag into IViolationInfo, for best performance.
             final CheckDataFactory factory = checkType.getDataFactory();
-            if (factory == null) {
+            if (config.debugOnly && factory == null) {
                 return false;
-            }
-            final ICheckData data = factory.getData(player);
-            if (data == null || !data.getDebug()) {
-                return false;
+            } else {
+                final ICheckData data = factory.getData(player);
+                if (data == null) {
+                    if (config.debugOnly) {
+                        return false;
+                    }
+                } else {
+                    debugSet = data.getDebug();
+                    if (config.debugOnly && !debugSet) {
+                        return false;
+                    }
+                }
             }
         }
-        log(checkType, player, info, config);
+        log(checkType, player, info, config.allToTrace || debugSet, config.allToNotify);
         return false;
     }
 
-    private void log(final CheckType checkType, final Player player, final IViolationInfo info, final AllViolationsConfig config) {
+    private void log(final CheckType checkType, final Player player, final IViolationInfo info, final boolean toTrace, final boolean toNotify) {
         // Generate the message.
         // TODO: More colors?
         final StringBuilder builder = new StringBuilder(300);
@@ -130,10 +139,10 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
         final String message = builder.toString();
         // Send the message.
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
-        if (config.allToNotify) {
+        if (toNotify) {
             logManager.info(Streams.NOTIFY_INGAME, message);
         }
-        if (config.allToTrace) {
+        if (toTrace) {
             logManager.info(Streams.TRACE_FILE, ChatColor.stripColor(message));
         }
     }
