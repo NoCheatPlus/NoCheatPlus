@@ -504,7 +504,7 @@ public class BlockProperties {
             blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND | F_GROUND_HEIGHT; // Set ground too, to be sure.
         }
 
-        // Step
+        // Step (ground + full width).
         for (final Material mat : new Material[]{
                 Material.STEP, Material.WOOD_STEP,
         }) {
@@ -564,9 +564,10 @@ public class BlockProperties {
             blockFlags[mat.getId()] |= F_HEIGHT100;
         }
 
-        // Full xz-bounds.
+        // Full width/xz-bounds.
         for (final Material mat : new Material[]{
                 Material.PISTON_EXTENSION,
+                Material.ENDER_PORTAL_FRAME
         }) {
             blockFlags[mat.getId()] |= F_XZ100;
         }
@@ -628,6 +629,7 @@ public class BlockProperties {
                 // Strictly needed (multiple boxes otherwise).
                 Material.PISTON_EXTENSION,
                 Material.BREWING_STAND,
+                Material.ENDER_PORTAL_FRAME,
                 // XZ-bounds issues.
                 Material.CAKE_BLOCK
                 // Already worked around with isPassableWorkaround (kept for dev-reference).
@@ -1760,6 +1762,10 @@ public class BlockProperties {
                 return true;
             }
         }
+        else if ((flags & F_GROUND_HEIGHT) != 0 
+                && getGroundMinHeight(access, bx, by, bz, id, access.getBounds(bx, by, bz), flags) <= Math.min(fy, fy + dY * dT)) {
+            return true;
+        }
         // Nothing found.
         return false;
     }
@@ -1849,11 +1855,15 @@ public class BlockProperties {
     }
 
     /**
-     * Reference block height for on-ground judgment: player must be at this or greater height to stand on this block.<br>
+     * Reference block height for on-ground judgment: player must be at this or
+     * greater height to stand on this block.<br>
      * <br>
-     * TODO: Check naming convention, might change to something with max ... volatile!
-     * <br>
-     * This might return 0 or somewhat arbitrary values for some blocks that don't have full bounds (!), might return 0 for blocks with the F_GROUND_HEIGHT flag, unless they are treated individually here.
+     * TODO: Check naming convention, might change to something with max ...
+     * volatile! <br>
+     * This might return 0 or somewhat arbitrary values for some blocks that
+     * don't have full bounds (!), might return 0 for blocks with the
+     * F_GROUND_HEIGHT flag, unless they are treated individually here.
+     * 
      * @param access
      * @param x
      * @param y
@@ -1861,6 +1871,7 @@ public class BlockProperties {
      * @param id
      * @param bounds
      * @param flags
+     *            Flags for this block.
      * @return
      */
     public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
@@ -1908,13 +1919,8 @@ public class BlockProperties {
             return 0.625;
         }
         else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
-            // TODO: Test
-            // TODO: Other concepts ...
-            if ((access.getData(x, y, z) & 0x04) != 0) {
-                return 1.0;
-            } else {
-                return bounds[4];
-            }
+            // Allow moving as if no eye was inserted.
+            return 0.8125;
         }
         else if ((flags & F_GROUND_HEIGHT) != 0) {
             // All blocks that are not treated individually are ground all through.
@@ -2253,7 +2259,10 @@ public class BlockProperties {
     }
 
     /**
-     * Check if the bounds collide with the block for the given type id at the given position.
+     * Check if the bounds collide with the block for the given type id at the
+     * given position. This does not check workarounds for ground_height nor
+     * passable.
+     * 
      * @param access
      * @param minX
      * @param minY
@@ -2265,8 +2274,11 @@ public class BlockProperties {
      * @param y
      * @param z
      * @param id
-     * @param bounds Not null: bounds of the block at x, y, z.
-     * @param flags Block flags for the block at x, y, z. Mix in F_COLLIDE_EDGES to disallow the "high edges" of blocks.
+     * @param bounds
+     *            Not null: bounds of the block at x, y, z.
+     * @param flags
+     *            Block flags for the block at x, y, z. Mix in F_COLLIDE_EDGES
+     *            to disallow the "high edges" of blocks.
      * @return
      */
     public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
@@ -2340,7 +2352,7 @@ public class BlockProperties {
                 if ((access.getData(x, y, z) & 0x04) != 0) {
                     bmaxY = 1.0;
                 } else {
-                    bmaxY = bounds[4];
+                    bmaxY = 0.8125;
                 }
             }
             else {
