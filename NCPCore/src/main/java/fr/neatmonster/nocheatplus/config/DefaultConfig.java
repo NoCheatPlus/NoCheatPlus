@@ -53,12 +53,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, "&cNCP: &f");
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false);
 
-        //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
-        //        set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
-
-        //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
-        //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
-
         // Data settings.
         // Expired offline players data.
         set(ConfPaths.DATA_EXPIRATION_ACTIVE, false);
@@ -399,18 +393,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES, Arrays.asList("sethome", "home set", "setwarp", "warp set", "setback", "set back", "back set"));
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
-        //        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true);
         set(ConfPaths.MOVING_SURVIVALFLY_STEPHEIGHT, "default");
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID, true);
-        // The settings aren't enabled by default. Simply write them yourself in the configuration file.
-        // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 200);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1500 log:flylong:0:5:cif cancel cmd:kickfly");
 
         // sf / hover check.
