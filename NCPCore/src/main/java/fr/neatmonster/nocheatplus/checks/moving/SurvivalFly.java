@@ -1406,7 +1406,7 @@ public class SurvivalFly extends Check {
         // TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
 
         // Test bunny early, because it applies often and destroys as little as possible.
-        hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data);
+        hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data, cc);
 
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
         if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
@@ -1434,7 +1434,7 @@ public class SurvivalFly extends Check {
         // After failure bunny (2nd).
         if (hDistanceAboveLimit > 0) {
             // (Could distinguish tags from above call).
-            hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data);
+            hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data, cc);
         }
 
         // Horizontal buffer.
@@ -1468,7 +1468,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return hDistanceAboveLimit
      */
-    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data) {
+    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
         boolean allowHop = true;
         boolean double_bunny = false;
@@ -1549,10 +1549,19 @@ public class SurvivalFly extends Check {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
             // TODO: LiftOffEnvelope.allowBunny ?
-            if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL // && yDistance >= 0.4 
+            if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL
                     && !data.sfLowJump || data.sfNoLowJump
-                    && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround || double_bunny)
-                    && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
+                    // Y-distance envelope.
+                    && (
+                            yDistance > 0.0 
+                            && yDistance > data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier) - GRAVITY_SPAN
+                            || yDistance > 0.0 && from.isHeadObstructed()
+                            || cc.sfGroundHop && yDistance >= 0
+                            && hAllowedDistance > 0.0 && hDistance / hAllowedDistance < 1.35
+                            )
+                            // Bad auto indent.
+                            && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround || double_bunny)
+                            && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
                     ) {
                 // TODO: Jump effect might allow more strictness. 
                 // TODO: Expected minimum gain depends on last speed (!).

@@ -82,7 +82,7 @@ public class MovingConfig extends ACheckConfig {
     public static final double Y_ON_GROUND_MAX = 0.0626;
     // TODO: Model workarounds as lost ground, use Y_ON_GROUND_MIN?
     public static final double Y_ON_GROUND_DEFAULT = 0.016; // Jump upwards, while placing blocks.
-//    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
+    //    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
 
 
     public final boolean    ignoreCreative;
@@ -137,6 +137,11 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
     public final boolean    survivalFlyCobwebHack;
+    /**
+     * If true, will allow moderate bunny hop without lift off. Applies for
+     * normal speed on 1.6.4 and probably below.
+     */
+    public final boolean    sfGroundHop;
     public final boolean    survivalFlyAccountingH;
     public final boolean    survivalFlyAccountingV;
     public final boolean    sfSetBackPolicyVoid;
@@ -176,7 +181,6 @@ public class MovingConfig extends ACheckConfig {
     // Trace
     public final int traceSize;
     public final double traceMergeDist;
-
 
     /**
      * Instantiates a new moving configuration.
@@ -236,6 +240,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlySwimmingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyCobwebHack = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
+        sfGroundHop = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_GROUNDHOP, ServerVersion.compareMinecraftVersion("1.7") == -1);
         survivalFlyAccountingH = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         survivalFlyAccountingV = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         sfSetBackPolicyFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE);
@@ -290,7 +295,6 @@ public class MovingConfig extends ACheckConfig {
         traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
 
     }
-
 
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.checks.ICheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
