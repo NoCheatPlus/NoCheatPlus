@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.logging.debug;
 
-import java.util.Arrays;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,6 +10,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -250,12 +249,51 @@ public class DebugUtil {
 
     }
 
-    public static  void addBlockBelowInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-        builder.append(tag + " below id=" + loc.getTypeIdBelow() + " data=" + loc.getData(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()) + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())));
+    public static void addBlockBelowInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
+        addBlockInfo(builder, loc.getBlockCache(), loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ(), tag + " below");
     }
 
-    public static  void addBlockInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-        builder.append(tag + " id=" + loc.getTypeId() + " data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+    public static void addBlockInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
+        addBlockInfo(builder, loc.getBlockCache(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), tag);
+    }
+
+    /**
+     * Add information about id, data, shape to the builder. Starts with a space
+     * always.
+     * 
+     * @param builder
+     * @param blockCache
+     * @param x
+     *            Block coordinates.
+     * @param y
+     * @param z
+     * @param messagePrefix
+     *            May be null.
+     */
+    public static void addBlockInfo(final StringBuilder builder, final BlockCache blockCache, final int x, final int y, final int z, final String messagePrefix) {
+        if (messagePrefix != null && ! messagePrefix.isEmpty()) {
+            builder.append(messagePrefix);
+        }
+        builder.append(" id=");
+        final int id = blockCache.getTypeId(x, y, z);
+        builder.append(id);
+        builder.append(" data=");
+        builder.append(blockCache.getData(x, y, z));
+        final double[] bounds = blockCache.getBounds(x, y, z);
+        final double minHeight = BlockProperties.getGroundMinHeight(blockCache, x, y, z, id, bounds, BlockProperties.getBlockFlags(id));
+        builder.append(" shape=[");
+        builder.append(bounds[0]);
+        builder.append(", ");
+        builder.append(bounds[1]);
+        builder.append(", ");
+        builder.append(bounds[2]);
+        builder.append(", ");
+        builder.append(bounds[3]);
+        builder.append(", ");
+        builder.append(minHeight == bounds[4] ? minHeight : (minHeight + ".." + bounds[4]));
+        builder.append(", ");
+        builder.append(bounds[5]);
+        builder.append("]");
     }
 
     /**
