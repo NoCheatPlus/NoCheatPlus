@@ -800,7 +800,7 @@ public class SurvivalFly extends Check {
             strictVdistRel = false;
         }
         else if (data.lastYDist != Double.MAX_VALUE) {
-            if (data.lastYDist >= -GRAVITY_MAX / 2.0 && data.lastYDist <= 0.0 && data.fromWasReset) {
+            if (data.lastYDist >= -Math.max(GRAVITY_MAX / 2.0, 1.3 * Math.abs(yDistance)) && data.lastYDist <= 0.0 && data.fromWasReset) {
                 if (resetTo) { // TODO: Might have to use max if resetto.
                     vAllowedDistance = cc.sfStepHeight;
                 }
@@ -1531,7 +1531,7 @@ public class SurvivalFly extends Check {
 
             // Allow hop for special cases.
             if (!allowHop && (from.isOnGround() || data.noFallAssumeGround)) {
-                if (data.bunnyhopDelay <= 6 || from.isHeadObstructed() || to.isHeadObstructed()) {
+                if (data.bunnyhopDelay <= 6 || yDistance >= 0.0 && from.isHeadObstructed() || to.isHeadObstructed()) {
                     // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
                     tags.add("ediblebunny");
                     allowHop = true;
@@ -1550,17 +1550,17 @@ public class SurvivalFly extends Check {
             // TODO: Allow slightly higher speed on lost ground?
             // TODO: LiftOffEnvelope.allowBunny ?
             if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL
-                    && !data.sfLowJump || data.sfNoLowJump
+                    && (!data.sfLowJump || data.sfNoLowJump)
                     // Y-distance envelope.
                     && (
                             yDistance > 0.0 
-                            && yDistance > data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier) - GRAVITY_SPAN
-                            || yDistance > 0.0 && from.isHeadObstructed()
-                            || cc.sfGroundHop && yDistance >= 0
+                            && yDistance > data.liftOffEnvelope.getMinJumpGain(data.jumpAmplifier) - GRAVITY_SPAN
+                            || yDistance > 0.0 && from.isHeadObstructed(yDistance + from.getyOnGround())
+                            || (cc.sfGroundHop && yDistance >= 0 || yDistance == 0.0 && !data.fromWasReset) // TODO: (2nd) demand try next jump.
                             && hAllowedDistance > 0.0 && hDistance / hAllowedDistance < 1.35
                             )
                             // Bad auto indent.
-                            && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround || double_bunny)
+                            && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && (data.noFallAssumeGround || data.fromWasReset) || double_bunny)
                             && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
                     ) {
                 // TODO: Jump effect might allow more strictness. 

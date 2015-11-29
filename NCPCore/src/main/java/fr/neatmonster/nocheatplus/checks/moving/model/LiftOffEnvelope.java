@@ -33,19 +33,30 @@ public enum LiftOffEnvelope {
         this.jumpEffectApplies = jumpEffectApplies;
     }
 
+    /**
+     * Minimal distance expected with lift-off.
+     * @param jumpAmplifier
+     * @return
+     */
+    public double getMinJumpGain(double jumpAmplifier) {
+        if (jumpEffectApplies && jumpAmplifier != 0.0) {
+            return Math.max(0.0, maxJumpGain + 0.1 * jumpAmplifier);
+        }
+        else {
+            return maxJumpGain;
+        }
+    }
+
     public double getMaxJumpGain(double jumpAmplifier) {
-        // TODO: Count in effect level.
         if (jumpEffectApplies && jumpAmplifier != 0.0) {
             return Math.max(0.0, maxJumpGain + 0.2 * jumpAmplifier);
         }
         else {
-
             return maxJumpGain;
         }
     }
 
     public double getMaxJumpHeight(double jumpAmplifier) {
-        // TODO: Count in effect level.
         if (jumpEffectApplies && jumpAmplifier > 0.0) {
             // Note: The jumpAmplifier value is one higher than the MC level.
             if (jumpAmplifier < 10.0) {
@@ -61,7 +72,6 @@ public enum LiftOffEnvelope {
                 // Quadratic, with some amount of gravity counted in.
                 return 0.6 + (jumpAmplifier + 3.2) * (jumpAmplifier + 3.2) / 16.0 - (jumpAmplifier * (jumpAmplifier - 1.0) / 2.0) * (0.0625 / 2.0);
             }
-
         } // TODO: < 0.0 ?
         else {
             return maxJumpHeight;
