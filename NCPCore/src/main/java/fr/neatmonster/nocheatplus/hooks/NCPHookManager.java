@@ -32,7 +32,7 @@ public final class NCPHookManager {
 
     /** Mapping the check types to the hooks. */
     private static final Map<CheckType, List<NCPHook>> hooksByChecks = new HashMap<CheckType, List<NCPHook>>();
-    
+
     private static Comparator<NCPHook> HookComparator = new Comparator<NCPHook>() {
         @Override
         public int compare(final NCPHook o1, final NCPHook o2) {
@@ -53,13 +53,13 @@ public final class NCPHookManager {
     };
 
     static{
-    	// Fill the map to be sure that thread safety can be guaranteed.
-    	for (final CheckType type : CheckType.values()){
-    		if (APIUtils.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
-    		else hooksByChecks.put(type, new ArrayList<NCPHook>());
-    	}
+        // Fill the map to be sure that thread safety can be guaranteed.
+        for (final CheckType type : CheckType.values()){
+            if (APIUtils.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
+            else hooksByChecks.put(type, new ArrayList<NCPHook>());
+        }
     }
-    
+
     /**
      * Register a hook for a specific check type (all, group, or an individual check).
      * 
@@ -112,7 +112,7 @@ public final class NCPHookManager {
             Collections.sort(hooks, HookComparator);
         }
     }
-    
+
     /**
      * Add hook to the hooksByChecks mappings.<br>
      * Assumes that the hook already has been registered in the allHooks map.
@@ -275,22 +275,22 @@ public final class NCPHookManager {
      * @param throwable
      *            the throwable
      */
-    private static final void logHookFailure(final CheckType checkType, final Player player, final NCPHook hook,
-            final Throwable t) {
+    private static final void logHookFailure(final CheckType checkType, final Player player, final NCPHook hook, final Throwable t) {
         // TODO: might accumulate failure rate and only log every so and so seconds or disable hook if spamming (leads
         // to NCP spam though)?
         final StringBuilder builder = new StringBuilder(1024);
         builder.append("Hook " + getHookDescription(hook) + " encountered an unexpected exception:\n");
         builder.append("Processing: ");
-        if (checkType.getParent() != null)
-            builder.append("Prent " + checkType.getParent() + " ");
+        if (checkType.getParent() != null) {
+            builder.append("Parent " + checkType.getParent() + " ");
+        }
         builder.append("Check " + checkType);
         builder.append(" Player " + player.getName());
         builder.append("\n");
         builder.append("Exception (" + t.getClass().getSimpleName() + "): " + t.getMessage() + "\n");
-        for (final StackTraceElement el : t.getStackTrace())
+        for (final StackTraceElement el : t.getStackTrace()) {
             builder.append(el.toString());
-
+        }
         Bukkit.getLogger().severe(builder.toString());
     }
 
@@ -412,17 +412,17 @@ public final class NCPHookManager {
     public static final boolean shouldCancelVLProcessing(final ViolationData violationData) {
         // Checks for hooks registered for this event, parent groups or ALL will be inserted into the list.
         // Return true as soon as one hook returns true. Test hooks, if present.
-    	final CheckType type = violationData.check.getType();
+        final CheckType type = violationData.check.getType();
         final List<NCPHook> hooksCheck = hooksByChecks.get(type);
         if (!hooksCheck.isEmpty()){
-        	if (APIUtils.needsSynchronization(type)){
-        		synchronized (hooksCheck) {
-        			return applyHooks(type, violationData.player, violationData, hooksCheck);
-				}
-        	}
-        	else{
-        		return applyHooks(type, violationData.player, violationData, hooksCheck);
-        	}
+            if (APIUtils.needsSynchronization(type)){
+                synchronized (hooksCheck) {
+                    return applyHooks(type, violationData.player, violationData, hooksCheck);
+                }
+            }
+            else{
+                return applyHooks(type, violationData.player, violationData, hooksCheck);
+            }
         }   
         return false;
     }
