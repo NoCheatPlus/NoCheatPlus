@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -138,7 +139,7 @@ public class ViolationData implements IViolationInfo, ActionData {
                 return check.getClass().getSimpleName();
             case HEALTH: {
                 String health = getParameterValue(ParameterName.HEALTH);
-                return health == null ? (player.getHealth() + "/" + player.getMaxHealth()) : health;
+                return health == null ? (BridgeHealth.getHealth(player) + "/" + BridgeHealth.getMaxHealth(player)) : health;
             }
             case IP:
                 return player.getAddress().toString().substring(1).split(":")[0];
