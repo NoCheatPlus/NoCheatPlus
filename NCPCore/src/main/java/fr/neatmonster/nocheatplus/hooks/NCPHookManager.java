@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
+import fr.neatmonster.nocheatplus.logging.Streams;
 
 /**
  * After-check-failure hook manager integrated into NoCheatPlus.
@@ -260,7 +261,7 @@ public final class NCPHookManager {
      *            the hook
      */
     private static final void logHookAdded(final NCPHook hook) {
-        Bukkit.getLogger().info("Added hook: " + getHookDescription(hook) + ".");
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Added hook: " + getHookDescription(hook) + ".");
     }
 
     /**
@@ -291,7 +292,7 @@ public final class NCPHookManager {
         for (final StackTraceElement el : t.getStackTrace()) {
             builder.append(el.toString());
         }
-        Bukkit.getLogger().severe(builder.toString());
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, builder.toString());
     }
 
     /**
@@ -301,7 +302,7 @@ public final class NCPHookManager {
      *            the hook
      */
     private static final void logHookRemoved(final NCPHook hook) {
-        Bukkit.getLogger().info("Removed hook: " + getHookDescription(hook) + ".");
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Removed hook: " + getHookDescription(hook) + ".");
     }
 
     /**
