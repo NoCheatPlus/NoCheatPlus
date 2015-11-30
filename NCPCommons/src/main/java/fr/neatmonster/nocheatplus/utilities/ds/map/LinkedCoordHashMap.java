@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
  * get/contains should work if the map stays unchanged.
  * <hr>
  * Linked hash map implementation of CoordMap<V>, allowing for insertion/access
- * order. Default order is the order of insertion. This implementation does not
+ * order. By default entries are added to the end. This implementation does not
  * imitate the LinkedHashMap behavior [may be adapted to be similar, if
  * desired], instead methods are provided for manipulating the order at will.
  * 
@@ -51,7 +51,7 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
         private LinkedHashEntry<V> current = null;
         private LinkedHashEntry<V> next;
 
-        private boolean reverse;
+        private final boolean reverse;
 
         protected LinkedHashIterator(LinkedCoordHashMap<V> map, boolean reverse) {
             this.map = map;
@@ -177,7 +177,11 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     public V put(final int x, final int y, final int z, final V value, final MoveOrder order) {
         // TODO: Optimized.
         final V previousValue = super.put(x, y, z, value);
-        if (order == MoveOrder.END) {
+        if (order == MoveOrder.FRONT) {
+            moveToFront(x, y, z);
+        }
+        else if (previousValue != null && order == MoveOrder.END) {
+            // Ensure the intended order.
             moveToEnd(x, y, z);
         }
         return previousValue;
@@ -198,7 +202,8 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     }
 
     /**
-     * Control order of iteration. Actual order depends on the accessOrder flag.
+     * Control order of iteration.
+     * 
      * @param reversed
      * @return
      */
@@ -209,8 +214,8 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     @Override
     protected LinkedHashEntry<V> newEntry(int x, int y, int z, V value, int hash) {
         LinkedHashEntry<V> entry = new LinkedHashEntry<V>(x, y, z, value, hash);
-        // Always put in first.
-        setFirst(entry);
+        // Always put in last.
+        setLast(entry);
         return entry;
     }
 
@@ -222,7 +227,8 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     private void setFirst(LinkedHashEntry<V> entry) {
         if (this.firstEntry == null) {
             this.firstEntry = this.lastEntry = entry;
-        } else {
+        }
+        else {
             entry.next = this.firstEntry;
             this.firstEntry.previous = entry;
             this.firstEntry = entry;
@@ -237,7 +243,8 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     private void setLast(LinkedHashEntry<V> entry) {
         if (this.firstEntry == null) {
             this.firstEntry = this.lastEntry = entry;
-        } else {
+        }
+        else {
             entry.previous = this.lastEntry;
             this.lastEntry.next = entry;
             this.lastEntry = entry;
@@ -247,18 +254,31 @@ public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonste
     @Override
     protected void removeEntry(LinkedHashEntry<V> entry) {
         // Just unlink.
-        if (entry.previous == null) {
+        if (entry == this.firstEntry) {
             this.firstEntry = entry.next;
-        } else {
+            if (this.firstEntry != null) {
+                this.firstEntry.previous = null;
+            }
+        }
+        else {
             entry.previous.next = entry.next;
-            entry.previous = null;
         }
-        if (entry.next == null) {
+        if (entry == this.lastEntry) {
             this.lastEntry = entry.previous;
-        } else {
-            entry.next.previous = entry.previous;
-            entry.next = null;
+            if (this.lastEntry != null) {
+                this.lastEntry.next = null;
+            }
         }
+        else {
+            entry.next.previous = entry.previous;
+        }
+        entry.previous = entry.next = null;
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        firstEntry = lastEntry = null;
     }
 
 }

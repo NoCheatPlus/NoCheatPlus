@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry;
+import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 
 public class TestCoordMap {
@@ -318,32 +319,165 @@ public class TestCoordMap {
         final int n = e ? 40000 : 6000; // Number of coordinates.
         final int max = 800; // Coordinate maximum.
 
+        // Preparecoordinates.
         int [][] coords = getUniqueRandomCoords(n, max, random);
-
         LinkedCoordHashMap<Integer> map = new LinkedCoordHashMap<Integer>(1, 0.75f);
+
+        // Use a map with these coordinates.
         fillMap(map, coords);
-        // Test if the order of iteration is correct (!).
-        int i = 0;
-        Iterator<Entry<Integer>> it = map.iterator(true); // New entries are put to front.
-        while (it.hasNext()) {
-            testNext(it, coords, i);
-            i++;
+
+        // Initial iteration order.
+        testIterationOrder(map, coords, 1);
+
+        // Re-put, moving to end.
+        for (int i = 0; i < coords.length; i++) {
+            map.put(coords[i][0], coords[i][1], coords[i][2], i, MoveOrder.END);
+            testLast(map, coords[i], i);
         }
-        i = coords.length - 1;
-        it = map.iterator(false);
-        while (it.hasNext()) {
-            testNext(it, coords, i);
-            i--;
+        if (map.size() != coords.length) {
+            fail("Map different size than coords.");
+        }
+        testIterationOrder(map, coords, 1);
+
+        // Re-put, moving to front.
+        for (int i = coords.length - 1; i >= 0; i--) {
+            map.put(coords[i][0], coords[i][1], coords[i][2], i, MoveOrder.FRONT);
+            testFirst(map, coords[i], i);
+        }
+        if (map.size() != coords.length) {
+            fail("Map different size than coords.");
+        }
+        testIterationOrder(map, coords, 1);
+
+        // Map.clear
+        map.clear();
+        if (map.size() != 0) {
+            fail("Expect map size to be 0 after clear.");
+        }
+        if (map.iterator(false).hasNext()) {
+            fail("Expect no first element on iteration after clear.");
+        }
+        if (map.iterator(true).hasNext()) {
+            fail("Expect no last element on iteration after clear.");
         }
 
-        // TODO: Specific tests with iterator.remove.
+        // New map with all coordinates.
+        fillMap(map, coords);
+        // Half the coordinates.
+        int[][] halfCoords = new int[n / 2][3];
+        for (int i = 0; i < n / 2; i++) {
+            for (int j = 0; j < 3; j++) {
+                halfCoords[i][j] = coords[i * 2][j];
+            }
+        }
+        // Test remove every second entry.
+        for (int i = 0; i < n / 2; i++) {
+            map.remove(coords[i * 2 + 1][0], coords[i * 2 + 1][1], coords[i * 2 + 1][2]);
+            if (map.contains(coords[i * 2 + 1][0], coords[i * 2 + 1][1], coords[i * 2 + 1][2])) {
+                fail("Expect removed entries not to be contained in the map.");
+            }
+        }
+        if (map.size() != n / 2) {
+            fail("Map size should be halfed after removing every second element (" + map.size() + " instead of " + n / 2 + ").");
+        }
+        testIterationOrder(map, halfCoords, 2);
+
+        // Test iterator.remove every second entry.
+        map.clear();
+        fillMap(map, coords);
+        int i = 0;
+        Iterator<Entry<Integer>> it = map.iterator(false);
+        while (it.hasNext()) {
+            Entry<Integer> entry = it.next();
+            if (i % 2 == 1) {
+                it.remove();
+                if (map.contains(entry.getX(), entry.getY(), entry.getZ())) {
+                    fail("Expect entries removed by iterator not to be in the map.");
+                }
+            }
+            i ++;
+        }
+        if (map.size() != n / 2) {
+            fail("Map size should be halfed after removing every second element with an iterator (" + map.size() + " instead of " + n / 2 + ").");
+        }
+        testIterationOrder(map, halfCoords, 2);
+
+
+        // TODO: Some random mixtures.
 
     }
 
-    private void testNext(Iterator<Entry<Integer>> it, int[][] coords, int matchIndex) {
+    private void testIterationOrder(LinkedCoordHashMap<Integer> map, int[][] coords, int multiplyId) {
+        // Test if the order of iteration is correct (!).
+        int i = 0;
+        Iterator<Entry<Integer>> it = map.iterator(false); // New entries are put to the end.
+        while (it.hasNext()) {
+            testNext(it, coords, i, multiplyId);
+            i++;
+        }
+        if (i != coords.length) {
+            fail("Iterator different size than coords.");
+        }
+        if (i != map.size()) {
+            fail("Iterator different size than map.");
+        }
+        if (map.size() != coords.length) {
+            fail("Map different size than coords.");
+        }
+        i = coords.length - 1;
+        it = map.iterator(true);
+        while (it.hasNext()) {
+            testNext(it, coords, i, multiplyId);
+            i--;
+        }
+        if (i != -1) {
+            fail("Iterator wrong size.");
+        }
+        if (map.size() != coords.length) {
+            fail("Map different size than coords.");
+        }
+    }
+
+    /**
+     * Test if the last element is the expected one.
+     * @param map
+     * @param is
+     */
+    private void testLast(LinkedCoordHashMap<Integer> map, int[] coords, int value) {
+        if (map.get(coords[0], coords[1], coords[2]) != value) {
+            fail("Not even in the map: " + value);
+        }
+        Entry<Integer> entry = map.iterator(true).next();
+        if (entry.getValue() != value) {
+            fail("Wrong id: " + entry.getValue() + " instead of " + value);
+        }
+        if (entry.getX() != coords[0] || entry.getY() != coords[1] || entry.getZ() != coords[2]) {
+            fail("Coordinate mismatch on " + value);
+        }
+    }
+
+    /**
+     * Test if the first element is the expected one.
+     * @param map
+     * @param is
+     */
+    private void testFirst(LinkedCoordHashMap<Integer> map, int[] coords, int value) {
+        if (map.get(coords[0], coords[1], coords[2]) != value) {
+            fail("Not even in the map: " + value);
+        }
+        Entry<Integer> entry = map.iterator().next();
+        if (entry.getValue() != value) {
+            fail("Wrong id: " + entry.getValue() + " instead of " + value);
+        }
+        if (entry.getX() != coords[0] || entry.getY() != coords[1] || entry.getZ() != coords[2]) {
+            fail("Coordinate mismatch on " + value);
+        }
+    }
+
+    private void testNext(Iterator<Entry<Integer>> it, int[][] coords, int matchIndex, int multiplyId) {
         Entry<Integer> entry = it.next();
-        if (entry.getValue().intValue() != matchIndex) {
-            fail("Index mismatch, expect " + matchIndex + ", got instead: " + entry.getValue());
+        if (entry.getValue().intValue() != matchIndex * multiplyId) {
+            fail("Index vs. value mismatch, expect " + matchIndex * multiplyId + ", got instead: " + entry.getValue());
         }
         if (entry.getX() != coords[matchIndex][0] || entry.getY() != coords[matchIndex][1] || entry.getZ() != coords[matchIndex][2]) {
             // Very unlikely.
