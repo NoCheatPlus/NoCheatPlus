@@ -173,6 +173,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean assumeSprint;
     public final int speedGrace;
     public final boolean enforceLocation;
+//    public final boolean blockChangeTrackerPush;
 
     // Vehicles
     public final boolean vehicleEnforceLocation;
@@ -274,7 +275,8 @@ public class MovingConfig extends ACheckConfig {
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, yOnGround);
 
         // TODO: Ignore the stance, once it is known that the server catches such.
-        ignoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.NO).decide();
+        AlmostBoolean refIgnoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.MAYBE);
+        ignoreStance = refIgnoreStance == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.8") >= 0 : refIgnoreStance.decide();
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
@@ -286,6 +288,7 @@ public class MovingConfig extends ACheckConfig {
         } else {
             enforceLocation = ref.decide();
         }
+//        blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
 
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, AlmostBoolean.MAYBE);
         vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
