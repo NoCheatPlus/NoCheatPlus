@@ -182,7 +182,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
         }
         final Player player = event.getPlayer();
         final NetConfig cc = configFactory.getConfig(player);
-        if (cc.flyingFrequencyActive && cc.flyingFrequencyStrayPacketsCancel) {
+        if (cc.flyingFrequencyActive) {
             final NetData data = dataFactory.getData(player);
             // Register expected location for comparison with outgoing packets.
             data.teleportQueue.onTeleportEvent(new DataPacketFlying(false, to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch(), System.currentTimeMillis()));

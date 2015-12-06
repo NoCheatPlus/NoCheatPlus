@@ -99,6 +99,7 @@ public class MovingFlying extends BaseAdapter {
         final DataPacketFlying packetData = packetMismatch ? null : interpretPacket(event, time);
 
         // Early return tests, if the packet can be interpreted.
+        boolean skipFlyingFrequency = false;
         if (packetData != null) {
             // Prevent processing packets with obviously malicious content.
             if (isInvalidContent(packetData)) {
@@ -109,27 +110,22 @@ public class MovingFlying extends BaseAdapter {
                 }
                 return;
             }
-            if (cc.flyingFrequencyStrayPacketsCancel) {
-                switch(data.teleportQueue.processAck(packetData)) {
-                    case CANCEL: {
-                        // TODO: Configuration for cancel (or implement skipping violation level escalation)?
-                        // TODO: Checking FlyingFrequency might still make sense?
-                        event.setCancelled(true);
-                        if (data.debug) {
-                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " wait for ACK on teleport, cancel packet: " + packetData);
-                        }
-                        return;
+            switch(data.teleportQueue.processAck(packetData)) {
+                case CANCEL: {
+                    if (data.debug) {
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet before having received ACK on outgoing position.");
                     }
-                    case ACK: {
-                        // Skip processing ACK packets, no cancel.
-                        if (data.debug) {
-                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " interpret as ACK for a teleport: " + packetData);
-                        }
-                        return;
+                }
+                case ACK: {
+                    // Skip processing ACK packets, no cancel.
+                    skipFlyingFrequency = true;
+                    if (data.debug) {
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet interpreted as ACK for outgoing position.");
                     }
-                    default: {
-                        // Continue.
-                    }
+                    return;
+                }
+                default: {
+                    // Continue.
                 }
             }
         }
@@ -138,7 +134,7 @@ public class MovingFlying extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
-        if (flyingFrequency.check(player, packetData, time, data, cc)) {
+        if (!skipFlyingFrequency && flyingFrequency.check(player, packetData, time, data, cc)) {
             event.setCancelled(true);
             return;
         }

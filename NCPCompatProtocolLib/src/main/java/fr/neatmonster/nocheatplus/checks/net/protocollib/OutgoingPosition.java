@@ -40,7 +40,7 @@ public class OutgoingPosition extends BaseAdapter {
 
         final Player player = event.getPlayer();
         final NetConfig cc = configFactory.getConfig(player);
-        if (cc.flyingFrequencyActive && cc.flyingFrequencyStrayPacketsCancel) {
+        if (cc.flyingFrequencyActive) {
             final NetData data = dataFactory.getData(player);
             final DataPacketFlying packetData = interpretPacket(event.getPacket(), time, data);
             if (packetData != null && data.debug) {

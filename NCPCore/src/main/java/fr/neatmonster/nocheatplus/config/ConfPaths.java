@@ -631,8 +631,6 @@ public abstract class ConfPaths {
     @GlobalConfig
     public static final String  NET_FLYINGFREQUENCY_PACKETSPERSECOND        = NET_FLYINGFREQUENCY + "packetspersecond";
     public static final String  NET_FLYINGFREQUENCY_ACTIONS                 = NET_FLYINGFREQUENCY + "actions";
-    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS            = NET_FLYINGFREQUENCY + "straypackets.";
-    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL     = NET_FLYINGFREQUENCY_STRAYPACKETS + "cancel";
     // TODO: Reduceredundant has been removed (implement or remove config).
     private static final String NET_FLYINGFREQUENCY_REDUNDANT               = NET_FLYINGFREQUENCY + "reduceredundant.";
     public static final String  NET_FLYINGFREQUENCY_REDUNDANT_ACTIVE        = NET_FLYINGFREQUENCY_REDUNDANT + "active";
@@ -667,6 +665,9 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_SERVER_CBREFLECT_ENABLE     = COMPATIBILITY_SERVER_CBREFLECT + "enable";
 
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
+    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER        = COMPATIBILITY_BLOCKS + "changetracker.";
+    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE = COMPATIBILITY_BLOCKS_CHANGETRACKER + "active";
+    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS= COMPATIBILITY_BLOCKS_CHANGETRACKER + "pistons";
 
     // Moved paths.
     @Moved(newPath = LOGGING_BACKEND_CONSOLE_ACTIVE)
@@ -732,5 +733,7 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_CONSOLE_PREFIX           = "logging.backend.console.prefix";
     @Deprecated
     public static final String  MOVING_VELOCITY_GRACETICKS               = "checks.moving.velocity.graceticks";
+    @Deprecated
+    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL     = "checks.net.flyingfrequency.straypackets.cancel";
 
 }
