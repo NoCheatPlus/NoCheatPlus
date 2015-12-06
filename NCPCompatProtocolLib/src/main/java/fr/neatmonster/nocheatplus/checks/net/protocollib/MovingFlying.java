@@ -122,7 +122,6 @@ public class MovingFlying extends BaseAdapter {
                     if (data.debug) {
                         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet interpreted as ACK for outgoing position.");
                     }
-                    return;
                 }
                 default: {
                     // Continue.
