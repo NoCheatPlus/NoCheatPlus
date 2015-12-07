@@ -172,6 +172,9 @@ public class BlockProperties {
         }
     }
 
+    /** Liquid height if no solid/full blocks are above. */
+    protected static final double LIQUID_HEIGHT_LOWERED = 80000002;
+
     protected static final int maxBlocks = 4096; 
 
     /** Properties by block id, might be extended to 4096 later for custom blocks.*/
@@ -2337,12 +2340,12 @@ public class BlockProperties {
                     }
                     else {
                         //bmaxY = 1.0; // - (double) data8 / 9.0;
-                        bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : 0.8;
+                        bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : LIQUID_HEIGHT_LOWERED;
                     }
                 }
                 else {
                     //bmaxY = 1.0;
-                    bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : 0.8;
+                    bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : LIQUID_HEIGHT_LOWERED;
                 }
             }
             else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
