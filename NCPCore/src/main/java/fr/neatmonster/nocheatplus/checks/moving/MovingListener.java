@@ -793,7 +793,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (max_gain < effect) {
                 effect = max_gain;
                 if (data.debug) {
-                    DebugUtil.debug(player.getName() + " Cap bounce effect by recent y-distances.");
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Cap bounce effect by recent y-distances.");
                 }
             }
         }
