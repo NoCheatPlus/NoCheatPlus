@@ -173,7 +173,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean assumeSprint;
     public final int speedGrace;
     public final boolean enforceLocation;
-//    public final boolean blockChangeTrackerPush;
+    public final boolean blockChangeTrackerPush;
 
     // Vehicles
     public final boolean vehicleEnforceLocation;
@@ -288,7 +288,7 @@ public class MovingConfig extends ACheckConfig {
         } else {
             enforceLocation = ref.decide();
         }
-//        blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
+        blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
 
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, AlmostBoolean.MAYBE);
         vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.

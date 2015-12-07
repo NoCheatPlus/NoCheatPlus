@@ -545,7 +545,7 @@ public class DefaultConfig extends ConfigFile {
                 ));
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + ".snow", "default");
-        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, true);
+        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, false); // TODO: Activate once it really works?
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true);
 
         //        // Update internal factory based on all the new entries to the "actions" section.

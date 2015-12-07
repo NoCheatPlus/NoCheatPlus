@@ -51,6 +51,8 @@ import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeListener;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
@@ -196,6 +198,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     /** Hook for logging all violations. */
     protected final AllViolationsHook allViolationsHook = new AllViolationsHook();
+
+    /** Block change tracking (pistons, other). */
+    private final BlockChangeTracker blockChangeTracker = new BlockChangeTracker();
+    /** Listener for the BlockChangeTracker (register once, lazy). */
+    private BlockChangeListener blockChangeListener = null;
 
     /** Tick listener that is only needed sometimes (component registration). */
     protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
@@ -683,6 +690,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         genericInstances.clear();
         // Feature tags.
         featureTags.clear();
+        // BlockChangeTracker.
+        blockChangeTracker.clear();
+        if (blockChangeListener != null) {
+            blockChangeListener.setEnabled(false);
+            blockChangeListener = null; // Only on disable.
+        }
 
         // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
         if (changedCommands != null){
@@ -862,6 +875,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             // Register sub-components (allow later added to use registries, if any).
             processQueuedSubComponentHolders();
         }
+        updateBlockChangeTracker(config);
 
         // Register "higher level" components (check listeners).
         for (final Object obj : new Object[]{
@@ -933,6 +947,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Disable all checks for these players for one tick ?
         // TODO: Prepare check data for players [problem: permissions]?
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new PostEnableTask(commandHandler, onlinePlayers));
+
+        // Mid-term cleanup (seconds range).
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                midTermCleanup();
+            }
+        }, 83, 83);
 
         // Set StaticLog to more efficient output.
         StaticLog.setStreamID(Streams.STATUS);
@@ -1010,6 +1032,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Cache some things. TODO: Where is this comment from !?
         // Re-setup allViolationsHook.
         allViolationsHook.setConfig(new AllViolationsConfig(config));
+        // Set block change tracker.
+        updateBlockChangeTracker(config);
     }
 
     /**
@@ -1023,6 +1047,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
         clearExemptionsOnJoin = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN);
         clearExemptionsOnLeave = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE);
+    }
+
+    private void updateBlockChangeTracker(final ConfigFile config) {
+        if (config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) 
+                && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS)) {
+            if (blockChangeListener == null) {
+                blockChangeListener = new BlockChangeListener(blockChangeTracker);
+                this.addComponent(blockChangeListener);
+            }
+            blockChangeListener.setEnabled(true);
+        }
+        else if (blockChangeListener != null) {
+            blockChangeListener.setEnabled(false);
+            blockChangeTracker.clear();
+        }
     }
 
     @Override
@@ -1248,7 +1287,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             sched.cancelTask(consistencyCheckerTaskId);
         }
         ConfigFile config = ConfigManager.getConfigFile();
-        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true)) return;
+        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true)) {
+            return;
+        }
         // Schedule task in seconds.
         final long delay = 20L * config.getInt(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 1, 3600, 10);
         consistencyCheckerTaskId = sched.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -1257,6 +1298,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 runConsistencyChecks();
             }
         }, delay, delay );
+    }
+
+    /**
+     * Several seconds, repeating.
+     */
+    protected void midTermCleanup() {
+        if (blockChangeListener.isEnabled()) {
+            blockChangeTracker.checkExpiration(TickTask.getTick());
+        }
     }
 
     /**
@@ -1365,6 +1415,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             allTags.put(entry.getKey(), Collections.unmodifiableSet(entry.getValue()));
         }
         return Collections.unmodifiableMap(allTags);
+    }
+
+    @Override
+    public BlockChangeTracker getBlockChangeTracker() {
+        return blockChangeTracker;
     }
 
 }

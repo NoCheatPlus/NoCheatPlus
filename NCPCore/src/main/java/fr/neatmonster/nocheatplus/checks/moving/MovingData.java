@@ -138,6 +138,8 @@ public class MovingData extends ACheckData {
     public SimpleEntry  verVelUsed = null;
     /** Compatibility entry for bouncing of slime blocks and the like. */
     public SimpleEntry verticalBounce = null;
+    /** Last used block change id (BlockChangeTracker). */
+    public long blockChangeId = 0; // TODO: Need split into several?
 
     /** Tick at which walk/fly speeds got changed last time. */
     public int speedTick = 0;
@@ -863,8 +865,8 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Check the verVelUsed field and return that if appropriate. Otherwise
-     * call useVerticalVelocity(amount). 
+     * Use the verVelUsed field, if it matches. Otherwise call
+     * useVerticalVelocity(amount).
      * 
      * @param amount
      * @return

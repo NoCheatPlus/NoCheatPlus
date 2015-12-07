@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 
 
@@ -129,5 +130,11 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * @return
      */
     public LogManager getLogManager();
+
+    /**
+     * Get the block change tracker (pistons, other).
+     * @return
+     */
+    public BlockChangeTracker getBlockChangeTracker();
 
 }

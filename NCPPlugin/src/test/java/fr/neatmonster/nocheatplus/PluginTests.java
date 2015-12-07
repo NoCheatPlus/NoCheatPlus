@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
@@ -136,6 +137,11 @@ public class PluginTests {
 
         @Override
         public boolean hasFeatureTag(String key, String feature) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public BlockChangeTracker getBlockChangeTracker() {
             throw new UnsupportedOperationException();
         }
 

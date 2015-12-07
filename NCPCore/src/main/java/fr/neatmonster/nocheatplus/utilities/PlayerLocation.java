@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -7,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 
 /**
  * An utility class used to know a lot of things for a player and a location
@@ -940,6 +944,79 @@ public class PlayerLocation {
      */
     public int getTypeIdAbove() {
         return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
+    }
+
+    /**
+     * Check for push using the full bounding box (pistons).
+     * 
+     * @param blockChangeTracker
+     * @param oldChangeId
+     * @param direction
+     * @param coverDistance
+     *            The (always positive) distance to cover.
+     * @return The lowest id greater than oldChangeId, or -1 if nothing found..
+     */
+    public long getBlockChangeIdPush(final BlockChangeTracker blockChangeTracker, final long oldChangeId, final Direction direction, final double coverDistance) {
+        final int tick = TickTask.getTick();
+        final UUID worldId = world.getUID();
+        final int iMinX = Location.locToBlock(minX);
+        final int iMaxX = Location.locToBlock(maxX);
+        final int iMinY = Location.locToBlock(minY);
+        final int iMaxY = Location.locToBlock(maxY);
+        final int iMinZ = Location.locToBlock(minZ);
+        final int iMaxZ = Location.locToBlock(maxZ);
+        long minId = Long.MAX_VALUE;
+        for (int x = iMinX; x <= iMaxX; x++) {
+            for (int z = iMinZ; z <= iMaxZ; z++) {
+                for (int y = iMinY; y <= iMaxY; y++) {
+                    final long tempId = blockChangeTracker.getChangeIdPush(oldChangeId, tick, worldId, x, y, z, direction);
+                    if (tempId != -1 && tempId < minId) {
+                        // Check vs. coverDistance, exclude cases where the piston can't push that far.
+                        if (coverDistance > 0.0 && coversDistance(x, y, z, direction, coverDistance)) {
+                            minId = tempId;
+                        }
+                    }
+                }
+            }
+        }
+        return minId == Long.MAX_VALUE ? -1 : minId;
+    }
+
+    /**
+     * Test if a block fully pushed into that direction can push the player by coverDistance.
+     * 
+     * @param x Block coordinates.
+     * @param y
+     * @param z
+     * @param direction
+     * @param coverDistance
+     * @return
+     */
+    private boolean coversDistance(final int x, final int y, final int z, final Direction direction, final double coverDistance) {
+        switch (direction) {
+            case Y_POS: {
+                return y + 1.0 - Math.max(minY, (double) y) >= coverDistance;
+            }
+            case Y_NEG: {
+                return Math.min(maxY, (double) y + 1) - y >= coverDistance;
+            }
+            case X_POS: {
+                return x + 1.0 - Math.max(minX, (double) x) >= coverDistance;
+            }
+            case X_NEG: {
+                return Math.min(maxX, (double) x + 1) - x >= coverDistance;
+            }
+            case Z_POS: {
+                return z + 1.0 - Math.max(minZ, (double) z) >= coverDistance;
+            }
+            case Z_NEG: {
+                return Math.min(maxZ, (double) z + 1) - z >= coverDistance;
+            }
+            default: {
+                // Assume anything does (desired direction is NONE, read as ALL, thus accept all).
+                return true;
+            }
+        }
     }
 
     /**

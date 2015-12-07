@@ -18,6 +18,8 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -97,11 +99,14 @@ public class SurvivalFly extends Check {
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
 
+    private final BlockChangeTracker blockChangeTracker;
+
     /**
      * Instantiates a new survival fly check.
      */
     public SurvivalFly() {
         super(CheckType.MOVING_SURVIVALFLY);
+        blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
     /**
@@ -370,7 +375,20 @@ public class SurvivalFly extends Check {
             vDistanceAboveLimit = res[1];
         }
 
-        // TODO: on ground -> on ground improvements
+        // Post-check recovery.
+        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.0 && cc.blockChangeTrackerPush) {
+            // TODO: Better place for checking for push [redesign for intermediate result objects?].
+            // Vertical push/pull.
+            double[] pushResult = getPushResultVertical(yDistance, from, to, data);
+            if (pushResult != null) {
+                vAllowedDistance = pushResult[0];
+                vDistanceAboveLimit = pushResult[1];
+            }
+        }
+        // Push/pull sideways.
+        // TODO: Slightly itchy: regard x and z separately (Better in another spot).
+
+        // TODO: on ground -> on ground improvements.
 
         // Debug output.
         final int tagsLength;
@@ -533,6 +551,44 @@ public class SurvivalFly extends Check {
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);
         }
+        return null;
+    }
+
+    /**
+     * Check for push/pull by pistons, alter data appropriately (blockChangeId).
+     * 
+     * @param yDistance
+     * @param from
+     * @param to
+     * @param data
+     * @return
+     */
+    private double[] getPushResultVertical(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
+        final long oldChangeId = data.blockChangeId;
+        // TODO: Allow push up to 1.0 (or 0.65 something) even beyond block borders, IF COVERED [adapt PlayerLocation].
+        // Push (/pull) up.
+        if (yDistance > 0.0) {
+            // TODO: Other conditions? [some will be in passable later].
+            double maxDistYPos = 1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
+            final long changeIdYPos = from.getBlockChangeIdPush(blockChangeTracker, oldChangeId, Direction.Y_POS, yDistance);
+            if (changeIdYPos != -1) {
+                data.blockChangeId = Math.max(data.blockChangeId, changeIdYPos);
+                tags.add("push_y_pos");
+                return new double[]{maxDistYPos, 0.0};
+            }
+        }
+        // Push (/pull) down.
+        else if (yDistance < 0.0) {
+            // TODO: Other conditions? [some will be in passable later].
+            double maxDistYPos = from.getY() - from.getBlockY(); // TODO: Margin ?
+            final long changeIdYPos = from.getBlockChangeIdPush(blockChangeTracker, oldChangeId, Direction.Y_NEG, -yDistance);
+            if (changeIdYPos != -1) {
+                data.blockChangeId = Math.max(data.blockChangeId, changeIdYPos);
+                tags.add("push_y_neg");
+                return new double[]{maxDistYPos, 0.0};
+            }
+        }
+        // Nothing found.
         return null;
     }
 
