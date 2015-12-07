@@ -1304,7 +1304,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Several seconds, repeating.
      */
     protected void midTermCleanup() {
-        if (blockChangeListener.isEnabled()) {
+        if (blockChangeListener != null && blockChangeListener.isEnabled()) {
             blockChangeTracker.checkExpiration(TickTask.getTick());
         }
     }
