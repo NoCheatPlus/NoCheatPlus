@@ -1160,8 +1160,11 @@ public class SurvivalFly extends Check {
         // TODO: Do any belong into odd gravity? (Needs re-grouping EVERYTHING anyway.)
         return (data.sfJumpPhase == 1 || data.sfJumpPhase == 2)
                 && (
+                        // Too few decrease on first moves out of water.
+                        data.lastYDist > 0.0 && yDistance < data.lastYDist - GRAVITY_MAX && yDistDiffEx > 0.0 && yDistDiffEx < GRAVITY_MAX + GRAVITY_ODD
+                        && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND)
                         // Jump or decrease falling speed after a small gain (could be bounding box?).
-                        yDistDiffEx > 0.0 && data.liftOffEnvelope != LiftOffEnvelope.NORMAL
+                        || yDistDiffEx > 0.0 && data.liftOffEnvelope != LiftOffEnvelope.NORMAL
                         && data.lastYDist >= -GRAVITY_MAX - GRAVITY_MIN && data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN
                         && yDistance > data.lastYDist && yDistance < 0.84 * maxJumpGain
                         // Falling slightly too fast.
@@ -1725,6 +1728,13 @@ public class SurvivalFly extends Check {
                     //&& !BlockProperties.isLiquid(to.getTypeId(to.getBlockX(), Location.locToBlock(to.getY() + to.getEyeHeight()), to.getBlockZ()))
                     ) {
                 return new double[]{data.lastYDist - GRAVITY_MAX - GRAVITY_MIN, 0.0};
+            }
+            // Increase speed slightly on second in-medium move.
+            // TODO: Also without velocity?
+            else if (data.insideMediumCount <= 1 && 
+                    data.lastYDist < 0.8 && yDistance < data.lastYDist - GRAVITY_ODD && yDistance > data.lastYDist - GRAVITY_MAX
+                    ) {
+                
             }
             // In-water rough near-0-inversion from allowed speed to a negative amount, little more than allowed (magic -0.2 roughly).
             else if (data.lastYDist >= GRAVITY_MAX / 2.0 && data.lastYDist <= GRAVITY_MAX + GRAVITY_MIN / 2.0
