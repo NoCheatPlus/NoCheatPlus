@@ -22,7 +22,7 @@ public class CountableLocation extends DataLocation {
     public String toString() {
         final StringBuilder builder = new StringBuilder(256);
         builder.append("CountableLocation(");
-        builder.append(",x=");
+        builder.append("x=");
         builder.append(x);
         builder.append(",y=");
         builder.append(y);

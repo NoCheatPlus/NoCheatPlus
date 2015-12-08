@@ -49,7 +49,7 @@ public class DataLocation {
     public String toString() {
         final StringBuilder builder = new StringBuilder(256);
         builder.append("Location(");
-        builder.append(",x=");
+        builder.append("x=");
         builder.append(x);
         builder.append(",y=");
         builder.append(y);
