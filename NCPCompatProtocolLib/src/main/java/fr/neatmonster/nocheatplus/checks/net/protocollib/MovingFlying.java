@@ -111,16 +111,16 @@ public class MovingFlying extends BaseAdapter {
                 return;
             }
             switch(data.teleportQueue.processAck(packetData)) {
-                case CANCEL: {
+                case WAITING: {
                     if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet before having received ACK on outgoing position.");
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet, still waiting for ACK on outgoing position.");
                     }
                 }
                 case ACK: {
                     // Skip processing ACK packets, no cancel.
                     skipFlyingFrequency = true;
                     if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet interpreted as ACK for outgoing position.");
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet, interpret as ACK for outgoing position.");
                     }
                 }
                 default: {

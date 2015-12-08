@@ -24,7 +24,6 @@ import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
-import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
@@ -176,6 +175,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         // TODO: Might move to MovingListener.
+        // TODO: Might still add cancelled UNKNOWN events. TEST IT
         final Location to = event.getTo();
         if (to == null) {
             return;
@@ -185,7 +185,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
         if (cc.flyingFrequencyActive) {
             final NetData data = dataFactory.getData(player);
             // Register expected location for comparison with outgoing packets.
-            data.teleportQueue.onTeleportEvent(new DataPacketFlying(false, to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch(), System.currentTimeMillis()));
+            data.teleportQueue.onTeleportEvent(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
         }
     }
 
