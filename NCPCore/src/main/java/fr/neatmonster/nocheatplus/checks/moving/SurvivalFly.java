@@ -1017,8 +1017,16 @@ public class SurvivalFly extends Check {
                 // Skip if the player could step up.
                 if (yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
                     if (data.getOrUseVerticalVelocity(yDistance) == null) {
-                        vDistanceAboveLimit = Math.max(vDistanceAboveLimit, totalVDistViolation);
-                        tags.add("vdistsb");
+                        // Last minute special case.
+                        if (data.lastYDist == Double.MAX_VALUE && hDistance == 0.0 
+                                && yDistance > 0.0 && yDistance < 0.000000005 && Math.abs(totalVDistViolation) < 0.000000005
+                                && !resetFrom && !resetTo && !data.noFallAssumeGround
+                                ) {
+                            // Special case after teleport to in-air (PaperSpigot, might confine further by server type/version).
+                        } else {
+                            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, totalVDistViolation);
+                            tags.add("vdistsb");
+                        }
                     }
                 }
             }
