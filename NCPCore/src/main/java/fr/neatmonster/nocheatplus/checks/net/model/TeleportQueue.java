@@ -32,7 +32,7 @@ public class TeleportQueue {
     /** Location from a Bukkit event, which we expect an outgoing teleport for. */
     private DataLocation expectOutgoing = null;
 
-    private long maxAge = 1500; // TODO: configurable
+    private long maxAge = 4000; // TODO: configurable
     private int maxQueueSize = 60; // TODO: configurable
 
 
