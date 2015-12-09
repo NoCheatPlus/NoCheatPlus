@@ -1018,8 +1018,8 @@ public class SurvivalFly extends Check {
                 if (yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
                     if (data.getOrUseVerticalVelocity(yDistance) == null) {
                         // Last minute special case.
-                        if (data.lastYDist == Double.MAX_VALUE && hDistance == 0.0 
-                                && yDistance > 0.0 && yDistance < 0.000000005 && Math.abs(totalVDistViolation) < 0.000000005
+                        if (data.lastYDist == Double.MAX_VALUE && data.sfJumpPhase == 0
+                                && Math.abs(totalVDistViolation) < 0.000000005 && yDistance > 0.0 && yDistance < 0.000000005 
                                 && !resetFrom && !resetTo && !data.noFallAssumeGround
                                 ) {
                             // Special case after teleport to in-air (PaperSpigot, might confine further by server type/version).
