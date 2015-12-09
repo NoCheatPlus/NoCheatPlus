@@ -111,10 +111,15 @@ public class TeleportQueue {
      *         ACK.
      */
     public AckResolution processAck(final DataPacketFlying packetData) {
+        // Check packet.
+        if (!packetData.hasPos || !packetData.hasLook) {
+            return AckResolution.IDLE;
+        }
+        // Check queue.
         final AckResolution res;
 
         lock.lock();
-        if (expectIncoming.isEmpty() || !packetData.hasPos || !packetData.hasLook) {
+        if (expectIncoming.isEmpty()) {
             res = AckResolution.IDLE;
         } else {
             res = getAckResolution(packetData);
