@@ -1742,7 +1742,7 @@ public class SurvivalFly extends Check {
             else if (data.insideMediumCount <= 1 && 
                     data.lastYDist < 0.8 && yDistance < data.lastYDist - GRAVITY_ODD && yDistance > data.lastYDist - GRAVITY_MAX
                     ) {
-                
+                return new double[]{yDistance, 0.0};
             }
             // In-water rough near-0-inversion from allowed speed to a negative amount, little more than allowed (magic -0.2 roughly).
             else if (data.lastYDist >= GRAVITY_MAX / 2.0 && data.lastYDist <= GRAVITY_MAX + GRAVITY_MIN / 2.0
