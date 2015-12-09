@@ -663,7 +663,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, moveInfo.data, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, mightBeMultipleMoves, moveInfo.data, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {

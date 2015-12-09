@@ -121,7 +121,7 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MoveData moveData, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final boolean mightBeMultipleMoves, final MoveData moveData, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
 
         // Calculate some distances.
@@ -370,7 +370,7 @@ public class SurvivalFly extends Check {
             }
         }
         else {
-            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, data, cc);
+            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, mightBeMultipleMoves, data, cc);
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
         }
@@ -804,7 +804,7 @@ public class SurvivalFly extends Check {
      * Core y-distance checks for in-air movement (may include air -> other).
      * @return
      */
-    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, final MovingData data, final MovingConfig cc) {
+    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc) {
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;
         double vDistanceAboveLimit = 0.0;
@@ -1018,11 +1018,14 @@ public class SurvivalFly extends Check {
                 if (yDistance > cc.sfStepHeight || !tags.contains("lostground_couldstep")) {
                     if (data.getOrUseVerticalVelocity(yDistance) == null) {
                         // Last minute special case.
-                        if (data.lastYDist == Double.MAX_VALUE && data.sfJumpPhase == 0
-                                && Math.abs(totalVDistViolation) < 0.000000005 && yDistance > 0.0 && yDistance < 0.000000005 
+                        if (data.lastYDist == Double.MAX_VALUE && data.sfJumpPhase == 0 && mightBeMultipleMoves
+                                && Math.abs(totalVDistViolation) < 0.01 && yDistance > 0.0 && yDistance < 0.01
                                 && !resetFrom && !resetTo && !data.noFallAssumeGround
                                 ) {
-                            // Special case after teleport to in-air (PaperSpigot, might confine further by server type/version).
+                            // Special case after teleport to in-air (PaperSpigot).
+                            // TODO: Confine to PaperSpigot?
+                            // TODO: Confine to from at block level (offest 0)?
+                            tags.add("skip_paper");
                         } else {
                             vDistanceAboveLimit = Math.max(vDistanceAboveLimit, totalVDistViolation);
                             tags.add("vdistsb");
