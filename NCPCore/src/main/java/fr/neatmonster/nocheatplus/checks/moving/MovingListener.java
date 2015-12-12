@@ -59,6 +59,8 @@ import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.IData;
@@ -907,6 +909,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
 
+        // TODO: Consider to store event.getFrom() from LOWEST priority in processingEvents.
         if (processingEvents.remove(player.getName()) == null) {
             // This means moving data has been reset by a teleport.
             // TODO: vehicles, cancelled, ...
@@ -925,18 +928,37 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Feed yawrate and reset moving data positions if necessary.
         final MovingData mData = MovingData.getData(player);
-        final long tick = TickTask.getTick();
+        final int tick = TickTask.getTick();
         if (!event.isCancelled()) {
             final Location pLoc = player.getLocation(useLoc);
             onMoveMonitorNotCancelled(player, TrigUtil.isSamePosAndLook(pLoc, from) ? from : pLoc, event.getTo(), now, tick, data, mData);
             useLoc.setWorld(null);
         }
         else {
-            data.lastMoveTime = now; // TODO: Evaluate moving this to MovingData !?
-            // TODO: teleported + other resetting ?
-            Combined.feedYawRate(player, from.getYaw(), now, from.getWorld().getName(), data);
-            mData.resetPositions(from);
-            mData.resetTrace(player, from, tick); // TODO: Should probably leave this to the teleport event!
+            onCancelledMove(player, from, tick, now, mData, data);
+        }
+    }
+
+    /**
+     * Adjust data for a cancelled move. No teleport event will fire, but an
+     * outgoing position is sent. Note that event.getFrom() may be overridden by
+     * a plugin, which the server will ignore, but can lead to confusion.
+     * 
+     * @param player
+     * @param from
+     * @param tick
+     * @param now
+     * @param mData
+     * @param data
+     */
+    private void onCancelledMove(final Player player, final Location from, final int tick, final long now, final MovingData mData, final CombinedData data) {
+        data.lastMoveTime = now; // TODO: Move to MovingData?
+        // TODO: teleported + other resetting ?
+        Combined.feedYawRate(player, from.getYaw(), now, from.getWorld().getName(), data);
+        mData.resetPositions(from);
+        mData.resetTrace(player, from, tick); // TODO: Should probably leave this to the teleport event!
+        if (((NetConfig) CheckType.NET_FLYINGFREQUENCY.getConfigFactory().getConfig(player)).flyingFrequencyActive) {
+            ((NetData) CheckType.NET_FLYINGFREQUENCY.getDataFactory().getData(player)).teleportQueue.onTeleportEvent(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch());
         }
     }
 
