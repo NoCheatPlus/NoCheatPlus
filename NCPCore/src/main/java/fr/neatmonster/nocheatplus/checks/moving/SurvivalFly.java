@@ -1169,30 +1169,31 @@ public class SurvivalFly extends Check {
         // TODO: Relate jump phase to last/second-last move fromWasReset (needs keeping that data in classes).
         // TODO: And distinguish where JP=2 is ok?
         // TODO: Do any belong into odd gravity? (Needs re-grouping EVERYTHING anyway.)
+        // 0: ...
         return (data.sfJumpPhase == 1 || data.sfJumpPhase == 2)
                 && (
-                        // Too few decrease on first moves out of water.
+                        // 1: Too few decrease on first moves out of water.
                         data.lastYDist > 0.0 && yDistance < data.lastYDist - GRAVITY_MAX && yDistDiffEx > 0.0 && yDistDiffEx < GRAVITY_MAX + GRAVITY_ODD
                         && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND)
-                        // Jump or decrease falling speed after a small gain (could be bounding box?).
+                        // 1: Jump or decrease falling speed after a small gain (could be bounding box?).
                         || yDistDiffEx > 0.0 && data.liftOffEnvelope != LiftOffEnvelope.NORMAL
                         && data.lastYDist >= -GRAVITY_MAX - GRAVITY_MIN && data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN
                         && yDistance > data.lastYDist && yDistance < 0.84 * maxJumpGain
-                        // Falling slightly too fast.
+                        // 1: Falling slightly too fast.
                         || yDistDiffEx < 0.0 && (
-                                // Friction issue (bad). TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
+                                // 2: Friction issue (bad). TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
                                 (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
                                 && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
                                 )
-                                // Falling slightly too slow.
+                                // 1: Falling slightly too slow.
                                 || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
                                 &&
                                 (
-                                        // Falling too slow around 0 yDistance.
+                                        // 2: Falling too slow around 0 yDistance.
                                         data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
                                         && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
                                         && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
-                                        // Moving out of liquid with velocity.
+                                        // 2: Moving out of liquid with velocity.
                                         || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
                                         && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
                                         && data.lastYDist - yDistance > GRAVITY_MAX
@@ -1219,81 +1220,81 @@ public class SurvivalFly extends Check {
         //        && (yDistChange < -GRAVITY_MIN && Math.abs(yDistChange) <= 2.0 * GRAVITY_MAX + GRAVITY_SPAN
         //        || from.isHeadObstructed(from.getyOnGround()) || data.fromWasReset && from.isHeadObstructed())
         return 
-                // Any envelope (supposedly normal) near 0 yDistance.
+                // 0: Any envelope (supposedly normal) near 0 yDistance.
                 yDistance > -2.0 * GRAVITY_MAX - GRAVITY_MIN && yDistance < 2.0 * GRAVITY_MAX + GRAVITY_MIN
                 && (
-                        // Too big chunk of change, but within reasonable bounds (should be contained in some other generic case?).
+                        // 1: Too big chunk of change, but within reasonable bounds (should be contained in some other generic case?).
                         data.lastYDist < 3.0 * GRAVITY_MAX + GRAVITY_MIN && yDistChange < -GRAVITY_MIN && yDistChange > -2.5 * GRAVITY_MAX -GRAVITY_MIN
                         // Transition to 0.0 yDistance.
                         || data.lastYDist > GRAVITY_ODD / 2.0 && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
-                        // yDist inversion near 0 (almost). TODO: This actually happens near liquid, but NORMAL env!?
+                        // 1: yDist inversion near 0 (almost). TODO: This actually happens near liquid, but NORMAL env!?
                         // lastYDist < Gravity max + min happens with dirty phase (slimes),. previously: max + span
                         // TODO: Can all cases be reduced to change sign with max. neg. gain of max + span ?
                         || data.lastYDist <= GRAVITY_MAX + GRAVITY_MIN && data.lastYDist > GRAVITY_ODD
                         && yDistance < GRAVITY_ODD && yDistance > -2.0 * GRAVITY_MAX - GRAVITY_ODD / 2.0
-                        // Head is obstructed. TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
+                        // 1: Head is obstructed. TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
                         || data.lastYDist >= 0.0 && (from.isHeadObstructed(from.getyOnGround()) || data.fromWasReset && from.isHeadObstructed())
-                        // Break the block underneath.
+                        // 1: Break the block underneath.
                         || data.lastYDist < 0.0 && data.toWasReset // TODO: Also assumeGround? Should have more precise flags.
                         && yDistance >= -GRAVITY_MAX - GRAVITY_SPAN && yDistance <= GRAVITY_MIN
-                        // Slope with slimes (also near ground without velocityJumpPhase, rather lowjump but not always).
+                        // 1: Slope with slimes (also near ground without velocityJumpPhase, rather lowjump but not always).
                         || data.lastYDist < -GRAVITY_MAX && yDistChange < - GRAVITY_ODD / 2.0 && yDistChange > -GRAVITY_MIN
-                        // Near ground (slime block).
+                        // 1: Near ground (slime block).
                         || data.lastYDist == 0.0 && yDistance < -GRAVITY_ODD / 2.5 && yDistance > -GRAVITY_MIN && to.isOnGround(GRAVITY_MIN)
                         )
-                        // With velocity.
+                        // 0: With velocity.
                         || data.isVelocityJumpPhase()
                         && (
-                                // Near zero inversion with slimes (rather dirty phase).
+                                // 1: Near zero inversion with slimes (rather dirty phase).
                                 data.lastYDist > GRAVITY_ODD && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN
                                 && yDistance <= -data.lastYDist && yDistance > -data.lastYDist - GRAVITY_MAX - GRAVITY_ODD
-                                // Odd mini-decrease with dirty phase (slime).
+                                // 1: Odd mini-decrease with dirty phase (slime).
                                 || data.lastYDist < -0.204 && yDistance > -0.26
                                 && yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD / 4.0
-                                // Lot's of decrease near zero TODO: merge later.
+                                // 1: Lot's of decrease near zero TODO: merge later.
                                 || data.lastYDist < -GRAVITY_ODD && data.lastYDist > -GRAVITY_MIN
                                 && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < -GRAVITY_MAX
-                                // Odd decrease less near zero.
+                                // 1: Odd decrease less near zero.
                                 || yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD 
                                 && data.lastYDist < 0.5 && data.lastYDist > 0.4
-                                // Small decrease after high edge. TODO: Consider min <-> span, generic.
+                                // 1: Small decrease after high edge. TODO: Consider min <-> span, generic.
                                 || data.lastYDist == 0.0 && yDistance > -GRAVITY_MIN && yDistance < -GRAVITY_ODD
                                 )
-                                // Small distance to set.back. .
+                                // 0: Small distance to set.back. .
                                 || data.hasSetBack() && Math.abs(data.getSetBackY() - from.getY()) < 1.0
                                 // TODO: Consider low fall distance as well.
                                 && (
-                                        // Near ground small decrease.
+                                        // 1: Near ground small decrease.
                                         data.lastYDist > GRAVITY_MAX && data.lastYDist < 3.0 * GRAVITY_MAX
                                         && yDistChange > - GRAVITY_MIN && yDistChange < -GRAVITY_ODD
-                                        // Bounce without velocity set.
+                                        // 1: Bounce without velocity set.
                                         //|| data.lastYDist == 0.0 && yDistance > -GRAVITY_MIN && yDistance < GRAVITY_SPAN
                                         )
-                                        // Jump-effect-specific
+                                        // 0: Jump-effect-specific
                                         // TODO: Jump effect at reduced lift off envelope -> skip this?
                                         || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
                                         && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < GRAVITY_MIN
                                         && yDistChange < -GRAVITY_SPAN
-                                        // Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
+                                        // 0: Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
                                         || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
                                         && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
-                                        // Reduced jumping envelope.
+                                        // 0: Reduced jumping envelope.
                                         || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
                                         && (
-                                                // Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
+                                                // 1: Wild-card allow half gravity near 0 yDistance. TODO: Check for removal of included cases elsewhere.
                                                 data.lastYDist > -10.0 * GRAVITY_ODD / 2.0 && data.lastYDist < 10.0 * GRAVITY_ODD
                                                 && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX
-                                                // 
+                                                // 1: 
                                                 || data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN && data.lastYDist > GRAVITY_ODD
                                                 && yDistance > 0.4 * GRAVITY_ODD && yDistance - data.lastYDist < -GRAVITY_ODD / 2.0
-                                                // 
+                                                // 1: 
                                                 || data.lastYDist < 0.2 && data.lastYDist >= 0.0 && yDistance > -0.2 && yDistance < 2.0 * GRAVITY_MAX
-                                                // 
+                                                // 1: 
                                                 || data.lastYDist > 0.4 * GRAVITY_ODD && data.lastYDist < GRAVITY_MIN && yDistance == 0.0
-                                                // Too small decrease, right after lift off.
+                                                // 1: Too small decrease, right after lift off.
                                                 || data.sfJumpPhase == 1 && data.lastYDist > -GRAVITY_ODD && data.lastYDist <= GRAVITY_MAX + GRAVITY_SPAN
                                                 && yDistance - data.lastYDist < 0.0114
-                                                // Any leaving liquid and keeping distance once.
+                                                // 1: Any leaving liquid and keeping distance once.
                                                 || data.sfJumpPhase == 1 
                                                 && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == data.lastYDist
                                                 )
