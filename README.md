@@ -39,7 +39,7 @@ Download
 * [Jenkins (development versions)] (http://ci.md-5.net/job/NoCheatPlus/)
 
 Support and Documentation
-* [Tickets] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
+* [Issues/Tickets] (https://github.com/NoCheatPlus/Issues/issues)
 * [Wiki] (https://github.com/NoCheatPlus/Docs/wiki)
 * [Configuration] (https://github.com/NoCheatPlus/Docs/wiki/Configuration)
 * [Permissions] (https://github.com/NoCheatPlus/Docs/wiki/Permissions)

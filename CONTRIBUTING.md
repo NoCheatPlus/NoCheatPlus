@@ -4,8 +4,7 @@ Contributing to NoCheatPlus
 This page describes how to contribute code to the project by means of pull requests.
 
 Other types of contribution:
-* [Tickets (all sorts)] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/) are currently hosted on BukkitDev, but will be migrated to GitHub later on.
-* [Tickets for the Wiki] (https://github.com/NoCheatPlus/Docs/issues) are on GitHub, these are only for the purpose of improving the Wiki itself.
+* [Issues/Tickets] (https://github.com/NoCheatPlus/Issues/issues) are hosted on GitHub.
 
 Pull Requests
 ---------
