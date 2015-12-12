@@ -86,6 +86,7 @@ public class TeleportQueue {
                         if (last.isSameLocation(x, y, z, yaw, pitch)) {
                             last.time = time;
                             last.count ++;
+                            res = last;
                         }
                     }
                 }
