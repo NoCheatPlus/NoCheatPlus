@@ -942,7 +942,7 @@ public class SurvivalFly extends Check {
                 // Odd decrease after lift-off.
             }
             else if (oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, data)) {
-                // Jump after leaving the liquid near ground.
+                // Just having left liquid.
             }
             else if (yDistance > 0.0 && data.lastYDist != Double.MAX_VALUE && data.lastYDist > yDistance
                     && data.lastYDist - yDistance <= data.lastYDist / 4.0
@@ -987,6 +987,9 @@ public class SurvivalFly extends Check {
                 }
                 else if (oddGravity(from, to, yDistance, yDistChange, data)) {
                     // Starting to fall.
+                }
+                else if (oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, data)) {
+                    // Just having left liquid.
                 }
                 else if (data.lastYDist >= 0.0 && yDistance <= 0.0 && yDistance > -GRAVITY_MAX - GRAVITY_SPAN && from.isHeadObstructed()) {
                     // Head was blocked, thus faster decrease than expected.
@@ -1168,38 +1171,58 @@ public class SurvivalFly extends Check {
     private static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, final MovingData data) {
         // TODO: Relate jump phase to last/second-last move fromWasReset (needs keeping that data in classes).
         // TODO: And distinguish where JP=2 is ok?
+        // TODO: Most are medium transitions with the possibility to keep/alter friction or even speed on 1st/2nd move (counting in the transition).
         // TODO: Do any belong into odd gravity? (Needs re-grouping EVERYTHING anyway.)
-        // 0: ...
-        return (data.sfJumpPhase == 1 || data.sfJumpPhase == 2)
-                && (
-                        // 1: Too few decrease on first moves out of water.
-                        data.lastYDist > 0.0 && yDistance < data.lastYDist - GRAVITY_MAX && yDistDiffEx > 0.0 && yDistDiffEx < GRAVITY_MAX + GRAVITY_ODD
-                        && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND)
-                        // 1: Jump or decrease falling speed after a small gain (could be bounding box?).
-                        || yDistDiffEx > 0.0 && data.liftOffEnvelope != LiftOffEnvelope.NORMAL
-                        && data.lastYDist >= -GRAVITY_MAX - GRAVITY_MIN && data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN
-                        && yDistance > data.lastYDist && yDistance < 0.84 * maxJumpGain
-                        // 1: Falling slightly too fast.
-                        || yDistDiffEx < 0.0 && (
-                                // 2: Friction issue (bad). TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
-                                (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
-                                && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
+        if (data.sfJumpPhase != 1 && data.sfJumpPhase != 2) {
+            return false;
+        }
+        return 
+                // 0: Falling slightly too fast (velocity/special).
+                yDistDiffEx < 0.0 && (
+                        // 2: Friction issue (bad).
+                        // TODO: Velocity jump phase isn't exact on that account, but shouldn't hurt.
+                        // TODO: Water-bound or not?
+                        (data.liftOffEnvelope != LiftOffEnvelope.NORMAL || data.isVelocityJumpPhase())
+                        && fallingEnvelope(yDistance, data.lastYDist, data.lastFrictionVertical, GRAVITY_ODD / 2.0)
+                        )
+                        // 0: Not normal envelope.
+                        // TODO: Water-bound or not?
+                        || data.liftOffEnvelope != LiftOffEnvelope.NORMAL
+                        && (
+                                // 1: Jump or decrease falling speed after a small gain (could be bounding box?).
+                                yDistDiffEx > 0.0 && yDistance > data.lastYDist && yDistance < 0.84 * maxJumpGain
+                                && data.lastYDist >= -GRAVITY_MAX - GRAVITY_MIN && data.lastYDist < GRAVITY_MAX + GRAVITY_SPAN
                                 )
-                                // 1: Falling slightly too slow.
-                                || yDistDiffEx > 0.0 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID
-                                &&
-                                (
-                                        // 2: Falling too slow around 0 yDistance.
-                                        data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
-                                        && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
-                                        && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
-                                        // 2: Moving out of liquid with velocity.
-                                        || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
-                                        && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
-                                        && data.lastYDist - yDistance > GRAVITY_MAX
-                                        && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                                // 0: Moving out of water somehow.
+                                || (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND)
+                                && (
+                                        // 1: Too few decrease on first moves out of water (upwards).
+                                        data.lastYDist > 0.0 && yDistance < data.lastYDist - GRAVITY_MAX && yDistDiffEx > 0.0 && yDistDiffEx < GRAVITY_MAX + GRAVITY_ODD
+                                        // 1: Odd decrease of speed as if still in water, moving out of water (downwards).
+                                        // TODO: data.lastFrictionVertical might not catch it (jump phase 0 -> next = air).
+                                        // TODO: Could not reproduce since first time (use DebugUtil.debug(String, boolean)).
+                                        || data.lastYDist < -2.0 * GRAVITY_MAX && data.sfJumpPhase == 1 
+                                        && yDistance < -GRAVITY_MAX && yDistance > data.lastYDist 
+                                        && Math.abs(yDistance - data.lastYDist * data.lastFrictionVertical) < GRAVITY_MAX 
+                                        // 1: Falling too slow, keeping roughly gravity-once speed.
+                                        || data.sfJumpPhase == 1
+                                        && data.lastYDist < -GRAVITY_ODD && data.lastYDist > -GRAVITY_MAX - GRAVITY_MIN 
+                                        && Math.abs(data.lastYDist - yDistance) < GRAVITY_SPAN 
+                                        && (yDistance < data.lastYDist || yDistance < GRAVITY_MIN)
+                                        // 1: Falling slightly too slow.
+                                        || yDistDiffEx > 0.0 && (
+                                                // 2: Falling too slow around 0 yDistance.
+                                                data.lastYDist != Double.MAX_VALUE && data.lastYDist > -2.0 * GRAVITY_MAX - GRAVITY_ODD
+                                                && yDistance < data.lastYDist && data.lastYDist - yDistance < GRAVITY_MAX
+                                                && data.lastYDist - yDistance > GRAVITY_MIN / 4.0
+                                                // 2: Moving out of liquid with velocity.
+                                                || data.lastYDist != Double.MAX_VALUE && data.lastYDist > 0.0
+                                                && yDistance < data.lastYDist && yDistance > 0.0 && data.sfJumpPhase == 1
+                                                && data.lastYDist - yDistance > GRAVITY_MAX
+                                                && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                                                )
                                         )
-                        );
+                                        ; // (return)
     }
 
     /**
