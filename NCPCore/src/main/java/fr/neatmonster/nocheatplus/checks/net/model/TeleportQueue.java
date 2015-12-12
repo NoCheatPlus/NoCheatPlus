@@ -70,7 +70,12 @@ public class TeleportQueue {
                     // Lazy expiration check.
                     final Iterator<CountableLocation> it = expectIncoming.iterator();
                     while (it.hasNext()) {
-                        if (time - maxAge > it.next().time) {
+                        final CountableLocation ref = it.next();
+                        if (time < ref.time) {
+                            // Time ran backwards. Force keep entries.
+                            ref.time = time;
+                        }
+                        else if (time - maxAge > ref.time) {
                             it.remove();
                         } else {
                             break;
@@ -155,9 +160,14 @@ public class TeleportQueue {
                     expectIncoming.removeFirst(); // Do not use the iterator here.
                 }
                 return AckResolution.ACK;
-            } else {
+            }
+            else {
                 // Skip until match or none found.
                 // TODO: Consider settings like maxSkipCount or strictly return WAITING.
+                if (packetData.time < ref.time) {
+                    // Time ran backwards, update to now.
+                    ref.time = packetData.time;
+                }
             }
         }
         // No match.
