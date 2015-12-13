@@ -40,32 +40,32 @@ public class SurvivalFly extends Check {
     private static final String DOUBLE_BUNNY = "doublebunny";
 
     // Horizontal speeds/modifiers.
-    public static final double walkSpeed            = 0.221D;
+    public static final double WALK_SPEED            = 0.221D;
 
-    public static final double modSneak             = 0.13D / walkSpeed;
+    public static final double modSneak             = 0.13D / WALK_SPEED;
     //    public static final double modSprint            = 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
 
-    public static final double modBlock             = 0.16D / walkSpeed;
-    public static final double modSwim              = 0.115D / walkSpeed;
+    public static final double modBlock             = 0.16D / WALK_SPEED;
+    public static final double modSwim              = 0.115D / WALK_SPEED;
     public static final double[] modDepthStrider    = new double[] {
         1.0,
-        0.1645 / modSwim / walkSpeed,
-        0.1995 / modSwim / walkSpeed,
+        0.1645 / modSwim / WALK_SPEED,
+        0.1995 / modSwim / WALK_SPEED,
         1.0 / modSwim, // Results in walkspeed.
     };
 
-    public static final double modWeb               = 0.105D / walkSpeed; // TODO: walkingSpeed * 0.15D; <- does not work
+    public static final double modWeb               = 0.105D / WALK_SPEED; // TODO: walkingSpeed * 0.15D; <- does not work
 
     public static final double modIce                 = 2.5D; // 
 
     /** Faster moving down stream (water mainly). */
-    public static final double modDownStream	= 0.19 / (walkSpeed * modSwim);
+    public static final double modDownStream	= 0.19 / (WALK_SPEED * modSwim);
 
     /** Maximal horizontal buffer. It can be higher, but normal resetting should keep this limit. */
     public static final double hBufMax			= 1.0;
 
     // Vertical speeds/modifiers. 
-    public static final double climbSpeed		= walkSpeed * 1.3; // TODO: Check if the factor is needed!  
+    public static final double climbSpeed		= WALK_SPEED * 1.3; // TODO: Check if the factor is needed!  
 
     // Other.
     /** Bunny-hop delay. */
@@ -171,7 +171,7 @@ public class SurvivalFly extends Check {
         if (data.lostSprintCount > 0) {
             // Sprint got toggled off, though the client is still (legitimately) moving at sprinting speed.
             // NOTE: This could extend the "sprinting grace" period, theoretically, until on ground.
-            if (resetTo && (fromOnGround || from.isResetCond()) || hDistance <= walkSpeed) {
+            if (resetTo && (fromOnGround || from.isResetCond()) || hDistance <= WALK_SPEED) {
                 // Invalidate.
                 data.lostSprintCount = 0;
                 tags.add("invalidate_lostsprint");
@@ -206,7 +206,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.walkSpeed * ((double) data.walkSpeed / 0.2);
+        final double walkSpeed = SurvivalFly.WALK_SPEED * ((double) data.walkSpeed / 0.2);
 
         setNextFriction(from, to, data, cc);
 
@@ -247,6 +247,13 @@ public class SurvivalFly extends Check {
         if (data.isVelocityJumpPhase() || data.resetVelocityJumpPhase()) {
             // (Reset is done after checks run.) 
             tags.add("dirty");
+        }
+
+        // Check if head is obstructed.
+        if (!resetFrom || !resetTo) {
+            data.thisMove.headObstructed = (yDistance > 0.0 ? from.isHeadObstructedMax(yDistance) : from.isHeadObstructed()) 
+                    //                    || to.isHeadObstructed() // Best not have this one.
+                    ;
         }
 
         //////////////////////
@@ -809,6 +816,7 @@ public class SurvivalFly extends Check {
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;
         double vDistanceAboveLimit = 0.0;
+        final MoveData lastMove = data.moveData.get(0);
 
         // Change seen from last yDistance.
         final double yDistChange = data.lastYDist == Double.MAX_VALUE ? Double.MAX_VALUE : yDistance - data.lastYDist;
@@ -952,7 +960,7 @@ public class SurvivalFly extends Check {
                 // Too strong decrease with velocity.
                 // TODO: Observed when moving off water, might be confined by that.
             }
-            else if (to.isHeadObstructed() || from.isHeadObstructedMax(yDistance)) {
+            else if (data.thisMove.headObstructed || lastMove.valid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
             else {
@@ -990,7 +998,8 @@ public class SurvivalFly extends Check {
                 else if (oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, data)) {
                     // Just having left liquid.
                 }
-                else if (data.lastYDist >= 0.0 && yDistance <= 0.0 && yDistance > -GRAVITY_MAX - GRAVITY_SPAN && from.isHeadObstructed()) {
+                else if (lastMove.valid && yDistance <= 0.0 && yDistance > -GRAVITY_MAX - GRAVITY_SPAN 
+                        && (data.thisMove.headObstructed || lastMove.valid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
                     // Head was blocked, thus faster decrease than expected.
                 }
                 else {
@@ -1254,7 +1263,8 @@ public class SurvivalFly extends Check {
                         // TODO: Can all cases be reduced to change sign with max. neg. gain of max + span ?
                         || data.lastYDist <= GRAVITY_MAX + GRAVITY_MIN && data.lastYDist > GRAVITY_ODD
                         && yDistance < GRAVITY_ODD && yDistance > -2.0 * GRAVITY_MAX - GRAVITY_ODD / 2.0
-                        // 1: Head is obstructed. TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
+                        // 1: Head is obstructed. 
+                        // TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
                         || data.lastYDist >= 0.0 && (from.isHeadObstructed(from.getyOnGround()) || data.fromWasReset && from.isHeadObstructed())
                         // 1: Break the block underneath.
                         || data.lastYDist < 0.0 && data.toWasReset // TODO: Also assumeGround? Should have more precise flags.
@@ -1279,7 +1289,8 @@ public class SurvivalFly extends Check {
                                 // 1: Odd decrease less near zero.
                                 || yDistChange > -GRAVITY_MIN && yDistChange < -GRAVITY_ODD 
                                 && data.lastYDist < 0.5 && data.lastYDist > 0.4
-                                // 1: Small decrease after high edge. TODO: Consider min <-> span, generic.
+                                // 1: Small decrease after high edge.
+                                // TODO: Consider min <-> span, generic.
                                 || data.lastYDist == 0.0 && yDistance > -GRAVITY_MIN && yDistance < -GRAVITY_ODD
                                 )
                                 // 0: Small distance to set.back. .
@@ -1297,7 +1308,8 @@ public class SurvivalFly extends Check {
                                         || data.jumpAmplifier > 0 && data.lastYDist < GRAVITY_MAX + GRAVITY_MIN / 2.0 && data.lastYDist > -2.0 * GRAVITY_MAX - 0.5 * GRAVITY_MIN
                                         && yDistance > -2.0 * GRAVITY_MAX - 2.0 * GRAVITY_MIN && yDistance < GRAVITY_MIN
                                         && yDistChange < -GRAVITY_SPAN
-                                        // 0: Another near 0 yDistance case. TODO: Inaugurate into some more generic envelope.
+                                        // 0: Another near 0 yDistance case.
+                                        // TODO: Inaugurate into some more generic envelope.
                                         || data.lastYDist > -GRAVITY_MAX && data.lastYDist < GRAVITY_MIN && !data.toWasReset
                                         && yDistance < data.lastYDist - GRAVITY_MIN / 2.0 && yDistance > data.lastYDist - GRAVITY_MAX - 0.5 * GRAVITY_MIN
                                         // 0: Reduced jumping envelope.
@@ -1462,10 +1474,8 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        if (yDistance >= 0.0 && from.isHeadObstructedMax(yDistance) 
-                                || yDistance < 0.0 && from.isHeadObstructed()
-                                || to.isHeadObstructed() // TODO: Not sure this should count at all (should with 1st on might be multiple?).
-                                ) {
+                        final MoveData lastMove = data.moveData.get(0);
+                        if (data.thisMove.headObstructed || yDistance <= 0.0 && lastMove.valid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                             // Exempt.
                             tags.add("nolowjump_ceil");
                         }
@@ -1576,7 +1586,8 @@ public class SurvivalFly extends Check {
         // TODO: A more state-machine like modeling (hop, slope, states, low-edge).
 
         // Fly phase.
-        if (data.lastHDist != Double.MAX_VALUE && data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint) {
+        // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
+        if (data.lastHDist != Double.MAX_VALUE && data.bunnyhopDelay > 0 && hDistance > WALK_SPEED) { // * modSprint) {
             // (lastHDist may be reset on commands.)
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay;
@@ -1621,7 +1632,8 @@ public class SurvivalFly extends Check {
             }
 
             // 2x horizontal speed increase detection.
-            if (!allowHop && data.lastHDist != Double.MAX_VALUE && hDistance - data.lastHDist >= walkSpeed * 0.5 && hopTime == 1) {
+            // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
+            if (!allowHop && data.lastHDist != Double.MAX_VALUE && hDistance - data.lastHDist >= WALK_SPEED * 0.5 && hopTime == 1) {
                 if (data.lastYDist >= -GRAVITY_MAX / 2.0 && data.lastYDist <= 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
                     // TODO: Confine to increasing set back y ?
                     tags.add(DOUBLE_BUNNY);
@@ -1631,7 +1643,8 @@ public class SurvivalFly extends Check {
 
             // Allow hop for special cases.
             if (!allowHop && (from.isOnGround() || data.noFallAssumeGround)) {
-                if (data.bunnyhopDelay <= 6 || yDistance >= 0.0 && from.isHeadObstructed() || to.isHeadObstructed()) {
+                // TODO: Better reset delay in this case ?
+                if (data.bunnyhopDelay <= 6 || yDistance >= 0.0 && data.thisMove.headObstructed) { // || to.isHeadObstructed()) {
                     // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
                     tags.add("ediblebunny");
                     allowHop = true;
@@ -1641,23 +1654,29 @@ public class SurvivalFly extends Check {
 
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
-        if (allowHop && hDistance >= walkSpeed
+        // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
+        if (allowHop && hDistance >= WALK_SPEED
                 && (hDistance > (((data.lastHDist == Double.MAX_VALUE || data.lastHDist == 0.0 && data.lastYDist == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
                 && hDistance < 2.15 * hAllowedDistance
-                || (yDistance > from.getyOnGround() || hDistance < 2.6 * walkSpeed) && data.lastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.lastHDist && hDistance < 2.15 * data.lastHDist
+                // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
+                || (yDistance > from.getyOnGround() || hDistance < 2.6 * WALK_SPEED) && data.lastHDist != Double.MAX_VALUE && hDistance > 1.314 * data.lastHDist && hDistance < 2.15 * data.lastHDist
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
             // TODO: LiftOffEnvelope.allowBunny ?
+            final MoveData lastMove = data.moveData.get(0);
             if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL
                     && (!data.sfLowJump || data.sfNoLowJump)
                     // 0: Y-distance envelope.
                     && yDistance >= 0.0
                     && (
+                            // 1: Normal jumping.
                             yDistance > 0.0 
                             && yDistance > data.liftOffEnvelope.getMinJumpGain(data.jumpAmplifier) - GRAVITY_SPAN
-                            || from.isHeadObstructedMax(yDistance) 
-                            // TODO: (2nd below) demand try next jump.
+                            // 1: Too short with head obstructed.
+                            || data.thisMove.headObstructed || lastMove.valid && lastMove.headObstructed && lastMove.yDistance <= 0.0
+                            // 1: Hop without y distance increase at moderate h-speed.
+                            // TODO: 2nd below: demand next move to jump. Relate to stored past moves. 
                             || (cc.sfGroundHop || yDistance == 0.0 && !data.fromWasReset)
                             && hAllowedDistance > 0.0 && hDistance / hAllowedDistance < 1.35
                             )
@@ -1699,7 +1718,7 @@ public class SurvivalFly extends Check {
 
     private static double swimBaseSpeedV() {
         // TODO: Does this have to be the dynamic walk speed (refactoring)?
-        return walkSpeed * modSwim + 0.02;
+        return WALK_SPEED * modSwim + 0.02;
     }
 
     /**
@@ -1754,7 +1773,7 @@ public class SurvivalFly extends Check {
                         // TODO: What now !?
                         || !to.isInLiquid()
                         || (toOnGround || data.lastYDist != Double.MAX_VALUE && data.lastYDist - yDistance >= 0.010 || to.isAboveStairs())) {
-                    double vAllowedDistance = walkSpeed * modSwim + 0.5;
+                    double vAllowedDistance = baseSpeed + 0.5;
                     double vDistanceAboveLimit = yDistance - vAllowedDistance;
                     if (vDistanceAboveLimit <= 0.0) {
                         return new double[]{vAllowedDistance, 0.0};
