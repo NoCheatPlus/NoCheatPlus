@@ -930,7 +930,7 @@ public class SurvivalFly extends Check {
                 vDistRelVL = true;
             }
         } // else: yDistDiffEx <= 0.0
-        else if (yDistance >= 0.0) {
+        else if (yDistance >= 0.0) { // Moved too short.
             if (!strictVdistRel || Math.abs(yDistDiffEx) <= GRAVITY_SPAN || vAllowedDistance <= 0.2) {
                 // Allow jumping less high unless within "strict envelope".
                 // TODO: Extreme anti-jump effects, perhaps.
@@ -951,9 +951,7 @@ public class SurvivalFly extends Check {
                 // Too strong decrease with velocity.
                 // TODO: Observed when moving off water, might be confined by that.
             }
-            else if (to.isHeadObstructed() 
-                    // TODO: Not sure about the second case:
-                    || data.lastYDist > 0.0 && yDistance ==  0.0 && from.isHeadObstructed()) {
+            else if (to.isHeadObstructed() || from.isHeadObstructedMax(yDistance)) {
                 // Head is blocked, thus a shorter move.
             }
             else {
@@ -1463,7 +1461,14 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        if (!from.isHeadObstructed() && !to.isHeadObstructed()) {
+                        if (yDistance >= 0.0 && from.isHeadObstructedMax(yDistance) 
+                                || yDistance < 0.0 && from.isHeadObstructed()
+                                || to.isHeadObstructed() // TODO: Not sure this should count at all (should with 1st on might be multiple?).
+                                ) {
+                            // Exempt.
+                            tags.add("nolowjump_ceil");
+                        }
+                        else {
                             tags.add("lowjump_set");
                             data.sfLowJump = true;
                         }
@@ -1645,15 +1650,17 @@ public class SurvivalFly extends Check {
             // TODO: LiftOffEnvelope.allowBunny ?
             if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL
                     && (!data.sfLowJump || data.sfNoLowJump)
-                    // Y-distance envelope.
+                    // 0: Y-distance envelope.
+                    && yDistance >= 0.0
                     && (
                             yDistance > 0.0 
                             && yDistance > data.liftOffEnvelope.getMinJumpGain(data.jumpAmplifier) - GRAVITY_SPAN
-                            || yDistance > 0.0 && from.isHeadObstructed(yDistance + from.getyOnGround())
-                            || (cc.sfGroundHop && yDistance >= 0 || yDistance == 0.0 && !data.fromWasReset) // TODO: (2nd) demand try next jump.
+                            || from.isHeadObstructedMax(yDistance) 
+                            // TODO: (2nd below) demand try next jump.
+                            || (cc.sfGroundHop || yDistance == 0.0 && !data.fromWasReset)
                             && hAllowedDistance > 0.0 && hDistance / hAllowedDistance < 1.35
                             )
-                            // Bad auto indent.
+                            // 0: Bad auto indent.
                             && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && (data.noFallAssumeGround || data.fromWasReset) || double_bunny)
                             && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
                     ) {

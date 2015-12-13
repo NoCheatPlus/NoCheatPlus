@@ -660,24 +660,36 @@ public class PlayerLocation {
 
     /**
      * Test if something solid/ground-like collides within the given margin
-     * above the height of the player.
+     * above the eye height of the player.
      * 
-     * @param marginAboveHeight
+     * @param marginAboveEyeHeight
      * @return
      */
-    public boolean isHeadObstructed(double marginAboveHeight) {
-        return BlockProperties.collides(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+    public boolean isHeadObstructed(double marginAboveEyeHeight) {
+        return BlockProperties.collides(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveEyeHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
     }
 
     /**
      * Test if something solid/ground-like collides within a default margin
-     * above the height of the player. Margin is yOnGround + max(0.0, 2.0 - eyeHeight).
+     * above the eye height of the player. Margin is yOnGround + max(0.0, 2.0 -
+     * eyeHeight).
      * 
-     * @param marginAboveHeight
      * @return
      */
     public boolean isHeadObstructed() {
         return isHeadObstructed(Math.max(0.0, 2.0 - eyeHeight) + yOnGround);
+    }
+
+    /**
+     * Test if something solid/ground-like collides within the maximum of the
+     * default margin and the given margin above the eye height of the player.
+     * Will add yOnGround to the given margin.
+     * 
+     * @param marginAboveEyeHeight
+     * @return
+     */
+    public boolean isHeadObstructedMax(double marginAboveEyeHeight) {
+        return isHeadObstructed(Math.max(marginAboveEyeHeight, 2.0 - eyeHeight) + yOnGround);
     }
 
     /**
