@@ -1,6 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.bukkit.Location;
@@ -16,6 +18,7 @@ import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
@@ -146,6 +149,18 @@ public class MovingData extends ACheckData {
     public float walkSpeed = 0.0f;
     public float flySpeed = 0.0f;
 
+    /**
+     * Keep track of past moves edge data. First entry always is the last fully
+     * processed move, or invalid, even during processing. The currently
+     * processed move always is thisMove. The list length always stays the same.
+     */
+    public final LinkedList<MoveData> moveData = new LinkedList<MoveData>();
+    /**
+     * The move currently being processed. Will be inserted to first position
+     * when done, and exchanged for the invalidated last element of moveData.
+     */
+    public MoveData thisMove = new MoveData();
+
     // Velocity handling.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
     private final SimpleAxisVelocity verVel = new SimpleAxisVelocity();
@@ -254,12 +269,39 @@ public class MovingData extends ACheckData {
         super(config);
         morePacketsFreq = new ActionFrequency(config.morePacketsEPSBuckets, 500);
         morePacketsBurstFreq = new ActionFrequency(12, 5000);
+
+        // Past moves data: initialize with dummies.
+        for (int i = 0; i < 2; i++) { // Two past moves allow better workarounds than 1.
+            moveData.add(new MoveData());
+        }
+    }
+
+    /**
+     * Invalidate thisMove and all elements in moveData.
+     */
+    private void invalidateMoveData() {
+        final Iterator<MoveData> it = moveData.iterator();
+        while (it.hasNext()) {
+            it.next().invalidate();
+        }
+        thisMove.invalidate();
+    }
+
+    /**
+     * Call after processing with a valid thisMove field. Insert thisMove as
+     * first in moveData, set thisMove to invalidated last element of moveData.
+     */
+    public void finishThisMove() {
+        moveData.addFirst(thisMove);
+        thisMove = moveData.removeLast();
+        thisMove.invalidate();
     }
 
     /**
      * Clear the data of the fly checks (not more-packets).
      */
     public void clearFlyData() {
+        invalidateMoveData();
         bunnyhopDelay = 0;
         sfJumpPhase = 0;
         jumpAmplifier = 0;
@@ -325,6 +367,7 @@ public class MovingData extends ACheckData {
      * Move event: Mildly reset some data, prepare setting a new to-Location.
      */
     public void prepareSetBack(final Location loc) {
+        invalidateMoveData();
         clearAccounting();
         sfJumpPhase = 0;
         lastYDist = lastHDist = Double.MAX_VALUE;
@@ -398,12 +441,14 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Just reset the "last locations" references.
+     * Reset edge data for last moves.
      * @param x
      * @param y
      * @param z
      */
     public void resetPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
+        invalidateMoveData();
+        moveData.get(0).set(x, y, z, yaw, pitch);
         fromX = toX = x;
         fromY = toY = y;
         fromZ = toZ = z;
@@ -456,6 +501,7 @@ public class MovingData extends ACheckData {
     }
 
     public void resetLastDistances() {
+        // TODO: Will change with moveData in use.
         lastHDist = lastYDist = Double.MAX_VALUE;
     }
 
@@ -465,6 +511,7 @@ public class MovingData extends ACheckData {
      * @param to
      */
     public void setPositions(final Location from, final Location to) {
+        // TODO: Will change with moveData in use..
         fromX = from.getX();
         fromY = from.getY();
         fromZ = from.getZ();

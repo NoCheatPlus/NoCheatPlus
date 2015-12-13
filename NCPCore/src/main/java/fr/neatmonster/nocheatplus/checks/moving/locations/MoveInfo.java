@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.moving.locations;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -25,8 +24,6 @@ public class MoveInfo {
     public final BlockCache cache;
     public final PlayerLocation from;
     public final PlayerLocation to;
-    /** Not initialized in set. */
-    public final MoveData data = new MoveData();
 
     public MoveInfo(final MCAccess mcAccess){
         cache = mcAccess.getBlockCache(null);
@@ -65,7 +62,6 @@ public class MoveInfo {
         from.cleanup();
         to.cleanup();
         cache.cleanup();
-        data.reset();
     }
 
 }

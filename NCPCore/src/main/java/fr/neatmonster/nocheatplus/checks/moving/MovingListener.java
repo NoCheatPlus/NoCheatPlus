@@ -544,7 +544,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Set some data for this move.
-        moveInfo.data.set(pFrom, pTo);
+        data.thisMove.set(pFrom, pTo);
 
         // Potion effect "Jump".
         final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
@@ -665,7 +665,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, mightBeMultipleMoves, moveInfo.data, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, mightBeMultipleMoves, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
@@ -710,7 +710,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else if (checkCf) {
             // CreativeFly
             if (newTo == null) {
-                newTo = creativeFly.check(player, pFrom, pTo, moveInfo.data, data, cc, time);
+                newTo = creativeFly.check(player, pFrom, pTo, data, cc, time);
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
@@ -745,10 +745,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
             }
             // Set positions.
-            // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
             data.setPositions(from, to);
-            data.lastHDist = moveInfo.data.hDistance;
-            data.lastYDist = moveInfo.data.yDistance;
+            data.lastHDist = data.thisMove.hDistance;
+            data.lastYDist = data.thisMove.yDistance;
+            data.finishThisMove();
             return false;
         }
         else {
@@ -905,7 +905,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
     public void onPlayerMoveMonitor(final PlayerMoveEvent event) {
-        // TODO: revise: cancelled events.
+
+        // TODO: Use stored move data to verify if from/to have changed (thus a teleport will result, possibly a minor issue due to the teleport).
+
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
 
@@ -952,6 +954,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      */
     private void onCancelledMove(final Player player, final Location from, final int tick, final long now, final MovingData mData, final CombinedData data) {
+        // TODO: Revise handling of cancelled events.
         data.lastMoveTime = now; // TODO: Move to MovingData?
         // TODO: teleported + other resetting ?
         Combined.feedYawRate(player, from.getYaw(), now, from.getWorld().getName(), data);

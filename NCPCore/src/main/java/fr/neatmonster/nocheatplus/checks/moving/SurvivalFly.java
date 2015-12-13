@@ -121,8 +121,9 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final boolean mightBeMultipleMoves, final MoveData moveData, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
+        final MoveData thisMove = data.thisMove;
 
         // Calculate some distances.
         final double xDistance, yDistance, zDistance, hDistance;
@@ -133,14 +134,14 @@ public class SurvivalFly extends Check {
             hasHdist = false;
         } else {
             xDistance = to.getX() - from.getX();
-            yDistance = moveData.yDistance;
+            yDistance = thisMove.yDistance;
             zDistance = to.getZ() - from.getZ();
             if (xDistance == 0.0 && zDistance == 0.0) {
                 hDistance = 0.0;
                 hasHdist = false;
             } else {
                 hasHdist = true;
-                hDistance = moveData.hDistance;
+                hDistance = thisMove.hDistance;
             }
         }
 

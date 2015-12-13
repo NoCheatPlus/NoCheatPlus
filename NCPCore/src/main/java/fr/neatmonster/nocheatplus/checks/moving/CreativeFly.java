@@ -41,7 +41,10 @@ public class CreativeFly extends Check {
      * @param time Millis.
      * @return
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MoveData moveData, final MovingData data, final MovingConfig cc, final long time) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
+
+        // Edge data for this move.
+        final MoveData thisMove = data.thisMove;
 
         // Ensure we have a set-back location.
         if (!data.hasSetBack()) {
@@ -59,8 +62,8 @@ public class CreativeFly extends Check {
         }
 
         // Calculate some distances.
-        final double yDistance = moveData.yDistance;
-        final double hDistance = moveData.hDistance;
+        final double yDistance = thisMove.yDistance;
+        final double hDistance = thisMove.hDistance;
 
         // Sprinting.
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
