@@ -103,6 +103,7 @@ public class BlockInteractListener extends CheckListener {
 
         final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
         boolean cancelled = false;
+        boolean preventUseItem = false;
 
         final BlockFace face = event.getBlockFace();
         final Location loc = player.getLocation(useLoc);
@@ -110,6 +111,7 @@ public class BlockInteractListener extends CheckListener {
         // Interaction speed.
         if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)) {
             cancelled = true;
+            preventUseItem = true;
         }
 
         // First the reach check.
@@ -137,7 +139,7 @@ public class BlockInteractListener extends CheckListener {
                 event.setUseInteractedBlock(Result.DENY);
                 final ItemStack stack = player.getItemInHand();
                 final Material mat = stack == null ? Material.AIR : stack.getType();
-                if (mat.isEdible() || mat == Material.POTION) {
+                if (!preventUseItem && (mat.isEdible() || mat == Material.POTION)) {
                     // TODO: Ender pearl?
                     event.setUseItemInHand(Result.ALLOW);
                 } else {
