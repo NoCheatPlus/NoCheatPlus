@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -40,10 +41,10 @@ public class SurvivalFly extends Check {
     private static final String DOUBLE_BUNNY = "doublebunny";
 
     // Horizontal speeds/modifiers.
-    public static final double WALK_SPEED            = 0.221D;
+    public static final double WALK_SPEED           = 0.221D;
 
     public static final double modSneak             = 0.13D / WALK_SPEED;
-    //    public static final double modSprint            = 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
+    //    public static final double modSprint            = 0.29 / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
 
     public static final double modBlock             = 0.16D / WALK_SPEED;
     public static final double modSwim              = 0.115D / WALK_SPEED;
@@ -711,13 +712,21 @@ public class SurvivalFly extends Check {
             // Note: Attributes count in slowness potions, thus leaving out isn't possible.
             final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
             if (attrMod == Double.MAX_VALUE) {
+                // TODO: Slowness potion.
                 // Count in speed potions.
                 final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
                 if (speedAmplifier != Double.NEGATIVE_INFINITY) {
                     hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
                 }
-            } else {
+            }
+            else {
                 hAllowedDistance *= attrMod;
+                // TODO: Consider getting modifiers from items, calculate with classic means (or iterate over all modifiers).
+                // Hack for allow sprint-jumping with slowness.
+                if (sprinting && hAllowedDistance < 0.29 && cc.sfSlownessSprintHack && player.hasPotionEffect(PotionEffectType.SLOW)) {
+                    // TODO: Should restrict further by yDistance, ground and other (jumping only).
+                    hAllowedDistance = slownessSprintHack(player, hAllowedDistance);
+                }
             }
         }
         // TODO: Reset friction on too big change of direction?
@@ -754,6 +763,20 @@ public class SurvivalFly extends Check {
         } else {
             return hAllowedDistance;
         }
+    }
+
+    /**
+     * Return a 'corrected' allowed horizontal speed. Call only if the player
+     * has a SLOW effect.
+     * 
+     * @param player
+     * @param hAllowedDistance
+     * @return
+     */
+    private double slownessSprintHack(final Player player, final double hAllowedDistance) {
+        // TODO: Certainly wrong for items with speed modifier (see above: calculate the classic way?).
+        // Simple: up to high levels they can stay close, with a couple of hops until max base speed. 
+        return 0.29;
     }
 
     /**
