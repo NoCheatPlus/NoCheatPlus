@@ -1,15 +1,20 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
- * Carry data of a move, involving from- and to- locations.
+ * Carry data of a move, involving from- and to- locations. This is for
+ * temporary storage and often resetting, also to encapsulate some data during
+ * checking.
  * 
  * @author asofold
  *
  */
 public class MoveData {
+
+    // TODO: Use objects for from and to (could lead to redesign, think of PlayerLocation)?
 
 
     //////////////////////////////////////////
@@ -21,24 +26,60 @@ public class MoveData {
      */
     public boolean valid = false;
 
-    /** Double.MAX_VALUE if not available, e.g. after a teleport. */
-    public double yDistance = Double.MAX_VALUE;
-    /** Double.MAX_VALUE if not available, e.g. after a teleport. */
-    public double hDistance = Double.MAX_VALUE;
+    /**
+     * Start position coordinates.
+     */
+    public double fromX, fromY, fromZ;
+    /** Looking direction of the start position. */
+    public float fromYaw, fromPitch;
 
-    // TODO: Last coords, 
+    /**
+     * Indicate if coordinates for a move end-point and distances are present.
+     * Always set on setPositions call.
+     */
+    public boolean toIsValid = false;
+
+    /////////////////////////////////////////////////////////////////////
+    // Only set if a move end-point is set, i.e. toIsValid set to true.
+    /////////////////////////////////////////////////////////////////////
+
+    /** End-point of a move. Only valid if toIsValid is set to true. */
+    public double toX, toY, toZ;
+
+    /** Looking direction of a move end-point. Only valid if toIsValid is set to true. */
+    public float toYaw, toPitch;
+
+    /**
+     * The vertical distance covered by a move. Note the sign for moving up or
+     * down. Only valid if toIsValid is set to true.
+     */
+    public double yDistance;
+
+    /**
+     * The horizontal distance covered by a move. Note the sign for moving up or
+     * down. Only valid if toIsValid is set to true.
+     */
+    public double hDistance;
+
     // TODO: Velocity used, fly check, ...
 
-
     //////////////////////////////////////////////////////////
-    // Reset with set, could be lazily initialized.
+    // Reset with set, could be lazily set during checking.
     //////////////////////////////////////////////////////////
 
     /**
      * Head is obstructed. Should expect descending next move, if in air. <br>
-     * Set at the beginning of SurvivalFly.check, if either end point is not on ground.
+     * Set at the beginning of SurvivalFly.check, if either end-point is not on
+     * ground.
      */
     public boolean headObstructed = false;
+
+
+    /**
+     * The fly check that was using the current data. One of MOVING_SURVIVALFLY,
+     * MOVING_CREATIVEFLY, UNKNOWN.
+     */
+    public CheckType flyCheck = CheckType.UNKNOWN;
 
     // TODO: ground/reset/web/...
 
@@ -59,6 +100,17 @@ public class MoveData {
             final double toX, final double toY, final double toZ, final float toYaw, final float toPitch) {
         yDistance = toY - fromY;
         hDistance = TrigUtil.distance(fromX, fromZ, toX, toZ);
+        this.fromX = fromX;
+        this.fromY = fromY;
+        this.fromZ = fromZ;
+        this.fromYaw = fromYaw;
+        this.fromPitch = fromPitch;
+        this.toX = toX;
+        this.toY = toY;
+        this.toZ = toZ;
+        this.toYaw = toYaw;
+        this.toPitch = toPitch;
+        toIsValid = true;
     }
 
     /**
@@ -70,12 +122,17 @@ public class MoveData {
      * @param pitch
      */
     private void setPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
-        yDistance = Double.MAX_VALUE;
-        hDistance = Double.MAX_VALUE;
+        this.fromX = x;
+        this.fromY = y;
+        this.fromZ = z;
+        this.fromYaw = yaw;
+        this.fromPitch = pitch;
+        toIsValid = false;
     }
 
     private void resetBase() {
         headObstructed = false;
+        flyCheck = CheckType.UNKNOWN;
         valid = true;
     }
 
@@ -109,6 +166,7 @@ public class MoveData {
      */
     public void invalidate() {
         valid = false;
+        toIsValid = false;
     }
 
 }

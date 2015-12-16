@@ -56,6 +56,7 @@ import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
@@ -403,8 +404,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MoveInfo moveInfo = useMoveInfo();
         final Location loc = player.getLocation(moveInfo.useLoc);
+        final MoveData lastMove = data.moveData.getFirst();
+        // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
         if (TrigUtil.isSamePos(from, loc) 
-                || TrigUtil.isSamePos(loc, data.fromX, data.fromY, data.fromZ)
+                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.fromX, lastMove.fromY, lastMove.fromZ)
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
                 //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN 
                 ) {
@@ -545,6 +548,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Set some data for this move.
         data.thisMove.set(pFrom, pTo);
+        final MoveData lastMove = data.moveData.getFirst();
 
         // Potion effect "Jump".
         final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
@@ -611,7 +615,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         // Fake use velocity here.
                         data.prependVerticalVelocity(new SimpleEntry(tick, 0.0, 1));
                         data.getOrUseVerticalVelocity(0.0);
-                        if (data.lastYDist < 0.0) {
+                        if (lastMove.toIsValid && lastMove.yDistance < 0.0) {
                             // Renew the bounce effect.
                             data.verticalBounce = new SimpleEntry(tick, data.verticalBounce.value, 1);
                         }
@@ -658,7 +662,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
 
             // Hack: Add velocity for transitions between creativefly and survivalfly.
-            if (data.lastFlyCheck == CheckType.MOVING_CREATIVEFLY && data.lastHDist != Double.MAX_VALUE) {
+            if (lastMove.toIsValid && lastMove.flyCheck == CheckType.MOVING_CREATIVEFLY) {
                 workaroundFlyNoFlyTransition(tick, data);
             }
 
@@ -705,7 +709,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
             }
-            data.lastFlyCheck = CheckType.MOVING_SURVIVALFLY;
+            data.thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
         }
         else if (checkCf) {
             // CreativeFly
@@ -714,7 +718,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
-            data.lastFlyCheck = CheckType.MOVING_CREATIVEFLY;
+            data.thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
         }
         else {
             // No fly checking :(.
@@ -740,14 +744,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
 
         if (newTo == null) {
+            // Allowed move.
             // Bounce effects.
             if (verticalBounce) {
                 processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
             }
-            // Set positions.
-            data.setPositions(from, to);
-            data.lastHDist = data.thisMove.hDistance;
-            data.lastYDist = data.thisMove.yDistance;
+            // Finished move processing.
             data.finishThisMove();
             return false;
         }
@@ -766,9 +768,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      */
     private static void workaroundFlyNoFlyTransition(final int tick, final MovingData data) {
-        final double amount = data.lastHDist * SurvivalFly.FRICTION_MEDIUM_AIR;
+        final MoveData lastMove = data.moveData.getFirst();
+        final double amount = lastMove.hDistance * SurvivalFly.FRICTION_MEDIUM_AIR;
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
-        data.addVerticalVelocity(new SimpleEntry(data.lastYDist, 2));
+        data.addVerticalVelocity(new SimpleEntry(lastMove.yDistance, 2));
         data.addVerticalVelocity(new SimpleEntry(0.0, 2));
         data.setFrictionJumpPhase();
     }
@@ -789,9 +792,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
         double effect = Math.min(3.5, base + Math.min(base / 10.0, SurvivalFly.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
-        if (effect > 0.42) {
+        final MoveData lastMove = data.moveData.getFirst();
+        if (effect > 0.42 && lastMove.toIsValid) {
             // Extra cap by last y distance(s).
-            final double max_gain = Math.abs(data.lastYDist < 0.0 ? Math.min(data.lastYDist, toY - fromY) : (toY - fromY)) - SurvivalFly.GRAVITY_SPAN;
+            final double max_gain = Math.abs(lastMove.yDistance < 0.0 ? Math.min(lastMove.yDistance, toY - fromY) : (toY - fromY)) - SurvivalFly.GRAVITY_SPAN;
             if (max_gain < effect) {
                 effect = max_gain;
                 if (data.debug) {
@@ -976,7 +980,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param mData
      */
     private void onMoveMonitorNotCancelled(final Player player, final Location from, final Location to, final long now, final long tick, final CombinedData data, final MovingData mData) {
-        data.lastMoveTime = now; // TODO: Evaluate moving this to MovingData !?
+        data.lastMoveTime = now; // TODO: Move to MovingData ?
         final String toWorldName = to.getWorld().getName();
         Combined.feedYawRate(player, to.getYaw(), now, toWorldName, data);
         // TODO: maybe even not count vehicles at all ?
@@ -988,11 +992,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             mData.updateTrace(player, to, tick); // TODO: Can you become invincible by sending special moves?
         }
         else if (!from.getWorld().getName().equals(toWorldName)) {
+            // A teleport event should follow.
             mData.resetPositions(to);
             mData.resetTrace(player, to, tick);
         }
         else {
-            mData.setTo(to); // Called on lowest too.
+            // TODO: Detect differing location (a teleport event would follow).
+            final MoveData lastMove = mData.moveData.getFirst();
+            if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.toX, lastMove.toY, lastMove.toZ)) {
+                // Something odd happened.
+                mData.resetPositions(to);
+            } else {
+                // Normal move, nothing to do.
+            }
             mData.updateTrace(player, to, tick);
         }
     }
@@ -1091,7 +1103,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         if (TrigUtil.distance(from, to) < margin) {
                             smallRange = true;
                         }
-                        else if (data.toX != Double.MAX_VALUE && data.hasSetBack()) {
+                        else if (data.hasSetBack()) {
+                            // (Removed demand for a past move to be present - remember on issues.)
                             final Location setBack = data.getSetBack(to);
                             if (TrigUtil.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin) {
                                 smallRange = true;
@@ -1140,9 +1153,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         ref = data.getSetBack(to);
                         event.setTo(ref);
                         adjustLiftOffEnvelope(player, ref, data, cc);
+                        data.resetPositions(ref);
                     }
                     else {
-                        ref = from; // Player.getLocation ?
+                        ref = from;
                         event.setCancelled(true);
                     }
                 }
@@ -1161,6 +1175,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     //							}
                     //						});
                     //					}
+                    final MoveData lastMove = data.moveData.getFirst();
+                    if (lastMove.toIsValid) {
+                        // TODO: Could keep on ground
+                        lastMove.set(lastMove.toX, lastMove.toY, lastMove.toZ, ref.getYaw(), ref.getPitch()); 
+                    } else {
+                        data.resetPositions(ref);
+                    }
                 }
                 else {
                     // "real" teleport
@@ -1169,7 +1190,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
                     data.clearMorePacketsData();
                     data.clearFlyData();
-                    data.resetPositions(to);
                     if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
                         // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
                         // Keep old lift-off envelope.
@@ -1190,6 +1210,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         data.noFallSkipAirCheck = true;
                     }
                     data.sfHoverTicks = -1; // Important against concurrent modification exception.
+                    data.resetPositions(ref);
                 }
 
                 if (data.debug && BuildParameters.debugLevel > 0) {
@@ -1208,9 +1229,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         }
         // Reset stuff.
-        Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
+        Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
         data.resetTeleported();
-        data.resetLastDistances();
         // Prevent further moving processing for nested events.
         processingEvents.remove(player.getName());
     }
@@ -1489,7 +1509,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         // (Note: resetPositions resets lastFlyCheck and other.)
 
-        data.resetLastDistances();
         data.clearMorePacketsData();
         data.removeAllVelocity();
         data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist); // Might reset to loc instead of set-back ?
@@ -1555,8 +1574,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Check for missed moves.
             // TODO: Consider to catch all, at least (debug-) logging-wise.
             if (!BlockProperties.isPassable(loc)) {
-                if (data.toX != Double.MAX_VALUE) {
-                    final Location refLoc = new Location(loc.getWorld(), data.toX, data.toY, data.toZ);
+                final MoveData lastMove = data.moveData.getFirst();
+                if (lastMove.toIsValid) {
+                    final Location refLoc = new Location(loc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ);
                     final double d = refLoc.distanceSquared(loc);
                     if (d > 0.0) {
                         // TODO: Consider to always set back here. Might skip on big distances.
@@ -1675,9 +1695,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: What with the case of vehicle moved to another world !?
                 loc = vLoc; // 
                 if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
-                    final Location oldLoc = new Location(pLoc.getWorld(), data.toX, data.toY, data.toZ);
-                    if (data.toX != Double.MAX_VALUE && MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
-                        loc = oldLoc;
+                    final MoveData lastMove = data.moveData.getFirst();
+                    if (lastMove.toIsValid) {
+                        final Location oldLoc = new Location(pLoc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ);
+                        if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
+                            loc = oldLoc;
+                        }
                     }
                 }
 
@@ -1817,7 +1840,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
-        if (data.toX != Double.MAX_VALUE && TrigUtil.distanceSquared(data.toX, data.toY, data.toZ, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
+        final MoveData lastMove = data.moveData.getFirst();
+        if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.toX, lastMove.toY, lastMove.toZ, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
             // Teleport back. 
             // TODO: Add history / alert?
             //player.sendMessage(ChatColor.RED + "NCP: enforce location !"); // TODO: DEBUG - REMOVE.
@@ -1826,7 +1850,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Could use a flexible set-back policy (switch to in-air on login). 
                 return data.getSetBack(loc);
             } else {
-                return new Location(player.getWorld(), data.toX, data.toY, data.toZ, loc.getYaw(), loc.getPitch());
+                return new Location(player.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ, loc.getYaw(), loc.getPitch());
             }
         } else {
             return null;

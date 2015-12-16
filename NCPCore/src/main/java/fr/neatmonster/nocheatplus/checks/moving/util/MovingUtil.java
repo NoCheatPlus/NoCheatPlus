@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -149,12 +150,13 @@ public class MovingUtil {
             if (TrigUtil.isSamePos(loc, refLoc) && (entity instanceof Player)) {
                 final Player other = (Player) entity;
                 final MovingData otherData = MovingData.getData(other);
-                if (otherData.toX == Double.MAX_VALUE) {
+                final MoveData otherLastMove = otherData.moveData.getFirst();
+                if (!otherLastMove.toIsValid) {
                     // Data might have been removed.
                     // TODO: Consider counting as tracked?
                     continue;
                 }
-                else if (TrigUtil.isSamePos(refLoc, otherData.toX, otherData.toY, otherData.toZ)) {
+                else if (TrigUtil.isSamePos(refLoc, otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ)) {
                     // Tracked.
                     return null;
                 }
@@ -163,7 +165,7 @@ public class MovingUtil {
                     // TODO: Discard locations in the same block, if passable.
                     // TODO: Sanity check distance?
                     // More leniency: allow moving inside of the same block.
-                    if (TrigUtil.isSameBlock(loc, otherData.toX, otherData.toY, otherData.toZ) && !BlockProperties.isPassable(refLoc.getWorld(), otherData.toX, otherData.toY, otherData.toZ)) {
+                    if (TrigUtil.isSameBlock(loc, otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ) && !BlockProperties.isPassable(refLoc.getWorld(), otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ)) {
                         continue;
                     }
                     untrackedData = otherData;
@@ -176,7 +178,8 @@ public class MovingUtil {
         }
         else {
             // TODO: Count and log to TRACE_FILE, if multiple locations would match (!).
-            return new Location(loc.getWorld(), untrackedData.toX, untrackedData.toY, untrackedData.toZ, loc.getYaw(), loc.getPitch());
+            final MoveData lastMove = untrackedData.moveData.getFirst();
+            return new Location(loc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ, loc.getYaw(), loc.getPitch());
         }
     }
 

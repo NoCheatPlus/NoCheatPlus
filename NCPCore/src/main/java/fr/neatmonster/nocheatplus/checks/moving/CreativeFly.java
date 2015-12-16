@@ -45,6 +45,7 @@ public class CreativeFly extends Check {
 
         // Edge data for this move.
         final MoveData thisMove = data.thisMove;
+        final MoveData lastMove = data.moveData.getFirst();
 
         // Ensure we have a set-back location.
         if (!data.hasSetBack()) {
@@ -139,9 +140,9 @@ public class CreativeFly extends Check {
             limitV *= data.flySpeed / 0.1;
         }
 
-        if (data.lastYDist != Double.MAX_VALUE) {
+        if (lastMove.toIsValid) {
             // (Disregard gravity.)
-            double frictionDist = data.lastYDist * SurvivalFly.FRICTION_MEDIUM_AIR;
+            double frictionDist = lastMove.yDistance * SurvivalFly.FRICTION_MEDIUM_AIR;
             if (!flying) {
                 frictionDist -= SurvivalFly.GRAVITY_MIN;
             }

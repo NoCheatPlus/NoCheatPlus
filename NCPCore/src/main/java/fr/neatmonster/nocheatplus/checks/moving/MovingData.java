@@ -10,7 +10,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
@@ -127,16 +126,6 @@ public class MovingData extends ACheckData {
     /** Last time the player was actually sprinting. */
     public long           timeSprinting = 0;
     public double         multSprinting = 1.30000002; // Multiplier at the last time sprinting.
-    /**
-     * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
-     */
-    public double       lastYDist = Double.MAX_VALUE;
-    /**
-     * Last valid horizontal distance covered by a move. Integer.MAX_VALUE indicates "not set".
-     */
-    public double       lastHDist = Double.MAX_VALUE;
-    /** Last flying check used (creativefly, survivalfly, unknown), used for hacks. */
-    public CheckType    lastFlyCheck = CheckType.UNKNOWN;
     /** Just used velocity, during processing of moving checks. */
     public SimpleEntry  verVelUsed = null;
     /** Compatibility entry for bouncing of slime blocks and the like. */
@@ -169,12 +158,6 @@ public class MovingData extends ACheckData {
     private final FrictionAxisVelocity horVel = new FrictionAxisVelocity();
 
     // Coordinates.
-    /** Last from coordinates. X is at Double.MAX_VALUE, if not set. */
-    public double         fromX = Double.MAX_VALUE, fromY, fromZ;
-    /** Last to coordinates. X is at Double.MAX_VALUE, if not set. */
-    public double         toX = Double.MAX_VALUE, toY, toZ;
-    /** Last to looking direction. Yaw is at Float.MAX_VALUE if not set. */
-    public float          toYaw = Float.MAX_VALUE, toPitch ;
     /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves." */
     private LocationTrace trace = null; 
 
@@ -306,11 +289,7 @@ public class MovingData extends ACheckData {
         sfJumpPhase = 0;
         jumpAmplifier = 0;
         setBack = null;
-        lastYDist = lastHDist = Double.MAX_VALUE;
-        lastFlyCheck = CheckType.UNKNOWN;
         sfZeroVdist = 0;
-        fromX = toX = Double.MAX_VALUE;
-        toYaw = Float.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
         removeAllVelocity();
@@ -370,8 +349,6 @@ public class MovingData extends ACheckData {
         invalidateMoveData();
         clearAccounting();
         sfJumpPhase = 0;
-        lastYDist = lastHDist = Double.MAX_VALUE;
-        lastFlyCheck = CheckType.UNKNOWN;
         sfZeroVdist = 0;
         toWasReset = false;
         fromWasReset = false;
@@ -441,34 +418,21 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Reset edge data for last moves.
+     * Invalidate all past moves data and set the last position to the given
+     * coordinates.
+     * 
      * @param x
      * @param y
      * @param z
      */
     public void resetPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
-        invalidateMoveData();
-        moveData.get(0).set(x, y, z, yaw, pitch);
-        fromX = toX = x;
-        fromY = toY = y;
-        fromZ = toZ = z;
-        toYaw = yaw;
-        toPitch = pitch;
-        lastYDist = lastHDist = Double.MAX_VALUE;
-        lastFlyCheck = CheckType.UNKNOWN;
-        sfZeroVdist = 0;
-        sfDirty = false;
-        sfLowJump = false;
-        liftOffEnvelope = defaultLiftOffEnvelope;
-        insideMediumCount = 0;
-        lastFrictionHorizontal = lastFrictionVertical = 0.0;
-        verticalBounce = null;
-        // TODO: other buffers ?
-        // No reset of vehicleConsistency.
+        resetPositions();
+        moveData.getFirst().set(x, y, z, yaw, pitch);
     }
 
     /**
-     * Just reset the "last locations" references.
+     * Invalidate all past moves data and set last position if not null.
+     * 
      * @param loc
      */
     public void resetPositions(PlayerLocation loc) {
@@ -481,7 +445,8 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Just reset the "last locations" references.
+     * Invalidate all past moves data and set last position if not null.
+     * 
      * @param loc
      */
     public void resetPositions(final Location loc) {
@@ -494,32 +459,19 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Reset the "last locations" to "not set".
+     * Invalidate all past moves data.
      */
     public void resetPositions() {
-        resetPositions(Double.MAX_VALUE, 0.0, 0.0, Float.MAX_VALUE, 0f);
-    }
-
-    public void resetLastDistances() {
-        // TODO: Will change with moveData in use.
-        lastHDist = lastYDist = Double.MAX_VALUE;
-    }
-
-    /**
-     * Set positions according to a move (just to and from).
-     * @param from
-     * @param to
-     */
-    public void setPositions(final Location from, final Location to) {
-        // TODO: Will change with moveData in use..
-        fromX = from.getX();
-        fromY = from.getY();
-        fromZ = from.getZ();
-        toX = to.getX();
-        toY = to.getY();
-        toZ = to.getZ();
-        toYaw = to.getYaw();
-        toPitch = to.getPitch();
+        invalidateMoveData();
+        sfZeroVdist = 0;
+        sfDirty = false;
+        sfLowJump = false;
+        liftOffEnvelope = defaultLiftOffEnvelope;
+        insideMediumCount = 0;
+        lastFrictionHorizontal = lastFrictionVertical = 0.0;
+        verticalBounce = null;
+        // TODO: other buffers ?
+        // No reset of vehicleConsistency.
     }
 
     /**
@@ -700,18 +652,6 @@ public class MovingData extends ACheckData {
      */
     public final void resetSetBack() {
         setBack = null;
-    }
-
-    /**
-     * Just set the last "to-coordinates", no world check.
-     * @param to
-     */
-    public final void setTo(final Location to) {
-        toX = to.getX();
-        toY = to.getY();
-        toZ = to.getZ();
-        toYaw = to.getYaw();
-        toPitch = to.getPitch();
     }
 
     /**

@@ -31,6 +31,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -283,8 +284,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) < 4.5){
             final MovingData mData = MovingData.getData(player);
             // Check if fly checks is an issue at all, re-check "real sprinting".
-            if (mData.fromX != Double.MAX_VALUE && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
-                final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
+            final MoveData lastMove = mData.moveData.getFirst();
+            if (lastMove.valid && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
+                final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), lastMove.fromX, lastMove.fromZ);
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
                     final MovingConfig mc = MovingConfig.getConfig(player);
