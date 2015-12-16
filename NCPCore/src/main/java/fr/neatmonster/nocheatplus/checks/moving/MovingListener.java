@@ -750,7 +750,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
             }
             // Finished move processing.
-            data.finishThisMove();
+            if (processingEvents.containsKey(playerName)) {
+                // Normal processing.
+                // TODO: More simple: UUID keys or a data flag instead?
+                data.finishThisMove();
+            } else {
+                // Teleport during violation processing, just invalidate thisMove.
+                data.thisMove.invalidate();
+            }
             return false;
         }
         else {
