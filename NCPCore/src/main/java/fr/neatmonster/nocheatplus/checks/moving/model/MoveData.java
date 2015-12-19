@@ -16,6 +16,10 @@ public class MoveData {
 
     // TODO: Use objects for from and to (could lead to redesign, think of PlayerLocation)?
 
+    /**
+     * Not enforced, but meant to be an invalidated MoveData instance.
+     */
+    public static final MoveData alwaysInvalidated = new MoveData();
 
     //////////////////////////////////////////
     // Guaranteed to be initialized with set.
@@ -24,7 +28,7 @@ public class MoveData {
      * Indicate if data has been set. Likely there will be sets of properties
      * with a flag for each such set.
      */
-    public boolean valid = false;
+    public boolean valid = false; // Must initialize.
 
     /**
      * Start position coordinates.
@@ -37,11 +41,13 @@ public class MoveData {
      * Indicate if coordinates for a move end-point and distances are present.
      * Always set on setPositions call.
      */
-    public boolean toIsValid = false;
+    public boolean toIsValid = false; // Must initialize.
 
     /////////////////////////////////////////////////////////////////////
     // Only set if a move end-point is set, i.e. toIsValid set to true.
     /////////////////////////////////////////////////////////////////////
+
+    // Coordinates and distances.
 
     /** End-point of a move. Only valid if toIsValid is set to true. */
     public double toX, toY, toZ;
@@ -61,25 +67,39 @@ public class MoveData {
      */
     public double hDistance;
 
-    // TODO: Velocity used, fly check, ...
-
     //////////////////////////////////////////////////////////
     // Reset with set, could be lazily set during checking.
     //////////////////////////////////////////////////////////
+
+    // Properties of the player.
+
+    /**
+     * Walk speed modifier. Set in SurvivalFly.check.
+     */
+    public double walkSpeed;
+
+    // Special properties of the environment.
 
     /**
      * Head is obstructed. Should expect descending next move, if in air. <br>
      * Set at the beginning of SurvivalFly.check, if either end-point is not on
      * ground.
      */
-    public boolean headObstructed = false;
+    public boolean headObstructed;
 
+    /**
+     * Player is moving downstream in flowing liquid (horizontal rather). Set in
+     * SurvivalFly.check.
+     */
+    public boolean downStream;
+
+    // Meta stuff.
 
     /**
      * The fly check that was using the current data. One of MOVING_SURVIVALFLY,
      * MOVING_CREATIVEFLY, UNKNOWN.
      */
-    public CheckType flyCheck = CheckType.UNKNOWN;
+    public CheckType flyCheck;
 
     // TODO: ground/reset/web/...
 
@@ -131,7 +151,12 @@ public class MoveData {
     }
 
     private void resetBase() {
+        // Properties of the player.
+        walkSpeed = 0.2;
+        // Special properties of the environment.
         headObstructed = false;
+        downStream = false;
+        // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
         valid = true;
     }

@@ -208,7 +208,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        final double walkSpeed = SurvivalFly.WALK_SPEED * ((double) data.walkSpeed / 0.2);
+        thisMove.walkSpeed = SurvivalFly.WALK_SPEED * ((double) data.walkSpeed / 0.2);
 
         setNextFriction(from, to, data, cc);
 
@@ -268,7 +268,7 @@ public class SurvivalFly extends Check {
         data.bunnyhopDelay--; // TODO: Design to do the changing at the bottom? [if change: check limits in bunnyHop(...)]
 
         // Set flag for swimming with the flowing direction of liquid.
-        final boolean downStream = hDistance > walkSpeed * modSwim && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
+        thisMove.downStream = hDistance > thisMove.walkSpeed * modSwim && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
 
         // Handle ice.
         // TODO: Re-model ice stuff and other (e.g. general thing: ground-modifier + reset conditions).
@@ -285,7 +285,7 @@ public class SurvivalFly extends Check {
         if (hasHdist) {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
-            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
+            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, thisMove, data, cc, false);
 
             // Judge if horizontal speed is above limit.
             hDistanceAboveLimit = hDistance - hAllowedDistance;
@@ -293,7 +293,7 @@ public class SurvivalFly extends Check {
             // Velocity, buffers and after failure checks.
             if (hDistanceAboveLimit > 0) {
                 // TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
-                final double[] res = hDistAfterFailure(player, from, to, walkSpeed, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, lastMove, data, cc, false);
+                final double[] res = hDistAfterFailure(player, from, to, hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, data, cc, false);
                 hAllowedDistance = res[0];
                 hDistanceAboveLimit = res[1];
                 hFreedom = res[2];
@@ -322,7 +322,7 @@ public class SurvivalFly extends Check {
             }
 
             // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-            if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHorVel()) {
+            if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > thisMove.walkSpeed && !data.hasActiveHorVel()) {
                 // (Ignore some cases, in order to prevent false positives.)
                 // TODO: speed effects ?
                 if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
@@ -646,14 +646,13 @@ public class SurvivalFly extends Check {
      * 
      * @param player
      * @param sprinting
-     * @param hDistance
-     * @param hAllowedDistance
+     * @param thisMove
      * @param data
      * @param cc
      * @param checkPermissions If to check permissions, allowing to speed up a little bit. Only set to true after having failed with it set to false.
      * @return
      */
-    private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final double walkSpeed, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+    private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final MoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
         final MoveData lastMove = data.moveData.getFirst();
@@ -667,14 +666,14 @@ public class SurvivalFly extends Check {
             data.sfOnIce = 0;
             // TODO: if (from.isOnIce()) <- makes it even slower !
             // Does include sprinting by now (would need other accounting methods).
-            hAllowedDistance = modWeb * walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+            hAllowedDistance = modWeb * thisMove.walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
         else if (from.isInLiquid() && to.isInLiquid()) {
             // Check all liquids (lava might demand even slower speed though).
             // TODO: Test how to go with only checking from (less dolphins).
             // TODO: Sneaking and blocking applies to when in water !
-            hAllowedDistance = modSwim * walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
+            hAllowedDistance = modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
             if (from.isInWater() || !from.isInLava()) { // (We don't really have other liquids, though.)
                 final int level = BridgeEnchant.getDepthStriderLevel(player);
                 if (level > 0) {
@@ -687,21 +686,21 @@ public class SurvivalFly extends Check {
             // (Friction is used as is.)
         }
         else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
-            hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
+            hAllowedDistance = modSneak * thisMove.walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
             // TODO: Attribute modifiers can count in here, e.g. +0.5 (+ 50% doesn't seem to pose a problem, neither speed effect 2).
         }
         else if (!sfDirty && from.isOnGround() && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
-            hAllowedDistance = modBlock * walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
+            hAllowedDistance = modBlock * thisMove.walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
         else {
             useBaseModifiers = true;
             if (sprinting) {
-                hAllowedDistance = walkSpeed * cc.survivalFlySprintingSpeed / 100D;
+                hAllowedDistance = thisMove.walkSpeed * cc.survivalFlySprintingSpeed / 100D;
             }
             else {
-                hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+                hAllowedDistance = thisMove.walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             }
             // Ensure friction can't be used to speed.
             // TODO: Model bunny hop as a one time peak + friction. Allow medium based friction.
@@ -736,7 +735,7 @@ public class SurvivalFly extends Check {
 
         // Account for flowing liquids (only if needed).
         // Assume: If in liquids this would be placed right here.
-        if (downStream) {
+        if (thisMove.downStream) {
             hAllowedDistance *= modDownStream;
         }
 
@@ -751,7 +750,7 @@ public class SurvivalFly extends Check {
         }
 
         // Friction mechanics (next move).
-        if (hDistance <= hAllowedDistance) {
+        if (thisMove.hDistance <= hAllowedDistance) {
             // Move is within lift-off/burst envelope, allow next time.
             // TODO: This probably is the wrong place (+ bunny, + buffer)?
             data.nextFrictionHorizontal = 1.0;
@@ -1529,34 +1528,33 @@ public class SurvivalFly extends Check {
      * 
      * buffers and velocity, also re-check hDist with permissions, if needed.
      * 
+     * 
      * @param player
      * @param from
      * @param to
-     * @param walkSpeed
      * @param hAllowedDistance
-     * @param hDistance
      * @param hDistanceAboveLimit
-     * @param yDistance
      * @param sprinting
-     * @param downStream
-     * @param skipPermChecks
+     * @param thisMove
+     * @param lastMove
      * @param data
      * @param cc
+     * @param skipPermChecks
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
-    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, final double walkSpeed, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final boolean downStream, final MoveData lastMove, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
+    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
 
         // TODO: Still not entirely sure about this checking order.
         // TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
 
         // Test bunny early, because it applies often and destroys as little as possible.
-        hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, lastMove, data, cc);
+        hDistanceAboveLimit = bunnyHop(from, to, hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, data, cc);
 
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
         if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
             // TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
-            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, true);
-            hDistanceAboveLimit = hDistance - hAllowedDistance;
+            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, thisMove, data, cc, true);
+            hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks");
         }
 
@@ -1578,7 +1576,7 @@ public class SurvivalFly extends Check {
         // After failure bunny (2nd).
         if (hDistanceAboveLimit > 0) {
             // (Could distinguish tags from above call).
-            hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, lastMove, data, cc);
+            hDistanceAboveLimit = bunnyHop(from, to, hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, data, cc);
         }
 
         // Horizontal buffer.
@@ -1612,10 +1610,14 @@ public class SurvivalFly extends Check {
      * @param data
      * @return hDistanceAboveLimit
      */
-    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
         boolean allowHop = true;
         boolean double_bunny = false;
+        
+        // Pull down.
+        final double hDistance = thisMove.hDistance;
+        final double yDistance = thisMove.yDistance;
 
         // TODO: A more state-machine like modeling (hop, slope, states, low-edge).
 
@@ -1689,7 +1691,7 @@ public class SurvivalFly extends Check {
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
         // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
-        if (allowHop && hDistance >= WALK_SPEED
+        if (allowHop && hDistance >= WALK_SPEED // TODO: thisMove.hAllowedSpeedBase
                 && (hDistance > (((!lastMove.toIsValid || lastMove.hDistance == 0.0 && lastMove.yDistance == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
                 && hDistance < 2.15 * hAllowedDistance
                 // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
