@@ -569,15 +569,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             checkCf = false;
             checkSf = true;
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
+            data.thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
         }
         else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
             checkCf = true;
             checkSf = false;
             data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
+            data.thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
         }
         else {
             checkCf = checkSf = false;
+            // (thisMove.flyCheck stays UNKNOWN.)
         }
 
         boolean checkNf = true;
@@ -709,7 +712,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
             }
-            data.thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
         }
         else if (checkCf) {
             // CreativeFly
@@ -718,7 +720,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
-            data.thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
         }
         else {
             // No fly checking :(.
