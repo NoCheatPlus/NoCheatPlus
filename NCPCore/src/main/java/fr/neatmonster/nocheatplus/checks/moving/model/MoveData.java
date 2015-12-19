@@ -93,6 +93,20 @@ public class MoveData {
      */
     public boolean downStream;
 
+    // Bounds set by checks.
+
+    /**
+     * Allowed horizontal base distance (as if moving off the spot). Set in
+     * SurvivalFly.check.
+     */
+    public double hAllowedDistanceBase;
+
+    /**
+     * Allowed horizontal distance (including frictions, workarounds like bunny
+     * hopping). Set in SurvivalFly.check.
+     */
+    public double hAllowedDistance;
+
     // Meta stuff.
 
     /**
@@ -156,6 +170,8 @@ public class MoveData {
         // Special properties of the environment.
         headObstructed = false;
         downStream = false;
+        // Bounds set by checks.
+        hAllowedDistanceBase = hAllowedDistance = 0.0;
         // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
         valid = true;

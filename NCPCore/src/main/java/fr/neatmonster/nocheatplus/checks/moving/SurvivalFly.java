@@ -281,11 +281,12 @@ public class SurvivalFly extends Check {
             data.sfOnIce--;
         }
 
+        // TODO: Remove these local variables ?
         double hAllowedDistance = 0.0, hDistanceAboveLimit = 0.0, hFreedom = 0.0;
         if (hasHdist) {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
-            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, thisMove, data, cc, false);
+            hAllowedDistance = setAllowedhDist(player, from, to, sprinting, thisMove, data, cc, false);
 
             // Judge if horizontal speed is above limit.
             hDistanceAboveLimit = hDistance - hAllowedDistance;
@@ -338,6 +339,9 @@ public class SurvivalFly extends Check {
              * cleared [add time distance to tags/log on violations].
              */
             data.clearActiveHorVel();
+            thisMove.hAllowedDistanceBase = 0.0;
+            thisMove.hAllowedDistance = 0.0;
+            // TODO: Other properties should be set as well?
         }
 
 
@@ -641,18 +645,20 @@ public class SurvivalFly extends Check {
     }
 
     /**
-     * Return hAllowedDistance, not exact, check permissions as far as
-     * necessary, if flag is set to check them.
+     * Set hAllowedDistanceBase and hAllowedDistance in thisMove. Not exact,
+     * check permissions as far as necessary, if flag is set to check them.
      * 
      * @param player
      * @param sprinting
      * @param thisMove
      * @param data
      * @param cc
-     * @param checkPermissions If to check permissions, allowing to speed up a little bit. Only set to true after having failed with it set to false.
+     * @param checkPermissions
+     *            If to check permissions, allowing to speed up a little bit.
+     *            Only set to true after having failed with it set to false.
      * @return
      */
-    private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final MoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+    private double setAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final MoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
         final MoveData lastMove = data.moveData.getFirst();
@@ -749,6 +755,9 @@ public class SurvivalFly extends Check {
             hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
         }
 
+        // Base speed is set.
+        thisMove.hAllowedDistanceBase = hAllowedDistance;
+
         // Friction mechanics (next move).
         if (thisMove.hDistance <= hAllowedDistance) {
             // Move is within lift-off/burst envelope, allow next time.
@@ -761,10 +770,11 @@ public class SurvivalFly extends Check {
             // Consider friction.
             // TODO: Invalidation mechanics.
             // TODO: Friction model for high speeds?
-            return Math.max(hAllowedDistance, lastMove.hDistance * friction);
+            thisMove.hAllowedDistance = Math.max(hAllowedDistance, lastMove.hDistance * friction);
         } else {
-            return hAllowedDistance;
+            thisMove.hAllowedDistance = hAllowedDistance;
         }
+        return thisMove.hAllowedDistance;
     }
 
     /**
@@ -1553,7 +1563,7 @@ public class SurvivalFly extends Check {
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
         if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
             // TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
-            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, thisMove, data, cc, true);
+            hAllowedDistance = setAllowedhDist(player, from, to, sprinting, thisMove, data, cc, true);
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks");
         }
@@ -1614,7 +1624,7 @@ public class SurvivalFly extends Check {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
         boolean allowHop = true;
         boolean double_bunny = false;
-        
+
         // Pull down.
         final double hDistance = thisMove.hDistance;
         final double yDistance = thisMove.yDistance;
@@ -1622,8 +1632,8 @@ public class SurvivalFly extends Check {
         // TODO: A more state-machine like modeling (hop, slope, states, low-edge).
 
         // Fly phase.
-        // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
-        if (lastMove.toIsValid && data.bunnyhopDelay > 0 && hDistance > WALK_SPEED) { // * modSprint) {
+        // TODO: Check which conditions might need resetting at lower speed (!).
+        if (lastMove.toIsValid && data.bunnyhopDelay > 0 && hDistance > thisMove.hAllowedDistanceBase) {
             // (lastHDist may be reset on commands.)
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay;
@@ -1690,8 +1700,7 @@ public class SurvivalFly extends Check {
 
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
-        // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
-        if (allowHop && hDistance >= WALK_SPEED // TODO: thisMove.hAllowedSpeedBase
+        if (allowHop && hDistance >= thisMove.hAllowedDistanceBase // TODO: thisMove.hAllowedSpeedBase
                 && (hDistance > (((!lastMove.toIsValid || lastMove.hDistance == 0.0 && lastMove.yDistance == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
                 && hDistance < 2.15 * hAllowedDistance
                 // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
