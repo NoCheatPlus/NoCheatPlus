@@ -545,7 +545,7 @@ public class SurvivalFly extends Check {
         }
 
         // Horizontal velocity invalidation.
-        if (hDistance <= (cc.velocityStrictInvalidation ? hAllowedDistance : hAllowedDistance / 2.0)) {
+        if (hDistance <= (cc.velocityStrictInvalidation ? thisMove.hAllowedDistanceBase : thisMove.hAllowedDistanceBase / 2.0)) {
             // TODO: Should there be other side conditions?
             // Invalidate used horizontal velocity.
             //        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** INVALIDATE ON SPEED");
@@ -656,7 +656,7 @@ public class SurvivalFly extends Check {
      * @param checkPermissions
      *            If to check permissions, allowing to speed up a little bit.
      *            Only set to true after having failed with it set to false.
-     * @return
+     * @return Allowed distance.
      */
     private double setAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final MoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
     {
@@ -1628,12 +1628,15 @@ public class SurvivalFly extends Check {
         // Pull down.
         final double hDistance = thisMove.hDistance;
         final double yDistance = thisMove.yDistance;
+        // TODO: hDistanceBaseRef: Distinguish where to exclude sprint modifier?
+        final double hDistanceBaseRef = thisMove.hAllowedDistanceBase;
 
         // TODO: A more state-machine like modeling (hop, slope, states, low-edge).
 
         // Fly phase.
         // TODO: Check which conditions might need resetting at lower speed (!).
-        if (lastMove.toIsValid && data.bunnyhopDelay > 0 && hDistance > thisMove.hAllowedDistanceBase) {
+        // Friction phase.
+        if (lastMove.toIsValid && data.bunnyhopDelay > 0 && hDistance > hDistanceBaseRef) {
             // (lastHDist may be reset on commands.)
             allowHop = false; // Magic!
             final int hopTime = bunnyHopMax - data.bunnyhopDelay;
@@ -1645,14 +1648,14 @@ public class SurvivalFly extends Check {
                 // Bunny slope (downwards, directly after hop but before friction).
                 if (data.bunnyhopDelay == bunnyHopMax - 1) {
                     // Ensure relative speed decrease vs. hop is met somehow.
-                    if (hDistDiff >= 0.66 * (lastMove.hDistance - hAllowedDistance)) {
+                    if (hDistDiff >= 0.66 * (lastMove.hDistance - hDistanceBaseRef)) {
                         tags.add("bunnyslope");
                         hDistanceAboveLimit = 0.0;
                     }
                 }
                 else if (
                         hDistDiff >= lastMove.hDistance / bunnyDivFriction || hDistDiff >= hDistanceAboveLimit / 33.3 || 
-                        hDistDiff >= (hDistance - hAllowedDistance) * (1.0 - SurvivalFly.FRICTION_MEDIUM_AIR)
+                        hDistDiff >= (hDistance - hDistanceBaseRef) * (1.0 - SurvivalFly.FRICTION_MEDIUM_AIR)
                         ) {
                     // TODO: Confine friction by medium ?
                     // TODO: Also calculate an absolute (minimal) speed decrease over the whole time, at least max - count?
@@ -1679,7 +1682,7 @@ public class SurvivalFly extends Check {
 
             // 2x horizontal speed increase detection.
             // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
-            if (!allowHop && hDistance - lastMove.hDistance >= WALK_SPEED * 0.5 && hopTime == 1) {
+            if (!allowHop && hDistance - lastMove.hDistance >= hDistanceBaseRef * 0.5 && hopTime == 1) {
                 if (lastMove.yDistance >= -GRAVITY_MAX / 2.0 && lastMove.yDistance <= 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
                     // TODO: Confine to increasing set back y ?
                     tags.add(DOUBLE_BUNNY);
@@ -1700,11 +1703,11 @@ public class SurvivalFly extends Check {
 
         // Check hop (singular peak up to roughly two times the allowed distance).
         // TODO: Needs better modeling.
-        if (allowHop && hDistance >= thisMove.hAllowedDistanceBase // TODO: thisMove.hAllowedSpeedBase
-                && (hDistance > (((!lastMove.toIsValid || lastMove.hDistance == 0.0 && lastMove.yDistance == 0.0) ? 1.11 : 1.314)) * hAllowedDistance) 
-                && hDistance < 2.15 * hAllowedDistance
+        if (allowHop && hDistance >= hDistanceBaseRef
+                && (hDistance > (((!lastMove.toIsValid || lastMove.hDistance == 0.0 && lastMove.yDistance == 0.0) ? 1.11 : 1.314)) * hDistanceBaseRef) 
+                && hDistance < 2.15 * hDistanceBaseRef
                 // TODO: Walk speed (static or not) is not a good reference, switch to need normal/base speed instead.
-                || (yDistance > from.getyOnGround() || hDistance < 2.6 * WALK_SPEED) && lastMove.toIsValid && hDistance > 1.314 * lastMove.hDistance && hDistance < 2.15 * lastMove.hDistance
+                || (yDistance > from.getyOnGround() || hDistance < 2.6 * hDistanceBaseRef) && lastMove.toIsValid && hDistance > 1.314 * lastMove.hDistance && hDistance < 2.15 * lastMove.hDistance
                 ) { // if (sprinting) {
             // TODO: Test bunny spike over all sorts of speeds + attributes.
             // TODO: Allow slightly higher speed on lost ground?
@@ -1722,7 +1725,7 @@ public class SurvivalFly extends Check {
                             // 1: Hop without y distance increase at moderate h-speed.
                             // TODO: 2nd below: demand next move to jump. Relate to stored past moves. 
                             || (cc.sfGroundHop || yDistance == 0.0 && !data.fromWasReset)
-                            && hAllowedDistance > 0.0 && hDistance / hAllowedDistance < 1.35
+                            && hDistanceBaseRef > 0.0 && hDistance / hDistanceBaseRef < 1.35
                             )
                             // 0: Bad auto indent.
                             && (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && (data.noFallAssumeGround || data.fromWasReset) || double_bunny)
@@ -2043,7 +2046,7 @@ public class SurvivalFly extends Check {
                     // Special cases.
                     if (yDistance == 0.0 && lastMove.yDistance <= -0.23 && (hDistance <= lastMove.hDistance * 1.1)) {
                         // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
-                        // TODO: (hDistance <= data.sfLastHDist || hDistance <= hAllowedDistance)
+                        // TODO: (hDistance <= data.sfLastHDist || hDistance <= hDistanceBaseRef)
                         // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
                         // TODO: Temporary test (should probably be covered by one of the above instead).
                         // TODO: Code duplication with edgeasc7 below.

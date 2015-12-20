@@ -74,7 +74,8 @@ public class MoveData {
     // Properties of the player.
 
     /**
-     * Walk speed modifier. Set in SurvivalFly.check.
+     * Typical maximum walk speed, accounting for player capabilities. Set in
+     * SurvivalFly.check.
      */
     public double walkSpeed;
 
@@ -96,8 +97,8 @@ public class MoveData {
     // Bounds set by checks.
 
     /**
-     * Allowed horizontal base distance (as if moving off the spot). Set in
-     * SurvivalFly.check.
+     * Allowed horizontal base distance (as if moving off the spot, excluding
+     * bunny/friction). Set in SurvivalFly.check.
      */
     public double hAllowedDistanceBase;
 
@@ -171,9 +172,11 @@ public class MoveData {
         headObstructed = false;
         downStream = false;
         // Bounds set by checks.
-        hAllowedDistanceBase = hAllowedDistance = 0.0;
+        hAllowedDistanceBase = 0.0;
+        hAllowedDistance = 0.0;
         // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
+        // Done.
         valid = true;
     }
 
