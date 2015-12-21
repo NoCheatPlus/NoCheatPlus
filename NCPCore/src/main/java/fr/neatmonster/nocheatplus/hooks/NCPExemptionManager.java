@@ -92,7 +92,8 @@ public class NCPExemptionManager {
      * <hr>
      * This might help exempting NPCs from checks for all time, making
      * performance a lot better. A future purpose might be to exempt vehicles
-     * and similar (including passengers) from checks.
+     * and similar (including passengers) from checks. Includes players, note that this can not
+     * check for exemption by meta data.
      * 
      * @param id
      *            The unique id.
@@ -106,7 +107,8 @@ public class NCPExemptionManager {
     }
 
     /**
-     * Check if a player is exempted from a check right now.
+     * Check if a player is exempted from a check right now. This also checks
+     * for exemption by meta data.
      * 
      * @param player
      *            The player to exempt from checks
@@ -116,11 +118,13 @@ public class NCPExemptionManager {
      * @return If the player is exempted from the check right now.
      */
     public static final boolean isExempted(final Player player, final CheckType checkType) {
-        return isExempted(player.getUniqueId(), checkType);
+        // TODO: Settings: If to check meta data at all.
+        return isExempted(player.getUniqueId(), checkType) || player.hasMetadata("nocheat.exempt");
     }
 
     /**
-     * Undo exempting an entity from all checks.
+     * Undo exempting an entity from all checks. Includes players, note that
+     * exemption by meta data is not removed here.
      * 
      * @param id
      *            The unique id.
@@ -131,6 +135,7 @@ public class NCPExemptionManager {
 
     /**
      * Undo exempting an entity from a certain check, or check group, as given.
+     * Note that exemption by meta data is not removed here.
      * 
      * @param id
      *            The unique id.
@@ -145,7 +150,8 @@ public class NCPExemptionManager {
     }
 
     /**
-     * Undo exempting a player from all checks.
+     * Undo exempting a player from all checks. Note that exemption by meta data
+     * is not removed here.
      * 
      * @param player
      *            the player
@@ -156,6 +162,7 @@ public class NCPExemptionManager {
 
     /**
      * Undo exempting a player form a certain check, or check group, as given.
+     * Note that exemption by meta data is not removed here.
      * 
      * @param player
      *            the player
@@ -163,6 +170,7 @@ public class NCPExemptionManager {
      *            the check type
      */
     public static final void unexempt(final Player player, final CheckType checkType) {
+        // TODO: Consider settings for removing meta data as well.
         unexempt(player.getUniqueId(), checkType);
     }
 
