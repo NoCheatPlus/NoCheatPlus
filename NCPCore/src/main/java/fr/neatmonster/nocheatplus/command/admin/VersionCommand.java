@@ -12,6 +12,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -68,6 +69,16 @@ public class VersionCommand extends BaseCommand{
             }
             Collections.sort(fullNames, String.CASE_INSENSITIVE_ORDER);
             lines.add("Hooks: " + StringUtil.join(fullNames, " | "));
+        }
+        final List<String> relatedPlugins = new LinkedList<String>();
+        for (final String name : new String[]{"CompatNoCheatPlus", "ProtocolLib"}) {
+            Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+            if (plugin != null) {
+                relatedPlugins.add(plugin.getDescription().getFullName());
+            }
+        }
+        if (!relatedPlugins.isEmpty()) {
+            lines.add("Related plugins: " + StringUtil.join(relatedPlugins, " | "));
         }
         return lines;
     }
