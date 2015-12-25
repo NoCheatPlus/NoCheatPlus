@@ -397,6 +397,7 @@ public class MovingData extends ACheckData {
     public void onPlayerLeave() {
         removeAllVelocity();
         deleteTrace();
+        invalidateMoveData();
     }
 
     /**
