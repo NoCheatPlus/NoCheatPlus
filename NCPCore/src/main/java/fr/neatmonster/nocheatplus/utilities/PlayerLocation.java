@@ -209,6 +209,16 @@ public class PlayerLocation {
     }
 
     /**
+     * Return the bounding box as a new double array (minX, minY, minZ, maxX,
+     * maxY, maxZ).
+     * 
+     * @return
+     */
+    public double[] getBoundsAsDoubles() {
+        return new double[] {minX, minY, minZ, maxX, maxY, maxZ};
+    }
+
+    /**
      * Compares block coordinates (not the world).
      * 
      * @param other

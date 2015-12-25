@@ -2118,6 +2118,21 @@ public class BlockProperties {
 
     /**
      * Test if the box collide with any block that matches the flags somehow.
+     * Convenience method.
+     * 
+     * @param bounds
+     *            'Classic' bounds as returned for blocks (minX, minY, minZ,
+     *            maxX, maxY, maxZ).
+     * @param flags
+     *            The flags to match.
+     * @return
+     */
+    public static final boolean collides(final BlockCache access, double[] bounds,  final long flags) {
+        return collides(access, bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5], flags);
+    }
+
+    /**
+     * Test if the box collide with any block that matches the flags somehow.
      * @param minX
      * @param minY
      * @param minZ
