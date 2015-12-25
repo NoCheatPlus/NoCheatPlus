@@ -366,6 +366,8 @@ public class MovingData extends ACheckData {
      * @param loc
      */
     public void adjustMediumProperties(final PlayerLocation loc) {
+        // Ensure block flags have been collected.
+        loc.collectBlockFlags();
         // Simplified.
         if (loc.isInWeb()) {
             liftOffEnvelope = LiftOffEnvelope.NO_JUMP;

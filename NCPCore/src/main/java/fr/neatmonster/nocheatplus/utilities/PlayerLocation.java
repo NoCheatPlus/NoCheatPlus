@@ -874,6 +874,19 @@ public class PlayerLocation {
     }
 
     /**
+     * Set block flags using yOnGround, unless already set. Check the maximally
+     * used bounds for the block checking, to have flags ready for faster
+     * denial.
+     * 
+     * @param maxYonGround
+     */
+    public void collectBlockFlags() {
+        if (blockFlags == null) {
+            collectBlockFlags(yOnGround);
+        }
+    }
+
+    /**
      * Check the maximally used bounds for the block checking,
      * to have flags ready for faster denial.
      * @param maxYonGround
