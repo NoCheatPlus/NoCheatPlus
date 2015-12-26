@@ -162,8 +162,6 @@ public class MovingData extends ACheckData {
     private LocationTrace trace = null; 
 
     // sf rather
-    /** To/from was ground or web or assumed to be etc. */
-    public boolean		  toWasReset, fromWasReset;
     /** Basic envelope constraints for switching into air. */
     public LiftOffEnvelope liftOffEnvelope = defaultLiftOffEnvelope;
     /** Count how many moves have been made inside a medium (other than air). */
@@ -197,8 +195,6 @@ public class MovingData extends ACheckData {
     public float          noFallFallDistance = 0;
     /** Last y coordinate from when the player was on ground. */
     public double         noFallMaxY = 0;
-    /** Indicate that NoFall should assume the player to be on ground. */
-    public boolean noFallAssumeGround = false;
     /** Indicate that NoFall is not to use next damage event for checking on-ground properties. */ 
     public boolean noFallSkipAirCheck = false;
     // Passable check.
@@ -224,7 +220,7 @@ public class MovingData extends ACheckData {
     public int 			sfHoverTicks = -1;
     /** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
     public int 			sfHoverLoginTicks = 0;
-    public int			sfOnIce = 0;
+    public int			sfOnIce = 0; // TODO: Replace by allowed speed + friction.
     public long			sfCobwebTime = 0;
     public double		sfCobwebVL = 0;
     public long			sfVLTime = 0;
@@ -265,6 +261,7 @@ public class MovingData extends ACheckData {
     private void invalidateMoveData() {
         final Iterator<MoveData> it = moveData.iterator();
         while (it.hasNext()) {
+            // TODO: If using many elements ever, stop at the first already invalidated one.
             it.next().invalidate();
         }
         thisMove.invalidate();
@@ -295,7 +292,6 @@ public class MovingData extends ACheckData {
         removeAllVelocity();
         sfHorizontalBuffer = 0.0;
         lostSprintCount = 0;
-        toWasReset = fromWasReset = false; // TODO: true maybe
         sfHoverTicks = sfHoverLoginTicks = -1;
         sfDirty = false;
         sfLowJump = false;
@@ -330,7 +326,6 @@ public class MovingData extends ACheckData {
         // keep jump phase.
         sfHorizontalBuffer = 0.0;
         lostSprintCount = 0;
-        toWasReset = fromWasReset = false; // TODO: true maybe
         sfHoverTicks = -1; // 0 ?
         sfDirty = false;
         sfLowJump = false;
@@ -350,8 +345,6 @@ public class MovingData extends ACheckData {
         clearAccounting();
         sfJumpPhase = 0;
         sfZeroVdist = 0;
-        toWasReset = false;
-        fromWasReset = false;
         verticalBounce = null;
         // Remember where we send the player to.
         setTeleported(loc);
@@ -359,7 +352,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Adjust properties that relate to the mediu, called on set back and
+     * Adjust properties that relate to the medium, called on set back and
      * similar. <br>
      * Currently: liftOffEnvelope, nextFriction.
      * 

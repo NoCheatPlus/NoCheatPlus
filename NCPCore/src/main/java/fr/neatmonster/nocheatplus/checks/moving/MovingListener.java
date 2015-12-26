@@ -407,7 +407,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MoveData lastMove = data.moveData.getFirst();
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
         if (TrigUtil.isSamePos(from, loc) 
-                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.fromX, lastMove.fromY, lastMove.fromZ)
+                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.from.x, lastMove.from.y, lastMove.from.z)
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
                 //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN 
                 ) {
@@ -462,7 +462,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Set up data / caching.
 
         // TODO: Data resetting above ?
-        data.noFallAssumeGround = false;
         data.resetTeleported();
         // Debug.
         if (data.debug) {
@@ -664,6 +663,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 pTo.collectBlockFlags(maxYNoFall);
             }
 
+            // Set basic properties for past move bookkeeping.
+            data.thisMove.setExtraProperties(pFrom, pTo);
+
             // Hack: Add velocity for transitions between creativefly and survivalfly.
             if (lastMove.toIsValid && lastMove.flyCheck == CheckType.MOVING_CREATIVEFLY) {
                 workaroundFlyNoFlyTransition(tick, data);
@@ -681,7 +683,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (newTo == null) {
                 // Hover.
                 // TODO: Could reset for from-on-ground as well, for not too big moves.
-                if (cc.sfHoverCheck && !data.toWasReset && !pTo.isOnGround()) {
+                if (cc.sfHoverCheck 
+                        && !(lastMove.toIsValid && lastMove.to.extraPropertiesValid && lastMove.to.onGroundOrResetCond) 
+                        && !pTo.isOnGround()) {
                     // Start counting ticks.
                     hoverTicks.add(playerName);
                     data.sfHoverTicks = 0;
@@ -738,11 +742,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Reset jump amplifier if needed.
         if ((checkSf || checkCf) && jumpAmplifier != data.jumpAmplifier) {
-            if (data.noFallAssumeGround || pFrom.isOnGround() || pTo.isOnGround()) {
+            // TODO: General cool-down for latency?
+            if (data.thisMove.touchedGround || !checkSf && (pFrom.isOnGround() || pTo.isOnGround())) {
+                // (No need to check from/to for onGround, if SurvivalFly is to be checked.)
                 data.jumpAmplifier = jumpAmplifier;
             }
         }
-
 
         if (newTo == null) {
             // Allowed move.
@@ -1007,7 +1012,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else {
             // TODO: Detect differing location (a teleport event would follow).
             final MoveData lastMove = mData.moveData.getFirst();
-            if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.toX, lastMove.toY, lastMove.toZ)) {
+            if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.x, lastMove.to.y, lastMove.to.z)) {
                 // Something odd happened.
                 mData.resetPositions(to);
             } else {
@@ -1066,11 +1071,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingData data = MovingData.getData(player);
         final Location teleported = data.getTeleported();
 
+        // Prevent further moving processing for nested events.
+        processingEvents.remove(player.getName());
+
         // Invalidate first-move thing.
-        data.joinOrRespawn = false;
+        data.joinOrRespawn = false; // TODO: Might conflict with 'moved wrongly' on join.
 
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
         Location to = event.getTo();
+        final TeleportCause cause = event.getCause();
         final Location ref;
         final MovingConfig cc = MovingConfig.getConfig(player);
         if (teleported != null && teleported.equals(to)) {
@@ -1090,157 +1099,106 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: This could be done on MONITOR.
             data.onSetBack(teleported);
             adjustLiftOffEnvelope(player, teleported, data, cc);
-        } else {
-            // Only if it wasn't NoCheatPlus, drop data from more packets check.
-            if (to != null && !event.isCancelled()) {
-                // Normal teleport.
-
-                // Detect small distance teleports.
-                boolean smallRange = false;
-                boolean cancel = false;
-                //				boolean pass = false;
-
-                final double margin = 0.67;
-                final Location from = event.getFrom();
-
-
-                final TeleportCause cause = event.getCause();
-                if (cause == TeleportCause.UNKNOWN) {
-                    // Check special small range teleports (server moves players out of blocks).
-                    if (from != null && from.getWorld().equals(to.getWorld())) {
-                        if (TrigUtil.distance(from, to) < margin) {
-                            smallRange = true;
-                        }
-                        else if (data.hasSetBack()) {
-                            // (Removed demand for a past move to be present - remember on issues.)
-                            final Location setBack = data.getSetBack(to);
-                            if (TrigUtil.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin) {
-                                smallRange = true;
-                            }
-                        }
-                        // Override smallRange, if the teleport seems ok.
-                        if (smallRange && BlockProperties.isOnGroundOrResetCond(player, to, cc.yOnGround) && BlockProperties.isPassable(to)) {
-                            // TODO: Consider to remove the smallRange workaround and re-evaluate [Block jump on protected region into fence].
-                            smallRange = false;
-                        }
-                    }
-                }
-                else if (cause == TeleportCause.ENDER_PEARL) {
-                    if (CombinedConfig.getConfig(player). enderPearlCheck && !BlockProperties.isPassable(to)) { // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)) {
-                        // Not check on-ground: Check the second throw.
-                        cancel = true;
-                    }
-                    else {
-                        //						pass = true;
-                    }
-                }
-                else if (cause == TeleportCause.COMMAND) {
-                    // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
-                    // TODO: Consider checking this on low or lowest (!).
-                    // TODO: Other like TeleportCause.PLUGIN?
-                    if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
-                        final Location newTo = MovingUtil.checkUntrackedLocation(to);
-                        if (newTo != null) {
-                            // Adjust the teleport to go to the last tracked to-location of the other player.
-                            to = newTo;
-                            event.setTo(newTo);
-                            cancel = smallRange = false;
-                            // TODO: Consider console, consider data.debug.
-                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
-                        }
-                    }
-                }
-
-                //				if (pass) {
-                //					ref = to;
-                //				}
-                //				else 
-                if (cancel) {
-                    // Cancel!
-                    if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
-                        ref = data.getSetBack(to);
-                        event.setTo(ref);
-                        adjustLiftOffEnvelope(player, ref, data, cc);
-                        data.resetPositions(ref);
-                    }
-                    else {
-                        ref = from;
-                        event.setCancelled(true);
-                    }
-                }
-                else if (smallRange) {
-                    // Very small range teleport, keep set back etc.
-                    ref = to;
-                    //					if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
-                    //						final Location setBack = data.getSetBack(from);
-                    //						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-                    //							@Override
-                    //							public void run() {
-                    //								if (!data.hasSetBackWorldChanged(setBack)) { // && data.isSetBack(setBack)) {
-                    //									player.sendMessage("SETBACK FROM MC DERP.");
-                    //									player.teleport(setBack, TeleportCause.PLUGIN);
-                    //								}
-                    //							}
-                    //						});
-                    //					}
-                    final MoveData lastMove = data.moveData.getFirst();
-                    if (lastMove.toIsValid) {
-                        // TODO: Could keep on ground
-                        lastMove.set(lastMove.toX, lastMove.toY, lastMove.toZ, ref.getYaw(), ref.getPitch()); 
-                    } else {
-                        data.resetPositions(ref);
-                    }
-                }
-                else {
-                    // "real" teleport
-                    ref = to;
-                    double fallDistance = data.noFallFallDistance;
-                    final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
-                    data.clearMorePacketsData();
-                    data.clearFlyData();
-                    if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
-                        // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
-                        // Keep old lift-off envelope.
-                        data.liftOffEnvelope = oldEnv;
-                    }
-                    data.setSetBack(to);
-                    adjustLiftOffEnvelope(player, to, data, cc);
-                    // TODO: How to account for plugins that reset the fall distance here?
-                    if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
-                        // Reset fall distance if set so in the config.
-                        if (!cc.noFallTpReset) {
-                            // (Set fall distance if set to not reset.)
-                            player.setFallDistance((float) fallDistance);
-                        }
-                    }
-                    if (event.getCause() == TeleportCause.ENDER_PEARL) {
-                        // Prevent NoFall violations for ender-pearls.
-                        data.noFallSkipAirCheck = true;
-                    }
-                    data.sfHoverTicks = -1; // Important against concurrent modification exception.
-                    data.resetPositions(ref);
-                }
-
-                if (data.debug && BuildParameters.debugLevel > 0) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP" + (smallRange ? " (small-range)" : "") + (cancel ? " (cancelled)" : "") +  ": " + to);
-                }
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (set-back): " + to);
             }
-            else {
+        } else {
+            // Ignore if cancelled or if end point is set.
+            if (to == null || event.isCancelled()) {
                 // Cancelled, not a set back, ignore it, basically.
                 // Better reset teleported (compatibility). Might have drawbacks.
                 data.resetTeleported();
-                if (data.debug && BuildParameters.debugLevel > 0) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP (cancelled): " + to);
+                if (data.debug) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (already cancelled): " + to);
                 }
                 return;
             }
 
+            // Normal teleport.
+            boolean cancel = false;
+            // boolean pass = false;
+
+            final Location from = event.getFrom();
+
+            if (cause == TeleportCause.ENDER_PEARL) {
+                if (CombinedConfig.getConfig(player).enderPearlCheck && !BlockProperties.isPassable(to)) { // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)) {
+                    // Not check on-ground: Check the second throw.
+                    // TODO: Bounding box check or onGround as replacement?
+                    cancel = true;
+                }
+            }
+            else if (cause == TeleportCause.COMMAND) {
+                // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
+                // TODO: Consider checking this on low or lowest (!).
+                // TODO: Other like TeleportCause.PLUGIN?
+                if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
+                    final Location newTo = MovingUtil.checkUntrackedLocation(to);
+                    if (newTo != null) {
+                        // Adjust the teleport to go to the last tracked to-location of the other player.
+                        to = newTo;
+                        event.setTo(newTo);
+                        cancel = false;
+                        // TODO: Consider console, consider data.debug.
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
+                    }
+                }
+            }
+
+            if (cancel) {
+                // NCP actively prevents this teleport.
+                if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
+                    ref = data.getSetBack(to);
+                    event.setTo(ref);
+                    adjustLiftOffEnvelope(player, ref, data, cc);
+                    data.resetPositions(ref);
+                }
+                else {
+                    ref = from;
+                    event.setCancelled(true);
+                }
+            }
+            else {
+                // "real" teleport
+                ref = to;
+                double fallDistance = data.noFallFallDistance;
+                final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
+                data.clearMorePacketsData();
+                data.clearFlyData();
+                if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
+                    // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
+                    // Keep old lift-off envelope.
+                    data.liftOffEnvelope = oldEnv;
+                }
+                data.setSetBack(to);
+                adjustLiftOffEnvelope(player, to, data, cc);
+                // TODO: How to account for plugins that reset the fall distance here?
+                if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
+                    // Reset fall distance if set so in the config.
+                    if (!cc.noFallTpReset) {
+                        // (Set fall distance if set to not reset.)
+                        player.setFallDistance((float) fallDistance);
+                    } else if (fallDistance >= 3.0) {
+                        data.noFallSkipAirCheck = true;
+                    }
+                }
+                if (cause == TeleportCause.ENDER_PEARL) {
+                    // Prevent NoFall violations for ender-pearls.
+                    data.noFallSkipAirCheck = true;
+                }
+                data.sfHoverTicks = -1; // Important against concurrent modification exception.
+                data.resetPositions(ref);
+            }
+
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " " + (cancel ? " (cancelled)" : "") +  ": " + to);
+            }
+
+
         }
+
         // Reset stuff.
         Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
         data.resetTeleported();
-        // Prevent further moving processing for nested events.
-        processingEvents.remove(player.getName());
     }
 
     /**
@@ -1466,6 +1424,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
+        // TODO: Prevent/cancel scheduled teleport (use PlayerData/task for teleport, or a sequence count).
         data.clearFlyData();
         data.resetSetBack(); // To force dataOnJoin to set it to loc.
         // Handle respawn like join.
@@ -1507,7 +1466,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.clearFlyData();
             data.setSetBack(loc);
             data.resetPositions(loc);
-            data.joinOrRespawn = true;
+            data.joinOrRespawn = true; // TODO: Review if to always set (!).
         } else {
             // TODO: Check consistency/distance.
             //final Location setBack = data.getSetBack(loc);
@@ -1525,10 +1484,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.vDistAcc.clear();
         final MoveInfo moveInfo = useMoveInfo();
         moveInfo.set(player, loc, null, cc.yOnGround);
-        data.toWasReset = moveInfo.from.isOnGroundOrResetCond();
+        final MoveData lastMove = data.moveData.getFirst();
+        lastMove.from.setExtraProperties(moveInfo.from);
         data.adjustMediumProperties(moveInfo.from);
         returnMoveInfo(moveInfo);
-        data.fromWasReset = data.toWasReset;
 
         // Enforcing the location.
         if (cc.enforceLocation) {
@@ -1536,7 +1495,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Hover.
-        initHover(player, data, cc, data.toWasReset); // isOnGroundOrResetCond
+        initHover(player, data, cc, lastMove.from.onGroundOrResetCond); // isOnGroundOrResetCond
 
         //		// Bad pitch/yaw, just in case.
         //		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
@@ -1580,11 +1539,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         if (!player.isSleeping() && !player.isDead()) {
             // Check for missed moves.
+            // TODO: Force-load chunks [log if (!)] ?
             // TODO: Consider to catch all, at least (debug-) logging-wise.
             if (!BlockProperties.isPassable(loc)) {
                 final MoveData lastMove = data.moveData.getFirst();
                 if (lastMove.toIsValid) {
-                    final Location refLoc = new Location(loc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ);
+                    final Location refLoc = new Location(loc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
                     final double d = refLoc.distanceSquared(loc);
                     if (d > 0.0) {
                         // TODO: Consider to always set back here. Might skip on big distances.
@@ -1705,7 +1665,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
                     final MoveData lastMove = data.moveData.getFirst();
                     if (lastMove.toIsValid) {
-                        final Location oldLoc = new Location(pLoc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ);
+                        final Location oldLoc = new Location(pLoc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
                         if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
                             loc = oldLoc;
                         }
@@ -1849,7 +1809,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
         final MoveData lastMove = data.moveData.getFirst();
-        if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.toX, lastMove.toY, lastMove.toZ, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
+        if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
             // Teleport back. 
             // TODO: Add history / alert?
             //player.sendMessage(ChatColor.RED + "NCP: enforce location !"); // TODO: DEBUG - REMOVE.
@@ -1858,7 +1818,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Could use a flexible set-back policy (switch to in-air on login). 
                 return data.getSetBack(loc);
             } else {
-                return new Location(player.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ, loc.getYaw(), loc.getPitch());
+                return new Location(player.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getYaw(), loc.getPitch());
             }
         } else {
             return null;

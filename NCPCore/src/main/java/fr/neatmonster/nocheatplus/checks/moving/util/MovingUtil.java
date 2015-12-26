@@ -156,7 +156,7 @@ public class MovingUtil {
                     // TODO: Consider counting as tracked?
                     continue;
                 }
-                else if (TrigUtil.isSamePos(refLoc, otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ)) {
+                else if (TrigUtil.isSamePos(refLoc, otherLastMove.to.x, otherLastMove.to.y, otherLastMove.to.z)) {
                     // Tracked.
                     return null;
                 }
@@ -165,7 +165,7 @@ public class MovingUtil {
                     // TODO: Discard locations in the same block, if passable.
                     // TODO: Sanity check distance?
                     // More leniency: allow moving inside of the same block.
-                    if (TrigUtil.isSameBlock(loc, otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ) && !BlockProperties.isPassable(refLoc.getWorld(), otherLastMove.toX, otherLastMove.toY, otherLastMove.toZ)) {
+                    if (TrigUtil.isSameBlock(loc, otherLastMove.to.x, otherLastMove.to.y, otherLastMove.to.z) && !BlockProperties.isPassable(refLoc.getWorld(), otherLastMove.to.x, otherLastMove.to.y, otherLastMove.to.z)) {
                         continue;
                     }
                     untrackedData = otherData;
@@ -179,7 +179,7 @@ public class MovingUtil {
         else {
             // TODO: Count and log to TRACE_FILE, if multiple locations would match (!).
             final MoveData lastMove = untrackedData.moveData.getFirst();
-            return new Location(loc.getWorld(), lastMove.toX, lastMove.toY, lastMove.toZ, loc.getYaw(), loc.getPitch());
+            return new Location(loc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getYaw(), loc.getPitch());
         }
     }
 

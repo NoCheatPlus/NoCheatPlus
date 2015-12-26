@@ -10,6 +10,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -122,10 +124,14 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, final MovingData data, final MovingConfig cc) {
 
-        final double fromY = from.getY();
-        final double toY = to.getY();
+        final MoveData thisMove = data.thisMove;
+        final LocationData from = thisMove.from;
+        final LocationData to = thisMove.to;
+
+        final double fromY = from.y;
+        final double toY = to.y;
 
         final double yDiff = toY - fromY;
 
@@ -133,20 +139,22 @@ public class NoFall extends Check {
 
         // Reset-cond is not touched by yOnGround.
         // TODO: Distinguish water depth vs. fall distance ?
-        final boolean fromReset = from.isResetCond();
-        final boolean toReset = to.isResetCond();
+        final boolean fromReset = from.resetCond;
+        final boolean toReset = to.resetCond;
 
+        final boolean fromOnGround, toOnGround;
         // Adapt yOnGround if necessary (sf uses another setting).
         if (yDiff < 0 && cc.yOnGround < cc.noFallyOnGround) {
             // In fact this is somewhat heuristic, but it seems to work well.
             // Missing on-ground seems to happen with running down pyramids rather.
             // TODO: Should be obsolete.
-            adjustYonGround(from, to , cc.noFallyOnGround);
+            adjustYonGround(pFrom, pTo , cc.noFallyOnGround);
+            fromOnGround = pFrom.isOnGround();
+            toOnGround = pTo.isOnGround();
+        } else {
+            fromOnGround = from.onGround;
+            toOnGround = to.onGround;
         }
-
-        final boolean fromOnGround = from.isOnGround();
-        final boolean toOnGround = to.isOnGround();
-
 
         // TODO: early returns (...) 
 
@@ -155,14 +163,22 @@ public class NoFall extends Check {
         if (fromReset) {
             // Just reset.
             data.clearNoFallData();
+            // Ensure very big/strange moves don't yield violations.
+            if (toY - fromY <= -3.0) {
+                data.noFallSkipAirCheck = true;
+            }
         }
-        else if (fromOnGround || data.noFallAssumeGround) {
+        else if (fromOnGround || !toOnGround && thisMove.touchedGround) {
             // Check if to deal damage (fall back damage check).
             if (cc.noFallDealDamage) {
                 handleOnGround(player, minY, true, data, cc);
             }
             else {
                 adjustFallDistance(player, minY, true, data, cc);
+            }
+            // Ensure very big/strange moves don't yield violations.
+            if (toY - fromY <= -3.0) {
+                data.noFallSkipAirCheck = true;
             }
         }
         else if (toReset) {
@@ -199,7 +215,7 @@ public class NoFall extends Check {
         if (!toReset && !toOnGround && yDiff < 0) {
             data.noFallFallDistance -= yDiff;
         }
-        else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)) {
+        else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || thisMove.touchedGround) && yDiff >= 0)) {
             final double max = Math.max(data.noFallFallDistance, mcFallDistance);
             if (max > 0.0 && max < 0.75) { // (Ensure this does not conflict with deal-damage set to false.) 
                 if (data.debug) {
