@@ -304,18 +304,15 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Teleport event: Mildly reset the flying data without losing any important information.
+     * Teleport event: Mildly reset the flying data without losing any important
+     * information. The given setBack location is set internally, past move set
+     * to it.
      * 
      * @param setBack
      */
-    public void onSetBack(final Location setBack) {
-        // Reset positions
-        resetPositions(teleported);
-        // NOTE: Do mind that the reference is used directly for set-backs, should stay consistent, though.
-
-        setSetBack(teleported);
-        this.morePacketsSetback = this.morePacketsVehicleSetback = null; // TODO: or set.
-
+    public void onSetBack(final PlayerLocation setBack) {
+        // Reset positions (a teleport should follow, though).
+        this.morePacketsSetback = this.morePacketsVehicleSetback = null;
         clearAccounting(); // Might be more safe to do this.
         // Keep no-fall data.
         // Fly data: problem is we don't remember the settings for the set back location.
@@ -335,6 +332,10 @@ public class MovingData extends ACheckData {
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verticalBounce = null;
+        // Reset to setBack.
+        resetPositions(setBack);
+        adjustMediumProperties(setBack);
+        setSetBack(setBack);
     }
 
     /**
@@ -386,6 +387,7 @@ public class MovingData extends ACheckData {
         insideMediumCount = 0;
     }
 
+
     /**
      * Called when a player leaves the server.
      */
@@ -414,50 +416,23 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Invalidate all past moves data and set the last position to the given
-     * coordinates.
-     * 
-     * @param x
-     * @param y
-     * @param z
-     */
-    public void resetPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
-        resetPositions();
-        moveData.getFirst().set(x, y, z, yaw, pitch);
-    }
-
-    /**
      * Invalidate all past moves data and set last position if not null.
      * 
      * @param loc
      */
     public void resetPositions(PlayerLocation loc) {
-        if (loc == null) {
-            resetPositions();
-        }
-        else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        }
-    }
-
-    /**
-     * Invalidate all past moves data and set last position if not null.
-     * 
-     * @param loc
-     */
-    public void resetPositions(final Location loc) {
-        if (loc == null) {
-            resetPositions();
-        }
-        else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        resetPositions();
+        if (loc != null) {
+            final MoveData lastMove = moveData.getFirst();
+            // Always set with extra properties.
+            lastMove.setWithExtraProperties(loc);
         }
     }
 
     /**
      * Invalidate all past moves data.
      */
-    public void resetPositions() {
+    private void resetPositions() {
         invalidateMoveData();
         sfZeroVdist = 0;
         sfDirty = false;

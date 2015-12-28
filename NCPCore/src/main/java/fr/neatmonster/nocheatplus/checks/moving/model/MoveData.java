@@ -189,15 +189,24 @@ public class MoveData {
      * Set with join / teleport / set-back. Does not set extra properties for
      * locations.
      * 
-     * @param x
-     * @param y
-     * @param z
-     * @param yaw
-     * @param pitch
+     * @param loc
      */
-    public void set(final double x, final double y, final double z, final float yaw, final float pitch) {
-        setPositions(x, y, z, yaw, pitch);
+    public void set(final PlayerLocation loc) {
+        setPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         resetBase();
+    }
+
+    /**
+     * Set with join / teleport / set-back, also set extra properties.
+     * 
+     * @param loc
+     */
+    public void setWithExtraProperties(final PlayerLocation loc) {
+        set(loc);
+        from.setExtraProperties(loc);
+        if (this.from.onGround) {
+            this.touchedGround = true;
+        }
     }
 
     /**
