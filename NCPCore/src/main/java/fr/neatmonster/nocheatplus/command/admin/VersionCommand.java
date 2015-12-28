@@ -78,7 +78,8 @@ public class VersionCommand extends BaseCommand{
             }
         }
         if (!relatedPlugins.isEmpty()) {
-            lines.add("Related plugins: " + StringUtil.join(relatedPlugins, " | "));
+            lines.add("#### Related Plugins ####");
+            lines.add(StringUtil.join(relatedPlugins, " | "));
         }
         return lines;
     }
