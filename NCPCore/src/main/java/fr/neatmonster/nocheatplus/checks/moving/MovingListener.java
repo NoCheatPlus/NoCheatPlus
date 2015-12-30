@@ -54,7 +54,6 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
-import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
@@ -1058,19 +1057,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * If a player gets teleported, it may have two reasons. Either it was NoCheat or another plugin. If it was
-     * NoCheatPlus, the target location should match the "data.teleportedTo" value.
-     * 
-     * On teleports, reset some movement related data that gets invalid.
+     * Detect NCP set-backs, check ender pearl and untracked locations, adjust
+     * data.
      * 
      * @param event
-     *            the event
      */
     @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        final Location teleported = data.getTeleported();
+        final MovingConfig cc = MovingConfig.getConfig(player);
 
         // Prevent further moving processing for nested events.
         processingEvents.remove(player.getName());
@@ -1079,10 +1075,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.joinOrRespawn = false; // TODO: Might conflict with 'moved wrongly' on join.
 
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
-        Location to = event.getTo();
         final TeleportCause cause = event.getCause();
-        final Location ref;
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        final Location teleported = data.getTeleported();
+        Location to = event.getTo();
+
+        // Early return: set-back.
         if (teleported != null && teleported.equals(to)) {
             // Teleport by NCP.
             // Prevent cheaters getting rid of flying data (morepackets, other).
@@ -1091,115 +1088,130 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 event.setCancelled(false);
                 event.setTo(teleported); // ?
                 event.setFrom(teleported);
-                ref = teleported;
-            }
-            else {
-                // Not cancelled but NCP teleport.
-                ref = to;
             }
             // TODO: This could be done on MONITOR.
             final MoveInfo moveInfo = useMoveInfo();
             moveInfo.set(player, teleported, null, cc.yOnGround);
             data.onSetBack(moveInfo.from);
             returnMoveInfo(moveInfo);
+
+            // Reset stuff.
+            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+            data.resetTeleported();
+
+            // Log.
             if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (set-back): " + to);
             }
-        } else {
-            // Ignore if cancelled or if end point is set.
-            if (to == null || event.isCancelled()) {
-                // Cancelled, not a set back, ignore it, basically.
-                // Better reset teleported (compatibility). Might have drawbacks.
-                data.resetTeleported();
-                if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (already cancelled): " + to);
-                }
-                return;
+
+            return;
+        }
+
+        final Location ref;
+        // Early return: cancelled or no end point set.
+        if (to == null || event.isCancelled()) {
+            // Cancelled, not a set back, ignore it, basically.
+            // Better reset teleported (compatibility). Might have drawbacks.
+            data.resetTeleported();
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (already cancelled): " + to);
             }
 
-            // Normal teleport.
-            boolean cancel = false;
-            // boolean pass = false;
+            return;
+        }
 
-            final Location from = event.getFrom();
+        // Normal teleport.
+        boolean cancel = false;
+        final Location from = event.getFrom();
 
-            if (cause == TeleportCause.ENDER_PEARL) {
-                if (CombinedConfig.getConfig(player).enderPearlCheck && !BlockProperties.isPassable(to)) { // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)) {
-                    // Not check on-ground: Check the second throw.
-                    // TODO: Bounding box check or onGround as replacement?
-                    cancel = true;
+        // Ender pearl into blocks.
+        if (cause == TeleportCause.ENDER_PEARL) {
+            if (CombinedConfig.getConfig(player).enderPearlCheck && !BlockProperties.isPassable(to)) { // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)) {
+                // Not check on-ground: Check the second throw.
+                // TODO: Bounding box check or onGround as replacement?
+                cancel = true;
+            }
+        }
+        // Teleport to untracked locations.
+        else if (cause == TeleportCause.COMMAND) { // TODO: TeleportCause.PLUGIN?
+            // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
+            // TODO: Consider checking this on low or lowest (!).
+            if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
+                final Location newTo = MovingUtil.checkUntrackedLocation(to);
+                if (newTo != null) {
+                    // Adjust the teleport to go to the last tracked to-location of the other player.
+                    to = newTo;
+                    event.setTo(newTo);
+                    //cancel = false;
+                    // TODO: Consider console, consider data.debug.
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
                 }
             }
-            else if (cause == TeleportCause.COMMAND) {
-                // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
-                // TODO: Consider checking this on low or lowest (!).
-                // TODO: Other like TeleportCause.PLUGIN?
-                if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
-                    final Location newTo = MovingUtil.checkUntrackedLocation(to);
-                    if (newTo != null) {
-                        // Adjust the teleport to go to the last tracked to-location of the other player.
-                        to = newTo;
-                        event.setTo(newTo);
-                        cancel = false;
-                        // TODO: Consider console, consider data.debug.
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
-                    }
-                }
-            }
+        }
 
-            if (cancel) {
-                // NCP actively prevents this teleport.
-                if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
-                    ref = data.getSetBack(to);
-                    event.setTo(ref);
-                    resetPositionsAndMediumProperties(player, ref, data, cc);
-                }
-                else {
-                    ref = from;
-                    event.setCancelled(true);
-                }
-            }
-            else {
-                // "real" teleport
-                ref = to;
-                double fallDistance = data.noFallFallDistance;
-                final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
-                data.clearMorePacketsData();
-                data.clearFlyData();
-                if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
-                    // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
-                    // Keep old lift-off envelope.
-                    data.liftOffEnvelope = oldEnv;
-                }
-                data.setSetBack(to);
-                // TODO: How to account for plugins that reset the fall distance here?
-                if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
-                    // Reset fall distance if set so in the config.
-                    if (!cc.noFallTpReset) {
-                        // (Set fall distance if set to not reset.)
-                        player.setFallDistance((float) fallDistance);
-                    } else if (fallDistance >= 3.0) {
-                        data.noFallSkipAirCheck = true;
-                    }
-                }
-                if (cause == TeleportCause.ENDER_PEARL) {
-                    // Prevent NoFall violations for ender-pearls.
-                    data.noFallSkipAirCheck = true;
-                }
-                data.sfHoverTicks = -1; // Important against concurrent modification exception.
+        // Early return: Cancel this teleport.
+        if (cancel) {
+            // NCP actively prevents this teleport.
+            if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
+                ref = data.getSetBack(to);
+                event.setTo(ref);
                 resetPositionsAndMediumProperties(player, ref, data, cc);
             }
-
-            if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " " + (cancel ? " (cancelled)" : "") +  ": " + to);
+            else {
+                ref = from;
+                event.setCancelled(true);
             }
 
+            // Reset stuff.
+            Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+            data.resetTeleported();
 
+            // Log.
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (cancel): " + to);
+            }
+
+            return;
         }
+
+        // Normal teleport
+        ref = to;
+        double fallDistance = data.noFallFallDistance;
+        //        final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
+        data.clearMorePacketsData();
+        data.clearFlyData();
+        data.setSetBack(to);
+        // TODO: How to account for plugins that reset the fall distance here?
+        if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
+            // Reset fall distance if set so in the config.
+            if (!cc.noFallTpReset) {
+                // (Set fall distance if set to not reset.)
+                player.setFallDistance((float) fallDistance);
+            } else if (fallDistance >= 3.0) {
+                data.noFallSkipAirCheck = true;
+            }
+        }
+        if (cause == TeleportCause.ENDER_PEARL) {
+            // Prevent NoFall violations for ender-pearls.
+            data.noFallSkipAirCheck = true;
+        }
+        data.sfHoverTicks = -1; // Important against concurrent modification exception.
+        resetPositionsAndMediumProperties(player, ref, data, cc);
+        // TODO: Decide to remove the LiftOffEnvelope thing completely.
+        //        if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
+        //            // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
+        //            // Keep old lift-off envelope.
+        //            data.liftOffEnvelope = oldEnv;
+        //        }
 
         // Reset stuff.
         Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
         data.resetTeleported();
+
+        // Log.
+        if (data.debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (normal): " + to);
+        }
     }
 
     /**
