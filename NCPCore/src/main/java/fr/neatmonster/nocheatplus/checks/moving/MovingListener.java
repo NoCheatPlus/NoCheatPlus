@@ -1107,7 +1107,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
 
-        final Location ref;
         // Early return: cancelled or no end point set.
         if (to == null || event.isCancelled()) {
             // Cancelled, not a set back, ignore it, basically.
@@ -1152,6 +1151,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Early return: Cancel this teleport.
         if (cancel) {
             // NCP actively prevents this teleport.
+            final Location ref;
             if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
                 ref = data.getSetBack(to);
                 event.setTo(ref);
@@ -1175,7 +1175,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Normal teleport
-        ref = to;
         double fallDistance = data.noFallFallDistance;
         //        final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
         data.clearMorePacketsData();
@@ -1196,7 +1195,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.noFallSkipAirCheck = true;
         }
         data.sfHoverTicks = -1; // Important against concurrent modification exception.
-        resetPositionsAndMediumProperties(player, ref, data, cc);
+        resetPositionsAndMediumProperties(player, to, data, cc);
         // TODO: Decide to remove the LiftOffEnvelope thing completely.
         //        if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
         //            // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
@@ -1205,7 +1204,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         //        }
 
         // Reset stuff.
-        Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+        Combined.resetYawRate(player, to.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
         data.resetTeleported();
 
         // Log.
