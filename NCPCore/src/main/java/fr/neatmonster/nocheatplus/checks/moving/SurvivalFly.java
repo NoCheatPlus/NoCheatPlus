@@ -147,6 +147,11 @@ public class SurvivalFly extends Check {
             }
         }
 
+        // Recover from data removal (somewhat random insertion point).
+        if (data.liftOffEnvelope == LiftOffEnvelope.UNKNOWN) {
+            data.adjustMediumProperties(from);
+        }
+
         // Ensure we have a set-back location set, plus allow moving from upwards with respawn/login.
         if (!data.hasSetBack()) {
             data.setSetBack(from);
@@ -919,7 +924,12 @@ public class SurvivalFly extends Check {
                 strictVdistRel = true;
             }
         }
-        else if (lastMove.valid) {
+        else {
+            if (lastMove.valid) {
+                tags.add("data_reset");
+            } else {
+                tags.add("data_missing");
+            }
             // Teleport/join/respawn.
             if (data.thisMove.from.onGround) {
                 vAllowedDistance = maxJumpGain + jumpGainMargin;
@@ -931,13 +941,6 @@ public class SurvivalFly extends Check {
                 vAllowedDistance = 0.0;
             }
             strictVdistRel = false;
-        }
-        else {
-            // Problematic point (thinking of "ncp remove ...").
-            // Ensure: data.resetLastDistances() must be used on teleport/join etc.
-            vAllowedDistance = yDistance;
-            strictVdistRel = true;
-            tags.add("data_missing");
         }
         // Compare yDistance to expected, use velocity on violation.
         // TODO: Quick detect valid envelope and move workaround code into a method.
