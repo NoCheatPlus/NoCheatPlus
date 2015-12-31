@@ -555,6 +555,17 @@ public class MovingData extends ACheckData {
     }
 
     /**
+     * Check if the given location is the teleported-to location.
+     * 
+     * @param loc
+     * @return In case of either loc or teleported being null, false is
+     *         returned, otherwise teleported.equals(loc).
+     */
+    public boolean isTeleported(final Location loc) {
+        return loc != null && teleported != null && teleported.equals(loc);
+    }
+
+    /**
      * Set teleport-to location to recognize NCP set-backs. This copies the coordinates and world.
      * @param loc
      */

@@ -1057,72 +1057,45 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * Detect NCP set-backs, check ender pearl and untracked locations, adjust
-     * data.
+     * LOWEST: Checks, indicate cancel processing player move.
      * 
      * @param event
      */
-    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport(final PlayerTeleportEvent event) {
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    public void onPlayerTeleportLowest(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
 
         // Prevent further moving processing for nested events.
         processingEvents.remove(player.getName());
 
-        // Invalidate first-move thing.
-        data.joinOrRespawn = false; // TODO: Might conflict with 'moved wrongly' on join.
-
-        // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
+        // Various early return conditions.
+        if (event.isCancelled()) {
+            return;
+        }
         final TeleportCause cause = event.getCause();
-        final Location teleported = data.getTeleported();
-        Location to = event.getTo();
-
-        // Early return: set-back.
-        if (teleported != null && teleported.equals(to)) {
-            // Teleport by NCP.
-            // Prevent cheaters getting rid of flying data (morepackets, other).
-            // TODO: even more strict enforcing ?
-            if (event.isCancelled()) {
-                event.setCancelled(false);
-                event.setTo(teleported); // ?
-                event.setFrom(teleported);
-            }
-            // TODO: This could be done on MONITOR.
-            final MoveInfo moveInfo = useMoveInfo();
-            moveInfo.set(player, teleported, null, cc.yOnGround);
-            data.onSetBack(moveInfo.from);
-            returnMoveInfo(moveInfo);
-
-            // Reset stuff.
-            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
-            data.resetTeleported();
-
-            // Log.
-            if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (set-back): " + to);
-            }
-
+        switch(cause) {
+            case COMMAND:
+            case ENDER_PEARL:
+                break;
+            default:
+                return;
+        }
+        final Location to = event.getTo();
+        if (to == null) {
+            // Better cancel this one.
+            //            if (!event.isCancelled()) {
+            event.setCancelled(true);
+            //            }
+            return;
+        }
+        final MovingData data = MovingData.getData(player);
+        if (data.isTeleported(to)) {
             return;
         }
 
-        // Early return: cancelled or no end point set.
-        if (to == null || event.isCancelled()) {
-            // Cancelled, not a set back, ignore it, basically.
-            // Better reset teleported (compatibility). Might have drawbacks.
-            data.resetTeleported();
-            if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (already cancelled): " + to);
-            }
-
-            return;
-        }
-
-        // Normal teleport.
+        // Run checks.
+        final MovingConfig cc = MovingConfig.getConfig(player);
         boolean cancel = false;
-        final Location from = event.getFrom();
-
         // Ender pearl into blocks.
         if (cause == TeleportCause.ENDER_PEARL) {
             if (CombinedConfig.getConfig(player).enderPearlCheck && !BlockProperties.isPassable(to)) { // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)) {
@@ -1134,43 +1107,117 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Teleport to untracked locations.
         else if (cause == TeleportCause.COMMAND) { // TODO: TeleportCause.PLUGIN?
             // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
-            // TODO: Consider checking this on low or lowest (!).
             if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
                 final Location newTo = MovingUtil.checkUntrackedLocation(to);
                 if (newTo != null) {
                     // Adjust the teleport to go to the last tracked to-location of the other player.
-                    to = newTo;
                     event.setTo(newTo);
-                    //cancel = false;
                     // TODO: Consider console, consider data.debug.
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
                 }
             }
         }
+        // (Here event.setTo might've been called, unless cancel is set.)
 
-        // Early return: Cancel this teleport.
+        // Handle cancel.
         if (cancel) {
             // NCP actively prevents this teleport.
-            final Location ref;
-            if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)) {
-                ref = data.getSetBack(to);
-                event.setTo(ref);
-                resetPositionsAndMediumProperties(player, ref, data, cc);
-            }
-            else {
-                ref = from;
-                event.setCancelled(true);
-            }
-
-            // Reset stuff.
-            Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
-            data.resetTeleported();
-
+            event.setCancelled(true);
             // Log.
             if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (cancel): " + to);
             }
+        }
+    }
 
+    /**
+     * HIGHEST: Revert cancel on set-back.
+     * 
+     * @param event
+     */
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
+    public void onPlayerTeleport(final PlayerTeleportEvent event) {
+        // Only check cancelled events.
+        if (!event.isCancelled()) {
+            return;
+        }
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.getData(player);
+        Location to = event.getTo();
+        // Revert cancel on set-back.
+        if (data.isTeleported(to)) {
+            // Teleport by NCP.
+            final Location teleported = data.getTeleported();
+            // Prevent cheaters getting rid of flying data (morepackets, other).
+            // TODO: even more strict enforcing ?
+            event.setCancelled(false);
+            event.setTo(teleported); // ?
+            event.setFrom(teleported);
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (revert cancel on set-back): " + to);
+            }
+            return;
+        }
+    }
+
+    /**
+     * MONITOR: Adjust data to what happened.
+     * 
+     * @param event
+     */
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
+    public void onPlayerTeleportMonitor(final PlayerTeleportEvent event) {
+        // Evaluate result and adjust data.
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.getData(player);
+
+        // Invalidate first-move thing.
+        data.joinOrRespawn = false; // TODO: Might conflict with 'moved wrongly' on join.
+
+        // Special cases.
+        final Location to = event.getTo();
+        if (event.isCancelled()) {
+            if (data.isTeleported(to)) {
+                // TODO: Schedule a teleport to set-back with PlayerData (+ failure count)?
+                // TODO: Log once per player always?
+                if (data.debug) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (set-back was prevented): " + to);
+                }
+            }
+            else {
+                if (data.debug) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (cancelled): " + to);
+                }
+            }
+            data.resetTeleported();
+            return;
+        }
+        else if (to == null) {
+            // Weird event.
+            // TODO: Log?
+            if (!event.isCancelled()) {
+                // TODO: Log!
+            }
+            data.resetTeleported();
+            return;
+        }
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        if (data.isTeleported(to)) {
+            // Set-back.
+            final Location teleported = data.getTeleported();
+            final MoveInfo moveInfo = useMoveInfo();
+            moveInfo.set(player, teleported, null, cc.yOnGround);
+            data.onSetBack(moveInfo.from);
+            returnMoveInfo(moveInfo);
+
+            // Reset stuff.
+            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+            data.resetTeleported();
+
+            // Log.
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (set-back): " + to);
+            }
             return;
         }
 
@@ -1190,7 +1237,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 data.noFallSkipAirCheck = true;
             }
         }
-        if (cause == TeleportCause.ENDER_PEARL) {
+        if (event.getCause() == TeleportCause.ENDER_PEARL) {
             // Prevent NoFall violations for ender-pearls.
             data.noFallSkipAirCheck = true;
         }
@@ -1209,7 +1256,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Log.
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (normal): " + to);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (normal): " + to);
         }
     }
 
