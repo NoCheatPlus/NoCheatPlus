@@ -597,7 +597,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                                 && MovingUtil.getRealisticFallDistance(player, pFrom.getY(), pTo.getY(), data) > 1.0
                                 // Within wobble-distance.
                                 || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
-                                && to.getY() - from.getY() < -SurvivalFly.GRAVITY_MIN
+                                && to.getY() - from.getY() < -Magic.GRAVITY_MIN
                                 && !pTo.isOnGround()
                                 )
                         ) {
@@ -781,7 +781,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private static void workaroundFlyNoFlyTransition(final int tick, final MovingData data) {
         final MoveData lastMove = data.moveData.getFirst();
-        final double amount = lastMove.hDistance * SurvivalFly.FRICTION_MEDIUM_AIR;
+        final double amount = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
         data.addVerticalVelocity(new SimpleEntry(lastMove.yDistance, 2));
         data.addVerticalVelocity(new SimpleEntry(0.0, 2));
@@ -803,11 +803,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Prepare velocity.
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
-        double effect = Math.min(3.5, base + Math.min(base / 10.0, SurvivalFly.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
+        double effect = Math.min(3.5, base + Math.min(base / 10.0, Magic.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
         final MoveData lastMove = data.moveData.getFirst();
         if (effect > 0.42 && lastMove.toIsValid) {
             // Extra cap by last y distance(s).
-            final double max_gain = Math.abs(lastMove.yDistance < 0.0 ? Math.min(lastMove.yDistance, toY - fromY) : (toY - fromY)) - SurvivalFly.GRAVITY_SPAN;
+            final double max_gain = Math.abs(lastMove.yDistance < 0.0 ? Math.min(lastMove.yDistance, toY - fromY) : (toY - fromY)) - Magic.GRAVITY_SPAN;
             if (max_gain < effect) {
                 effect = max_gain;
                 if (data.debug) {

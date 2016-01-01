@@ -371,18 +371,18 @@ public class MovingData extends ACheckData {
             // TODO: Distinguish strong limit.
             liftOffEnvelope = LiftOffEnvelope.LIMIT_LIQUID;
             if (loc.isInLava()) {
-                nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_LAVA;
+                nextFrictionHorizontal = nextFrictionVertical = Magic.FRICTION_MEDIUM_LAVA;
             } else {
-                nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_WATER;
+                nextFrictionHorizontal = nextFrictionVertical = Magic.FRICTION_MEDIUM_WATER;
             }
         }
         else if (loc.isOnGround()) {
             liftOffEnvelope = LiftOffEnvelope.NORMAL;
-            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
+            nextFrictionHorizontal = nextFrictionVertical = Magic.FRICTION_MEDIUM_AIR;
         }
         else {
             liftOffEnvelope = LiftOffEnvelope.UNKNOWN;
-            nextFrictionHorizontal = nextFrictionVertical = SurvivalFly.FRICTION_MEDIUM_AIR;
+            nextFrictionHorizontal = nextFrictionVertical = Magic.FRICTION_MEDIUM_AIR;
         }
         insideMediumCount = 0;
     }

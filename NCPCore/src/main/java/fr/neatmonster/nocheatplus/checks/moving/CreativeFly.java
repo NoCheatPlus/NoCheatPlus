@@ -142,9 +142,9 @@ public class CreativeFly extends Check {
 
         if (lastMove.toIsValid) {
             // (Disregard gravity.)
-            double frictionDist = lastMove.yDistance * SurvivalFly.FRICTION_MEDIUM_AIR;
+            double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
             if (!flying) {
-                frictionDist -= SurvivalFly.GRAVITY_MIN;
+                frictionDist -= Magic.GRAVITY_MIN;
             }
             limitV = Math.max(frictionDist, limitV);
         }
