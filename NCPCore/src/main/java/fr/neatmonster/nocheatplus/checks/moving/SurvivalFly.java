@@ -1130,21 +1130,23 @@ public class SurvivalFly extends Check {
             vDistanceAboveLimit = Math.max(vDistanceAboveLimit, inAirChecks(now, from, to, hDistance, yDistance, lastMove, data, cc));
         }
 
-        // Simple-step blocker.
-        // TODO: Complex step blocker: distance to set-back + low jump + accounting info
-        if ((resetFrom || lastMove.touchedGround) && resetTo && vDistanceAboveLimit <= 0D && 
-                yDistance > cc.sfStepHeight && yDistance > maxJumpGain + 0.1) {
-            boolean step = true;
+        // Block 'step' with yDistance between step height and minJumpGain (vdistrel and vdistsb should catch the rest).
+        // TODO: Model other cases of unexpectedly low 'jumping', such as using too few velocity?
+        // (Actual step cheats are probably better detected by generalized patterns.)
+        if (vDistanceAboveLimit <= 0D 
+                && yDistance > cc.sfStepHeight && yDistance < data.liftOffEnvelope.getMinJumpGain(data.jumpAmplifier) 
+                && !data.thisMove.headObstructed && !data.thisMove.from.resetCond && !data.thisMove.to.resetCond
+                && (data.thisMove.from.onGround || data.thisMove.touchedGroundWorkaround) && data.thisMove.to.onGround 
+                ) {
             // Exclude a lost-ground case.
-            if (data.thisMove.touchedGroundWorkaround && lastMove.toIsValid && lastMove.yDistance <= 0.0 && yDistance > 0.0 && 
-                    yDistance + Math.abs(lastMove.yDistance) <= 2.0 * (maxJumpGain + 0.1)) {
-                step = false;
+            if (data.thisMove.touchedGroundWorkaround && lastMove.toIsValid && lastMove.yDistance <= 0.0
+                    && yDistance + Math.abs(lastMove.yDistance) <= 2.0 * (maxJumpGain + 0.1)) {
+                // TODO: Review: still needed?
             }
-            // Check bypass permission last.
-            if (step && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
-                final double vl = Math.max(vDistanceAboveLimit, Math.abs(from.isOnClimbable() ? yDistance : yDistance - (maxJumpGain + 0.1))); // Could adjust if on ladders etc.
-                if (vl > 0.0 && data.getOrUseVerticalVelocity(yDistance) == null) {
-                    vDistanceAboveLimit = vl;
+            else {
+                // Potential violation.
+                if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP) && data.getOrUseVerticalVelocity(yDistance) == null) {
+                    vDistanceAboveLimit = yDistance - cc.sfStepHeight;
                     tags.add("step");
                 }
             }
