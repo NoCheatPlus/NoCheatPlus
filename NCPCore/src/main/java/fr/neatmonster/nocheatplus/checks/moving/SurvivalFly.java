@@ -959,6 +959,7 @@ public class SurvivalFly extends Check {
                 // Note resetFrom should usually mean that allowed dist is > 0 ?
             }
             else if (lastMove.toIsValid) {
+                // TODO: Sort in workarounds to methods, unless extremely frequent.
                 if (yDistance < 0.0 && lastMove.yDistance < 0.0 && yDistChange > -GRAVITY_MAX
                         && (from.isOnGround(Math.abs(yDistance) + 0.001) || BlockProperties.isLiquid(to.getTypeId(to.getBlockX(), Location.locToBlock(to.getY() - 0.5), to.getBlockZ())))) {
                     // Pretty coarse workaround, should instead do a proper modeling for from.getDistanceToGround.
@@ -986,7 +987,7 @@ public class SurvivalFly extends Check {
                 else if (oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
                     // Jump after leaving the liquid near ground.
                 }
-                else if (oddGravity(from, to, yDistance, yDistChange, lastMove, data)) {
+                else if (oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
                     // Starting to fall / gravity effects.
                 }
                 else if (oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
@@ -1007,7 +1008,7 @@ public class SurvivalFly extends Check {
                 // Allow jumping less high unless within "strict envelope".
                 // TODO: Extreme anti-jump effects, perhaps.
             }
-            else if (lastMove.toIsValid && oddGravity(from, to, yDistance, yDistChange, lastMove, data)) {
+            else if (lastMove.toIsValid && oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
                 // Starting to fall.
             }
             else if (lastMove.toIsValid && oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
@@ -1056,7 +1057,7 @@ public class SurvivalFly extends Check {
                         ) {
                     // LIMIT_LIQUID, vDist inversion (!).
                 }
-                else if (lastMove.toIsValid && oddGravity(from, to, yDistance, yDistChange, lastMove, data)) {
+                else if (lastMove.toIsValid && oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
                     // Starting to fall.
                 }
                 else if (lastMove.toIsValid && oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
@@ -1314,7 +1315,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return If the condition applies, i.e. if to exempt.
      */
-    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final MoveData lastMove, final MovingData data) {
+    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // TODO: Identify spots only to apply with limited LiftOffEnvelope (some guards got removed before switching to that).
         // TODO: Cleanup pending.
         // Old condition (normal lift-off envelope).
@@ -1367,6 +1368,9 @@ public class SurvivalFly extends Check {
                                 // 1: Small decrease after high edge.
                                 // TODO: Consider min <-> span, generic.
                                 || lastMove.yDistance == 0.0 && yDistance > -GRAVITY_MIN && yDistance < -GRAVITY_ODD
+                                // 1: Too small but decent decrease moving up, marginal violation.
+                                || yDistDiffEx > 0.0 && yDistDiffEx < 0.01
+                                && yDistance > GRAVITY_MAX && yDistance < lastMove.yDistance - GRAVITY_MAX
                                 )
                                 // 0: Small distance to set.back. .
                                 || data.hasSetBack() && Math.abs(data.getSetBackY() - from.getY()) < 1.0
