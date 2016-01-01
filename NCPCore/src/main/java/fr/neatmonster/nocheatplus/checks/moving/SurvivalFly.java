@@ -1027,6 +1027,9 @@ public class SurvivalFly extends Check {
             else if (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
+            else if (lastMove.toIsValid && oddFrictionUp(yDistance, lastMove, data)) {
+                // Odd friction behavior (not necessarily friction).
+            }
             else {
                 vDistRelVL = true;
             }
@@ -1413,6 +1416,33 @@ public class SurvivalFly extends Check {
                                                 && Math.abs(yDistance) <= swimBaseSpeedV() && yDistance == lastMove.yDistance
                                                 )
                                                 ;
+    }
+
+    /**
+     * Odd friction behavior with moving up (not necessarily friction),
+     * accounting for more than one past move.
+     * 
+     * @param yDistance
+     * @param lastMove
+     * @param data
+     * @return
+     */
+    public static boolean oddFrictionUp(final double yDistance, final MoveData lastMove, final MovingData data) {
+        // Use past move data for two moves.
+        final MoveData pastMove1 = data.moveData.get(1);
+        if (!lastMove.to.extraPropertiesValid || !pastMove1.toIsValid || !pastMove1.to.extraPropertiesValid) {
+            return false;
+        }
+        final MoveData thisMove = data.thisMove;
+        return 
+                // Odd speed decrease bumping into a block sideways somehow, having moved through water.
+                data.sfJumpPhase == 1 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND
+                && !thisMove.touchedGround && !thisMove.from.resetCond && !thisMove.to.resetCond // In-air
+                && !lastMove.touchedGround && lastMove.from.inWater && !lastMove.to.resetCond // Out of water.
+                && lastMove.yDistance > yDistance + GRAVITY_MAX && yDistance > lastMove.yDistance / 5.0 // Odd too high decrease.
+                && !pastMove1.touchedGround && !pastMove1.from.resetCond && pastMove1.to.inWater // Into water.
+                && pastMove1.yDistance > lastMove.yDistance - GRAVITY_MAX // Some speed decrease.
+                ;
     }
 
     /**
