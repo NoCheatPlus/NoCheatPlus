@@ -1296,10 +1296,8 @@ public class SurvivalFly extends Check {
                                                 && yDistance < lastMove.yDistance && lastMove.yDistance - yDistance < GRAVITY_MAX
                                                 && lastMove.yDistance - yDistance > GRAVITY_MIN / 4.0
                                                 // 2: Moving out of liquid with velocity.
-                                                || lastMove.yDistance > 0.0
-                                                && yDistance < lastMove.yDistance && yDistance > 0.0 && data.sfJumpPhase == 1
-                                                && lastMove.yDistance - yDistance > GRAVITY_MAX
-                                                && yDistDiffEx < GRAVITY_MAX + GRAVITY_SPAN && data.isVelocityJumpPhase()
+                                                || yDistance > 0.0 && data.sfJumpPhase == 1 && yDistDiffEx < 4.0 * GRAVITY_MAX
+                                                && yDistance < lastMove.yDistance - GRAVITY_MAX && data.isVelocityJumpPhase()
                                                 )
                                         )
                                         ; // (return)
