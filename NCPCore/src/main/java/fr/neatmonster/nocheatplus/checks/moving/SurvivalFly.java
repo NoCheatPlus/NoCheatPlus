@@ -986,8 +986,8 @@ public class SurvivalFly extends Check {
             else if (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
-            else if (lastMove.toIsValid && Magic.oddFrictionUp(yDistance, lastMove, data)) {
-                // Odd friction behavior (not necessarily friction).
+            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, lastMove, data)) {
+                // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
             }
             else {
                 vDistRelVL = true;
@@ -1028,6 +1028,9 @@ public class SurvivalFly extends Check {
                 else if (yDistance <= 0.0 && yDistance > -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN 
                         && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
                     // Head was blocked, thus faster decrease than expected.
+                }
+                else if (lastMove.toIsValid && Magic.oddFriction(yDistance, lastMove, data)) {
+                    // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
                 }
                 else {
                     // Violation.

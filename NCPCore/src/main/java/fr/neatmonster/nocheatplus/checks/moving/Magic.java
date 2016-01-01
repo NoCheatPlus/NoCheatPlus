@@ -308,15 +308,42 @@ public class Magic {
     }
 
     /**
-     * Odd friction behavior with moving up (not necessarily friction),
-     * accounting for more than one past move.
+     * Test for a specific move in-air -> water, then water -> in-air.
+     * 
+     * @param thisMove
+     *            Not strictly the latest move in MovingData.
+     * @param lastMove
+     *            Move before thisMove.
+     * @return
+     */
+    private static boolean splashMove(final MoveData thisMove, final MoveData lastMove) {
+        // Use past move data for two moves.
+        return !thisMove.touchedGround && thisMove.from.inWater && !thisMove.to.resetCond // Out of water.
+                && !lastMove.touchedGround && !lastMove.from.resetCond && lastMove.to.inWater // Into water.
+                ;
+    }
+
+    /**
+     * Fully in-air move.
+     * @param thisMove
+     *            Not strictly the latest move in MovingData.
+     * @return
+     */
+    private static boolean inAir(final MoveData thisMove) {
+        return !thisMove.touchedGround && !thisMove.from.resetCond && !thisMove.to.resetCond;
+    }
+
+    /**
+     * Odd behavior with moving up or (slightly) down, not like the ordinary
+     * friction mechanics, accounting for more than one past move. Only for too
+     * high decrease.
      * 
      * @param yDistance
      * @param lastMove
      * @param data
      * @return
      */
-    static boolean oddFrictionUp(final double yDistance, final MoveData lastMove, final MovingData data) {
+    static boolean oddFriction(final double yDistance, final MoveData lastMove, final MovingData data) {
         // Use past move data for two moves.
         final MoveData pastMove1 = data.moveData.get(1);
         if (!lastMove.to.extraPropertiesValid || !pastMove1.toIsValid || !pastMove1.to.extraPropertiesValid) {
@@ -324,14 +351,21 @@ public class Magic {
         }
         final MoveData thisMove = data.thisMove;
         return 
-                // Odd speed decrease bumping into a block sideways somehow, having moved through water.
-                data.sfJumpPhase == 1 && data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND
-                && !thisMove.touchedGround && !thisMove.from.resetCond && !thisMove.to.resetCond // In-air
-                && !lastMove.touchedGround && lastMove.from.inWater && !lastMove.to.resetCond // Out of water.
-                && lastMove.yDistance > yDistance + GRAVITY_MAX && yDistance > lastMove.yDistance / 5.0 // Odd too high decrease.
-                && !pastMove1.touchedGround && !pastMove1.from.resetCond && pastMove1.to.inWater // Into water.
+                // 0: Odd speed decrease bumping into a block sideways somehow, having moved through water.
+                // (These should probably be oddLiquid cases, might pull pastMove1 to vDistAir later.)
+                data.sfJumpPhase == 1 
+                && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID)
+                && inAir(thisMove) && splashMove(lastMove, pastMove1)
                 && pastMove1.yDistance > lastMove.yDistance - GRAVITY_MAX // Some speed decrease.
-                ;
+                && lastMove.yDistance > yDistance + GRAVITY_MAX && lastMove.yDistance > 0.0 // Positive speed. TODO: rather > 1.0 (!).
+                && (
+                        // 1: Odd too high decrease, after middle move being within friction envelope.
+                        yDistance > lastMove.yDistance / 5.0
+                        // 1: Two times about the same decrease (e.g. near 1.0), ending up near zero distance.
+                        || yDistance > -GRAVITY_MAX 
+                        && Math.abs(pastMove1.yDistance - lastMove.yDistance - (lastMove.yDistance - thisMove.yDistance)) < GRAVITY_MAX
+                        )
+                        ;
     }
 
 }
