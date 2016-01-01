@@ -1885,10 +1885,9 @@ public class SurvivalFly extends Check {
                     ) {
                 return new double[]{lastMove.yDistance - GRAVITY_MAX - GRAVITY_MIN, 0.0};
             }
-            // Increase speed slightly on second in-medium move.
-            // TODO: Also without velocity?
-            else if (data.insideMediumCount <= 1
-                    && lastMove.yDistance < 0.8 && yDistance < lastMove.yDistance - GRAVITY_ODD && yDistance > lastMove.yDistance - GRAVITY_MAX
+            // Increase speed slightly on second in-medium move (dirty flag may have been reset).
+            else if (data.insideMediumCount <= 1 && lastMove.yDistance < 0.8 
+                    && yDistance < lastMove.yDistance - GRAVITY_ODD / 2.0 && yDistance > lastMove.yDistance - GRAVITY_MAX
                     ) {
                 return new double[]{yDistance, 0.0};
             }
