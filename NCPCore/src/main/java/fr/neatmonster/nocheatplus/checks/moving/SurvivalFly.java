@@ -46,7 +46,7 @@ public class SurvivalFly extends Check {
     /** Divisor vs. last hDist for minimum slow down. */
     private static final double bunnyDivFriction = 160.0; // Rather in-air, blocks would differ by friction.
 
-    
+
 
     // TODO: Friction by block to walk on (horizontal only, possibly to be in BlockProperties rather).
 
@@ -884,27 +884,8 @@ public class SurvivalFly extends Check {
             }
         }
         else {
-            if (lastMove.valid) {
-                tags.add("data_reset");
-            }
-            else {
-                tags.add("data_missing");
-            }
             // Teleport/join/respawn.
-            if (data.thisMove.from.onGround) {
-                vAllowedDistance = maxJumpGain + jumpGainMargin;
-                if (data.thisMove.to.onGround) {
-                    vAllowedDistance = Math.max(cc.sfStepHeight, vAllowedDistance);
-                }
-            }
-            else if (Magic.skipPaper(data.thisMove, lastMove, data)) {
-                vAllowedDistance = Magic.PAPER_DIST;
-                tags.add("skip_paper");
-            }
-            else {
-                // Allow 0 y-distance once.
-                vAllowedDistance = 0.0;
-            }
+            vAllowedDistance = vAllowedDistanceNoData(data.thisMove, lastMove, maxJumpGain, jumpGainMargin, data, cc);
             strictVdistRel = false;
         }
         // Compare yDistance to expected, use velocity on violation.
@@ -1134,6 +1115,44 @@ public class SurvivalFly extends Check {
             }
         }
         return new double[]{vAllowedDistance, vDistanceAboveLimit};
+    }
+
+    /**
+     * vAllowedDistance with data having been reset after teleport/join/respawn.
+     * 
+     * @param thisMove
+     * @param lastMove
+     * @param maxJumpGain
+     * @param jumpGainMargin
+     * @param data
+     * @param cc
+     * @return
+     */
+    private double vAllowedDistanceNoData(final MoveData thisMove, final MoveData lastMove, 
+            final double maxJumpGain, final double jumpGainMargin, 
+            final MovingData data, final MovingConfig cc) {
+        if (lastMove.valid) {
+            tags.add("data_reset");
+        }
+        else {
+            tags.add("data_missing");
+        }
+        double vAllowedDistance;
+        if (thisMove.from.onGround) {
+            vAllowedDistance = maxJumpGain + jumpGainMargin;
+            if (thisMove.to.onGround) {
+                vAllowedDistance = Math.max(cc.sfStepHeight, vAllowedDistance);
+            }
+        }
+        else if (Magic.skipPaper(thisMove, lastMove, data)) {
+            vAllowedDistance = Magic.PAPER_DIST;
+            tags.add("skip_paper");
+        }
+        else {
+            // Allow 0 y-distance once.
+            vAllowedDistance = 0.0;
+        }
+        return vAllowedDistance;
     }
 
     /**
