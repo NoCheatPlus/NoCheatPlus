@@ -129,6 +129,8 @@ public class MoveData {
      * MOVING_CREATIVEFLY, UNKNOWN.
      */
     public CheckType flyCheck;
+    
+    public boolean mightBeMultipleMoves;
 
     private void setPositions(final PlayerLocation from, final PlayerLocation to) {
         this.from.setLocation(from);
@@ -168,6 +170,7 @@ public class MoveData {
         hAllowedDistance = 0.0;
         // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
+        mightBeMultipleMoves = false;
         // Done.
         valid = true;
     }

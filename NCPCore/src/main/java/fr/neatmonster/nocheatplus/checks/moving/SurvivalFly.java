@@ -824,7 +824,7 @@ public class SurvivalFly extends Check {
             envelopeHack = true;
             tags.add("hack_venv");
         }
-        else{
+        else {
             envelopeHack = false;
         }
 
@@ -886,7 +886,8 @@ public class SurvivalFly extends Check {
         else {
             if (lastMove.valid) {
                 tags.add("data_reset");
-            } else {
+            }
+            else {
                 tags.add("data_missing");
             }
             // Teleport/join/respawn.
@@ -895,7 +896,12 @@ public class SurvivalFly extends Check {
                 if (data.thisMove.to.onGround) {
                     vAllowedDistance = Math.max(cc.sfStepHeight, vAllowedDistance);
                 }
-            } else {
+            }
+            else if (Magic.skipPaper(data.thisMove, lastMove, data)) {
+                vAllowedDistance = Magic.PAPER_DIST;
+                tags.add("skip_paper");
+            }
+            else {
                 // Allow 0 y-distance once.
                 vAllowedDistance = 0.0;
             }
@@ -1064,13 +1070,8 @@ public class SurvivalFly extends Check {
                     // Ignore: Envelope already checked.
                 }
                 // Teleport to in-air (PaperSpigot 1.7.10).
-                else if (!lastMove.toIsValid && data.sfJumpPhase == 0 && mightBeMultipleMoves
-                        && Math.abs(totalVDistViolation) < 0.01 && yDistance > 0.0 && yDistance < 0.01
-                        && !resetFrom && !resetTo && !data.thisMove.touchedGround
-                        ) {
-                    // TODO: Confine to PaperSpigot?
-                    // TODO: Confine to from at block level (offset 0)?
-                    tags.add("skip_paper");
+                else if (Magic.skipPaper(data.thisMove, lastMove, data)) {
+                    // Tag already set above.
                 }
                 // Attempt to use velocity.
                 else if (data.getOrUseVerticalVelocity(yDistance) == null) {

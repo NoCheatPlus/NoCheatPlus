@@ -49,6 +49,8 @@ public class Magic {
     // Vertical speeds/modifiers. 
     public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!  
 
+    // Other constants.
+    public static final double PAPER_DIST = 0.01;
 
     /**
      * The absolute per-tick base speed for swimming vertically.
@@ -366,6 +368,24 @@ public class Magic {
                         && Math.abs(pastMove1.yDistance - lastMove.yDistance - (lastMove.yDistance - thisMove.yDistance)) < GRAVITY_MAX
                         )
                         ;
+    }
+
+    /**
+     * First move after set-back / teleport. Originally has been found with
+     * PaperSpigot for MC 1.7.10, however it also does occur on Spigot for MC
+     * 1.7.10.
+     * 
+     * @param thisMove
+     * @param lastMove
+     * @param data
+     * @return
+     */
+    static boolean skipPaper(final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+        // TODO: Confine to from at block level (offset 0)?
+        final double setBackYDistance = thisMove.to.y - data.getSetBackY();
+        return !lastMove.toIsValid && data.sfJumpPhase == 0 && thisMove.mightBeMultipleMoves
+                && setBackYDistance > 0.0 && setBackYDistance < PAPER_DIST 
+                && thisMove.yDistance > 0.0 && thisMove.yDistance < PAPER_DIST && inAir(thisMove);
     }
 
 }

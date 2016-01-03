@@ -546,6 +546,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Set some data for this move.
         data.thisMove.set(pFrom, pTo);
+        if (mightBeMultipleMoves) {
+            data.thisMove.mightBeMultipleMoves = true;
+        }
         final MoveData lastMove = data.moveData.getFirst();
 
         // Potion effect "Jump".
