@@ -596,7 +596,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         && !survivalFly.isReallySneaking(player)
                         && (
                                 // Normal envelope (forestall NoFall).
-                                to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)
+                                (to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) // Ordinary.
+                                // With carpet. TODO: Magic block id.
+                                || pTo.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9)
                                 && MovingUtil.getRealisticFallDistance(player, pFrom.getY(), pTo.getY(), data) > 1.0
                                 // Within wobble-distance.
                                 || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5

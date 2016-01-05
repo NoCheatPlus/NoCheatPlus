@@ -273,8 +273,10 @@ public class Magic {
                                         // 1: Near ground small decrease.
                                         lastMove.yDistance > GRAVITY_MAX && lastMove.yDistance < 3.0 * GRAVITY_MAX
                                         && yDistChange > - GRAVITY_MIN && yDistChange < -GRAVITY_ODD
-                                        // 1: Bounce without velocity set.
+                                        // 1: Bounce without velocity set. TODO: wat?
                                         //|| lastMove.yDistance == 0.0 && yDistance > -GRAVITY_MIN && yDistance < GRAVITY_SPAN
+                                        // 1: Bounce with carpet.
+                                        || yDistance < 0.006
                                         )
                                         // 0: Jump-effect-specific
                                         // TODO: Jump effect at reduced lift off envelope -> skip this?
