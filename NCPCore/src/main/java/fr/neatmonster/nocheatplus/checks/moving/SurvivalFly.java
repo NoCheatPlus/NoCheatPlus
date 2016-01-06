@@ -1141,7 +1141,7 @@ public class SurvivalFly extends Check {
             tags.add("data_missing");
         }
         double vAllowedDistance;
-        if (thisMove.yDistance > - Magic.GRAVITY_MAX && thisMove.yDistance < 0.0) {
+        if (thisMove.yDistance > - Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN && thisMove.yDistance < 0.0) {
             // Allow falling.
             vAllowedDistance = thisMove.yDistance;
         }
