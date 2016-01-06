@@ -939,6 +939,9 @@ public class SurvivalFly extends Check {
                 else if (Magic.oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
                     // Odd decrease after lift-off.
                 }
+                else if (Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
+                    // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+                }
                 else {
                     // Violation.
                     vDistRelVL = true;
@@ -973,7 +976,7 @@ public class SurvivalFly extends Check {
             else if (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
-            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, lastMove, data)) {
+            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
                 // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
             }
             else {
@@ -1016,7 +1019,7 @@ public class SurvivalFly extends Check {
                         && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
                     // Head was blocked, thus faster decrease than expected.
                 }
-                else if (lastMove.toIsValid && Magic.oddFriction(yDistance, lastMove, data)) {
+                else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
                     // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
                 }
                 else {
@@ -1138,13 +1141,19 @@ public class SurvivalFly extends Check {
             tags.add("data_missing");
         }
         double vAllowedDistance;
-        if (thisMove.from.onGround) {
+        if (thisMove.yDistance > - Magic.GRAVITY_MAX && thisMove.yDistance < 0.0) {
+            // Allow falling.
+            vAllowedDistance = thisMove.yDistance;
+        }
+        else if (thisMove.from.onGround) {
+            // Allow jumping.
             vAllowedDistance = maxJumpGain + jumpGainMargin;
             if (thisMove.to.onGround) {
                 vAllowedDistance = Math.max(cc.sfStepHeight, vAllowedDistance);
             }
         }
         else if (Magic.skipPaper(thisMove, lastMove, data)) {
+            // Double arithmetics, moving up after join/teleport/respawn.
             vAllowedDistance = Magic.PAPER_DIST;
             tags.add("skip_paper");
         }
@@ -1609,6 +1618,15 @@ public class SurvivalFly extends Check {
                 }
             }
 
+            if (lastMove.toIsValid) {
+                // Lenient on marginal violation if speed decreases by 'enough'.
+                // (Observed on 'dirty' phase.)
+                if (Math.abs(frictDist - yDistance) <= 2.0 * Magic.GRAVITY_MAX
+                        && yDistance < lastMove.yDistance - 4.0 * Math.abs(frictDist - yDistance)
+                        ) {
+                    return new double[]{yDistance, 0.0};
+                }
+            }
         }
         // Otherwise, only if last move is available.
         else if (lastMove.toIsValid) {
