@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -146,8 +147,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Commands that were changed for protecting them against tab complete or
      * use.
      */
-    protected List<CommandProtectionEntry> changedCommands = null;
-
+    final LinkedList<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
 
     private final ListenerManager listenerManager = new ListenerManager(this, false);
 
@@ -243,17 +243,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final long ts = System.currentTimeMillis();
         final List<String> rem = new LinkedList<String>();
         synchronized (denyLoginNames) {
-            for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
+            for (final Entry<String, Long> entry : denyLoginNames.entrySet()) {
                 if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
             }
-            for (final String name : rem){
+            for (final String name : rem) {
                 denyLoginNames.remove(name);
             }
         }
     }
 
     @Override
-    public boolean allowLogin(String playerName){
+    public boolean allowLogin(String playerName) {
         playerName = playerName.trim().toLowerCase();
         final Long time = denyLoginNames.remove(playerName);
         if (time == null) return false;
@@ -261,10 +261,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
-    public int allowLoginAll(){
+    public int allowLoginAll() {
         int denied = 0;
         final long now = System.currentTimeMillis();
-        for (final String playerName : denyLoginNames.keySet()){
+        for (final String playerName : denyLoginNames.keySet()) {
             final Long time = denyLoginNames.get(playerName);
             if (time != null && time > now) denied ++;
         }
@@ -273,7 +273,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
-    public void denyLogin(String playerName, long duration){
+    public void denyLogin(String playerName, long duration) {
         final long ts = System.currentTimeMillis() + duration;
         playerName = playerName.trim().toLowerCase();
         synchronized (denyLoginNames) {
@@ -286,7 +286,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
-    public boolean isLoginDenied(String playerName){
+    public boolean isLoginDenied(String playerName) {
         return isLoginDenied(playerName, System.currentTimeMillis());
     }
 
@@ -307,17 +307,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
-    public int sendAdminNotifyMessage(final String message){
-        if (useSubscriptions){
+    public int sendAdminNotifyMessage(final String message) {
+        if (useSubscriptions) {
             // TODO: Might respect console settings, or add extra config section (e.g. notifications).
             return sendAdminNotifyMessageSubscriptions(message);
         }
-        else{
+        else {
             return sendAdminNotifyMessageStored(message);
         }
     }
 
-    private final boolean hasTurnedOffNotifications(final String playerName){
+    private boolean hasTurnedOffNotifications(final String playerName) {
         final PlayerData data = DataManager.getPlayerData(playerName, false);
         return data != null && data.getNotifyOff();
     }
@@ -327,17 +327,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * @param message
      * @return
      */
-    public int sendAdminNotifyMessageStored(final String message){
+    public int sendAdminNotifyMessageStored(final String message) {
         final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
         if (names == null) return 0;
         int done = 0;
-        for (final String name : names){
-            if (hasTurnedOffNotifications(name)){
+        for (final String name : names) {
+            if (hasTurnedOffNotifications(name)) {
                 // Has turned off notifications.
                 continue;
             }
             final Player player = DataManager.getPlayerExact(name);
-            if (player != null){
+            if (player != null) {
                 player.sendMessage(message);
                 done ++;
             }
@@ -350,14 +350,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * @param message
      * @return
      */
-    public int sendAdminNotifyMessageSubscriptions(final String message){
+    public int sendAdminNotifyMessageSubscriptions(final String message) {
         final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.NOTIFY);
         final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
         final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
-        for (final Permissible permissible : permissibles){
-            if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)){
+        for (final Permissible permissible : permissibles) {
+            if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)) {
                 final CommandSender sender = (CommandSender) permissible;
-                if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())){
+                if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())) {
                     continue;
                 }
 
@@ -366,12 +366,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
         }
         // Fall-back checking for players.
-        if (names != null){
-            for (final String name : names){
-                if (!done.contains(name)){
+        if (names != null) {
+            for (final String name : names) {
+                if (!done.contains(name)) {
                     final Player player = DataManager.getPlayerExact(name);
-                    if (player != null && player.hasPermission(Permissions.NOTIFY)){
-                        if (hasTurnedOffNotifications(player.getName())){
+                    if (player != null && player.hasPermission(Permissions.NOTIFY)) {
+                        if (hasTurnedOffNotifications(player.getName())) {
                             continue;
                         }
                         player.sendMessage(message); 
@@ -395,12 +395,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
         final List<ComponentRegistry<T>> result = new LinkedList<ComponentRegistry<T>>();
-        for (final ComponentRegistry<?> registry : subRegistries){
-            if (clazz.isAssignableFrom(registry.getClass())){
+        for (final ComponentRegistry<?> registry : subRegistries) {
+            if (clazz.isAssignableFrom(registry.getClass())) {
                 try{
                     result.add((ComponentRegistry<T>) registry);
                 }
-                catch(Throwable t){
+                catch(Throwable t) {
                     // Ignore.
                 }
             }
@@ -431,7 +431,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
         if (obj == this) throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
 
-        if (allComponents.contains(obj)){
+        if (allComponents.contains(obj)) {
             // All added components are in here.
             return false;
         }
@@ -447,25 +447,25 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
             added = true;
         }
-        if (obj instanceof TickListener){
+        if (obj instanceof TickListener) {
             TickTask.addTickListener((TickListener) obj);
             added = true;
         }
-        if (obj instanceof PermStateReceiver){
+        if (obj instanceof PermStateReceiver) {
             // No immediate update done.
             permStateReceivers.add((PermStateReceiver) obj);
             added = true;
         }
-        if (obj instanceof MCAccessHolder){
+        if (obj instanceof MCAccessHolder) {
             // These will get notified in initMcAccess (iterates over allComponents).
             ((MCAccessHolder) obj).setMCAccess(getMCAccess());
             added = true;
         }
-        if (obj instanceof ConsistencyChecker){
+        if (obj instanceof ConsistencyChecker) {
             consistencyCheckers.add((ConsistencyChecker) obj);
             added = true;
         }
-        if (obj instanceof JoinLeaveListener){
+        if (obj instanceof JoinLeaveListener) {
             joinLeaveListeners.add((JoinLeaveListener) obj);
             added = true;
         }
@@ -475,21 +475,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
         // Add to sub registries.
-        for (final ComponentRegistry<?> registry : subRegistries){
+        for (final ComponentRegistry<?> registry : subRegistries) {
             final Object res = ReflectionUtil.invokeGenericMethodOneArg(registry, "addComponent", obj);
-            if (res != null && (res instanceof Boolean) && ((Boolean) res).booleanValue()){
+            if (res != null && (res instanceof Boolean) && ((Boolean) res).booleanValue()) {
                 added = true;
             }
         }
 
         // Add ComponentRegistry instances after adding to sub registries to prevent adding it to itself.
-        if (allowComponentRegistry && (obj instanceof ComponentRegistry<?>)){
+        if (allowComponentRegistry && (obj instanceof ComponentRegistry<?>)) {
             subRegistries.add((ComponentRegistry<?>) obj);
             added = true;
         }
 
         // Components holding more components to register later.
-        if (obj instanceof IHoldSubComponents){
+        if (obj instanceof IHoldSubComponents) {
             subComponentholders.add((IHoldSubComponents) obj);
             onDemandTickListener.register();
             added = true; // Convention.
@@ -506,17 +506,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     private void addListener(final Listener listener) {
         // private: Use addComponent.
-        if (manageListeners){
+        if (manageListeners) {
             String tag = "NoCheatPlus";
-            if (listener instanceof ComponentWithName){
+            if (listener instanceof ComponentWithName) {
                 tag = ((ComponentWithName) listener).getComponentName();
             }
             listenerManager.registerAllEventHandlers(listener, tag);
             listeners.add(listener);
         }
-        else{
+        else {
             Bukkit.getPluginManager().registerEvents(listener, this);
-            if (listener instanceof IHaveMethodOrder){
+            if (listener instanceof IHaveMethodOrder) {
                 // TODO: Might log the order too, might prevent registration ?
                 // TODO: Alternative: queue listeners and register after startup (!)
                 logManager.warning(Streams.INIT, "Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
@@ -528,41 +528,41 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Test if NCP uses the ListenerManager at all.
      * @return If so.
      */
-    public boolean doesManageListeners(){
+    public boolean doesManageListeners() {
         return manageListeners;
     }
 
     @Override
     public void removeComponent(final Object obj) {
-        if (obj instanceof Listener){
-            listeners.remove(obj);
+        if (obj instanceof Listener) {
+            listeners.remove((Listener) obj);
             listenerManager.remove((Listener) obj);
         }
-        if (obj instanceof PermStateReceiver){
+        if (obj instanceof PermStateReceiver) {
             permStateReceivers.remove((PermStateReceiver) obj);
         }
-        if (obj instanceof TickListener){
+        if (obj instanceof TickListener) {
             TickTask.removeTickListener((TickListener) obj);
         }
         if (obj instanceof INotifyReload) {
-            notifyReload.remove(obj);
+            notifyReload.remove((INotifyReload) obj);
         }
-        if (obj instanceof ConsistencyChecker){
-            consistencyCheckers.remove(obj);
+        if (obj instanceof ConsistencyChecker) {
+            consistencyCheckers.remove((ConsistencyChecker) obj);
         }
-        if (obj instanceof JoinLeaveListener){
+        if (obj instanceof JoinLeaveListener) {
             joinLeaveListeners.remove((JoinLeaveListener) obj);
         }
         if (obj instanceof DisableListener) {
-            disableListeners.remove(obj);
+            disableListeners.remove((DisableListener) obj);
         }
 
         // Remove sub registries.
-        if (obj instanceof ComponentRegistry<?>){
-            subRegistries.remove(obj);
+        if (obj instanceof ComponentRegistry<?>) {
+            subRegistries.remove((ComponentRegistry<?>) obj);
         }
         // Remove from present registries, order prevents to remove from itself.
-        for (final ComponentRegistry<?> registry : subRegistries){
+        for (final ComponentRegistry<?> registry : subRegistries) {
             ReflectionUtil.invokeGenericMethodOneArg(registry, "removeComponent", obj);
         }
 
@@ -578,7 +578,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
 
         // Remove listener references.
-        if (verbose){
+        if (verbose) {
             if (listenerManager.hasListenerMethods()) {
                 logManager.info(Streams.INIT, "Cleanup ListenerManager...");
             }
@@ -593,7 +593,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         BukkitScheduler sched = getServer().getScheduler();
 
         // Stop data-man task.
-        if (dataManTaskId != -1){
+        if (dataManTaskId != -1) {
             sched.cancelTask(dataManTaskId);
             dataManTaskId = -1;
         }
@@ -609,7 +609,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // (Keep the tick task locked!)
 
         // Stop consistency checking task.
-        if (consistencyCheckerTaskId != -1){
+        if (consistencyCheckerTaskId != -1) {
             sched.cancelTask(consistencyCheckerTaskId);
             consistencyCheckerTaskId = -1;
         }
@@ -658,13 +658,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // (Expect external plugins to unregister their hooks on their own.)
         // (No native hooks present, yet.)
 
-        // Unregister all added components explicitly.
+        // Unregister all added components explicitly (reverse order).
         if (verbose) {
             logManager.info(Streams.INIT, "Unregister all registered components...");
         }
-        final ArrayList<Object> allComponents = new ArrayList<Object>(this.allComponents);
-        for (int i = allComponents.size() - 1; i >= 0; i--){
-            removeComponent(allComponents.get(i));
+        final ArrayList<Object> components = new ArrayList<Object>(this.allComponents);
+        for (int i = components.size() - 1; i >= 0; i--) {
+            removeComponent(components.get(i));
         }
 
         // Cleanup BlockProperties.
@@ -697,14 +697,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             blockChangeListener = null; // Only on disable.
         }
 
-        // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
-        if (changedCommands != null){
-            changedCommands.clear();
-            changedCommands = null;
-        }
-        //		// Restore changed commands.
+        // Restore changed commands.
         //		if (verbose) LogUtil.logInfo("Undo command changes...");
         //		undoCommandChanges();
+        // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
+        changedCommands.clear();
 
         // Cleanup the configuration manager.
         if (verbose) {
@@ -729,44 +726,47 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /**
-     * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
-     * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
+     * Does not undo 100%, but restores
+     * <ul>
+     * <li>old permission,</li>
+     * <li>permission-message,</li>
+     * <li>label (unlikely to be changed),</li>
+     * <li>permission default.</li>
+     * </ul>
+     * 
+     * @deprecated Leads to compatibility issues with NPC plugins such as
+     *             Citizens 2, due to recalculation of permissions (specifically
+     *             during disabling).
      */
     public void undoCommandChanges() {
-        if (changedCommands != null){
-            while (!changedCommands.isEmpty()){
-                final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
-                entry.restore();
+        if (!changedCommands.isEmpty()) {
+            final Iterator<CommandProtectionEntry> it = changedCommands.descendingIterator();
+            while (it.hasNext()) {
+                it.next().restore();
             }
-            changedCommands = null;
+            changedCommands.clear();
         }
     }
 
     protected void setupCommandProtection() {
         // TODO: Might re-check with plugins enabling during runtime (!).
-        final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
         // Read lists and messages from config.
         final ConfigFile config = ConfigManager.getConfigFile();
         // (Might add options to invert selection.)
         // "No permission".
         // TODO: Could/should set permission message to null here (server default), might use keyword "default".
         final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
-        if (noPerm != null && !noPerm.isEmpty()){
+        if (noPerm != null && !noPerm.isEmpty()) {
             final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
+            // Setup and add changes to history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
         }
         // "Unknown command", override the other option.
         final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
-        if (noCommand != null && !noCommand.isEmpty()){
+        if (noCommand != null && !noCommand.isEmpty()) {
             final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
+            // Setup and add changes to history for undoing.
             changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
-        }
-        // Add to changes history for undoing.
-        if (this.changedCommands == null) {
-            this.changedCommands = changedCommands;
-        }
-        else {
-            this.changedCommands.addAll(changedCommands);
         }
     }
 
@@ -833,7 +833,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             listenerManager.setRegisterDirectly(true);
             listenerManager.registerAllWithBukkit();
         }
-        else{
+        else {
             // Just for safety.
             listenerManager.setRegisterDirectly(false);
             listenerManager.clear();
@@ -870,7 +870,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 // Put ReloadListener first, because Checks could also listen to it.
                 new ReloadHook(),
                 dataMan,
-        }){
+        }) {
             addComponent(obj);
             // Register sub-components (allow later added to use registries, if any).
             processQueuedSubComponentHolders();
@@ -888,7 +888,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 new FightListener(),
                 new InventoryListener(),
                 new MovingListener(),
-        }){
+        }) {
             addComponent(obj);
             // Register sub-components (allow later added to use registries, if any).
             processQueuedSubComponentHolders();
@@ -896,7 +896,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Register optional default components.
         final DefaultComponentFactory dcf = new DefaultComponentFactory();
-        for (final Object obj : dcf.getAvailableComponentsOnEnable(this)){
+        for (final Object obj : dcf.getAvailableComponentsOnEnable(this)) {
             addComponent(obj);
             // Register sub-components to enable registries for optional components.
             processQueuedSubComponentHolders();
@@ -924,7 +924,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Setup allViolationsHook
         allViolationsHook.setConfig(new AllViolationsConfig(config));
 
-        //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
+        //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)) {
         //            // Is a new update available?
         //        	final int timeout = config.getInt(ConfPaths.MISCELLANEOUS_UPDATETIMEOUT, 4) * 1000;
         //        	getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
@@ -936,7 +936,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         //        }
 
         // Is the version the configuration was created with consistent with the current one?
-        if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)){
+        if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
             // Could use custom prefix from logging, however ncp should be mentioned then.
             logManager.warning(Streams.INIT, "" + configProblems);
         }
@@ -965,7 +965,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
-    protected void postEnable(final NoCheatPlusCommand commandHandler, final Player[] onlinePlayers){
+    protected void postEnable(final NoCheatPlusCommand commandHandler, final Player[] onlinePlayers) {
         logManager.info(Streams.INIT, "Post-enable running...");
         try {
             // Set child permissions for commands for faster checking.
@@ -983,29 +983,33 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             logManager.severe(Streams.INIT, "Failed to apply command protection: " + t.getClass().getSimpleName());
             logManager.severe(Streams.INIT, t);
         }
-        for (final Player player : onlinePlayers){
+        for (final Player player : onlinePlayers) {
             updatePermStateReceivers(player);
             if (player.isSleeping()) {
                 CombinedData.getData(player).wasInBed = true;
             }
         }
-        // TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+        if (onlinePlayers.length > 0) {
+            logManager.info(Streams.INIT, "Updated data for " + onlinePlayers.length + " players (post-enable).");
+        }
         // Register late listener.
         Bukkit.getPluginManager().registerEvents(getLateListener(), this);
         lateListenerRegistered = true;
+        // Finished.
         logManager.info(Streams.INIT, "Post-enable finished.");
-        logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
+        // Log version to file (queued).
+        logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n"));
     }
 
     /**
      * Empties and registers the subComponentHolders list.
      */
-    protected void processQueuedSubComponentHolders(){
+    protected void processQueuedSubComponentHolders() {
         if (subComponentholders.isEmpty()) return;
         final List<IHoldSubComponents> copied = new ArrayList<IHoldSubComponents>(subComponentholders);
         subComponentholders.clear();
-        for (final IHoldSubComponents holder : copied){
-            for (final Object component : holder.getSubComponents()){
+        for (final IHoldSubComponents holder : copied) {
+            for (final Object component : holder.getSubComponents()) {
                 addComponent(component);
             }
         }
@@ -1014,7 +1018,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * All action done on reload.
      */
-    protected void processReload(){
+    protected void processReload() {
         final ConfigFile config = ConfigManager.getConfigFile();
         setInstanceMembers(config);
         // TODO: Process registered ComponentFactory instances.
@@ -1070,7 +1074,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
-    public MCAccess getMCAccess(){
+    public MCAccess getMCAccess() {
         if (mcAccess == null) initMCAccess();
         return mcAccess;
     }
@@ -1095,7 +1099,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public MCAccess initMCAccess(final ConfigFile config) {
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig());
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig(config));
         setMCAccess(mcAccess);
         return mcAccess;
     }
@@ -1104,15 +1108,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Set and propagate to registered MCAccessHolder instances.
      */
     @Override
-    public void setMCAccess(final MCAccess mcAccess){
+    public void setMCAccess(final MCAccess mcAccess) {
         // Just sets it and propagates it.
         // TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
         this.mcAccess = mcAccess;
-        for (final Object obj : this.allComponents){
-            if (obj instanceof MCAccessHolder){
+        for (final Object obj : this.allComponents) {
+            if (obj instanceof MCAccessHolder) {
                 try{
                     ((MCAccessHolder) obj).setMCAccess(mcAccess);
-                } catch(Throwable t){
+                } catch(Throwable t) {
                     logManager.severe(Streams.INIT, "MCAccessHolder(" + obj.getClass().getName() + ") failed to set MCAccess: " + t.getClass().getSimpleName());
                     logManager.severe(Streams.INIT, t);
                 }
@@ -1124,7 +1128,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Initialize BlockProperties, including config.
      */
-    protected void initBlockProperties(ConfigFile config){
+    protected void initBlockProperties(ConfigFile config) {
         // Set up BlockProperties.
         BlockProperties.init(getMCAccess(), ConfigManager.getWorldConfigProvider());
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
@@ -1198,10 +1202,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
 
             @EventHandler(priority = EventPriority.LOWEST)
-            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
-            {
-                final Player player = event.getPlayer();
-                updatePermStateReceivers(player);
+            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event) {
+                updatePermStateReceivers(event.getPlayer());
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1216,9 +1218,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         };
     }
 
-    protected void onJoinLow(final Player player){
+    protected void onJoinLow(final Player player) {
         final String playerName = player.getName();
-        if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)){
+        if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)) {
             // Login notifications...
             final PlayerData data = DataManager.getPlayerData(playerName, true);
             //			// Update available.
@@ -1235,11 +1237,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
         }
         // JoinLeaveListenerS: Do update comment in NoCheatPlusAPI with changing event priority.
-        for (final JoinLeaveListener jlListener : joinLeaveListeners){
+        for (final JoinLeaveListener jlListener : joinLeaveListeners) {
             try{
                 jlListener.playerJoins(player);
             }
-            catch(Throwable t){
+            catch(Throwable t) {
                 logManager.severe(Streams.INIT, "JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (join): " + t.getClass().getSimpleName());
                 logManager.severe(Streams.INIT, t);
             }
@@ -1252,11 +1254,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         for (final PermStateReceiver pr : permStateReceivers) {
             pr.removePlayer(player.getName());
         }
-        for (final JoinLeaveListener jlListener : joinLeaveListeners){
+        for (final JoinLeaveListener jlListener : joinLeaveListeners) {
             try{
                 jlListener.playerLeaves(player);
             }
-            catch(Throwable t){
+            catch(Throwable t) {
                 logManager.severe(Streams.INIT, "JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (leave): " + t.getClass().getSimpleName());
                 logManager.severe(Streams.INIT, t);
             }
@@ -1281,9 +1283,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
-    protected void scheduleConsistencyCheckers(){
+    protected void scheduleConsistencyCheckers() {
         BukkitScheduler sched = getServer().getScheduler();
-        if (consistencyCheckerTaskId != -1){
+        if (consistencyCheckerTaskId != -1) {
             sched.cancelTask(consistencyCheckerTaskId);
         }
         ConfigFile config = ConfigManager.getConfigFile();
@@ -1312,10 +1314,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Run consistency checks for at most the configured duration. If not finished, a task will be scheduled to continue.
      */
-    protected void runConsistencyChecks(){
+    protected void runConsistencyChecks() {
         final long tStart = System.currentTimeMillis();
         final ConfigFile config = ConfigManager.getConfigFile();
-        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK) || consistencyCheckers.isEmpty()){
+        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK) || consistencyCheckers.isEmpty()) {
             consistencyCheckerIndex = 0;
             return;
         }
@@ -1323,34 +1325,32 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (consistencyCheckerIndex >= consistencyCheckers.size()) consistencyCheckerIndex = 0;
         final Player[] onlinePlayers = BridgeMisc.getOnlinePlayers();
         // Loop
-        while (consistencyCheckerIndex < consistencyCheckers.size()){
+        while (consistencyCheckerIndex < consistencyCheckers.size()) {
             final ConsistencyChecker checker = consistencyCheckers.get(consistencyCheckerIndex);
             try{
                 checker.checkConsistency(onlinePlayers);
             }
-            catch (Throwable t){
+            catch (Throwable t) {
                 logManager.severe(Streams.INIT, "ConsistencyChecker(" + checker.getClass().getName() + ") encountered an exception:");
                 logManager.severe(Streams.INIT, t);
             }
             consistencyCheckerIndex ++; // Do not remove :).
             final long now = System.currentTimeMillis();
-            if (now < tStart || now >= tEnd){
+            if (now < tStart || now >= tEnd) {
                 break;
             }
         }
         // (The index might be bigger than size by now.)
 
-        final boolean debug = config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
-
         // If not finished, schedule further checks.
-        if (consistencyCheckerIndex < consistencyCheckers.size()){
+        if (consistencyCheckerIndex < consistencyCheckers.size()) {
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 @Override
                 public void run() {
                     runConsistencyChecks();
                 }
             });
-            if (debug){
+            if (config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
                 logManager.info(Streams.STATUS, "Interrupted consistency checking until next tick.");
             }
         }

@@ -1907,11 +1907,11 @@ public class SurvivalFly extends Check {
      * @param tag
      * @return
      */
-    private final boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MoveData lastMove, final MovingData data, final String tag) {
+    private boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MoveData lastMove, final MovingData data, final String tag) {
         return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.x, lastMove.from.y, lastMove.from.z, lastMove.hDistance, width, yOnGround, data, tag);
     }
 
-    private final boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, double x2, final double y2, double z2, final double hDistance2, final double width, final double yOnGround, final MovingData data, final String tag) {
+    private boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, double x2, final double y2, double z2, final double hDistance2, final double width, final double yOnGround, final MovingData data, final String tag) {
         // First: calculate vector towards last from.
         x2 -= x1;
         z2 -= z1;
@@ -2127,7 +2127,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private final Location handleViolation(final long now, final double result, final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
+    private Location handleViolation(final long now, final double result, final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
     {
         // Increment violation level.
         data.survivalFlyVL += result;
@@ -2199,7 +2199,7 @@ public class SurvivalFly extends Check {
      * @param vDistanceAboveLimit
      * @return If to silently set back.
      */
-    private final boolean hackCobweb(final Player player, final MovingData data, final PlayerLocation to, 
+    private boolean hackCobweb(final Player player, final MovingData data, final PlayerLocation to, 
             final long now, final double vDistanceAboveLimit)
     {
         if (now - data.sfCobwebTime > 3000) {

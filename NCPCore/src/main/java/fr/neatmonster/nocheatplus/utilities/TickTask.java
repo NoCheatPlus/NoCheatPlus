@@ -522,7 +522,7 @@ public class TickTask implements Runnable {
      * Notify all listeners. A copy of the listeners under lock, then processed without lock. Theoretically listeners can get processed though they have already been unregistered.
      * 
      */
-    private final void notifyListeners() {
+    private void notifyListeners() {
         // Copy for iterating, to allow reentrant registration while processing.
         final TickListener[] copyListeners;
         synchronized (tickListeners) {

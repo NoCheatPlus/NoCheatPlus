@@ -18,7 +18,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
  */
 public class MCAccessFactory {
 
-    private final String[] updateLocs = new String[]{
+    private final String[] updateLocs = new String[] {
             " Check for updates and support at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
             " Development builds (unsupported by the Bukkit Staff, use at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
     };
@@ -57,14 +57,12 @@ public class MCAccessFactory {
             return new MCAccessGlowstone();
         } catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // Try to set up api-only access (since 1.4.6).
         try {
             mcAccess = new MCAccessBukkit();
-            final String msg;
-            msg = "Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.";
-            StaticLog.logWarning(msg);
+            StaticLog.logWarning("Running in Bukkit-API-only mode (" + Bukkit.getServer().getVersion() + "). If this is not intended, please check for updates and consider to request support.");
             for (String uMsg : updateLocs) {
                 StaticLog.logWarning(uMsg);
             }
@@ -76,7 +74,7 @@ public class MCAccessFactory {
         }
         catch(Throwable t) {
             throwables.add(t);
-        };
+        }
 
         // All went wrong.
         // TODO: Fall-back solution (disable plugin, disable checks).
@@ -135,7 +133,7 @@ public class MCAccessFactory {
             }
             catch(Throwable t) {
                 throwables.add(t);
-            };
+            }
         }
 
         // None worked.

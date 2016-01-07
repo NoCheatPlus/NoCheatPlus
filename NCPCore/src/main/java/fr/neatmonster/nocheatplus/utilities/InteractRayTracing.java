@@ -96,7 +96,7 @@ public class InteractRayTracing extends RayTracing {
      * @param blockZ
      * @return
      */
-    private final boolean doesCollide(final int blockX, final int blockY, final int blockZ) {
+    private boolean doesCollide(final int blockX, final int blockY, final int blockZ) {
         final int id = blockCache.getTypeId(blockX, blockY, blockZ);
         final long flags = BlockProperties.getBlockFlags(id);
         if ((flags & BlockProperties.F_SOLID) == 0) {
@@ -132,7 +132,7 @@ public class InteractRayTracing extends RayTracing {
     //     * @param blockZ
     //     * @return
     //     */
-    //    private final boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
+    //    private boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
     //        
     //        // TODO: Recode this/other.
     //        

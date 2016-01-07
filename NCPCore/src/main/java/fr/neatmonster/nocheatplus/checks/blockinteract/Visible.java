@@ -202,7 +202,7 @@ public class Visible extends Check {
      * @param blockDiff
      * @return
      */
-    private final double getMinTime(final double eye, final int eyeBlock, final double dir, final int blockDiff) {
+    private double getMinTime(final double eye, final int eyeBlock, final double dir, final int blockDiff) {
         if (blockDiff == 0) {
             // Already on the block.
             return 0.0;
@@ -221,7 +221,7 @@ public class Visible extends Check {
      * @param tMin Result of getMinTime for this coordinate.
      * @return
      */
-    private final double getMaxTime(final double eye, final int eyeBlock, final double dir, final double tMin) {
+    private double getMaxTime(final double eye, final int eyeBlock, final double dir, final double tMin) {
         if (dir == 0.0) {
             // Always on (blockDiff == 0 as well).
             return Double.MAX_VALUE;
@@ -243,7 +243,7 @@ public class Visible extends Check {
      * @param block
      * @return
      */
-    private final double toBlock(final double coord, final int block) {
+    private double toBlock(final double coord, final int block) {
         final int blockDiff = block - Location.locToBlock(coord);
         if (blockDiff == 0) {
             return coord;

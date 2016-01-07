@@ -48,7 +48,7 @@ public class NoFall extends Check {
      * @param data
      * @param y
      */
-    private final void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
+    private void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         //        final int pD = getDamage(mcPlayer.fallDistance);
         //        final int nfD = getDamage(data.noFallFallDistance);
         //        final int yD = getDamage((float) (data.noFallMaxY - y));
@@ -81,7 +81,7 @@ public class NoFall extends Check {
         return getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
     }
 
-    private final void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
+    private void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         final float noFallFallDistance = Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY));
         if (noFallFallDistance >= 3.0) {
             final float fallDistance = player.getFallDistance();
