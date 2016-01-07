@@ -6,7 +6,7 @@
 	<groupId>fr.neatmonster</groupId>
 	<artifactId>nocheatplus</artifactId>
 	<name>NoCheatPlus</name>
-	<version>3.13.5-SNAPSHOT</version>
+	<version>3.13.5-BETA</version>
 	<description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
 	<url>http://dev.bukkit.org/server-mods/nocheatplus</url>
 
