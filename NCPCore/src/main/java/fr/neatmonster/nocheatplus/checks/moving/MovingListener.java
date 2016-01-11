@@ -672,7 +672,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
             // Hack: Add velocity for transitions between creativefly and survivalfly.
             if (lastMove.toIsValid && lastMove.flyCheck == CheckType.MOVING_CREATIVEFLY) {
-                workaroundFlyNoFlyTransition(tick, data);
+                workaroundFlyNoFlyTransition(player, tick, data);
             }
 
             // Actual check.
@@ -784,13 +784,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param tick
      * @param data
      */
-    private static void workaroundFlyNoFlyTransition(final int tick, final MovingData data) {
+    private static void workaroundFlyNoFlyTransition(final Player player, final int tick, final MovingData data) {
         final MoveData lastMove = data.moveData.getFirst();
         final double amount = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
         data.addVerticalVelocity(new SimpleEntry(lastMove.yDistance, 2));
         data.addVerticalVelocity(new SimpleEntry(0.0, 2));
         data.setFrictionJumpPhase();
+        // Reset fall height.
+        // TODO: Later (e.g. 1.9) check for the ModelFlying, if fall damage is intended.
+        data.clearNoFallData();
+        player.setFallDistance(0f);
     }
 
     /**
@@ -1202,6 +1206,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Log?
             if (!event.isCancelled()) {
                 // TODO: Log!
+                // TODO: Reset yaw rate, such as to accept any yaw to start with (!).
             }
             data.resetTeleported();
             return;
