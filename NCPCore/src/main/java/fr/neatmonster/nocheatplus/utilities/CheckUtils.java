@@ -1,5 +1,10 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,6 +26,9 @@ import fr.neatmonster.nocheatplus.logging.Streams;
  * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
  */
 public class CheckUtils {
+
+    // TODO: Quick and dirty -> other methods elsewhere.
+    private static Set<Integer> logOnce = Collections.synchronizedSet(new HashSet<Integer>());
 
     /**
      * Kick and log.
@@ -179,13 +187,34 @@ public class CheckUtils {
             }
             if (!APIUtils.needsSynchronization(checkType)) {
                 // Checking for exemption can cause harm now.
-                // TODO: Log once + examine stack (which plugin/component does it).
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Off primary thread call to hasByPass for " + checkType + ".");
+                improperAPIAccess(checkType);
             }
         }
         // TODO: ExemptionManager relies on the initial definition for which type can be checked off main thread.
         // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
         return NCPExemptionManager.isExempted(player, checkType);
+    }
+
+    private static void improperAPIAccess(final CheckType checkType) {
+        // TODO: Log once + examine stack (which plugins/things are involved).
+        final String trace = Arrays.toString(Thread.currentThread().getStackTrace());
+        final int ref = trace.hashCode() ^ new Integer(trace.length());
+        final String extra;
+        final boolean details = logOnce.add(ref);
+        if (details) {
+            // Not already contained.
+            extra = " (id=" + ref + ")";
+        } else {
+            extra = " (see earlier log with id=" + ref + ")";
+        }
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Off primary thread call to hasByPass for " + checkType + extra + ".");
+        if (details) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, trace);
+            if (logOnce.size() > 10000) {
+                logOnce.clear();
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Cleared log-once ids, due to exceeding the maximum number of stored ids.");
+            }
+        }
     }
 
 }
