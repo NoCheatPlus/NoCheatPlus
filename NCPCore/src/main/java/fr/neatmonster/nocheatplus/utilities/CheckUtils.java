@@ -28,7 +28,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 public class CheckUtils {
 
     // TODO: Quick and dirty -> other methods elsewhere.
-    private static Set<Integer> logOnce = Collections.synchronizedSet(new HashSet<Integer>());
+    private static final Set<Integer> logOnce = Collections.synchronizedSet(new HashSet<Integer>());
 
     /**
      * Kick and log.
@@ -198,7 +198,7 @@ public class CheckUtils {
     private static void improperAPIAccess(final CheckType checkType) {
         // TODO: Log once + examine stack (which plugins/things are involved).
         final String trace = Arrays.toString(Thread.currentThread().getStackTrace());
-        final int ref = trace.hashCode() ^ new Integer(trace.length());
+        final int ref = trace.hashCode() ^ new Integer(trace.length()).hashCode();
         final String extra;
         final boolean details = logOnce.add(ref);
         if (details) {
