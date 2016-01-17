@@ -48,13 +48,36 @@ public class TestAcceptDenyCounters {
         checkCounts(leaf, 73, 65, "leaf");
     }
 
-    public void checkCounts(IAcceptDenyCounter counter, int acceptCount, int denyCount, String counterName) {
+    public static void checkCounts(IAcceptDenyCounter counter, int acceptCount, int denyCount, String counterName) {
         if (counter.getAcceptCount() != acceptCount) {
             fail("Wrong accept count for counter '" + counterName + "': " + counter.getAcceptCount() + " instead of " + acceptCount + ".");
         }
         if (counter.getDenyCount() != denyCount) {
             fail("Wrong deny count for counter '" + counterName + "': " + counter.getDenyCount() + " instead of " + denyCount + ".");
         }
+    }
+
+    public static void checkSame(String testName, IAcceptDenyCounter... counters) {
+        if (counters.length < 2) {
+            return;
+        }
+        IAcceptDenyCounter first = counters[0];
+        for (int i = 1; i < counters.length; i++) {
+            if (first.getAcceptCount() != counters[i].getAcceptCount()) {
+                fail("Accept count differs at index " + i + ": " + testName);
+            }
+            if (first.getDenyCount() != counters[i].getDenyCount()) {
+                fail("Deny count differs at index " + i + ": " + testName);
+            }
+        }
+
+    }
+
+    public static void checkSame(int acceptCount, int denyCount, String testName, IAcceptDenyCounter... counters) {
+        for (int i = 0; i < counters.length; i++) {
+            checkCounts(counters[i], acceptCount, denyCount, "counter at index " + i + " / " + testName);
+        }
+        checkSame(testName, counters);
     }
 
 }

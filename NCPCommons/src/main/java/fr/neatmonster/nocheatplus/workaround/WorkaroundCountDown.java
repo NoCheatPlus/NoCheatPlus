@@ -67,7 +67,7 @@ public class WorkaroundCountDown extends AbstractWorkaround implements IStagedWo
     }
 
     @Override
-    public boolean testUse(boolean isUse) {
+    public boolean testUse(final boolean isUse) {
         if (!isUse) {
             return currentCount > 0;
         }

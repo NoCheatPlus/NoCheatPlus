@@ -74,7 +74,8 @@ public abstract class AbstractWorkaround implements IWorkaround {
 
     /**
      * Override the parent counters in instance with the ones set in this
-     * instance, if possible.
+     * instance, where feasible, if possible. (By default, only the
+     * allTimeCounter is checked for a parent.)
      * 
      * @param instance
      * @return The given instance.
