@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
@@ -468,6 +469,7 @@ public class SurvivalFly extends Check {
         }
 
         // Apply reset conditions.
+        boolean inAir = false; // Hack.
         if (resetTo) {
             // The player has moved onto ground.
             if (toOnGround) {
@@ -507,6 +509,11 @@ public class SurvivalFly extends Check {
             if (to.getY() < 0.0 && cc.sfSetBackPolicyVoid) {
                 data.setSetBack(to);
             }
+            inAir = true;
+        }
+        
+        if (!inAir) {
+            data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
         }
 
         // Horizontal velocity invalidation.

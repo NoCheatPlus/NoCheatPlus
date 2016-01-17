@@ -32,7 +32,8 @@ public interface IWorkaroundRegistry {
     public static class WorkaroundSet {
 
         // TODO: getUseCount()
-        // TODO: A list for ids of just used workarounds (reset externally. Add use(id) vs alter Workaround)?
+        // TODO: A list of just used IStageWorkaround / maybe other extra, or a flag (reset externally).
+        // TODO: Alternative: provide a use(Collection<String>) method to add the id to on accept.
         // TODO: Better optimized constructor (instanceof-decisions can be pre-cached).
 
         /** Map workaround id to workaround. */
@@ -204,6 +205,16 @@ public interface IWorkaroundRegistry {
      * @param workaroundIds
      */
     public void setGroup(String groupId, Collection<String> workaroundIds);
+
+    /**
+     * Specify what workaround ids belong to a certain group. Workarounds can be
+     * in multiple groups. The workaroundIds must exist.
+     * 
+     * @param groupId
+     * @param bluePrints
+     *            The ids are used, must exist.
+     */
+    public void setGroup(String groupId, IWorkaround... bluePrints);
 
     /**
      * Define which workarounds and which groups belong to the WorkaroundSet of

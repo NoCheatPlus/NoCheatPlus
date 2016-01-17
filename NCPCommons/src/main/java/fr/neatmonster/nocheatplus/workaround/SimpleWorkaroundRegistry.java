@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.workaround;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,6 +62,11 @@ public class SimpleWorkaroundRegistry implements IWorkaroundRegistry {
             }
         }
         groups.put(groupId, workaroundIds.toArray(new String[workaroundIds.size()]));
+    }
+
+    @Override
+    public void setGroup(String groupId, IWorkaround... bluePrints) {
+        setGroup(groupId, getCheckedIdSet(Arrays.asList(bluePrints)));
     }
 
     private void setWorkaroundSet(final String workaroundSetId, final Collection<IWorkaround> bluePrints, final String... groupIds) {

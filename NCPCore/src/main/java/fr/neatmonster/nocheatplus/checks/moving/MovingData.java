@@ -22,11 +22,13 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
+import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
+import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 
 /**
  * Player specific data for the moving checks.
@@ -235,7 +237,8 @@ public class MovingData extends ACheckData {
     public double nextFrictionHorizontal = 0.0;
     /** Used during processing, no resetting necessary.*/
     public double nextFrictionVertical= 0.0;
-
+    /** Workarounds */
+    public final WorkaroundSet ws;
 
     // HOT FIX
     /** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
@@ -248,6 +251,9 @@ public class MovingData extends ACheckData {
         super(config);
         morePacketsFreq = new ActionFrequency(config.morePacketsEPSBuckets, 500);
         morePacketsBurstFreq = new ActionFrequency(12, 5000);
+
+        // A new set of workaround conters.
+        ws = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(WRPT.class).getWorkaroundSet(WRPT.WS_MOVING);
 
         // Past moves data: initialize with dummies.
         for (int i = 0; i < 2; i++) { // Two past moves allow better workarounds than 1.

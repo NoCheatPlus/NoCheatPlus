@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /**
@@ -92,8 +93,12 @@ public class Magic {
                                 || yDistance == 0.0 && data.sfZeroVdist > 0 && data.sfZeroVdist < 10
                         )
                         // 0: Jumping on slimes, change viewing direction at the max. height.
+                        // TODO: Precondition bounced off or touched slime.
+                        // TODO: Once per jumpphase.
                         || yDistance == 0.0 && data.sfZeroVdist == 1 
-                        && (data.isVelocityJumpPhase() || data.hasSetBack() && to.getY() - data.getSetBackY() < 1.35);
+                        && (data.isVelocityJumpPhase() || data.hasSetBack() && to.getY() - data.getSetBackY() < 1.35)
+                        && data.ws.use(WRPT.W_M_SF_SLIME_JP_2X0)
+                        ;
     }
 
     /**

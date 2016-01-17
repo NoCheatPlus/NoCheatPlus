@@ -44,6 +44,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
@@ -842,6 +843,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Register some generic stuff.
         // Counters: debugging purposes, maybe integrated for statistics later.
         registerGenericInstance(new Counters());
+        registerGenericInstance(new WRPT()); // Not entirely sure here.
 
         // Initialize MCAccess.
         initMCAccess(config);
