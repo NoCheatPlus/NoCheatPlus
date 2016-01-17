@@ -172,7 +172,9 @@ public interface IWorkaroundRegistry {
 
     /**
      * Registers workaround.getNewInstance() for the set id as a blueprint. A
-     * parent counter will be created, if it doesn't exist yet.
+     * parent counter will be created, if it doesn't exist yet. The counter will
+     * not be added to the allTimeCounter of the given IWorkaround instances,
+     * but to the one of the internally stored instance.
      * 
      * @param bluePrints
      */

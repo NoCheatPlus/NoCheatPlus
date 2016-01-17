@@ -43,9 +43,9 @@ public class SimpleWorkaroundRegistry implements IWorkaroundRegistry {
             // Set a parent counter, if not already set. 
             final IAcceptDenyCounter allTimeCounter = bluePrintCopy.getAllTimeCounter();
             if (allTimeCounter instanceof ICounterWithParent) {
-                final ICounterWithParent bluePrintCopyWithParent = (ICounterWithParent) bluePrintCopy;
-                if (bluePrintCopyWithParent.getParentCounter() == null) {
-                    bluePrintCopyWithParent.setParentCounter(createGlobalCounter(bluePrintCopy.getId()));
+                final ICounterWithParent bluePrintCopyWithParentCounter = (ICounterWithParent) allTimeCounter;
+                if (bluePrintCopyWithParentCounter.getParentCounter() == null) {
+                    bluePrintCopyWithParentCounter.setParentCounter(createGlobalCounter(bluePrintCopy.getId()));
                 }
             }
         }
