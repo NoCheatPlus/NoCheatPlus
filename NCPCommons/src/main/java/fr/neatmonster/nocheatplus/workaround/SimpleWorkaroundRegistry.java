@@ -2,10 +2,14 @@ package fr.neatmonster.nocheatplus.workaround;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.AcceptDenyCounter;
+import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.IAcceptDenyCounter;
+import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.ICounterWithParent;
 
 /**
  * Simple registry for workarounds. No thread-safety built in.
@@ -16,10 +20,10 @@ import java.util.Map;
 public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
 
     /** Global counter by id. */
-    private final Map<String, WorkaroundCounter> counters = new HashMap<String, WorkaroundCounter>();
+    private final Map<String, IAcceptDenyCounter> counters = new HashMap<String, IAcceptDenyCounter>();
 
     /** Workaround blue print by id. */
-    private final Map<String, Workaround> bluePrints = new HashMap<String, Workaround>();
+    private final Map<String, IWorkaround> bluePrints = new HashMap<String, IWorkaround>();
 
     /** Map group id to array of workaround ids. */
     private final Map<String, String[]> groups = new HashMap<String, String[]>();
@@ -31,10 +35,19 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
     private final Map<String, String[]> workaroundSetGroups = new HashMap<String, String[]>();
 
     @Override
-    public void setWorkaroundBluePrint(final Workaround... bluePrints) {
+    public void setWorkaroundBluePrint(final IWorkaround... bluePrints) {
+        // TODO: Might consistency check, plus policy for overriding (ignore all if present).
         for (int i = 0; i < bluePrints.length; i++) {
-            final Workaround workaround = bluePrints[i];
-            this.bluePrints.put(workaround.getId(), workaround.getNewInstance());
+            final IWorkaround bluePrintCopy = bluePrints[i].getNewInstance();
+            this.bluePrints.put(bluePrintCopy.getId(), bluePrintCopy);
+            // Set a parent counter, if not already set. 
+            final IAcceptDenyCounter allTimeCounter = bluePrintCopy.getAllTimeCounter();
+            if (allTimeCounter instanceof ICounterWithParent) {
+                final ICounterWithParent bluePrintCopyWithParent = (ICounterWithParent) bluePrintCopy;
+                if (bluePrintCopyWithParent.getParentCounter() == null) {
+                    bluePrintCopyWithParent.setParentCounter(createGlobalCounter(bluePrintCopy.getId()));
+                }
+            }
         }
     }
 
@@ -44,10 +57,10 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
     }
 
     @Override
-    public void setWorkaroundSet(final String workaroundSetId, final Collection<Workaround> bluePrints, final String... groupIds) {
+    public void setWorkaroundSet(final String workaroundSetId, final Collection<IWorkaround> bluePrints, final String... groupIds) {
         final String[] ids = new String[bluePrints.size()];
         int i = 0;
-        for (final Workaround bluePrint : bluePrints) {
+        for (final IWorkaround bluePrint : bluePrints) {
             final String id = bluePrint.getId();
             if (!this.bluePrints.containsKey(id)) {
                 // Lazily register.
@@ -69,9 +82,9 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
 
     @Override
     public void setWorkaroundSetByIds(final String workaroundSetId, final Collection<String> bluePrintIds, final String... groupIds) {
-        final List<Workaround> bluePrints = new ArrayList<Workaround>(bluePrintIds.size());
+        final List<IWorkaround> bluePrints = new ArrayList<IWorkaround>(bluePrintIds.size());
         for (final String id : bluePrintIds) {
-            final Workaround bluePrint = this.bluePrints.get(id);
+            final IWorkaround bluePrint = this.bluePrints.get(id);
             if (bluePrint == null) {
                 throw new IllegalArgumentException("the blueprint is not registered: " + id);
             }
@@ -86,7 +99,7 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
         if (workaroundIds == null) {
             throw new IllegalArgumentException("WorkaroundSet not registered: " + workaroundSetId);
         }
-        final Workaround[] bluePrints = new Workaround[workaroundIds.length];
+        final IWorkaround[] bluePrints = new IWorkaround[workaroundIds.length];
         for (int i = 0; i < workaroundIds.length; i++) {
             bluePrints[i] = this.bluePrints.get(workaroundIds[i]);
         }
@@ -106,15 +119,15 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
     }
 
     @Override
-    public WorkaroundCounter getGlobalCounter(final String id) {
+    public IAcceptDenyCounter getGlobalCounter(final String id) {
         return counters.get(id);
     }
 
     @Override
-    public WorkaroundCounter createGlobalCounter(final String id) {
-        WorkaroundCounter counter = counters.get(id);
+    public IAcceptDenyCounter createGlobalCounter(final String id) {
+        IAcceptDenyCounter counter = counters.get(id);
         if (counter == null) {
-            counter = new WorkaroundCounter(id);
+            counter = new AcceptDenyCounter();
             counters.put(id, counter);
         }
         return counter;
@@ -122,8 +135,8 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <C extends Workaround> C getWorkaround(final String id, final Class<C> workaroundClass) {
-        final Workaround workaround = getWorkaround(id);
+    public <C extends IWorkaround> C getWorkaround(final String id, final Class<C> workaroundClass) {
+        final IWorkaround workaround = getWorkaround(id);
         if (workaroundClass.isAssignableFrom(workaround.getClass())) {
             return (C) workaround;
         }
@@ -133,8 +146,8 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
     }
 
     @Override
-    public Workaround getWorkaround(final String id) {
-        final Workaround bluePrint = bluePrints.get(id);
+    public IWorkaround getWorkaround(final String id) {
+        final IWorkaround bluePrint = bluePrints.get(id);
         if (bluePrint == null) {
             throw new IllegalArgumentException("Id not registered as blueprint: " + id);
         }
@@ -142,12 +155,8 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
     }
 
     @Override
-    public Map<String, Integer> getGlobalUseCount() {
-        final Map<String, Integer> currentCounts = new LinkedHashMap<String, Integer>(counters.size());
-        for (final WorkaroundCounter counter : counters.values()) {
-            currentCounts.put(counter.getId(), counter.getUseCount());
-        }
-        return currentCounts;
+    public Map<String, IAcceptDenyCounter> getGlobalCounters() {
+        return Collections.unmodifiableMap(counters);
     }
 
 }

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.IAcceptDenyCounter;
 
 /**
  * An access point for fetching global WorkaroundCounter instances and a factory
@@ -21,7 +22,8 @@ public interface WorkaroundRegistry {
      * Convenience to retrieve any type of per-player Workaround by id, for the
      * case one doesn't want to store the registry and/or individual Workaround
      * implementations as members. Groups allow resetting certain types of
-     * workarounds in bunches.
+     * workarounds in bunches. The resetConditions methods only call
+     * resetConditions for instances of IStagedWorkaround.
      * 
      * @author asofold
      *
@@ -30,16 +32,20 @@ public interface WorkaroundRegistry {
 
         // TODO: getUseCount()
         // TODO: A list for ids of just used workarounds (reset externally. Add use(id) vs alter Workaround)?
-        // TODO: Better optimized constructor.
+        // TODO: Better optimized constructor (instanceof-decisions can be pre-cached).
 
         /** Map workaround id to workaround. */
-        private final Map<String, Workaround> workaroundsById = new LinkedHashMap<String, Workaround>();
+        private final Map<String, IWorkaround> workaroundsById = new LinkedHashMap<String, IWorkaround>();
 
         /** Only the workarounds that might need resetting. */
-        private final Workaround[] mightNeedReset;
+        private final IStagedWorkaround[] stagedWorkarounds;
 
-        /** Map groupId to workarounds. */
-        private final Map<String, Workaround[]> groups;
+        // TODO: Consider to make accessible (flexible log/stats command) or remove keeping entire groups.
+        /** Map groupId to workarounds. Set to null, if no groups are present. */
+        private final Map<String, IWorkaround[]> groups;
+
+        /** Only the staged workarounds within a group by group id. Set to null, if no groups are present. */
+        private final Map<String, IStagedWorkaround[]> stagedGroups;
 
         /**
          * 
@@ -49,36 +55,48 @@ public interface WorkaroundRegistry {
          *            are set. All referenced workaround ids must be registered,
          *            workarounds can be in multiple groups.
          */
-        public WorkaroundSet(final Workaround[] bluePrints, final Map<String, String[]> groups) {
-            final Class<?> excludeFromReset = WorkaroundCounter.class;
-            final List<Workaround> mightNeedReset = new ArrayList<Workaround>(bluePrints.length);
+        public WorkaroundSet(final IWorkaround[] bluePrints, final Map<String, String[]> groups) {
+            // Add new instances to workaroundsById and stagedWorkarounds.
+            final ArrayList<IWorkaround> stagedWorkarounds = new ArrayList<IWorkaround>(bluePrints.length);
             for (int i = 0; i < bluePrints.length; i++) {
-                final Workaround workaround = bluePrints[i].getNewInstance();
+                final IWorkaround workaround = bluePrints[i].getNewInstance();
                 workaroundsById.put(workaround.getId(), workaround);
-                if (workaround.getClass() != excludeFromReset) {
-                    mightNeedReset.add(workaround);
+                if (workaround instanceof IStagedWorkaround) {
+                    stagedWorkarounds.add(workaround);
                 }
             }
-            this.mightNeedReset = mightNeedReset.toArray(new Workaround[mightNeedReset.size()]);
+            this.stagedWorkarounds = stagedWorkarounds.toArray(new IStagedWorkaround[stagedWorkarounds.size()]);
+
             // Prepare fast to reset lists, if groups are given.
             if (groups != null) {
-                this.groups = new HashMap<String, Workaround[]>();
+                this.groups = new HashMap<String, IWorkaround[]>();
+                this.stagedGroups =  new HashMap<String, IStagedWorkaround[]>();
                 for (final Entry<String, String[]> entry : groups.entrySet()) {
+                    final String groupId = entry.getKey();
                     final String[] workaroundIds = entry.getValue();
-                    final Workaround[] group = new Workaround[workaroundIds.length];
+                    final IWorkaround[] group = new IWorkaround[workaroundIds.length];
+                    final ArrayList<IStagedWorkaround> stagedGroup = new ArrayList<IStagedWorkaround>(workaroundIds.length);
                     for (int i = 0; i < workaroundIds.length; i++) {
-                        group[i] = getWorkaround(workaroundIds[i]);
+                        final IWorkaround workaround = getWorkaround(workaroundIds[i]);
+                        group[i] = workaround;
+                        if (workaround instanceof IStagedWorkaround) {
+                            stagedGroup.add((IStagedWorkaround) workaround);
+                        }
                     }
-                    this.groups.put(entry.getKey(), group);
+                    this.groups.put(groupId, group);
+                    if (!stagedGroup.isEmpty()) {
+                        this.stagedGroups.put(groupId, stagedGroup.toArray(new IStagedWorkaround[stagedGroup.size()]));
+                    }
                 }
             } else {
                 this.groups = null;
+                this.stagedGroups = null;
             }
         }
 
         @SuppressWarnings("unchecked")
-        public <C extends Workaround> C getWorkaround(final String id, final Class<C> workaroundClass) {
-            final Workaround present = getWorkaround(id);
+        public <C extends IWorkaround> C getWorkaround(final String id, final Class<C> workaroundClass) {
+            final IWorkaround present = getWorkaround(id);
             if (!workaroundClass.isAssignableFrom(present.getClass())) {
                 throw new IllegalArgumentException("Wrong type of registered workaround requested: " + workaroundClass.getName() + " instead of " + present.getClass().getName());
             } else {
@@ -86,8 +104,8 @@ public interface WorkaroundRegistry {
             }
         }
 
-        public Workaround getWorkaround(final String id) {
-            final Workaround present = workaroundsById.get(id);
+        public IWorkaround getWorkaround(final String id) {
+            final IWorkaround present = workaroundsById.get(id);
             if (present == null) {
                 throw new IllegalArgumentException("Workaround id not registered: " + id);
             }
@@ -99,8 +117,8 @@ public interface WorkaroundRegistry {
          * WorkaroundCounter instances (sub classes get reset too).
          */
         public void resetConditions() {
-            for (int i = 0; i < mightNeedReset.length; i++) {
-                mightNeedReset[i].resetConditions();
+            for (int i = 0; i < stagedWorkarounds.length; i++) {
+                stagedWorkarounds[i].resetConditions();
             }
         }
 
@@ -111,26 +129,54 @@ public interface WorkaroundRegistry {
          * @param groupId
          */
         public void resetConditions(final String groupId) {
-            final Workaround[] workarounds = groups.get(groupId);
-            if (workarounds == null) {
-                throw new IllegalArgumentException("Group not registered: " + groupId);
+            if (this.stagedGroups != null) {
+                final IStagedWorkaround[] workarounds = stagedGroups.get(groupId);
+                if (workarounds != null) {
+                    for (int i = 0; i < workarounds.length; i++) {
+                        workarounds[i].resetConditions();
+                    }
+                }
             }
-            for (int i = 0; i < workarounds.length; i++) {
-                workarounds[i].resetConditions();
-            }
+        }
+
+        /**
+         * Unchecked use.
+         * 
+         * @param workaroundId
+         * @return The result of IWorkaround.use() for the registered instance.
+         * @throws NullPointerException
+         *             if no workaround is registered for this id.
+         * 
+         */
+        public boolean use(String workaroundId) {
+            // TODO: For consistency might throw the same exception everywhere (IllegalArgument?). 
+            return workaroundsById.get(workaroundId).use();
+        }
+
+        /**
+         * Unchecked canUse.
+         * 
+         * @param workaroundId
+         * @return The result of IWorkaround.canUse() for the registered
+         *         instance.
+         * @throws NullPointerException
+         *             if no workaround is registered for this id.
+         * 
+         */
+        public boolean canUse(String workaroundId) {
+            // TODO: For consistency might throw the same exception everywhere (IllegalArgument?). 
+            return workaroundsById.get(workaroundId).canUse();
         }
 
     }
 
-    // TODO: Might make getWorkaround non public, to favor use of WorkaroundSet.
-
     /**
-     * Registers workaround.getNewInstance() for the set id. Set parent to
-     * createGlobalCounter(id), if a global counter is desired.
+     * Registers workaround.getNewInstance() for the set id as a blueprint. A
+     * parent counter will be created, if it doesn't exist yet.
      * 
      * @param bluePrints
      */
-    public void setWorkaroundBluePrint(Workaround...bluePrints);
+    public void setWorkaroundBluePrint(IWorkaround...bluePrints);
 
     /**
      * Specify what workaround ids belong to a certain group. Workarounds can be
@@ -147,12 +193,12 @@ public interface WorkaroundRegistry {
      * 
      * @param workaroundSetId
      * @param bluePrints
-     *            Lazily registers, if no blueprint is present. Already
+     *            Lazily registers, if no blueprint is present (calling setWorkaroundBluePrint, note parent counters). Already
      *            registered blueprints are kept.
      * @param groupIds
      *            Must already be registered.
      */
-    public void setWorkaroundSet(String workaroundSetId, Collection<Workaround> bluePrints, String... groupIds);
+    public void setWorkaroundSet(String workaroundSetId, Collection<IWorkaround> bluePrints, String... groupIds);
 
     /**
      * Define which workarounds and which groups belong to the WorkaroundSet of
@@ -174,21 +220,22 @@ public interface WorkaroundRegistry {
     public WorkaroundSet getWorkaroundSet(String workaroundSetId);
 
     /**
-     * Get a registered global WorkaroundCounter, if registered.
+     * Get a registered global IAcceptDenyCounter instance, if registered.
      * 
      * @param id
-     * @return The registered WorkaroundCounter instance, or null if none is
+     * @return The registered IAcceptDenyCounter instance, or null if none is
      *         registered for the given id.
      */
-    public WorkaroundCounter getGlobalCounter(String id);
+    public IAcceptDenyCounter getGlobalCounter(String id);
 
     /**
-     * Get a registered global WorkaroundCounter, create if not present.
+     * Get a registered global IAcceptDenyCounter instance, create if not
+     * present.
      * 
      * @param id
      * @return
      */
-    public WorkaroundCounter createGlobalCounter(String id);
+    public IAcceptDenyCounter createGlobalCounter(String id);
 
     /**
      * Retrieve a new instance, ready for use, attached to a global counter of
@@ -202,7 +249,7 @@ public interface WorkaroundRegistry {
      * @throws IllegalArgumentException
      *             If either of id or workaroundClass is not possible to use.
      */
-    public <C extends Workaround> C getWorkaround(String id, Class<C> workaroundClass);
+    public <C extends IWorkaround> C getWorkaround(String id, Class<C> workaroundClass);
 
     /**
      * Retrieve a new instance, ready for use, attached to a global counter of
@@ -213,13 +260,14 @@ public interface WorkaroundRegistry {
      * @throws IllegalArgumentException
      *             If either of id or workaroundClass is not possible to use.
      */
-    public Workaround getWorkaround(String id);
+    public IWorkaround getWorkaround(String id);
 
     /**
-     * Get all global count values by id.
+     * Retrieve an unmodifiable map for all registered global counters. The counters
+     * are not copies, so they could be altered, discouraged though.
      * 
      * @return
      */
-    public Map<String, Integer> getGlobalUseCount();
+    public Map<String, IAcceptDenyCounter> getGlobalCounters();
 
 }

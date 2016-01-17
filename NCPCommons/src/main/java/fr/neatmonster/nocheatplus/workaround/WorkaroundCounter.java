@@ -7,28 +7,19 @@ package fr.neatmonster.nocheatplus.workaround;
  */
 public class WorkaroundCounter extends AbstractWorkaround {
 
-    public WorkaroundCounter(String id, Workaround parent) {
-        super(id, parent);
-    }
-
     public WorkaroundCounter(String id) {
         super(id);
     }
 
     @Override
-    public boolean canUse() {
+    public boolean testUse(final boolean isUse) {
         // Just counting.
         return true;
     }
 
     @Override
-    public void resetConditions() {
-        // Nothing to do.
-    }
-
-    @Override
     public WorkaroundCounter getNewInstance() {
-        return new WorkaroundCounter(getId());
+        return setParentCounters(new WorkaroundCounter(getId()));
     }
 
 }
