@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -119,7 +120,19 @@ public class NCPExemptionManager {
      */
     public static final boolean isExempted(final Player player, final CheckType checkType) {
         // TODO: Settings: If to check meta data at all.
+        // TODO: Settings: check types to exempt npcs from (and if to use) -> implement setSettings
         return isExempted(player.getUniqueId(), checkType) || player.hasMetadata("nocheat.exempt");
+    }
+
+    /**
+     * Check if a player is an npc, using current settings.
+     * 
+     * @param player
+     * @return
+     */
+    public static final boolean isNpc(final Player player) {
+        // TODO: Configurability: Which metadata key(s + if).
+        return (player instanceof NPC) || player.hasMetadata("npc");
     }
 
     /**

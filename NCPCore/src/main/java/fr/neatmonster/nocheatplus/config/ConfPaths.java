@@ -658,6 +658,8 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE           = COMPATIBILITY_EXEMPTIONS + "remove.";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN      = COMPATIBILITY_EXEMPTIONS_REMOVE + "join";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE     = COMPATIBILITY_EXEMPTIONS_REMOVE + "leave";
+    // TODO: remove: tick, metadata.
+    // TODO: npcs: active, checks (default: fight, moving, all the noswings, wrongblock etc.)
 
     public static final String COMPATIBILITY_SERVER                      = COMPATIBILITY + "server.";
     public static final String COMPATIBILITY_SERVER_CBDEDICATED          = COMPATIBILITY_SERVER + "cbdedicated.";

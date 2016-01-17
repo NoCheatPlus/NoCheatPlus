@@ -696,6 +696,7 @@ public class SurvivalFly extends Check {
                 // Hack for allow sprint-jumping with slowness.
                 if (sprinting && hAllowedDistance < 0.29 && cc.sfSlownessSprintHack && player.hasPotionEffect(PotionEffectType.SLOW)) {
                     // TODO: Should restrict further by yDistance, ground and other (jumping only).
+                    // TODO: Restrict to not in water (depth strider)?
                     hAllowedDistance = slownessSprintHack(player, hAllowedDistance);
                 }
             }
