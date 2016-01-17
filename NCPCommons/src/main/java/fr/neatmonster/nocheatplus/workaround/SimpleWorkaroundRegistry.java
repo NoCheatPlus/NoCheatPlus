@@ -88,7 +88,7 @@ public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
         }
         final Workaround[] bluePrints = new Workaround[workaroundIds.length];
         for (int i = 0; i < workaroundIds.length; i++) {
-            bluePrints[i] = this.bluePrints.get(workaroundIds[i]).getNewInstance();
+            bluePrints[i] = this.bluePrints.get(workaroundIds[i]);
         }
         final Map<String, String[]> groups;
         final String[] groupIds = this.workaroundSetGroups.get(workaroundSetId);
