@@ -17,7 +17,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.ICounterWithPare
  * @author asofold
  *
  */
-public class SimpleWorkaroundRegistry implements WorkaroundRegistry {
+public class SimpleWorkaroundRegistry implements IWorkaroundRegistry {
 
     /** Global counter by id. */
     private final Map<String, IAcceptDenyCounter> counters = new HashMap<String, IAcceptDenyCounter>();

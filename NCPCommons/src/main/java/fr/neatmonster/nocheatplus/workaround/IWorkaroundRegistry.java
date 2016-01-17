@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.IAcceptDenyCount
  * @author asofold
  *
  */
-public interface WorkaroundRegistry {
+public interface IWorkaroundRegistry {
 
     /**
      * Convenience to retrieve any type of per-player Workaround by id, for the
