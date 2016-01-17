@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.AcceptDenyCounter;
 import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.IAcceptDenyCounter;
@@ -53,11 +55,15 @@ public class SimpleWorkaroundRegistry implements IWorkaroundRegistry {
 
     @Override
     public void setGroup(final String groupId, final Collection<String> workaroundIds) {
+        for (final String id : workaroundIds) {
+            if (!bluePrints.containsKey(id)) {
+                throw new IllegalArgumentException("No blueprint for id '" + id + "' in group '" + groupId + "'.");
+            }
+        }
         groups.put(groupId, workaroundIds.toArray(new String[workaroundIds.size()]));
     }
 
-    @Override
-    public void setWorkaroundSet(final String workaroundSetId, final Collection<IWorkaround> bluePrints, final String... groupIds) {
+    private void setWorkaroundSet(final String workaroundSetId, final Collection<IWorkaround> bluePrints, final String... groupIds) {
         final String[] ids = new String[bluePrints.size()];
         int i = 0;
         for (final IWorkaround bluePrint : bluePrints) {
@@ -157,6 +163,31 @@ public class SimpleWorkaroundRegistry implements IWorkaroundRegistry {
     @Override
     public Map<String, IAcceptDenyCounter> getGlobalCounters() {
         return Collections.unmodifiableMap(counters);
+    }
+
+    @Override
+    public String getCheckedWorkaroundId(String workaroundId) {
+        final IWorkaround bluePrint = this.bluePrints.get(workaroundId);
+        if (bluePrint == null) {
+            throw new IllegalArgumentException("No blueprint registered for: " + workaroundId);
+        } else {
+            return bluePrint.getId();
+        }
+    }
+
+    @Override
+    public Set<String> getCheckedIdSet(Collection<? extends IWorkaround> workarounds) {
+        final Set<String> ids = new LinkedHashSet<String>();
+        for (final IWorkaround workaround : workarounds) {
+            final IWorkaround bluePrint = this.bluePrints.get(workaround.getId());
+            if (bluePrint == null) {
+                throw new IllegalArgumentException("No blueprint registered for: " + workaround.getId());
+            }
+            else  {
+                ids.add(bluePrint.getId());
+            }
+        }
+        return ids;
     }
 
 }

@@ -2,6 +2,11 @@ package fr.neatmonster.nocheatplus.test;
 
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.AcceptDenyCounter;
@@ -10,6 +15,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.ICounterWithPare
 import fr.neatmonster.nocheatplus.workaround.IStagedWorkaround;
 import fr.neatmonster.nocheatplus.workaround.IWorkaround;
 import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry;
+import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 import fr.neatmonster.nocheatplus.workaround.SimpleWorkaroundRegistry;
 import fr.neatmonster.nocheatplus.workaround.WorkaroundCountDown;
 import fr.neatmonster.nocheatplus.workaround.WorkaroundCounter;
@@ -125,7 +131,7 @@ public class TestWorkarounds {
         // Register a single workaround (no parent counter).
         checkSetWorkaroundBluePrint(new WorkaroundCounter("wc.man"), reg);
 
-        // Register a single workaround with a parent counter set (createed from registry).
+        // Register a single workaround with a parent counter set (created from registry).
         IWorkaround wrp = new WorkaroundCounter("wc.man.rp"); // With parent counter from registry.
         ((ICounterWithParent) wrp.getAllTimeCounter()).setParentCounter(c_man);
         checkSetWorkaroundBluePrint(wrp, reg);
@@ -135,7 +141,127 @@ public class TestWorkarounds {
         ((ICounterWithParent) wep.getAllTimeCounter()).setParentCounter(new AcceptDenyCounter());
         checkSetWorkaroundBluePrint(wep, reg);
 
-        // TODO: Test a WorkaroundSet with all types of workarounds. Groups, WorkaroundSet methods.
+        // WorkaroundSet
+
+        // Register workarounds.
+        List<WorkaroundCounter> wg1 = getWorkaroundCounters("w.man", 15);
+        List<WorkaroundCountDown> wg2 = getWorkaroundcountDowns("w.man", 15);
+        List<IWorkaround> wgAll = new ArrayList<IWorkaround>(30);
+        wgAll.addAll(wg1);
+        wgAll.addAll(wg2);
+        try {
+            reg.getCheckedIdSet(wg1);
+            fail("Expect IllegalArgumentException for not registered workarounds.");
+        }
+        catch (IllegalArgumentException ex) {
+            // Success.
+        }
+        reg.setWorkaroundBluePrint(wgAll.toArray(new IWorkaround[2 * 15]));
+        List<String> ids1 = new ArrayList<String>(reg.getCheckedIdSet(wg1));
+        List<String> ids2 = new ArrayList<String>(reg.getCheckedIdSet(wg2));
+        List<String> idsAll = new ArrayList<String>(reg.getCheckedIdSet(wgAll));
+        // Register groups.
+        reg.setGroup("group.mix", Arrays.asList(ids1.get(0), ids2.get(0)));
+        reg.setGroup("group.wc", ids1);
+        reg.setGroup("group.wcd", ids2);
+        // reg.setWorkaroundSet with string ids.
+        reg.setWorkaroundSetByIds("ws.all", idsAll, "group.mix", "group.wc", "group.wcd");
+        // reg.getWorkaroundSet.
+        WorkaroundSet ws = reg.getWorkaroundSet("ws.all");
+        // Test the WorkaroundSet
+        for (String id : idsAll) {
+            ws.getWorkaround(id);
+        }
+        // Test reset all.
+        useAll(idsAll, ws);
+        int accept = 1;
+        int deny = 0;
+        checkAllTimeCount(idsAll, ws, accept, deny);
+        checkStageCount(ids2, ws, 1, 0);
+        ws.resetConditions();
+        checkAllTimeCount(idsAll, ws, accept, deny);
+        checkStageCount(ids2, ws, 0, 0);
+        // Reset group.wc.
+        useAll(idsAll, ws);
+        accept += 1;
+        ws.resetConditions("group.wc");
+        checkAllTimeCount(idsAll, ws, accept, deny);
+        checkStageCount(ids2, ws, 1, 0);
+        ws.resetConditions();
+        // group.wcd
+        useAll(idsAll, ws);
+        accept += 1;
+        ws.resetConditions("group.wcd");
+        checkAllTimeCount(idsAll, ws, accept, deny);
+        checkStageCount(ids2, ws, 0, 0);
+        ws.resetConditions();
+        // group.mix
+        useAll(idsAll, ws);
+        accept += 1;
+        ws.resetConditions("group.mix");
+        checkAllTimeCount(idsAll, ws, accept, deny);
+        TestAcceptDenyCounters.checkCounts(((IStagedWorkaround) (ws.getWorkaround(ids2.get(0)))).getStageCounter(), 0, 0, "stageCounter/" + ids2.get(0));
+        for (int i = 1; i < ids2.size(); i++) {
+            TestAcceptDenyCounters.checkCounts(((IStagedWorkaround) (ws.getWorkaround(ids2.get(i)))).getStageCounter(), 1, 0, "stageCounter/" + ids2.get(i));
+        }
+        ws.resetConditions();
+        // TODO: Individual group reset (needs half of group.wcd).
+
+        // TODO: More details/cases (also failure cases, exceptions, etc).
+
+    }
+
+    /**
+     * Get a collection of new WorkaroundCounter instances.
+     * 
+     * @param name
+     *            Prefix of naming name.class.count
+     * @param repeatCount
+     * @return
+     */
+    public static List<WorkaroundCounter> getWorkaroundCounters(String name, int repeatCount) {
+        final List<WorkaroundCounter> workarounds = new ArrayList<WorkaroundCounter>();
+        for (int i = 0; i < repeatCount; i++) {
+            workarounds.add(new WorkaroundCounter(name + ".WorkaroundCounter." + i));
+        }
+        return workarounds;
+    }
+
+    /**
+     * Get a collection of new WorkaroundCountDown instances, initialized with
+     * counting up from 1.
+     * 
+     * @param name
+     *            Prefix of naming name.class.count
+     * @param repeatCount
+     * @return
+     */
+    public static List<WorkaroundCountDown> getWorkaroundcountDowns(String name, int repeatCount) {
+        final List<WorkaroundCountDown> workarounds = new ArrayList<WorkaroundCountDown>();
+        for (int i = 0; i < repeatCount; i++) {
+            workarounds.add(new WorkaroundCountDown(name + ".WorkaroundCountDown." + i, i + 1));
+        }
+        return workarounds;
+    }
+
+    public static void useAll(Collection<String> ids, WorkaroundSet ws) {
+        for (String id : ids) {
+            ws.use(id);
+        }
+    }
+
+    public static void checkStageCount(Collection<String> ids, WorkaroundSet ws, int acceptCount, int denyCount) {
+        for (String id : ids) {
+            IAcceptDenyCounter counter = ((IStagedWorkaround) ws.getWorkaround(id)).getStageCounter();
+            TestAcceptDenyCounters.checkCounts(counter, acceptCount, denyCount, "stageCounter/" + id);
+        }
+    }
+
+    public static void checkAllTimeCount(Collection<String> ids, WorkaroundSet ws, int acceptCount, int denyCount) {
+        for (String id : ids) {
+            IAcceptDenyCounter counter = ws.getWorkaround(id).getAllTimeCounter();
+            TestAcceptDenyCounters.checkCounts(counter, acceptCount, denyCount, "allTimeCounter/" + id);
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import fr.neatmonster.nocheatplus.utilities.ds.count.acceptdeny.IAcceptDenyCounter;
 
@@ -88,7 +89,8 @@ public interface IWorkaroundRegistry {
                         this.stagedGroups.put(groupId, stagedGroup.toArray(new IStagedWorkaround[stagedGroup.size()]));
                     }
                 }
-            } else {
+            }
+            else {
                 this.groups = null;
                 this.stagedGroups = null;
             }
@@ -99,11 +101,19 @@ public interface IWorkaroundRegistry {
             final IWorkaround present = getWorkaround(id);
             if (!workaroundClass.isAssignableFrom(present.getClass())) {
                 throw new IllegalArgumentException("Wrong type of registered workaround requested: " + workaroundClass.getName() + " instead of " + present.getClass().getName());
-            } else {
+            }
+            else {
                 return (C) present;
             }
         }
 
+        /**
+         * 
+         * @param id
+         * @return
+         * @throws IllegalArgumentException
+         *             If no workaround is set for the id.
+         */
         public IWorkaround getWorkaround(final String id) {
             final IWorkaround present = workaroundsById.get(id);
             if (present == null) {
@@ -144,13 +154,19 @@ public interface IWorkaroundRegistry {
          * 
          * @param workaroundId
          * @return The result of IWorkaround.use() for the registered instance.
-         * @throws NullPointerException
-         *             if no workaround is registered for this id.
+         * @throws IllegalArgumentException
+         *             If no workaround is registered for this id.
          * 
          */
         public boolean use(String workaroundId) {
             // TODO: For consistency might throw the same exception everywhere (IllegalArgument?). 
-            return workaroundsById.get(workaroundId).use();
+            final IWorkaround workaround = workaroundsById.get(workaroundId);
+            if (workaround == null) {
+                throw new IllegalArgumentException("Workaround id not registered: " + workaroundId);
+            }
+            else {
+                return workaround.use();
+            }
         }
 
         /**
@@ -182,25 +198,12 @@ public interface IWorkaroundRegistry {
 
     /**
      * Specify what workaround ids belong to a certain group. Workarounds can be
-     * in multiple groups.
+     * in multiple groups. The workaroundIds must exist.
      * 
      * @param groupId
      * @param workaroundIds
      */
     public void setGroup(String groupId, Collection<String> workaroundIds);
-
-    /**
-     * Define which workarounds and which groups belong to the WorkaroundSet of
-     * the given workaroundSetId.
-     * 
-     * @param workaroundSetId
-     * @param bluePrints
-     *            Lazily registers, if no blueprint is present (calling setWorkaroundBluePrint, note parent counters). Already
-     *            registered blueprints are kept.
-     * @param groupIds
-     *            Must already be registered.
-     */
-    public void setWorkaroundSet(String workaroundSetId, Collection<IWorkaround> bluePrints, String... groupIds);
 
     /**
      * Define which workarounds and which groups belong to the WorkaroundSet of
@@ -265,11 +268,32 @@ public interface IWorkaroundRegistry {
     public IWorkaround getWorkaround(String id);
 
     /**
-     * Retrieve an unmodifiable map for all registered global counters. The counters
-     * are not copies, so they could be altered, discouraged though.
+     * Retrieve an unmodifiable map for all registered global counters. The
+     * counters are not copies, so they could be altered, discouraged though.
      * 
      * @return
      */
     public Map<String, IAcceptDenyCounter> getGlobalCounters();
+
+    /**
+     * Convenience to get the internally registered id.
+     * 
+     * @param workaroundId
+     * @return
+     * @throws IllegalArgumentException
+     *             If an id is not registered for a given workaround.
+     */
+    public String getCheckedWorkaroundId(String workaroundId);
+
+    /**
+     * Convenience method to get a set of ids, testing if bluePrints exist.
+     * 
+     * @param workarounds
+     * @return A set fit for iteration. Contained ids are taken from the
+     *         internally registered instances.
+     * @throws IllegalArgumentException
+     *             If an id is not registered for a given workaround.
+     */
+    public Set<String> getCheckedIdSet(Collection<? extends IWorkaround> workarounds); // UH.
 
 }
