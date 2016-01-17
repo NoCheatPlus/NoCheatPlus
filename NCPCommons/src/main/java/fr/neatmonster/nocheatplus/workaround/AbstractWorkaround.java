@@ -30,8 +30,8 @@ public abstract class AbstractWorkaround implements IWorkaround {
     }
 
     /**
-     * Not meant to be overridden (alters counter, depending on result).
-     * Override testUse(false) instead.
+     * Check if the workaround can be used by relaying that decision to
+     * testUse(false). The allTimeCounter is updated here.
      */
     @Override
     public boolean use() {
@@ -46,7 +46,7 @@ public abstract class AbstractWorkaround implements IWorkaround {
     }
 
     /**
-     * Not meant to be overridden. Override testUse(true) instead.
+     * Simply relay to testUse(true).
      */
     @Override
     public boolean canUse() {

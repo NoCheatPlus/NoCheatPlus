@@ -18,8 +18,9 @@ public class WorkaroundCountDown extends AbstractWorkaround implements IStagedWo
 
     /** The start value for the count down. */
     private final int initialCount;
-    /** The current state */
+    /** The current state of the count down. */
     private int currentCount;
+    /** Counter for the current stage, resetting with resetConditions. */
     private final IResettableAcceptDenyCounter stageCounter;
 
     /**
@@ -50,19 +51,6 @@ public class WorkaroundCountDown extends AbstractWorkaround implements IStagedWo
     }
 
     @Override
-    public boolean use() {
-        // Adjust currentCount based on super.use().
-        if (super.use()) {
-            currentCount --;
-            stageCounter.accept();
-            return true;
-        } else {
-            stageCounter.deny();
-            return false;
-        }
-    }
-
-    @Override
     public void resetConditions() {
         currentCount = initialCount;
         stageCounter.resetCounter();
@@ -80,7 +68,19 @@ public class WorkaroundCountDown extends AbstractWorkaround implements IStagedWo
 
     @Override
     public boolean testUse(boolean isUse) {
-        return currentCount > 0;
+        if (!isUse) {
+            return currentCount > 0;
+        }
+        else {
+            if (currentCount > 0) {
+                currentCount --;
+                stageCounter.accept();
+                return true;
+            } else {
+                stageCounter.deny();
+                return false;
+            }
+        }
     }
 
 }
