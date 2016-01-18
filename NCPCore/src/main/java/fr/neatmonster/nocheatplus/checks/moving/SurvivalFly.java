@@ -511,7 +511,7 @@ public class SurvivalFly extends Check {
             }
             inAir = true;
         }
-        
+
         if (!inAir) {
             data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
         }
@@ -847,7 +847,8 @@ public class SurvivalFly extends Check {
         // TODO: Cleanup pending.
         final boolean strictVdistRel;
         final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
-        final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain). 
+        final double jumpGainMargin = 0.005; // TODO: Model differently, workarounds where needed. 0.05 interferes with max height vs. velocity (<= 0.47 gain).
+        // TODO: Add/set 'allow starting to fall' first (data reset / from ground on if no speed).
         if (lastMove.toIsValid && Magic.fallingEnvelope(yDistance, lastMove.yDistance, data.lastFrictionVertical, 0.0)) {
             // Less headache: Always allow falling. 
             // TODO: Base should be data.lastFrictionVertical? Problem: "not set" detection?
@@ -902,7 +903,8 @@ public class SurvivalFly extends Check {
         boolean vDistRelVL = false;
         // Difference from vAllowedDistance to yDistance.
         final double yDistDiffEx = yDistance - vAllowedDistance;
-        if (envelopeHack) {
+        if (envelopeHack || yDistDiffEx <= 0.0 && yDistDiffEx > -Magic.GRAVITY_SPAN) {
+            // (Clearly accepted envelopes first.)
             vDistRelVL = false;
             //vAllowedDistance = yDistance;
         }
@@ -992,48 +994,46 @@ public class SurvivalFly extends Check {
             }
             // else: Allow moving up less. Note: possibility of low jump.
         } else { // if (yDistance < 0.0) // Rather too fast falling.
-            if (Math.abs(yDistDiffEx) > Magic.GRAVITY_SPAN) {
-                if (yDistance < -3.0 && lastMove.yDistance < -3.0 && Math.abs(yDistDiffEx) < 5.0 * Magic.GRAVITY_MAX) {
-                    // Disregard not falling faster at some point (our constants don't match 100%).
-                }
-                else if (resetTo && (yDistDiffEx > -Magic.GRAVITY_SPAN || !fromOnGround && !data.thisMove.touchedGround && yDistChange >= 0.0)) {
-                    // Moving onto ground allows a shorter move.
-                    // TODO: Any lost-ground cases? 
-                }
-                else if (yDistance > lastMove.yDistance - Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN && (resetTo || data.thisMove.touchedGround)) {
-                    // Mirrored case for yDistance > yAllowedDistance, hitting ground.
-                    // TODO: Needs more efficient structure.
-                }
-                else if (resetFrom && yDistance >= -0.5 && (yDistance > -0.31 || (resetTo || to.isAboveStairs()) && (lastMove.yDistance < 0.0))) {
-                    // Stairs and other cases moving off ground or ground-to-ground.
-                    // TODO: Margins !?
-                }
-                else if (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID 
-                        && data.sfJumpPhase == 1 && lastMove.toIsValid
-                        && lastMove.from.inLiquid && !(lastMove.to.extraPropertiesValid && lastMove.to.inLiquid)
-                        && !resetFrom && resetTo // TODO: There might be other cases (possibly wrong bounding box).
-                        && lastMove.yDistance > 0.0 && lastMove.yDistance < 0.5 * Magic.GRAVITY_ODD
-                        && yDistance < 0.0 && Math.abs(Math.abs(yDistance) - lastMove.yDistance) < Magic.GRAVITY_SPAN / 2.0
-                        ) {
-                    // LIMIT_LIQUID, vDist inversion (!).
-                }
-                else if (lastMove.toIsValid && Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
-                    // Starting to fall.
-                }
-                else if (lastMove.toIsValid && Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
-                    // Just having left liquid.
-                }
-                else if (yDistance <= 0.0 && yDistance > -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN 
-                        && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
-                    // Head was blocked, thus faster decrease than expected.
-                }
-                else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
-                    // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
-                }
-                else {
-                    // Violation.
-                    vDistRelVL = true;
-                }
+            if (yDistance < -3.0 && lastMove.yDistance < -3.0 && Math.abs(yDistDiffEx) < 5.0 * Magic.GRAVITY_MAX) {
+                // Disregard not falling faster at some point (our constants don't match 100%).
+            }
+            else if (resetTo && (yDistDiffEx > -Magic.GRAVITY_SPAN || !fromOnGround && !data.thisMove.touchedGround && yDistChange >= 0.0)) {
+                // Moving onto ground allows a shorter move.
+                // TODO: Any lost-ground cases? 
+            }
+            else if (yDistance > lastMove.yDistance - Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN && (resetTo || data.thisMove.touchedGround)) {
+                // Mirrored case for yDistance > yAllowedDistance, hitting ground.
+                // TODO: Needs more efficient structure.
+            }
+            else if (resetFrom && yDistance >= -0.5 && (yDistance > -0.31 || (resetTo || to.isAboveStairs()) && (lastMove.yDistance < 0.0))) {
+                // Stairs and other cases moving off ground or ground-to-ground.
+                // TODO: Margins !?
+            }
+            else if (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID 
+                    && data.sfJumpPhase == 1 && lastMove.toIsValid
+                    && lastMove.from.inLiquid && !(lastMove.to.extraPropertiesValid && lastMove.to.inLiquid)
+                    && !resetFrom && resetTo // TODO: There might be other cases (possibly wrong bounding box).
+                    && lastMove.yDistance > 0.0 && lastMove.yDistance < 0.5 * Magic.GRAVITY_ODD
+                    && yDistance < 0.0 && Math.abs(Math.abs(yDistance) - lastMove.yDistance) < Magic.GRAVITY_SPAN / 2.0
+                    ) {
+                // LIMIT_LIQUID, vDist inversion (!).
+            }
+            else if (lastMove.toIsValid && Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
+                // Starting to fall.
+            }
+            else if (lastMove.toIsValid && Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
+                // Just having left liquid.
+            }
+            else if (yDistance <= 0.0 && yDistance > -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN 
+                    && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
+                // Head was blocked, thus faster decrease than expected.
+            }
+            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
+                // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+            }
+            else {
+                // Violation.
+                vDistRelVL = true;
             }
             // else Accept small aberrations !?
         }
@@ -1149,7 +1149,7 @@ public class SurvivalFly extends Check {
             tags.add("data_missing");
         }
         double vAllowedDistance;
-        if (thisMove.yDistance > - Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN && thisMove.yDistance < 0.0) {
+        if (thisMove.yDistance > -(Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN) && thisMove.yDistance < 0.0) {
             // Allow falling.
             vAllowedDistance = thisMove.yDistance;
         }
