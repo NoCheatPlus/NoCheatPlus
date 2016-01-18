@@ -10,7 +10,6 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -22,6 +21,8 @@ public class OutgoingPosition extends BaseAdapter {
     public static final int indexZ = 2;
     public static final int indexYaw = 0;
     public static final int indexPitch = 1;
+
+    private final Integer ID_OUTGOING_POSITION_UNTRACKED = counters.registerKey("packet.outgoing_position.untracked");
 
     public OutgoingPosition(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
@@ -37,25 +38,19 @@ public class OutgoingPosition extends BaseAdapter {
             return;
         }
         final long time = System.currentTimeMillis();
-
         final Player player = event.getPlayer();
-        final NetConfig cc = configFactory.getConfig(player);
-        if (cc.flyingFrequencyActive) {
-            final NetData data = dataFactory.getData(player);
-            final CountableLocation packetData = interpretPacket(event.getPacket(), time, data);
-            if (packetData != null && data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Expect ACK on outgoing position: " + packetData);
-            }
+        if (configFactory.getConfig(player).flyingFrequencyActive) {
+            interpretPacket(player, event.getPacket(), time, dataFactory.getData(player));
         }
     }
 
-    private CountableLocation interpretPacket(final PacketContainer packet, final long time, final NetData data) {
+    private void interpretPacket(final Player player, final PacketContainer packet, final long time, final NetData data) {
         final StructureModifier<Double> doubles = packet.getDoubles();
         final StructureModifier<Float> floats = packet.getFloat();
 
         if (doubles.size() != 3 || floats.size() != 2) {
             packetMismatch(packet);
-            return null;
+            return;
         }
 
         // TODO: Detect/skip data with relative coordinates.
@@ -67,11 +62,24 @@ public class OutgoingPosition extends BaseAdapter {
         final float yaw = floats.read(indexYaw);
         final float pitch = floats.read(indexPitch);
 
-        return data.teleportQueue.onOutgoingTeleport(x, y, z, yaw, pitch);
+        final CountableLocation packetData = data.teleportQueue.onOutgoingTeleport(x, y, z, yaw, pitch);
+        if (packetData == null) {
+            // Add counter for untracked (by Bukkit API) outgoing teleport.
+            // TODO: There may be other cases which are indicated by Bukkit API events.
+            counters.add(ID_OUTGOING_POSITION_UNTRACKED, 1);
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Untracked outgoing position: " + x + ", " + y + ", " + z + " (yaw=" + yaw + ", pitch=" + pitch + ").");
+            }
+        }
+        else {
+            if (data.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Expect ACK on outgoing position: " + packetData);
+            }
+        }
     }
 
     private void packetMismatch(PacketContainer packet) {
-        // TODO: Consider.
+        // TODO: What? Add to counters?
     }
 
 }
