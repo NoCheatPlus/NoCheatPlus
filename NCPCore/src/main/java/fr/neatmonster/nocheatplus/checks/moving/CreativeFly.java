@@ -96,7 +96,14 @@ public class CreativeFly extends Check {
             fSpeed *= data.walkSpeed / 0.2;
         }
 
-        final double limitH = model.hMod / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
+        double limitH = model.hMod / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
+
+        if (lastMove.toIsValid) {
+            // TODO: Use last friction (as well)?
+            // TODO: Test/adjust more.
+            double frictionDist = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
+            limitH = Math.max(frictionDist, limitH);
+        }
 
         // Finally, determine how far the player went beyond the set limits.
         //        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
@@ -142,6 +149,7 @@ public class CreativeFly extends Check {
 
         if (lastMove.toIsValid) {
             // (Disregard gravity.)
+            // TODO: Use last friction (as well)?
             double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
             if (!flying) {
                 frictionDist -= Magic.GRAVITY_MIN;
