@@ -940,17 +940,8 @@ public class SurvivalFly extends Check {
                         && yDistance < lastMove.yDistance - 0.001) {
                     // Odd decrease with water.
                 }
-                else if (Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
-                    // Jump after leaving the liquid near ground.
-                }
-                else if (Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
-                    // Starting to fall / gravity effects.
-                }
-                else if (Magic.oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
-                    // Odd decrease after lift-off.
-                }
-                else if (Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
-                    // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+                else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+                    // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
                 }
                 else {
                     // Violation.
@@ -967,15 +958,6 @@ public class SurvivalFly extends Check {
                 // Allow jumping less high unless within "strict envelope".
                 // TODO: Extreme anti-jump effects, perhaps.
             }
-            else if (lastMove.toIsValid && Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
-                // Starting to fall.
-            }
-            else if (lastMove.toIsValid && Magic.oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
-                // Odd decrease after lift-off.
-            }
-            else if (lastMove.toIsValid && Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
-                // Just having left liquid.
-            }
             else if (yDistance > 0.0 && lastMove.toIsValid && lastMove.yDistance > yDistance
                     && lastMove.yDistance - yDistance <= lastMove.yDistance / 4.0
                     && data.isVelocityJumpPhase()
@@ -986,8 +968,8 @@ public class SurvivalFly extends Check {
             else if (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
-            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
-                // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+            else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+                // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
             else {
                 vDistRelVL = true;
@@ -1018,18 +1000,12 @@ public class SurvivalFly extends Check {
                     ) {
                 // LIMIT_LIQUID, vDist inversion (!).
             }
-            else if (lastMove.toIsValid && Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
-                // Starting to fall.
-            }
-            else if (lastMove.toIsValid && Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
-                // Just having left liquid.
-            }
             else if (yDistance <= 0.0 && yDistance > -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN 
                     && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
                 // Head was blocked, thus faster decrease than expected.
             }
-            else if (lastMove.toIsValid && Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
-                // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+            else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+                // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
             else {
                 // Violation.

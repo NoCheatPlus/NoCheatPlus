@@ -110,7 +110,7 @@ public class Magic {
      * @param data
      * @return
      */
-    static boolean oddSlope(final PlayerLocation to, final double yDistance, final double maxJumpGain, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddSlope(final PlayerLocation to, final double yDistance, final double maxJumpGain, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         return data.sfJumpPhase == 1 //&& data.fromWasReset 
                 && Math.abs(yDistDiffEx) < 2.0 * GRAVITY_SPAN 
                 && lastMove.yDistance > 0.0 && yDistance < lastMove.yDistance
@@ -176,7 +176,7 @@ public class Magic {
      * 
      * @return If the exemption condition applies.
      */
-    static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, final MoveData lastMove, final MovingData data) {
+    private static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, final MoveData lastMove, final MovingData data) {
         // TODO: Relate jump phase to last/second-last move fromWasReset (needs keeping that data in classes).
         // TODO: And distinguish where JP=2 is ok?
         // TODO: Most are medium transitions with the possibility to keep/alter friction or even speed on 1st/2nd move (counting in the transition).
@@ -248,7 +248,7 @@ public class Magic {
      * @param data
      * @return If the condition applies, i.e. if to exempt.
      */
-    static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // TODO: Identify spots only to apply with limited LiftOffEnvelope (some guards got removed before switching to that).
         // TODO: Cleanup pending.
         // Old condition (normal lift-off envelope).
@@ -420,7 +420,7 @@ public class Magic {
      * @param data
      * @return
      */
-    static boolean oddFriction(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddFriction(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // Use past move data for two moves.
         final MoveData pastMove1 = data.moveData.get(1);
         if (!lastMove.to.extraPropertiesValid || !pastMove1.toIsValid || !pastMove1.to.extraPropertiesValid) {
@@ -475,6 +475,46 @@ public class Magic {
         return !lastMove.toIsValid && data.sfJumpPhase == 0 && thisMove.mightBeMultipleMoves
                 && setBackYDistance > 0.0 && setBackYDistance < PAPER_DIST 
                 && thisMove.yDistance > 0.0 && thisMove.yDistance < PAPER_DIST && inAir(thisMove);
+    }
+
+    /**
+     * Several types of odd in-air moves, mostly with gravity near maximum,
+     * friction, medium change. Needs lastMove.toIsValid.
+     * 
+     * @param from
+     * @param to
+     * @param yDistance
+     * @param yDistChange
+     * @param yDistDiffEx
+     * @param maxJumpGain
+     * @param resetTo
+     * @param lastMove
+     * @param data
+     * @param cc
+     * @return true if a workaround applies.
+     */
+    static boolean oddJunction(final PlayerLocation from, final PlayerLocation to,
+            final double yDistance, final double yDistChange, final double yDistDiffEx, 
+            final double maxJumpGain, final boolean resetTo,
+            final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+        // TODO: Cleanup/reduce signature (accept thisMove.yDistance etc.).
+        if (Magic.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
+            // Jump after leaving the liquid near ground.
+            return true;
+        }
+        if (Magic.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
+            // Starting to fall / gravity effects.
+            return true;
+        }
+        if ((yDistDiffEx > 0.0 || yDistance >= 0.0) && Magic.oddSlope(to, yDistance, maxJumpGain, yDistDiffEx, lastMove, data)) {
+            // Odd decrease after lift-off.
+            return true;
+        }
+        if (Magic.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
+            // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+            return true;
+        }
+        return false;
     }
 
 }
