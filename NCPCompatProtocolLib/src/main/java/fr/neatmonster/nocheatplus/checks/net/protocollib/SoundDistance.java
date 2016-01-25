@@ -52,6 +52,7 @@ public class SoundDistance extends BaseAdapter {
     public SoundDistance(Plugin plugin) {
         super(plugin, ListenerPriority.LOW, PacketType.Play.Server.NAMED_SOUND_EFFECT);
         this.configs = (NetConfigCache) CheckType.NET.getConfigFactory(); // TODO: DataManager.getConfig(NetConfigCache.class);
+        this.checkType = CheckType.NET_SOUNDDISTANCE;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class SoundDistance extends BaseAdapter {
         final StructureModifier<Integer> ints = packetContainer.getIntegers();
         final double dSq = TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(2) / 8, loc.getX(), loc.getZ());
         //        if (data.debug) {
-        //            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " SoundDistance(" + soundName + "): " + StringUtil.fdec1.format(Math.sqrt(dSq)));
+        //            debug(player, "SoundDistance(" + soundName + "): " + StringUtil.fdec1.format(Math.sqrt(dSq)));
         //        }
         if (dSq > cc.soundDistanceSq) {
             event.setCancelled(true);

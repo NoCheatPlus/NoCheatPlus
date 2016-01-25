@@ -207,4 +207,16 @@ public abstract class Check implements MCAccessHolder {
         return mcAccess;
     }
 
+    /**
+     * Output a message for a player with the standard format (see
+     * CheckUtils.debug(Player, CheckType, String).
+     * 
+     * @param player
+     *            Can be null.
+     * @param message
+     */
+    public void debug(final Player player, final String message) {
+        CheckUtils.debug(player, type, message);
+    }
+
 }

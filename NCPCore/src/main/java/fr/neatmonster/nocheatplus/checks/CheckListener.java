@@ -5,11 +5,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
  * This class provides naming etc for registration with ListenerManager.
@@ -18,56 +21,64 @@ import fr.neatmonster.nocheatplus.components.NCPListener;
  *
  */
 public class CheckListener extends NCPListener implements MCAccessHolder, IHoldSubComponents{
-	
-	/** Check group / type which this listener is for. */
-	protected final CheckType checkType;
-	protected MCAccess mcAccess;
-	
-	/** */
-	protected final List<Object> queuedComponents = new LinkedList<Object>();
-	
-	public CheckListener(){
-		this(null);
-	}
 
-	public CheckListener(CheckType checkType){
-		this.checkType = checkType; 
-		this.mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
-	}
-	
-	@Override
-	public String getComponentName() {
-		final String part = super.getComponentName();
-		return checkType == null ? part : part + "_" + checkType.name();
-	}
+    /** Check group / type which this listener is for. */
+    protected final CheckType checkType;
+    protected MCAccess mcAccess;
 
-	@Override
-	public void setMCAccess(MCAccess mcAccess) {
-		this.mcAccess = mcAccess;
-	}
+    /** */
+    protected final List<Object> queuedComponents = new LinkedList<Object>();
 
-	@Override
-	public MCAccess getMCAccess() {
-		return mcAccess;
-	}
-	
-	/**
-	 * Convenience method to add checks as components to NCP with a delay (IHoldSubComponent).
-	 * This should not be used after having added the check to the ComponentRegistry (NCP-API).
-	 * @param check
-	 * @return The given Check instance, for chaining.
-	 */
-	protected <C extends Check>  C addCheck(C check){
-		// Could also set up a map from check type to check, etc.
-		queuedComponents.add(check);
-		return check;
-	}
+    public CheckListener(CheckType checkType){
+        this.checkType = checkType; 
+        this.mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+    }
 
-	@Override
-	public Collection<Object> getSubComponents() {
-		final List<Object> res = new ArrayList<Object>(this.queuedComponents);
-		this.queuedComponents.clear();
-		return res;
-	}
-	
+    @Override
+    public String getComponentName() {
+        final String part = super.getComponentName();
+        return checkType == null ? part : part + "_" + checkType.name();
+    }
+
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        this.mcAccess = mcAccess;
+    }
+
+    @Override
+    public MCAccess getMCAccess() {
+        return mcAccess;
+    }
+
+    /**
+     * Convenience method to add checks as components to NCP with a delay (IHoldSubComponent).
+     * This should not be used after having added the check to the ComponentRegistry (NCP-API).
+     * @param check
+     * @return The given Check instance, for chaining.
+     */
+    protected <C extends Check>  C addCheck(C check){
+        // Could also set up a map from check type to check, etc.
+        queuedComponents.add(check);
+        return check;
+    }
+
+    @Override
+    public Collection<Object> getSubComponents() {
+        final List<Object> res = new ArrayList<Object>(this.queuedComponents);
+        this.queuedComponents.clear();
+        return res;
+    }
+
+    /**
+     * Output a message for a player with the standard format (see
+     * CheckUtils.debug(Player, CheckType, String).
+     * 
+     * @param player
+     *            Can be null.
+     * @param message
+     */
+    public void debug(final Player player, final String message) {
+        CheckUtils.debug(player, checkType, message);
+    }
+
 }

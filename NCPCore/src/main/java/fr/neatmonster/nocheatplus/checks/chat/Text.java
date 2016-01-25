@@ -18,7 +18,6 @@ import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -120,7 +119,7 @@ public class Text extends Check implements INotifyReload {
         final List<String> debugParts;
         if (debug) {
             debugParts = new LinkedList<String>();
-            debugParts.add("[chat.text] Message ("+player.getName()+"/"+message.length()+"): ");
+            debugParts.add("Message (length=" + message.length()+"): ");
         }
         else debugParts = null;
 
@@ -307,7 +306,7 @@ public class Text extends Check implements INotifyReload {
             debugParts.add("Normal: min=" +  StringUtil.fdec3.format(cc.textFreqNormMin) +", weight=" +  StringUtil.fdec3.format(cc.textFreqNormWeight) + " => accumulated=" + StringUtil.fdec3.format(accumulated));
             debugParts.add("Short-term: min=" +  StringUtil.fdec3.format(cc.textFreqShortTermMin) +", weight=" +  StringUtil.fdec3.format(cc.textFreqShortTermWeight) + " => accumulated=" + StringUtil.fdec3.format(shortTermAccumulated));
             debugParts.add("vl: " + StringUtil.fdec3.format(data.textVL));
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, StringUtil.join(debugParts, " | "));
+            debug(player, StringUtil.join(debugParts, " | "));
             debugParts.clear();
         }
 

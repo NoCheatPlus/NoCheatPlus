@@ -21,7 +21,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -149,7 +148,7 @@ public class BlockBreakListener extends CheckListener {
             //        	data.clickedX = Integer.MAX_VALUE;
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+                debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
             }
         }
 
@@ -177,7 +176,7 @@ public class BlockBreakListener extends CheckListener {
             priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Just set a flag to true when the arm was swung.
-        //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Animation");
+        // debug(player, "Animation");
         BlockBreakData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 
@@ -191,7 +190,7 @@ public class BlockBreakListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
-        //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Interact("+event.isCancelled()+"): " + event.getClickedBlock());
+        // debug(player, "Interact("+event.isCancelled()+"): " + event.getClickedBlock());
         // The following is to set the "first damage time" for a block.
 
         // Return if it is not left clicking a block. 

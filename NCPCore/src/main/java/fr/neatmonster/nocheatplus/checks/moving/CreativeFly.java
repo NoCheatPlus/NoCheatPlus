@@ -6,7 +6,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -14,7 +13,6 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
-import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
@@ -207,12 +205,11 @@ public class CreativeFly extends Check {
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final MovingData data) {
         StringBuilder builder = new StringBuilder(350);
-        builder.append(player.getName());
-        builder.append(" CreativeFly hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vlimit=" + limitV);
+        builder.append("hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vlimit=" + limitV);
         if (data.verVelUsed != null) {
             builder.append(" vvel_use=" + data.verVelUsed);
         }
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
+        debug(player, builder.toString());
     }
 
 }

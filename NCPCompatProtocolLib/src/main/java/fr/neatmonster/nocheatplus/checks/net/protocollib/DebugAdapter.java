@@ -7,9 +7,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketEvent;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.logging.Streams;
-
 public class DebugAdapter extends BaseAdapter {
 
     public DebugAdapter(Plugin plugin) {
@@ -23,7 +20,7 @@ public class DebugAdapter extends BaseAdapter {
     public void onPacketReceiving(PacketEvent event) {
         final Player player = event.getPlayer();
         if (dataFactory.getData(player).debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " packet: " + event.getPacketType());
+            debug(player, "packet: " + event.getPacketType());
         }
     }
 

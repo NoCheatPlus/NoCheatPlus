@@ -9,10 +9,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
-import fr.neatmonster.nocheatplus.logging.Streams;
 
 public class OutgoingPosition extends BaseAdapter {
 
@@ -68,12 +66,12 @@ public class OutgoingPosition extends BaseAdapter {
             // TODO: There may be other cases which are indicated by Bukkit API events.
             counters.add(ID_OUTGOING_POSITION_UNTRACKED, 1);
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Untracked outgoing position: " + x + ", " + y + ", " + z + " (yaw=" + yaw + ", pitch=" + pitch + ").");
+                debug(player, "Untracked outgoing position: " + x + ", " + y + ", " + z + " (yaw=" + yaw + ", pitch=" + pitch + ").");
             }
         }
         else {
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Expect ACK on outgoing position: " + packetData);
+                debug(player, "Expect ACK on outgoing position: " + packetData);
             }
         }
     }

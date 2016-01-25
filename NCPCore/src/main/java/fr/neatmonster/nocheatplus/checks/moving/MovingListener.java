@@ -367,7 +367,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             earlyReturn = true;
         } else if (player.isSleeping()) {
             // Ignore sleeping playerrs.
-            // TODO: sleeping: (which cb!) NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "-> " + player.isSleepingIgnored());
+            // TODO: sleeping: (which cb!) debug(player, "isSleepingIgnored=" + player.isSleepingIgnored());
             data.sfHoverTicks = -1;
             earlyReturn = true;
         } else if (!from.getWorld().equals(to.getWorld())) {
@@ -419,7 +419,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Split into two moves.
             // 1. Process from -> loc.
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Split move 1 (from -> loc):");
+                debug(player, "Split move 1 (from -> loc):");
             }
             moveInfo.set(player, from, loc, cc.yOnGround);
             if (!checkPlayerMove(player, from, loc, true, moveInfo, data, cc, event) && processingEvents.containsKey(player.getName())) {
@@ -428,7 +428,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 data.joinOrRespawn = false;
                 // 2. Process loc -> to.
                 if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Split move 2 (loc -> to):");
+                    debug(player, "Split move 2 (loc -> to):");
                 }
                 moveInfo.set(player, loc, to, cc.yOnGround);
                 checkPlayerMove(player, loc, to, false, moveInfo, data, cc, event);
@@ -820,13 +820,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (max_gain < effect) {
                 effect = max_gain;
                 if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Cap bounce effect by recent y-distances.");
+                    debug(player, "Cap bounce effect by recent y-distances.");
                 }
             }
         }
         // (Actually observed max. is near 3.5.) TODO: Why 3.14 then?
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Bounce effect (dY=" + fallDistance + "): " + effect); 
+            debug(player, "Bounce effect (dY=" + fallDistance + "): " + effect); 
         }
         data.noFallSkipAirCheck = true;
         data.verticalBounce =  new SimpleEntry(effect, 1);
@@ -858,7 +858,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Debug.
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
+            debug(player, "Set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
         }
     }
 
@@ -1060,7 +1060,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.setSetBack(player.getLocation(useLoc)); // TODO: Monitor this change (!).
         if (data.debug) {
             // Log location.
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " death: " + player.getLocation(useLoc));
+            debug(player, "Death: " + player.getLocation(useLoc));
         }
         useLoc.setWorld(null);
     }
@@ -1134,7 +1134,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             event.setCancelled(true);
             // Log.
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + cause + " (cancel): " + to);
+                debug(player, "TP " + cause + " (cancel): " + to);
             }
         }
     }
@@ -1195,7 +1195,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             else {
                 if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (cancelled): " + to);
+                    debug(player, "TP " + event.getCause() + " (cancelled): " + to);
                 }
             }
             data.resetTeleported();
@@ -1226,7 +1226,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
             // Log.
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (set-back): " + to);
+                debug(player, "TP " + event.getCause() + " (set-back): " + to);
             }
             return;
         }
@@ -1266,7 +1266,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Log.
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (normal): " + to);
+            debug(player, "TP " + event.getCause() + " (normal): " + to);
         }
     }
 
@@ -1325,7 +1325,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // A little extra sweep to check for debug flags.
             normalVehicles.add(entityType);
             if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "VehicleMoveEvent fired for: " + entityType);
+                debug(null, "VehicleMoveEvent fired for: " + entityType);
             }
         }
         // TODO: Might account for the case of a player letting the vehicle move but not themselves (do mind latency).
@@ -1454,7 +1454,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
+            debug(player, "Damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
         // Fall-back check.
         final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : 3.0);
@@ -1462,7 +1462,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Adjust fall damage to: " + maxD);
+                debug(player, "Adjust fall damage to: " + maxD);
             }
         }
         if (allowReset) {
@@ -1524,7 +1524,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc, boolean isRespawn) {
 
         final int tick = TickTask.getTick();
-        final String tag = isRespawn ? "respawn" : "join";
+        final String tag = isRespawn ? "Respawn" : "Join";
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
             final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
@@ -1571,7 +1571,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         //		}
         if (data.debug) {
             // Log location.
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " + tag + ": " + loc);
+            debug(player, tag + ": " + loc);
         }
     }
 
@@ -1742,7 +1742,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
             }
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
+                debug(player, "Vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
             }
         }
 
@@ -1752,7 +1752,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
+            debug(player, "Vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
         }
         resetPositionsAndMediumProperties(player, loc, data, cc);
         data.setSetBack(loc);

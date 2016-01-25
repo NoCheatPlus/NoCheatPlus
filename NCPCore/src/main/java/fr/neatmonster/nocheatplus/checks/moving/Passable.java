@@ -5,13 +5,11 @@ import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
-import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -59,7 +57,7 @@ public class Passable extends Check {
                         tags = "raytracing_2x_";
                     }
                     else if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " passable: allow moving out of a block.");
+                        debug(player, "Allow moving out of a block.");
                     }
                 }
                 else{
@@ -128,7 +126,7 @@ public class Passable extends Check {
         if (data.hasSetBack()) {
             setBackLoc = data.getSetBack(to);;
             if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using set-back location for passable.");
+                debug(player, "Using set-back location for passable.");
             }
         }
 
@@ -156,7 +154,7 @@ public class Passable extends Check {
             } else {
                 newTo = from.getLocation();
                 if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using from location for passable.");
+                    debug(player, "Using from location for passable.");
                 }
             }
             newTo.setYaw(to.getYaw());
@@ -202,24 +200,24 @@ public class Passable extends Check {
             }
         }
         // Horizontal first may be obsolete, due to splitting moves anyway and due to not having been called ever (!). 
-//        final double yDiff = to.getY() - from.getY() ;
-//        if (manhattan <= 3 && Math.abs(yDiff)  < 1.0 && yDiff < 0.0) {
-//            // Workaround for client-side calculations not being possible (y vs. horizontal move). Typically stairs.
-//            // horizontal first.
-//            if (data.debug) {
-//                DebugUtil.debug(from.getPlayer().getName() + " passable - Test horizontal move first.");
-//            }
-//            rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
-//            rayTracing.loop();
-//            if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
-//                // y second.
-//                rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
-//                rayTracing.loop();
-//                if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
-//                    return true;
-//                }
-//            }
-//        }
+        //        final double yDiff = to.getY() - from.getY() ;
+        //        if (manhattan <= 3 && Math.abs(yDiff)  < 1.0 && yDiff < 0.0) {
+        //            // Workaround for client-side calculations not being possible (y vs. horizontal move). Typically stairs.
+        //            // horizontal first.
+        //            if (data.debug) {
+        //                DebugUtil.debug(from.getPlayer().getName() + " passable - Test horizontal move first.");
+        //            }
+        //            rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
+        //            rayTracing.loop();
+        //            if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
+        //                // y second.
+        //                rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
+        //                rayTracing.loop();
+        //                if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()) {
+        //                    return true;
+        //                }
+        //            }
+        //        }
         return false;
     }
 

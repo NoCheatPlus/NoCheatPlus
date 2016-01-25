@@ -217,4 +217,18 @@ public class CheckUtils {
         }
     }
 
+    /**
+     * Static relay for the check-specific convenience methods, logging with standard format ([player_name] [check_type] ...).
+     * @param player May be null.
+     * @param checkType
+     * @param message
+     */
+    public static void debug(final Player player, final CheckType checkType, final String message) {
+        String base = "[" + checkType + "] ";
+        if (player != null) {
+            base = "[" + player.getName() + "] " + base;
+        }
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, base + message);
+    }
+
 }

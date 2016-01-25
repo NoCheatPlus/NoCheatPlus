@@ -334,7 +334,9 @@ public class DebugUtil {
     }
 
     /**
-     * Debug to TRACE_FILE.
+     * Debug to TRACE_FILE. Meant for temporary use, use CheckUtils.debug for
+     * permanent inserts.
+     * 
      * @return The given returnValue.
      */
     public static boolean debug(String message, boolean returnValue) {
@@ -343,7 +345,9 @@ public class DebugUtil {
     }
 
     /**
-     * Debug to TRACE_FILE.
+     * Debug to TRACE_FILE. Meant for temporary use, use CheckUtils.debug for
+     * permanent inserts.
+     * 
      * @param message
      * @return
      */

@@ -106,21 +106,21 @@ public class MovingFlying extends BaseAdapter {
                 // TODO: More specific, log and kick or log once [/limited] ?
                 event.setCancelled(true);
                 if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " sends a flying packet with malicious content.");
+                    debug(player, "Flying packet with malicious content.");
                 }
                 return;
             }
             switch(data.teleportQueue.processAck(packetData)) {
                 case WAITING: {
                     if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet, still waiting for ACK on outgoing position.");
+                        debug(player, "Incoming packet, still waiting for ACK on outgoing position.");
                     }
                 }
                 case ACK: {
                     // Skip processing ACK packets, no cancel.
                     skipFlyingFrequency = true;
                     if (data.debug) {
-                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " incoming packet, interpret as ACK for outgoing position.");
+                        debug(player, "Incoming packet, interpret as ACK for outgoing position.");
                     }
                 }
                 default: {
@@ -147,7 +147,7 @@ public class MovingFlying extends BaseAdapter {
         //        }
 
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " " +(packetData == null ? "(incompatible data)" : packetData) + (event.isCancelled() ? " CANCEL" : ""));
+            debug(player, (packetData == null ? "(Incompatible data)" : packetData.toString()) + (event.isCancelled() ? " CANCEL" : ""));
         }
 
     }

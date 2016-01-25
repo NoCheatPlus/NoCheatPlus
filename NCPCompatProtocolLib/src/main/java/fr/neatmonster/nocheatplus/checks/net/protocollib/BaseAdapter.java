@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
@@ -12,6 +13,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
  * Convenience base class for PacketAdapter creation with using config, data, counters.
@@ -23,6 +25,9 @@ public abstract class BaseAdapter extends PacketAdapter {
     protected final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     protected final NetConfigCache configFactory = (NetConfigCache) CheckType.NET.getConfigFactory();
     protected final NetDataFactory dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
+
+    /** Override for specific output on the debug method. */
+    protected CheckType checkType = CheckType.NET;
 
     public BaseAdapter(AdapterParameteters params) {
         super(params);
@@ -46,6 +51,15 @@ public abstract class BaseAdapter extends PacketAdapter {
 
     public BaseAdapter(Plugin plugin, PacketType... types) {
         super(plugin, types);
+    }
+
+    /**
+     * Convenience method for logging the standard format.
+     * @param player
+     * @param message
+     */
+    public void debug(final Player player, final String message) {
+        CheckUtils.debug(player, checkType, message);
     }
 
 }
