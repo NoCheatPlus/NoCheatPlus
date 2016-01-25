@@ -218,17 +218,32 @@ public class CheckUtils {
     }
 
     /**
-     * Static relay for the check-specific convenience methods, logging with standard format ([player_name] [check_type] ...).
-     * @param player May be null.
+     * Static relay for the check-specific convenience methods, logging with
+     * standard format ([player_name] [check_type] ...).
+     * 
+     * @param player
+     *            May be null.
      * @param checkType
      * @param message
      */
     public static void debug(final Player player, final CheckType checkType, final String message) {
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, getLogMessagePrefix(player, checkType) + message);
+    }
+
+    /**
+     * Get the standard log message prefix with a trailing space.
+     * 
+     * @param player
+     *            May be null.
+     * @param checkType
+     * @return
+     */
+    public static String getLogMessagePrefix(final Player player, final CheckType checkType) {
         String base = "[" + checkType + "] ";
         if (player != null) {
             base = "[" + player.getName() + "] " + base;
         }
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, base + message);
+        return base;
     }
 
 }

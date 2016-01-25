@@ -42,6 +42,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -61,8 +62,10 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
@@ -83,6 +86,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -464,7 +468,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.resetTeleported();
         // Debug.
         if (data.debug) {
-            DebugUtil.outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
+            outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
         }
         // Check for illegal move and bounding box etc.
         if ((moveInfo.from.hasIllegalCoords() || moveInfo.to.hasIllegalCoords()) ||
@@ -1377,7 +1381,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         if (data.debug) {
             // Log move.
-            DebugUtil.outputDebugVehicleMove(player, vehicle, from, to, fake);
+            outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
 
         if (morePacketsVehicle.isEnabled(player, data, cc)) {
@@ -1977,6 +1981,101 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         parkedInfo.clear();
         hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
         MovingData.onReload();
+    }
+
+    /**
+     * Output information specific to player-move events.
+     * @param player
+     * @param from
+     * @param to
+     * @param mcAccess
+     */
+    private void outputMoveDebug(final Player player, final PlayerLocation from, final PlayerLocation to, final double maxYOnGround, final MCAccess mcAccess) {
+        final StringBuilder builder = new StringBuilder(250);
+        final Location loc = player.getLocation();
+        builder.append(CheckUtils.getLogMessagePrefix(player, checkType));
+        builder.append("MOVE in world " + from.getWorld().getName() + ":\n");
+        DebugUtil.addMove(from, to, loc, builder);
+        final double jump = mcAccess.getJumpAmplifier(player);
+        final double speed = mcAccess.getFasterMovementAmplifier(player);
+        final double strider = BridgeEnchant.getDepthStriderLevel(player);
+        if (BuildParameters.debugLevel > 0){
+            try{
+                // TODO: Check backwards compatibility (1.4.2). Remove try-catch
+                builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
+            } catch (Throwable t){}
+            if (player.isSprinting()){
+                builder.append("(sprinting)");
+            }
+            if (player.isSneaking()){
+                builder.append("(sneaking)");
+            }
+            if (player.isBlocking()) {
+                builder.append("(blocking)");
+            }
+            final Vector v = player.getVelocity();
+            if (v.lengthSquared() > 0.0) {
+                builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
+            }
+        }
+        if (speed != Double.NEGATIVE_INFINITY){
+            builder.append("(e_speed=" + (speed + 1) + ")");
+        }
+        final double slow = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SLOW);
+        if (slow != Double.NEGATIVE_INFINITY) {
+            builder.append("(e_slow=" + (slow + 1) + ")");
+        }
+        if (jump != Double.NEGATIVE_INFINITY){
+            builder.append("(e_jump=" + (jump + 1) + ")");
+        }
+        if (strider != 0){
+            builder.append("(e_depth_strider=" + strider + ")");
+        }
+        // Print basic info first in order
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
+        // Extended info.
+        if (BuildParameters.debugLevel > 0){
+            builder.setLength(0);
+            // Note: the block flags are for normal on-ground checking, not with yOnGrond set to 0.5.
+            from.collectBlockFlags(maxYOnGround);
+            if (from.getBlockFlags() != 0) builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
+            if (from.getTypeId() != 0) DebugUtil.addBlockInfo(builder, from, "\nfrom");
+            if (from.getTypeIdBelow() != 0) DebugUtil.addBlockBelowInfo(builder, from, "\nfrom");
+            if (!from.isOnGround() && from.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+            to.collectBlockFlags(maxYOnGround);
+            if (to.getBlockFlags() != 0) builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
+            if (to.getTypeId() != 0) DebugUtil.addBlockInfo(builder, to, "\nto");
+            if (to.getTypeIdBelow() != 0) DebugUtil.addBlockBelowInfo(builder, to, "\nto");
+            if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
+        }
+    }
+
+    /**
+     * Intended for vehicle-move events.
+     * 
+     * @param player
+     * @param vehicle
+     * @param from
+     * @param to
+     * @param fake true if the event was not fired by an external source (just gets noted).
+     */
+    private void outputDebugVehicleMove(final Player player, final Entity vehicle, final Location from, final Location to, final boolean fake) {
+        final StringBuilder builder = new StringBuilder(250);
+        final Location vLoc = vehicle.getLocation();
+        final Location loc = player.getLocation();
+        // TODO: Differentiate debug levels (needs setting up some policy + document in BuildParamteres)?
+        final Entity actualVehicle = player.getVehicle();
+        final boolean wrongVehicle = actualVehicle == null || actualVehicle.getEntityId() != vehicle.getEntityId();
+        builder.append(CheckUtils.getLogMessagePrefix(player, checkType));
+        builder.append("VEHICLE MOVE " + (fake ? "(fake)" : "") + " in world " + from.getWorld().getName() + ":\n");
+        DebugUtil.addMove(from, to, null, builder);
+        builder.append("\n Vehicle: ");
+        DebugUtil.addLocation(vLoc, builder);
+        builder.append("\n Player: ");
+        DebugUtil.addLocation(loc, builder);
+        builder.append("\n Vehicle type: " + vehicle.getType() + (wrongVehicle ? (actualVehicle == null ? " (exited?)" : " actual: " + actualVehicle.getType()) : ""));
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 
 }
