@@ -219,7 +219,7 @@ public class CheckUtils {
 
     /**
      * Static relay for the check-specific convenience methods, logging with
-     * standard format ([player_name] [check_type] ...).
+     * standard format ([check_type] [player_name] ...).
      * 
      * @param player
      *            May be null.
@@ -241,7 +241,7 @@ public class CheckUtils {
     public static String getLogMessagePrefix(final Player player, final CheckType checkType) {
         String base = "[" + checkType + "] ";
         if (player != null) {
-            base = "[" + player.getName() + "] " + base;
+            base += "[" + player.getName() + "] ";
         }
         return base;
     }
