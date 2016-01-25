@@ -43,18 +43,18 @@ public class VersionCommand extends BaseCommand{
         lines.addAll(Arrays.asList(new String[]{
                 "---- Version information ----",
                 "#### Server ####",
-                Bukkit.getServer().getVersion(),
-                "(detected: " + ServerVersion.getMinecraftVersion() + ")",
+                alt(Bukkit.getServer().getVersion()),
+                "  detected: " + alt(ServerVersion.getMinecraftVersion()),
                 "#### NoCheatPlus ####",
-                "Plugin: " + Bukkit.getPluginManager().getPlugin("NoCheatPlus").getDescription().getVersion(),
-                "MCAccess: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag(),
+                "Plugin: " + alt(Bukkit.getPluginManager().getPlugin("NoCheatPlus").getDescription().getVersion()),
+                "MCAccess: " + alt(mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag()),
         }));
         final Map<String, Set<String>> featureTags = NCPAPIProvider.getNoCheatPlusAPI().getAllFeatureTags();
         if (!featureTags.isEmpty()) {
             final List<String> features = new LinkedList<String>();
             // Add present features.
             for (final Entry<String, Set<String>> entry : featureTags.entrySet()) {
-                features.add("  " + entry.getKey() + ": " + StringUtil.join(entry.getValue(), " | "));
+                features.add(alt("  " + entry.getKey() + ": " + StringUtil.join(entry.getValue(), " | ")));
             }
             // Sort and add.
             Collections.sort(features, String.CASE_INSENSITIVE_ORDER);
@@ -65,7 +65,7 @@ public class VersionCommand extends BaseCommand{
         if (!hooks.isEmpty()){
             final List<String> fullNames = new LinkedList<String>();
             for (final NCPHook hook : hooks){
-                fullNames.add(hook.getHookName() + " " + hook.getHookVersion());
+                fullNames.add(alt(hook.getHookName() + " " + hook.getHookVersion()));
             }
             Collections.sort(fullNames, String.CASE_INSENSITIVE_ORDER);
             lines.add("Hooks: " + StringUtil.join(fullNames, " | "));
@@ -74,7 +74,7 @@ public class VersionCommand extends BaseCommand{
         for (final String name : new String[]{"CompatNoCheatPlus", "ProtocolLib"}) {
             Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
             if (plugin != null) {
-                relatedPlugins.add(plugin.getDescription().getFullName());
+                relatedPlugins.add(alt(plugin.getDescription().getFullName()));
             }
         }
         if (!relatedPlugins.isEmpty()) {
@@ -82,6 +82,10 @@ public class VersionCommand extends BaseCommand{
             lines.add(StringUtil.join(relatedPlugins, " | "));
         }
         return lines;
+    }
+    
+    private static String alt(String x) {
+        return x.replace('(', '~').replace(')', '~');
     }
 
 }

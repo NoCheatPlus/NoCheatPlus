@@ -422,7 +422,7 @@ public class BlockProperties {
         try{
             initTools(mcAccess, worldConfigProvider);
             initBlocks(mcAccess, worldConfigProvider);
-            blocksFeatures.add("BlocksMC1_4(base)");
+            blocksFeatures.add("BlocksMC1_4");
             // Extra hand picked setups.
             try{
                 blocksFeatures.addAll(new VanillaBlocksFactory().setupVanillaBlocks(worldConfigProvider));
