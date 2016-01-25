@@ -10,9 +10,11 @@ import fr.neatmonster.nocheatplus.actions.ActionData;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
+import fr.neatmonster.nocheatplus.actions.types.GenericLogAction;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.StreamID;
 
 /**
  * Violation specific data, for executing actions.<br>
@@ -124,7 +126,9 @@ public class ViolationData implements IViolationInfo, ActionData {
     @Override
     public boolean hasCancel() {
         for (final Action<ViolationData, ActionList>  action : applicableActions) {
-            if (action instanceof CancelAction) return true;
+            if (action instanceof CancelAction) {
+                return true;
+            }
         }
         return false;
     }
@@ -152,9 +156,10 @@ public class ViolationData implements IViolationInfo, ActionData {
                 return player.getUniqueId().toString();
             case VIOLATIONS:
                 return String.valueOf((long) Math.round(vL));
-            case WORLD:
+            case WORLD: {
                 String world = getParameterValue(ParameterName.WORLD);
                 return world == null ? player.getWorld().getName() : world;
+            }
             default:
                 break;
         }
@@ -165,7 +170,7 @@ public class ViolationData implements IViolationInfo, ActionData {
         final String value = parameters.get(parameterName);
         return(value == null) ? ("[" + parameterName.getText() + "]") : value;
     }
-    
+
     private  String getParameterValue(ParameterName parameterName) {
         return parameters == null ? null : parameters.get(parameterName);
     }
@@ -217,4 +222,51 @@ public class ViolationData implements IViolationInfo, ActionData {
     public ActionList getActionList() {
         return actions;
     }
+
+    /**
+     * Test if there exist log actions in applicableActions that might log to
+     * the referenced stream. This method will iterate over applicableActions,
+     * it's not very efficient to call it multiple times (unless for JIT).
+     * Usually actions are stored in 'optimized' form, thus this result should
+     * be final. If an action is not stored in optimized form, it might still
+     * check for configuration flags on execute (bugs or custom actions
+     * implementations).
+     * 
+     * @param streamID
+     * @return
+     */
+    public boolean logsToStream(final StreamID streamID) {
+        if (!needsParameters) {
+            return false;
+        }
+        for (final Action <ViolationData, ActionList> action : applicableActions) {
+            if ((action instanceof GenericLogAction) && ((GenericLogAction) action).logsToStream(streamID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Test if there are any instances of GenericLogAction in the
+     * applicableActions. This method will iterate over applicableActions, it's
+     * not efficient to call it extra to logsToStream. Usually actions are
+     * stored in 'optimized' form, thus this result should be final. If an
+     * action is not stored in optimized form, it might still check for
+     * configuration flags on execute (bugs or custom actions implementations).
+     * 
+     * @return
+     */
+    public boolean hasLogAction() {
+        if (!needsParameters) {
+            return false;
+        }
+        for (final Action <ViolationData, ActionList> action : applicableActions) {
+            if (action instanceof GenericLogAction) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -148,4 +148,23 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
         return !checkActive;
     }
 
+    /**
+     * Test if this action might log to the referenced stream.
+     * 
+     * @param streamID
+     *            Only pass original StreamID instances (e.g.
+     *            Streams.NOTIFY_INGAME).
+     * @return If true, this might log to the referenced stream - it'll
+     *         certainly log to that stream, if isOptimized returns true as
+     *         well.
+     */
+    public boolean logsToStream(final StreamID streamID) {
+        for (int i = 0; i < configs.length; i++) {
+            if (streamID == configs[i].streamID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
