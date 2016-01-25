@@ -64,7 +64,7 @@ public class Visible extends Check {
             // TODO: Should the reachable-face-check be done here too (if it is added at all)?
             collides = false;
         }
-        else{
+        else {
             // Ray-tracing.
             final Vector direction = loc.getDirection();
             // Initialize.
@@ -76,38 +76,31 @@ public class Visible extends Check {
             blockCache.cleanup();
         }
 
-        //        if (data.debug) {//  && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-        //            // TODO: Log more useful information to the trace file instead, probably depending on the block type?
-        //            // TODO: Tags
-        //            final float moveYaw = MovingData.getData(player).toYaw;
-        //            String refYaw = "";
-        //            if (moveYaw != loc.getYaw()) {
-        //                refYaw = " (moved-yaw=" + moveYaw + ")";
-        //            }
-        //            player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " yaw=" + loc.getYaw() + refYaw + " pitch=" + loc.getPitch() + " collide=" + collides);
-        //        }
-
         // Actions ?
         boolean cancel = false;
-        if (collides){
+        if (collides) {
             data.visibleVL += 1;
             final ViolationData vd = new ViolationData(this, player, data.visibleVL, 1, cc.visibleActions);
             if (data.debug || vd.needsParameters()) {
                 // TODO: Consider adding the start/end/block-type information if debug is set.
                 vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+                // Debug output.
+                if (data.debug) {
+                    debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() );
+                }
             }
-            if (executeActions(vd)){
+            if (executeActions(vd)) {
                 cancel = true;
             }
         }
-        else{
+        else {
             data.visibleVL *= 0.99;
         }
 
         return cancel;
     }
 
-    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final double dirX, final double dirY, final double dirZ, final int blockX, final int blockY, final int blockZ, final BlockFace face, final List<String> tags, final boolean debug){
+    private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final double dirX, final double dirY, final double dirZ, final int blockX, final int blockY, final int blockZ, final BlockFace face, final List<String> tags, final boolean debug) {
         // Block of eyes.
         final int eyeBlockX = Location.locToBlock(eyeX);
         final int eyeBlockY = Location.locToBlock(eyeY);
@@ -134,23 +127,29 @@ public class Visible extends Check {
         final double tMaxY = getMaxTime(eyeY, eyeBlockY, dirY, tMinY);
         final double tMaxZ = getMaxTime(eyeZ, eyeBlockZ, dirZ, tMinZ);
 
+        // Point of time of collision.
+        final double tCollide = Math.max(tMinX, Math.max(tMinY, tMinZ));
+        // Collision location (corrected to be on the clicked block).
+        double collideX = toBlock(eyeX + dirX * tCollide, blockX);
+        double collideY = toBlock(eyeY + dirY * tCollide, blockY);
+        double collideZ = toBlock(eyeZ + dirZ * tCollide, blockZ);
+
+        if (!TrigUtil.isSameBlock(blockX, blockY, blockZ, collideX, collideY, collideZ)) {
+            tags.add("early_block_miss");
+        }
+
         // Check if the the block is hit by the direction at all (timing interval).
         if (tMinX > tMaxY && tMinX > tMaxZ || 
                 tMinY > tMaxX && tMinY > tMaxZ || 
                 tMinZ > tMaxX && tMaxZ > tMaxY) {
             // TODO: Option to tolerate a minimal difference in t and use a corrected position then.
-            tags.add("block_miss");
+            tags.add("time_miss");
             //            Bukkit.getServer().broadcastMessage("visible: " + tMinX + "," + tMaxX + " | " + tMinY + "," + tMaxY + " | " + tMinZ + "," + tMaxZ);
             return true;
         }
 
-        // Point of time of collision.
-        final double tCollide = Math.max(tMinX, Math.max(tMinY, tMinZ));
 
-        // Collision location (corrected to be on the clicked block).
-        double collideX = toBlock(eyeX + dirX * tCollide, blockX);
-        double collideY = toBlock(eyeY + dirY * tCollide, blockY);
-        double collideZ = toBlock(eyeZ + dirZ * tCollide, blockZ);
+
         // Correct the last-on-block to be on the edge (could be two).
         if (tMinX == tCollide) {
             collideX = Math.round(collideX);
@@ -161,10 +160,14 @@ public class Visible extends Check {
         if (tMinZ == tCollide) {
             collideZ = Math.round(collideZ);
         }
+
+        if (!TrigUtil.isSameBlock(blockX, blockY, blockZ, collideX, collideY, collideZ)) {
+            tags.add("late_block_miss");
+        }
+
         /*
-         * TODO: Still false positives on transitions between blocks. Could
-         * correcting towards the eye location rather than just rounding solve
-         * it?
+         * TODO: Still false positives on transitions between blocks. The
+         * location does not reflect the latest flying packet(s).
          */
 
         // Perform ray-tracing.
@@ -189,7 +192,7 @@ public class Visible extends Check {
              * (e.g. make DEBUG_LEVEL accessible by API and config).
              */
             // TEST: Log as a false positive (!).
-            //NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "blockinteract.visible test case:\n" + rayTracing.getTestCase(1.05, false));
+            // debug(player, "test case:\n" + rayTracing.getTestCase(1.05, false));
         }
         return collides;
     }
