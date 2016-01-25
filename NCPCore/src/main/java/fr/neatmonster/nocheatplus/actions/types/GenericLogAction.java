@@ -143,4 +143,9 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
         return builder.toString();
     }
 
+    @Override
+    public boolean isOptimized() {
+        return !checkActive;
+    }
+
 }

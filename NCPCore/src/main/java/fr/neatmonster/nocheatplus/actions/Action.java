@@ -81,4 +81,15 @@ public abstract class Action <D extends ActionData, L extends AbstractActionList
     public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold) {
         return this;
     }
+
+    /**
+     * Test if this action is (like) an optimized version of this action type,
+     * like would be returned by getOptimizedCopy.
+     * 
+     * @return
+     */
+    public boolean isOptimized() {
+        return true;
+    }
+
 }
