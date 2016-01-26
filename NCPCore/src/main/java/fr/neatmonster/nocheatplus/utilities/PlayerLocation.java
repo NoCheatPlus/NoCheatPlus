@@ -446,7 +446,7 @@ public class PlayerLocation {
                 return true;
             }
             // Check the block at head height.
-            final int headY = Location.locToBlock(y + eyeHeight);
+            final int headY = Location.locToBlock(maxY);
             if (headY > blockY) {
                 for (int cy = blockY + 1; cy <= headY; cy ++) {
                     if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)) {
@@ -701,7 +701,7 @@ public class PlayerLocation {
      * @return
      */
     public boolean isHeadObstructed(double marginAboveEyeHeight) {
-        return BlockProperties.collides(blockCache, x - width, y + eyeHeight, z - width, x + width, y + eyeHeight + marginAboveEyeHeight, z + width, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+        return BlockProperties.collides(blockCache, minX , maxY, minZ, maxX, maxY + marginAboveEyeHeight, maxZ, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
     }
 
     /**
