@@ -125,6 +125,7 @@ public class MovingFlying extends BaseAdapter {
                 }
                 default: {
                     // Continue.
+                    data.addFlyingQueue(packetData); // TODO: Not the optimal position, perhaps.
                 }
             }
         }

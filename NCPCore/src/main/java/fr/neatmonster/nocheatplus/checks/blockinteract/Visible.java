@@ -10,10 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.InteractRayTracing;
@@ -30,6 +32,9 @@ public class Visible extends Check {
     private final InteractRayTracing rayTracing = new InteractRayTracing(false);
 
     private final List<String> tags = new ArrayList<String>();
+
+    /** For temporary use, no nested use, setWorld(null) after use, etc. */
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
     public Visible() {
         super(CheckType.BLOCKINTERACT_VISIBLE);
@@ -50,7 +55,7 @@ public class Visible extends Check {
     public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
         // TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
         // TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
-        final boolean collides;
+        boolean collides;
         final int blockX = block.getX();
         final int blockY = block.getY();
         final int blockZ = block.getZ();
@@ -66,11 +71,64 @@ public class Visible extends Check {
         }
         else {
             // Ray-tracing.
-            final Vector direction = loc.getDirection();
+            Vector direction = loc.getDirection();
             // Initialize.
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
             collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);
+            if (collides) {
+                // Debug output.
+                if (data.debug) {
+                    debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
+                }
+                // Re-check with flying packets.
+                final DataPacketFlying[] flyingQueue = ((NetData) CheckType.NET.getDataFactory().getData(player)).copyFlyingQueue();
+                // TODO: Maybe just the latest one does (!).
+                LocUtil.set(useLoc, loc);
+                final float oldPitch = useLoc.getPitch();
+                final float oldYaw = useLoc.getYaw();
+                // TODO: Specific max-recheck-count (likely doesn't equal packet count).
+                int count = 0;
+                for (int i = 0; i < flyingQueue.length; i++) {
+                    final DataPacketFlying packetData = flyingQueue[i];
+                    // TODO: Allow if within threshold(s) of last move. 
+                    // TODO: Confine by distance.
+                    // Abort/skipping conditions.
+                    //                    if (packetData.hasPos) {
+                    //                        break;
+                    //                    }
+                    if (!packetData.hasLook) {
+                        continue;
+                    }
+                    // TODO: Might skip last pitch+yaw as well.
+                    if (packetData.pitch == oldPitch && packetData.yaw == oldYaw) {
+                        if (count == 0) {
+                            count = 1;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    else if (count < 4) {
+                        count ++;
+                    }
+                    // Run ray-tracing again with updated pitch and yaw.
+                    useLoc.setPitch(packetData.pitch);
+                    useLoc.setYaw(packetData.yaw);
+                    direction = useLoc.getDirection(); // TODO: Better.
+                    tags.clear();
+                    tags.add("flying(" + i + ")"); // Interesting if this gets through.
+                    collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);
+                    if (!collides) {
+                        break;
+                    }
+                    // Debug output.
+                    if (data.debug) {
+                        debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
+                    }
+                }
+                useLoc.setWorld(null);
+            }
             // Cleanup.
             rayTracing.cleanup();
             blockCache.cleanup();
@@ -81,20 +139,19 @@ public class Visible extends Check {
         if (collides) {
             data.visibleVL += 1;
             final ViolationData vd = new ViolationData(this, player, data.visibleVL, 1, cc.visibleActions);
-            if (data.debug || vd.needsParameters()) {
-                // TODO: Consider adding the start/end/block-type information if debug is set.
-                vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
-                // Debug output.
-                if (data.debug) {
-                    debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() );
-                }
-            }
+            //            if (data.debug || vd.needsParameters()) {
+            //                // TODO: Consider adding the start/end/block-type information if debug is set.
+            //                vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+            //            }
             if (executeActions(vd)) {
                 cancel = true;
             }
         }
         else {
             data.visibleVL *= 0.99;
+            if (data.debug) {
+                debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
+            }
         }
 
         return cancel;
@@ -111,11 +168,12 @@ public class Visible extends Check {
         final int bdZ = blockZ - eyeBlockZ;
 
         // Coarse orientation check.
-        if (bdX != 0 && dirX * bdX <= 0.0 || bdY != 0 && dirY * bdY <= 0.0 || bdZ != 0 && dirZ * bdZ <= 0.0) {
-            // TODO: There seem to be false positives, do add debug logging with/before violation handling.
-            tags.add("coarse_orient");
-            return true;
-        }
+        // TODO: Might skip (axis transitions...)?
+        //        if (bdX != 0 && dirX * bdX <= 0.0 || bdY != 0 && dirY * bdY <= 0.0 || bdZ != 0 && dirZ * bdZ <= 0.0) {
+        //            // TODO: There seem to be false positives, do add debug logging with/before violation handling.
+        //            tags.add("coarse_orient");
+        //            return true;
+        //        }
 
         // TODO: If medium strict, check if the given BlockFace seems acceptable.
 
@@ -128,13 +186,13 @@ public class Visible extends Check {
         final double tMaxZ = getMaxTime(eyeZ, eyeBlockZ, dirZ, tMinZ);
 
         // Point of time of collision.
-        final double tCollide = Math.max(tMinX, Math.max(tMinY, tMinZ));
+        final double tCollide = Math.max(0.0, Math.max(tMinX, Math.max(tMinY, tMinZ)));
         // Collision location (corrected to be on the clicked block).
         double collideX = toBlock(eyeX + dirX * tCollide, blockX);
         double collideY = toBlock(eyeY + dirY * tCollide, blockY);
         double collideZ = toBlock(eyeZ + dirZ * tCollide, blockZ);
 
-        if (!TrigUtil.isSameBlock(blockX, blockY, blockZ, collideX, collideY, collideZ)) {
+        if (TrigUtil.distanceSquared(0.5 + blockX, 0.5 + blockY, 0.5 + blockZ, collideX, collideY, collideZ) > 0.75) {
             tags.add("early_block_miss");
         }
 
@@ -145,12 +203,15 @@ public class Visible extends Check {
             // TODO: Option to tolerate a minimal difference in t and use a corrected position then.
             tags.add("time_miss");
             //            Bukkit.getServer().broadcastMessage("visible: " + tMinX + "," + tMaxX + " | " + tMinY + "," + tMaxY + " | " + tMinZ + "," + tMaxZ);
-            return true;
+            // return true; // TODO: Strict or not (direction check ...).
+            // Attempt to correct somehow.
+            collideX = postCorrect(blockX, bdX, collideX);
+            collideY = postCorrect(blockY, bdY, collideY);
+            collideZ = postCorrect(blockZ, bdZ, collideZ);
         }
 
-
-
         // Correct the last-on-block to be on the edge (could be two).
+        // TODO: Correct towards minimum of all time values, then towards block, rather.
         if (tMinX == tCollide) {
             collideX = Math.round(collideX);
         }
@@ -161,7 +222,7 @@ public class Visible extends Check {
             collideZ = Math.round(collideZ);
         }
 
-        if (!TrigUtil.isSameBlock(blockX, blockY, blockZ, collideX, collideY, collideZ)) {
+        if (TrigUtil.distanceSquared(0.5 + blockX, 0.5 + blockY, 0.5 + blockZ, collideX, collideY, collideZ) > 0.75) {
             tags.add("late_block_miss");
         }
 
@@ -195,6 +256,24 @@ public class Visible extends Check {
             // debug(player, "test case:\n" + rayTracing.getTestCase(1.05, false));
         }
         return collides;
+    }
+
+    /**
+     * Correct onto the block (from off-block), against the direction.
+     * 
+     * @param blockC
+     * @param bdC
+     * @param collideC
+     * @return
+     */
+    private double postCorrect(int blockC, int bdC, double collideC) {
+        int ref = bdC < 0 ? blockC + 1 : blockC;
+        if (Location.locToBlock(collideC) == ref) {
+            return collideC;
+        }
+        else {
+            return ref;
+        }
     }
 
     /**
