@@ -219,11 +219,11 @@ public class SurvivalFly extends Check {
         }
 
         // Check if head is obstructed.
-        if (!resetFrom || !resetTo) {
-            data.thisMove.headObstructed = (yDistance > 0.0 ? from.isHeadObstructedMax(yDistance) : from.isHeadObstructed()) 
-                    //                    || to.isHeadObstructed() // Best not have this one.
-                    ;
-        }
+        //if (!resetFrom || !resetTo) {
+        data.thisMove.headObstructed = (yDistance > 0.0 ? from.isHeadObstructed(yDistance) : from.isHeadObstructed()) 
+                //                    || to.isHeadObstructed() // Best not have this one.
+                ;
+        //}
 
         //////////////////////
         // Horizontal move.
@@ -2260,7 +2260,7 @@ public class SurvivalFly extends Check {
         final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
         final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
         final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
-        builder.append("\nonground: " + (data.thisMove.touchedGroundWorkaround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase + ", liftoff: " + data.liftOffEnvelope.name() + "(" + data.insideMediumCount + ")");
+        builder.append("\nonground: " + (data.thisMove.headObstructed ? "(head obstr.) " : "") + (data.thisMove.touchedGroundWorkaround ? "(touched ground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase + ", liftoff: " + data.liftOffEnvelope.name() + "(" + data.insideMediumCount + ")");
         final String dHDist = (lastMove.toIsValid && Math.abs(lastMove.hDistance - hDistance) > 0.0005) ? ("(" + (hDistance > lastMove.hDistance ? "+" : "") + StringUtil.fdec3.format(hDistance - lastMove.hDistance) + ")") : "";
         builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " + StringUtil.fdec3.format(yDistance) + (!lastMove.toIsValid ? "" : (" (" + (yDistance > lastMove.yDistance ? "+" : "") + StringUtil.fdec3.format(yDistance - lastMove.yDistance) + ")")) + " / " + StringUtil.fdec3.format(vAllowedDistance) + ", sby=" + (data.hasSetBack() ? (data.getSetBackY() + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " + data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier) + ")") : "?"));
         if (data.verVelUsed != null) {

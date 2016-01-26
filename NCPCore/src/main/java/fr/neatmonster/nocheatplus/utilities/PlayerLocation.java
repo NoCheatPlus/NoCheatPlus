@@ -701,30 +701,41 @@ public class PlayerLocation {
      * @return
      */
     public boolean isHeadObstructed(double marginAboveEyeHeight) {
+        return isHeadObstructed(marginAboveEyeHeight, true); // TODO: This is changed behavior, need to check calls.
+    }
+
+    /**
+     * Test if something solid/ground-like collides within the given margin
+     * above the eye height of the player.
+     * 
+     * @param marginAboveEyeHeight
+     * @param stepCorrection
+     *            If set to true, a correction method is used for leniency.
+     * @return
+     */
+    public boolean isHeadObstructed(double marginAboveEyeHeight, boolean stepCorrection) {
+        if (stepCorrection) {
+            double ref = maxY + marginAboveEyeHeight;
+            ref = ref - Location.locToBlock(ref) + 0.35;
+            for (double bound = 1.0; bound >= 0.0; bound -= 0.25) {
+                if (ref >= bound) {
+                    // Use this for correction.
+                    marginAboveEyeHeight += bound + 0.35 - ref;
+                    break;
+                }
+            }
+        }
         return BlockProperties.collides(blockCache, minX , maxY, minZ, maxX, maxY + marginAboveEyeHeight, maxZ, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
     }
 
     /**
-     * Test if something solid/ground-like collides within a default margin
-     * above the eye height of the player. Margin is yOnGround + max(0.0, 2.0 -
-     * eyeHeight).
+     * Test if something solid/ground-like collides within a default
+     * margin/estimation above the eye height of the player.
      * 
      * @return
      */
     public boolean isHeadObstructed() {
-        return isHeadObstructed(Math.max(0.0, 2.0 - eyeHeight) + yOnGround);
-    }
-
-    /**
-     * Test if something solid/ground-like collides within the maximum of the
-     * default margin and the given margin above the eye height of the player.
-     * Will add yOnGround to the given margin.
-     * 
-     * @param marginAboveEyeHeight
-     * @return
-     */
-    public boolean isHeadObstructedMax(double marginAboveEyeHeight) {
-        return isHeadObstructed(Math.max(marginAboveEyeHeight, 2.0 - eyeHeight) + yOnGround);
+        return isHeadObstructed(0.0, true);
     }
 
     /**
