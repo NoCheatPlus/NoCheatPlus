@@ -859,7 +859,12 @@ public class SurvivalFly extends Check {
         else if (resetFrom || data.thisMove.touchedGroundWorkaround) {
             // TODO: More concise conditions? Some workaround may allow more.
             if (toOnGround) {
-                vAllowedDistance = Math.max(cc.sfStepHeight, maxJumpGain + jumpGainMargin);
+                // Hack for boats (coarse: allows minecarts too).
+                if (yDistance > cc.sfStepHeight && yDistance - cc.sfStepHeight < 0.00000003 && to.isOnGroundDueToStandingOnAnEntity()) {
+                    vAllowedDistance = yDistance;
+                } else  {
+                    vAllowedDistance = Math.max(cc.sfStepHeight, maxJumpGain + jumpGainMargin);
+                }
             }
             else {
                 // Code duplication with the absolute limit below.

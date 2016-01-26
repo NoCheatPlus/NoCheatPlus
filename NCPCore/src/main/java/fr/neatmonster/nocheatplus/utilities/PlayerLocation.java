@@ -50,6 +50,12 @@ public class PlayerLocation {
     /** Maximal yOnGround for which the player is not on ground. No extra xz/y margin.*/
     private double notOnGroundMaxY = Double.MIN_VALUE;
 
+    /**
+     * Player is on ground, due to standing on an entity. (Might not get
+     * evaluated if the player is on ground anyway.)
+     */
+    private boolean standsOnEntity = false;
+
     // "Light" object members (reset to null) //
 
     // TODO: The following should be changed to primitive types, add one long for "checked"-flags. Booleans can be compressed into a long.
@@ -495,8 +501,12 @@ public class PlayerLocation {
             return onGround;
         }
         // Check cached values and simplifications.
-        if (notOnGroundMaxY >= yOnGround) onGround = false;
-        else if (onGroundMinY <= yOnGround) onGround = true;
+        if (notOnGroundMaxY >= yOnGround) {
+            onGround = false;
+        }
+        else if (onGroundMinY <= yOnGround) {
+            onGround = true;
+        }
         else {
             // Shortcut check (currently needed for being stuck + sf).
             if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0) {
@@ -525,15 +535,17 @@ public class PlayerLocation {
                     onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
                 }
             }
-            else onGround = false;
+            else {
+                onGround = false;
+            }
         }
-        if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
+        if (onGround) {
+            onGroundMinY = Math.min(onGroundMinY, yOnGround);
+        }
         else {
-            //          NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** onground check entities");
-            // TODO: further confine this ?
             notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
-            final double d1 = 0.25D;
-            onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
+            final double d1 = 0.25;
+            onGround = standsOnEntity = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
         }
         return onGround;
     }
@@ -627,14 +639,27 @@ public class PlayerLocation {
     }
 
     /**
-     * Simple check with custom margins (Boat, Minecart). 
-     * @param yOnGround Margin below the player.
+     * Simple check with custom margins (Boat, Minecart). Does not update the
+     * internally stored standsOnEntity field.
+     * 
+     * @param yOnGround
+     *            Margin below the player.
      * @param xzMargin
-     * @param yMargin Extra margin added below and above.
+     * @param yMargin
+     *            Extra margin added below and above.
      * @return
      */
     public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin) {
         return blockCache.standsOnEntity(player, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
+    }
+
+    /**
+     * Test if the player is just on ground due to standing on an entity.
+     * 
+     * @return True, if the player is not standing on blocks, but on an entity.
+     */
+    public boolean isOnGroundDueToStandingOnAnEntity() {
+        return isOnGround() && standsOnEntity; // Just ensure it is initialized.
     }
 
     /**
@@ -866,6 +891,7 @@ public class PlayerLocation {
         // Reset cached values.
         typeId = typeIdBelow = data = null;
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onClimbable = passable = null;
+        standsOnEntity = false;
         onGroundMinY = Double.MAX_VALUE;
         notOnGroundMaxY = Double.MIN_VALUE;
         blockFlags = null;
@@ -1061,6 +1087,7 @@ public class PlayerLocation {
      */
     public void prepare(final PlayerLocation other) {
         this.onGround = other.isOnGround();
+        this.standsOnEntity = other.standsOnEntity;
         this.inWater = other.isInWater();
         this.inLava = other.isInLava();
         this.inWeb = other.isInWeb();
