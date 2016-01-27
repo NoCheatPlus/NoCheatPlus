@@ -717,9 +717,9 @@ public class PlayerLocation {
         if (stepCorrection) {
             double ref = maxY + marginAboveEyeHeight;
             ref = ref - Location.locToBlock(ref) + 0.35;
-            for (double bound = 1.0; bound >= 0.0; bound -= 0.25) {
+            for (double bound = 1.0; bound > 0.0; bound -= 0.25) {
                 if (ref >= bound) {
-                    // Use this for correction.
+                    // Use this level for correction.
                     marginAboveEyeHeight += bound + 0.35 - ref;
                     break;
                 }
