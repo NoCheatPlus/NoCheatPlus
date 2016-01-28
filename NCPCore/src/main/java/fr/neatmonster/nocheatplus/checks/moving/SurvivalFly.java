@@ -1474,7 +1474,18 @@ public class SurvivalFly extends Check {
                     tags.add("ediblebunny");
                     allowHop = true;
                 }
+                else if (lastMove.yDistance < 0.0 && thisMove.to.onGround && thisMove.yDistance == 0.0 
+                        && Magic.fallAfterHeadObstructed(data, 2) 
+                        && lastMove.hDistance > lastMove.hAllowedDistanceBase && lastMove.hDistance < 1.34 * lastMove.hAllowedDistanceBase
+                        && thisMove.hDistance > lastMove.hDistance * 1.24
+                        && thisMove.hDistance < lastMove.hDistance * 1.34
+                        ) {
+                    tags.add("headbangbunny");
+                    allowHop = true;
+                }
+
             }
+
         }
 
         // Check hop (singular peak up to roughly two times the allowed distance).

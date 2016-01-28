@@ -517,4 +517,25 @@ public class Magic {
         return false;
     }
 
+    /**
+     * Disregarding this move, test if all the way falling after head being
+     * obstructed.
+     * 
+     * @param data
+     * @return
+     */
+    static boolean fallAfterHeadObstructed(final MovingData data, int limit) {
+        limit = Math.min(limit, data.moveData.size());
+        for (int i = 0; i < limit; i++) {
+            final MoveData move = data.moveData.get(i);
+            if (!move.toIsValid || move.yDistance >= 0.0) {
+                return false;
+            }
+            else if (move.headObstructed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
