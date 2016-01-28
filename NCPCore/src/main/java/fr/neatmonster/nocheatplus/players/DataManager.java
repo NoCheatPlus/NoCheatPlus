@@ -63,14 +63,14 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 @SetupOrder(priority = -80)
 public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, DisableListener{
 
-    protected static DataManager instance = null;
+    private static DataManager instance = null;
 
     // Not static
     private int foundInconsistencies = 0;
 
     // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting
     /** PlayerData storage. */
-    protected final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
+    private final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
 
     /*
      * 
@@ -87,32 +87,32 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      * on logout, but might be later.
      */
     // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting the UUID.
-    protected final PlayerMap playerMap;
+    private final PlayerMap playerMap;
 
     /**
      * IRemoveData instances.
      * // TODO: might use a map for those later (extra or not).
      */
-    protected final ArrayList<IRemoveData> iRemoveData = new ArrayList<IRemoveData>();
+    private final ArrayList<IRemoveData> iRemoveData = new ArrayList<IRemoveData>();
 
     /**
      * Execution histories of the checks.
      */
-    protected final Map<CheckType, Map<String, ExecutionHistory>> executionHistories = new HashMap<CheckType, Map<String,ExecutionHistory>>();
+    private final Map<CheckType, Map<String, ExecutionHistory>> executionHistories = new HashMap<CheckType, Map<String,ExecutionHistory>>();
 
     /** Flag if data expiration is active at all. */
-    protected boolean doExpireData = false;
+    private boolean doExpireData = false;
 
     /** 
      * Duration in milliseconds for expiration of logged off players data. 
      * In the config minutes are used as unit.
      */
-    protected long durExpireData = 0;
+    private long durExpireData = 0;
 
     /** Data and execution history. */
-    protected boolean deleteData = true;
+    private boolean deleteData = true;
     /** Violation history and execution history. */
-    protected boolean deleteHistory = false;
+    private boolean deleteHistory = false;
 
     /**
      * Sets the static instance reference.
