@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
@@ -16,13 +17,17 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
  */
 public class Captcha extends Check implements ICaptcha{
 
+    /** The random number generator. */
+    // MOVE TO generic registry (unique instance).
+    private final Random random;
+
     public Captcha() {
         super(CheckType.CHAT_CAPTCHA);
+        this.random = CheckUtils.getRandom();
+        if (this.random == null) {
+            throw new IllegalStateException("No Random instance registered.");
+        }
     }
-
-    /** The random number generator. */
-    private final Random random = new Random();
-
 
     @Override
     public void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -843,7 +844,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Register some generic stuff.
         // Counters: debugging purposes, maybe integrated for statistics later.
         registerGenericInstance(new Counters());
-        registerGenericInstance(new WRPT()); // Not entirely sure here.
+        registerGenericInstance(new WRPT());
+        registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
 
         // Initialize MCAccess.
         initMCAccess(config);
