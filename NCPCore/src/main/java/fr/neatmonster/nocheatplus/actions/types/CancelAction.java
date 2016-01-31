@@ -11,10 +11,18 @@ import fr.neatmonster.nocheatplus.actions.ActionData;
 public class CancelAction<D extends ActionData, L extends AbstractActionList<D, L>> extends Action<D, L> {
 
     /**
-     * Instantiates a new cancel action.
+     * Default cancel action.
      */
     public CancelAction() {
-        super("cancel", 0, 0);
+        this("cancel");
+    }
+
+    /**
+     * Sub-class constructor.
+     * @param name
+     */
+    public CancelAction(String name) {
+        super(name, 0, 0);
     }
 
     /* (non-Javadoc)

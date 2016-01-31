@@ -273,7 +273,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:angle:3:5:f cancel vl>250 log:angle:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_CRITICAL_CHECK, true);
-        set(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE, 0.06251D);
+        set(ConfPaths.FIGHT_CRITICAL_CANCEL_CANCEL, 100);
+        set(ConfPaths.FIGHT_CRITICAL_CANCEL_DIVIDEDAMAGE, 1.5);
+        set(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE, 0.06251);
         set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:critical:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);

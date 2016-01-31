@@ -402,6 +402,10 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_CRITICAL                           = FIGHT + "critical.";
     public static final String  FIGHT_CRITICAL_CHECK                     = FIGHT_CRITICAL + "active";
+    private static final String FIGHT_CRITICAL_CANCEL                    = FIGHT_CRITICAL + "cancel.";
+    public static final String  FIGHT_CRITICAL_CANCEL_CANCEL             = FIGHT_CRITICAL_CANCEL + "cancel";
+    public static final String  FIGHT_CRITICAL_CANCEL_DIVIDEDAMAGE       = FIGHT_CRITICAL_CANCEL + "dividedamage";
+    // TODO: Deprecate or rename (->falldistancemin)?
     public static final String  FIGHT_CRITICAL_FALLDISTANCE              = FIGHT_CRITICAL + "falldistance";
     public static final String  FIGHT_CRITICAL_ACTIONS                   = FIGHT_CRITICAL + "actions";
 

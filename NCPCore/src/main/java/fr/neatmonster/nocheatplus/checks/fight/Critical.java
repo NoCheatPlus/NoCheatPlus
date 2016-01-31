@@ -46,8 +46,9 @@ public class Critical extends Check {
         // TODO: All debugging to the trace (later allow hooking your own trace).
         if (mcFallDistance > 0.0 && data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
             final MovingData mData = MovingData.getData(player);
-
+            // TODO: Use paste move tracking instead (fly check).
             if (MovingUtil.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)) {
+                // TODO: Log to trace instead.
                 // TODO: Set max y in MovingListener, to be independent of sf/nofall!
                 player.sendMessage("Critical: fd=" + mcFallDistance + "(" + mData.noFallFallDistance +") y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
             }
@@ -64,6 +65,7 @@ public class Critical extends Check {
                     (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.liftOffEnvelope == LiftOffEnvelope.NORMAL
                         || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
+                // TODO: Use past move tracking to check for SurvivalFly.
                 if (MovingUtil.shouldCheckSurvivalFly(player, dataM, ccM)) {
                     data.criticalVL += 1.0;
                     // Execute whatever actions are associated with this check and 
@@ -72,11 +74,11 @@ public class Critical extends Check {
                     if (vd.needsParameters()) {
                         final List<String> tags = new ArrayList<String>();
                         if (dataM.sfLowJump) {
-                            tags.add("sf_lowjump");
+                            tags.add("lowjump");
                         }
                         vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
                     }
-                    cancel = executeActions(vd);	
+                    cancel = executeActions(vd);
                 }
             }
         }
