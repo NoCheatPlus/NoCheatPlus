@@ -70,7 +70,7 @@ public class DefaultComponentFactory {
                 available.add(new ProtocolLibComponent(plugin));
             } else {
                 if (pluginProtocolLib != null) {
-                    StaticLog.logWarning("Can't tell if the packet level hooks are compatible to the version of ProtocolLib in use.");
+                    StaticLog.logWarning("Can't tell if the packet level hooks are compatible to the version of ProtocolLib in use. NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, and ProtocolLib 3.6.4 or later on Minecraft 1.8 (and later).");
                 }
                 StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
             }
