@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.DisableListener;
+import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
@@ -304,6 +305,43 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         if (checkType == CheckType.ALL) {
             instance.playerData.clear(); // TODO
         }
+    }
+
+    /**
+     * Adjust to the system time having run backwards. This is much like
+     * clearData(CheckType.ALL), with the exception of calling
+     * ICanHandleTimeRunningBackwards.handleTimeRanBackwards for data instances
+     * which implement this.
+     */
+    public static void handleSystemTimeRanBackwards() {
+        // Collect data factories and clear execution history.
+        final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
+        for (final CheckType type : APIUtils.getWithChildren(CheckType.ALL)) {
+            final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
+            if (map != null) {
+                map.clear();
+            }
+            final CheckDataFactory factory = type.getDataFactory();
+            if (factory != null) {
+                factories.add(factory);
+            }
+        }
+        for (final CheckDataFactory factory : factories) {
+            if (factory instanceof ICanHandleTimeRunningBackwards) {
+                ((ICanHandleTimeRunningBackwards) factory).handleTimeRanBackwards();
+            } else {
+                factory.removeAllData();
+            }
+        }
+        for (final IRemoveData rmd : instance.iRemoveData) {
+            if (rmd instanceof ICanHandleTimeRunningBackwards) {
+                ((ICanHandleTimeRunningBackwards) rmd).handleTimeRanBackwards();
+            } else {
+                rmd.removeAllData();
+            }
+        }
+        ViolationHistory.clear(CheckType.ALL);
+        // (Not removing PlayerData instances.)
     }
 
     /**

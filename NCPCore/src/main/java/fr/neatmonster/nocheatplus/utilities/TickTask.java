@@ -565,10 +565,10 @@ public class TickTask implements Runnable {
         // Time running backwards check (not only players can!).
         if (timeLast > time) {
             StaticLog.logWarning("System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
-            DataManager.clearData(CheckType.ALL);
+            DataManager.handleSystemTimeRanBackwards();
             lastDur = 50;
             for (int i = 0; i < spikeDurations.length; i++) {
-                spikes[i].clear(0);
+                spikes[i].update(time);
             }
         }
         else if (tick > 0) {

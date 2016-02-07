@@ -119,4 +119,17 @@ public class NetData extends ACheckData {
         return out;
     }
 
+    /**
+     * (Not implementing the interface, to avoid confusion.)
+     */
+    public void handleSystemTimeRanBackwards() {
+        final long now = System.currentTimeMillis();
+        teleportQueue.clear(); // Can't handle timeouts. TODO: Might still keep.
+        lastKeepAliveTime = Math.min(lastKeepAliveTime, now);
+        flyingFrequencyTimeNotOnGround = Math.min(flyingFrequencyTimeNotOnGround, now);
+        flyingFrequencyTimeOnGround = Math.min(flyingFrequencyTimeOnGround, now);
+        // (Keep flyingQueue.)
+        // (ActionFrequency can handle this.)
+    }
+
 }

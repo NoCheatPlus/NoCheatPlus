@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -36,8 +37,7 @@ import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
  */
 public class MovingData extends ACheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory factory = new CheckDataFactory() {
+    public static final class MovingDataFactory implements CheckDataFactory, ICanHandleTimeRunningBackwards {
         @Override
         public final ICheckData getData(final Player player) {
             return MovingData.getData(player);
@@ -50,9 +50,19 @@ public class MovingData extends ACheckData {
 
         @Override
         public void removeAllData() {
-            clear();
+            MovingData.clear();
         }
-    };
+
+        @Override
+        public void handleTimeRanBackwards() {
+            for (final MovingData data : playersMap.values()) {
+                data.handleTimeRanBackwards();
+            }
+        }
+    }
+
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new MovingDataFactory();
 
     private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
     /** The map containing the data per players. */
@@ -1018,6 +1028,18 @@ public class MovingData extends ACheckData {
         noFallSkipAirCheck = true;
         prependVerticalVelocity(verticalBounce);
         verticalBounce = null;
+    }
+
+    public void handleTimeRanBackwards() {
+        final long time = System.currentTimeMillis();
+        timeSprinting = Math.min(timeSprinting, time);
+        morePacketsVehicleLastTime = Math.min(morePacketsVehicleLastTime, time);
+        sfCobwebTime = Math.min(sfCobwebTime, time);
+        sfVLTime = Math.min(sfVLTime, time);
+        trace.reset(); // Might implement something better some time (trace.handleTimeRanBackwards -> set time values, object pool).
+        clearAccounting(); // Not sure: adding up might not be nice.
+        removeAllVelocity(); // TODO: This likely leads to problems.
+        // (ActionFrequency can handle this.)
     }
 
 }

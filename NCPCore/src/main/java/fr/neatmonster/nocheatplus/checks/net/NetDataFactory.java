@@ -1,19 +1,24 @@
 package fr.neatmonster.nocheatplus.checks.net;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
+import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
+import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
- * Copy on write, right now.
+ * Factory for NetData.
  * @author asofold
  *
  */
-public class NetDataFactory implements CheckDataFactory {
+public class NetDataFactory implements CheckDataFactory, ICanHandleTimeRunningBackwards {
 
-    private final LinkedHashMapCOW<String, NetData> dataMap = new LinkedHashMapCOW<String, NetData>();
+    private final HashMapLOW<String, NetData> dataMap = new HashMapLOW<String, NetData>(Math.min(Bukkit.getServer().getMaxPlayers(), 500));
 
     @Override
     public void removeAllData() {
@@ -35,6 +40,15 @@ public class NetDataFactory implements CheckDataFactory {
     @Override
     public NetData removeData(String playerName) {
         return dataMap.remove(playerName);
+    }
+
+    @Override
+    public void handleTimeRanBackwards() {
+        final Iterator<Entry<String, NetData>> it = dataMap.iterator();
+        while (it.hasNext()) {
+            final Entry<String, NetData> entry = it.next();
+            entry.getValue().handleSystemTimeRanBackwards();
+        }
     }
 
 }
