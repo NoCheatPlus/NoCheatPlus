@@ -36,6 +36,10 @@ public class HashMapLOW <K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
+    private static int getBucketIndex(final int hashCode, final int buckets) {
+        return Math.abs(hashCode) % buckets;
+    }
+
     static class LHMEntry<K, V> implements Entry<K, V> {
 
         final int hashCode;
@@ -436,7 +440,7 @@ public class HashMapLOW <K, V> {
                 for (int j = 0; j < bucket.contents.length; j++) {
                     final LHMEntry<K, V> entry = bucket.contents[j];
                     if (entry != null) {
-                        final int newIndex = entry.hashCode % newLength;
+                        final int newIndex = getBucketIndex(entry.hashCode, newLength);
                         LHMBucket<K, V> newBucket = newBuckets[newIndex];
                         if (newBucket == null) {
                             newBucket = new LHMBucket<K, V>();
@@ -486,7 +490,7 @@ public class HashMapLOW <K, V> {
     public V put(final K key, final V value) {
         final int hashCode = getHashCode(key);
         lock.lock();
-        final int index = hashCode % buckets.length;
+        final int index = getBucketIndex(hashCode, buckets.length);
         LHMBucket<K, V> bucket = buckets[index];
         if (bucket == null) {
             bucket = new LHMBucket<K, V>();
@@ -527,7 +531,7 @@ public class HashMapLOW <K, V> {
      * @return
      */
     private V removeUnderLock(final int hashCode, final K key) {
-        final int index = hashCode % buckets.length;
+        final int index = getBucketIndex(hashCode, buckets.length);
         final LHMBucket<K, V> bucket = buckets[index];
         if (bucket == null || bucket.size == 0) {
             return null;
@@ -566,7 +570,7 @@ public class HashMapLOW <K, V> {
     public V get(final K key) {
         final int hashCode = getHashCode(key);
         final LHMBucket<K, V>[] buckets = this.buckets;
-        final LHMBucket<K, V> bucket = buckets[hashCode % buckets.length];
+        final LHMBucket<K, V> bucket = buckets[getBucketIndex(hashCode, buckets.length)];
         if (bucket == null || bucket.size == 0) {
             return null;
         }
@@ -598,7 +602,7 @@ public class HashMapLOW <K, V> {
     public boolean containsKey(final K key) {
         final int hashCode = getHashCode(key);
         final LHMBucket<K, V>[] buckets = this.buckets;
-        final LHMBucket<K, V> bucket = buckets[hashCode % buckets.length];
+        final LHMBucket<K, V> bucket = buckets[getBucketIndex(hashCode, buckets.length)];
         if (bucket == null || bucket.size == 0) {
             return false;
         }
