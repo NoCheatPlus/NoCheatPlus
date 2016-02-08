@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.net;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -18,7 +17,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
  */
 public class NetDataFactory implements CheckDataFactory, ICanHandleTimeRunningBackwards {
 
-    private final HashMapLOW<String, NetData> dataMap = new HashMapLOW<String, NetData>(Math.min(Bukkit.getServer().getMaxPlayers(), 500));
+    private final HashMapLOW<String, NetData> dataMap = new HashMapLOW<String, NetData>(35);
 
     @Override
     public void removeAllData() {
