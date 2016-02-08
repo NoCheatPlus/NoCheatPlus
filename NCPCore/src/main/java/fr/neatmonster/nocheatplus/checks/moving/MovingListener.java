@@ -1044,10 +1044,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerPortal(final PlayerPortalEvent event) {
+        final Location to = event.getTo();
         final MovingData data = MovingData.getData(event.getPlayer());
-        data.clearFlyData();
-        data.clearMorePacketsData();
-        // TODO: This event might be redundant (!).
+        if (data.debug) {
+            debug(event.getPlayer(), "[PORTAL] to=" + to);
+        }
+        if (to != null) {
+            // TODO: This should be redundant, might remove anyway.
+            // TODO: Rather add something like setLatencyImmunity(...ms / conditions).
+            data.clearFlyData();
+            data.clearMorePacketsData();
+        }
     }
 
     /**
