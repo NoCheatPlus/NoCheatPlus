@@ -25,9 +25,9 @@ public class Drop extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-    	// Take time once.
-    	final long time = System.currentTimeMillis();
-    	
+        // Take time once.
+        final long time = System.currentTimeMillis();
+
         final InventoryConfig cc = InventoryConfig.getConfig(player);
         final InventoryData data = InventoryData.getData(player);
 
@@ -53,7 +53,7 @@ public class Drop extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.dropVL, data.dropCount - cc.dropLimit, cc.dropActions);
+            cancel = executeActions(player, data.dropVL, data.dropCount - cc.dropLimit, cc.dropActions).willCancel();
         }
 
         return cancel;

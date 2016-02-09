@@ -95,7 +95,7 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, violation, cc.reachActions);
+            cancel = executeActions(player, data.reachVL, violation, cc.reachActions).willCancel();
             if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
                 cancel = true;
             }
@@ -229,7 +229,7 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, violation, cc.reachActions);
+            cancel = executeActions(player, data.reachVL, violation, cc.reachActions).willCancel();
             if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
                 cancel = true;
             }

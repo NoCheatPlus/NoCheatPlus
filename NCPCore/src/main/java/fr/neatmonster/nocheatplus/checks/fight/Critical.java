@@ -63,7 +63,7 @@ public class Critical extends Check {
             // TODO: Skip near the highest jump height (needs check if head collided with something solid, which also detects low jump).
             if (!dataM.isVelocityJumpPhase() && 
                     (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.liftOffEnvelope == LiftOffEnvelope.NORMAL
-                        || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
+                    || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
                 // TODO: Use past move tracking to check for SurvivalFly.
                 if (MovingUtil.shouldCheckSurvivalFly(player, dataM, ccM)) {
@@ -78,7 +78,7 @@ public class Critical extends Check {
                         }
                         vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
                     }
-                    cancel = executeActions(vd);
+                    cancel = executeActions(vd).willCancel();
                 }
             }
         }

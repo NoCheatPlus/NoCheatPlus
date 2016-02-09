@@ -111,7 +111,7 @@ public class FastConsume extends Check implements Listener{
                 else{
                     vd.setParameter(ParameterName.TAGS, "");
                 }
-                if (executeActions(vd)){
+                if (executeActions(vd).willCancel()){
                     cancel = true;
                 }
             }

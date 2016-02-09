@@ -79,7 +79,7 @@ public class Speed extends Check {
             // cancel the event.
             final ViolationData vd = new ViolationData(this, player, data.speedVL, max - cc.speedLimit, cc.speedActions);
             vd.setParameter(ParameterName.LIMIT, String.valueOf(Math.round(cc.speedLimit)));
-            cancel = executeActions(vd);
+            cancel = executeActions(vd).willCancel();
         }
         else data.speedVL *= 0.96;
 

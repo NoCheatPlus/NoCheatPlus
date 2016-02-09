@@ -104,10 +104,10 @@ public abstract class Check implements MCAccessHolder {
      *            the actions
      * @param isMainThread
      *            if the thread the main thread
-     * @return true, if successful
+     * @return The ViolationData instance that is created for execution of
+     *         actions.
      */
-    public boolean executeActions(final Player player, final double vL, final double addedVL, final ActionList actions) {
-        // Sync it into the main thread by using an event.
+    public ViolationData executeActions(final Player player, final double vL, final double addedVL, final ActionList actions) {
         return executeActions(new ViolationData(this, player, vL, addedVL, actions));
     }
 
@@ -116,28 +116,26 @@ public abstract class Check implements MCAccessHolder {
      * 
      * @param violationData
      *            the violation data
-     * @return true, if the event should be cancelled
+     * @return The ViolationData instanced passed to this method.
      */
-    public boolean executeActions(final ViolationData violationData) {
+    public ViolationData executeActions(final ViolationData violationData) {
 
         // Dispatch the VL processing to the hook manager (now thread safe).
         if (NCPHookManager.shouldCancelVLProcessing(violationData)) {
             // One of the hooks has decided to cancel the VL processing, return false.
-            return false;
+            violationData.preventCancel();
         }
-
-        final boolean hasCancel = violationData.hasCancel(); 
-
-        if (Bukkit.isPrimaryThread()) {
-            return violationData.executeActions();
+        else if (Bukkit.isPrimaryThread()) {
+            violationData.executeActions();
         }
         else {
             // Always schedule to add to ViolationHistory.
+            // TODO: Might clear input-specific effects (stored ones will be handled extra to those).
             TickTask.requestActionsExecution(violationData);
         }
 
-        // (Design change: Permission checks are moved to cached permissions, lazily updated.)
-        return hasCancel;
+        // (Permission checks are moved to cached permissions, lazily updated.)
+        return violationData;
     }
 
     /**

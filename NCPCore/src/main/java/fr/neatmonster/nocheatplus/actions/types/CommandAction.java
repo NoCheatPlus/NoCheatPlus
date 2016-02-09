@@ -33,7 +33,7 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
      * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
      */
     @Override
-    public boolean execute(final D violationData) {
+    public void execute(final D violationData) {
         final String command = super.getMessage(violationData);
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
@@ -43,7 +43,6 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
         } catch (final Exception e) {
             // I don't care in this case, your problem if your command fails.
         }
-        return false;
     }
 
     /**

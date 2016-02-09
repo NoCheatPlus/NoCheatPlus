@@ -67,7 +67,7 @@ public class Reach extends Check {
             // cancel the event.
             final ViolationData vd = new ViolationData(this, player, data.reachVL, distance, cc.reachActions);
             vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(data.reachDistance));
-            cancel = executeActions(vd);
+            cancel = executeActions(vd).willCancel();
         } else{
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;

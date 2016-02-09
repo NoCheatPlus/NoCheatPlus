@@ -145,7 +145,7 @@ public class Passable extends Check {
                 vd.setParameter(ParameterName.TAGS, tags);
             }
         }
-        if (executeActions(vd)) {
+        if (executeActions(vd).willCancel()) {
             // TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
             final Location newTo;
             if (setBackLoc != null) {

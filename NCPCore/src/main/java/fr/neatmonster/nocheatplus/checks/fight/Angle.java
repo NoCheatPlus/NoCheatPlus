@@ -166,7 +166,7 @@ public class Angle extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.angleVL, violation, cc.angleActions);
+            cancel = executeActions(player, data.angleVL, violation, cc.angleActions).willCancel();
         } else {
             // Reward the player by lowering their violation level.
             data.angleVL *= 0.98D;            

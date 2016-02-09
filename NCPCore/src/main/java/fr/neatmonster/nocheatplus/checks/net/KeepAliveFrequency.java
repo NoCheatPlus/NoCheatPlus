@@ -26,7 +26,7 @@ public class KeepAliveFrequency extends Check {
         if (first > 1f && !CheckUtils.hasBypass(CheckType.NET_KEEPALIVEFREQUENCY, player, data)) {
             // Trigger a violation.
             final double vl = Math.max(first - 1f, data.keepAliveFreq.score(1f) - data.keepAliveFreq.numberOfBuckets());
-            if (executeActions(player, vl, 1.0, cc.keepAliveFrequencyActions)) {
+            if (executeActions(player, vl, 1.0, cc.keepAliveFrequencyActions).willCancel()) {
                 return true;
             }
         }

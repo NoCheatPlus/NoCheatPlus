@@ -35,7 +35,7 @@ public class FlyingFrequency extends Check {
     public boolean check(final Player player, final DataPacketFlying packetData, final long time, final NetData data, final NetConfig cc) {
         data.flyingFrequencyAll.add(time, 1f);
         final float allScore = data.flyingFrequencyAll.score(1f);
-        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !CheckUtils.hasBypass(CheckType.NET_FLYINGFREQUENCY, player, data) && executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions)) {
+        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !CheckUtils.hasBypass(CheckType.NET_FLYINGFREQUENCY, player, data) && executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions).willCancel()) {
             return true;
         } else {
             return false;

@@ -38,10 +38,10 @@ public class NoSwing extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.noSwingVL, 1D, cc.noSwingActions);
+            cancel = executeActions(player, data.noSwingVL, 1D, cc.noSwingActions).willCancel();
         }
 
         return cancel;
     }
-    
+
 }

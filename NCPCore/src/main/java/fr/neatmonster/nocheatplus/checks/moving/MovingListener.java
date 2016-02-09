@@ -1447,7 +1447,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (!pLoc.isOnGround(1.0, 0.3, 0.1) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()) {
                 // Likely a new style no-fall bypass (damage in mid-air).
                 data.noFallVL += 1.0;
-                if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions) && data.hasSetBack()) {
+                if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel() && data.hasSetBack()) {
                     // Cancel the event and restore fall distance.
                     // NoFall data will not be reset 
                     allowReset = false;

@@ -55,7 +55,7 @@ public class Against extends Check {
             final ViolationData vd = new ViolationData(this, player, data.againstVL, 1, cc.againstActions);
             vd.setParameter(ParameterName.BLOCK_TYPE, placedMat.toString());
             vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(placedMat)));
-            return executeActions(vd);
+            return executeActions(vd).willCancel();
         } else {
             data.againstVL *=  0.99; // Assume one false positive every 100 blocks.
             return false;

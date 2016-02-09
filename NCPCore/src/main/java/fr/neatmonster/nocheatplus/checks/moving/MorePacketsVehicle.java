@@ -44,26 +44,26 @@ public class MorePacketsVehicle extends Check {
      * @return the location
      */
     public Location check(final Player player, final Location from, final Location to, final MovingData data, final MovingConfig cc) {
-    	// Take time once, first:
-    	final long time = System.currentTimeMillis();
+        // Take time once, first:
+        final long time = System.currentTimeMillis();
 
         Location newTo = null;
 
         if (!data.hasMorePacketsVehicleSetBack()){
-        	// TODO: Check if other set-back is appropriate or if to set on other events.
-        	data.setMorePacketsVehicleSetBack(from);
-        	if (data.morePacketsVehicleTaskId != -1) {
-        		// TODO: Set back outdated or not?
-        		Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
-        	}
+            // TODO: Check if other set-back is appropriate or if to set on other events.
+            data.setMorePacketsVehicleSetBack(from);
+            if (data.morePacketsVehicleTaskId != -1) {
+                // TODO: Set back outdated or not?
+                Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
+            }
         }
 
         // Take a packet from the buffer.
         data.morePacketsVehicleBuffer--;
-        
+
         if (data.morePacketsVehicleTaskId != -1){
-        	// Short version !
-        	return data.getMorePacketsVehicleSetBack();
+            // Short version !
+            return data.getMorePacketsVehicleSetBack();
         }
 
         // Player used up buffer, they fail the check.
@@ -76,10 +76,10 @@ public class MorePacketsVehicle extends Check {
             // cancel the event.
             final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions);
             if (data.debug || vd.needsParameters()) {
-            	vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsVehicleBuffer));
+                vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsVehicleBuffer));
             }
-            if (executeActions(vd)){
-            	newTo = data.getMorePacketsVehicleSetBack();
+            if (executeActions(vd).willCancel()){
+                newTo = data.getMorePacketsVehicleSetBack();
             }
         }
 
@@ -93,32 +93,32 @@ public class MorePacketsVehicle extends Check {
             // If there was a long pause (maybe server lag?), allow buffer to grow up to 100.
             if (seconds > 2) {
                 if (data.morePacketsVehicleBuffer > 100) {
-                	data.morePacketsVehicleBuffer = 100;
+                    data.morePacketsVehicleBuffer = 100;
                 }
             } else if (data.morePacketsVehicleBuffer > 50) {
-            	// Only allow growth up to 50.
+                // Only allow growth up to 50.
                 data.morePacketsVehicleBuffer = 50;
             }
-            
+
             // Set the new "last" time.
             data.morePacketsVehicleLastTime = time;
 
             // Set the new "setback" location.
             if (newTo == null) {
-            	data.setMorePacketsVehicleSetBack(from);
+                data.setMorePacketsVehicleSetBack(from);
             }
         } else if (data.morePacketsVehicleLastTime > time) {
-        	// Security check, maybe system time changed.
+            // Security check, maybe system time changed.
             data.morePacketsVehicleLastTime = time;
         }
 
         if (newTo == null) {
-        	return null;
+            return null;
         }
 
         // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to allow the
         // player to look somewhere else despite getting pulled back by NoCheatPlus.
         return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
     }
-    
+
 }

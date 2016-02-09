@@ -45,9 +45,8 @@ public abstract class Action <D extends ActionData, L extends AbstractActionList
      * 
      * @param violationData
      *            the violation data
-     * @return true, if to cancel players actions, false otherwise. [SUBJECT TO REMOVAL]
      */
-    public abstract boolean execute(final D violationData);
+    public abstract void execute(final D violationData);
 
     /**
      * Check if parameters are needed at all for faster processing.

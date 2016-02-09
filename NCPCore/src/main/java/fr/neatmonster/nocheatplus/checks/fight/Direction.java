@@ -71,7 +71,7 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
+            cancel = executeActions(player, data.directionVL, distance, cc.directionActions).willCancel();
 
             if (cancel) {
                 // Deal an attack penalty time.
@@ -176,7 +176,7 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, context.minViolation, cc.directionActions);
+            cancel = executeActions(player, data.directionVL, context.minViolation, cc.directionActions).willCancel();
 
             if (cancel) {
                 // Deal an attack penalty time.

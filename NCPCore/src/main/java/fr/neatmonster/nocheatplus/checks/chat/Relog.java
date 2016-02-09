@@ -9,11 +9,11 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class Relog extends Check {
 
-	public Relog() {
-		super(CheckType.CHAT_RELOG);
-	}
-	
-	   /**
+    public Relog() {
+        super(CheckType.CHAT_RELOG);
+    }
+
+    /**
      * Check (Join), only call from synchronized code.
      * 
      * @param player
@@ -30,7 +30,7 @@ public class Relog extends Check {
         final long now = System.currentTimeMillis();
 
         final CombinedData cData = CombinedData.getData(player);
-        
+
         // Enforce the player does not relog too fast.
         if (now - cData.lastLogoutTime < cc.relogTimeout) {
             if (now - data.relogWarningTime > cc.relogWarningTimeout)
@@ -42,7 +42,7 @@ public class Relog extends Check {
             } else{
                 // Find out if we need to ban the player or not.
                 data.relogVL += 1D;
-                cancel = executeActions(player, (double) data.relogVL, 1D, cc.relogActions);
+                cancel = executeActions(player, (double) data.relogVL, 1D, cc.relogActions).willCancel();
             }
         }
         // TODO: decrease relog vl ?

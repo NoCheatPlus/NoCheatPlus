@@ -26,11 +26,21 @@ public interface IViolationInfo extends ParameterHolder {
     public double getTotalVl();
 
     /**
-     * Check if the actions contain a cancel action.
+     * Check if a cancel would happen.
+     * 
+     * @return
+     * @deprecated The concept of cancel has been changed to be contained in
+     *             penalties, use willCancel instead.
+     */
+    public boolean hasCancel();
+
+    /**
+     * Test, if the evaluation of penalties will lead to canceling. This may be
+     * overridden, if violation processing is cancelled by a hook.
      * 
      * @return
      */
-    public boolean hasCancel();
+    public boolean willCancel();
 
     /**
      * Test if there is any instances of (Generic)LogAction set in the

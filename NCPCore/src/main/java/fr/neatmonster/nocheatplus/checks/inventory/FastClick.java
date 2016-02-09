@@ -128,7 +128,7 @@ public class FastClick extends Check {
         if (violation > 0){
             data.fastClickVL += violation;
             final ViolationData vd = new ViolationData(this, player, data.fastClickVL, violation, cc.fastClickActions);
-            cancel = executeActions(vd);
+            cancel = executeActions(vd).willCancel();
         }
 
         if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){

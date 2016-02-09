@@ -46,12 +46,12 @@ public class Direction extends Check {
 
             // Add the overall violation level of the check.
             data.directionVL += distance;
-            
+
             // TODO: Set distance parameter.
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
+            cancel = executeActions(player, data.directionVL, distance, cc.directionActions).willCancel();
         } else
             // Player did likely nothing wrong, reduce violation counter to reward them.
             data.directionVL *= 0.9D;

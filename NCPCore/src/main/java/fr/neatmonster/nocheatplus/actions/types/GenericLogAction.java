@@ -108,10 +108,10 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
     }
 
     @Override
-    public boolean execute(final ViolationData violationData) {
+    public void execute(final ViolationData violationData) {
         // TODO: Consider permission caching or removing the feature? [Besides, check earlier?]
         if (violationData.player.hasPermission(violationData.getPermissionSilent())) {
-            return false;
+            return;
         }
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
         final String message = super.getMessage(violationData);
@@ -125,7 +125,6 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
             }
             logManager.log(config.streamID, config.level, config.chatColor ? messageWithColor : messageNoColor);
         }
-        return false;
     }
 
     /**

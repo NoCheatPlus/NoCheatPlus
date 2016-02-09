@@ -37,7 +37,7 @@ public class Gutenberg extends Check implements Listener {
         }
         // Violation.
         final int vl = pages - 50;
-        if (executeActions(player, vl, vl, cc.gutenbergActions)) {
+        if (executeActions(player, vl, vl, cc.gutenbergActions).willCancel()) {
             event.setCancelled(true);
         }
     }

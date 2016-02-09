@@ -13,23 +13,22 @@ public class DummyAction<D extends ActionData, L extends AbstractActionList<D, L
     /** The original string used for this action definition. */
     protected final String definition;
 
-	/**
-	 * Instantiates a new dummy.
-	 * 
-	 * @param definition
-	 *            the definition
-	 */
-	public DummyAction(final String definition) {
-		super("dummyAction", 0, 0);
-		this.definition = definition;
-	}
+    /**
+     * Instantiates a new dummy.
+     * 
+     * @param definition
+     *            the definition
+     */
+    public DummyAction(final String definition) {
+        super("dummyAction", 0, 0);
+        this.definition = definition;
+    }
 
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
      */
     @Override
-    public boolean execute(final D violationData) {
-        return false;
+    public void execute(final D violationData) {
     }
 
     /* (non-Javadoc)
@@ -40,11 +39,11 @@ public class DummyAction<D extends ActionData, L extends AbstractActionList<D, L
         return definition;
     }
 
-	@Override
-	public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold)
-	{
-		// Never execute this.
-		return null;
-	}
+    @Override
+    public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold)
+    {
+        // Never execute this.
+        return null;
+    }
 
 }

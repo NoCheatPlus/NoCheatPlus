@@ -110,8 +110,7 @@ public class AutoSign extends Check {
         if (vd.needsParameters()){
             vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
         }
-        return executeActions(vd);
+        return executeActions(vd).willCancel();
     }
-
 
 }

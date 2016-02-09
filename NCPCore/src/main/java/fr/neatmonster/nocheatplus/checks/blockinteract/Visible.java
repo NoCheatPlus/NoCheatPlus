@@ -143,7 +143,7 @@ public class Visible extends Check {
             //                // TODO: Consider adding the start/end/block-type information if debug is set.
             //                vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             //            }
-            if (executeActions(vd)) {
+            if (executeActions(vd).willCancel()) {
                 cancel = true;
             }
         }

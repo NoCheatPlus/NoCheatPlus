@@ -76,7 +76,7 @@ public class Commands extends Check {
                 }
                 return true;
             }
-            else if (executeActions(player, data.commandsVL, violation, cc.commandsActions))
+            else if (executeActions(player, data.commandsVL, violation, cc.commandsActions).willCancel())
                 return true;
         }
         else if (cc.chatWarningCheck && now - data.chatWarningTime > cc.chatWarningTimeout && (100f * nw / cc.commandsLevel > cc.chatWarningLevel || 100f * data.commandsShortTermWeight / cc.commandsShortTermLevel > cc.chatWarningLevel)){

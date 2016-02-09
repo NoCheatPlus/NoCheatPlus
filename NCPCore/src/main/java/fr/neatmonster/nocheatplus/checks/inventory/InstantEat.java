@@ -62,7 +62,7 @@ public class InstantEat extends Check {
             if (data.instantEatFood != null) {
                 vd.setParameter(ParameterName.FOOD, data.instantEatFood.toString());
             }
-            cancel = executeActions(vd);
+            cancel = executeActions(vd).willCancel();
         }
 
         data.instantEatInteract = 0;

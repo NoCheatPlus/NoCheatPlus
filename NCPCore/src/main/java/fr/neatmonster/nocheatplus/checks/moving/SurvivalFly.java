@@ -2141,7 +2141,7 @@ public class SurvivalFly extends Check {
             vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
         }
         // Some resetting is done in MovingListener.
-        if (executeActions(vd)) {
+        if (executeActions(vd).willCancel()) {
             // Set-back + view direction of to (more smooth).
             return data.getSetBack(to);
         }
@@ -2172,7 +2172,7 @@ public class SurvivalFly extends Check {
             vd.setParameter(ParameterName.DISTANCE, "0.0(HOVER)");
             vd.setParameter(ParameterName.TAGS, "hover");
         }
-        if (executeActions(vd)) {
+        if (executeActions(vd).willCancel()) {
             // Set-back or kick.
             if (data.hasSetBack()) {
                 final Location newTo = data.getSetBack(loc);

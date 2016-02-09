@@ -40,7 +40,7 @@ public class Speed extends Check {
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
-                cancel = executeActions(player, data.speedVL, difference, cc.speedActions);
+                cancel = executeActions(player, data.speedVL, difference, cc.speedActions).willCancel();
             }
 
             data.speedLastRefused = true;

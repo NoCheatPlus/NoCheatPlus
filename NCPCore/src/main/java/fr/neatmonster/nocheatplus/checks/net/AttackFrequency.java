@@ -77,7 +77,7 @@ public class AttackFrequency extends Check {
                 vd.setParameter(ParameterName.LIMIT, Integer.toString((int) maxLimit));
                 vd.setParameter(ParameterName.TAGS, tags);
             }
-            if (executeActions(vd)) {
+            if (executeActions(vd).willCancel()) {
                 cancel = true;
             }
             // Feed Improbable.
