@@ -709,14 +709,21 @@ public class PlayerLocation {
      * above the eye height of the player.
      * 
      * @param marginAboveEyeHeight
+     *            Must be greater than or equal zero.
      * @param stepCorrection
      *            If set to true, a correction method is used for leniency.
      * @return
+     * @throws IllegalArgumentException
+     *             If marginAboveEyeHeight is smaller than 0.
      */
     public boolean isHeadObstructed(double marginAboveEyeHeight, boolean stepCorrection) {
+        if (marginAboveEyeHeight < 0.0) {
+            throw new IllegalArgumentException("marginAboveEyeHeight must be greater than 0.");
+        }
+        // TODO: Add test for this bit of code.
         if (stepCorrection) {
             double ref = maxY + marginAboveEyeHeight;
-            ref = ref - Location.locToBlock(ref) + 0.35;
+            ref = ref - (double) Location.locToBlock(ref) + 0.35;
             for (double bound = 1.0; bound > 0.0; bound -= 0.25) {
                 if (ref >= bound) {
                     // Use this level for correction.
