@@ -13,6 +13,7 @@ Tips
 ---------
 * Be sure that your CraftBukkit and NoCheatPlus versions match together.
 * Don't use tabs in the config.yml file.
+* Use [ProtocolLib] (http://dev.bukkit.org/bukkit-plugins/protocollib) for full efficiency of the fight checks and other.
 * For compatibility with other plugins such as mcMMO, citizens and more check out [CompatNoCheatPlus] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/).
 
 Compiling NoCheatPlus
@@ -51,4 +52,5 @@ Developers
 * [Contribute] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
 
 Related
+* [ProtocolLib at BukkitDev] (http://dev.bukkit.org/bukkit-plugins/protocollib)
 * [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
