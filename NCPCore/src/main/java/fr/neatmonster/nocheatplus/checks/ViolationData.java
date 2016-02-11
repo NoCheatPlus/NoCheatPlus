@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.GenericLogAction;
 import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
+import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.actions.types.penalty.InputSpecificPenalty;
 import fr.neatmonster.nocheatplus.actions.types.penalty.Penalty;
 import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
@@ -60,7 +61,28 @@ public class ViolationData implements IViolationInfo, ActionData {
     /** hasPlayerEffects returned true. */
     private ArrayList<Penalty> playerPenalties = null;
     /** hasInputSpecificEffects returned true. */
-    private ArrayList<InputSpecificPenalty> inputSpecificPenalties = null;
+    private final IPenaltyList penaltyList;
+
+    /**
+     * Instantiates a new violation data without syupport for input-specific penalties..
+     * <hr>
+     * This constructor must be thread-safe for checks that might be executed
+     * outside of the primary thread.
+     * 
+     * @param check
+     *            the check
+     * @param player
+     *            the player
+     * @param vL
+     *            the violation level
+     * @param addedVL
+     *            the violation level added
+     * @param actions
+     *            the actions
+     */
+    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions) {
+        this(check, player, vL, addedVL, actions, null);
+    }
 
     /**
      * Instantiates a new violation data.
@@ -78,14 +100,17 @@ public class ViolationData implements IViolationInfo, ActionData {
      *            the violation level added
      * @param actions
      *            the actions
+     * @param penaltyList
+     *            IPenaltyList instances for filling in, or null to skip.
      */
-    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions) {
+    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions, final IPenaltyList penaltyList) {
         this.check = check;
         this.player = player;
         this.vL = vL;
         this.addedVL = addedVL;
         this.actions = actions;
         this.applicableActions = actions.getActions(vL); // TODO: Consider storing applicableActions only if history wants it.
+        this.penaltyList = penaltyList;
         boolean needsParameters = false;
 
         final ArrayList<Penalty> applicablePenalties = new ArrayList<Penalty>();
@@ -133,28 +158,10 @@ public class ViolationData implements IViolationInfo, ActionData {
                     }
                     playerPenalties.add(penalty);
                 }
-                if (penalty.hasInputSpecificEffects()) {
-                    if (inputSpecificPenalties == null) {
-                        inputSpecificPenalties = new ArrayList<InputSpecificPenalty>();
-                    }
-                    inputSpecificPenalties.add((InputSpecificPenalty) penalty);
+                if (penaltyList != null && penalty.hasInputSpecificEffects()) {
+                    penaltyList.addInputSpecificPenalty((InputSpecificPenalty) penalty);
                 }
             }
-        }
-    }
-
-    /**
-     * Call with a specific input (obviously not meant for vast number of
-     * penalties and/or a a vast number of calls with differing input types).
-     * 
-     * @param input
-     */
-    public void applyInputSpecificPenalties(final Object input) {
-        if (inputSpecificPenalties == null) {
-            return;
-        }
-        for (int i = 0; i < inputSpecificPenalties.size(); i++) {
-            inputSpecificPenalties.get(i).apply(input);
         }
     }
 
