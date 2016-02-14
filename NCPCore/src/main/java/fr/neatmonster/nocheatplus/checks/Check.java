@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
+import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -97,13 +98,34 @@ public abstract class Check implements MCAccessHolder {
      * Execute actions, thread-safe.<br>
      * 
      * @param player
-     *            the player
-     * @param VL
-     *            the vL
+     *            The player who failed a check.
+     * @param vL
+     *            The total check-specific violation level.
+     * @param addedVL
+     *            The violation level, that has been added with this violation.
      * @param actions
-     *            the actions
-     * @param isMainThread
-     *            if the thread the main thread
+     *            The ActionList to use for this violation.
+     * @param penaltyList
+     *            IPenaltyList instance to fill in penalties for specific input
+     *            other than Player.
+     * @return The ViolationData instance that is created for execution of
+     *         actions.
+     */
+    public ViolationData executeActions(final Player player, final double vL, final double addedVL, final ActionList actions, final IPenaltyList penaltyList) {
+        return executeActions(new ViolationData(this, player, vL, addedVL, actions, penaltyList));
+    }
+
+    /**
+     * Execute actions, thread-safe.<br>
+     * 
+     * @param player
+     *            The player who failed a check.
+     * @param vL
+     *            The total check-specific violation level.
+     * @param addedVL
+     *            The violation level, that has been added with this violation.
+     * @param actions
+     *            The ActionList to use for this violation.
      * @return The ViolationData instance that is created for execution of
      *         actions.
      */
