@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -205,38 +206,52 @@ public class BlockPlaceListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.isCancelled()) {
+            // TODO: Might run checks if (event.useInteractedBlock()) ...
+            return;
+        }
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
         final Player player = event.getPlayer();
 
         final ItemStack stack = player.getItemInHand();
-        if (stack == null) return;
+        if (stack == null) {
+            return;
+        }
 
         final Material type = stack.getType();
-
-        if (type == Material.BOAT){
+        if (type == Material.BOAT) {
             // Check boats-anywhere.
             final org.bukkit.block.Block block = event.getClickedBlock();
             final Material mat = block.getType();
 
             // TODO: allow lava ?
-            if (mat == Material.WATER || mat == Material.STATIONARY_WATER) return;
+            if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
+                return;
+            }
 
             final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
             final Material relMat = relBlock.getType();
 
             // TODO: Placing inside of water, but not "against" ?
-            if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
+            if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) {
+                return;
+            }
 
-            if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)){
+            // TODO: Add a check type for exemption?
+            if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
+                final Result previousUseBlock = event.useInteractedBlock();
                 event.setCancelled(true);
+                event.setUseItemInHand(Result.DENY);
+                event.setUseInteractedBlock(previousUseBlock == Result.DEFAULT ? Result.ALLOW : previousUseBlock);
                 counters.addPrimaryThread(idBoatsAnywhere, 1);
             }
 
         }
-        else if (type == Material.MONSTER_EGG){
+        else if (type == Material.MONSTER_EGG) {
             // Check blockplace.speed.
             if (speed.isEnabled(player) && speed.check(player)) {
                 // If the check was positive, cancel the event.
