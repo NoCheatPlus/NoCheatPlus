@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,8 +47,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.actions.ActionList;
+import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
@@ -588,6 +593,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // (thisMove.flyCheck stays UNKNOWN.)
         }
 
+        // Extreme move check (sf or cf is precondition, should have their own config/actions later).
+        if ((checkSf || checkCf) && 
+                (Math.abs(data.thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) || data.thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
+            // Test for friction and velocity.
+            newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
+        }
+
         boolean checkNf = true;
         boolean verticalBounce = false;
         if (checkSf || checkCf) {
@@ -779,6 +791,96 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             onSetBack(player, event, newTo, data, cc);
             return true;
         }
+    }
+
+    /**
+     * Check for extremely large moves. Initial intention is to prevent cheaters
+     * from creating extreme load. SurvivalFly or CreativeFly is needed.
+     * 
+     * @param player
+     * @param from
+     * @param to
+     * @param data
+     * @param cc
+     * @return
+     */
+    @SuppressWarnings("unused")
+    private Location checkExtremeMove(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+        final MoveData thisMove = data.thisMove;
+        final MoveData lastMove = data.moveData.get(0);
+        // TODO: Latency effects.
+        double violation = 0.0; // h + v violation (full move).
+        // Vertical move.
+        final boolean allowVerticalVelocity = false; // TODO: Configurable
+        if (Math.abs(thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) {
+            // Exclude valid moves first.
+            // About 3.9 seems to be the positive maximum for velocity use in survival mode, regardless jump effect.
+            // About -1.85 seems to be the negative maximum for velocity use in survival mode. Falling can result in slightly less than -3.
+            if (lastMove.toIsValid && Math.abs(thisMove.yDistance) < Math.abs(lastMove.yDistance)
+                    && (thisMove.yDistance > 0.0 && lastMove.yDistance > 0.0 
+                            || thisMove.yDistance < 0.0 && lastMove.yDistance < 0.0) 
+                            || allowVerticalVelocity && data.getOrUseVerticalVelocity(thisMove.yDistance) != null) {
+                // Speed decreased or velocity is present.
+            }
+            else {
+                // Violation.
+                violation += thisMove.yDistance; // Could subtract lastMove.yDistance.
+            }
+        }
+        // Horizontal move.
+        if (thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
+            // Exclude valid moves first.
+            // Observed maximum use so far: 5.515
+            // TODO: Velocity flag too (if combined with configurable distances)?
+            final double amount = thisMove.hDistance - data.getHorizontalFreedom(); // Will change with model change.
+            if (amount < 0.0 || lastMove.toIsValid && thisMove.hDistance - lastMove.hDistance <= 0.0 
+                    || data.useHorizontalVelocity(amount) >= amount) {
+                // Speed decreased or velocity is present.
+            }
+            else {
+                // Violation.
+                violation += thisMove.hDistance; // Could subtract lastMove.yDistance.
+            }
+        }
+        if (violation > 0.0) {
+            // Ensure a set-back location is present.
+            if (!data.hasSetBack()) {
+                data.setSetBack(from);
+            }
+            // Process violation as sub check of the appropriate fly check.
+            violation *= 100.0;
+            final Check check;
+            final ActionList actions;
+            final double vL;
+            if (thisMove.flyCheck == CheckType.MOVING_SURVIVALFLY) {
+                check = survivalFly;
+                actions = cc.survivalFlyActions;
+                data.survivalFlyVL += violation;
+                vL = data.survivalFlyVL;
+            }
+            else {
+                check = creativeFly;
+                actions = cc.creativeFlyActions;
+                data.creativeFlyVL += violation;
+                vL = data.creativeFlyVL;
+            }
+            final ViolationData vd = new ViolationData(check, player, vL, violation, actions);
+            // TODO: Reduce copy and paste (method to fill in locations, once using exact coords and latering default actions).
+            if (vd.needsParameters()) {
+                vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
+                vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
+                vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from, to)));
+                vd.setParameter(ParameterName.TAGS, "EXTREME_MOVE");
+            }
+            // Some resetting is done in MovingListener.
+            if (check.executeActions(vd).willCancel()) {
+                // Set-back + view direction of to (more smooth).
+                return data.getSetBack(to);
+            }
+        }
+        // No cancel intended.
+        return null;
+
     }
 
     /**

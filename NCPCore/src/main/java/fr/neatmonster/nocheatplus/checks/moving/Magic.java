@@ -52,6 +52,13 @@ public class Magic {
 
     // Other constants.
     public static final double PAPER_DIST = 0.01;
+    /**
+     * Extreme move check threshold (Actual like 3.9 upwards with velocity,
+     * velocity downwards may be like -1.835 max., but falling will be near 3
+     * too.)
+     */
+    public static final double EXTREME_MOVE_DIST_VERTICAL = 4.0;
+    public static final double EXTREME_MOVE_DIST_HORIZONTAL = 22.0;
 
     /**
      * The absolute per-tick base speed for swimming vertically.
