@@ -73,7 +73,10 @@ public interface MCAccess {
     public AlmostBoolean isBlockLiquid(int id);
 
     /**
-     * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
+     * Does only check y bounds, returns false if dead. This is called by
+     * PlayerLocation.hasIllegalStance(), PlayerLocation.hasIllegalCoords()
+     * should always be checked first.
+     * 
      * @param player
      * @return MAYBE if undecided, YES or NO if decided.
      */
