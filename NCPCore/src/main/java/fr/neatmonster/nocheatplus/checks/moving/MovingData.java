@@ -1036,7 +1036,10 @@ public class MovingData extends ACheckData {
         morePacketsVehicleLastTime = Math.min(morePacketsVehicleLastTime, time);
         sfCobwebTime = Math.min(sfCobwebTime, time);
         sfVLTime = Math.min(sfVLTime, time);
-        trace.reset(); // Might implement something better some time (trace.handleTimeRanBackwards -> set time values, object pool).
+        if (trace != null) {
+            // Might implement something better some time (trace.handleTimeRanBackwards -> set time values, object pool).
+            trace = null;
+        }
         clearAccounting(); // Not sure: adding up might not be nice.
         removeAllVelocity(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
