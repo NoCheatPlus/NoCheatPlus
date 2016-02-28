@@ -22,24 +22,54 @@ public final class BridgeEnchant {
     private final static Enchantment THORNS = parseEnchantment("THORNS");
 
     /**
+     * Retrieve the maximum level for an enchantment, present in armor slots.
      * 
      * @param player
-     * @return Maximum level of DEPTH_STRIDER found on armor items, capped at 3. Will return 0 if not available.
+     * @param enchantment
+     *            If null, 0 will be returned.
+     * @return 0 if none found, or the maximum found.
      */
-    public static int getDepthStriderLevel(final Player player) {
+    private static int getMaxLevelArmor(final Player player, final Enchantment enchantment) {
+        if (enchantment == null) {
+            return 0;
+        }
         int level = 0;
-        if (DEPTH_STRIDER != null) {
-            // Find the maximum level of depth strider.
-            final ItemStack[] armor = player.getInventory().getArmorContents();
-            for (int i = 0; i < armor.length; i++) {
-                final ItemStack item = armor[i];
-                if (!BlockProperties.isAir(item)) {
-                    level = Math.max(item.getEnchantmentLevel(DEPTH_STRIDER), level);
-                }
+        // Find the maximum level for the given enchantment.
+        final ItemStack[] armor = player.getInventory().getArmorContents();
+        for (int i = 0; i < armor.length; i++) {
+            final ItemStack item = armor[i];
+            if (!BlockProperties.isAir(item)) {
+                level = Math.max(item.getEnchantmentLevel(enchantment), level);
             }
         }
-        // Cap at three.
-        return Math.min(3, level);
+        return level;
+    }
+
+    /**
+     * Test, if there is any armor with the given enchantment on.
+     * 
+     * @param player
+     * @param enchantment
+     *            If null, false will be returned.
+     * @return
+     */
+    private static boolean hasArmor(final Player player, final Enchantment enchantment) {
+        if (enchantment == null) {
+            return false;
+        }
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getArmorContents();
+        for (int i = 0; i < contents.length; i++){
+            final ItemStack stack = contents[i];
+            if (stack != null && stack.getEnchantmentLevel(enchantment) > 0){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasThorns() {
+        return THORNS != null;
     }
 
     public static boolean hasDepthStrider() {
@@ -47,23 +77,25 @@ public final class BridgeEnchant {
     }
 
     /**
-     * Check if a player might return some damage due to the "thorns" enchantment.
+     * Check if the player might return some damage due to the "thorns"
+     * enchantment.
+     * 
      * @param player
      * @return
      */
     public static boolean hasThorns(final Player player) {
-        if (THORNS == null) {
-            return false;
-        }
-        final PlayerInventory inv = player.getInventory();
-        final ItemStack[] contents = inv.getArmorContents();
-        for (int i = 0; i < contents.length; i++){
-            final ItemStack stack = contents[i];
-            if (stack != null && stack.getEnchantmentLevel(THORNS) > 0){
-                return true;
-            }
-        }
-        return false;
+        return hasArmor(player, THORNS);
+    }
+
+    /**
+     * 
+     * @param player
+     * @return Maximum level of DEPTH_STRIDER found on armor items, capped at 3.
+     *         Will return 0 if not available.
+     */
+    public static int getDepthStriderLevel(final Player player) {
+        // Cap at three.
+        return Math.min(3, getMaxLevelArmor(player, DEPTH_STRIDER));
     }
 
 }
