@@ -414,10 +414,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(moveInfo.useLoc);
         final MoveData lastMove = data.moveData.getFirst();
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
-        if (TrigUtil.isSamePos(from, loc) 
+        if (
+                // Handling split moves has been disabled.
+                !cc.splitMoves ||
+                // The usual case: no micro move happened.
+                TrigUtil.isSamePos(from, loc)
+                // Special case / bug? TODO: Which/why, which version of MC/spigot?
                 || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.from.x, lastMove.from.y, lastMove.from.z)
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
-                //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN 
+                //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN
                 ) {
             // Fire move from -> to
             // (Special case: Location has not been updated last moving event.)

@@ -598,6 +598,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_SURVIVALFLY_YSTEP                    = MOVING_SURVIVALFLY + "ystep";
 
     // General.
+    public static final String  MOVING_SPLITMOVES                           = MOVING + "splitmoves"; // Needs better categories...
     public static final String  MOVING_TEMPKICKILLEGAL                      = MOVING + "tempkickillegal";
     public static final String  MOVING_IGNORESTANCE                         = MOVING + "ignorestance";
     // TODO: Might add a section for illegal move.

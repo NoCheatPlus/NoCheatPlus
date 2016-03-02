@@ -167,6 +167,11 @@ public class MovingConfig extends ACheckConfig {
     public final double     yOnGround;
 
     // General things.
+    /**
+     * If to allow splitting moves, due to player.getLocation reflecting
+     * soemthing else than from/to.
+     */
+    public final boolean splitMoves;
     public final boolean ignoreStance;
     public final boolean tempKickIllegal;
     public final boolean loadChunksOnJoin;
@@ -277,6 +282,8 @@ public class MovingConfig extends ACheckConfig {
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, yOnGround);
 
         // TODO: Ignore the stance, once it is known that the server catches such.
+        AlmostBoolean refSplitMoves = config.getAlmostBoolean(ConfPaths.MOVING_SPLITMOVES, AlmostBoolean.MAYBE);
+        splitMoves = refSplitMoves == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") == -1 : refSplitMoves.decide();
         AlmostBoolean refIgnoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.MAYBE);
         ignoreStance = refIgnoreStance == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.8") >= 0 : refIgnoreStance.decide();
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
