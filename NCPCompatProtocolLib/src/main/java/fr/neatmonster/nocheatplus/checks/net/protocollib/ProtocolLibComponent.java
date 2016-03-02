@@ -80,7 +80,12 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
             // (Set lastKeepAlive if this or fight.godmode is enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveAdapter", plugin);
         }
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
+        if (ServerVersion.compareMinecraftVersion("1.9") >= 0) {
+            // Don't use this listener.
+            // TODO: Add module for ProtocolLib 3.7 ?
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Disable SoundDistance due to incompatibilities.");
+        }
+        else if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.SoundDistance", plugin);
         }
         if (!registeredPacketAdapters.isEmpty()) {

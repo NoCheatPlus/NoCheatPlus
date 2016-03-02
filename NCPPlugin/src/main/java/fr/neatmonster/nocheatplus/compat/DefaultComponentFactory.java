@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.Streams;
 
 /**
  * Default factory for add-in components which might only be available under certain circumstances.
@@ -63,18 +64,45 @@ public class DefaultComponentFactory {
 
         // ProtocolLib dependencies.
         Plugin pluginProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-        try {
-            if (ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) 
-                    || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false)
-                    && pluginProtocolLib != null && GenericVersion.compareVersions("3.6.4", pluginProtocolLib.getDescription().getVersion()) == 0) {
-                available.add(new ProtocolLibComponent(plugin));
-            } else {
-                if (pluginProtocolLib != null) {
-                    StaticLog.logWarning("Can't tell if the packet level hooks are compatible to the version of ProtocolLib in use. NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, and ProtocolLib 3.6.4 or later on Minecraft 1.8 (and later).");
-                }
-                StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
+        boolean protocolLibAvailable = false;
+        if (pluginProtocolLib != null) {
+            String _pV = pluginProtocolLib.getDescription().getVersion().toLowerCase();
+            String pV = GenericVersion.collectVersion(_pV, 0);
+            if (pV == null) {
+                pV = GenericVersion.parseVersionDelimiters(_pV, "", "-snapshot");
             }
-        } catch (Throwable t){
+            if (pV == null) {
+                
+            }
+            else {
+                try {
+                    boolean vP1 = GenericVersion.compareVersions("3.6.4", pV) == 0;
+                    boolean vP2 = GenericVersion.compareVersions("3.6.5", pV) == 0;
+                    boolean vP3 = GenericVersion.compareVersions("3.7", pV) == 0;
+                    if (
+                            ServerVersion.isMinecraftVersionBetween("1.9", true, "2.0", false)
+                            && vP3
+                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) 
+                            &&
+                            (vP1 || vP2) 
+                            || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false)
+                            && vP1
+                            ) {
+                        available.add(new ProtocolLibComponent(plugin));
+                        protocolLibAvailable = true;
+                    }
+                } catch (Throwable t){
+                    StaticLog.logWarning("Failed to set up packet level hooks.");
+                    if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.INIT, t);
+                    }
+                }
+            }
+        }
+        if (!protocolLibAvailable) {
+            if (pluginProtocolLib != null) {
+                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9 [EXPERIMENTAL].");
+            }
             StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
 

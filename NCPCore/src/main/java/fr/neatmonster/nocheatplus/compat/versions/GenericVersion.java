@@ -90,7 +90,7 @@ public class GenericVersion {
      * @param suffix
      * @return
      */
-    protected static String parseVersionDelimiters(String input, String prefix, String suffix) {
+    public static String parseVersionDelimiters(String input, String prefix, String suffix) {
         int preIndex = prefix.isEmpty() ? 0 : input.indexOf(prefix);
         if (preIndex != -1) {
             String candidate = input.substring(preIndex + prefix.length());
@@ -111,7 +111,7 @@ public class GenericVersion {
      * @param beginIndex
      * @return null if not successful.
      */
-    protected static String collectVersion(String input, int beginIndex) {
+    public static String collectVersion(String input, int beginIndex) {
         StringBuilder buffer = new StringBuilder(128);
         // Rigid scan by character.
         boolean numberFound = false;
