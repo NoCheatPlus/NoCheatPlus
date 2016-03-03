@@ -80,7 +80,7 @@ public class DefaultComponentFactory {
                     boolean vP2 = GenericVersion.compareVersions("3.6.5", pV) == 0;
                     boolean vP3 = GenericVersion.compareVersions("3.7", pV) == 0;
                     if (
-                            ServerVersion.isMinecraftVersionBetween("1.9", true, "2.0", false)
+                            ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false)
                             && vP3
                             || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) 
                             &&
