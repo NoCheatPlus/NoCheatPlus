@@ -196,20 +196,22 @@ public class DebugUtil {
         builder.append(" data=");
         builder.append(blockCache.getData(x, y, z));
         final double[] bounds = blockCache.getBounds(x, y, z);
-        final double minHeight = BlockProperties.getGroundMinHeight(blockCache, x, y, z, id, bounds, BlockProperties.getBlockFlags(id));
-        builder.append(" shape=[");
-        builder.append(bounds[0]);
-        builder.append(", ");
-        builder.append(bounds[1]);
-        builder.append(", ");
-        builder.append(bounds[2]);
-        builder.append(", ");
-        builder.append(bounds[3]);
-        builder.append(", ");
-        builder.append(minHeight == bounds[4] ? minHeight : (minHeight + ".." + bounds[4]));
-        builder.append(", ");
-        builder.append(bounds[5]);
-        builder.append("]");
+        if (bounds != null) {
+            final double minHeight = BlockProperties.getGroundMinHeight(blockCache, x, y, z, id, bounds, BlockProperties.getBlockFlags(id));
+            builder.append(" shape=[");
+            builder.append(bounds[0]);
+            builder.append(", ");
+            builder.append(bounds[1]);
+            builder.append(", ");
+            builder.append(bounds[2]);
+            builder.append(", ");
+            builder.append(bounds[3]);
+            builder.append(", ");
+            builder.append(minHeight == bounds[4] ? minHeight : (minHeight + ".." + bounds[4]));
+            builder.append(", ");
+            builder.append(bounds[5]);
+            builder.append("]");
+        }
     }
 
     /**

@@ -7,16 +7,20 @@ import java.lang.reflect.Method;
 
 /**
  * Auxiliary methods for dealing with reflection.
+ * 
  * @author asofold
  *
  */
 public class ReflectionUtil {
 
     /**
-     * Convenience method to check if members exist and fail if not. This checks getField(...) == null.
+     * Convenience method to check if members exist and fail if not. This checks
+     * getField(...) == null.
+     * 
      * @param prefix
      * @param specs
-     * @throws RuntimeException If any member is not present.
+     * @throws RuntimeException
+     *             If any member is not present.
      */
     public static void checkMembers(String prefix, String[]... specs){
         try {
@@ -37,10 +41,46 @@ public class ReflectionUtil {
     }
 
     /**
-     * Check for the given names if the method returns the desired type of result (exact check).
+     * Convenience method to check if members exist and fail if not. This checks
+     * getField(...) == null.
+     * 
+     * @param clazz
+     *            The class for which to check members for.
+     * @param type
+     *            The expected type of fields.
+     * @param fieldNames
+     *            The field names.
+     * @throws RuntimeException
+     *             If any member is not present or of wrong type.
+     */
+    public static void checkMembers(Class<?> clazz, Class<?> type, String... fieldNames){
+        try {
+            for (String fieldName : fieldNames){
+                Field field = clazz.getField(fieldName);
+                if (field == null) {
+                    throw new NoSuchFieldException(clazz.getName() + "." + fieldName + " does not exist.");
+                }
+                else if (field.getType() != type) {
+                    throw new NoSuchFieldException(clazz.getName() + "." + fieldName + " has wrong type: " + field.getType());
+                }
+            }
+        } catch (SecurityException e) {
+            // Let this one pass.
+            //throw new RuntimeException(e);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    /**
+     * Check for the given names if the method returns the desired type of
+     * result (exact check).
+     * 
      * @param methodNames
      * @param returnType
-     * @throws RuntimeException If one method is not existing or not matching return type or has arguments.
+     * @throws RuntimeException
+     *             If one method is not existing or not matching return type or
+     *             has arguments.
      */
     public static void checkMethodReturnTypesNoArgs(Class<?> objClass, String[] methodNames, Class<?> returnType){
         // TODO: Add check: boolean isStatic.
@@ -64,10 +104,15 @@ public class ReflectionUtil {
     }
 
     /**
-     * Dirty method to call a declared method with a generic parameter type. Does try+catch for method invocation and should not throw anything for the normal case. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
+     * Dirty method to call a declared method with a generic parameter type.
+     * Does try+catch for method invocation and should not throw anything for
+     * the normal case. Purpose for this is generic factory registration, having
+     * methods with type Object alongside methods with more specialized types.
+     * 
      * @param obj
      * @param methodName
-     * @param arg Argument or invoke the method with.
+     * @param arg
+     *            Argument or invoke the method with.
      * @return null in case of errors (can not be distinguished).
      */
     public static Object invokeGenericMethodOneArg(final Object obj, final String methodName, final Object arg){
@@ -113,10 +158,16 @@ public class ReflectionUtil {
     }
 
     /**
-     * Invoke a method without arguments, get the method matching the return types best, i.e. first type is preferred. At present a result is returned, even if the return type does not match at all.
+     * Invoke a method without arguments, get the method matching the return
+     * types best, i.e. first type is preferred. At present a result is
+     * returned, even if the return type does not match at all.
+     * 
      * @param obj
      * @param methodName
-     * @param returnTypePreference Most preferred return type first, might return null, might return a method with a completely different return type, comparison with ==, no isAssignableForm. TODO: really ?
+     * @param returnTypePreference
+     *            Most preferred return type first, might return null, might
+     *            return a method with a completely different return type,
+     *            comparison with ==, no isAssignableForm. TODO: really ?
      * @return
      */
     public static Object invokeMethodNoArgs(final Object obj, final String methodName, final Class<?> ...  returnTypePreference){
@@ -147,6 +198,7 @@ public class ReflectionUtil {
 
     /**
      * More fail-safe method invocation.
+     * 
      * @param method
      * @param object
      * @return null in case of failures (!).
@@ -163,6 +215,7 @@ public class ReflectionUtil {
 
     /**
      * Fail-safe call.
+     * 
      * @param method
      * @param object
      * @param arguments
@@ -180,6 +233,7 @@ public class ReflectionUtil {
 
     /**
      * Direct getMethod attempt.
+     * 
      * @param objClass
      * @param methodName
      * @param returnTypePreference
@@ -206,7 +260,9 @@ public class ReflectionUtil {
     }
 
     /**
-     * Iterate over all methods, attempt to return best matching return type (earliest in array).
+     * Iterate over all methods, attempt to return best matching return type
+     * (earliest in array).
+     * 
      * @param objClass
      * @param methodName
      * @param returnTypePreference
@@ -254,9 +310,11 @@ public class ReflectionUtil {
 
     /**
      * Get the field by name (and type). Failsafe.
+     * 
      * @param clazz
      * @param fieldName
-     * @param type Set to null to get any type of field.
+     * @param type
+     *            Set to null to get any type of field.
      * @return Field or null.
      */
     public static Field getField(Class<?> clazz, String fieldName, Class<?> type) {
@@ -273,6 +331,7 @@ public class ReflectionUtil {
 
     /**
      * Set the field fail-safe.
+     * 
      * @param field
      * @param object
      * @param value
@@ -317,6 +376,7 @@ public class ReflectionUtil {
 
     /**
      * Fail-safe getMethod.
+     * 
      * @param clazz
      * @param methodName
      * @param arguments
@@ -333,6 +393,7 @@ public class ReflectionUtil {
 
     /**
      * Get a method matching one of the declared argument specifications.
+     * 
      * @param clazz
      * @param methodName
      * @param argumentLists
@@ -351,6 +412,7 @@ public class ReflectionUtil {
 
     /**
      * Fail-safe.
+     * 
      * @param clazz
      * @param parameterTypes
      * @return null on errors.
@@ -366,6 +428,7 @@ public class ReflectionUtil {
 
     /**
      * Fail-safe.
+     * 
      * @param constructor
      * @param arguments
      * @return null on errors.

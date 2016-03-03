@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,6 +58,20 @@ public class StringUtil {
         return join(Arrays.asList(input), link);
     }
 
+    public static <O extends Object> String join(Iterator<O> iterator, String link) {
+        final StringBuilder builder = new StringBuilder(1024);
+        boolean first = true;
+        while (iterator.hasNext()) {
+            final Object obj = iterator.next();
+            if (!first) {
+                builder.append(link);
+            }
+            builder.append(obj.toString());
+            first = false;
+        }
+        return builder.toString();
+    }
+
     /**
      * Join parts with link.
      * 
@@ -69,7 +84,9 @@ public class StringUtil {
         final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
         boolean first = true;
         for (final Object obj : input) {
-            if (!first) builder.append(link);
+            if (!first) {
+                builder.append(link);
+            }
             builder.append(obj.toString());
             first = false;
         }

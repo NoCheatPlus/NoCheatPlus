@@ -1,23 +1,23 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import net.minecraft.server.v1_8_R3.AttributeInstance;
-import net.minecraft.server.v1_8_R3.AttributeModifier;
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.DamageSource;
-import net.minecraft.server.v1_8_R3.EntityComplexPart;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.GenericAttributes;
-import net.minecraft.server.v1_8_R3.MobEffectList;
+import net.minecraft.server.v1_9_R1.AttributeInstance;
+import net.minecraft.server.v1_9_R1.AttributeModifier;
+import net.minecraft.server.v1_9_R1.AxisAlignedBB;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.DamageSource;
+import net.minecraft.server.v1_9_R1.EntityComplexPart;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.GenericAttributes;
+import net.minecraft.server.v1_9_R1.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,55 +28,68 @@ import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-public class MCAccessCBDev implements MCAccess{
+public class MCAccessCBDev implements MCAccess {
+
+    private final MobEffectList JUMP;
+    private final MobEffectList FASTER_MOVEMENT;
 
     /**
      * Test for availability in constructor.
      */
     public MCAccessCBDev() {
-//        try {
+        //        try {
+        // TODO: AxisAlignedBB abcdef
+        // TODO: BlockPosition
+        // TODO: IBlockData
+        // TODO: Block.a, Block.updateState, Block.q(IBlockData
         getCommandMap();
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R3.", 
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
                 new String[] {"Entity" , "length", "width", "locY"});
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R3.", 
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
                 new String[] {"EntityPlayer" , "dead", "deathTicks", "invulnerableTicks"});
         // block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.EntityLiving.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.EntityLiving.class, 
                 new String[]{"getHeadHeight"}, float.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.EntityPlayer.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.EntityPlayer.class, 
                 new String[]{"getHealth"}, float.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Block.class, 
-                new String[]{"B", "C", "D", "E", "F", "G"}, double.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeInstance.class, 
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_9_R1.AxisAlignedBB.class, double.class,
+                "a", "b", "c", "d", "e", "f");
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.AttributeInstance.class, 
                 new String[]{"b"}, double.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeModifier.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.AttributeModifier.class, 
                 new String[]{"c"}, int.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.AttributeModifier.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.AttributeModifier.class, 
                 new String[]{"d"}, double.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Material.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.Material.class, 
                 new String[]{"isSolid", "isLiquid"}, boolean.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R3.Block.class, 
-                new String[]{"getMaterial"}, net.minecraft.server.v1_8_R3.Material.class);
         // obc: getHandle() for CraftWorld, CraftPlayer, CraftEntity.
         // nms: Several: AxisAlignedBB, WorldServer
         // nms: Block.getById(int), BlockPosition(int, int, int), WorldServer.getEntities(Entity, AxisAlignedBB)
         // nms: AttributeInstance.a(UUID), EntityComplexPart, EntityPlayer.getAttributeInstance(IAttribute).
-        
-//        } catch(Throwable t) {
-//            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.INIT, t);
-//            throw new RuntimeException("NO WERK");
-//        }
+
+        //        } catch(Throwable t) {
+        //            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.INIT, t);
+        //            throw new RuntimeException("NO WERK");
+        //        }
+        JUMP = MobEffectList.getByName("jump_boost");
+        if (JUMP == null) {
+            throw new RuntimeException();
+        }
+        FASTER_MOVEMENT = MobEffectList.getByName("speed");
+        if (FASTER_MOVEMENT == null) {
+            throw new RuntimeException();
+        }
     }
 
     @Override
     public String getMCVersion() {
-        // 1.8.4-1.8.6 (1_8_R3)
-        return "1.8.4-1.8.7";
+        // 1.9 (1_9_R1)
+        return "1.9";
     }
 
     @Override
     public String getServerVersionTag() {
-        return "Spigot-CB-1.8_R3";
+        return "Spigot-CB-1.9_R1";
     }
 
     @Override
@@ -91,7 +104,7 @@ public class MCAccessCBDev implements MCAccess{
 
     @Override
     public double getHeight(final Entity entity) {
-        final net.minecraft.server.v1_8_R3.Entity mcEntity = ((CraftEntity) entity).getHandle();
+        final net.minecraft.server.v1_9_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
         AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
         final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
         if (entity instanceof LivingEntity) {
@@ -99,25 +112,34 @@ public class MCAccessCBDev implements MCAccess{
         } else return entityHeight;
     }
 
+    private net.minecraft.server.v1_9_R1.Material getMaterial(int blockId) {
+        final Block block = Block.getById(blockId);
+        if (block == null) {
+            return null;
+        }
+        // (Currently no update state, since we don't have any position.)
+        return block.q(block.getBlockData());
+    }
+
     @Override
     public AlmostBoolean isBlockSolid(final int id) {
-        final Block block = Block.getById(id);
-        if (block == null || block.getMaterial() == null) {
+        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id);
+        if (material == null) {
             return AlmostBoolean.MAYBE;
         }
         else {
-            return AlmostBoolean.match(block.getMaterial().isSolid());
+            return AlmostBoolean.match(material.isSolid());
         }
     }
 
     @Override
     public AlmostBoolean isBlockLiquid(final int id) {
-        final Block block = Block.getById(id);
-        if (block == null || block.getMaterial() == null) {
+        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id);
+        if (material == null) {
             return AlmostBoolean.MAYBE;
         }
         else {
-            return AlmostBoolean.match(block.getMaterial().isLiquid());
+            return AlmostBoolean.match(material.isLiquid());
         }
     }
 
@@ -150,8 +172,8 @@ public class MCAccessCBDev implements MCAccess{
     @Override
     public double getJumpAmplifier(final Player player) {
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-        if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
-            return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
+        if (mcPlayer.hasEffect(JUMP)) {
+            return mcPlayer.getEffect(JUMP).getAmplifier();
         }
         else {
             return Double.NEGATIVE_INFINITY;
@@ -161,8 +183,8 @@ public class MCAccessCBDev implements MCAccess{
     @Override
     public double getFasterMovementAmplifier(final Player player) {
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-        if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
-            return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
+        if (mcPlayer.hasEffect(FASTER_MOVEMENT)) {
+            return mcPlayer.getEffect(FASTER_MOVEMENT).getAmplifier();
         }
         else {
             return Double.NEGATIVE_INFINITY;
