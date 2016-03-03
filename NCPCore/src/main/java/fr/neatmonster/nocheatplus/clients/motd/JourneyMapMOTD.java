@@ -1,7 +1,8 @@
 package fr.neatmonster.nocheatplus.clients.motd;
 
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import org.bukkit.entity.Player;
+
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
  * JourneyMap + VoxelMap mod.

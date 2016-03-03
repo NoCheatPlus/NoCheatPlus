@@ -13,9 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.command.actions.AllowLoginCommand;
 import fr.neatmonster.nocheatplus.command.actions.BanCommand;
+import fr.neatmonster.nocheatplus.command.actions.DenyListCommand;
 import fr.neatmonster.nocheatplus.command.actions.DenyLoginCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickCommand;
-import fr.neatmonster.nocheatplus.command.actions.DenyListCommand;
 import fr.neatmonster.nocheatplus.command.actions.TellCommand;
 import fr.neatmonster.nocheatplus.command.actions.delay.DelayCommand;
 import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
