@@ -281,9 +281,10 @@ public class MovingConfig extends ACheckConfig {
         yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, Y_ON_GROUND_DEFAULT); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, yOnGround);
 
-        // TODO: Ignore the stance, once it is known that the server catches such.
         AlmostBoolean refSplitMoves = config.getAlmostBoolean(ConfPaths.MOVING_SPLITMOVES, AlmostBoolean.MAYBE);
-        splitMoves = refSplitMoves == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") == -1 : refSplitMoves.decide();
+        //splitMoves = refSplitMoves == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") == -1 : refSplitMoves.decide();
+        splitMoves = refSplitMoves.decideOptimistically();
+        // TODO: Ignore the stance, once it is known that the server catches such.
         AlmostBoolean refIgnoreStance = config.getAlmostBoolean(ConfPaths.MOVING_IGNORESTANCE, AlmostBoolean.MAYBE);
         ignoreStance = refIgnoreStance == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.8") >= 0 : refIgnoreStance.decide();
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
