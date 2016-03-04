@@ -60,9 +60,9 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
             return null;
         }
         final BlockPosition pos = new BlockPosition(x, y, z);
-        final IBlockData data = block.getBlockData();
-        block.updateState(data, world, pos); // TODO: REALLY THIS?
-        final AxisAlignedBB bb = block.a(data, world, pos);
+        final IBlockData data = block.updateState(getType(pos), this, pos);
+
+        final AxisAlignedBB bb = block.a(data, this, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.
             //return null;
@@ -129,11 +129,13 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 
     @Override
     public IBlockData getType(BlockPosition pos) {
+        // TODO: Can this be cached ?
         return world.getType(pos);
     }
 
     @Override
     public boolean isEmpty(BlockPosition pos) {
+        // TODO: Can (and should) this be cached ?
         return world.isEmpty(pos);
     }
 
