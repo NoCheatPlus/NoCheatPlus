@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.server.v1_9_R1.AxisAlignedBB;
 import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.EntityBoat;
+import net.minecraft.server.v1_9_R1.EntityShulker;
 import net.minecraft.server.v1_9_R1.EnumDirection;
 import net.minecraft.server.v1_9_R1.IBlockAccess;
 import net.minecraft.server.v1_9_R1.IBlockData;
@@ -85,7 +86,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
             final Iterator iterator = list.iterator();
             while (iterator.hasNext()) {
                 final net.minecraft.server.v1_9_R1.Entity other = (net.minecraft.server.v1_9_R1.Entity) iterator.next();
-                if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
+                if (mcEntity == other || !(other instanceof EntityBoat) && !(other instanceof EntityShulker)) { // && !(other instanceof EntityMinecart)) continue;
                     continue;
                 }
                 if (minY >= other.locY && minY - other.locY <= 0.7){
