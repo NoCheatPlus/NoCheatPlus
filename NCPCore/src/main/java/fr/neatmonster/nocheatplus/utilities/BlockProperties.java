@@ -257,7 +257,7 @@ public class BlockProperties {
 
     public static final BlockProps ironDoorType = new BlockProps(woodPickaxe, 5);
 
-    private static final BlockProps indestructibleType = new BlockProps(noTool, -1f, indestructibleTimes);
+    public static final BlockProps indestructibleType = new BlockProps(noTool, -1f, indestructibleTimes);
 
     /** Returned if unknown */
     private static BlockProps defaultBlockProps = instantType;
