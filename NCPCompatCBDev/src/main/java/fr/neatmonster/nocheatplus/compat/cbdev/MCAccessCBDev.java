@@ -4,10 +4,13 @@ import net.minecraft.server.v1_9_R1.AttributeInstance;
 import net.minecraft.server.v1_9_R1.AttributeModifier;
 import net.minecraft.server.v1_9_R1.AxisAlignedBB;
 import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.DamageSource;
 import net.minecraft.server.v1_9_R1.EntityComplexPart;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.GenericAttributes;
+import net.minecraft.server.v1_9_R1.IBlockAccess;
+import net.minecraft.server.v1_9_R1.IBlockData;
 import net.minecraft.server.v1_9_R1.MobEffectList;
 
 import org.bukkit.Bukkit;
@@ -38,16 +41,17 @@ public class MCAccessCBDev implements MCAccess {
      */
     public MCAccessCBDev() {
         //        try {
-        // TODO: AxisAlignedBB abcdef
-        // TODO: BlockPosition
-        // TODO: IBlockData
-        // TODO: Block... used in BlockCache.
         getCommandMap();
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
-                new String[] {"Entity" , "length", "width", "locY"});
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
-                new String[] {"EntityPlayer" , "dead", "deathTicks", "invulnerableTicks"});
-        // block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
+        if (ReflectionUtil.getMethod(Block.class, "updateState", IBlockData.class, IBlockAccess.class, BlockPosition.class).getReturnType() != IBlockData.class) {
+            // TODO: Check if still needed.
+            throw new RuntimeException();
+        }
+        if (ReflectionUtil.getMethod(Block.class, "a", IBlockData.class, IBlockAccess.class, BlockPosition.class).getReturnType() != AxisAlignedBB.class) {
+            throw new RuntimeException();
+        }
+        if (ReflectionUtil.getConstructor(BlockPosition.class, int.class, int.class, int.class) == null) {
+            throw new RuntimeException();
+        }
         ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.EntityLiving.class, 
                 new String[]{"getHeadHeight"}, float.class);
         ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.EntityPlayer.class, 
@@ -62,6 +66,12 @@ public class MCAccessCBDev implements MCAccess {
                 new String[]{"d"}, double.class);
         ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_9_R1.Material.class, 
                 new String[]{"isSolid", "isLiquid"}, boolean.class);
+        // TODO: Confine the following by types as well.
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
+                new String[] {"Entity" , "length", "width", "locY"});
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_9_R1.", 
+                new String[] {"EntityPlayer" , "dead", "deathTicks", "invulnerableTicks"});
+
         // obc: getHandle() for CraftWorld, CraftPlayer, CraftEntity.
         // nms: Several: AxisAlignedBB, WorldServer
         // nms: Block.getById(int), BlockPosition(int, int, int), WorldServer.getEntities(Entity, AxisAlignedBB)
