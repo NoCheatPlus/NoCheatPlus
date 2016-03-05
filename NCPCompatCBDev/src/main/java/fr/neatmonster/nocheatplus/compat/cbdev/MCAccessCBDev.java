@@ -42,10 +42,6 @@ public class MCAccessCBDev implements MCAccess {
     public MCAccessCBDev() {
         //        try {
         getCommandMap();
-        if (ReflectionUtil.getMethod(Block.class, "updateState", IBlockData.class, IBlockAccess.class, BlockPosition.class).getReturnType() != IBlockData.class) {
-            // TODO: Check if still needed.
-            throw new RuntimeException();
-        }
         if (ReflectionUtil.getMethod(Block.class, "a", IBlockData.class, IBlockAccess.class, BlockPosition.class).getReturnType() != AxisAlignedBB.class) {
             throw new RuntimeException();
         }

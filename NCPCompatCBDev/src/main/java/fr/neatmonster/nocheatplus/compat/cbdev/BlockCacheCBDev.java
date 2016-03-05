@@ -61,9 +61,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
             return null;
         }
         final BlockPosition pos = new BlockPosition(x, y, z);
-        final IBlockData data = block.updateState(getType(pos), this, pos); // TODO: updateState still needed?
-
-        final AxisAlignedBB bb = block.a(data, this, pos);
+        final AxisAlignedBB bb = block.a(getType(pos), this, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.
             //return null;
