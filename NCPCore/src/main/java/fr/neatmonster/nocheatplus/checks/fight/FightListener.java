@@ -30,11 +30,13 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -84,11 +86,21 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc2 = new Location(null, 0, 0, 0);
 
+    /** MoveInfo instance for temporary use with shouldCheckSurvivalFly. */
+    private MoveInfo moveInfo;
+
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
 
     public FightListener(){
         super(CheckType.FIGHT);
+        moveInfo = new MoveInfo(mcAccess);
+    }
+
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        super.setMCAccess(mcAccess);
+        moveInfo = new MoveInfo(mcAccess);
     }
 
     /**
@@ -289,15 +301,17 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), lastMove.from.x, lastMove.from.z);
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
-                    final MovingConfig mc = MovingConfig.getConfig(player);
-                    if (now <= mData.timeSprinting + mc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, mData, mc)){
+                    final MovingConfig mCc = MovingConfig.getConfig(player);
+                    moveInfo.set(damagedPlayer, loc, null, mCc.yOnGround);
+                    if (now <= mData.timeSprinting + mCc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, mData, mCc)){
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
                         mData.lostSprintCount = 7;
-                        if ((data.debug || mc.debug) && BuildParameters.debugLevel > 0){
+                        if ((data.debug || mCc.debug) && BuildParameters.debugLevel > 0){
                             debug(player, "lostsprint: hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
                         }
                     }
+                    moveInfo.cleanup();
                 }
             }
         }

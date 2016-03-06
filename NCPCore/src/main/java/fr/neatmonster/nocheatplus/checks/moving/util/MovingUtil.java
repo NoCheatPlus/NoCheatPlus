@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -37,18 +38,24 @@ public class MovingUtil {
 
     /**
      * Check if the player is to be checked by the survivalfly check.
+     * 
      * @param player
+     * @param fromLoc
+     *            The location the player is moving from or just where the
+     *            player is.
      * @param data
      * @param cc
      * @return
      */
-    public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc) {
+    public static final boolean shouldCheckSurvivalFly(final Player player, final PlayerLocation fromLocation, final MovingData data, final MovingConfig cc) {
         final GameMode gameMode = player.getGameMode();
-        return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR && 
-                !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) 
-                && !player.hasPermission(Permissions.MOVING_SURVIVALFLY) &&
-                (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
-                && (cc.ignoreAllowFlight || !player.getAllowFlight());
+        return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
+                && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
+                && (cc.ignoreAllowFlight || !player.getAllowFlight())
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
+                && (Bridge1_9.getLevitationAmplifier(player) == Double.NEGATIVE_INFINITY || fromLocation.isInLiquid())
+                && (!Bridge1_9.isReadyForElytra(player) || fromLocation.isOnGroundOrResetCond())
+                && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
     }
 
     /**

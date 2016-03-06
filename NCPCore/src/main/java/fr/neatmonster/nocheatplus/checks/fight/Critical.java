@@ -13,9 +13,10 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -24,11 +25,20 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class Critical extends Check {
 
+    private MoveInfo moveInfo;
+
     /**
      * Instantiates a new critical check.
      */
     public Critical() {
         super(CheckType.FIGHT_CRITICAL);
+        moveInfo = new MoveInfo(mcAccess);
+    }
+
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        super.setMCAccess(mcAccess);
+        moveInfo = new MoveInfo(mcAccess);
     }
 
     /**
@@ -43,15 +53,9 @@ public class Critical extends Check {
 
         final double mcFallDistance = (double) player.getFallDistance();
         final MovingConfig mCc = MovingConfig.getConfig(player);
-        // TODO: All debugging to the trace (later allow hooking your own trace).
-        if (mcFallDistance > 0.0 && data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
-            final MovingData mData = MovingData.getData(player);
-            // TODO: Use paste move tracking instead (fly check).
-            if (MovingUtil.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)) {
-                // TODO: Log to trace instead.
-                // TODO: Set max y in MovingListener, to be independent of sf/nofall!
-                player.sendMessage("Critical: fd=" + mcFallDistance + "(" + mData.noFallFallDistance +") y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
-            }
+
+        if (data.debug) {
+            debug(player, "y=" + loc.getY() + " mcfalldist=" + mcFallDistance);
         }
 
         // Check if the hit was a critical hit (very small fall-distance, not on ladder, 
@@ -65,8 +69,9 @@ public class Critical extends Check {
                     (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.liftOffEnvelope == LiftOffEnvelope.NORMAL
                     || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
-                // TODO: Use past move tracking to check for SurvivalFly.
-                if (MovingUtil.shouldCheckSurvivalFly(player, dataM, ccM)) {
+                // TODO: Use past move tracking to check for SurvivalFly and the like?
+                moveInfo.set(player, loc, null, ccM.yOnGround);
+                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, dataM, ccM)) {
                     data.criticalVL += 1.0;
                     // Execute whatever actions are associated with this check and 
                     //  the violation level and find out if we should cancel the event.
@@ -80,9 +85,13 @@ public class Critical extends Check {
                     }
                     cancel = executeActions(vd).willCancel();
                 }
+                moveInfo.cleanup();
             }
         }
 
         return cancel;
     }
+
+
+
 }

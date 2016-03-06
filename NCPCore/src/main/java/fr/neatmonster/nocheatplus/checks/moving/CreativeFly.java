@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.GameMode;
@@ -14,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -21,6 +24,8 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * aren't allowed to fly, and therefore have tighter rules to obey.
  */
 public class CreativeFly extends Check {
+
+    private final List<String> tags = new LinkedList<String>();
 
     /**
      * Instantiates a new creative fly check.
@@ -41,6 +46,9 @@ public class CreativeFly extends Check {
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
 
+        // Reset tags, just in case.
+        tags.clear();
+
         // Edge data for this move.
         final MoveData thisMove = data.thisMove;
         final MoveData lastMove = data.moveData.getFirst();
@@ -51,7 +59,8 @@ public class CreativeFly extends Check {
         }
 
         final GameMode gameMode = player.getGameMode();
-        final ModelFlying model = cc.flyingModels.get(gameMode);
+        final ModelFlying model = cc.getModelFlying(player, from);
+        // TODO: Store model in past moves?
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
@@ -88,6 +97,7 @@ public class CreativeFly extends Check {
                 // TODO: Prevent for pre-1.8?
                 fSpeed *= model.hModSprint;
             }
+            tags.add("flying");
         }
         else {
             // (Ignore sprinting here).
@@ -136,6 +146,9 @@ public class CreativeFly extends Check {
         }
 
         resultH *= 100D;
+        if (resultH > 0.0) {
+            tags.add("hdist");
+        }
 
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
         double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
@@ -162,10 +175,14 @@ public class CreativeFly extends Check {
             resultV = (yDistance - limitV) * 100D;
         }
 
+        if (resultV > 0.0) {
+            tags.add("vdist");
+        }
+
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         if (data.debug) {
-            outpuDebugMove(player, hDistance, limitH, yDistance, limitV, data);
+            outpuDebugMove(player, hDistance, limitH, yDistance, limitV, model, tags, data);
         }
 
         // The player went to far, either horizontal or vertical.
@@ -182,6 +199,9 @@ public class CreativeFly extends Check {
                     vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                     vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                     vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from,  to)));
+                    if (!tags.isEmpty()) {
+                        vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+                    }
                 }
                 if (executeActions(vd).willCancel()) {
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
@@ -203,11 +223,16 @@ public class CreativeFly extends Check {
         return null;
     }
 
-    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final MovingData data) {
+    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
         StringBuilder builder = new StringBuilder(350);
         builder.append("hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vlimit=" + limitV);
         if (data.verVelUsed != null) {
             builder.append(" vvel_use=" + data.verVelUsed);
+        }
+        builder.append(" model=" + model.id);
+        if (!tags.isEmpty()) {
+            builder.append(" tags=");
+            builder.append(StringUtil.join(tags, "+"));
         }
         debug(player, builder.toString());
     }

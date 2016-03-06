@@ -15,12 +15,14 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.versions.Bugs;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 /**
@@ -89,7 +91,9 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    ignoreAllowFlight;
 
     public final boolean    creativeFlyCheck;
-    public final Map<GameMode, ModelFlying> flyingModels = new HashMap<GameMode, ModelFlying>();
+    private final Map<GameMode, ModelFlying> flyingModelGameMode = new HashMap<GameMode, ModelFlying>();
+    private final ModelFlying flyingModelElytra;
+    private final ModelFlying flyingModelLevitation;
     public final ActionList creativeFlyActions;
 
     public final boolean    morePacketsCheck;
@@ -202,10 +206,12 @@ public class MovingConfig extends ACheckConfig {
         ignoreAllowFlight = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
 
         creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
-        final ModelFlying defaultModel = new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying());
+        final ModelFlying defaultModel = new ModelFlying("gamemode.creative", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying());
         for (final GameMode gameMode : GameMode.values()) {
-            flyingModels.put(gameMode, new ModelFlying(config, ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
+            flyingModelGameMode.put(gameMode, new ModelFlying("gamemode." + gameMode.name().toLowerCase(), config, ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
         }
+        flyingModelLevitation = new ModelFlying("potion.levitation", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "levitation.", defaultModel);
+        flyingModelElytra = new ModelFlying("jetpack.elytra", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", defaultModel);
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
@@ -331,4 +337,35 @@ public class MovingConfig extends ACheckConfig {
                 return true;
         }
     }
+
+    public ModelFlying getModelFlying(final Player player, final PlayerLocation fromLocation) {
+        final GameMode gameMode = player.getGameMode();
+        final ModelFlying modelGameMode = flyingModelGameMode.get(gameMode);
+        switch(gameMode) {
+            case SURVIVAL:
+            case ADVENTURE:
+                // Check for jetpack/potion first.
+                break;
+            default:
+                return modelGameMode;
+        }
+        // TODO: ORDER IS RANDOM GUESSING. Is mixtures possible?
+        if (fromLocation.isInLiquid()) {
+            // TODO: INCONSISTENT.
+            return modelGameMode;
+        }
+        if (Bridge1_9.getLevitationAmplifier(player) != Double.NEGATIVE_INFINITY) {
+            return flyingModelLevitation;
+        }
+        if (fromLocation.isOnGroundOrResetCond()) {
+            // TODO: INCONSISTENT.
+            return modelGameMode;
+        }
+        if (Bridge1_9.isReadyForElytra(player)) {
+            return flyingModelElytra;
+        }
+        // Default by game mode.
+        return modelGameMode;
+    }
+
 }

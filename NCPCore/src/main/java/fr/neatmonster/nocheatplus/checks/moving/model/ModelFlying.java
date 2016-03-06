@@ -11,6 +11,11 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
  */
 public class ModelFlying {
 
+    /**
+     * The id for this model. The default model id is null.
+     */
+    public final String id;
+
     /** The horizontal per-tick distance in creative mode. */
     public static final double HORIZONTAL_SPEED = 0.6D;
     /** The vertical per-tick distance in creative mode. */
@@ -25,23 +30,28 @@ public class ModelFlying {
     /** Maximum flying height to add to the maximum height of the map. */
     public final double maxHeight;
 
-    public ModelFlying(double hMod, double hModSprint, double vMod, double maxHeight) {
+    public ModelFlying(String id, double hMod, double hModSprint, double vMod, double maxHeight) {
+        // TODO: useFlying, useflyspeed/walkspeed, vertical ascend/descend, limit gain, limit abs. distance
+        // TODO: possibly other friction based envelope constraints.
+        this.id = id;
         this.hMod = hMod;
         this.hModSprint = hModSprint;
         this.vMod = vMod;
         this.maxHeight = maxHeight;
     }
 
-    public ModelFlying(ConfigurationSection config, String prefix, ModelFlying defaults) {
-        // TODO: Add @Hidden annotation (counts for child nodes) and add all defaults.
-        hMod = config.getDouble(prefix + ConfPaths.SUB_HORIZONTALSPEED, defaults.hMod);
-        hModSprint = config.getDouble(prefix + ConfPaths.SUB_MODSPRINT, defaults.hModSprint); // Currently a hidden setting.
-        vMod = config.getDouble(prefix + ConfPaths.SUB_VERTICALSPEED, defaults.vMod);
-        maxHeight = config.getDouble(prefix + ConfPaths.SUB_MAXHEIGHT, defaults.maxHeight);
+    public ModelFlying(String id, ConfigurationSection config, String prefix, ModelFlying defaults) {
+        this(
+                id,
+                config.getDouble(prefix + ConfPaths.SUB_HORIZONTALSPEED, defaults.hMod),
+                config.getDouble(prefix + ConfPaths.SUB_MODSPRINT, defaults.hModSprint), // Currently a hidden setting.
+                config.getDouble(prefix + ConfPaths.SUB_VERTICALSPEED, defaults.vMod),
+                config.getDouble(prefix + ConfPaths.SUB_MAXHEIGHT, defaults.maxHeight)
+                );
     }
 
     public ModelFlying() {
-        this(100.0, 1.92, 100, 128);
+        this(null, 100.0, 1.92, 100, 128);
     }
 
 }
