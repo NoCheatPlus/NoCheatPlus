@@ -302,7 +302,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
                     final MovingConfig mCc = MovingConfig.getConfig(player);
-                    moveInfo.set(damagedPlayer, loc, null, mCc.yOnGround);
+                    moveInfo.set(player, loc, null, mCc.yOnGround);
                     if (now <= mData.timeSprinting + mCc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, mData, mCc)){
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
