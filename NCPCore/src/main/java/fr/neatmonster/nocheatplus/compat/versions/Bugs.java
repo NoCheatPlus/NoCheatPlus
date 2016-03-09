@@ -14,23 +14,23 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
  *
  */
 public class Bugs {
-    
+
     private static boolean enforceLocation = false;
-    
+
     private static boolean pvpKnockBackVelocity = false;
-    
+
     protected static void init() {
         final String mcVersion = ServerVersion.getMinecraftVersion();
         final String serverVersion = Bukkit.getServer().getVersion().toLowerCase();
         final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
         final List<String> noteWorthy = new LinkedList<String>();
-        
+
         // Need to add velocity (only internally) because the server does not.
-        pvpKnockBackVelocity = ServerVersion.select("1.8", false, true, true, false);
+        pvpKnockBackVelocity = ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false);
         if (pvpKnockBackVelocity) {
             noteWorthy.add("pvpKnockBackVelocity");
         }
-        
+
         // First move exploit (classic CraftBukkit or Spigot before 1.7.5). 
         if (mcVersion == GenericVersion.UNKNOWN_VERSION) {
             // Assume something where it's not an issue.
@@ -57,13 +57,13 @@ public class Bugs {
             // Consider Bukkit.getLogger, or put to status after post-enable.
         }
     }
-    
+
     public static boolean shouldEnforceLocation() {
         return enforceLocation;
     }
-    
+
     public static boolean shouldPvpKnockBackVelocity() {
         return pvpKnockBackVelocity;
     }
-    
+
 }
