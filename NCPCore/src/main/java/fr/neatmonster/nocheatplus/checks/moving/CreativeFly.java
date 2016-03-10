@@ -56,11 +56,6 @@ public class CreativeFly extends Check {
         thisMove.modelFlying = model;
         final MoveData lastMove = data.moveData.getFirst();
 
-        // Ensure we have a set-back location.
-        if (!data.hasSetBack()) {
-            data.setSetBack(from);
-        }
-
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
         if (to.getY() > maximumHeight) {

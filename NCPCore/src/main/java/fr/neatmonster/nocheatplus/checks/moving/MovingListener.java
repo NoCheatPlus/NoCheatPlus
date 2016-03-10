@@ -609,16 +609,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // (thisMove.flyCheck stays UNKNOWN.)
         }
 
-        // Extreme move check (sf or cf is precondition, should have their own config/actions later).
-        if ((checkSf || checkCf) && 
-                (Math.abs(data.thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) || data.thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
-            // Test for friction and velocity.
-            newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
-        }
-
+        // Pre-check checks (hum), either for cf or for sf.
         boolean checkNf = true;
         boolean verticalBounce = false;
         if (checkSf || checkCf) {
+            // Ensure we have a set-back set.
+            MovingUtil.checkSetBack(player, pFrom, data, this);
+
+            // Extreme move check (sf or cf is precondition, should have their own config/actions later).
+            if ((Math.abs(data.thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) || data.thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
+                // Test for friction and velocity.
+                newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
+            }
+
             // Check jumping on things like slime blocks.
             // Detect potential bounce.
             if (to.getY() < from.getY()) {
@@ -666,6 +669,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     data.verticalBounce = null;
                 }
             }
+
         }
 
         // Check passable first to prevent set-back override.

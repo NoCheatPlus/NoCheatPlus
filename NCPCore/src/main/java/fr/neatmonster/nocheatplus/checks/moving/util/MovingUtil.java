@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -211,6 +212,32 @@ public class MovingUtil {
         } else {
             // TODO: This would ignore the first split move, if this is the second one.
             return (double) player.getFallDistance() + Math.max(0.0, fromY - toY);
+        }
+    }
+
+    /**
+     * Ensure we have a set-back location set, plus allow moving from upwards
+     * with respawn/login. Intended for MovingListener (pre-checks).
+     * 
+     * @param player
+     * @param from
+     * @param data
+     */
+    public static void checkSetBack(final Player player, final PlayerLocation from, final MovingData data, final IDebugPlayer idp) {
+        if (!data.hasSetBack()) {
+            data.setSetBack(from);
+        }
+        else if (data.joinOrRespawn && from.getY() > data.getSetBackY() && 
+                TrigUtil.isSamePos(from.getX(), from.getZ(), data.getSetBackX(), data.getSetBackZ()) &&
+                (from.isOnGround() || from.isResetCond())) {
+            // TODO: Move most to a method?
+            // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
+            if (data.debug) {
+                // TODO: Should this be info?
+                idp.debug(player, "Adjust set-back after join/respawn: " + from.getLocation());
+            }
+            data.setSetBack(from);
+            data.resetPositions(from);
         }
     }
 

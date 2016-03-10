@@ -113,22 +113,6 @@ public class SurvivalFly extends Check {
             data.adjustMediumProperties(from);
         }
 
-        // Ensure we have a set-back location set, plus allow moving from upwards with respawn/login.
-        if (!data.hasSetBack()) {
-            data.setSetBack(from);
-        }
-        else if (data.joinOrRespawn && from.getY() > data.getSetBackY() && 
-                TrigUtil.isSamePos(from.getX(), from.getZ(), data.getSetBackX(), data.getSetBackZ()) &&
-                (from.isOnGround() || from.isResetCond())) {
-            // TODO: Move most to a method?
-            // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
-            if (data.debug) {
-                debug(player, "Adjust set-back after join/respawn: " + from.getLocation());
-            }
-            data.setSetBack(from);
-            data.resetPositions(from);
-        }
-
         // Set some flags.
         final boolean fromOnGround = from.isOnGround();
         final boolean toOnGround = to.isOnGround();
@@ -539,7 +523,7 @@ public class SurvivalFly extends Check {
         }
         return null;
     }
-
+    
     /**
      * Check for push/pull by pistons, alter data appropriately (blockChangeId).
      * 
