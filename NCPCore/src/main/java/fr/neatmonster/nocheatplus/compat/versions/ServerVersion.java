@@ -155,26 +155,7 @@ public class ServerVersion {
      * @return
      */
     public static boolean isMinecraftVersionBetween(String versionLow, boolean includeLow, String versionHigh, boolean includeHigh) {
-        final String minecraftVersion = getMinecraftVersion();
-        if (includeLow) {
-            if (GenericVersion.compareVersions(minecraftVersion, versionLow) == -1) {
-                return false;
-            }
-        } else {
-            if (GenericVersion.compareVersions(minecraftVersion, versionLow) <= 0) {
-                return false;
-            }
-        }
-        if (includeHigh) {
-            if (GenericVersion.compareVersions(minecraftVersion, versionHigh) == 1) {
-                return false;
-            }
-        } else {
-            if (GenericVersion.compareVersions(minecraftVersion, versionHigh) >= 0) {
-                return false;
-            }
-        }
-        return true;
+        return GenericVersion.isVersionBetween(getMinecraftVersion(), versionLow, includeLow, versionHigh, includeHigh);
     }
 
     /**

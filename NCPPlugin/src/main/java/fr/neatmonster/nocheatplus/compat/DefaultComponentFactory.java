@@ -72,13 +72,13 @@ public class DefaultComponentFactory {
                 pV = GenericVersion.parseVersionDelimiters(_pV, "", "-snapshot");
             }
             if (pV == null) {
-                
+
             }
             else {
                 try {
                     boolean vP1 = GenericVersion.compareVersions("3.6.4", pV) == 0;
                     boolean vP2 = GenericVersion.compareVersions("3.6.5", pV) == 0;
-                    boolean vP3 = GenericVersion.compareVersions("3.7", pV) == 0;
+                    boolean vP3 = GenericVersion.isVersionBetween(pV, "3.7", true, "3.7.0", true);
                     if (
                             ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false)
                             && vP3

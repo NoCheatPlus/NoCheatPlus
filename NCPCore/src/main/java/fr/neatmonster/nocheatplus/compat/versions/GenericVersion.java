@@ -141,4 +141,41 @@ public class GenericVersion {
         }
     }
 
+    /**
+     * Test if the given version is between the two given ones.
+     * 
+     * @param version
+     *            The version to compare with the given bounds.
+     * @param versionLow
+     *            Can not be GenericVersion.UNKNOWN_VERSION.
+     * @param includeLow
+     *            If to allow equality for the low edge.
+     * @param versionHigh
+     *            Can not be GenericVersion.UNKNOWN_VERSION.
+     * @param includeHigh
+     *            If to allow equality for the high edge.
+     * @return
+     */
+    public static boolean isVersionBetween(String version, String versionLow, boolean includeLow, String versionHigh, boolean includeHigh) {
+        if (includeLow) {
+            if (GenericVersion.compareVersions(version, versionLow) == -1) {
+                return false;
+            }
+        } else {
+            if (GenericVersion.compareVersions(version, versionLow) <= 0) {
+                return false;
+            }
+        }
+        if (includeHigh) {
+            if (GenericVersion.compareVersions(version, versionHigh) == 1) {
+                return false;
+            }
+        } else {
+            if (GenericVersion.compareVersions(version, versionHigh) >= 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
