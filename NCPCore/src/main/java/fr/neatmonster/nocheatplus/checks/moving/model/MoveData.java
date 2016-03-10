@@ -129,7 +129,13 @@ public class MoveData {
      * MOVING_CREATIVEFLY, UNKNOWN.
      */
     public CheckType flyCheck;
-    
+
+    /**
+     * The ModelFlying instance used with this move, will be null if it doesn't
+     * apply.
+     */
+    public ModelFlying modelFlying;
+
     public boolean mightBeMultipleMoves;
 
     private void setPositions(final PlayerLocation from, final PlayerLocation to) {
@@ -170,6 +176,7 @@ public class MoveData {
         hAllowedDistance = 0.0;
         // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
+        modelFlying = null;
         mightBeMultipleMoves = false;
         // Done.
         valid = true;

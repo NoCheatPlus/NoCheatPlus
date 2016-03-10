@@ -49,18 +49,17 @@ public class CreativeFly extends Check {
         // Reset tags, just in case.
         tags.clear();
 
-        // Edge data for this move.
+        // Some edge data for this move.
+        final GameMode gameMode = player.getGameMode();
+        final ModelFlying model = cc.getModelFlying(player, from);
         final MoveData thisMove = data.thisMove;
+        thisMove.modelFlying = model;
         final MoveData lastMove = data.moveData.getFirst();
 
         // Ensure we have a set-back location.
         if (!data.hasSetBack()) {
             data.setSetBack(from);
         }
-
-        final GameMode gameMode = player.getGameMode();
-        final ModelFlying model = cc.getModelFlying(player, from);
-        // TODO: Store model in past moves?
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
