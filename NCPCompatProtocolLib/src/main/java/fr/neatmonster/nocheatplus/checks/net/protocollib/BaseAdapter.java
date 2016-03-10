@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
+import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -20,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  * @author asofold
  *
  */
-public abstract class BaseAdapter extends PacketAdapter {
+public abstract class BaseAdapter extends PacketAdapter implements IDebugPlayer {
 
     protected final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     protected final NetConfigCache configFactory = (NetConfigCache) CheckType.NET.getConfigFactory();
@@ -53,11 +54,7 @@ public abstract class BaseAdapter extends PacketAdapter {
         super(plugin, types);
     }
 
-    /**
-     * Convenience method for logging the standard format.
-     * @param player
-     * @param message
-     */
+    @Override
     public void debug(final Player player, final String message) {
         CheckUtils.debug(player, checkType, message);
     }

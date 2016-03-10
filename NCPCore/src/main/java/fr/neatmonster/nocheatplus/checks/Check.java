@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -56,7 +57,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * actual check.</li>
  * 
  */
-public abstract class Check implements MCAccessHolder {
+public abstract class Check implements MCAccessHolder, IDebugPlayer {
 
     // TODO: Do these get cleaned up ?
     /** The execution histories of each check. */
@@ -227,14 +228,7 @@ public abstract class Check implements MCAccessHolder {
         return mcAccess;
     }
 
-    /**
-     * Output a message for a player with the standard format (see
-     * CheckUtils.debug(Player, CheckType, String).
-     * 
-     * @param player
-     *            Can be null.
-     * @param message
-     */
+    @Override
     public void debug(final Player player, final String message) {
         CheckUtils.debug(player, type, message);
     }

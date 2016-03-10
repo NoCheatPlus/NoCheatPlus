@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
@@ -20,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  * @author mc_dev
  *
  */
-public class CheckListener extends NCPListener implements MCAccessHolder, IHoldSubComponents{
+public class CheckListener extends NCPListener implements MCAccessHolder, IHoldSubComponents, IDebugPlayer {
 
     /** Check group / type which this listener is for. */
     protected final CheckType checkType;
@@ -69,14 +70,7 @@ public class CheckListener extends NCPListener implements MCAccessHolder, IHoldS
         return res;
     }
 
-    /**
-     * Output a message for a player with the standard format (see
-     * CheckUtils.debug(Player, CheckType, String).
-     * 
-     * @param player
-     *            Can be null.
-     * @param message
-     */
+    @Override
     public void debug(final Player player, final String message) {
         CheckUtils.debug(player, checkType, message);
     }
