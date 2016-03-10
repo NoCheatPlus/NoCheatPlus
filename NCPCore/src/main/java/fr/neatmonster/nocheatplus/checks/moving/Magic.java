@@ -375,6 +375,22 @@ public class Magic {
     }
 
     /**
+     * Test for a specific move ground/in-air -> water, then water -> in-air.
+     * 
+     * @param thisMove
+     *            Not strictly the latest move in MovingData.
+     * @param lastMove
+     *            Move before thisMove.
+     * @return
+     */
+    private static boolean splashMoveNonStrict(final MoveData thisMove, final MoveData lastMove) {
+        // Use past move data for two moves.
+        return !thisMove.touchedGround && thisMove.from.inWater && !thisMove.to.resetCond // Out of water.
+                && !lastMove.from.resetCond && lastMove.to.inWater // Into water.
+                && excludeStaticSpeed(thisMove) && excludeStaticSpeed(lastMove)
+                ;
+    }
+    /**
      * Fully in-air move.
      * 
      * @param thisMove
@@ -439,31 +455,56 @@ public class Magic {
                 // (These should probably be oddLiquid cases, might pull pastMove1 to vDistAir later.)
                 (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID)
                 && data.sfJumpPhase == 1 && inAir(thisMove)
-                && pastMove1.yDistance > lastMove.yDistance - GRAVITY_MAX // Some speed decrease.
-                && lastMove.yDistance > yDistance + GRAVITY_MAX && lastMove.yDistance > 0.0 // Positive speed. TODO: rather > 1.0 (!).
                 && (
-                        // 1: Odd speed decrease bumping into a block sideways somehow, having moved through water.
-                        yDistDiffEx < 0.0 && splashMove(lastMove, pastMove1)
+                        // 1: Towards ascending rather.
+                        pastMove1.yDistance > lastMove.yDistance - GRAVITY_MAX // Some speed decrease.
+                        && lastMove.yDistance > yDistance + GRAVITY_MAX && lastMove.yDistance > 0.0 // Positive speed. TODO: rather > 1.0 (!).
                         && (
-                                // 2: Odd too high decrease, after middle move being within friction envelope.
-                                yDistance > lastMove.yDistance / 5.0
-                                // 2: Two times about the same decrease (e.g. near 1.0), ending up near zero distance.
-                                || yDistance > -GRAVITY_MAX 
-                                && Math.abs(pastMove1.yDistance - lastMove.yDistance - (lastMove.yDistance - thisMove.yDistance)) < GRAVITY_MAX
+                                // 2: Odd speed decrease bumping into a block sideways somehow, having moved through water.
+                                yDistDiffEx < 0.0 && splashMove(lastMove, pastMove1)
+                                && (
+                                        // 3: Odd too high decrease, after middle move being within friction envelope.
+                                        yDistance > lastMove.yDistance / 5.0
+                                        // 3: Two times about the same decrease (e.g. near 1.0), ending up near zero distance.
+                                        || yDistance > -GRAVITY_MAX 
+                                        && Math.abs(pastMove1.yDistance - lastMove.yDistance - (lastMove.yDistance - thisMove.yDistance)) < GRAVITY_MAX
+                                        )
+                                        // 2: Almost keep speed (gravity only), moving out of lava with (high) velocity.
+                                        // (Needs jump phase == 1, to confine decrease from pastMove1 to lastMove.)
+                                        // TODO: Never seems to apply.
+                                        // TODO: Might explicitly demand (lava) friction decrease from pastMove1 to lastMove.
+                                        || inLiquid(pastMove1) && leavingLiquid(lastMove) && lastMove.yDistance > 4.0 * GRAVITY_MAX
+                                        // TODO: Store applicable or used friction in MoveData and use enoughFrictionEnvelope?
+                                        && yDistance < lastMove.yDistance - Magic.GRAVITY_MAX 
+                                        && yDistance > lastMove.yDistance - 2.0 * Magic.GRAVITY_MAX
+                                        && Math.abs(lastMove.yDistance - pastMove1.yDistance) > 4.0 * GRAVITY_MAX
+
                                 )
-                                // 1: Almost keep speed (gravity only), moving out of lava with (high) velocity.
-                                // (Needs jump phase == 1, to confine decrease from pastMove1 to lastMove.)
-                                // TODO: Never seems to apply.
-                                // TODO: Might explicitly demand (lava) friction decrease from pastMove1 to lastMove.
-                                || inLiquid(pastMove1) && leavingLiquid(lastMove) && lastMove.yDistance > 4.0 * GRAVITY_MAX
-                                // TODO: Store applicable or used friction in MoveData and use enoughFrictionEnvelope?
-                                && yDistance < lastMove.yDistance - Magic.GRAVITY_MAX 
-                                && yDistance > lastMove.yDistance - 2.0 * Magic.GRAVITY_MAX
-                                && Math.abs(lastMove.yDistance - pastMove1.yDistance) > 4.0 * GRAVITY_MAX
-
+                                // 1: Less 'strict' speed increase, descending rather.
+                                || pastMove1.yDistance < 0.0
+                                // Actual speed decrease due to water.
+                                && lastMove.yDistance - GRAVITY_MAX < yDistance && yDistance < 0.7 * lastMove.yDistance
+                                && Math.abs(pastMove1.yDistance + lastMove.yDistance) > 2.5
+                                // (Actually splashMove or aw-ww-wa-aa)
+                                && (splashMove(lastMove, pastMove1) && pastMove1.yDistance > lastMove.yDistance
+                                        // Allow more decrease if moving through more solid water.
+                                        || inLiquid(pastMove1) && leavingLiquid(lastMove) && pastMove1.yDistance *.7 > lastMove.yDistance)
                         )
-
-                        ;
+//                        // 0: Odd normal envelope set 
+//                        // TODO: (special case with splash move in SurvivalFly.check, might need replacing by new style workaround.)
+//                        || data.liftOffEnvelope == LiftOffEnvelope.NORMAL && data.sfJumpPhase == 1 && inAir(thisMove)
+//                        && DebugUtil.debug("TEST1", true)
+//                        //                                && data.isVelocityJumpPhase()
+//                        // Velocity very fast into water above.
+//                        && (splashMoveNonStrict(lastMove, pastMove1) || inLiquid(pastMove1) && leavingLiquid(lastMove))
+//                        // TODO: Store applicable or used friction in MoveData and use enoughFrictionEnvelope?
+//                        && DebugUtil.debug("TEST2", true)
+//                        && yDistance < lastMove.yDistance - Magic.GRAVITY_MAX 
+//                        && yDistance > lastMove.yDistance - 2.0 * Magic.GRAVITY_MAX
+//                        && DebugUtil.debug("TEST3", true)
+//                        && (Math.abs(lastMove.yDistance - pastMove1.yDistance) > 4.0 * GRAVITY_MAX
+//                                || pastMove1.yDistance > 3.0 && lastMove.yDistance > 3.0 && Math.abs(lastMove.yDistance - pastMove1.yDistance) < 2.0 * GRAVITY_MAX)
+                                ;
     }
 
     /**

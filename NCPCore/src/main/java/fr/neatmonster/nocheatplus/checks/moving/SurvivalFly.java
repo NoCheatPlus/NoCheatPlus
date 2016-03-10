@@ -523,7 +523,7 @@ public class SurvivalFly extends Check {
         }
         return null;
     }
-    
+
     /**
      * Check for push/pull by pistons, alter data appropriately (blockChangeId).
      * 
@@ -1609,6 +1609,12 @@ public class SurvivalFly extends Check {
                 if (Math.abs(frictDist - yDistance) <= 2.0 * Magic.GRAVITY_MAX
                         && yDistance < lastMove.yDistance - 4.0 * Math.abs(frictDist - yDistance)
                         ) {
+                    return new double[]{yDistance, 0.0};
+                }
+                // Jumping with velocity into water from below, just slightly more decrease than gravity, twice.
+                if (yDistance > frictDist && yDistance < lastMove.yDistance - Magic.GRAVITY_MAX && data.insideMediumCount <= 1) {
+                    // (Should be able to do without aw-ww-ww confinement.)
+                    // (dirty seems to be set/kept reliably)
                     return new double[]{yDistance, 0.0};
                 }
             }
