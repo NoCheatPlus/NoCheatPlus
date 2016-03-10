@@ -625,21 +625,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Check jumping on things like slime blocks.
             // Detect potential bounce.
             if (to.getY() < from.getY()) {
-                if (
-                        // Common conditions.   
-                        (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
-                        && !survivalFly.isReallySneaking(player)
-                        && (
-                                // Normal envelope (forestall NoFall).
-                                (to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) // Ordinary.
-                                // With carpet. TODO: Magic block id.
-                                || pTo.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9)
-                                && MovingUtil.getRealisticFallDistance(player, pFrom.getY(), pTo.getY(), data) > 1.0
-                                // Within wobble-distance.
-                                || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
-                                && to.getY() - from.getY() < -Magic.GRAVITY_MIN
-                                && !pTo.isOnGround()
-                                )
+                if ((BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
+                        && !survivalFly.isReallySneaking(player) && checkBounceEnvelope(player, pFrom, pTo, data, cc)
                         ) {
                     // Prepare bounce: The center of the player must be above the block.
                     // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
@@ -650,26 +637,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             else if (data.verticalBounce != null) {
                 // Prepared bounce support.
-                if (to.getY() > from.getY() || to.getY() == from.getY() && data.verticalBounce.value < 0.13) {
-                    // Apply bounce.
-                    if (to.getY() == from.getY()) {
-                        // Fake use velocity here.
-                        data.prependVerticalVelocity(new SimpleEntry(tick, 0.0, 1));
-                        data.getOrUseVerticalVelocity(0.0);
-                        if (lastMove.toIsValid && lastMove.yDistance < 0.0) {
-                            // Renew the bounce effect.
-                            data.verticalBounce = new SimpleEntry(tick, data.verticalBounce.value, 1);
-                        }
-                    } else {
-                        data.useVerticalBounce(player);
-                    }
+                if (onPreparedBounceSupport(player, from, to, lastMove, tick, data)) {
                     checkNf = false;
-                    // TODO: Find % of verticalBounce.value or abs. value for X: yDistance > 0, deviation from effect < X -> set sfNoLowJump
-                } else {
-                    data.verticalBounce = null;
                 }
             }
-
         }
 
         // Check passable first to prevent set-back override.
@@ -810,6 +781,66 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Set-back handling.
             onSetBack(player, event, newTo, data, cc);
             return true;
+        }
+    }
+
+    /**
+     * A slime block is underneath, the player isn't really sneaking.
+     * 
+     * @param player
+     * @param from
+     * @param to
+     * @param data
+     * @param cc
+     * @return
+     */
+    private boolean checkBounceEnvelope(Player player, PlayerLocation from, PlayerLocation to, MovingData data, MovingConfig cc) {
+        return 
+                // 0: Normal envelope (forestall NoFall).
+                (
+                        // 1: Ordinary.
+                        to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) 
+                        // 1: With carpet. TODO: Magic block id.
+                        || to.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9
+                        )
+                        && MovingUtil.getRealisticFallDistance(player, from.getY(), to.getY(), data) > 1.0
+                        // 0: Within wobble-distance.
+                        || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
+                        && to.getY() - from.getY() < -Magic.GRAVITY_MIN
+                        && !to.isOnGround()
+                        ;
+    }
+
+    /**
+     * Handle a prepare bounce.
+     * 
+     * @param player
+     * @param from
+     * @param to
+     * @param lastMove
+     * @param tick
+     * @param data
+     * @return True, if bounce has been used, i.e. to do without fall damage.
+     */
+    private boolean onPreparedBounceSupport(Player player, Location from, Location to, MoveData lastMove, int tick, MovingData data) {
+        if (to.getY() > from.getY() || to.getY() == from.getY() && data.verticalBounce.value < 0.13) {
+            // Apply bounce.
+            if (to.getY() == from.getY()) {
+                // Fake use velocity here.
+                data.prependVerticalVelocity(new SimpleEntry(tick, 0.0, 1));
+                data.getOrUseVerticalVelocity(0.0);
+                if (lastMove.toIsValid && lastMove.yDistance < 0.0) {
+                    // Renew the bounce effect.
+                    data.verticalBounce = new SimpleEntry(tick, data.verticalBounce.value, 1);
+                }
+            } else {
+                data.useVerticalBounce(player);
+            }
+            return true;
+            // TODO: Find % of verticalBounce.value or abs. value for X: yDistance > 0, deviation from effect < X -> set sfNoLowJump
+        } else {
+            data.verticalBounce = null;
+            return false;
         }
     }
 
