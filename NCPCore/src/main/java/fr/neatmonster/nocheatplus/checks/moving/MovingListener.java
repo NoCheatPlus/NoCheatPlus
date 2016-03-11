@@ -60,6 +60,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;

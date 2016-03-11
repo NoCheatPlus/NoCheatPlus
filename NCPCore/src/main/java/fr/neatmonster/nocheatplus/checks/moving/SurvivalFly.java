@@ -16,6 +16,9 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
+import fr.neatmonster.nocheatplus.checks.moving.magic.MagicAir;
+import fr.neatmonster.nocheatplus.checks.moving.magic.MagicLiquid;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
@@ -813,7 +816,7 @@ public class SurvivalFly extends Check {
 
         // Hacks.
         final boolean envelopeHack;
-        if (!resetFrom && !resetTo && Magic.venvHacks(from, to, yDistance, yDistChange, lastMove, data)) {
+        if (!resetFrom && !resetTo && MagicAir.venvHacks(from, to, yDistance, yDistChange, lastMove, data)) {
             envelopeHack = true;
             tags.add("hack_venv");
         }
@@ -930,7 +933,7 @@ public class SurvivalFly extends Check {
                         && yDistance < lastMove.yDistance - 0.001) {
                     // Odd decrease with water.
                 }
-                else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+                else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
                     // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
                 }
                 else {
@@ -958,7 +961,7 @@ public class SurvivalFly extends Check {
             else if (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0) {
                 // Head is blocked, thus a shorter move.
             }
-            else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+            else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
                 // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
             else {
@@ -994,7 +997,7 @@ public class SurvivalFly extends Check {
                     && (data.thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance >= 0.0)) {
                 // Head was blocked, thus faster decrease than expected.
             }
-            else if (lastMove.toIsValid && Magic.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
+            else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, lastMove, data, cc)) {
                 // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
             else {
@@ -1580,91 +1583,11 @@ public class SurvivalFly extends Check {
             // ("== 0.0" is covered by the minimal speed check above.)
         }
 
-        // Special cases.
-        if (yDistance >= 0) {
-            // TODO: liftOffEnvelope: refine conditions (general) , should be near water level.
-            // TODO: 1.5 high blocks ?
-            // TODO: Conditions seem warped.
-            if (yDistance <= 0.5) {
-                if (lastMove.toIsValid && yDistance < lastMove.yDistance
-                        && lastMove.yDistance - yDistance > Math.max(0.001, yDistance - baseSpeed)) {
-                    // Decrease more than difference to baseSpeed.
-                    return new double[]{yDistance, 0.0};
-                }
-                if (yDistance <= data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier) && !BlockProperties.isLiquid(from.getTypeIdAbove()) 
-                        // TODO: What now !?
-                        || !to.isInLiquid() // TODO: impossible !?
-                        || (toOnGround || lastMove.toIsValid && lastMove.yDistance - yDistance >= 0.010 || to.isAboveStairs())) {
-                    double vAllowedDistance = baseSpeed + 0.5;
-                    double vDistanceAboveLimit = yDistance - vAllowedDistance;
-                    if (vDistanceAboveLimit <= 0.0) {
-                        return new double[]{vAllowedDistance, 0.0};
-                    }
-                }
-            }
-
-            if (lastMove.toIsValid) {
-                // Lenient on marginal violation if speed decreases by 'enough'.
-                // (Observed on 'dirty' phase.)
-                if (Math.abs(frictDist - yDistance) <= 2.0 * Magic.GRAVITY_MAX
-                        && yDistance < lastMove.yDistance - 4.0 * Math.abs(frictDist - yDistance)
-                        ) {
-                    return new double[]{yDistance, 0.0};
-                }
-                // Jumping with velocity into water from below, just slightly more decrease than gravity, twice.
-                if (yDistance > frictDist && yDistance < lastMove.yDistance - Magic.GRAVITY_MAX && data.insideMediumCount <= 1) {
-                    // (Should be able to do without aw-ww-ww confinement.)
-                    // (dirty seems to be set/kept reliably)
-                    return new double[]{yDistance, 0.0};
-                }
-            }
+        // Workarounds for special cases.
+        final Double wRes = MagicLiquid.liquidWorkarounds(from, to, baseSpeed, frictDist, lastMove, data);
+        if (wRes != null) {
+            return new double[]{wRes, 0.0};
         }
-        // Otherwise, only if last move is available.
-        else if (lastMove.toIsValid) {
-            // Falling into water, mid-speed (second move after diving in).
-            if (yDistance > -0.9 && yDistance < lastMove.yDistance 
-                    && Math.abs(yDistance - lastMove.yDistance) <= Magic.GRAVITY_MAX + Magic.GRAVITY_MIN 
-                    && yDistance - lastMove.yDistance < -Magic.GRAVITY_MIN
-                    //&& !BlockProperties.isLiquid(to.getTypeId(to.getBlockX(), Location.locToBlock(to.getY() + to.getEyeHeight()), to.getBlockZ()))
-                    ) {
-                return new double[]{lastMove.yDistance - Magic.GRAVITY_MAX - Magic.GRAVITY_MIN, 0.0};
-            }
-            // Increase speed slightly on second in-medium move (dirty flag may have been reset).
-            else if (data.insideMediumCount <= 1 && lastMove.yDistance < 0.8 
-                    && yDistance < lastMove.yDistance - Magic.GRAVITY_ODD / 2.0 && yDistance > lastMove.yDistance - Magic.GRAVITY_MAX
-                    ) {
-                return new double[]{yDistance, 0.0};
-            }
-            // In-water rough near-0-inversion from allowed speed to a negative amount, little more than allowed (magic -0.2 roughly).
-            else if (lastMove.yDistance >= Magic.GRAVITY_MAX / 2.0 && lastMove.yDistance <= Magic.GRAVITY_MAX + Magic.GRAVITY_MIN / 2.0
-                    && yDistance < 0.0 && yDistance > -2.0 * Magic.GRAVITY_MAX - Magic.GRAVITY_MIN / 2.0
-                    && data.isVelocityJumpPhase() && to.isInLiquid() // TODO: Might skip the liquid check, though.
-                    && lastMove.from.inLiquid && lastMove.to.extraPropertiesValid && lastMove.to.inLiquid // TODO: in water only?
-                    ) {
-                return new double[]{yDistance, 0.0};
-            }
-            // Lava rather.
-            else if (data.lastFrictionVertical < 0.65 // (Random, but smaller than water.) 
-                    && (
-                            // Moving downstream.
-                            lastMove.yDistance < 0.0 && yDistance > -0.5 && yDistance < lastMove.yDistance 
-                            && lastMove.yDistance - yDistance < Magic.GRAVITY_MIN && BlockProperties.isDownStream(from, to)
-                            // Mix of gravity and base speed [careful: relates to water base speed].
-                            || lastMove.yDistance < 0.0 && yDistance > -baseSpeed - Magic.GRAVITY_MAX && yDistance < lastMove.yDistance
-                            && lastMove.yDistance - yDistance > Magic.GRAVITY_SPAN
-                            && Math.abs(lastMove.yDistance + baseSpeed) < 0.25 * baseSpeed
-                            // Falling slightly too fast in lava.
-                            || data.insideMediumCount == 1 || data.insideMediumCount == 2 
-                            && lastMove.yDistance < 0.0 && yDistance < lastMove.yDistance 
-                            && yDistance - lastMove.yDistance > -Magic.GRAVITY_MIN && yDistance > -0.65
-                            )
-                    ) {
-                return new double[]{yDistance, 0.0};
-            }
-        }
-
-        // TODO: Also DOWNSTREAM !?
-
 
         // Try to use velocity for compensation.
         if (data.getOrUseVerticalVelocity(yDistance) != null) {

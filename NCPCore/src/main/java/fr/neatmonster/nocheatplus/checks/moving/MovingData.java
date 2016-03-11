@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
