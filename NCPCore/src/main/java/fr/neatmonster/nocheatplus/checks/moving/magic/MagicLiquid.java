@@ -103,7 +103,7 @@ public class MagicLiquid {
                     && yDistance > lastMove.yDistance - Magic.GRAVITY_MAX
                     && (
                             // Ordinary (some old case).
-                            lastMove.yDistance < 0.8 && yDistance < lastMove.yDistance - Magic.GRAVITY_ODD / 2.0
+                            lastMove.yDistance < 0.8 && yDistance < lastMove.yDistance - Magic.GRAVITY_SPAN
                             // Check with three moves, rather shortly touching water.
                             || lastMove.yDistance < -0.5 // Arbitrary, actually observed has been < -1.0
                             && pastMove1.toIsValid && pastMove1.to.extraPropertiesValid
