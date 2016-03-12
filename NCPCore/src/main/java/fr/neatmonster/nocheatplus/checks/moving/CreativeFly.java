@@ -137,6 +137,7 @@ public class CreativeFly extends Check {
             if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
                 data.bunnyhopDelay = 9;
                 resultH = 0D;
+                tags.add("bunnyhop");
             }
         }
 
@@ -163,11 +164,17 @@ public class CreativeFly extends Check {
             limitV = Math.max(frictionDist, limitV);
         }
 
-        final double resultV;
-        if (yDistance > limitV && data.getOrUseVerticalVelocity(yDistance) != null) {
+        // Determine violation amount, post-violation recovery.
+        double resultV = Math.max(0.0, (yDistance - limitV) * 100.0);
+        // Ordinary step up. TODO: sfStepHeight should be a common modeling parameter?
+        if (yDistance < cc.sfStepHeight 
+                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())) {
             resultV = 0.0;
-        } else {
-            resultV = (yDistance - limitV) * 100D;
+            tags.add("step_up");
+        }
+        // Velocity.
+        if (resultV > 0.0 && data.getOrUseVerticalVelocity(yDistance) != null) {
+            resultV = 0.0;
         }
 
         if (resultV > 0.0) {
