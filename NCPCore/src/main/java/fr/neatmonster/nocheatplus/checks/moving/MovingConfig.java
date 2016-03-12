@@ -349,6 +349,9 @@ public class MovingConfig extends ACheckConfig {
             default:
                 return modelGameMode;
         }
+        if (player.isFlying() || !ignoreAllowFlight && player.getAllowFlight()) {
+            return modelGameMode;
+        }
         // TODO: ORDER IS RANDOM GUESSING. Is mixtures possible?
         if (fromLocation.isInLiquid()) {
             // TODO: INCONSISTENT.
