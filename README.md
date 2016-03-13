@@ -30,6 +30,7 @@ Do set the correct version alongside the file name. On newer version of maven, y
 * NoCheatPlus is compiled for Java 6.
 
 All profiles for reference:
+
 | Profile | Parameter set to `true` | Description |
 | :------ | :----------------------- | :---------- |
 | `-P minimal` | _default_ | Default profile without native access modules. |
