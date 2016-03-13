@@ -19,7 +19,12 @@ Tips
 Compiling NoCheatPlus
 ---------
 * We use [Maven] (http://maven.apache.org/download.cgi) 3 to handle the dependencies.
-* You can compile it with this Maven goal: `mvn clean package`, if you don't want any dedicated CraftBukkit modules, or if you are lacking the jar files. If you do have all the dependencies, you can set the parameter `cbdedicated` to `true` and activate the profile `all` adding `-P all` to the goals (e.g. on Jenkins, for some setups setting the property may suffice). If you want to build only using the compat module for your current server version, you can remove all the unneeded module references from the root pom.xml and the corresponding dependencies from NCPPlugin/pom.xml. Custom modules not put under the group id `fr.neatmonster` might need to be added to the `includes` section in NoCheatPlus/pom.xml as well.
+* You can compile it with this Maven goal: `mvn clean package`, if you don't want any dedicated CraftBukkit modules, or if you are lacking the jar files. If you do have all the dependencies, you can set the parameter `cbdedicated` to `true` and activate the profile `all` adding `-P all` to the goals (e.g. on Jenkins, for some setups setting the property may suffice). For more options, see the table below. If you want to build only using the compat module for your current server version, you can remove all the unneeded module references from the root pom.xml and the corresponding dependencies from NCPPlugin/pom.xml. Custom modules not put under the group id `fr.neatmonster` might need to be added to the `includes` section in NoCheatPlus/pom.xml as well.
+* All profiles for reference:
+ | Profile | Parameter set to `true` | Description |
+ | `-P minimal` | _default_ | Default profile without native access modules. |
+ | `-P all` | `cbdedicated` | All compat modules. |
+ | `-P cbdev` | `cbdev` | Only the dev-module, usually the latest. Might get removed on very stable versions, in favor of a dedicated module (!). |
 * Jar files for the dedicated compat modules, which your local maven repository might be missing, can also be installed manually.
 Example for Eclipse with embedded maven:
 Add a new maven build run configuration, name it appropriately, e.g. ```Install CB 1.7.5```.

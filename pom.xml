@@ -57,6 +57,28 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>cbdev</id>
+			<activation>
+				<property>
+					<name>cbdev</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<module>NCPBuildBase</module>
+				<module>NCPCommons</module>
+				<module>NCPCore</module>
+				<module>NCPCompatBukkit</module>
+				<!-- Non minimal below. -->
+				<module>NCPCompatCBDev</module>
+				<!-- Non minimal above. -->
+				<module>NCPCompatProtocolLib</module>
+				<module>NCPCompatGlowstone</module>
+				<module>NCPPlugin</module>
+				<module>NoCheatPlus</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>minimal</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -79,14 +101,9 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
 		</repository>
-<!-- 		<repository>
-			<id>md_5-releases</id>
-			<url>http://repo.md-5.net/content/repositories/releases/</url>
-		</repository>
-		<repository>
-			<id>md_5-snapshots</id>
-			<url>http://repo.md-5.net/content/repositories/snapshots/</url>
-		</repository> -->
+		<!-- <repository> <id>md_5-releases</id> <url>http://repo.md-5.net/content/repositories/releases/</url> 
+			</repository> <repository> <id>md_5-snapshots</id> <url>http://repo.md-5.net/content/repositories/snapshots/</url> 
+			</repository> -->
 		<repository>
 			<id>bukkit</id>
 			<url>http://repo.bukkit.org/content/groups/public/</url>
