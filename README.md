@@ -32,7 +32,7 @@ Do set the correct version alongside the file name. On newer version of maven, y
 All profiles for reference:
 
 | Profile | Parameter set to `true` | Description |
-| :------ | :----------------------- | :---------- |
+| :------------------ | :----------------------------- | :-------------- |
 | `-P minimal` | _default_ | Default profile without native access modules. |
 | `-P all` | `cbdedicated` | All compat modules. |
 | `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8_R3. |
