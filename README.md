@@ -24,6 +24,8 @@ Compiling NoCheatPlus
  | Profile | Parameter set to `true` | Description |
  | `-P minimal` | _default_ | Default profile without native access modules. |
  | `-P all` | `cbdedicated` | All compat modules. |
+ | `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8_R3. |
+ | `-P spigot1_9_r1` | `spigot1_9_r1` | Just Spigot 1.9_R1. |
  | `-P cbdev` | `cbdev` | Only the dev-module, usually the latest. Might get removed on very stable versions, in favor of a dedicated module (!). |
 * Jar files for the dedicated compat modules, which your local maven repository might be missing, can also be installed manually.
 Example for Eclipse with embedded maven:
