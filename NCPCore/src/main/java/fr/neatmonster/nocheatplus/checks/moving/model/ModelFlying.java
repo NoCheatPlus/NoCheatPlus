@@ -31,8 +31,9 @@ public class ModelFlying {
     public final double maxHeight;
 
     public ModelFlying(String id, double hMod, double hModSprint, double vMod, double maxHeight) {
-        // TODO: useFlying, useflyspeed/walkspeed, vertical ascend/descend, limit gain, limit abs. distance
+        // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
         // TODO: possibly other friction based envelope constraints.
+        // TODO: Check if needed: use fly/walk speed.
         this.id = id;
         this.hMod = hMod;
         this.hModSprint = hModSprint;

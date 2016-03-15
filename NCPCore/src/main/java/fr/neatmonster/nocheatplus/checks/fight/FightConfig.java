@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.versions.Bugs;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -142,7 +143,7 @@ public class FightConfig extends ACheckConfig {
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
         directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
 
-        fastHealCheck = data.getBoolean(ConfPaths.FIGHT_FASTHEAL_CHECK);;
+        fastHealCheck = ServerVersion.compareMinecraftVersion("1.9") < 0 ? data.getBoolean(ConfPaths.FIGHT_FASTHEAL_CHECK) : false;
         fastHealInterval = data.getLong(ConfPaths.FIGHT_FASTHEAL_INTERVAL);
         fastHealBuffer = data.getLong(ConfPaths.FIGHT_FASTHEAL_BUFFER);
         fastHealActions = data.getOptimizedActionList(ConfPaths.FIGHT_FASTHEAL_ACTIONS, Permissions.FIGHT_FASTHEAL);

@@ -939,6 +939,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         //			});
         //        }
 
+        // Log other notes.
+        logOtherNotes(config);
+
         // Is the version the configuration was created with consistent with the current one?
         if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
             // Could use custom prefix from logging, however ncp should be mentioned then.
@@ -964,6 +967,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         StaticLog.setStreamID(Streams.STATUS);
         // Tell the server administrator that we finished loading NoCheatPlus now.
         logManager.info(Streams.INIT, "Version " + getDescription().getVersion() + " is enabled.");
+    }
+
+    /**
+     * Log other notes once on enabling.
+     * 
+     * @param config
+     */
+    private void logOtherNotes(ConfigFile config) {
+        if (ServerVersion.compareMinecraftVersion("1.9") >= 0) {
+            logManager.info(Streams.INIT, "Force disable FastHeal on Minecraft 1.9 and later.");
+        }
     }
 
     /**
