@@ -187,6 +187,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //damagedTrace.addEntry(tick, damagedLoc.getX(), damagedLoc.getY(), damagedLoc.getZ());
         }
 
+        // Log generic properties of this attack.
+        if (data.debug) {
+            debug(player, "Attacks " + (damagedPlayer == null ? ("entity " + damaged.getType()) : ("player" + damagedPlayer.getName())) + " damage=" + damage);
+        }
+
+        // Can't fight dead.
         if (cc.cancelDead){
             if (damaged.isDead()) {
                 cancelled = true;
@@ -197,7 +203,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
 
-        if (damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
+        // TODO: 1.9: sweep attack.
+
+        // LEGACY: thorns.
+        if (BridgeHealth.DAMAGE_THORNS == null && damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
             // Don't handle further, but do respect selfhit/canceldead.
             // TODO: Remove soon, at least version-dependent.
             data.thornsId = Integer.MIN_VALUE;
@@ -247,7 +256,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (reachEnabled || directionEnabled) {
                 if (damagedTrace != null) {
                     // Checks that use the LocationTrace instance of the attacked entity/player.
-                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, reachEnabled, directionEnabled);
+                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
                 } else {
                     // Still use the classic methods for non-players. maybe[]
                     if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
@@ -347,7 +356,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param directionEnabled
      * @return If to cancel (true) or not (false).
      */
-    private boolean locationTraceChecks(Player player, Location loc, FightData data, FightConfig cc, Entity damaged, Location damagedLoc, LocationTrace damagedTrace, long tick, boolean reachEnabled, boolean directionEnabled) {
+    private boolean locationTraceChecks(final Player player, final Location loc, final FightData data, final FightConfig cc, 
+            final Entity damaged, final Location damagedLoc, LocationTrace damagedTrace, 
+            final long tick, final long now,  final boolean reachEnabled, final boolean directionEnabled) {
         // TODO: Order / splitting off generic stuff.
         boolean cancelled = false;
 
@@ -365,6 +376,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         boolean directionPassed = !directionEnabled; // Passed individually for some tick.
         // TODO: Maintain a latency estimate + max diff and invalidate completely (i.e. iterate from latest NEXT time)], or just max latency.
         // TODO: Consider a max-distance to "now", for fast invalidation.
+        long latencyEstimate = -1;
         while (traceIt.hasNext()) {
             final TraceEntry entry = traceIt.next();
             // Simplistic just check both until end or hit.
@@ -388,6 +400,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (thisPassed) {
                 // TODO: Log/set estimated latency.
                 violation = false;
+                latencyEstimate = now - entry.time;
                 break;
             }
         }
@@ -407,6 +420,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
         // TODO: Log exact state, probably record min/max latency (individually).
+        if (data.debug && latencyEstimate >= 0) {
+            debug(player, "Latency estimate: " + latencyEstimate + " ms."); // FCFS rather, at present.
+        }
         return cancelled;
     }
 

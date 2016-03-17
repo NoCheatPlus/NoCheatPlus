@@ -25,7 +25,18 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 public class BridgeHealth {
 
     /** For debugging purposes. TODO: Reset on shutdown !? */
-    private static Set<String> failures = new HashSet<String>(); 
+    private static Set<String> failures = new HashSet<String>();
+
+    private static DamageCause getDamageCause(String name) {
+        try {
+            return DamageCause.valueOf(name);
+        } catch (Throwable t) {
+            // ouch.
+            return null;
+        }
+    }
+
+    public static final DamageCause DAMAGE_THORNS = getDamageCause("THORNS");
 
     /**
      * This method is meant to be called on API that changed from int to double.<br>
