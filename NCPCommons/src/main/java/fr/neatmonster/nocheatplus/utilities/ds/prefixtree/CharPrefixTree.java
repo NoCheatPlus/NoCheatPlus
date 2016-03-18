@@ -27,6 +27,7 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 
     /**
      * Auxiliary method to get a List of Character.
+     * 
      * @param chars
      * @return
      */
@@ -84,16 +85,35 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
         }
     }
 
+    /**
+     * Check if the tree has a prefix of chars. This does not mean a common
+     * prefix, but that the tree contains an end point that is a prefix of the
+     * input.
+     * 
+     * @param chars
+     * @return
+     */
     public boolean hasPrefix(final char[] chars){
         return hasPrefix(toCharacterList(chars));
     }
 
+    /**
+     * Check if the tree has a prefix of input. This does not mean a common
+     * prefix, but that the tree contains an end point that is a prefix of the
+     * input.
+     * 
+     * @param input
+     * @return
+     */
     public boolean hasPrefix(final String input){
         return hasPrefix(input.toCharArray());
     }
 
     /**
-     * Quick and dirty addition: Test if a prefix is contained which either matches the whole input or does not end inside of a word in the input, i.e. the inputs next character is a space.
+     * Quick and dirty addition: Test if a prefix is contained which either
+     * matches the whole input or does not end inside of a word in the input,
+     * i.e. the inputs next character is a space.
+     * 
      * @param input
      * @return
      */
@@ -108,8 +128,10 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 
     /**
      * Test hasPrefixWords for each given argument.
+     * 
      * @param inputs
-     * @return true if hasPrefixWords(String) returns true for any of the inputs, false otherwise.
+     * @return true if hasPrefixWords(String) returns true for any of the
+     *         inputs, false otherwise.
      */
     public boolean hasAnyPrefixWords(final String... inputs){
         for (int i = 0; i < inputs.length; i++){
@@ -122,8 +144,10 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 
     /**
      * Test hasPrefixWords for each element of the collection.
+     * 
      * @param inputs
-     * @return true if hasPrefixWords(String) returns true for any of the elements, false otherwise.
+     * @return true if hasPrefixWords(String) returns true for any of the
+     *         elements, false otherwise.
      */
     public boolean hasAnyPrefixWords(final Collection<String> inputs){
         for (final String input : inputs){
@@ -133,9 +157,11 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
         }
         return false;
     }
-    
+
     /**
-     * Test if there is an end-point in the tree that is a prefix of any of the inputs.
+     * Test if there is an end-point in the tree that is a prefix of any of the
+     * inputs.
+     * 
      * @param inputs
      * @return
      */
@@ -166,6 +192,7 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 
     /**
      * Factory method for a simple tree.
+     * 
      * @param keyType
      * @return
      */
