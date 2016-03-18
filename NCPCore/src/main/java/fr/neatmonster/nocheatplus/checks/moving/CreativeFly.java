@@ -103,7 +103,7 @@ public class CreativeFly extends Check {
             fSpeed *= data.walkSpeed / 0.2;
         }
 
-        double limitH = model.hMod / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
+        double limitH = model.hModSpeed / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
 
         if (lastMove.toIsValid) {
             // TODO: Use last friction (as well)?
@@ -151,7 +151,7 @@ public class CreativeFly extends Check {
         }
 
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
-        double limitV = model.vMod / 100D * ModelFlying.VERTICAL_SPEED; // * data.jumpAmplifier;
+        double limitV = model.vModAscendSpeed / 100D * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
 
         if (flying && yDistance > 0.0) {
             // Let fly speed apply with moving upwards.

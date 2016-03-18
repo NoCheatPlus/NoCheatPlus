@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.config;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,15 @@ public abstract class ConfPaths {
     public static final String SUB_SPEED                                 = "speed";
     public static final String SUB_VERTICAL                              = "vertical";
     public static final String SUB_VERTICALSPEED                         = "verticalspeed"; // Phase out.
+
+    // Composite sub-paths.
+    public static final String SUB_HORIZONTAL_SPEED                      = SUB_HORIZONTAL + "." + SUB_SPEED;
+    public static final String SUB_HORIZONTAL_MODSPRINT                  = SUB_HORIZONTAL + "." + SUB_MODSPRINT;
+    public static final String SUB_VERTICAL_ASCEND                       = SUB_VERTICAL + "." + SUB_ASCEND;
+    public static final String SUB_VERTICAL_ASCEND_SPEED                 = SUB_VERTICAL_ASCEND + "." + SUB_SPEED;
+    public static final String SUB_VERTICAL_DESCEND                      = SUB_VERTICAL + "." + SUB_DESCEND;
+    public static final String SUB_VERTICAL_DESCEND_SPEED                = SUB_VERTICAL_DESCEND + "." + SUB_SPEED;
+    public static final String SUB_VERTICAL_MAXHEIGHT                    = SUB_VERTICAL + "." + SUB_MAXHEIGHT;
 
     // General.
     public static final String SAVEBACKCONFIG                            = "savebackconfig";
@@ -754,7 +764,9 @@ public abstract class ConfPaths {
     @Deprecated
     public static final String  MOVING_VELOCITY_GRACETICKS               = "checks.moving.velocity.graceticks";
     @Deprecated
-    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL     = "checks.net.flyingfrequency.straypackets.cancel";
+    public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL  = "checks.net.flyingfrequency.straypackets.cancel";
+    @Deprecated // Elytra: Deprecate to force override the old config value (also auto-added to moved).
+    public static final String  MOVING_CREATIVEFLY_MODEL_ELYTRA_HORIZONTALSPEED = "checks.moving.creativefly.model.elytra.horizontalspeed";
 
     /**
      * Get moved paths for which an annotation doesn't work.
@@ -765,8 +777,14 @@ public abstract class ConfPaths {
         final List<WrapMoved> entries = new LinkedList<WrapMoved>();
         final List<ManyMoved> multiEntries = new LinkedList<ManyMoved>();
 
-        // TODO: Add entries.
+        // Add entries.
+        final List<String> cfModels = Arrays.asList("creative", "spectator", "survival", "adventure", "elytra", "levitation");
+        multiEntries.add(new ManyMoved(MOVING_CREATIVEFLY_MODEL, cfModels, "horizontalspeed", SUB_HORIZONTAL_SPEED));
+        multiEntries.add(new ManyMoved(MOVING_CREATIVEFLY_MODEL, cfModels, "modsprint", SUB_HORIZONTAL_MODSPRINT));
+        multiEntries.add(new ManyMoved(MOVING_CREATIVEFLY_MODEL, cfModels, "maxheight", SUB_VERTICAL_MAXHEIGHT));
+        multiEntries.add(new ManyMoved(MOVING_CREATIVEFLY_MODEL, cfModels, "verticalspeed", SUB_VERTICAL_ASCEND_SPEED));
 
+        // Expand ManyMoved entries.
         for (ManyMoved entry : multiEntries) {
             entries.addAll(entry.getWrapMoved());
         }
