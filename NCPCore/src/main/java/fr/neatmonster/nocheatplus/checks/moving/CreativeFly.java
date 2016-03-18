@@ -42,7 +42,7 @@ public class CreativeFly extends Check {
      * @param to
      * @param data
      * @param cc
-     * @param time Millis.
+     * @param time Milliseconds.
      * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
@@ -54,6 +54,10 @@ public class CreativeFly extends Check {
         final GameMode gameMode = player.getGameMode();
         final ModelFlying model = cc.getModelFlying(player, from);
         final MoveData thisMove = data.thisMove;
+        //        if (!data.thisMove.from.extraPropertiesValid) {
+        //            // TODO: Confine by model config flag or just always do [if the latter: do it in the listener]?
+        //            data.thisMove.setExtraProperties(from, to);
+        //        }
         thisMove.modelFlying = model;
         final MoveData lastMove = data.moveData.getFirst();
 
@@ -227,13 +231,13 @@ public class CreativeFly extends Check {
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
         StringBuilder builder = new StringBuilder(350);
-        builder.append("hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vlimit=" + limitV);
+        builder.append("hDist: " + hDistance + " / " + limitH + " vDist: " + yDistance + " / " + limitV);
         if (data.verVelUsed != null) {
-            builder.append(" vvel_use=" + data.verVelUsed);
+            builder.append(" vVelUsed: " + data.verVelUsed);
         }
-        builder.append(" model=" + model.id);
+        builder.append(" model: " + model.id);
         if (!tags.isEmpty()) {
-            builder.append(" tags=");
+            builder.append(" tags: ");
             builder.append(StringUtil.join(tags, "+"));
         }
         debug(player, builder.toString());
