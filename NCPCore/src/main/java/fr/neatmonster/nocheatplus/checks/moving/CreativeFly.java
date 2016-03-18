@@ -172,7 +172,9 @@ public class CreativeFly extends Check {
         double resultV = Math.max(0.0, (yDistance - limitV) * 100.0);
         // Ordinary step up. TODO: sfStepHeight should be a common modeling parameter?
         if (yDistance < cc.sfStepHeight 
-                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())) {
+                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())
+                && to.isOnGround()) {
+            // (Jump effect not checked yet.)
             resultV = 0.0;
             tags.add("step_up");
         }
