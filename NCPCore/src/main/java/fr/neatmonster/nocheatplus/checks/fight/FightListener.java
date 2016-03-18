@@ -203,7 +203,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
 
-        // TODO: 1.9: sweep attack.
+        // 1.9: sweep attack.
+        final int locHashCode = loc.hashCode();
+        if (damage == 1.0) {
+            // Might be a sweep attack.
+            if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
+                // TODO: Might limit the amount of 'too far off' sweep hits, possibly silent cancel for low frequency.
+                // Could further guard by checking equality of loc to last location.
+                if (data.debug) {
+                    debug(player, "(Assume sweep attack follow up damage.)");
+                    return cancelled;
+                }
+            }
+        } else {
+            // TODO: More side conditions for a sweep attack.
+            data.sweepTick = tick;
+            data.sweepLocationHashCode = locHashCode;
+        }
 
         // LEGACY: thorns.
         if (BridgeHealth.DAMAGE_THORNS == null && damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){

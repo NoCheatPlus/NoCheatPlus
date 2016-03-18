@@ -139,6 +139,15 @@ public class FightData extends ACheckData {
     /** The entity id  which might get counter-attacked. */
     public int thornsId = Integer.MIN_VALUE;
 
+    // 1.9: Sweep attack.
+    /**
+     * The tick of an attack that might lead to further sweep damage to other
+     * nearby entities.
+     */
+    public int sweepTick = 0;
+    /** Hash code of the location of last sweep attack. */
+    public int sweepLocationHashCode = 0;
+
     /** Any kind of health regeneration. */
     public long regainHealthTime    = 0;
     //    public double lastAttackedDist = 0.0;
