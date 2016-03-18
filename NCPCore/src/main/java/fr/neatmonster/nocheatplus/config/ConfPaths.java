@@ -1,5 +1,12 @@
 package fr.neatmonster.nocheatplus.config;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import fr.neatmonster.nocheatplus.config.PathUtils.ManyMoved;
+import fr.neatmonster.nocheatplus.config.PathUtils.WrapMoved;
+
 /**
  * Paths for the configuration options. Making everything final static prevents accidentally modifying any of these.
  */
@@ -8,15 +15,20 @@ public abstract class ConfPaths {
     // Sub-paths that are used with different path prefixes potentially.
     // TODO: These might better be in another class.
     public static final String SUB_ALLOWINSTANTBREAK                     = "allowinstantbreak";
+    public static final String SUB_ASCEND                                = "ascend";
     public static final String SUB_DEBUG                                 = "debug";
-    public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed";
+    public static final String SUB_DESCEND                               = "descend";
+    public static final String SUB_HORIZONTAL                            = "horizontal";
+    public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed"; // Phase out.
     public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
     public static final String SUB_LAG                                   = "lag";
     public static final String SUB_MAXHEIGHT                             = "maxheight";
     public static final String SUB_MODEL                                 = "model";
     public static final String SUB_MODSPRINT                             = "modsprint";
     public static final String SUB_OVERRIDEFLAGS                         = "overrideflags";
-    public static final String SUB_VERTICALSPEED                         = "verticalspeed";
+    public static final String SUB_SPEED                                 = "speed";
+    public static final String SUB_VERTICAL                              = "vertical";
+    public static final String SUB_VERTICALSPEED                         = "verticalspeed"; // Phase out.
 
     // General.
     public static final String SAVEBACKCONFIG                            = "savebackconfig";
@@ -743,5 +755,22 @@ public abstract class ConfPaths {
     public static final String  MOVING_VELOCITY_GRACETICKS               = "checks.moving.velocity.graceticks";
     @Deprecated
     public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL     = "checks.net.flyingfrequency.straypackets.cancel";
+
+    /**
+     * Get moved paths for which an annotation doesn't work.
+     * 
+     * @return A new collection of entries.
+     */
+    public static Collection<WrapMoved> getExtraMovedPaths() {
+        final List<WrapMoved> entries = new LinkedList<WrapMoved>();
+        final List<ManyMoved> multiEntries = new LinkedList<ManyMoved>();
+
+        // TODO: Add entries.
+
+        for (ManyMoved entry : multiEntries) {
+            entries.addAll(entry.getWrapMoved());
+        }
+        return entries;
+    }
 
 }

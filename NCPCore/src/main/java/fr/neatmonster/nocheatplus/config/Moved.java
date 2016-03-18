@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Moved{
+public @interface Moved {
 
     /**
      * The new path where the content has moved to.

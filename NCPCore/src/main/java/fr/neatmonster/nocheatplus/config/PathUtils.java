@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -25,6 +27,101 @@ public class PathUtils {
 
     // TODO: Make this a class to be able to process multiple files with different paths and annotations.
 
+    /**
+     * Individual configuration paths moved somewhere else. Can use @Moved or custom setup.
+     * 
+     * @author asofold
+     *
+     */
+    public static class WrapMoved {
+
+        public final String oldPath;
+        public final String newPath;
+        public final boolean configurationSection;
+
+        public WrapMoved(String oldPath,Moved moved) {
+            this(oldPath, moved.newPath(), moved.configurationSection());
+        }
+
+        /**
+         * Convenience: no configuration section.
+         * 
+         * @param oldPath
+         * @param newPath
+         */
+        public WrapMoved(String oldPath, String newPath) {
+            this(oldPath, newPath, false);
+        }
+
+        public WrapMoved(String oldPath, String newPath, boolean configurationSection) {
+            this.oldPath = oldPath;
+            this.newPath = newPath;
+            this.configurationSection = configurationSection;
+        }
+    }
+
+    /**
+     * All properties with a common suffix, have been moved from sub-sections of
+     * a root section to somewhere else within the same sub-section. This is
+     * used to create many WrapMoved entries.
+     * 
+     * @author asofold
+     *
+     */
+    public static class ManyMoved {
+        public final String sectionPrefix;
+        public final Set<String> subKeys;
+        public final String oldSuffix;
+        public final String newSuffix;
+        public final boolean configurationSection;
+
+        /**
+         * Convenience: no configuration section.
+         * @param rootSection
+         * @param subKeys
+         * @param oldSuffix
+         * @param newSuffix
+         */
+        public ManyMoved(String rootSection, Collection<String> subKeys, String oldSuffix, String newSuffix) {
+            this(rootSection, subKeys, oldSuffix, newSuffix, false);
+        }
+
+        /**
+         * 
+         * @param sectionPrefix
+         *            Does end on the separator.
+         * @param subKeys
+         *            Just the sub-section keys (no wild-card possible yet).
+         * @param oldSuffix
+         *            Old suffix to be moved to new suffix.
+         * @param newSuffix
+         * @param configurationSection
+         *            If to support moving entire configuration sections, likely
+         *            not yet supported.
+         */
+        public ManyMoved(String sectionPrefix, Collection<String> subKeys, String oldSuffix, String newSuffix, boolean configurationSection) {
+            this.sectionPrefix = sectionPrefix;
+            this.subKeys = new LinkedHashSet<String>(subKeys);
+            this.oldSuffix = oldSuffix;
+            this.newSuffix = newSuffix;
+            this.configurationSection = configurationSection;
+        }
+
+        /**
+         * Expand to individual WrapMove entries.
+         * 
+         * @return A new collection.
+         */
+        public Collection<WrapMoved> getWrapMoved() {
+            final List<WrapMoved> entries = new LinkedList<WrapMoved>();
+            for (final String key : subKeys) {
+                final String prefix = sectionPrefix + key + ".";
+                entries.add(new WrapMoved(prefix + oldSuffix, prefix + newSuffix, configurationSection));
+            }
+            return entries;
+        }
+    }
+
     // Deprecated paths.
     private static final Set<String> deprecatedFields = new LinkedHashSet<String>();
     private static final SimpleCharPrefixTree deprecatedPrefixes = new SimpleCharPrefixTree();
@@ -34,7 +131,7 @@ public class PathUtils {
     private static final SimpleCharPrefixTree globalOnlyPrefixes = new SimpleCharPrefixTree();
 
     // Paths moved to other paths.
-    private static final Map<String, Moved> movedPaths = new LinkedHashMap<String, Moved>();
+    private static final Map<String, WrapMoved> movedPaths = new LinkedHashMap<String, WrapMoved>();
 
     static{
         initPaths();
@@ -45,11 +142,15 @@ public class PathUtils {
      * @return
      */
     private static void initPaths() {
+        // TODO: Retrieving such entries should be (instance...) methods of ConfPaths or a specific configuration instance.
         deprecatedFields.clear();
         deprecatedPrefixes.clear();
         globalOnlyFields.clear();
         globalOnlyPrefixes.clear();
         movedPaths.clear();
+        for (final WrapMoved moved : ConfPaths.getExtraMovedPaths()) {
+            movedPaths.put(moved.oldPath, moved);
+        }
         for (final Field field : ConfPaths.class.getDeclaredFields()) {
             if (field.getType() != String.class) {
                 // Only process strings.
@@ -94,7 +195,7 @@ public class PathUtils {
     private static void addMoved(final Field field, final Moved rel) {
         try {
             final String path = field.get(null).toString();
-            movedPaths.put(path, rel);
+            movedPaths.put(path, new WrapMoved(path, rel));
         } catch (IllegalArgumentException e) {
         } catch (IllegalAccessException e) {
         }
@@ -243,20 +344,24 @@ public class PathUtils {
      * @param addPaths 
      */
     protected static void processMovedPaths(final ConfigurationSection config, final String configName, final Set<String> removePaths, final Map<String, Object> addPaths) {
-        for (final Entry<String, Moved> entry : movedPaths.entrySet()) {
+        for (final Entry<String, WrapMoved> entry : movedPaths.entrySet()) {
             final String path = entry.getKey();
             final Object value = config.get(path);
             if (config.contains(path)) {
-                final Moved moved = entry.getValue();
+                final WrapMoved moved = entry.getValue();
+                if (deprecatedPrefixes.hasPrefix(moved.oldPath)) {
+                    // Ignore deprecated values.
+                    continue;
+                }
                 if (value instanceof ConfigurationSection) {
-                    if (moved.configurationSection()) {
+                    if (moved.configurationSection) {
                         // TODO: Ensure those can be processed at all.
                     } else {
                         // Ignore configuration sections.
                         continue;
                     }
                 }
-                final String newPath = moved.newPath();
+                final String newPath = moved.newPath;
                 final String to;
                 if (newPath == null || newPath.isEmpty()) {
                     to = ".";
