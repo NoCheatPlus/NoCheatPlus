@@ -193,36 +193,29 @@ public class CreativeFly extends Check {
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
-            // TODO: Get rid of creativeFlyPreviousRefused.
-            if (data.creativeFlyPreviousRefused) {
-                // Increment violation level.
-                data.creativeFlyVL += result;
+            // Increment violation level.
+            data.creativeFlyVL += result;
 
-                // Execute whatever actions are associated with this check and the violation level and find out if we
-                // should cancel the event.
-                final ViolationData vd = new ViolationData(this, player, data.creativeFlyVL, result, cc.creativeFlyActions);
-                if (vd.needsParameters()) {
-                    vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
-                    vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
-                    vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from,  to)));
-                    if (!tags.isEmpty()) {
-                        vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
-                    }
+            // Execute whatever actions are associated with this check and the violation level and find out if we
+            // should cancel the event.
+            final ViolationData vd = new ViolationData(this, player, data.creativeFlyVL, result, cc.creativeFlyActions);
+            if (vd.needsParameters()) {
+                vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
+                vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
+                vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from,  to)));
+                if (!tags.isEmpty()) {
+                    vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
                 }
-                if (executeActions(vd).willCancel()) {
-                    // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
-                    // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                    return data.getSetBack(to);
-                }
-            } else {
-                data.creativeFlyPreviousRefused = true;
+            }
+            if (executeActions(vd).willCancel()) {
+                // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
+                // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
+                return data.getSetBack(to);
             }
         } else {
-            data.creativeFlyPreviousRefused = false;
+            // Slowly reduce the violation level with each event.
+            data.creativeFlyVL *= 0.97D;
         }
-
-        // Slowly reduce the violation level with each event.
-        data.creativeFlyVL *= 0.97D;
 
         // Adjust the set-back and other last distances.
         data.setSetBack(to);

@@ -187,9 +187,6 @@ public class MovingData extends ACheckData {
 
     // Check specific data -----
 
-    // Data of the creative check.
-    public boolean        creativeFlyPreviousRefused;
-
     // Data of the more packets check.
     /** Packet frequency count. */
     public final ActionFrequency morePacketsFreq;
