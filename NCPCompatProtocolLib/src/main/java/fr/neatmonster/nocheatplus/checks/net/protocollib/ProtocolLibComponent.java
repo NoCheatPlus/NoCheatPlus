@@ -173,7 +173,10 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload, Joi
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
         if (!registeredPacketAdapters.isEmpty()) {
             final Player player = event.getPlayer();
-            dataFactory.getData(player).onJoin(player);
+            final NetData data = dataFactory.getData(player);
+            data.onJoin(player);
+            final Location loc = player.getLocation();
+            data.teleportQueue.onTeleportEvent(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         }
     }
 
