@@ -19,12 +19,14 @@ public abstract class ConfPaths {
     public static final String SUB_ASCEND                                = "ascend";
     public static final String SUB_DEBUG                                 = "debug";
     public static final String SUB_DESCEND                               = "descend";
+    public static final String SUB_GRAVITY                               = "gravity";
     public static final String SUB_HORIZONTAL                            = "horizontal";
     public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed"; // Phase out.
     public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
     public static final String SUB_LAG                                   = "lag";
     public static final String SUB_MAXHEIGHT                             = "maxheight";
     public static final String SUB_MODEL                                 = "model";
+    public static final String SUB_MODIFIERS                             = "modifiers";
     public static final String SUB_MODSPRINT                             = "modsprint";
     public static final String SUB_OVERRIDEFLAGS                         = "overrideflags";
     public static final String SUB_SPEED                                 = "speed";
@@ -39,6 +41,7 @@ public abstract class ConfPaths {
     public static final String SUB_VERTICAL_DESCEND                      = SUB_VERTICAL + "." + SUB_DESCEND;
     public static final String SUB_VERTICAL_DESCEND_SPEED                = SUB_VERTICAL_DESCEND + "." + SUB_SPEED;
     public static final String SUB_VERTICAL_MAXHEIGHT                    = SUB_VERTICAL + "." + SUB_MAXHEIGHT;
+    public static final String SUB_VERTICAL_GRAVITY                      = SUB_VERTICAL + "." + SUB_GRAVITY;
 
     // General.
     public static final String SAVEBACKCONFIG                            = "savebackconfig";

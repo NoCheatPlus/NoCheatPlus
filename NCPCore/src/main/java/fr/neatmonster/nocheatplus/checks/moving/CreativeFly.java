@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -61,60 +62,16 @@ public class CreativeFly extends Check {
         thisMove.modelFlying = model;
         final MoveData lastMove = data.moveData.getFirst();
 
-        // Before doing anything, do a basic height check to determine if players are flying too high.
-        final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
-        if (to.getY() > maximumHeight) {
-            // TODO: USE velocity if possible.
-            return new Location(player.getWorld(), data.getSetBackX(), Math.max(maximumHeight - 10D, to.getWorld().getMaxHeight()), data.getSetBackZ(), to.getYaw(), to.getPitch());
-        }
-
         // Calculate some distances.
         final double yDistance = thisMove.yDistance;
         final double hDistance = thisMove.hDistance;
 
-        // Sprinting.
-        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
-
-        // If the player is affected by potion of swiftness.
-
-        final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
-        double fSpeed;
-
-        // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
-        if (speedModifier == Double.NEGATIVE_INFINITY) {
-            fSpeed = 1D;
-        }
-        else {
-            fSpeed = 1D + 0.2D * (speedModifier + 1D);
-        }
-
         final boolean flying = gameMode == BridgeMisc.GAME_MODE_SPECTATOR || player.isFlying();
-        if (flying) {
-            // TODO: Consider mechanichs for flying backwards.
-            fSpeed *= data.flySpeed / 0.1;
-            if (sprinting) {
-                // TODO: Prevent for pre-1.8?
-                fSpeed *= model.hModSprint;
-            }
-            tags.add("flying");
-        }
-        else {
-            // (Ignore sprinting here).
-            fSpeed *= data.walkSpeed / 0.2;
-        }
 
-        double limitH = model.hModSpeed / 100D * ModelFlying.HORIZONTAL_SPEED * fSpeed;
-
-        if (lastMove.toIsValid) {
-            // TODO: Use last friction (as well)?
-            // TODO: Test/adjust more.
-            double frictionDist = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
-            limitH = Math.max(frictionDist, limitH);
-        }
-
-        // Finally, determine how far the player went beyond the set limits.
-        //        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
-        double resultH = Math.max(0.0D, hDistance - limitH);
+        // Horizontal distance check.
+        double[] resH = hDist(player, from, to, hDistance, yDistance, flying, lastMove, time, model, data, cc);
+        double limitH = resH[0];
+        double resultH = resH[1];
 
         // Check velocity.
         if (resultH > 0) {
@@ -125,76 +82,72 @@ public class CreativeFly extends Check {
             }
             if (hFreedom > 0.0) {
                 resultH = Math.max(0.0, resultH - hFreedom);
+                if (resultH <= 0.0) {
+                    limitH = hDistance;
+                }
+                tags.add("hvel");
             }
         }
         else {
             data.clearActiveHorVel(); // TODO: test/check !
         }
 
-        data.bunnyhopDelay--;
-
-        if (!flying && resultH > 0 && sprinting) {
-            // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
-            // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
-            // again leads to a player moving almost twice as far in that step.
-            // TODO: Real modeling for that kind of moving pattern (same with sf?).
-            if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
-                data.bunnyhopDelay = 9;
-                resultH = 0D;
-                tags.add("bunnyhop");
-            }
-        }
-
-        resultH *= 100D;
+        resultH *= 100.0; // Normalize to % of a block.
         if (resultH > 0.0) {
             tags.add("hdist");
         }
 
-        // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
-        double limitV = model.vModAscendSpeed / 100D * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
+        // Vertical move.
+        double limitV = 0.0; // Limit.
+        double resultV = 0.0; // Violation (normalized to 100 * 1 block, applies if > 0.0).
 
-        if (flying && yDistance > 0.0) {
-            // Let fly speed apply with moving upwards.
-            limitV *= data.flySpeed / 0.1;
+        // Distinguish checking method by y-direction of the move.
+        if (yDistance > 0.0) {
+            // Ascend.
+            double[] res = vDistAscend(from, to, yDistance, flying, lastMove, model, data, cc);
+            resultV = Math.max(resultV, res[1]);
+            limitV = res[0];
+        }
+        else if (yDistance < 0.0) {
+            // Descend.
+            double[] res = vDistDescend(from, to, yDistance, flying, lastMove, model, data, cc);
+            resultV = Math.max(resultV, res[1]);
+            limitV = res[0];
+        }
+        else {
+            // Keep altitude.
+            double[] res = vDistZero(from, to, yDistance, flying, lastMove, model, data, cc);
+            resultV = Math.max(resultV, res[1]);
+            limitV = res[0];
         }
 
-        if (lastMove.toIsValid) {
-            // (Disregard gravity.)
-            // TODO: Use last friction (as well)?
-            double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
-            if (!flying) {
-                frictionDist -= Magic.GRAVITY_MIN;
-            }
-            limitV = Math.max(frictionDist, limitV);
-        }
-
-        // Determine violation amount, post-violation recovery.
-        double resultV = Math.max(0.0, (yDistance - limitV) * 100.0);
-        // Ordinary step up. TODO: sfStepHeight should be a common modeling parameter?
-        if (yDistance < cc.sfStepHeight 
-                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())
-                && to.isOnGround()) {
-            // (Jump effect not checked yet.)
-            resultV = 0.0;
-            tags.add("step_up");
-        }
         // Velocity.
         if (resultV > 0.0 && data.getOrUseVerticalVelocity(yDistance) != null) {
             resultV = 0.0;
+            tags.add("vvel");
         }
 
+        // Add tag for maximum height check (silent set back).
+        final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
+        if (to.getY() > maximumHeight) {
+            // TODO: Allow use velocity there (would need a flag to signal the actual check below)?
+            tags.add("maxheight");
+        }
+
+        resultV *= 100.0; // Normalize to % of a block.
         if (resultV > 0.0) {
             tags.add("vdist");
         }
 
-        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
+        final double result = Math.max(0.0, resultH) + Math.max(0.0, resultV);
 
         if (data.debug) {
             outpuDebugMove(player, hDistance, limitH, yDistance, limitV, model, tags, data);
         }
 
-        // The player went to far, either horizontal or vertical.
-        if (result > 0D) {
+        // Violation handling.
+        Location setBack = null; // Might get altered below.
+        if (result > 0.0) {
             // Increment violation level.
             data.creativeFlyVL += result;
 
@@ -212,27 +165,222 @@ public class CreativeFly extends Check {
             if (executeActions(vd).willCancel()) {
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                 // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                return data.getSetBack(to);
+                setBack = data.getSetBack(to);
             }
-        } else {
-            // Slowly reduce the violation level with each event.
-            data.creativeFlyVL *= 0.97D;
+        }
+        else {
+            // Maximum height check (silent set back).
+            if (to.getY() > maximumHeight) {
+                setBack = data.getSetBack(to);
+            }
+            if (setBack == null) {
+                // Slowly reduce the violation level with each event.
+                data.creativeFlyVL *= 0.97;
+            }
         }
 
-        // Adjust the set-back and other last distances.
-        data.setSetBack(to);
-        return null;
+        // Return setBack, if set.
+        if (setBack != null) {
+            // Check for max height of the set-back.
+            if (setBack.getY() > maximumHeight) {
+                // Correct the y position.
+                setBack.setY(getCorrectedHeight(maximumHeight, setBack.getWorld()));
+                if (data.debug) {
+                    debug(player, "Maximum height exceeded by set-back, correct to: " + setBack.getY());
+                }
+            }
+            return setBack;
+        }
+        else {
+            // Adjust the set-back and other last distances.
+            data.setSetBack(to);
+            return null;
+        }
+    }
+
+    /**
+     * 
+     * @param player
+     * @param from
+     * @param to
+     * @param hDistance
+     * @param yDistance
+     * @param flying
+     * @param lastMove
+     * @param time
+     * @param model
+     * @param data
+     * @param cc
+     * @return limitH, resultH (not normalized).
+     */
+    private double[] hDist(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean flying, final MoveData lastMove, final long time, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+        // Modifiers.
+        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
+        double fSpeed;
+
+        // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
+        if (model.applyModifiers) {
+            final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
+            if (speedModifier == Double.NEGATIVE_INFINITY) {
+                fSpeed = 1.0;
+            }
+            else {
+                fSpeed = 1.0 + 0.2 * (speedModifier + 1.0);
+            }
+            if (flying) {
+                // TODO: Consider mechanics for flying backwards.
+                fSpeed *= data.flySpeed / 0.1;
+                if (sprinting) {
+                    // TODO: Prevent for pre-1.8?
+                    fSpeed *= model.hModSprint;
+                    tags.add("sprint");
+                }
+                tags.add("flying");
+            }
+            else {
+                // (Ignore sprinting here).
+                fSpeed *= data.walkSpeed / 0.2;
+            }
+        }
+        else {
+            fSpeed = 1.0;
+        }
+
+        double limitH = model.hModSpeed / 100.0 * ModelFlying.HORIZONTAL_SPEED * fSpeed;
+
+        if (lastMove.toIsValid) {
+            // TODO: Use last friction (as well)?
+            // TODO: Test/adjust more.
+            double frictionDist = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
+            limitH = Math.max(frictionDist, limitH);
+            tags.add("hfrict");
+        }
+
+        // Finally, determine how far the player went beyond the set limits.
+        //        double resultH = Math.max(0.0.0, hDistance - data.horizontalFreedom - limitH);
+        double resultH = Math.max(0.0, hDistance - limitH);
+
+        if (model.applyModifiers) {
+            data.bunnyhopDelay--;
+            if (!flying && resultH > 0 && sprinting) {
+                // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
+                // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
+                // again leads to a player moving almost twice as far in that step.
+                // TODO: Real modeling for that kind of moving pattern (same with sf?).
+                if (data.bunnyhopDelay <= 0 && resultH < 0.4) {
+                    data.bunnyhopDelay = 9;
+                    resultH = 0.0;
+                    tags.add("bunnyhop");
+                }
+            }
+        }
+        return new double[] {limitH, resultH};
+    }
+
+
+    /**
+     * 
+     * @param from
+     * @param to
+     * @param yDistance
+     * @param flying
+     * @param lastMove
+     * @param model
+     * @param data
+     * @param cc
+     * @return limitV, resultV (not normalized).
+     */
+    private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+        double limitV = model.vModAscendSpeed / 100.0 * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
+        double resultV = 0.0;
+        if (model.applyModifiers && flying && yDistance > 0.0) {
+            // Let fly speed apply with moving upwards.
+            limitV *= data.flySpeed / 0.1;
+        }
+
+        if (model.gravity && lastMove.toIsValid && yDistance > limitV) { // TODO: gravity/friction?
+            // (Disregard gravity.)
+            // TODO: Use last friction (as well)?
+            double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
+            if (!flying) {
+                frictionDist -= Magic.GRAVITY_MIN;
+            }
+            if (frictionDist > limitV) {
+                limitV = frictionDist;
+                tags.add("vfrict_g");
+            }
+        }
+
+        // Determine violation amount.
+        resultV = Math.max(0.0, yDistance - limitV);
+
+        // Post-violation recovery.
+        // Ordinary step up. TODO: sfStepHeight should be a common modeling parameter?
+        if (yDistance <= cc.sfStepHeight 
+                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())
+                && to.isOnGround()) {
+            // (Jump effect not checked yet.)
+            resultV = 0.0;
+            tags.add("step_up");
+        }
+        return new double[] {limitV, resultV};
+    }
+
+    /**
+     * 
+     * @param from
+     * @param to
+     * @param yDistance
+     * @param flying
+     * @param lastMove
+     * @param model
+     * @param data
+     * @param cc
+     * @return limitV, resultV
+     */
+    private double[] vDistDescend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+        double limitV = 0.0;
+        double resultV = 0.0;
+        // Note that 'extreme moves' are covered by the extreme move check.
+        // TODO: if gravity: friction + gravity.
+        // TODO: deny falling, possibly special case head-step-down - to be tested (levitation).
+        // TODO: min-max envelope (elytra).
+        // TODO: ordinary flying (flying: enforce maximum speed at least)
+        return new double[] {limitV, resultV};
+    }
+
+    /**
+     * 
+     * @param from
+     * @param to
+     * @param yDistance
+     * @param flying
+     * @param lastMove
+     * @param model
+     * @param data
+     * @param cc
+     * @return limitV, resultV
+     */
+    private double[] vDistZero(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+        double limitV = 0.0;
+        double resultV = 0.0;
+        // TODO: Deny on enforcing mingain.
+        return new double[] {limitV, resultV};
+    }
+
+    private double getCorrectedHeight(final double maximumHeight, final World world) {
+        return Math.max(maximumHeight - 10.0, world.getMaxHeight());
     }
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
         StringBuilder builder = new StringBuilder(350);
-        builder.append("hDist: " + hDistance + " / " + limitH + " vDist: " + yDistance + " / " + limitV);
+        builder.append("hDist: " + hDistance + " / " + limitH + " , vDist: " + yDistance + " / " + limitV);
         if (data.verVelUsed != null) {
-            builder.append(" vVelUsed: " + data.verVelUsed);
+            builder.append(" , vVelUsed: " + data.verVelUsed);
         }
-        builder.append(" model: " + model.id);
+        builder.append(" , model: " + model.id);
         if (!tags.isEmpty()) {
-            builder.append(" tags: ");
+            builder.append(" , tags: ");
             builder.append(StringUtil.join(tags, "+"));
         }
         debug(player, builder.toString());

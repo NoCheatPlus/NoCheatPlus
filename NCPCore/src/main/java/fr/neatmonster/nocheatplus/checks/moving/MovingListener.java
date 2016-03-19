@@ -944,7 +944,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private static void workaroundFlyNoFlyTransition(final Player player, final int tick, final MovingData data) {
         final MoveData lastMove = data.moveData.getFirst();
-        final double amount = lastMove.hDistance * Magic.FRICTION_MEDIUM_AIR;
+        final double amount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0; // Allow same speed instead?
+        data.clearActiveHorVel(); // Clear active velocity due to adding actual speed here.
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
         data.addVerticalVelocity(new SimpleEntry(lastMove.yDistance, 2));
         data.addVerticalVelocity(new SimpleEntry(0.0, 2));

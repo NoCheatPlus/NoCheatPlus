@@ -25,20 +25,26 @@ public class ModelFlying {
     public final double hModSpeed;
     /** Additional modifier for horizontal flying speed (multiplier), when sprinting. */
     public final double hModSprint;
-    /** Modifier for vertical flying speed in per cent. */
+    /** Modifier for vertical flying speed in per cent, for ascending. */
     public final double vModAscendSpeed;
     /** Maximum flying height above the maximum building height of the map. */
     public final double maxHeight;
+    /** Apply modifiers like sprint, flyspeed, walkspeed, potions. */
+    public final boolean applyModifiers;
+    /** Allow falling with gravity, including friction. */
+    public final boolean gravity;
 
-    public ModelFlying(String id, double hMod, double hModSprint, double vMod, double maxHeight) {
+    public ModelFlying(String id, double hModSpeed, double hModSprint, double vModAscendSpeed, double maxHeight, boolean applyModifiers, boolean gravity) {
         // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
         // TODO: possibly other friction based envelope constraints.
         // TODO: Check if needed: use fly/walk speed.
         this.id = id;
-        this.hModSpeed = hMod;
+        this.hModSpeed = hModSpeed;
         this.hModSprint = hModSprint;
-        this.vModAscendSpeed = vMod;
+        this.vModAscendSpeed = vModAscendSpeed;
         this.maxHeight = maxHeight;
+        this.applyModifiers = applyModifiers;
+        this.gravity = gravity;
     }
 
     public ModelFlying(String id, ConfigurationSection config, String prefix, ModelFlying defaults) {
@@ -48,12 +54,14 @@ public class ModelFlying {
                 config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_SPEED, defaults.hModSpeed),
                 config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_MODSPRINT, defaults.hModSprint),
                 config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.vModAscendSpeed),
-                config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.maxHeight)
+                config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.maxHeight),
+                config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.applyModifiers),
+                config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.gravity)
                 );
     }
 
     public ModelFlying() {
-        this(null, 100.0, 1.92, 100, 128);
+        this(null, 100.0, 1.92, 100.0, 128, true, true);
     }
 
 }
