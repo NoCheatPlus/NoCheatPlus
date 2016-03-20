@@ -116,7 +116,7 @@ public class LostGround {
                     if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), from.getX(), from.getY(), from.getZ(), from.getWidth(), from.getyOnGround(), lastMove, data, "asc1", tags, from.getMCAccess())) {
                         return true;
                     }
-    
+
                     // Special cases.
                     if (yDistance == 0.0 && lastMove.yDistance <= -0.23 && (hDistance <= lastMove.hDistance * 1.1)) {
                         // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
@@ -128,7 +128,7 @@ public class LostGround {
                             return true;
                         }
                     }
-    
+
                     else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
                         // (Minimal margin.)
                         //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
@@ -183,7 +183,7 @@ public class LostGround {
      * @param tag
      * @return
      */
-    public static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.x, lastMove.from.y, lastMove.from.z, lastMove.hDistance, width, yOnGround, data, tag, tags, mcAccess);
     }
 
@@ -235,9 +235,9 @@ public class LostGround {
     private static boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
-    
+
         final double setBackYDistance = to.getY() - data.getSetBackY();
-    
+
         // Collides vertically.
         // Note: checking loc should make sense, rather if loc is higher than from?
         if (yDistance < 0.0 && !to.isOnGround() && from.isOnGround(from.getY() - to.getY() + 0.001)) {
@@ -251,11 +251,11 @@ public class LostGround {
                 return applyLostGround(player, from, false, data, "vcollide", tags);
             }
         }
-    
+
         if (!lastMove.toIsValid) {
             return false;
         }
-    
+
         if (data.sfJumpPhase <= 7) {
             // Check for sprinting down blocks etc.
             if (lastMove.yDistance <= yDistance && setBackYDistance < 0 && !to.isOnGround()) {
@@ -270,7 +270,7 @@ public class LostGround {
                     return applyLostGround(player, from, true, data, "pyramid", tags);
                 }
             }
-    
+
             // Check for jumping up strange blocks like flower pots on top of other blocks.
             if (yDistance == 0.0 && lastMove.yDistance > 0.0 && lastMove.yDistance < 0.25 && data.sfJumpPhase <= Math.max(0, 6 + data.jumpAmplifier * 3.0) && setBackYDistance > 1.0 && setBackYDistance < Math.max(0.0, 1.5 + 0.2 * data.jumpAmplifier) && !to.isOnGround()) {
                 // TODO: confine by block types ?
@@ -291,7 +291,7 @@ public class LostGround {
                 return applyLostGround(player, from, true, data, "edgedesc", tags);
             }
         }
-    
+
         // Nothing found.
         return false;
     }
@@ -340,7 +340,7 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    public static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         if (setBackSafe) {
             data.setSetBack(refLoc);
         }
