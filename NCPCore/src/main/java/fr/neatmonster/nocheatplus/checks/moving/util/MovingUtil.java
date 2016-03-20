@@ -55,7 +55,7 @@ public class MovingUtil {
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
                 && (Bridge1_9.getLevitationAmplifier(player) == Double.NEGATIVE_INFINITY || fromLocation.isInLiquid())
-                && (!Bridge1_9.isReadyForElytra(player) || fromLocation.isOnGroundOrResetCond())
+                && (!Bridge1_9.isWearingElytra(player) || fromLocation.isOnGroundOrResetCond())
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
     }
 

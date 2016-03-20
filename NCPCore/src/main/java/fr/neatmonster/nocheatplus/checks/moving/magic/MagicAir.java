@@ -5,7 +5,6 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
-import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 public class MagicAir {
@@ -338,6 +337,7 @@ public class MagicAir {
      * @param data
      * @return
      */
+    @SuppressWarnings("unused")
     private static boolean oddElytra(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // Organize cases differently here, at the cost of reaching some nesting level, in order to see if it's better to overview.
         final MoveData thisMove = data.thisMove;
@@ -351,12 +351,12 @@ public class MagicAir {
                 if (yDistChange < 0.0) {
                     // pastMove1 valid, decreasing speed envelope like above.
                     if (pastMove1.toIsValid && pastMove1.yDistance < 0.0) {
-                        final double lastDecrease = lastMove.yDistance - pastMove1.yDistance;
+                        final double lastYDistChange = lastMove.yDistance - pastMove1.yDistance;
                         // Increase falling speed from past to last.
-                        if (lastDecrease < 0.0) {
+                        if (lastYDistChange < 0.0) {
                             // Relate sum of decrease to gravity somehow. 
                             // TODO: Inaugurate by the one below?
-                            if (Math.abs(yDistChange + lastDecrease) > Magic.GRAVITY_ODD / 2.0) {
+                            if (Math.abs(yDistChange + lastYDistChange) > Magic.GRAVITY_ODD / 2.0) {
                                 // TODO: Might further test for a workaround count down or relate to total gain / jump phase.
                                 return true;
                             }
@@ -365,13 +365,10 @@ public class MagicAir {
                 }
                 // Independently of increasing/decreasing.
                 // Gliding possibly.
-                if (thisMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
-                        && lastMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
-                        && Math.abs(yDistChange) < Magic.GLIDE_DESCEND_GAIN_MAX) {
-                    // Restrict to early falling.
-                    if (data.sfJumpPhase < 20) {
-                        return true;
-                    }
+                if (Magic.glideVerticalGainEnvelope(thisMove.yDistance, lastMove.yDistance)) {
+                    // Restrict to early falling, or higher speeds.
+                    // (Further restrictions hardly grip, observed: jump phase > 40, yDistance at -0.214)
+                    return true;
                 }
             }
         }
@@ -415,10 +412,10 @@ public class MagicAir {
             // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
             return true;
         }
-        if (Bridge1_9.isWearingElytra(from.getPlayer()) && MagicAir.oddElytra(yDistance, yDistDiffEx, lastMove, data)) {
-            // Odd behavior with/after wearing elytra.
-            return true;
-        }
+//        if (Bridge1_9.isWearingElytra(from.getPlayer()) && MagicAir.oddElytra(yDistance, yDistDiffEx, lastMove, data)) {
+//            // Odd behavior with/after wearing elytra.
+//            return true;
+//        }
         return false;
     }
 

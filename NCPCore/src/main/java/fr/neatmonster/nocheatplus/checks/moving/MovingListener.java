@@ -966,13 +966,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Test for exceptions.
         if (Bridge1_9.isWearingElytra(player) && thisMove.hDistance > defaultAmount) {
             // Allowing the same speed won't always work on elytra (still increasing, differing modeling on client side with motXYZ).
+            // (Doesn't seem to be overly effective.)
             final MoveData pastMove1 = data.moveData.get(1);
             if (pastMove1.toIsValid && lastMove.modelFlying != null && pastMove1.modelFlying != null
-                    && thisMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
-                    && lastMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
-                    && pastMove1.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
-                    && Math.abs(pastMove1.yDistance - lastMove.yDistance) < Magic.GLIDE_DESCEND_GAIN_MAX
-                    && Math.abs(lastMove.yDistance - thisMove.yDistance) < Magic.GLIDE_DESCEND_GAIN_MAX
+                    && Magic.glideVerticalGainEnvelope(thisMove.yDistance, lastMove.yDistance)
+                    && Magic.glideVerticalGainEnvelope(lastMove.yDistance, pastMove1.yDistance)
                     && lastMove.hDistance > pastMove1.hDistance && thisMove.hDistance > lastMove.hDistance
                     && Math.abs(lastMove.hDistance - pastMove1.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX
                     && Math.abs(thisMove.hDistance - lastMove.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX) {

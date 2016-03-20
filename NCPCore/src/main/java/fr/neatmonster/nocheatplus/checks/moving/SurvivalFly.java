@@ -730,10 +730,22 @@ public class SurvivalFly extends Check {
             // Consider friction.
             // TODO: Invalidation mechanics.
             // TODO: Friction model for high speeds?
-            thisMove.hAllowedDistance = Math.max(hAllowedDistance, lastMove.hDistance * friction);
-        } else {
-            thisMove.hAllowedDistance = hAllowedDistance;
+            hAllowedDistance = Math.max(hAllowedDistance, lastMove.hDistance * friction);
         }
+//        if (hAllowedDistance < thisMove.hDistance) {
+//            // After failure recovery.
+//            if (lastMove.toIsValid) {
+//                final double hDistDiff = thisMove.hDistance - lastMove.hDistance;
+//                // Elytra.
+//                if (hDistDiff < Magic.GLIDE_HORIZONTAL_GAIN_MAX
+//                        && Magic.inAir(thisMove) && Bridge1_9.isWearingElytra(player)) {
+//                    // (Abrupt hdist stops aren't covered yet anyway.)
+//                    hAllowedDistance = thisMove.hDistance;
+//                    data.nextFrictionHorizontal = Magic.FRICTION_MEDIUM_AIR;
+//                }
+//            }
+//        }
+        thisMove.hAllowedDistance = hAllowedDistance;
         return thisMove.hAllowedDistance;
     }
 

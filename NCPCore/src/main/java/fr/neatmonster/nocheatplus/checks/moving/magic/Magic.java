@@ -49,7 +49,7 @@ public class Magic {
     /**
      * Somewhat arbitrary horizontal speed gain maximum for advance glide phase.
      */
-    public static final double GLIDE_HORIZONTAL_GAIN_MAX = GRAVITY_SPAN;
+    public static final double GLIDE_HORIZONTAL_GAIN_MAX = GRAVITY_MAX / 2.0;
 
     // Vertical speeds/modifiers. 
     public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!
@@ -59,10 +59,16 @@ public class Magic {
      */
     public static final double GLIDE_DESCEND_PHASE_MIN = -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN;
     /**
-     * Somewhat arbitrary, advanced glide phase, maximum descend speed gain.
-     * This value is positive.
+     * Somewhat arbitrary, advanced glide phase, maximum descend speed gain
+     * (absolute value is negative).
      */
-    public static final double GLIDE_DESCEND_GAIN_MAX = GRAVITY_MAX;
+    public static final double GLIDE_DESCEND_GAIN_MAX_NEG = -GRAVITY_MAX;
+    /**
+     * Somewhat arbitrary, advanced glide phase, maximum descend speed gain
+     * (absolute value is positive, a negative gain seen in relation to the
+     * moving direction).
+     */
+    public static final double GLIDE_DESCEND_GAIN_MAX_POS = GRAVITY_ODD / 1.95;
 
     // On-ground.
     public static final double Y_ON_GROUND_MIN = 0.00001;
@@ -176,7 +182,7 @@ public class Magic {
      *            Not strictly the latest move in MovingData.
      * @return
      */
-    static boolean inAir(final MoveData thisMove) {
+    public static boolean inAir(final MoveData thisMove) {
         return !thisMove.touchedGround && !thisMove.from.resetCond && !thisMove.to.resetCond;
     }
 
@@ -269,6 +275,20 @@ public class Magic {
             }
         }
         return false;
+    }
+
+    /**
+     * Advanced glide phase vertical gain envelope.
+     * @param yDistance
+     * @param previousYDistance
+     * @return
+     */
+    public static boolean glideVerticalGainEnvelope(final double yDistance, final double previousYDistance) {
+        return // Sufficient speed of descending.
+                yDistance < GLIDE_DESCEND_PHASE_MIN && previousYDistance < GLIDE_DESCEND_PHASE_MIN
+                // Controlled difference.
+                && yDistance - previousYDistance > GLIDE_DESCEND_GAIN_MAX_NEG 
+                && yDistance - previousYDistance < GLIDE_DESCEND_GAIN_MAX_POS;
     }
 
 }

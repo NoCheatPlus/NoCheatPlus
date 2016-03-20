@@ -51,18 +51,6 @@ public class Bridge1_9 {
     }
 
     /**
-     * Check if a player has an elytra equipped and is holding an end rod. This
-     * doesn't check for other conditions, like if the player is in air.
-     * 
-     * @param player
-     * @return
-     */
-    public static boolean isReadyForElytra(final Player player) {
-        // TODO: Generic jet-pack / potion support (triggers + model configs).
-        return END_ROD != null && ELYTRA != null && isWearingElytra(player) && hasItemInAnyHand(player, END_ROD);
-    }
-
-    /**
      * Just test if the player has elytra equipped in the chest plate slot. The
      * player may or may not be holding an end rod in either hand.
      * 
@@ -70,8 +58,13 @@ public class Bridge1_9 {
      * @return
      */
     public static boolean isWearingElytra(final Player player) {
-        final ItemStack stack = player.getInventory().getChestplate();
-        return stack != null && stack.getType() == ELYTRA;
+        if (ELYTRA == null) {
+            return false;
+        }
+        else {
+            final ItemStack stack = player.getInventory().getChestplate();
+            return stack != null && stack.getType() == ELYTRA;
+        }
     }
 
     /**
