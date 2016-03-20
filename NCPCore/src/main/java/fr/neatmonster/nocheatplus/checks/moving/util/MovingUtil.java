@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -238,6 +239,16 @@ public class MovingUtil {
             }
             data.setSetBack(from);
             data.resetPositions(from);
+        }
+    }
+
+    public static double getJumpAmplifier(final Player player, final MCAccess mcAccess) {
+        final double amplifier = mcAccess.getJumpAmplifier(player);
+        if (amplifier == Double.NEGATIVE_INFINITY) {
+            return 0.0;
+        }
+        else {
+            return 1.0 + amplifier;
         }
     }
 

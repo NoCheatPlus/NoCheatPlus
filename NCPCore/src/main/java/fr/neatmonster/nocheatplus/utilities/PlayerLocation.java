@@ -1137,4 +1137,12 @@ public class PlayerLocation {
         return builder.toString();
     }
 
+    /**
+     * Retrieve the internally stored MCAccess instance.
+     * @return
+     */
+    public MCAccess getMCAccess() {
+        return mcAccess;
+    }
+
 }
