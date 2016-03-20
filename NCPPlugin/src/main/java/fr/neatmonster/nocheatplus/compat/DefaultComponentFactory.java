@@ -62,6 +62,10 @@ public class DefaultComponentFactory {
             StaticLog.logInfo("Inventory checks: Gutenberg is not available.");
         }
 
+        // Version dependent activation of components.
+        final String vServerLc = Bukkit.getServer().getVersion().toLowerCase();
+        // TODO: Consider using a class for confining plugin vs. server versions.
+
         // ProtocolLib dependencies.
         Plugin pluginProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
         boolean protocolLibAvailable = false;
@@ -72,21 +76,23 @@ public class DefaultComponentFactory {
                 pV = GenericVersion.parseVersionDelimiters(_pV, "", "-snapshot");
             }
             if (pV == null) {
-
+                // TODO: Was another (specific) attempt parsing planned here !?
+                StaticLog.logWarning("Could not interpret the version of ProtocolLib, won't activate hooks.");
             }
             else {
                 try {
-                    boolean vP1 = GenericVersion.compareVersions("3.6.4", pV) == 0;
-                    boolean vP2 = GenericVersion.compareVersions("3.6.5", pV) == 0;
-                    boolean vP3 = GenericVersion.isVersionBetween(pV, "3.7", true, "3.7.0", true);
+                    boolean vP3_6_4 = GenericVersion.compareVersions("3.6.4", pV) == 0;
+                    boolean vP3_6_5 = GenericVersion.compareVersions("3.6.5", pV) == 0;
+                    boolean vP3_6_6 = GenericVersion.compareVersions("3.6.6", pV) == 0;
+                    boolean vP3_7_0 = GenericVersion.isVersionBetween(pV, "3.7", true, "3.7.0", true);
+                    boolean vP4_0_0 = GenericVersion.compareVersions("4.0.0", pV)  <= 0; // 4.0.0 or later until next MC version is out.
                     if (
-                            ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false)
-                            && vP3
-                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) 
-                            &&
-                            (vP1 || vP2) 
-                            || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false)
-                            && vP1
+                            ServerVersion.compareMinecraftVersion("1.9") == 0 && vP4_0_0
+                            || ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP3_7_0
+                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false)  && (vP3_6_4 || vP3_6_5) 
+                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) && vP3_6_6
+                            && vServerLc.indexOf("paperspigot") != -1
+                            || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false) && vP3_6_4
                             ) {
                         available.add(new ProtocolLibComponent(plugin));
                         protocolLibAvailable = true;
@@ -101,7 +107,7 @@ public class DefaultComponentFactory {
         }
         if (!protocolLibAvailable) {
             if (pluginProtocolLib != null) {
-                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9 [EXPERIMENTAL].");
+                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9, ProtocolLib 4.0.0 or later on Minecraft 1.9 [EXPERIMENTAL].");
             }
             StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
