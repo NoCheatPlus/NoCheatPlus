@@ -68,6 +68,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -942,9 +943,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param tick
      * @param data
      */
-    private static void workaroundFlyNoFlyTransition(final Player player, final int tick, final MovingData data) {
+    private void workaroundFlyNoFlyTransition(final Player player, final int tick, final MovingData data) {
         final MoveData lastMove = data.moveData.getFirst();
-        final double amount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0; // Allow same speed instead?
+        final double amount = guessFlyNoFlyVelocity(player, data.thisMove, lastMove, data);
         data.clearActiveHorVel(); // Clear active velocity due to adding actual speed here.
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
         data.addVerticalVelocity(new SimpleEntry(lastMove.yDistance, 2));
@@ -953,7 +954,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Reset fall height.
         // TODO: Later (e.g. 1.9) check for the ModelFlying, if fall damage is intended.
         data.clearNoFallData();
-        player.setFallDistance(0f);
+        player.setFallDistance(0f); // TODO: Might do without this in case of elytra, needs ensure NoFall doesn't kill the player (...).
+        if (data.debug){
+            debug(player, "Fly-nofly transition: Add velocity.");
+        }
+    }
+
+    private static double guessFlyNoFlyVelocity(final Player player, final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+        // Default margin: Allow slightly less than the previous speed.
+        final double defaultAmount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0;
+        // Test for exceptions.
+        if (Bridge1_9.isWearingElytra(player) && thisMove.hDistance > defaultAmount) {
+            // Allowing the same speed won't always work on elytra (still increasing, differing modeling on client side with motXYZ).
+            final MoveData pastMove1 = data.moveData.get(1);
+            if (pastMove1.toIsValid && lastMove.modelFlying != null && pastMove1.modelFlying != null
+                    && thisMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
+                    && lastMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
+                    && pastMove1.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
+                    && Math.abs(pastMove1.yDistance - lastMove.yDistance) < Magic.GLIDE_DESCEND_GAIN_MAX
+                    && Math.abs(lastMove.yDistance - thisMove.yDistance) < Magic.GLIDE_DESCEND_GAIN_MAX
+                    && lastMove.hDistance > pastMove1.hDistance && thisMove.hDistance > lastMove.hDistance
+                    && Math.abs(lastMove.hDistance - pastMove1.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX
+                    && Math.abs(thisMove.hDistance - lastMove.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX) {
+                return thisMove.hDistance + Magic.GLIDE_HORIZONTAL_GAIN_MAX;
+            }
+        }
+        return defaultAmount;
     }
 
     /**

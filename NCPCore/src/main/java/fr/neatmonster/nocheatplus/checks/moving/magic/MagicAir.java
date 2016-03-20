@@ -5,6 +5,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 public class MagicAir {
@@ -328,6 +329,56 @@ public class MagicAir {
     }
 
     /**
+     * Odd behavior with/after wearing elytra. End rod is not in either hand,
+     * elytra is equipped (not checked in here).
+     * 
+     * @param yDistance
+     * @param yDistDiffEx
+     * @param lastMove
+     * @param data
+     * @return
+     */
+    private static boolean oddElytra(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+        // Organize cases differently here, at the cost of reaching some nesting level, in order to see if it's better to overview.
+        final MoveData thisMove = data.thisMove;
+        final MoveData pastMove1 = data.moveData.get(1); // Checked below, if needed.
+        // Both descending moves.
+        if (thisMove.yDistance < 0.0 && lastMove.yDistance < 0.0) {
+            // Falling too slow.
+            if (yDistDiffEx > 0.0) {
+                final double yDistChange = thisMove.yDistance - lastMove.yDistance;
+                // Increase falling speed somehow.
+                if (yDistChange < 0.0) {
+                    // pastMove1 valid, decreasing speed envelope like above.
+                    if (pastMove1.toIsValid && pastMove1.yDistance < 0.0) {
+                        final double lastDecrease = lastMove.yDistance - pastMove1.yDistance;
+                        // Increase falling speed from past to last.
+                        if (lastDecrease < 0.0) {
+                            // Relate sum of decrease to gravity somehow. 
+                            // TODO: Inaugurate by the one below?
+                            if (Math.abs(yDistChange + lastDecrease) > Magic.GRAVITY_ODD / 2.0) {
+                                // TODO: Might further test for a workaround count down or relate to total gain / jump phase.
+                                return true;
+                            }
+                        }
+                    }
+                }
+                // Independently of increasing/decreasing.
+                // Gliding possibly.
+                if (thisMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
+                        && lastMove.yDistance < Magic.GLIDE_DESCEND_PHASE_MIN
+                        && Math.abs(yDistChange) < Magic.GLIDE_DESCEND_GAIN_MAX) {
+                    // Restrict to early falling.
+                    if (data.sfJumpPhase < 20) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Several types of odd in-air moves, mostly with gravity near maximum,
      * friction, medium change. Needs lastMove.toIsValid.
      * 
@@ -362,6 +413,10 @@ public class MagicAir {
         }
         if (MagicAir.oddFriction(yDistance, yDistDiffEx, lastMove, data)) {
             // Odd behavior with moving up or (slightly) down, accounting for more than one past move.
+            return true;
+        }
+        if (Bridge1_9.isWearingElytra(from.getPlayer()) && MagicAir.oddElytra(yDistance, yDistDiffEx, lastMove, data)) {
+            // Odd behavior with/after wearing elytra.
             return true;
         }
         return false;

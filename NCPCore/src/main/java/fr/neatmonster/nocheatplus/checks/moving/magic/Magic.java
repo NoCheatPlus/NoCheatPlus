@@ -45,8 +45,24 @@ public class Magic {
     /** Maximal horizontal buffer. It can be higher, but normal resetting should keep this limit. */
 
     public static final double hBufMax          = 1.0;
+
+    /**
+     * Somewhat arbitrary horizontal speed gain maximum for advance glide phase.
+     */
+    public static final double GLIDE_HORIZONTAL_GAIN_MAX = GRAVITY_SPAN;
+
     // Vertical speeds/modifiers. 
     public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!
+    /**
+     * Some kind of minimum y descend speed (note the negative sign), for an
+     * already advanced gliding/falling phase with elytra.
+     */
+    public static final double GLIDE_DESCEND_PHASE_MIN = -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN;
+    /**
+     * Somewhat arbitrary, advanced glide phase, maximum descend speed gain.
+     * This value is positive.
+     */
+    public static final double GLIDE_DESCEND_GAIN_MAX = GRAVITY_MAX;
 
     // On-ground.
     public static final double Y_ON_GROUND_MIN = 0.00001;
