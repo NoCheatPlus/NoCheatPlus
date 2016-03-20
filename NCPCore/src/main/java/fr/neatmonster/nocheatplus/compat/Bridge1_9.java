@@ -58,20 +58,20 @@ public class Bridge1_9 {
      * @return
      */
     public static boolean isReadyForElytra(final Player player) {
-        // TODO: Off-hand testing needs to be supported, pass an instance for access.
         // TODO: Generic jet-pack / potion support (triggers + model configs).
-        if (END_ROD == null || ELYTRA == null) {
-            return false;
-        }
-        ItemStack stack = player.getInventory().getChestplate();
-        if (stack == null || stack.getType() != ELYTRA) {
-            return false;
-        }
-        if (!hasItemInAnyHand(player, END_ROD)) {
-            return false;
-        }
-        // Possible to use elytra.
-        return true;
+        return END_ROD != null && ELYTRA != null && isWearingElytra(player) && hasItemInAnyHand(player, END_ROD);
+    }
+
+    /**
+     * Just test if the player has elytra equipped in the chest plate slot. The
+     * player may or may not be holding an end rod in either hand.
+     * 
+     * @param player
+     * @return
+     */
+    public static boolean isWearingElytra(final Player player) {
+        final ItemStack stack = player.getInventory().getChestplate();
+        return stack != null && stack.getType() == ELYTRA;
     }
 
     /**

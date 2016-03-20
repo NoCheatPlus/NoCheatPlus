@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.MagicLiquid;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
@@ -2204,6 +2205,9 @@ public class SurvivalFly extends Check {
         if (player.getFoodLevel() <= 5 && player.isSprinting()) {
             // Exception: does not take into account latency.
             tags.add("lowfoodsprint");
+        }
+        if (Bridge1_9.isWearingElytra(player)) {
+            tags.add("elytra_off");
         }
         if (!tags.isEmpty()) {
             builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));
