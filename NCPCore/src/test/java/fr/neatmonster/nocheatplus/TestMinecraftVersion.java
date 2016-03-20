@@ -4,6 +4,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 
 public class TestMinecraftVersion {
@@ -26,6 +27,27 @@ public class TestMinecraftVersion {
             } else if (!pair[0].equals(parsed)) {
                 fail("Expect " + pair[0] + " for input: " + pair[1] + ", got instead: " + parsed);
             }
+        }
+
+        // Expect -1
+        for (String[] pair : new String[][] {
+                {"1.8", "1.8.8"}
+        }) {
+            testCompare(pair[0], pair[1], -1);
+        };
+
+        // Expect 1
+        for (String[] pair : new String[][] {
+                {"1.8.8", "1.8"}
+        }) {
+            testCompare(pair[0], pair[1], 1);
+        };
+    }
+
+    private void testCompare(String v1, String v2, int expectedResult) {
+        int res = GenericVersion.compareVersions(v1, v2);
+        if (res != expectedResult) {
+            fail("Comparing " + v1 + " with " + v2 + " should result in " + expectedResult + ", got instead: " + res);
         }
     }
 

@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccessConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeListener;
+import fr.neatmonster.nocheatplus.compat.versions.Bugs;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
@@ -820,6 +822,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Re-check basic setup (if onLoad gets skipped by some custom thing).
         setupBasics();
+        if (Bugs.shouldEnforceLocation()) {
+            addFeatureTags("defaults", Arrays.asList("enforceLocation"));
+        }
+        if (Bugs.shouldPvpKnockBackVelocity()) {
+            addFeatureTags("defaults", Arrays.asList("pvpKnockBackVelocity"));
+        }
+        if (dataMan.storesPlayerInstances()) {
+            addFeatureTags("defaults", Arrays.asList("storePlayers"));
+        }
 
         // Start logger task(s).
         logManager.startTasks();
