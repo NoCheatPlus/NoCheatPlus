@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
@@ -79,13 +80,6 @@ public class MovingConfig extends ACheckConfig {
         worldsMap.put(worldName, ccNew);
         return ccNew;
     }
-
-    public static final double Y_ON_GROUND_MIN = 0.00001;
-    public static final double Y_ON_GROUND_MAX = 0.0626;
-    // TODO: Model workarounds as lost ground, use Y_ON_GROUND_MIN?
-    public static final double Y_ON_GROUND_DEFAULT = 0.016; // Jump upwards, while placing blocks.
-    //    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
-
 
     public final boolean    ignoreCreative;
     public final boolean    ignoreAllowFlight;
@@ -284,8 +278,8 @@ public class MovingConfig extends ACheckConfig {
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
         velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
-        yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, Y_ON_GROUND_DEFAULT); // sqrt(1/256), see: NetServerHandler.
-        noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Y_ON_GROUND_MIN, Y_ON_GROUND_MAX, yOnGround);
+        yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, Magic.Y_ON_GROUND_MIN, Magic.Y_ON_GROUND_MAX, Magic.Y_ON_GROUND_DEFAULT); // sqrt(1/256), see: NetServerHandler.
+        noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, Magic.Y_ON_GROUND_MIN, Magic.Y_ON_GROUND_MAX, yOnGround);
 
         AlmostBoolean refSplitMoves = config.getAlmostBoolean(ConfPaths.MOVING_SPLITMOVES, AlmostBoolean.MAYBE);
         //splitMoves = refSplitMoves == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") == -1 : refSplitMoves.decide();

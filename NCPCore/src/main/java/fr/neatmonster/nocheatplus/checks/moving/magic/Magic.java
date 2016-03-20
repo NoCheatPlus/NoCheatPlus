@@ -46,7 +46,14 @@ public class Magic {
 
     public static final double hBufMax          = 1.0;
     // Vertical speeds/modifiers. 
-    public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!  
+    public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!
+
+    // On-ground.
+    public static final double Y_ON_GROUND_MIN = 0.00001;
+    public static final double Y_ON_GROUND_MAX = 0.0626;
+    // TODO: Model workarounds as lost ground, use Y_ON_GROUND_MIN?
+    public static final double Y_ON_GROUND_DEFAULT = 0.016; // Jump upwards, while placing blocks.
+    //    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
 
     // Other constants.
     public static final double PAPER_DIST = 0.01;
