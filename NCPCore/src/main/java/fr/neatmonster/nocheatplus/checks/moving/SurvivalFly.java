@@ -87,10 +87,11 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
         final MoveData thisMove = data.thisMove;
         final MoveData lastMove = data.moveData.getFirst();
+        final boolean isSamePos = from.isSamePos(to);
 
         // Calculate some distances.
         final double xDistance, yDistance, zDistance, hDistance;

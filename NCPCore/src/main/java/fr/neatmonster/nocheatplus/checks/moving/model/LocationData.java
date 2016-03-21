@@ -121,4 +121,16 @@ public class LocationData {
         onGroundOrResetCond = false;
     }
 
+    public void addExtraProperties(final StringBuilder builder) {
+        if (!extraPropertiesValid) {
+            return;
+        }
+        if (onGround) {
+            builder.append(" ground");
+        }
+        if (resetCond) {
+            builder.append(" resetcond");
+        }
+    }
+
 }

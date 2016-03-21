@@ -20,6 +20,7 @@ public abstract class ConfPaths {
     public static final String SUB_DEBUG                                 = "debug";
     public static final String SUB_DESCEND                               = "descend";
     public static final String SUB_GRAVITY                               = "gravity";
+    public static final String SUB_GROUND                                = "ground";
     public static final String SUB_HORIZONTAL                            = "horizontal";
     public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed"; // Phase out.
     public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";

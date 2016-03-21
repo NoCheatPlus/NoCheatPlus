@@ -252,4 +252,21 @@ public class MovingUtil {
         }
     }
 
+    public static void prepareFullCheck(final PlayerLocation from, final PlayerLocation to, final MoveData thisMove, final double yOnGround) {
+        // Collect block flags.
+        from.collectBlockFlags(yOnGround);
+        if (from.isSamePos(to)) {
+            // TODO: Could consider pTo = pFrom, set pitch / yaw elsewhere.
+            // Sets all properties, but only once.
+            to.prepare(from);
+        }
+        else {
+            // Might collect block flags for small distances with the containing bounds for both. 
+            to.collectBlockFlags(yOnGround);
+        }
+
+        // Set basic properties for past move bookkeeping.
+        thisMove.setExtraProperties(from, to);
+    }
+
 }

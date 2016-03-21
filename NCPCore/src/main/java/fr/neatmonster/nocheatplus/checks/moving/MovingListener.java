@@ -661,23 +661,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (checkSf) {
             // SurvivalFly
 
-            // Collect block flags.
+            // Prepare from, to, thisMove for full checking.
             // TODO: Could further differentiate if really needed to (newTo / NoFall).
-            final double maxYNoFall = Math.max(cc.noFallyOnGround, cc.yOnGround);
-            pFrom.collectBlockFlags(maxYNoFall);
-            final boolean isSamePos = pFrom.isSamePos(pTo);
-            if (isSamePos) {
-                // TODO: Could consider pTo = pFrom, set pitch / yaw elsewhere.
-                // Sets all properties, but only once.
-                pTo.prepare(pFrom);
-            }
-            else {
-                // Might collect block flags for small distances with the containing bounds for both. 
-                pTo.collectBlockFlags(maxYNoFall);
-            }
-
-            // Set basic properties for past move bookkeeping.
-            data.thisMove.setExtraProperties(pFrom, pTo);
+            MovingUtil.prepareFullCheck(pFrom, pTo, data.thisMove, Math.max(cc.noFallyOnGround, cc.yOnGround));
 
             // Hack: Add velocity for transitions between creativefly and survivalfly.
             if (lastMove.toIsValid && lastMove.flyCheck == CheckType.MOVING_CREATIVEFLY) {
@@ -687,7 +673,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, mightBeMultipleMoves, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {

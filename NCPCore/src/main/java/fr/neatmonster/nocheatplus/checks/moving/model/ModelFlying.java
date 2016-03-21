@@ -33,8 +33,11 @@ public class ModelFlying {
     public final boolean applyModifiers;
     /** Allow falling with gravity, including friction. */
     public final boolean gravity;
+    /** Default ground moving mechanics (jump, lost ground). */
+    public final boolean ground;
 
-    public ModelFlying(String id, double hModSpeed, double hModSprint, double vModAscendSpeed, double maxHeight, boolean applyModifiers, boolean gravity) {
+    public ModelFlying(String id, double hModSpeed, double hModSprint, double vModAscendSpeed, double maxHeight, 
+            boolean applyModifiers, boolean gravity, final boolean ground) {
         // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
         // TODO: possibly other friction based envelope constraints.
         // TODO: Check if needed: use fly/walk speed.
@@ -45,6 +48,7 @@ public class ModelFlying {
         this.maxHeight = maxHeight;
         this.applyModifiers = applyModifiers;
         this.gravity = gravity;
+        this.ground = ground;
     }
 
     public ModelFlying(String id, ConfigurationSection config, String prefix, ModelFlying defaults) {
@@ -56,12 +60,13 @@ public class ModelFlying {
                 config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.vModAscendSpeed),
                 config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.maxHeight),
                 config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.applyModifiers),
-                config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.gravity)
+                config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.gravity),
+                config.getBoolean(prefix + ConfPaths.SUB_GROUND, defaults.ground)
                 );
     }
 
     public ModelFlying() {
-        this(null, 100.0, 1.92, 100.0, 128, true, true);
+        this(null, 100.0, 1.92, 100.0, 128, true, true, false);
     }
 
 }

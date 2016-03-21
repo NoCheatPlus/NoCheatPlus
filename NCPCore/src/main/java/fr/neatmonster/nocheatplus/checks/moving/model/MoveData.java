@@ -244,4 +244,21 @@ public class MoveData {
         to.extraPropertiesValid = false;
     }
 
+    public void addExtraProperties(final StringBuilder builder, final String prefix) {
+        if (from.extraPropertiesValid && from.onGroundOrResetCond) {
+            if (prefix != null && !prefix.isEmpty()) {
+                builder.append(prefix);
+            }
+            builder.append("from/x: ");
+            from.addExtraProperties(builder);
+        }
+        if (to.extraPropertiesValid && to.onGroundOrResetCond) {
+            if (prefix != null && !prefix.isEmpty()) {
+                builder.append(prefix);
+            }
+            builder.append(" to/x: ");
+            to.addExtraProperties(builder);
+        }
+    }
+
 }

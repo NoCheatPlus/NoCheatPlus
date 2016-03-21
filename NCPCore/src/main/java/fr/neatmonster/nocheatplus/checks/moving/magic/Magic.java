@@ -233,7 +233,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    static boolean excludeStaticSpeed(final MoveData thisMove) {
+    public static boolean excludeStaticSpeed(final MoveData thisMove) {
         return !thisMove.from.inWeb && !thisMove.to.inWeb
                 && !thisMove.from.onClimbable && !thisMove.to.onClimbable;
     }

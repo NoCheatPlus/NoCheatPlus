@@ -13,9 +13,12 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.magic.LostGround;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -67,9 +70,26 @@ public class CreativeFly extends Check {
         final double hDistance = thisMove.hDistance;
 
         final boolean flying = gameMode == BridgeMisc.GAME_MODE_SPECTATOR || player.isFlying();
+        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
+
+        // Lost ground, if set so.
+        if (model.ground) {
+            MovingUtil.prepareFullCheck(from, to, thisMove, Math.max(cc.yOnGround, cc.noFallyOnGround));
+            if (!thisMove.from.onGroundOrResetCond) {
+                if (from.isSamePos(to)) {
+                    if (lastMove.toIsValid && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3 // Copy and paste from sf.
+                            && LostGround.lostGroundStill(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags)) {
+                        // Nothing to do.
+                    }
+                }
+                else if (LostGround.lostGround(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags)) {
+                    // Nothing to do.
+                }
+            }
+        }
 
         // Horizontal distance check.
-        double[] resH = hDist(player, from, to, hDistance, yDistance, flying, lastMove, time, model, data, cc);
+        double[] resH = hDist(player, from, to, hDistance, yDistance, sprinting, flying, lastMove, time, model, data, cc);
         double limitH = resH[0];
         double resultH = resH[1];
 
@@ -104,7 +124,7 @@ public class CreativeFly extends Check {
         // Distinguish checking method by y-direction of the move.
         if (yDistance > 0.0) {
             // Ascend.
-            double[] res = vDistAscend(from, to, yDistance, flying, lastMove, model, data, cc);
+            double[] res = vDistAscend(from, to, yDistance, flying, thisMove, lastMove, model, data, cc);
             resultV = Math.max(resultV, res[1]);
             limitV = res[0];
         }
@@ -189,11 +209,22 @@ public class CreativeFly extends Check {
                     debug(player, "Maximum height exceeded by set-back, correct to: " + setBack.getY());
                 }
             }
+            data.sfJumpPhase = 0;
             return setBack;
         }
         else {
             // Adjust the set-back and other last distances.
             data.setSetBack(to);
+            // Adjust jump phase.
+            if (!thisMove.from.onGroundOrResetCond && !thisMove.to.onGroundOrResetCond) {
+                data.sfJumpPhase ++;
+            }
+            else if (thisMove.touchedGround && !thisMove.to.onGroundOrResetCond) {
+                data.sfJumpPhase = 1;
+            }
+            else {
+                data.sfJumpPhase = 0;
+            }
             return null;
         }
     }
@@ -213,9 +244,8 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitH, resultH (not normalized).
      */
-    private double[] hDist(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean flying, final MoveData lastMove, final long time, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] hDist(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final boolean flying, final MoveData lastMove, final long time, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         // Modifiers.
-        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
         double fSpeed;
 
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
@@ -290,7 +320,7 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitV, resultV (not normalized).
      */
-    private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData thisMove, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         double limitV = model.vModAscendSpeed / 100.0 * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
         double resultV = 0.0;
         if (model.applyModifiers && flying && yDistance > 0.0) {
@@ -298,31 +328,58 @@ public class CreativeFly extends Check {
             limitV *= data.flySpeed / 0.1;
         }
 
-        if (model.gravity && lastMove.toIsValid && yDistance > limitV) { // TODO: gravity/friction?
-            // (Disregard gravity.)
-            // TODO: Use last friction (as well)?
-            double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
-            if (!flying) {
-                frictionDist -= Magic.GRAVITY_MIN;
+        if (model.gravity) {
+            // Friction with gravity.
+            if (model.gravity && lastMove.toIsValid && yDistance > limitV) { // TODO: gravity/friction?
+                // (Disregard gravity.)
+                // TODO: Use last friction (as well)?
+                double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
+                if (!flying) {
+                    frictionDist -= Magic.GRAVITY_MIN;
+                }
+                if (frictionDist > limitV) {
+                    limitV = frictionDist;
+                    tags.add("vfrict_g");
+                }
             }
-            if (frictionDist > limitV) {
-                limitV = frictionDist;
-                tags.add("vfrict_g");
+        }
+
+        if (model.ground) {
+            // Jump lift off gain.
+            // NOTE: This assumes SurvivalFly busies about moves with from.onGroundOrResetCond.
+            if (yDistance > limitV && !thisMove.to.onGroundOrResetCond && !thisMove.from.onGroundOrResetCond && (
+                    // Last move touched ground.
+                    lastMove.toIsValid && lastMove.touchedGround && 
+                    (lastMove.yDistance <= 0.0 || lastMove.to.extraPropertiesValid && lastMove.to.onGround)
+                    // This move touched ground by a workaround.
+                    || thisMove.touchedGroundWorkaround
+                    )) {
+                // Allow normal jumping.
+                final double maxGain = LiftOffEnvelope.NORMAL.getMaxJumpGain(data.jumpAmplifier);
+                if (maxGain > limitV) {
+                    limitV = maxGain;
+                    tags.add("jump_gain");
+                }
             }
+        }
+
+        // Ordinary step up.
+        // TODO: Might be within a 'if (model.ground)' block?
+        // TODO: sfStepHeight should be a common modeling parameter?
+        if (yDistance > limitV && yDistance <= cc.sfStepHeight 
+                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond() || thisMove.touchedGroundWorkaround)
+                && to.isOnGround()) {
+            // (Jump effect not checked yet.)
+            limitV = cc.sfStepHeight;
+            tags.add("step_up");
         }
 
         // Determine violation amount.
         resultV = Math.max(0.0, yDistance - limitV);
 
         // Post-violation recovery.
-        // Ordinary step up. TODO: sfStepHeight should be a common modeling parameter?
-        if (yDistance <= cc.sfStepHeight 
-                && (lastMove.toIsValid && lastMove.yDistance < 0.0 || from.isOnGroundOrResetCond())
-                && to.isOnGround()) {
-            // (Jump effect not checked yet.)
-            resultV = 0.0;
-            tags.add("step_up");
-        }
+
+
         return new double[] {limitV, resultV};
     }
 
@@ -383,6 +440,8 @@ public class CreativeFly extends Check {
             builder.append(" , tags: ");
             builder.append(StringUtil.join(tags, "+"));
         }
+        builder.append(" , jumpphase: " + data.sfJumpPhase);
+        data.thisMove.addExtraProperties(builder, " , ");
         debug(player, builder.toString());
     }
 
