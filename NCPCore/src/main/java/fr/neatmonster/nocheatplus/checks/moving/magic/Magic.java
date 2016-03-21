@@ -291,4 +291,24 @@ public class Magic {
                 && yDistance - previousYDistance < GLIDE_DESCEND_GAIN_MAX_POS;
     }
 
+    /**
+     * Test if this + last 2 moves are within the gliding envelope (elytra), in
+     * this case with horizontal speed gain.
+     * 
+     * @param thisMove
+     * @param lastMove
+     * @param pastMove1
+     *            Is checked for validity in here (needed).
+     * @return
+     */
+    public static boolean glideEnvelopeWithHorizontalGain(final MoveData thisMove, final MoveData lastMove, final MoveData pastMove1) {
+        return pastMove1.toIsValid 
+                && Magic.glideVerticalGainEnvelope(thisMove.yDistance, lastMove.yDistance)
+                && Magic.glideVerticalGainEnvelope(lastMove.yDistance, pastMove1.yDistance)
+                && lastMove.hDistance > pastMove1.hDistance && thisMove.hDistance > lastMove.hDistance
+                && Math.abs(lastMove.hDistance - pastMove1.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX
+                && Math.abs(thisMove.hDistance - lastMove.hDistance) < Magic.GLIDE_HORIZONTAL_GAIN_MAX
+                ;
+    }
+
 }
