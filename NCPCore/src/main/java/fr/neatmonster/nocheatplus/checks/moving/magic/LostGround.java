@@ -87,14 +87,25 @@ public class LostGround {
         // TODO: Combine / refine preconditions for step height related.
         // TODO: || yDistance <= jump estimate? 
         if (yDistance <= cc.sfStepHeight && hDistance <= 1.5) { // hDistance is arbitrary, just to confine.
-            // Half block step up (definitive).
-            // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
-            if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier) && to.isOnGround()) {
-                // TODO: hDistance > 0.0
-                if (lastMove.yDistance < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
-                    return applyLostGround(player, from, true, data, "step", tags);
+            if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier)) {
+                // Half block step up (definitive).
+                // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
+                if (to.isOnGround()) {
+                    // TODO: hDistance > 0.0
+                    if (lastMove.yDistance < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
+                        return applyLostGround(player, from, true, data, "step", tags);
+                    }
+                }
+                // Noob tower (moving up placing blocks underneath). Rather since 1.9: player jumps off with 0.4 speed but ground within 0.42.
+                // TODO: Confine by actually having placed a block nearby, possibly rather low jumpphase (3, 4).
+                final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
+                if (yDistance > 0.0 && yDistance < maxJumpGain && lastMove.yDistance < 0.0 && maxJumpGain > yDistance 
+                        && Math.abs(lastMove.yDistance) + Magic.GRAVITY_MAX > cc.yOnGround + maxJumpGain - yDistance
+                        && from.isOnGround(cc.yOnGround + maxJumpGain - yDistance)) {
+                    return applyLostGround(player, from, true, data, "nbtwr", tags);
                 }
             }
+
             // Could step up (but might move to another direction, potentially).
             if (lastMove.yDistance < 0.0) { // TODO: <= ?
                 // Generic could step.
