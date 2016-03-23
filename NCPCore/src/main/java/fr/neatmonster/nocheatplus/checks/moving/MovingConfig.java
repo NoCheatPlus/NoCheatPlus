@@ -358,7 +358,7 @@ public class MovingConfig extends ACheckConfig {
             // TODO: INCONSISTENT.
             return modelGameMode;
         }
-        if (Bridge1_9.isWearingElytra(player)) {
+        if (Bridge1_9.isWearingElytra(player)) { // Defensive: don't demand isGliding.
             return flyingModelElytra;
         }
         // Default by game mode.

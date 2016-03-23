@@ -20,6 +20,9 @@ public class Bridge1_9 {
     private static final Material ELYTRA = Material.getMaterial("ELYTRA");
 
     private static Method getItemInOffHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInOffHand", ItemStack.class);
+    private static Method getItemInMainHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInMainHand", ItemStack.class);
+
+    private static Method isGliding = ReflectionUtil.getMethodNoArgs(Player.class, "isGliding", boolean.class);
 
     public static boolean hasLevitation() {
         return LEVITATION != null;
@@ -37,6 +40,14 @@ public class Bridge1_9 {
         return getItemInOffHand != null;
     }
 
+    public static boolean hasGetItemInMainHand() {
+        return getItemInMainHand != null;
+    }
+
+    public static boolean hasIsGliding() {
+        return isGliding != null;
+    }
+
     /**
      * Test for the 'levitation' potion effect.
      * 
@@ -48,6 +59,15 @@ public class Bridge1_9 {
             return Double.NEGATIVE_INFINITY;
         }
         return PotionUtil.getPotionEffectAmplifier(player, LEVITATION);
+    }
+
+    /**
+     * Gliding + wearing elytra.
+     * @param player
+     * @return
+     */
+    public static boolean isGlidingWithElytra(final Player player) {
+        return isGliding(player) && isWearingElytra(player);
     }
 
     /**
@@ -86,8 +106,14 @@ public class Bridge1_9 {
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     public static ItemStack getItemInMainHand(final Player player) {
-        return player.getItemInHand(); // As long as feasible (see: CraftInventoryPlayer).
+        if (getItemInMainHand == null) {
+            return player.getItemInHand(); // As long as feasible (see: CraftInventoryPlayer).
+        }
+        else {
+            return player.getInventory().getItemInMainHand();
+        }
     }
 
     /**
@@ -101,7 +127,16 @@ public class Bridge1_9 {
             return null;
         }
         else {
-            return(ItemStack) ReflectionUtil.invokeMethodNoArgs(getItemInOffHand, player.getInventory());
+            return player.getInventory().getItemInOffHand();
+        }
+    }
+
+    public static boolean isGliding(final Player player) {
+        if (isGliding == null) {
+            return false;
+        }
+        else {
+            return player.isGliding();
         }
     }
 

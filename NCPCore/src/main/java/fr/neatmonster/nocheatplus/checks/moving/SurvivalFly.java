@@ -1850,6 +1850,7 @@ public class SurvivalFly extends Check {
             tags.add("lowfoodsprint");
         }
         if (Bridge1_9.isWearingElytra(player)) {
+            // Just wearing (not isGliding).
             tags.add("elytra_off");
         }
         if (!tags.isEmpty()) {

@@ -950,7 +950,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Default margin: Allow slightly less than the previous speed.
         final double defaultAmount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0;
         // Test for exceptions.
-        if (thisMove.hDistance > defaultAmount && Bridge1_9.isWearingElytra(player)) {
+        if (thisMove.hDistance > defaultAmount && Bridge1_9.isGlidingWithElytra(player)) {
             // Allowing the same speed won't always work on elytra (still increasing, differing modeling on client side with motXYZ).
             // (Doesn't seem to be overly effective.)
             final MoveData pastMove1 = data.moveData.get(1);
