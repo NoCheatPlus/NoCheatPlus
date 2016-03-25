@@ -502,7 +502,16 @@ public class SurvivalFly extends Check {
             inAir = true;
         }
 
-        if (!inAir) {
+        if (inAir) {
+            // Adjust in-air counters.
+            if (yDistance == 0.0) {
+                data.sfZeroVdistRepeat ++;
+            } else {
+                data.sfZeroVdistRepeat = 0;
+            }
+        }
+        else {
+            data.sfZeroVdistRepeat = 0;
             data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
         }
 
@@ -516,12 +525,6 @@ public class SurvivalFly extends Check {
         // Adjust data.
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
-        if (yDistance == 0.0 && hDistance < 0.125) {
-            // TODO: Check h-dist envelope.
-            data.sfZeroVdist ++;
-        } else {
-            data.sfZeroVdist = 0;
-        }
         // Log tags added after violation handling.
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);

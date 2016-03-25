@@ -36,13 +36,15 @@ public class MagicAir {
                                 )
                                 // 1: Keep yDist == 0.0 on first falling.
                                 // TODO: Do test if hdist == 0.0 or something small can be assumed.
-                                || yDistance == 0.0 && data.sfZeroVdist > 0 && data.sfZeroVdist < 10
+                                || yDistance == 0.0 && data.sfZeroVdistRepeat > 0 && data.sfZeroVdistRepeat < 10 
+                                && data.thisMove.hDistance < 0.125 && lastMove.hDistance < 0.125
                         )
                         // 0: Jumping on slimes, change viewing direction at the max. height.
                         // TODO: Precondition bounced off or touched slime.
-                        // TODO: Once per jumpphase.
-                        || yDistance == 0.0 && data.sfZeroVdist == 1 
-                        && (data.isVelocityJumpPhase() || data.hasSetBack() && to.getY() - data.getSetBackY() < 1.35)
+                        // TODO: Instead of 1.35, relate to min/max jump gain?
+                        // TODO: Implicitly removed condition: hdist < 0.125
+                        || yDistance == 0.0 && data.sfZeroVdistRepeat == 1 
+                        && (data.isVelocityJumpPhase() || data.hasSetBack() && to.getY() - data.getSetBackY() < 1.35 && to.getY() - data.getSetBackY() > 0.0)
                         && data.ws.use(WRPT.W_M_SF_SLIME_JP_2X0)
                         ;
     }

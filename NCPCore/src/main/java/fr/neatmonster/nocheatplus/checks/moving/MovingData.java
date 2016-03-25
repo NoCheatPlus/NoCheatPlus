@@ -216,8 +216,11 @@ public class MovingData extends ACheckData {
     /** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
     public int          lostSprintCount = 0;
     public int          sfJumpPhase = 0;
-    /** Count how many times in a row v-dist has been zero, at very low h-dist (aimed at in-air checks). */
-    public int          sfZeroVdist = 0;
+    /**
+     * Count how many times in a row v-dist has been zero, only for in-air
+     * moves, updated on not cancelled moves (aimed at in-air workarounds).
+     */
+    public int          sfZeroVdistRepeat = 0;
     /** Only used during processing, to keep track of sub-checks using velocity. Reset in velocityTick, before checks run. */
 
     /** "Dirty" flag, for receiving velocity and similar while in air. */
@@ -301,7 +304,7 @@ public class MovingData extends ACheckData {
         sfJumpPhase = 0;
         jumpAmplifier = 0;
         setBack = null;
-        sfZeroVdist = 0;
+        sfZeroVdistRepeat = 0;
         clearAccounting();
         clearNoFallData();
         removeAllVelocity();
@@ -360,7 +363,7 @@ public class MovingData extends ACheckData {
         invalidateMoveData();
         clearAccounting();
         sfJumpPhase = 0;
-        sfZeroVdist = 0;
+        sfZeroVdistRepeat = 0;
         verticalBounce = null;
         // Remember where we send the player to.
         setTeleported(loc);
@@ -449,7 +452,7 @@ public class MovingData extends ACheckData {
      */
     private void resetPositions() {
         invalidateMoveData();
-        sfZeroVdist = 0;
+        sfZeroVdistRepeat = 0;
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
