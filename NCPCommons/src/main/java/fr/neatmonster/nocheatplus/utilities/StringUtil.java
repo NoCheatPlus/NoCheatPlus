@@ -316,4 +316,16 @@ public class StringUtil {
         }
     }
 
+    /**
+     * Format to maximally 3 digits after the comma, always show the sign,
+     * unless equal.
+     * 
+     * @param current
+     * @param previous
+     * @return
+     */
+    public static String formatDiff(final double current, final double previous) {
+        return current == previous ? "0" : ((current > previous ? "+" : "-") + fdec3.format(Math.abs(current - previous)));
+    }
+
 }

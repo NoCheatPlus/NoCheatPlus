@@ -654,11 +654,13 @@ public class SurvivalFly extends Check {
             }
             // (Friction is used as is.)
         }
+        // TODO: !sfDirty is very coarse, should use friction instead.
         else if (!sfDirty && from.isOnGround() && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = Magic.modSneak * thisMove.walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
             // TODO: Attribute modifiers can count in here, e.g. +0.5 (+ 50% doesn't seem to pose a problem, neither speed effect 2).
         }
+        // TODO: !sfDirty is very coarse, should use friction instead.
         else if (!sfDirty && from.isOnGround() && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
             hAllowedDistance = Magic.modBlock * thisMove.walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
@@ -1129,7 +1131,7 @@ public class SurvivalFly extends Check {
 
         // y direction change detection.
         // TODO: Consider using accounting for y-change detection. <- Nope :).
-        final boolean yDirChange = lastMove.toIsValid && lastMove.yDistance != yDistance && (yDistance <= 0 && lastMove.yDistance >= 0 || yDistance >= 0 && lastMove.yDistance <= 0 ); 
+        final boolean yDirChange = lastMove.toIsValid && lastMove.yDistance != yDistance && (yDistance <= 0.0 && lastMove.yDistance >= 0.0 || yDistance >= 0.0 && lastMove.yDistance <= 0.0 ); 
         if (yDirChange) {
             // yDirChange uses velocity if needed.
             vDistanceAboveLimit = yDirChange(from, to, yDistance, vDistanceAboveLimit, lastMove, data);
@@ -1147,15 +1149,15 @@ public class SurvivalFly extends Check {
             }
             else if (data.verVelUsed == null) { // Only skip if just used.
                 // Here yDistance can be negative and positive.
-                if (yDistance != 0D) {
-                    data.vDistAcc.add((float) yDistance);
-                    final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc" + (data.isVelocityJumpPhase() ? "dirty" : ""));
-                    if (accAboveLimit > vDistanceAboveLimit) {
-                        if (data.getOrUseVerticalVelocity(yDistance) == null) {
-                            vDistanceAboveLimit = accAboveLimit;
-                        }
+                //                if (yDistance != 0.0) {
+                data.vDistAcc.add((float) yDistance);
+                final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc" + (data.isVelocityJumpPhase() ? "dirty" : ""));
+                if (accAboveLimit > vDistanceAboveLimit) {
+                    if (data.getOrUseVerticalVelocity(yDistance) == null) {
+                        vDistanceAboveLimit = accAboveLimit;
                     }
                 }
+                //                }
             }
             else {
                 // TODO: Just to exclude source of error, might be redundant.
@@ -1475,17 +1477,17 @@ public class SurvivalFly extends Check {
                             || (cc.sfGroundHop || yDistance == 0.0 && !lastMove.touchedGroundWorkaround && !lastMove.from.onGround)
                             && hDistanceBaseRef > 0.0 && hDistance / hDistanceBaseRef < 1.35
                             )
-                            // 0: Ground + jump phase conditions.
-                            && (
-                                    // 1: Ordinary/obvious lift-off.
-                                    data.sfJumpPhase == 0 && from.isOnGround() 
-                                    // 1: Touched ground somehow.
-                                    || data.sfJumpPhase <= 1 && (thisMove.touchedGroundWorkaround || 
-                                            lastMove.touchedGround && !lastMove.bunnyHop) 
-                                            // 1: Double bunny.
-                                            || double_bunny)
-                                            // 0: Don't allow bunny to run out of liquid.
-                                            && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
+                    // 0: Ground + jump phase conditions.
+                    && (
+                            // 1: Ordinary/obvious lift-off.
+                            data.sfJumpPhase == 0 && from.isOnGround() 
+                            // 1: Touched ground somehow.
+                            || data.sfJumpPhase <= 1 && (thisMove.touchedGroundWorkaround || 
+                                    lastMove.touchedGround && !lastMove.bunnyHop) 
+                            // 1: Double bunny.
+                            || double_bunny)
+                    // 0: Don't allow bunny to run out of liquid.
+                    && !from.isResetCond() && !to.isResetCond() // TODO: !to.isResetCond() should be reviewed.
                     ) {
                 // TODO: Jump effect might allow more strictness. 
                 // TODO: Expected minimum gain depends on last speed (!).
@@ -1832,8 +1834,12 @@ public class SurvivalFly extends Check {
         final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
         final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
         builder.append("\nonground: " + (data.thisMove.headObstructed ? "(head obstr.) " : "") + (data.thisMove.touchedGroundWorkaround ? "(touched ground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase + ", liftoff: " + data.liftOffEnvelope.name() + "(" + data.insideMediumCount + ")");
-        final String dHDist = (lastMove.toIsValid && Math.abs(lastMove.hDistance - hDistance) > 0.0005) ? ("(" + (hDistance > lastMove.hDistance ? "+" : "") + StringUtil.fdec3.format(hDistance - lastMove.hDistance) + ")") : "";
-        builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " + StringUtil.fdec3.format(yDistance) + (!lastMove.toIsValid ? "" : (" (" + (yDistance > lastMove.yDistance ? "+" : "") + StringUtil.fdec3.format(yDistance - lastMove.yDistance) + ")")) + " / " + StringUtil.fdec3.format(vAllowedDistance) + " , sby=" + (data.hasSetBack() ? (data.getSetBackY() + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " + data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier) + ")") : "?"));
+        final String dHDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(hDistance, lastMove.hDistance) + ")" : "";
+        final String dYDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(yDistance, lastMove.yDistance)+ ")" : "";
+        builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " + StringUtil.fdec3.format(yDistance) + dYDist + " / " + StringUtil.fdec3.format(vAllowedDistance) + " , sby=" + (data.hasSetBack() ? (data.getSetBackY() + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " + data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier) + ")") : "?"));
+        if (lastMove.toIsValid) {
+            builder.append(" , fdsq: " + StringUtil.fdec3.format(data.thisMove.distanceSquared / lastMove.distanceSquared));
+        }
         if (data.verVelUsed != null) {
             builder.append(" , vVelUsed: " + data.verVelUsed + " ");
         }

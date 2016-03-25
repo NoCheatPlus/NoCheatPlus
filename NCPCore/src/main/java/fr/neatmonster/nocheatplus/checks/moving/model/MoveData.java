@@ -62,6 +62,9 @@ public class MoveData {
      */
     public double hDistance;
 
+    /** Total distance squared. Only valid if toIsValid is set to true. */
+    public double distanceSquared;
+
     //////////////////////////////////////////////////////////
     // Reset with set, could be lazily set during checking.
     //////////////////////////////////////////////////////////
@@ -143,6 +146,7 @@ public class MoveData {
         this.to.setLocation(to);
         yDistance = this.to.y - this.from.y;
         hDistance = TrigUtil.distance(this.from.x, this.from.z, this.to.x, this.to.z);
+        distanceSquared = yDistance * yDistance + hDistance * hDistance;
         toIsValid = true;
     }
 

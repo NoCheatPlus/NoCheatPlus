@@ -19,6 +19,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -328,9 +329,15 @@ public class CreativeFly extends Check {
             limitV *= data.flySpeed / 0.1;
         }
 
+        // TODO: Hack, move / config / something.
+        // TODO: Confine more. hdist change relates to ydist change
+        if (limitV == 0.0 && Bridge1_9.isGlidingWithElytra(from.getPlayer())) {
+            limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data);
+        }
+
         if (model.gravity) {
             // Friction with gravity.
-            if (model.gravity && lastMove.toIsValid && yDistance > limitV) { // TODO: gravity/friction?
+            if (yDistance > limitV && model.gravity && lastMove.toIsValid) { // TODO: gravity/friction?
                 // (Disregard gravity.)
                 // TODO: Use last friction (as well)?
                 double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
@@ -383,6 +390,50 @@ public class CreativeFly extends Check {
         return new double[] {limitV, resultV};
     }
 
+    private double hackLytra(final double yDistance, final double limitV, final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+        // TODO: Further: jumpphase vs. y-distance to set-back. Problem: velocity
+        // TODO: Further: record max h and descend speeds and relate to those.
+        // TODO: Demand total speed to decrease.
+        if (yDistance > Magic.GLIDE_DESCEND_PHASE_MIN && yDistance < 17.0 * Magic.GRAVITY_MAX
+                && (
+                        // Normal envelope.
+                        yDistance - lastMove.yDistance < Magic.GRAVITY_MAX * 1.5
+                        // Inversion (neg -> pos).
+                        || lastMove.yDistance < -Magic.GRAVITY_SPAN && yDistance < Magic.GRAVITY_MAX + Magic.GRAVITY_ODD && yDistance > Magic.GRAVITY_SPAN
+                        )
+                && thisMove.hDistance < lastMove.hDistance
+                && (lastMove.yDistance > 0.0 || lastMove.hDistance > 0.55) // Demand some speed on the transition.
+                // Demand total speed to decrease somehow, unless for the very transition.
+                && (thisMove.distanceSquared / lastMove.distanceSquared < 0.99
+                        || lastMove.yDistance < 0.0) // Might confine the latter something to be tested.
+                ) {
+            if (lastMove.hDistance > 0.52) {
+                // (Increasing y-distance.)
+                tags.add("elytra_asc1");
+                return yDistance;
+            }
+            else if (thisMove.hDistance > Magic.GRAVITY_MIN && yDistance < lastMove.yDistance) {
+                // (Decreasing y-distance.)
+                final MoveData pastMove1 = data.moveData.get(1);
+                if (pastMove1.toIsValid && pastMove1.to.extraPropertiesValid) {
+                    // Demand this being the first one, or decreasing by a decent amount with past two moves.
+                    if (
+                            // First move rather decreasing.
+                            pastMove1.yDistance < lastMove.yDistance 
+                            // Decreasing by a reasonable (?) amount.
+                            || yDistance - pastMove1.yDistance < -0.001
+                            // && yDistance - lastMove.yDistance < lastMove.yDistance - pastMove1.yDistance - 0.0005 // Probably need remove.
+                            ) {
+                        tags.add("elytra_asc2");
+                        return yDistance;
+                    }
+                }
+            }
+
+        }
+        return limitV;
+    }
+
     /**
      * 
      * @param from
@@ -430,8 +481,14 @@ public class CreativeFly extends Check {
     }
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
+        final MoveData lastMove = data.moveData.getFirst();
         StringBuilder builder = new StringBuilder(350);
-        builder.append("hDist: " + hDistance + " / " + limitH + " , vDist: " + yDistance + " / " + limitV);
+        final String dHDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(hDistance, lastMove.hDistance) + ")" : "";
+        final String dYDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(yDistance, lastMove.yDistance)+ ")" : "";
+        builder.append("hDist: " + hDistance + dHDist + " / " + limitH + " , vDist: " + yDistance + dYDist + " / " + limitV);
+        if (lastMove.toIsValid) {
+            builder.append(" , fdsq: " + StringUtil.fdec3.format(data.thisMove.distanceSquared / lastMove.distanceSquared));
+        }
         if (data.verVelUsed != null) {
             builder.append(" , vVelUsed: " + data.verVelUsed);
         }

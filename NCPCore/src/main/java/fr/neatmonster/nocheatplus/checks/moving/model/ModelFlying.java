@@ -66,7 +66,7 @@ public class ModelFlying {
     }
 
     public ModelFlying() {
-        this(null, 100.0, 1.92, 100.0, 128, true, true, false);
+        this(null, 100.0, 1.92, 100.0, 128, true, true, true);
     }
 
 }
