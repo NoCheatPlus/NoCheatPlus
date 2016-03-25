@@ -37,6 +37,10 @@ public class UseEntityAdapter extends BaseAdapter {
     public void onPacketReceiving(final PacketEvent event) {
         final long time = System.currentTimeMillis();
         final Player player = event.getPlayer();
+        if (player == null) {
+            // TODO: Warn once?
+            return;
+        }
         final NetConfig cc = configFactory.getConfig(player);
         final NetData data = dataFactory.getData(player);
 
@@ -60,7 +64,7 @@ public class UseEntityAdapter extends BaseAdapter {
         if (action == EntityUseAction.ATTACK && attackFrequency.isEnabled(player, data, cc) && attackFrequency.check(player, time, data, cc)) {
             cancel = true;
         }
-        
+
         // MIGHT: use entity, use block both on packet level?
 
         if (cancel) {
