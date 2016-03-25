@@ -38,6 +38,7 @@ public class MagicAir {
                                 // TODO: Do test if hdist == 0.0 or something small can be assumed.
                                 || yDistance == 0.0 && data.sfZeroVdistRepeat > 0 && data.sfZeroVdistRepeat < 10 
                                 && data.thisMove.hDistance < 0.125 && lastMove.hDistance < 0.125
+                                && to.getY() - data.getSetBackY() < 0.0 && to.getY() - data.getSetBackY() > -2.0 // Quite coarse.
                         )
                         // 0: Jumping on slimes, change viewing direction at the max. height.
                         // TODO: Precondition bounced off or touched slime.
@@ -164,7 +165,7 @@ public class MagicAir {
                 && (
                         // 1: Too big chunk of change, but within reasonable bounds (should be contained in some other generic case?).
                         lastMove.yDistance < 3.0 * Magic.GRAVITY_MAX + Magic.GRAVITY_MIN && yDistChange < -Magic.GRAVITY_MIN && yDistChange > -2.5 * Magic.GRAVITY_MAX -Magic.GRAVITY_MIN
-                        // Transition to 0.0 yDistance.
+                        // Transition to 0.0 yDistance, ascending.
                         || lastMove.yDistance > Magic.GRAVITY_ODD / 2.0 && lastMove.yDistance < Magic.GRAVITY_MIN && yDistance == 0.0
                         // 1: yDist inversion near 0 (almost). TODO: This actually happens near liquid, but NORMAL env!?
                         // lastYDist < Gravity max + min happens with dirty phase (slimes),. previously: max + span
