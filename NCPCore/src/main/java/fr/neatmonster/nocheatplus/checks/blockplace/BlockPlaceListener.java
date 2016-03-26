@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -28,6 +29,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
  * Central location to listen to events that are relevant for the block place checks.
@@ -85,6 +87,9 @@ public class BlockPlaceListener extends CheckListener {
     private final int idBoatsAnywhere = counters.registerKey("boatsanywhere");
     private final int idEnderPearl = counters.registerKey("throwenderpearl");
 
+    private final Class<?> blockMultiPlaceEvent = ReflectionUtil.getClass("org.bukkit.event.block.BlockMultiPlaceEvent");
+    private final boolean hasReplacedState = ReflectionUtil.getMethodNoArgs(BlockPlaceEvent.class, "getReplacedState", BlockState.class) != null;
+
     public BlockPlaceListener(){
         super(CheckType.BLOCKPLACE);
     }
@@ -110,11 +115,27 @@ public class BlockPlaceListener extends CheckListener {
         // TODO: Revise material use (not block.get... ?)
         //final Material mat = block.getType();
         final Player player = event.getPlayer();
-        final Material placedMat = player.getItemInHand().getType(); // Safety first.
+        final Material placedMat = hasReplacedState ? event.getBlockPlaced().getType() : player.getItemInHand().getType(); // Safety first.
         boolean cancelled = false;
 
         final BlockPlaceData data = BlockPlaceData.getData(player);
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+
+        final boolean shouldSkipSome;
+        if (blockMultiPlaceEvent != null && event.getClass() == blockMultiPlaceEvent) {
+            if (placedMat == Material.BEDROCK || placedMat == Material.END_CRYSTAL) {
+                shouldSkipSome = true;
+            }
+            else {
+                if (data.debug) {
+                    debug(player, "Block place " + event.getClass().getName() + " " + placedMat);
+                }
+                shouldSkipSome = false;
+            }
+        }
+        else {
+            shouldSkipSome = false;
+        }
 
         if (placedMat == Material.SIGN){
             // Might move to MONITOR priority.
@@ -140,12 +161,12 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Reach check (distance).
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data, cc)) {
+        if (!cancelled && !shouldSkipSome && reach.isEnabled(player) && reach.check(player, block, data, cc)) {
             cancelled = true;
         }
 
         // Direction check.
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
+        if (!cancelled && !shouldSkipSome && direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
             cancelled = true;
         }
 

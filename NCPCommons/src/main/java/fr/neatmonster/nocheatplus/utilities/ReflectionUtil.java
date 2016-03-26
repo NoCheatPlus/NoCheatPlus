@@ -443,4 +443,18 @@ public class ReflectionUtil {
         return null;
     }
 
+    /**
+     * Fail-safe class getting.
+     * @param fullName
+     * @return
+     */
+    public static Class<?> getClass(String fullName) {
+        try {
+            return Class.forName(fullName);
+        } catch (ClassNotFoundException e) {
+            // Ignore.
+        }
+        return null;
+    }
+
 }
