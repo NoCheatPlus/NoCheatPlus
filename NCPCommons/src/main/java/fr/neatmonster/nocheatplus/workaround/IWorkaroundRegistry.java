@@ -50,6 +50,11 @@ public interface IWorkaroundRegistry {
         private final Map<String, IStagedWorkaround[]> stagedGroups;
 
         /**
+         * Collection of just used ids, only set in use(...).
+         */
+        private Collection<String> justUsedIds = null;
+
+        /**
          * 
          * @param bluePrints
          * @param groups
@@ -166,7 +171,15 @@ public interface IWorkaroundRegistry {
                 throw new IllegalArgumentException("Workaround id not registered: " + workaroundId);
             }
             else {
-                return workaround.use();
+                if (workaround.use()) {
+                    if (justUsedIds != null) {
+                        justUsedIds.add(workaround.getId());
+                    }
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
         }
 
@@ -183,6 +196,16 @@ public interface IWorkaroundRegistry {
         public boolean canUse(String workaroundId) {
             // TODO: For consistency might throw the same exception everywhere (IllegalArgument?). 
             return workaroundsById.get(workaroundId).canUse();
+        }
+
+        /**
+         * Set the just used ids collection or null, to set or not set on
+         * use(...).
+         * 
+         * @param justUsedIds
+         */
+        public void setJustUsedIds(final Collection<String> justUsedIds) {
+            this.justUsedIds = justUsedIds;
         }
 
     }

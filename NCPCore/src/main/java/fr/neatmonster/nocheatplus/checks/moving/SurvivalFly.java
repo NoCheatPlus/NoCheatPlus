@@ -58,6 +58,7 @@ public class SurvivalFly extends Check {
 
     /** To join some tags with moving check violations. */
     private final ArrayList<String> tags = new ArrayList<String>(15);
+    private final ArrayList<String> justUsedWorkarounds = new ArrayList<String>();
 
 
     private final Set<String> reallySneaking = new HashSet<String>(30);
@@ -89,6 +90,10 @@ public class SurvivalFly extends Check {
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
+        if (data.debug) {
+            justUsedWorkarounds.clear();
+            data.ws.setJustUsedIds(justUsedWorkarounds);
+        }
         final MoveData thisMove = data.thisMove;
         final MoveData lastMove = data.moveData.getFirst();
         final boolean isSamePos = from.isSamePos(to);
@@ -323,6 +328,7 @@ public class SurvivalFly extends Check {
                 if (data.debug) {
                     tags.add("silentsbcobweb");
                     outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+                    data.ws.setJustUsedIds(null);
                 }
                 return data.getSetBack(to);
             }
@@ -366,6 +372,7 @@ public class SurvivalFly extends Check {
         if (data.debug) {
             outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
             tagsLength = tags.size();
+            data.ws.setJustUsedIds(null);
         } else {
             tagsLength = 0; // JIT vs. IDE.
         }
@@ -1864,6 +1871,9 @@ public class SurvivalFly extends Check {
         }
         if (!tags.isEmpty()) {
             builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));
+        }
+        if (!justUsedWorkarounds.isEmpty()) {
+            builder.append("\n" + " workarounds: " + StringUtil.join(justUsedWorkarounds, "+"));
         }
         builder.append("\n");
         //		builder.append(data.stats.getStatsStr(false));
