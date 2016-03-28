@@ -71,10 +71,12 @@ public class MagicAir {
                 && (
                         // Decrease more after lost-ground cases with more y-distance than normal lift-off.
                         lastMove.yDistance > maxJumpGain && lastMove.yDistance < 1.1 * maxJumpGain 
+                        && data.ws.use(WRPT.W_M_SF_SLOPE1)
                         //&& fallingEnvelope(yDistance, lastMove.yDistance, 2.0 * GRAVITY_SPAN)
                         // Decrease more after going through liquid (but normal ground envelope).
                         || lastMove.yDistance > 0.5 * maxJumpGain && lastMove.yDistance < 0.84 * maxJumpGain
-                        && lastMove.yDistance - yDistance <= Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN  
+                        && lastMove.yDistance - yDistance <= Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN
+                        && data.ws.use(WRPT.W_M_SF_SLOPE2)
                         );
     }
 

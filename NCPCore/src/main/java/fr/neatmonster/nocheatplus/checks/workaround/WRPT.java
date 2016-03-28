@@ -22,6 +22,8 @@ public class WRPT extends SimpleWorkaroundRegistry {
     ///////////////////////
 
     // MOVING_SURVIVALFLY
+
+    // (vEnvHacks)
     // TODO: The use once thing could be shared by several spots (e.g. all double-0 top of slope).
     /**  Workaround: One time use max of jump phase twice zero dist. */
     // TODO: This might be changed to (or extended with addition of) use once within air jump phase.
@@ -31,6 +33,18 @@ public class WRPT extends SimpleWorkaroundRegistry {
     public static final String W_M_SF_WEB_0V2 = "m.sf.web.0v2";
     public static final String W_M_SF_WEB_MICROGRAVITY1 = "m.sf.web.microgravity1";
     public static final String W_M_SF_WEB_MICROGRAVITY2 = "m.sf.web.microgravity2";
+
+    // oddSlope
+    public static final String W_M_SF_SLOPE1 = "m.sf.WRPT.SLOPE1";
+    public static final String W_M_SF_SLOPE2 = "m.sf.WRPT.SLOPE2";
+
+    // TODO: oddLiquid
+
+    // TODO: oddGravity
+
+    // TODO: oddFriction
+
+    // (TODO: oddElytra)
 
     ///////////////////////
     // Group ids.
