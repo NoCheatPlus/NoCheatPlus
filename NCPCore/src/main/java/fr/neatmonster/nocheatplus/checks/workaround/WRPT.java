@@ -84,6 +84,8 @@ public class WRPT extends SimpleWorkaroundRegistry {
                 W_M_SF_WEB_0V2,
                 W_M_SF_WEB_MICROGRAVITY1,
                 W_M_SF_WEB_MICROGRAVITY2,
+                W_M_SF_SLOPE1,
+                W_M_SF_SLOPE2,
                 // TODO: ALL workaorunds.
         };
         for (final String id : counters) {
