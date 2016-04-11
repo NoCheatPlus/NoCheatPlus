@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -123,7 +124,7 @@ public class BlockPlaceListener extends CheckListener {
 
         final boolean shouldSkipSome;
         if (blockMultiPlaceEvent != null && event.getClass() == blockMultiPlaceEvent) {
-            if (placedMat == Material.BEDROCK || placedMat == Material.END_CRYSTAL) {
+            if (placedMat == Material.BEDROCK || Bridge1_9.hasEndCrystalItem() && placedMat == Bridge1_9.END_CRYSTAL_ITEM) {
                 shouldSkipSome = true;
             }
             else {

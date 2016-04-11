@@ -15,9 +15,9 @@ public class Bridge1_9 {
 
     private static final PotionEffectType LEVITATION = PotionEffectType.getByName("LEVITATION");
 
-    private static final Material END_ROD = Material.getMaterial("END_ROD");
-
-    private static final Material ELYTRA = Material.getMaterial("ELYTRA");
+    public static final Material END_ROD = Material.getMaterial("END_ROD");
+    public static final Material ELYTRA = Material.getMaterial("ELYTRA");
+    public static final Material END_CRYSTAL_ITEM = Material.getMaterial("END_CRYSTAL");
 
     private static Method getItemInOffHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInOffHand", ItemStack.class);
     private static Method getItemInMainHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInMainHand", ItemStack.class);
@@ -30,6 +30,10 @@ public class Bridge1_9 {
 
     public static boolean hasEndRod() {
         return END_ROD != null;
+    }
+
+    public static boolean hasEndCrystalItem() {
+        return END_CRYSTAL_ITEM != null;
     }
 
     public static boolean hasElytra() {
