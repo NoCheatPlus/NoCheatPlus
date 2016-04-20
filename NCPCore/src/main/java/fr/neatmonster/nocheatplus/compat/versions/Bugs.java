@@ -18,7 +18,7 @@ public class Bugs {
         final String serverVersion = Bukkit.getServer().getVersion().toLowerCase();
 
         // Need to add velocity (only internally) because the server does not.
-        pvpKnockBackVelocity = ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false);
+        pvpKnockBackVelocity = ServerVersion.compareMinecraftVersion("1.8") >= 0;
 
         // First move exploit (classic CraftBukkit or Spigot before 1.7.5). 
         if (mcVersion == GenericVersion.UNKNOWN_VERSION) {
