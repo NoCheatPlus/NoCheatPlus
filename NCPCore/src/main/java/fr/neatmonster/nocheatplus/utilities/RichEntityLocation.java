@@ -14,27 +14,27 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 public class RichEntityLocation extends RichBoundsLocation {
 
     // Final members //
-    final MCAccess mcAccess;
+    private final MCAccess mcAccess;
 
 
     // Simple members //
 
     /** Full bounding box width. */
-    double width; // TODO: This is the entity width, happens to usually be the bounding box width +-. Move to entity / replace.
+    private double width; // TODO: This is the entity width, happens to usually be the bounding box width +-. Move to entity / replace.
 
     /** Some entity collision height. */
-    double height; // TODO: Move to entity / replace.
+    private double height; // TODO: Move to entity / replace.
 
     /**
      * Entity is on ground, due to standing on an entity. (Might not get
      * evaluated if the player is on ground anyway.)
      */
-    boolean standsOnEntity = false;
+    private boolean standsOnEntity = false;
 
 
     // "Heavy" object members that need to be set to null on cleanup. //
 
-    Entity entity = null;
+    private Entity entity = null;
 
 
     public RichEntityLocation(final MCAccess mcAccess, final BlockCache blockCache) {

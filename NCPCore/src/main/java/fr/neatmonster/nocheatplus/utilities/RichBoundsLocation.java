@@ -18,6 +18,8 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
  */
 public class RichBoundsLocation {
 
+    // TODO: Consider switching back from default to private visibility (use getters for other places).
+
     // Simple members // 
 
     /** Y parameter for growing the bounding box with the isOnGround check. */
