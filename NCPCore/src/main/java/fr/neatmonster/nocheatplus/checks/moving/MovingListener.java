@@ -2,22 +2,17 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -37,12 +32,7 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
-import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.event.vehicle.VehicleEnterEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -59,11 +49,11 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
-import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.moving.vehicle.VehicleChecks;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
@@ -106,35 +96,25 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
 
-    /** The instance of NoCheatPlus. */
-    private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
-
     /** The no fall check. **/
-    public final NoFall 			noFall 				= addCheck(new NoFall());
+    public final NoFall                 noFall              = addCheck(new NoFall());
 
     /** The creative fly check. */
-    private final CreativeFly        creativeFly        = addCheck(new CreativeFly());
+    private final CreativeFly           creativeFly         = addCheck(new CreativeFly());
 
     /** The more packets check. */
-    private final MorePackets        morePackets        = addCheck(new MorePackets());
+    private final MorePackets           morePackets         = addCheck(new MorePackets());
 
-    /** The more packets vehicle check. */
-    private final MorePacketsVehicle morePacketsVehicle = addCheck(new MorePacketsVehicle());
+    private final VehicleChecks         vehicleChecks       = new VehicleChecks();
 
     /** The survival fly check. */
-    private final SurvivalFly        survivalFly        = addCheck(new SurvivalFly());
+    private final SurvivalFly        survivalFly            = addCheck(new SurvivalFly());
 
     /** The Passable (simple no-clip) check.*/
-    private final Passable passable 					= addCheck(new Passable());
+    private final Passable               passable           = addCheck(new Passable());
 
     /** Combined check but handled here (subject to change!) */
-    private final BedLeave bedLeave 					= addCheck(new BedLeave());
-
-    /**
-     * Unused instances.<br>
-     * Might be better due to cascading events in case of actions or plugins doing strange things.
-     */
-    private final List<MoveInfo> parkedInfo = new ArrayList<MoveInfo>(10);
+    private final BedLeave               bedLeave           = addCheck(new BedLeave());
 
     /**
      * Store events by player name, in order to invalidate moving processing on higher priority level in case of teleports.
@@ -149,10 +129,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private int hoverTicksStep = 5;
 
-    private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
-
     /** Location for temporary use with getLocation(useLoc). Always call setWorld(null) after use. Use LocUtil.clone before passing to other API. */
     final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
+
+    /** Auxiliary functionality. */
+    private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
@@ -164,24 +145,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     public MovingListener() {
         super(CheckType.MOVING);
-    }
-
-    private MoveInfo useMoveInfo() {
-        if (parkedInfo.isEmpty()) {
-            return new MoveInfo(mcAccess);
-        }
-        else {
-            return parkedInfo.remove(parkedInfo.size() - 1);
-        }
-    }
-
-    /**
-     * Cleanup and add to parked.
-     * @param moveInfo
-     */
-    private void returnMoveInfo(final MoveInfo moveInfo) {
-        moveInfo.cleanup();
-        parkedInfo.add(moveInfo);
+        // Register vehicleChecks.
+        NCPAPIProvider.getNoCheatPlusAPI().addComponent(vehicleChecks);
     }
 
     /**
@@ -214,15 +179,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = useMoveInfo();
+        final MoveInfo moveInfo = aux.useMoveInfo();
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, cc.yOnGround);
         if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
-            returnMoveInfo(moveInfo);
+            aux.returnMoveInfo(moveInfo);
             useLoc.setWorld(null);
             return;
         }
-        returnMoveInfo(moveInfo);
+        aux.returnMoveInfo(moveInfo);
 
         if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) {
             useLoc.setWorld(null);
@@ -272,10 +237,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Location loc = player.getLocation(useLoc);
             final MovingData data = MovingData.getData(player);
             Location target = null;
-            final MoveInfo moveInfo = useMoveInfo();
+            final MoveInfo moveInfo = aux.useMoveInfo();
             moveInfo.set(player, loc, null, cc.yOnGround);
             final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc);
-            returnMoveInfo(moveInfo);
+            aux.returnMoveInfo(moveInfo);
             if (sfCheck) {
                 target = data.getSetBack(loc);
             }
@@ -322,7 +287,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Might omit this if neither check is activated.
         final Location loc = player.getLocation(useLoc);
         data.setSetBack(loc);
-        resetPositionsAndMediumProperties(player, loc, data, cc);
+        aux.resetPositionsAndMediumProperties(player, loc, data, cc);
         data.resetTrace(loc, TickTask.getTick(), cc.traceSize, cc.traceMergeDist);
         if (cc.enforceLocation) {
             // Just in case.
@@ -381,7 +346,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final boolean earlyReturn;
         if (player.isInsideVehicle()) {
             // No full processing for players in vehicles.
-            newTo = onPlayerMoveVehicle(player, from, to, data);
+            newTo = vehicleChecks.onPlayerMoveVehicle(player, from, to, data);
             earlyReturn = true;
         } else if (player.isDead() || player.isSleeping()) {
             // Ignore dead players.
@@ -423,7 +388,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Fire one or two moves here.
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = useMoveInfo();
+        final MoveInfo moveInfo = aux.useMoveInfo();
         final Location loc = player.getLocation(moveInfo.useLoc);
         final MoveData lastMove = data.moveData.getFirst();
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
@@ -463,7 +428,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         // Cleanup.
         data.joinOrRespawn = false;
-        returnMoveInfo(moveInfo);
+        aux.returnMoveInfo(moveInfo);
     }
 
     /**
@@ -568,7 +533,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // HOT FIX - for VehicleLeaveEvent missing.
         if (data.wasInVehicle) {
-            onVehicleLeaveMiss(player, data, cc);
+            vehicleChecks.onVehicleLeaveMiss(player, data, cc);
         }
 
         // Set some data for this move.
@@ -791,12 +756,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         // 1: With carpet. TODO: Magic block id.
                         || to.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9
                         )
-                        && MovingUtil.getRealisticFallDistance(player, from.getY(), to.getY(), data) > 1.0
-                        // 0: Within wobble-distance.
-                        || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
-                        && to.getY() - from.getY() < -Magic.GRAVITY_MIN
-                        && !to.isOnGround()
-                        ;
+                && MovingUtil.getRealisticFallDistance(player, from.getY(), to.getY(), data) > 1.0
+                // 0: Within wobble-distance.
+                || to.getY() - to.getBlockY() < 0.286 && to.getY() - from.getY() > -0.5
+                && to.getY() - from.getY() < -Magic.GRAVITY_MIN
+                && !to.isOnGround()
+                ;
     }
 
     /**
@@ -858,7 +823,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (lastMove.toIsValid && Math.abs(thisMove.yDistance) < Math.abs(lastMove.yDistance)
                     && (thisMove.yDistance > 0.0 && lastMove.yDistance > 0.0 
                             || thisMove.yDistance < 0.0 && lastMove.yDistance < 0.0) 
-                            || allowVerticalVelocity && data.getOrUseVerticalVelocity(thisMove.yDistance) != null) {
+                    || allowVerticalVelocity && data.getOrUseVerticalVelocity(thisMove.yDistance) != null) {
                 // Speed decreased or velocity is present.
             }
             else {
@@ -1015,7 +980,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Reset some data.
         data.prepareSetBack(newTo);
-        resetPositionsAndMediumProperties(player, newTo, data, cc); // TODO: Might move into prepareSetBack, experimental here.
+        aux.resetPositionsAndMediumProperties(player, newTo, data, cc); // TODO: Might move into prepareSetBack, experimental here.
 
         // Set new to-location.
         event.setTo(newTo);
@@ -1024,68 +989,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (data.debug) {
             debug(player, "Set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
         }
-    }
-
-    /**
-     * Called from player-move checking, if the player is inside of a vehicle.
-     * @param player
-     * @param from
-     * @param to
-     * @param data
-     */
-    private Location onPlayerMoveVehicle(final Player player, final Location from, final Location to, final MovingData data) {
-        // Workaround for pigs and other (1.5.x and before)!
-        // Note that with 1.6 not even PlayerMove fires for horses and pigs.
-        // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
-        final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
-        data.wasInVehicle = true;
-        data.sfHoverTicks = -1;
-        data.removeAllVelocity();
-        data.sfLowJump = false;
-        // TODO: What with processingEvents.remove(player.getName());
-        if (vehicle != null) {
-            final Location vLoc = vehicle.getLocation(); // TODO: Use a location as argument.
-            // (Auto detection of missing events, might fire one time too many per plugin run.)
-            if (!normalVehicles.contains(vehicle.getType())) {
-                onVehicleMove(vehicle, vLoc, vLoc, true);
-                return null;
-            } else {
-                data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
-                // TODO: Consider TeleportUtil.forceMount or similar.
-                final MovingConfig cc = MovingConfig.getConfig(player);
-                if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
-                    if (cc.vehicleEnforceLocation) {
-                        return vLoc;
-                    } else {
-                        return null;
-                    }
-                } else {
-                    resetPositionsAndMediumProperties(player, vLoc, data, cc);
-                    return null;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Called from player-move checking, if vehicle-leave has not been called after entering, but the player is not inside of a vehicle anymore.
-     * @param player
-     * @param data
-     * @param cc
-     */
-    private void onVehicleLeaveMiss(final Player player, final MovingData data, final MovingConfig cc) {
-        if (data.debug) {
-            StaticLog.logWarning("VehicleExitEvent missing for: " + player.getName());
-        }
-        onPlayerVehicleLeave(player, null);
-        //		if (BlockProperties.isRails(pFrom.getTypeId())) {
-        // Always clear no fall data, let Minecraft do fall damage.
-        data.noFallSkipAirCheck = true; // Might allow one time cheat.
-        data.sfLowJump = false;
-        data.clearNoFallData();
-        // TODO: What with processingEvents.remove(player.getName());
-        //		}
     }
 
     /**
@@ -1148,7 +1051,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.lastMoveTime = now; // TODO: Move to MovingData?
         // TODO: teleported + other resetting ?
         Combined.feedYawRate(player, from.getYaw(), now, from.getWorld().getName(), data);
-        resetPositionsAndMediumProperties(player, from, mData, mCc);
+        aux.resetPositionsAndMediumProperties(player, from, mData, mCc);
         mData.resetTrace(player, from, tick); // TODO: Should probably leave this to the teleport event!
         if (((NetConfig) CheckType.NET_FLYINGFREQUENCY.getConfigFactory().getConfig(player)).flyingFrequencyActive) {
             ((NetData) CheckType.NET_FLYINGFREQUENCY.getDataFactory().getData(player)).teleportQueue.onTeleportEvent(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch());
@@ -1173,13 +1076,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (player.isInsideVehicle()) {
             // TODO: refine (!).
             final Location ref = player.getVehicle().getLocation(useLoc);
-            resetPositionsAndMediumProperties(player, ref, mData, mCc); // TODO: Consider using to and intercept cheat attempts in another way.
+            aux.resetPositionsAndMediumProperties(player, ref, mData, mCc); // TODO: Consider using to and intercept cheat attempts in another way.
             useLoc.setWorld(null);
             mData.updateTrace(player, to, tick); // TODO: Can you become invincible by sending special moves?
         }
         else if (!from.getWorld().getName().equals(toWorldName)) {
             // A teleport event should follow.
-            resetPositionsAndMediumProperties(player, to, mData, mCc);
+            aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
             mData.resetTrace(player, to, tick);
         }
         else {
@@ -1187,7 +1090,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final MoveData lastMove = mData.moveData.getFirst();
             if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.x, lastMove.to.y, lastMove.to.z)) {
                 // Something odd happened.
-                resetPositionsAndMediumProperties(player, to, mData, mCc);
+                aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
             } else {
                 // Normal move, nothing to do.
             }
@@ -1386,10 +1289,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (data.isTeleported(to)) {
             // Set-back.
             final Location teleported = data.getTeleported();
-            final MoveInfo moveInfo = useMoveInfo();
+            final MoveInfo moveInfo = aux.useMoveInfo();
             moveInfo.set(player, teleported, null, cc.yOnGround);
             data.onSetBack(moveInfo.from);
-            returnMoveInfo(moveInfo);
+            aux.returnMoveInfo(moveInfo);
 
             // Reset stuff.
             Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
@@ -1423,7 +1326,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.noFallSkipAirCheck = true;
         }
         data.sfHoverTicks = -1; // Important against concurrent modification exception.
-        resetPositionsAndMediumProperties(player, to, data, cc);
+        aux.resetPositionsAndMediumProperties(player, to, data, cc);
         // TODO: Decide to remove the LiftOffEnvelope thing completely.
         //        if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
         //            // TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
@@ -1439,24 +1342,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (data.debug) {
             debug(player, "TP " + event.getCause() + " (normal): " + to);
         }
-    }
-
-    /**
-     * Convenience method to do both data.resetPositions and
-     * data.adjustMediumProperties, wrapping given loc with a PlayerLocation
-     * instance.
-     * 
-     * @param player
-     * @param loc
-     * @param data
-     * @param cc
-     */
-    private void resetPositionsAndMediumProperties(final Player player, final Location loc, final MovingData data, final MovingConfig cc) {
-        final MoveInfo moveInfo = useMoveInfo();
-        moveInfo.set(player, loc, null, cc.yOnGround);
-        data.resetPositions(moveInfo.from);
-        data.adjustMediumProperties(moveInfo.from);
-        returnMoveInfo(moveInfo);
     }
 
     /**
@@ -1481,97 +1366,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.addVelocity(player, cc, velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
-    /**
-     * When a vehicle moves, its player will be checked for various suspicious behaviors.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onVehicleMove(final VehicleMoveEvent event) {
-        final Vehicle vehicle = event.getVehicle();
-        final EntityType entityType = vehicle.getType();
-        if (!normalVehicles.contains(entityType)) {
-            // A little extra sweep to check for debug flags.
-            normalVehicles.add(entityType);
-            if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug) {
-                debug(null, "VehicleMoveEvent fired for: " + entityType);
-            }
-        }
-        // TODO: Might account for the case of a player letting the vehicle move but not themselves (do mind latency).
-        // Mind that players could be riding horses inside of minecarts etc.
-        if (vehicle.getVehicle() != null) {
-            // Do ignore events for vehicles inside of other vehicles.
-            return;
-        }
-        onVehicleMove(vehicle, event.getFrom(), event.getTo(), false);
-    }
-
-
-    public void onVehicleMove(final Entity vehicle, final Location from, final Location to, final boolean fake) {	
-        // (No re-check for vehicles that have vehicles, pre condition is that this has already been checked.)
-        final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
-        if (player == null) {
-            return;
-        }
-        if (vehicle.isDead() || !vehicle.isValid()) {
-            onPlayerVehicleLeave(player, vehicle);
-            return;
-        }
-        if (!from.getWorld().equals(to.getWorld())) return;
-
-        final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        data.joinOrRespawn = false;
-        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation(useLoc));
-        switch (data.vehicleConsistency) {
-            case FROM:
-            case TO:
-                resetPositionsAndMediumProperties(player, player.getLocation(useLoc), data, cc); // TODO: Drop MC 1.4!
-                break;
-            case INCONSISTENT:
-                // TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
-                // TODO: Test with latency.
-                break;
-        }
-
-        Location newTo = null;
-        data.sfNoLowJump = true;
-
-        if (cc.noFallVehicleReset) {
-            // Reset noFall data.
-            data.noFallSkipAirCheck = true; // Might allow one time cheat.
-            data.sfLowJump = false;
-            data.clearNoFallData();
-        }
-
-        if (data.debug) {
-            // Log move.
-            outputDebugVehicleMove(player, vehicle, from, to, fake);
-        }
-
-        if (morePacketsVehicle.isEnabled(player, data, cc)) {
-            // If the player is handled by the more packets vehicle check, execute it.
-            newTo = morePacketsVehicle.check(player, from, to, data, cc);
-        }
-        else {
-            // Otherwise we need to clear their data.
-            data.clearMorePacketsData();
-        }
-
-        // Schedule a set-back?
-        if (newTo != null && data.morePacketsVehicleTaskId == -1) {
-            // Schedule a delayed task to teleport back the vehicle with the player.
-            // (Only schedule if not already scheduled.)
-            // TODO: Might log debug if skipping.
-            // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
-            // TODO: Reset on world changes or not?
-            data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
-        }
-        useLoc.setWorld(null);
-    }
-
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onEntityDamage(final EntityDamageEvent event) {
         if (event.getCause() != DamageCause.FALL) {
@@ -1589,7 +1383,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = useMoveInfo();
+        final MoveInfo moveInfo = aux.useMoveInfo();
         final double yOnGround = Math.max(cc.noFallyOnGround, cc.yOnGround);
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, yOnGround);
@@ -1598,7 +1392,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, pLoc, data, cc) || !noFall.isEnabled(player, cc)) {
             data.clearNoFallData();
             useLoc.setWorld(null);
-            returnMoveInfo(moveInfo);
+            aux.returnMoveInfo(moveInfo);
             return;
         }
         boolean allowReset = true;
@@ -1622,7 +1416,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Also reset in other cases (moved too quickly)?
             }
         }
-        returnMoveInfo(moveInfo);
+        aux.returnMoveInfo(moveInfo);
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
@@ -1728,7 +1522,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // More resetting.
         data.vDistAcc.clear();
-        resetPositionsAndMediumProperties(player, loc, data, cc);
+        aux.resetPositionsAndMediumProperties(player, loc, data, cc);
 
         // Enforcing the location.
         if (cc.enforceLocation) {
@@ -1823,121 +1617,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onVehicleExit(final VehicleExitEvent event) {
-        final Entity entity = event.getExited();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-        onPlayerVehicleLeave((Player) entity, event.getVehicle());
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onVehicleDestroyLowest(final VehicleDestroyEvent event) {
-        // Prevent destroying ones own vehicle.
-        final Entity attacker = event.getAttacker();
-        if (attacker instanceof Player && attacker.equals(event.getVehicle().getPassenger())) {
-            final Player player = (Player) attacker;
-            final MovingConfig cc = MovingConfig.getConfig(player);
-            if (survivalFly.isEnabled(player, cc) || creativeFly.isEnabled(player, cc)) {
-                if (cc.vehiclePreventDestroyOwn) {
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
-                }
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onVehicleDestroy(final VehicleDestroyEvent event) {
-        final Entity entity = event.getVehicle().getPassenger();
-        if (!(entity instanceof Player)) return;
-        onPlayerVehicleLeave((Player) entity, event.getVehicle());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerVehicleEnter(final VehicleEnterEvent event) {
-        final Entity entity = event.getEntered();
-        if (!(entity instanceof Player)) {
-            return;
-        }
-        final Player player = (Player) entity;
-        final MovingData data = MovingData.getData(player);
-        data.joinOrRespawn = false;
-        data.removeAllVelocity();
-        // Event should have a vehicle, in case check this last.
-        data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
-        useLoc.setWorld(null); // TODO: A pool ?
-        // TODO: more resetting, visible check ?
-    }
-
-    /**
-     * Call on leaving or just having left a vehicle.
-     * @param player
-     * @param vehicle May be null in case of "not possible to determine".
-     */
-    private void onPlayerVehicleLeave(final Player player, final Entity vehicle) {
-        final MovingData data = MovingData.getData(player);
-        data.wasInVehicle = false;
-        data.joinOrRespawn = false;
-        //    	if (data.morePacketsVehicleTaskId != -1) {
-        //    		// Await set-back.
-        //    		// TODO: might still set ordinary set-backs ?
-        //    		return;
-        //    	}
-
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        // TODO: Loc can be inconsistent, determine which to use ! 
-        final Location pLoc = player.getLocation(useLoc);
-        Location loc = pLoc; // The location to use as set-back.
-        //  TODO: Which vehicle to use ?
-        // final Entity vehicle = player.getVehicle();
-        if (vehicle != null) {
-            final Location vLoc = vehicle.getLocation();
-            // Workaround for some entities/animals that don't fire VehicleMoveEventS.
-            if (!normalVehicles.contains(vehicle.getType()) || cc.noFallVehicleReset) {
-                data.noFallSkipAirCheck = true; // Might allow one time cheat.
-                data.clearNoFallData();
-            }
-            // Check consistency with vehicle location.
-            if (MoveConsistency.getConsistency(vLoc, null, pLoc) == MoveConsistency.INCONSISTENT) {
-                // TODO: Consider teleporting the player (...)
-                // TODO: What with the case of vehicle moved to another world !?
-                loc = vLoc; // 
-                if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
-                    final MoveData lastMove = data.moveData.getFirst();
-                    if (lastMove.toIsValid) {
-                        final Location oldLoc = new Location(pLoc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
-                        if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
-                            loc = oldLoc;
-                        }
-                    }
-                }
-
-            }
-            if (data.debug) {
-                debug(player, "Vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
-            }
-        }
-
-        // Adjust loc if in liquid (meant for boats !?).
-        if (BlockProperties.isLiquid(loc.getBlock().getType())) {
-            loc.setY(Location.locToBlock(loc.getY()) + 1.25);
-        }
-
-        if (data.debug) {
-            debug(player, "Vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
-        }
-        resetPositionsAndMediumProperties(player, loc, data, cc);
-        data.setSetBack(loc);
-        // Give some freedom to allow the "exiting move".
-        data.removeAllVelocity();
-        // TODO: Use-once entries usually are intended to allow one offset, but not jumping/flying on.
-        data.addHorizontalVelocity(new AccountEntry(0.9, 1, 1));
-        data.addVerticalVelocity(new SimpleEntry(0.6, 1)); // TODO: Typical margin?
-        useLoc.setWorld(null);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerToggleSneak(final PlayerToggleSneakEvent event) {
         survivalFly.setReallySneaking(event.getPlayer(), event.isSneaking());
     }
@@ -1958,17 +1637,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = useMoveInfo();
+        final MoveInfo moveInfo = aux.useMoveInfo();
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, cc.yOnGround);
         // TODO: data.isVelocityJumpPhase() might be too harsh, but prevents too easy abuse.
         if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc) || data.isVelocityJumpPhase() ||
                 BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround)) {
             useLoc.setWorld(null);
-            returnMoveInfo(moveInfo);
+            aux.returnMoveInfo(moveInfo);
             return;
         }
-        returnMoveInfo(moveInfo);
+        aux.returnMoveInfo(moveInfo);
         useLoc.setWorld(null);
         // TODO: Configurable.
         // TODO: Confine to minimum activation ticks.
@@ -2006,7 +1685,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Only check every so and so ticks.
             return;
         }
-        final MoveInfo info = useMoveInfo();
+        final MoveInfo info = aux.useMoveInfo();
         for (final String playerName : hoverTicks) {
             // TODO: put players into the set (+- one tick would not matter ?)
             // TODO: might add an online flag to data !
@@ -2049,7 +1728,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         hoverTicks.removeAll(rem);
         rem.clear();
-        returnMoveInfo(info);
+        aux.returnMoveInfo(info);
         useLoc.setWorld(null);
     }
 
@@ -2098,7 +1777,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else {
             if (data.sfHoverTicks > cc.sfHoverTicks) {
                 // Re-Check if survivalfly can apply at all.
-                final MoveInfo moveInfo = useMoveInfo();
+                final MoveInfo moveInfo = aux.useMoveInfo();
                 moveInfo.set(player, loc, null, cc.yOnGround);
                 if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
                     handleHoverViolation(player, loc, cc, data);
@@ -2111,7 +1790,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     res = false;
                     data.sfHoverTicks = 0;
                 }
-                returnMoveInfo(moveInfo);
+                aux.returnMoveInfo(moveInfo);
             }
             else res = false;
         }
@@ -2146,16 +1825,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void removeAllData() {
         hoverTicks.clear();
         playersEnforce.clear();
-        parkedInfo.clear();
+        aux.clear();
     }
 
     @Override
     public void onReload() {
-        for (final MoveInfo info : parkedInfo) {
-            // Just in case.
-            info.cleanup();
-        }
-        parkedInfo.clear();
+        aux.clear();
         hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
         MovingData.onReload();
     }
@@ -2226,33 +1901,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)");
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         }
-    }
-
-    /**
-     * Intended for vehicle-move events.
-     * 
-     * @param player
-     * @param vehicle
-     * @param from
-     * @param to
-     * @param fake true if the event was not fired by an external source (just gets noted).
-     */
-    private void outputDebugVehicleMove(final Player player, final Entity vehicle, final Location from, final Location to, final boolean fake) {
-        final StringBuilder builder = new StringBuilder(250);
-        final Location vLoc = vehicle.getLocation();
-        final Location loc = player.getLocation();
-        // TODO: Differentiate debug levels (needs setting up some policy + document in BuildParamteres)?
-        final Entity actualVehicle = player.getVehicle();
-        final boolean wrongVehicle = actualVehicle == null || actualVehicle.getEntityId() != vehicle.getEntityId();
-        builder.append(CheckUtils.getLogMessagePrefix(player, checkType));
-        builder.append("VEHICLE MOVE " + (fake ? "(fake)" : "") + " in world " + from.getWorld().getName() + ":\n");
-        DebugUtil.addMove(from, to, null, builder);
-        builder.append("\n Vehicle: ");
-        DebugUtil.addLocation(vLoc, builder);
-        builder.append("\n Player: ");
-        DebugUtil.addLocation(loc, builder);
-        builder.append("\n Vehicle type: " + vehicle.getType() + (wrongVehicle ? (actualVehicle == null ? " (exited?)" : " actual: " + actualVehicle.getType()) : ""));
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 
 }

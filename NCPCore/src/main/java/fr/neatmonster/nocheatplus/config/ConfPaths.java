@@ -556,10 +556,6 @@ public abstract class ConfPaths {
     public static final String  MOVING_MOREPACKETS_BURST_EPM             = MOVING_MOREPACKETS_BURST + "epmviolation";
     public static final String  MOVING_MOREPACKETS_ACTIONS               = MOVING_MOREPACKETS + "actions";
 
-    private static final String MOVING_MOREPACKETSVEHICLE                = MOVING + "morepacketsvehicle.";
-    public static final String  MOVING_MOREPACKETSVEHICLE_CHECK          = MOVING_MOREPACKETSVEHICLE + "active";
-    public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS        = MOVING_MOREPACKETSVEHICLE + "actions";
-
     private static final String MOVING_NOFALL                            = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                      = MOVING_NOFALL + "active";
     public static final String  MOVING_NOFALL_DEALDAMAGE                 = MOVING_NOFALL + "dealdamage";
@@ -617,7 +613,7 @@ public abstract class ConfPaths {
     private static final String MOVING_VELOCITY                             = MOVING + "velocity.";
     public static final String  MOVING_VELOCITY_ACTIVATIONCOUNTER           = MOVING_VELOCITY + "activationcounter";
     public static final String  MOVING_VELOCITY_ACTIVATIONTICKS             = MOVING_VELOCITY + "activationticks";
-    public static final String    MOVING_VELOCITY_STRICTINVALIDATION        = MOVING_VELOCITY + "strictinvalidation";
+    public static final String  MOVING_VELOCITY_STRICTINVALIDATION          = MOVING_VELOCITY + "strictinvalidation";
 
     public static final String  MOVING_NOFALL_YONGROUND                     = MOVING_NOFALL + "yonground";
     public static final String  MOVING_YONGROUND                            = MOVING + "yonground";
@@ -635,13 +631,16 @@ public abstract class ConfPaths {
     public static final String  MOVING_SPEEDGRACE                           = MOVING + "speedgrace";
     public static final String  MOVING_ENFORCELOCATION                      = MOVING + "enforcelocation";
 
-    private static final String MOVING_VEHICLES                             = MOVING + "vehicles.";
-    public static final String  MOVING_VEHICLES_ENFORCELOCATION             = MOVING_VEHICLES + "enforcelocation";
-    public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN           = MOVING_VEHICLES + "preventdestroyown";
-
     private static final String MOVING_TRACE                                = MOVING + "trace.";
     public  static final String MOVING_TRACE_SIZE                           = MOVING_TRACE + "size";
     public  static final String MOVING_TRACE_MERGEDIST                      = MOVING_TRACE + "mergedist";
+
+    private static final String MOVING_VEHICLE                             = MOVING + "vehicle.";
+    public static final String  MOVING_VEHICLE_ENFORCELOCATION             = MOVING_VEHICLE + "enforcelocation";
+    public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN           = MOVING_VEHICLE + "preventdestroyown";
+    private static final String MOVING_VEHICLE_MOREPACKETS                = MOVING_VEHICLE + "morepackets.";
+    public static final String  MOVING_VEHICLE_MOREPACKETS_CHECK          = MOVING_VEHICLE_MOREPACKETS + "active";
+    public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS        = MOVING_VEHICLE_MOREPACKETS + "actions";
 
     public static final String  NET                                         = CHECKS + "net.";
 
@@ -740,6 +739,14 @@ public abstract class ConfPaths {
     public static final String  MOVING_CREATIVEFLY_MAXHEIGHT             = "checks.moving.creativefly.maxheight";
     @Moved(newPath = MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE)
     public static final String MOVING_SURVIVALFLY_FALLDAMAGE             = "checks.moving.survivalfly.falldamage";
+    @Moved(newPath=MOVING_VEHICLE_ENFORCELOCATION)
+    public static final String  MOVING_VEHICLES_ENFORCELOCATION             = "checks.moving.vehicles.enforcelocation";
+    @Moved(newPath=MOVING_VEHICLE_PREVENTDESTROYOWN)
+    public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN           = "checks.moving.vehicles.preventdestroyown";
+    @Moved(newPath=MOVING_VEHICLE_MOREPACKETS_CHECK)
+    public static final String  MOVING_MOREPACKETSVEHICLE_CHECK          = "checks.moving.morepacketsvehicle.active";
+    @Moved(newPath=MOVING_VEHICLE_MOREPACKETS_ACTIONS)
+    public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS        = "checks.moving.morepacketsvehicle.actions";
     // Deprecated paths (just removed).
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";

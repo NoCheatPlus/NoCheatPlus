@@ -46,6 +46,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
@@ -68,6 +69,7 @@ import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
@@ -433,13 +435,24 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public boolean addComponent(final Object obj, final boolean allowComponentRegistry) {
 
         // TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
-        if (obj == this) throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
+        if (obj == this) {
+            throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
+        }
 
+        // Don't register twice.
         if (allComponents.contains(obj)) {
             // All added components are in here.
             return false;
         }
+
         boolean added = false;
+
+        // First register generic instances.
+        if (obj instanceof IRegisterAsGenericInstance) {
+            registerGenericInstance(obj);
+        }
+
+        // Other types.
         if (obj instanceof Listener) {
             addListener((Listener) obj);
             added = true;
@@ -500,7 +513,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
         // Add to allComponents if in fact added.
-        if (added) allComponents.add(obj);
+        if (added) {
+            allComponents.add(obj);
+        }
         return added;
     }
 
@@ -885,6 +900,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 // Put ReloadListener first, because Checks could also listen to it.
                 new ReloadHook(),
                 dataMan,
+                new AuxMoving(),
         }) {
             addComponent(obj);
             // Register sub-components (allow later added to use registries, if any).

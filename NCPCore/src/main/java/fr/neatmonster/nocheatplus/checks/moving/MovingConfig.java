@@ -323,7 +323,7 @@ public class MovingConfig extends ACheckConfig {
                 return passableCheck;
             case MOVING_MOREPACKETS:
                 return morePacketsCheck;
-            case MOVING_MOREPACKETSVEHICLE:
+            case MOVING_VEHICLE_MOREPACKETS:
                 return morePacketsVehicleCheck;
             case MOVING_CREATIVEFLY:
                 return creativeFlyCheck;

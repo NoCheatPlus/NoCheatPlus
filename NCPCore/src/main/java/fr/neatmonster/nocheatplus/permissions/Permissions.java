@@ -122,7 +122,6 @@ public class Permissions {
     public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
-    public static final String  MOVING_MOREPACKETSVEHICLE    = MOVING + ".morepacketsvehicle";
     public static final String  MOVING_NOFALL                = MOVING + ".nofall";
     public static final String  MOVING_PASSABLE              = MOVING + ".passable";
     public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
@@ -131,6 +130,8 @@ public class Permissions {
     public static final String  MOVING_SURVIVALFLY_SPEEDING  = MOVING_SURVIVALFLY + ".speeding";
     public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
     public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
+    public static final String  MOVING_VEHICLE               = MOVING + ".vehicle";
+    public static final String  MOVING_VEHICLE_MOREPACKETS   = MOVING_VEHICLE + ".morepackets";
 
     // Permissions for the individual client mods.
     private static final String MODS                         = NOCHEATPLUS + ".mods";

@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,6 +8,8 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
@@ -25,7 +27,7 @@ public class MorePacketsVehicle extends Check {
      * Instantiates a new more packet vehicle check.
      */
     public MorePacketsVehicle() {
-        super(CheckType.MOVING_MOREPACKETSVEHICLE);
+        super(CheckType.MOVING_VEHICLE_MOREPACKETS);
     }
 
     /**
