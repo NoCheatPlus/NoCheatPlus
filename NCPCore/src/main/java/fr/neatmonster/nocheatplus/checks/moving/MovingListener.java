@@ -700,17 +700,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Morepackets.
-        if (cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
-            // (Always check morepackets, to avoid packet speeding using micro-violations.)
+        if (cc.morePacketsCheck && (newTo == null || data.isMorePacketsSetBackOldest())
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) 
+                && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
+            /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
+            to avoid packet speeding using micro-violations.) */
             final Location mpNewTo = morePackets.check(player, pFrom, pTo, data, cc);
             if (mpNewTo != null) {
                 // Only override set-back, if the morepackets set-back location is older/-est. 
-                if (newTo == null || data.isMorePacketsSetBackOldest()) {
-                    if (newTo != null && data.debug) {
-                        debug(player, "Override set-back by the older morepackets set-back.");
-                    }
-                    newTo = mpNewTo;
+                if (newTo != null && data.debug) {
+                    debug(player, "Override set-back by the older morepackets set-back.");
                 }
+                newTo = mpNewTo;
             }
         } else {
             // Otherwise we need to clear their data.
