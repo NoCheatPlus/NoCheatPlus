@@ -108,6 +108,39 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
+     * Convenience constructor for using mcAccess.getHeight for fullHeight.
+     * @param location
+     * @param entity
+     * @param yOnGround
+     */
+    public void set(final Location location, final Entity entity, final double yOnGround) {
+        set(location, entity, mcAccess.getHeight(entity), yOnGround);
+    }
+
+    /**
+     * 
+     * @param location
+     * @param entity
+     * @param fullHeight Allows to specify eyeHeight here.
+     * @param yOnGround
+     */
+    public void set(final Location location, final Entity entity, final double fullHeight, final double yOnGround) {
+        super.set(location, mcAccess.getWidth(entity), fullHeight, yOnGround);
+        this.entity = entity;
+        this.width = mcAccess.getWidth(entity);
+        this.height = mcAccess.getHeight(entity);
+        standsOnEntity = false;
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, double fullWidth, double fullHeight, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of Entity.");
+    }
+
+    /**
      * Set cached info according to other.<br>
      * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
      * @param other
@@ -115,14 +148,6 @@ public class RichEntityLocation extends RichBoundsLocation {
     public void prepare(final RichEntityLocation other) {
         super.prepare(other);
         this.standsOnEntity = other.standsOnEntity;
-    }
-
-    public void set(final Location location, final Entity entity, final double fullHeight, final double yOnGround) {
-        super.set(location, mcAccess.getWidth(entity), fullHeight, yOnGround);
-        this.entity = entity;
-        this.width = mcAccess.getWidth(entity);
-        this.height = mcAccess.getHeight(entity);
-        standsOnEntity = false;
     }
 
     /**

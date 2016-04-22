@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -136,6 +137,22 @@ public class RichLivingEntityLocation extends RichEntityLocation {
         // Entity reference.
         this.livingEntity = livingEntity;
         this.eyeHeight = livingEntity.getEyeHeight();
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, Entity entity, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, Entity entity, double fullHeight, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
     }
 
     // No need to override prepare.

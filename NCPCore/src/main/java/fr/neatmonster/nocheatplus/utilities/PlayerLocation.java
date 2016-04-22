@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -88,6 +89,14 @@ public class PlayerLocation extends RichLivingEntityLocation {
         // Entity reference.
         this.player = player;
         this.onIce = null;
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, LivingEntity livingEntity, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of Player.");
     }
 
     /**
