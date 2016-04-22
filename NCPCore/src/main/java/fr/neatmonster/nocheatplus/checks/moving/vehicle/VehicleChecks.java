@@ -201,18 +201,23 @@ public class VehicleChecks extends CheckListener {
             }
         }
 
+        // Moving envelope check(s).
+        if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
+            newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
+        }
+
+        // More packets: Sort this in last, to avoid setting the set-back early. Always check to adjust set-back, for now.
         if (vehicleMorePackets.isEnabled(player, data, cc)) {
-            // If the player is handled by the more packets vehicle check, execute it.
-            newTo = vehicleMorePackets.check(player, from, to, data, cc);
+            // If the player is handled by the vehicle more packets check, execute it.
+            final Location mpNewTo = vehicleMorePackets.check(player, from, to, data, cc);
+            if (mpNewTo != null) {
+                // Just prefer this for now.
+                newTo = mpNewTo;
+            }
         }
         else {
             // Otherwise we need to clear their data.
             data.clearMorePacketsData();
-        }
-
-        // TODO: So far this is a test.
-        if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
-            newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
         }
 
         // Schedule a set-back?
