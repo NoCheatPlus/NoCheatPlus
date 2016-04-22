@@ -152,6 +152,19 @@ public class MovingData extends ACheckData {
     public float walkSpeed = 0.0f;
     public float flySpeed = 0.0f;
 
+    /** Count set-back (re-) setting. */
+    private int setBackResetCount = 0;
+    /**
+     * setBackResetCount (incremented) at the time of (re-) setting the ordinary
+     * set-back.
+     */
+    private int setBackResetTime = 0;
+    /**
+     * setBackResetCount (incremented) at the time of (re-) setting the
+     * morepackets set-back.
+     */
+    private int morePacketsSetBackResetTime = 0;
+
     /**
      * Keep track of past moves edge data. First entry always is the last fully
      * processed move, or invalid, even during processing. The currently
@@ -500,6 +513,7 @@ public class MovingData extends ACheckData {
             LocUtil.set(setBack, loc);
         }
         // TODO: Consider adjusting the set-back-y here. Problem: Need to take into account for bounding box (collect max-ground-height needed).
+        setBackResetTime = ++setBackResetCount;
     }
 
     /**
@@ -513,6 +527,7 @@ public class MovingData extends ACheckData {
         else{
             LocUtil.set(setBack, loc);
         }
+        setBackResetTime = ++setBackResetCount;
     }
 
     /**
@@ -561,6 +576,7 @@ public class MovingData extends ACheckData {
 
     public void setSetBackY(final double y) {
         setBack.setY(y);
+        // (Skip setting/increasing the reset count.)
     }
 
     /**
@@ -595,6 +611,16 @@ public class MovingData extends ACheckData {
         return morePacketsSetback != null;
     }
 
+    /**
+     * Test if the morepackets set-back is older than the ordinary set-back.
+     * Does not check for existence of either.
+     * 
+     * @return
+     */
+    public boolean isMorePacketsSetBackOldest() {
+        return morePacketsSetBackResetTime < setBackResetTime;
+    }
+
     public final void setMorePacketsSetBack(final PlayerLocation loc) {
         if (morePacketsSetback == null) {
             morePacketsSetback = loc.getLocation();
@@ -602,6 +628,7 @@ public class MovingData extends ACheckData {
         else {
             LocUtil.set(morePacketsSetback, loc);
         }
+        morePacketsSetBackResetTime = ++setBackResetCount;
     }
 
     public final void setMorePacketsSetBack(final Location loc) {
@@ -611,6 +638,7 @@ public class MovingData extends ACheckData {
         else {
             LocUtil.set(morePacketsSetback, loc);
         }
+        morePacketsSetBackResetTime = ++setBackResetCount;
     }
 
     public Location getMorePacketsSetBack() {
