@@ -217,8 +217,8 @@ public class MovingConfig extends ACheckConfig {
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
-        vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
-        vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
+        vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK);
+        vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS,
                 Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);

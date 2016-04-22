@@ -50,7 +50,7 @@ public class VehicleChecks extends CheckListener {
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
 
     /** The more packets vehicle check. */
-    private final MorePacketsVehicle morePacketsVehicle = addCheck(new MorePacketsVehicle());
+    private final VehicleMorePackets vehicleMorePackets = addCheck(new VehicleMorePackets());
 
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
 
@@ -186,9 +186,9 @@ public class VehicleChecks extends CheckListener {
             outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
 
-        if (morePacketsVehicle.isEnabled(player, data, cc)) {
+        if (vehicleMorePackets.isEnabled(player, data, cc)) {
             // If the player is handled by the more packets vehicle check, execute it.
-            newTo = morePacketsVehicle.check(player, from, to, data, cc);
+            newTo = vehicleMorePackets.check(player, from, to, data, cc);
         }
         else {
             // Otherwise we need to clear their data.
@@ -288,7 +288,7 @@ public class VehicleChecks extends CheckListener {
         final MovingData data = MovingData.getData(player);
         data.wasInVehicle = false;
         data.joinOrRespawn = false;
-        //      if (data.morePacketsVehicleTaskId != -1) {
+        //      if (data.vehicleSetBackTaskId != -1) {
         //          // Await set-back.
         //          // TODO: might still set ordinary set-backs ?
         //          return;

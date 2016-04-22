@@ -130,7 +130,7 @@ public class MovingData extends ACheckData {
     // Violation levels -----
     public double         creativeFlyVL            = 0D;
     public double         morePacketsVL            = 0D;
-    public double         morePacketsVehicleVL     = 0D;
+    public double         vehicleMorePacketsVL     = 0D;
     public double         noFallVL                 = 0D;
     public double         survivalFlyVL            = 0D;
 
@@ -617,11 +617,11 @@ public class MovingData extends ACheckData {
         return LocUtil.clone(morePacketsSetback);
     }
 
-    public boolean hasMorePacketsVehicleSetBack() {
+    public boolean hasVehicleMorePacketsSetBack() {
         return vehicleMorePacketsSetback != null;
     }
 
-    public final void setMorePacketsVehicleSetBack(final PlayerLocation loc) {
+    public final void setVehicleMorePacketsSetBack(final PlayerLocation loc) {
         if (vehicleMorePacketsSetback == null) {
             vehicleMorePacketsSetback = loc.getLocation();
         }
@@ -630,7 +630,7 @@ public class MovingData extends ACheckData {
         }
     }
 
-    public final void setMorePacketsVehicleSetBack(final Location loc) {
+    public final void setVehicleMorePacketsSetBack(final Location loc) {
         if (vehicleMorePacketsSetback == null) {
             vehicleMorePacketsSetback = LocUtil.clone(loc);
         }
@@ -639,7 +639,7 @@ public class MovingData extends ACheckData {
         }
     }
 
-    public final Location getMorePacketsVehicleSetBack() {
+    public final Location getVehicleMorePacketsSetBack() {
         return LocUtil.clone(vehicleMorePacketsSetback);
     }
 

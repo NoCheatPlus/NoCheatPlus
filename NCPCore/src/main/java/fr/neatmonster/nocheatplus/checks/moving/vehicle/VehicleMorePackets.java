@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
  */
-public class MorePacketsVehicle extends Check {
+public class VehicleMorePackets extends Check {
 
     /**
      * The usual number of packets per timeframe.
@@ -26,7 +26,7 @@ public class MorePacketsVehicle extends Check {
     /**
      * Instantiates a new more packet vehicle check.
      */
-    public MorePacketsVehicle() {
+    public VehicleMorePackets() {
         super(CheckType.MOVING_VEHICLE_MOREPACKETS);
     }
 
@@ -51,9 +51,9 @@ public class MorePacketsVehicle extends Check {
 
         Location newTo = null;
 
-        if (!data.hasMorePacketsVehicleSetBack()){
+        if (!data.hasVehicleMorePacketsSetBack()){
             // TODO: Check if other set-back is appropriate or if to set on other events.
-            data.setMorePacketsVehicleSetBack(from);
+            data.setVehicleMorePacketsSetBack(from);
             if (data.vehicleSetBackTaskId != -1) {
                 // TODO: Set back outdated or not?
                 Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
@@ -65,23 +65,23 @@ public class MorePacketsVehicle extends Check {
 
         if (data.vehicleSetBackTaskId != -1){
             // Short version !
-            return data.getMorePacketsVehicleSetBack();
+            return data.getVehicleMorePacketsSetBack();
         }
 
         // Player used up buffer, they fail the check.
         if (data.vehicleMorePacketsBuffer < 0) {
 
             // Increment violation level.
-            data.morePacketsVehicleVL = -data.vehicleMorePacketsBuffer;
+            data.vehicleMorePacketsVL = -data.vehicleMorePacketsBuffer;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.vehicleMorePacketsBuffer, cc.vehicleMorePacketsActions);
+            final ViolationData vd = new ViolationData(this, player, data.vehicleMorePacketsVL, -data.vehicleMorePacketsBuffer, cc.vehicleMorePacketsActions);
             if (data.debug || vd.needsParameters()) {
                 vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.vehicleMorePacketsBuffer));
             }
             if (executeActions(vd).willCancel()){
-                newTo = data.getMorePacketsVehicleSetBack();
+                newTo = data.getVehicleMorePacketsSetBack();
             }
         }
 
@@ -107,7 +107,7 @@ public class MorePacketsVehicle extends Check {
 
             // Set the new "setback" location.
             if (newTo == null) {
-                data.setMorePacketsVehicleSetBack(from);
+                data.setVehicleMorePacketsSetBack(from);
             }
         } else if (data.vehicleMorePacketsLastTime > time) {
             // Security check, maybe system time changed.

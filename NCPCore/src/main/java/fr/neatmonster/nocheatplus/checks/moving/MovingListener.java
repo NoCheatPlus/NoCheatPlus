@@ -700,7 +700,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Morepackets.
-        // TODO: Also update counters if newTo == null?
         if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
             // If it hasn't been stopped by any other check and is handled by the more packets check, execute it.
             newTo = morePackets.check(player, pFrom, pTo, data, cc);

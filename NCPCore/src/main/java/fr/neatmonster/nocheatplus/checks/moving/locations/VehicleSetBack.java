@@ -9,7 +9,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 
 /**
- * Task for scheduling a vehicle set back. Resets the morePacketsVehicleTaskId in the MovingData for the player.
+ * Task for scheduling a vehicle set back. Resets the vehicleSetBackTaskId in the MovingData for the player.
  * @author mc_dev
  *
  */
