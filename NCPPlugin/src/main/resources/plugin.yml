@@ -190,6 +190,8 @@ permissions:
                                 children:
                                     nocheatplus.checks.moving.vehicle.morepackets:
                                         description: Allow bypassing the morepackets check for vehicles.
+                                    nocheatplus.checks.moving.vehicle.envelope:
+                                        description: Allow bypassing the moving envelope check for vehicles.
                     nocheatplus.checks.net:
                       description: Allow a player to bypass the net (packet) checks.
                       children:

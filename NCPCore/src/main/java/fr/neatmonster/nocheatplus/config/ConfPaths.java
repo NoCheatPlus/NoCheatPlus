@@ -635,12 +635,14 @@ public abstract class ConfPaths {
     public  static final String MOVING_TRACE_SIZE                           = MOVING_TRACE + "size";
     public  static final String MOVING_TRACE_MERGEDIST                      = MOVING_TRACE + "mergedist";
 
-    private static final String MOVING_VEHICLE                             = MOVING + "vehicle.";
-    public static final String  MOVING_VEHICLE_ENFORCELOCATION             = MOVING_VEHICLE + "enforcelocation";
-    public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN           = MOVING_VEHICLE + "preventdestroyown";
-    private static final String MOVING_VEHICLE_MOREPACKETS                = MOVING_VEHICLE + "morepackets.";
-    public static final String  MOVING_VEHICLE_MOREPACKETS_CHECK          = MOVING_VEHICLE_MOREPACKETS + "active";
-    public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS        = MOVING_VEHICLE_MOREPACKETS + "actions";
+    private static final String MOVING_VEHICLE                              = MOVING + "vehicle.";
+    public static final String  MOVING_VEHICLE_ENFORCELOCATION              = MOVING_VEHICLE + "enforcelocation";
+    public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN            = MOVING_VEHICLE + "preventdestroyown";
+    private static final String MOVING_VEHICLE_MOREPACKETS                  = MOVING_VEHICLE + "morepackets.";
+    public static final String  MOVING_VEHICLE_MOREPACKETS_CHECK            = MOVING_VEHICLE_MOREPACKETS + "active";
+    public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS          = MOVING_VEHICLE_MOREPACKETS + "actions";
+    private static final String MOVING_VEHICLE_ENVELOPE                     = MOVING_VEHICLE + "envelope.";
+    public static final String  MOVING_VEHICLE_ENVELOPE_ACTIVE              = MOVING_VEHICLE_ENVELOPE + "active";
 
     public static final String  NET                                         = CHECKS + "net.";
 

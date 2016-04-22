@@ -49,9 +49,6 @@ public class VehicleChecks extends CheckListener {
     /** The instance of NoCheatPlus. */
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
 
-    /** The more packets vehicle check. */
-    private final VehicleMorePackets vehicleMorePackets = addCheck(new VehicleMorePackets());
-
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
 
     /** Temporary use, reset world to null afterwards, avoid nesting. */
@@ -59,6 +56,12 @@ public class VehicleChecks extends CheckListener {
 
     /** Auxiliary functionality. */
     private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
+
+    /** The vehicle more packets check. */
+    private final VehicleMorePackets vehicleMorePackets = addCheck(new VehicleMorePackets());
+
+    /** The vehicle moving envelope check. */
+    private final VehicleEnvelope vehicleEnvelope = new VehicleEnvelope();
 
     public VehicleChecks() {
         super(CheckType.MOVING_VEHICLE);
@@ -195,6 +198,11 @@ public class VehicleChecks extends CheckListener {
             data.clearMorePacketsData();
         }
 
+        // TODO: So far this is a test.
+        if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
+            newTo = vehicleEnvelope.check(player, from, to, fake, data, cc);
+        }
+
         // Schedule a set-back?
         if (newTo != null && data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
@@ -202,6 +210,8 @@ public class VehicleChecks extends CheckListener {
             // TODO: Might log debug if skipping.
             // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
             // TODO: Reset on world changes or not?
+            // TODO: Prevent vehicle data resetting due to dismount/mount/teleport.
+            // TODO: Once there is dismount penalties, teleport individually (!).
             data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
             // TODO: Handle scheduling failure.
         }

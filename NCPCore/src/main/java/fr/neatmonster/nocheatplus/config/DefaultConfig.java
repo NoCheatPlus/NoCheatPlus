@@ -392,10 +392,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_MOREPACKETS_BURST_EPM, 180);
         set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel vl>100 log:morepackets:0:2:if cancel cmd:kickpackets");
 
-        set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK, true);
-        set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS,
-                "cancel vl>10 log:morepackets:0:2:if cancel");
-
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
         set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
         set(ConfPaths.MOVING_NOFALL_RESETONVL, false);
@@ -432,10 +428,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_TRACE_SIZE, 60);
         set(ConfPaths.MOVING_TRACE_MERGEDIST, 0.9752); // Let all the hackers read code!
 
-        // Vehicles.
-        set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
-        set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, "default");
-
         // Velocity.
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
@@ -450,6 +442,15 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         set(ConfPaths.MOVING_ENFORCELOCATION, "default");
+
+        // Vehicles.
+        set(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN, true);
+        set(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, "default");
+
+        set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK, true);
+        set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel");
+
+        set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, "default");
 
         // NET
 

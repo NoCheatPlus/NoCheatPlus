@@ -101,9 +101,6 @@ public class MovingConfig extends ACheckConfig {
     public final double		morePacketsBurstEPM;
     public final ActionList morePacketsActions;
 
-    public final boolean    vehicleMorePacketsCheck;
-    public final ActionList vehicleMorePacketsActions;
-
     public final boolean    noFallCheck;
     /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
     public final boolean    noFallDealDamage;
@@ -182,6 +179,11 @@ public class MovingConfig extends ACheckConfig {
     // Vehicles
     public final boolean vehicleEnforceLocation;
     public final boolean vehiclePreventDestroyOwn;
+    
+    public final boolean    vehicleMorePacketsCheck;
+    public final ActionList vehicleMorePacketsActions;
+    
+    public final boolean vehicleEnvelopeActive;
 
     // Trace
     public final int traceSize;
@@ -216,10 +218,6 @@ public class MovingConfig extends ACheckConfig {
         morePacketsBurstDirect = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT);
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
-
-        vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK);
-        vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS,
-                Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
         noFallDealDamage = config.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
@@ -300,12 +298,16 @@ public class MovingConfig extends ACheckConfig {
         }
         blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
 
-        ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, AlmostBoolean.MAYBE);
-        vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
-        vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN);
-
         traceSize = config.getInt(ConfPaths.MOVING_TRACE_SIZE);
         traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
+        
+        ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, AlmostBoolean.MAYBE);
+        vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
+        vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN);
+        vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK);
+        vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
+        ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, AlmostBoolean.MAYBE);
+        vehicleEnvelopeActive = ref == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") >= 0 : ref.decide();
 
     }
 
@@ -325,6 +327,8 @@ public class MovingConfig extends ACheckConfig {
                 return morePacketsCheck;
             case MOVING_VEHICLE_MOREPACKETS:
                 return vehicleMorePacketsCheck;
+            case MOVING_VEHICLE_ENVELOPE:
+                return vehicleEnvelopeActive;
             case MOVING_CREATIVEFLY:
                 return creativeFlyCheck;
             default:

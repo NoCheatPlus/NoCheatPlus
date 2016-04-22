@@ -132,6 +132,7 @@ public class Permissions {
     public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
     public static final String  MOVING_VEHICLE               = MOVING + ".vehicle";
     public static final String  MOVING_VEHICLE_MOREPACKETS   = MOVING_VEHICLE + ".morepackets";
+    public static final String  MOVING_VEHICLE_ENVELOPE      = MOVING_VEHICLE + ".envelope";
 
     // Permissions for the individual client mods.
     private static final String MODS                         = NOCHEATPLUS + ".mods";
