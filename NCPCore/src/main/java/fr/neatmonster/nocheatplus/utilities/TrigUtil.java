@@ -214,7 +214,7 @@ public class TrigUtil {
      *            the location2
      * @return The distance between the locations.
      */
-    public static final double distance(final PlayerLocation location1, final Location location2)
+    public static final double distance(final RichBoundsLocation location1, final Location location2)
     {
         return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -228,7 +228,7 @@ public class TrigUtil {
      *            the location2
      * @return The distance between the locations.
      */
-    public static final double distance(final PlayerLocation location1, final PlayerLocation location2)
+    public static final double distance(final RichBoundsLocation location1, final RichBoundsLocation location2)
     {
         return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -266,12 +266,12 @@ public class TrigUtil {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
-    public static final double distanceSquared(final PlayerLocation location1, final PlayerLocation location2)
+    public static final double distanceSquared(final RichBoundsLocation location1, final RichBoundsLocation location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
-    public static final double distanceSquared(final PlayerLocation location1, final Location location2)
+    public static final double distanceSquared(final RichBoundsLocation location1, final Location location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -306,7 +306,7 @@ public class TrigUtil {
      * @param location2
      * @return
      */
-    public static final double xzDistance(final PlayerLocation location1, final PlayerLocation location2)
+    public static final double xzDistance(final RichBoundsLocation location1, final RichBoundsLocation location2)
     {
         return distance(location1.getX(), location1.getZ(), location2.getX(), location2.getZ());
     }
