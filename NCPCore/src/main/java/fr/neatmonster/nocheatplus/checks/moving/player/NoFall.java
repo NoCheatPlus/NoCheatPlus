@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -9,6 +9,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -36,7 +38,7 @@ public class NoFall extends Check {
      * @param fallDistance
      * @return
      */
-    protected static final double getDamage(final float fallDistance) {
+    public static final double getDamage(final float fallDistance) {
         return fallDistance - 3.0;
     }
 

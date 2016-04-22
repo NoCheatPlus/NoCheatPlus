@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving;
+package fr.neatmonster.nocheatplus.checks.moving.player;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,13 +15,15 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.magic.LostGround;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicAir;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicLiquid;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
-import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
@@ -67,6 +69,8 @@ public class SurvivalFly extends Check {
     private final Location useLoc = new Location(null, 0, 0, 0);
 
     private final BlockChangeTracker blockChangeTracker;
+
+    private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     /**
      * Instantiates a new survival fly check.
@@ -1259,7 +1263,7 @@ public class SurvivalFly extends Check {
                     double estimate = 1.15;
                     if (data.jumpAmplifier > 0) {
                         // TODO: Could skip this.
-                        estimate += 0.5 * getJumpAmplifier(player);
+                        estimate += 0.5 * aux.getJumpAmplifier(player);
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
@@ -1731,7 +1735,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @param data
      */
-    protected final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
+    public final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
         data.survivalFlyVL += cc.sfHoverViolation;
 
         // TODO: Extra options for set-back / kick, like vl?
@@ -1801,17 +1805,6 @@ public class SurvivalFly extends Check {
     public void setReallySneaking(final Player player, final boolean sneaking) {
         if (sneaking) reallySneaking.add(player.getName());
         else reallySneaking.remove(player.getName());
-    }
-
-
-    /**
-     * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
-     * NOTE: This is not the original amplifier value (use mcAccess for that).
-     * @param mcPlayer
-     * @return
-     */
-    protected final double getJumpAmplifier(final Player player) {
-        return MovingUtil.getJumpAmplifier(player, mcAccess);
     }
 
     /**

@@ -50,6 +50,16 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
     }
 
     /**
+     * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
+     * NOTE: This is not the original amplifier value (use mcAccess for that).
+     * @param mcPlayer
+     * @return
+     */
+    public final double getJumpAmplifier(final Player player) {
+        return MovingUtil.getJumpAmplifier(player, mcAccess);
+    }
+
+    /**
      * Convenience method to do both data.resetPositions and
      * data.adjustMediumProperties, wrapping given loc with a PlayerLocation
      * instance.

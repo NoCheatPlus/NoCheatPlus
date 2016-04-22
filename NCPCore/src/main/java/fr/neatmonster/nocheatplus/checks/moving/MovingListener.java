@@ -51,6 +51,11 @@ import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.player.CreativeFly;
+import fr.neatmonster.nocheatplus.checks.moving.player.MorePackets;
+import fr.neatmonster.nocheatplus.checks.moving.player.NoFall;
+import fr.neatmonster.nocheatplus.checks.moving.player.Passable;
+import fr.neatmonster.nocheatplus.checks.moving.player.SurvivalFly;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.vehicle.VehicleChecks;
@@ -544,7 +549,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MoveData lastMove = data.moveData.getFirst();
 
         // Potion effect "Jump".
-        final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
+        final double jumpAmplifier = aux.getJumpAmplifier(player);
         if (jumpAmplifier > data.jumpAmplifier) {
             data.jumpAmplifier = jumpAmplifier;
         }
