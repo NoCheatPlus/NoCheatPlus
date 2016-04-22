@@ -353,20 +353,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // No full processing for players in vehicles.
             newTo = vehicleChecks.onPlayerMoveVehicle(player, from, to, data);
             earlyReturn = true;
-        } else if (player.isDead() || player.isSleeping()) {
+        }
+        else if (player.isDead() || player.isSleeping()) {
             // Ignore dead players.
             data.sfHoverTicks = -1;
             earlyReturn = true;
-        } else if (player.isSleeping()) {
+        }
+        else if (player.isSleeping()) {
             // Ignore sleeping playerrs.
             // TODO: sleeping: (which cb!) debug(player, "isSleepingIgnored=" + player.isSleepingIgnored());
             data.sfHoverTicks = -1;
             earlyReturn = true;
-        } else if (!from.getWorld().equals(to.getWorld())) {
+        }
+        else if (!from.getWorld().equals(to.getWorld())) {
             // Keep hover ticks.
             // Ignore changing worlds.
             earlyReturn = true;
-        } else {
+        }
+        else {
             earlyReturn = false;
         }
 
@@ -713,7 +717,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
                 newTo = mpNewTo;
             }
-        } else {
+        }
+        else {
             // Otherwise we need to clear their data.
             data.clearMorePacketsData();
         }
@@ -738,7 +743,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Normal processing.
                 // TODO: More simple: UUID keys or a data flag instead?
                 data.finishThisMove();
-            } else {
+            }
+            else {
                 // Teleport during violation processing, just invalidate thisMove.
                 data.thisMove.invalidate();
             }
@@ -800,12 +806,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     // Renew the bounce effect.
                     data.verticalBounce = new SimpleEntry(tick, data.verticalBounce.value, 1);
                 }
-            } else {
+            }
+            else {
                 data.useVerticalBounce(player);
             }
             return true;
             // TODO: Find % of verticalBounce.value or abs. value for X: yDistance > 0, deviation from effect < X -> set sfNoLowJump
-        } else {
+        }
+        else {
             data.verticalBounce = null;
             return false;
         }
@@ -920,7 +928,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Later (e.g. 1.9) check for the ModelFlying, if fall damage is intended.
         data.clearNoFallData();
         player.setFallDistance(0f); // TODO: Might do without this in case of elytra, needs ensure NoFall doesn't kill the player (...).
-        if (data.debug){
+        if (data.debug) {
             debug(player, "Fly-nofly transition: Add velocity.");
         }
     }
@@ -1105,7 +1113,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.x, lastMove.to.y, lastMove.to.z)) {
                 // Something odd happened.
                 aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
-            } else {
+            }
+            else {
                 // Normal move, nothing to do.
             }
             mData.updateTrace(player, to, tick);
@@ -1331,7 +1340,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (!cc.noFallTpReset) {
                 // (Set fall distance if set to not reset.)
                 player.setFallDistance((float) fallDistance);
-            } else if (fallDistance >= 3.0) {
+            }
+            else if (fallDistance >= 3.0) {
                 data.noFallSkipAirCheck = true;
             }
         }
@@ -1521,7 +1531,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.setSetBack(loc);
             // (resetPositions is called below)
             data.joinOrRespawn = true; // TODO: Review if to always set (!).
-        } else {
+        }
+        else {
             // TODO: Check consistency/distance.
             //final Location setBack = data.getSetBack(loc);
             //final double d = loc.distanceSquared(setBack);
@@ -1603,7 +1614,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                                 // TODO: Actually trigger a passable violation (+tag).
                                 if (d > 1.25) {
                                     StaticLog.logWarning("SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
-                                } else {
+                                }
+                                else {
                                     StaticLog.logInfo("Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
                                     data.prepareSetBack(refLoc);
                                     if (!player.teleport(refLoc)) {
@@ -1679,7 +1691,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (player == null || !player.isOnline()) {
                 rem.add(playerName);
                 continue;
-            } else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
+            }
+            else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
                 // Don't remove but also don't check [subject to change].
                 continue;
             }
@@ -1756,10 +1769,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Might have to re-check all context with playerJoins and keeping old set-backs...
                 // Could use a flexible set-back policy (switch to in-air on login). 
                 return data.getSetBack(loc);
-            } else {
+            }
+            else {
                 return new Location(player.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getYaw(), loc.getPitch());
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -1865,15 +1880,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double jump = mcAccess.getJumpAmplifier(player);
         final double speed = mcAccess.getFasterMovementAmplifier(player);
         final double strider = BridgeEnchant.getDepthStriderLevel(player);
-        if (BuildParameters.debugLevel > 0){
+        if (BuildParameters.debugLevel > 0) {
             try{
                 // TODO: Check backwards compatibility (1.4.2). Remove try-catch
                 builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
-            } catch (Throwable t){}
-            if (player.isSprinting()){
+            } catch (Throwable t) {}
+            if (player.isSprinting()) {
                 builder.append("(sprinting)");
             }
-            if (player.isSneaking()){
+            if (player.isSneaking()) {
                 builder.append("(sneaking)");
             }
             if (player.isBlocking()) {
@@ -1884,23 +1899,23 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
             }
         }
-        if (speed != Double.NEGATIVE_INFINITY){
+        if (speed != Double.NEGATIVE_INFINITY) {
             builder.append("(e_speed=" + (speed + 1) + ")");
         }
         final double slow = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SLOW);
         if (slow != Double.NEGATIVE_INFINITY) {
             builder.append("(e_slow=" + (slow + 1) + ")");
         }
-        if (jump != Double.NEGATIVE_INFINITY){
+        if (jump != Double.NEGATIVE_INFINITY) {
             builder.append("(e_jump=" + (jump + 1) + ")");
         }
-        if (strider != 0){
+        if (strider != 0) {
             builder.append("(e_depth_strider=" + strider + ")");
         }
         // Print basic info first in order
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         // Extended info.
-        if (BuildParameters.debugLevel > 0){
+        if (BuildParameters.debugLevel > 0) {
             builder.setLength(0);
             // Note: the block flags are for normal on-ground checking, not with yOnGrond set to 0.5.
             from.collectBlockFlags(maxYOnGround);
