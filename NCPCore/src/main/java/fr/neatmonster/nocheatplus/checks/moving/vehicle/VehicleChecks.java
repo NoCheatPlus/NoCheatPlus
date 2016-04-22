@@ -44,6 +44,8 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  */
 public class VehicleChecks extends CheckListener {
 
+    // TODO: Handle nested passengers somehow, at least warn with some rate limiting.
+
     /** The instance of NoCheatPlus. */
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
 
@@ -88,8 +90,60 @@ public class VehicleChecks extends CheckListener {
         onVehicleMove(vehicle, event.getFrom(), event.getTo(), false);
     }
 
+    /**
+     * Called from player-move checking, if the player is inside of a vehicle.
+     * @param player
+     * @param from
+     * @param to
+     * @param data
+     */
+    public Location onPlayerMoveVehicle(final Player player, final Location from, final Location to, final MovingData data) {
+        // Workaround for pigs and other (1.5.x and before)!
+        // Note that with 1.6 not even PlayerMove fires for horses and pigs.
+        // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
+        final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
+        data.wasInVehicle = true;
+        data.sfHoverTicks = -1;
+        data.removeAllVelocity();
+        data.sfLowJump = false;
+        // TODO: What with processingEvents.remove(player.getName());
+        if (vehicle != null) {
+            final Location vLoc = vehicle.getLocation(); // TODO: Use a location as argument.
+            // (Auto detection of missing events, might fire one time too many per plugin run.)
+            if (!normalVehicles.contains(vehicle.getType())) {
+                onVehicleMove(vehicle, vLoc, vLoc, true);
+                return null;
+            } else {
+                data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
+                // TODO: Consider TeleportUtil.forceMount or similar.
+                final MovingConfig cc = MovingConfig.getConfig(player);
+                if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
+                    if (cc.vehicleEnforceLocation) {
+                        return vLoc;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    aux.resetPositionsAndMediumProperties(player, vLoc, data, cc);
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The actual checks for vehicle moving. Nested passengers are not handled
+     * here.
+     * 
+     * @param vehicle
+     * @param from
+     * @param to
+     * @param fake
+     */
     public void onVehicleMove(final Entity vehicle, final Location from, final Location to, final boolean fake) {   
         // (No re-check for vehicles that have vehicles, pre condition is that this has already been checked.)
+        // TODO: If fake: Use the last known position of the vehicle instead of from (if available, once implemented).
         final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
         if (player == null) {
             return;
@@ -98,7 +152,9 @@ public class VehicleChecks extends CheckListener {
             onPlayerVehicleLeave(player, vehicle);
             return;
         }
-        if (!from.getWorld().equals(to.getWorld())) return;
+        if (!from.getWorld().equals(to.getWorld())) {
+            return;
+        }
 
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
@@ -151,46 +207,20 @@ public class VehicleChecks extends CheckListener {
         useLoc.setWorld(null);
     }
 
-    /**
-     * Called from player-move checking, if the player is inside of a vehicle.
-     * @param player
-     * @param from
-     * @param to
-     * @param data
-     */
-    public Location onPlayerMoveVehicle(final Player player, final Location from, final Location to, final MovingData data) {
-        // Workaround for pigs and other (1.5.x and before)!
-        // Note that with 1.6 not even PlayerMove fires for horses and pigs.
-        // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
-        final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
-        data.wasInVehicle = true;
-        data.sfHoverTicks = -1;
-        data.removeAllVelocity();
-        data.sfLowJump = false;
-        // TODO: What with processingEvents.remove(player.getName());
-        if (vehicle != null) {
-            final Location vLoc = vehicle.getLocation(); // TODO: Use a location as argument.
-            // (Auto detection of missing events, might fire one time too many per plugin run.)
-            if (!normalVehicles.contains(vehicle.getType())) {
-                onVehicleMove(vehicle, vLoc, vLoc, true);
-                return null;
-            } else {
-                data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
-                // TODO: Consider TeleportUtil.forceMount or similar.
-                final MovingConfig cc = MovingConfig.getConfig(player);
-                if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
-                    if (cc.vehicleEnforceLocation) {
-                        return vLoc;
-                    } else {
-                        return null;
-                    }
-                } else {
-                    aux.resetPositionsAndMediumProperties(player, vLoc, data, cc);
-                    return null;
-                }
-            }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerVehicleEnter(final VehicleEnterEvent event) {
+        final Entity entity = event.getEntered();
+        if (!(entity instanceof Player)) {
+            return;
         }
-        return null;
+        final Player player = (Player) entity;
+        final MovingData data = MovingData.getData(player);
+        data.joinOrRespawn = false;
+        data.removeAllVelocity();
+        // Event should have a vehicle, in case check this last.
+        data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
+        useLoc.setWorld(null); // TODO: A pool ?
+        // TODO: more resetting, visible check ?
     }
 
     /**
@@ -243,24 +273,9 @@ public class VehicleChecks extends CheckListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVehicleDestroy(final VehicleDestroyEvent event) {
         final Entity entity = event.getVehicle().getPassenger();
-        if (!(entity instanceof Player)) return;
-        onPlayerVehicleLeave((Player) entity, event.getVehicle());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerVehicleEnter(final VehicleEnterEvent event) {
-        final Entity entity = event.getEntered();
-        if (!(entity instanceof Player)) {
-            return;
+        if (entity instanceof Player) {
+            onPlayerVehicleLeave((Player) entity, event.getVehicle());
         }
-        final Player player = (Player) entity;
-        final MovingData data = MovingData.getData(player);
-        data.joinOrRespawn = false;
-        data.removeAllVelocity();
-        // Event should have a vehicle, in case check this last.
-        data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
-        useLoc.setWorld(null); // TODO: A pool ?
-        // TODO: more resetting, visible check ?
     }
 
     /**
