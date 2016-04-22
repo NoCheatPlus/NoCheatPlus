@@ -101,8 +101,8 @@ public class MovingConfig extends ACheckConfig {
     public final double		morePacketsBurstEPM;
     public final ActionList morePacketsActions;
 
-    public final boolean    morePacketsVehicleCheck;
-    public final ActionList morePacketsVehicleActions;
+    public final boolean    vehicleMorePacketsCheck;
+    public final ActionList vehicleMorePacketsActions;
 
     public final boolean    noFallCheck;
     /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
@@ -217,8 +217,8 @@ public class MovingConfig extends ACheckConfig {
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
-        morePacketsVehicleCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
-        morePacketsVehicleActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
+        vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
+        vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
                 Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
@@ -324,7 +324,7 @@ public class MovingConfig extends ACheckConfig {
             case MOVING_MOREPACKETS:
                 return morePacketsCheck;
             case MOVING_VEHICLE_MOREPACKETS:
-                return morePacketsVehicleCheck;
+                return vehicleMorePacketsCheck;
             case MOVING_CREATIVEFLY:
                 return creativeFlyCheck;
             default:

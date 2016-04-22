@@ -29,7 +29,7 @@ public class VehicleSetBack implements Runnable{
     @Override
     public void run() {
     	final MovingData data = MovingData.getData(player);
-    	data.morePacketsVehicleTaskId = -1;
+    	data.vehicleSetBackTaskId = -1;
         try{
     		data.prepareSetBack(location);
         	TeleportUtil.teleport(vehicle, player, location, debug);

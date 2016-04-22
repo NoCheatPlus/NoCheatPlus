@@ -189,27 +189,27 @@ public class MovingData extends ACheckData {
 
     // Data of the more packets check.
     /** Packet frequency count. */
-    public final ActionFrequency morePacketsFreq;
+    public final ActionFrequency    morePacketsFreq;
     /** Burst count. */
-    public final ActionFrequency morePacketsBurstFreq;
-    private Location      morePacketsSetback = null;
+    public final ActionFrequency    morePacketsBurstFreq;
+    private Location                morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
-    public int            morePacketsVehicleBuffer = 50;
-    public long           morePacketsVehicleLastTime;
-    private Location      morePacketsVehicleSetback = null;
-    /** Task id of the morepackets set-back task. */ 
-    public int			  morePacketsVehicleTaskId = -1;
+    public int              vehicleMorePacketsBuffer = 50;
+    public long             vehicleMorePacketsLastTime;
+    private Location        vehicleMorePacketsSetback = null;
+    /** Task id of the vehicle set-back task. */ 
+    public int              vehicleSetBackTaskId = -1;
 
 
     // Data of the no fall check.
-    public float          noFallFallDistance = 0;
+    public float            noFallFallDistance = 0;
     /** Last y coordinate from when the player was on ground. */
-    public double         noFallMaxY = 0;
+    public double           noFallMaxY = 0;
     /** Indicate that NoFall is not to use next damage event for checking on-ground properties. */ 
-    public boolean noFallSkipAirCheck = false;
+    public boolean          noFallSkipAirCheck = false;
     // Passable check.
-    public double 	      passableVL;
+    public double           passableVL;
 
     // Data of the survival fly check.
     public double       sfHorizontalBuffer = 0.0; // ineffective: SurvivalFly.hBufMax / 2.0;
@@ -330,7 +330,7 @@ public class MovingData extends ACheckData {
      */
     public void onSetBack(final PlayerLocation setBack) {
         // Reset positions (a teleport should follow, though).
-        this.morePacketsSetback = this.morePacketsVehicleSetback = null;
+        this.morePacketsSetback = this.vehicleMorePacketsSetback = null;
         clearAccounting(); // Might be more safe to do this.
         // Keep no-fall data.
         // Fly data: problem is we don't remember the settings for the set back location.
@@ -427,7 +427,7 @@ public class MovingData extends ACheckData {
         if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
             clearFlyData();
         }
-        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())) {
+        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || vehicleMorePacketsSetback != null && worldName.equalsIgnoreCase(vehicleMorePacketsSetback.getWorld().getName())) {
             clearMorePacketsData();
             clearNoFallData(); // just in case.
         }
@@ -475,7 +475,7 @@ public class MovingData extends ACheckData {
      */
     public void clearMorePacketsData() {
         morePacketsSetback = null;
-        morePacketsVehicleSetback = null;
+        vehicleMorePacketsSetback = null;
         // TODO: Also reset other data ?
     }
 
@@ -618,29 +618,29 @@ public class MovingData extends ACheckData {
     }
 
     public boolean hasMorePacketsVehicleSetBack() {
-        return morePacketsVehicleSetback != null;
+        return vehicleMorePacketsSetback != null;
     }
 
     public final void setMorePacketsVehicleSetBack(final PlayerLocation loc) {
-        if (morePacketsVehicleSetback == null) {
-            morePacketsVehicleSetback = loc.getLocation();
+        if (vehicleMorePacketsSetback == null) {
+            vehicleMorePacketsSetback = loc.getLocation();
         }
         else {
-            LocUtil.set(morePacketsVehicleSetback, loc);
+            LocUtil.set(vehicleMorePacketsSetback, loc);
         }
     }
 
     public final void setMorePacketsVehicleSetBack(final Location loc) {
-        if (morePacketsVehicleSetback == null) {
-            morePacketsVehicleSetback = LocUtil.clone(loc);
+        if (vehicleMorePacketsSetback == null) {
+            vehicleMorePacketsSetback = LocUtil.clone(loc);
         }
         else {
-            LocUtil.set(morePacketsVehicleSetback, loc);
+            LocUtil.set(vehicleMorePacketsSetback, loc);
         }
     }
 
     public final Location getMorePacketsVehicleSetBack() {
-        return LocUtil.clone(morePacketsVehicleSetback);
+        return LocUtil.clone(vehicleMorePacketsSetback);
     }
 
     public final void resetTeleported() {
@@ -1034,7 +1034,7 @@ public class MovingData extends ACheckData {
     public void handleTimeRanBackwards() {
         final long time = System.currentTimeMillis();
         timeSprinting = Math.min(timeSprinting, time);
-        morePacketsVehicleLastTime = Math.min(morePacketsVehicleLastTime, time);
+        vehicleMorePacketsLastTime = Math.min(vehicleMorePacketsLastTime, time);
         sfCobwebTime = Math.min(sfCobwebTime, time);
         sfVLTime = Math.min(sfVLTime, time);
         if (trace != null) {

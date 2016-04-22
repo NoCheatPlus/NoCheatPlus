@@ -196,13 +196,14 @@ public class VehicleChecks extends CheckListener {
         }
 
         // Schedule a set-back?
-        if (newTo != null && data.morePacketsVehicleTaskId == -1) {
+        if (newTo != null && data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
             // (Only schedule if not already scheduled.)
             // TODO: Might log debug if skipping.
             // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
             // TODO: Reset on world changes or not?
-            data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
+            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
+            // TODO: Handle scheduling failure.
         }
         useLoc.setWorld(null);
     }

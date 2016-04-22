@@ -54,64 +54,64 @@ public class MorePacketsVehicle extends Check {
         if (!data.hasMorePacketsVehicleSetBack()){
             // TODO: Check if other set-back is appropriate or if to set on other events.
             data.setMorePacketsVehicleSetBack(from);
-            if (data.morePacketsVehicleTaskId != -1) {
+            if (data.vehicleSetBackTaskId != -1) {
                 // TODO: Set back outdated or not?
-                Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
+                Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
             }
         }
 
         // Take a packet from the buffer.
-        data.morePacketsVehicleBuffer--;
+        data.vehicleMorePacketsBuffer--;
 
-        if (data.morePacketsVehicleTaskId != -1){
+        if (data.vehicleSetBackTaskId != -1){
             // Short version !
             return data.getMorePacketsVehicleSetBack();
         }
 
         // Player used up buffer, they fail the check.
-        if (data.morePacketsVehicleBuffer < 0) {
+        if (data.vehicleMorePacketsBuffer < 0) {
 
             // Increment violation level.
-            data.morePacketsVehicleVL = -data.morePacketsVehicleBuffer;
+            data.morePacketsVehicleVL = -data.vehicleMorePacketsBuffer;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions);
+            final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.vehicleMorePacketsBuffer, cc.vehicleMorePacketsActions);
             if (data.debug || vd.needsParameters()) {
-                vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsVehicleBuffer));
+                vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.vehicleMorePacketsBuffer));
             }
             if (executeActions(vd).willCancel()){
                 newTo = data.getMorePacketsVehicleSetBack();
             }
         }
 
-        if (data.morePacketsVehicleLastTime + 1000 < time) {
+        if (data.vehicleMorePacketsLastTime + 1000 < time) {
             // More than 1 second elapsed, but how many?
-            final double seconds = (time - data.morePacketsVehicleLastTime) / 1000D;
+            final double seconds = (time - data.vehicleMorePacketsLastTime) / 1000D;
 
             // For each second, fill the buffer.
-            data.morePacketsVehicleBuffer += packetsPerTimeframe * seconds;
+            data.vehicleMorePacketsBuffer += packetsPerTimeframe * seconds;
 
             // If there was a long pause (maybe server lag?), allow buffer to grow up to 100.
             if (seconds > 2) {
-                if (data.morePacketsVehicleBuffer > 100) {
-                    data.morePacketsVehicleBuffer = 100;
+                if (data.vehicleMorePacketsBuffer > 100) {
+                    data.vehicleMorePacketsBuffer = 100;
                 }
-            } else if (data.morePacketsVehicleBuffer > 50) {
+            } else if (data.vehicleMorePacketsBuffer > 50) {
                 // Only allow growth up to 50.
-                data.morePacketsVehicleBuffer = 50;
+                data.vehicleMorePacketsBuffer = 50;
             }
 
             // Set the new "last" time.
-            data.morePacketsVehicleLastTime = time;
+            data.vehicleMorePacketsLastTime = time;
 
             // Set the new "setback" location.
             if (newTo == null) {
                 data.setMorePacketsVehicleSetBack(from);
             }
-        } else if (data.morePacketsVehicleLastTime > time) {
+        } else if (data.vehicleMorePacketsLastTime > time) {
             // Security check, maybe system time changed.
-            data.morePacketsVehicleLastTime = time;
+            data.vehicleMorePacketsLastTime = time;
         }
 
         if (newTo == null) {
