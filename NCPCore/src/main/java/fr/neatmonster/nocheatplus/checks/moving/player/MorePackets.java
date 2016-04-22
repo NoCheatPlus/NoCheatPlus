@@ -39,14 +39,16 @@ public class MorePackets extends Check {
      * resolution. See NetStatic for the actual check code.
      * 
      * @param player
-     *            the player
      * @param from
-     *            the from
      * @param to
-     *            the to
-     * @return the location
+     * @param allowSetSetBack
+     *            If to allow setting the set-back location.
+     * @param data
+     * @param cc
+     * @return
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
 
@@ -57,7 +59,7 @@ public class MorePackets extends Check {
         //    	}
 
         // Ensure we have a set-back location.
-        if (!data.hasMorePacketsSetBack()){
+        if (allowSetSetBack && !data.hasMorePacketsSetBack()){
             // TODO: Check if other set-back is appropriate or if to set/reset on other events.
             if (data.hasSetBack()) {
                 data.setMorePacketsSetBack(data.getSetBack(to));
@@ -73,7 +75,6 @@ public class MorePackets extends Check {
 
         // Process violation result.
         if (violation > 0.0) {
-
             // Increment violation level.
             data.morePacketsVL = violation; // TODO: Accumulate somehow [e.g. always += 1, decrease with continuous moving without violation]?
 
@@ -86,9 +87,9 @@ public class MorePackets extends Check {
             if (executeActions(vd).willCancel()) {
                 // Set to cancel the move.
                 return data.getMorePacketsSetBack(); 
-            } 
+            }
         } 
-        else {
+        else if (allowSetSetBack) {
             // Update the set-back location. (CHANGED to only update, if not a violation.)
             // (Might update whenever newTo == null)
             data.setMorePacketsSetBack(from);

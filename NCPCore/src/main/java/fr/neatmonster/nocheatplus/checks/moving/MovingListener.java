@@ -705,7 +705,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
             /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
             to avoid packet speeding using micro-violations.) */
-            final Location mpNewTo = morePackets.check(player, pFrom, pTo, data, cc);
+            final Location mpNewTo = morePackets.check(player, pFrom, pTo, newTo == null, data, cc);
             if (mpNewTo != null) {
                 // Only override set-back, if the morepackets set-back location is older/-est. 
                 if (newTo != null && data.debug) {
