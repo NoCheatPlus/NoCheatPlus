@@ -156,6 +156,7 @@ public class VehicleChecks extends CheckListener {
             return;
         }
         if (!from.getWorld().equals(to.getWorld())) {
+            // TODO: Data adjustments will be necessary with the envelope check.
             return;
         }
 
@@ -189,6 +190,17 @@ public class VehicleChecks extends CheckListener {
             outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
 
+        // Ensure a common set-back for now.
+        // TODO: Check activation of any check?
+        if (!data.hasVehicleMorePacketsSetBack()){
+            // TODO: Check if other set-back is appropriate or if to set on other events.
+            data.setVehicleMorePacketsSetBack(from);
+            if (data.vehicleSetBackTaskId != -1) {
+                // TODO: Set back outdated or not?
+                Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
+            }
+        }
+
         if (vehicleMorePackets.isEnabled(player, data, cc)) {
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = vehicleMorePackets.check(player, from, to, data, cc);
@@ -200,7 +212,7 @@ public class VehicleChecks extends CheckListener {
 
         // TODO: So far this is a test.
         if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
-            newTo = vehicleEnvelope.check(player, from, to, fake, data, cc);
+            newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
         }
 
         // Schedule a set-back?

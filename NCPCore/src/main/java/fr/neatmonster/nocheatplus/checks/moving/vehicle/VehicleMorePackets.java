@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -50,15 +49,6 @@ public class VehicleMorePackets extends Check {
         final long time = System.currentTimeMillis();
 
         Location newTo = null;
-
-        if (!data.hasVehicleMorePacketsSetBack()){
-            // TODO: Check if other set-back is appropriate or if to set on other events.
-            data.setVehicleMorePacketsSetBack(from);
-            if (data.vehicleSetBackTaskId != -1) {
-                // TODO: Set back outdated or not?
-                Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
-            }
-        }
 
         // Take a packet from the buffer.
         data.vehicleMorePacketsBuffer--;
