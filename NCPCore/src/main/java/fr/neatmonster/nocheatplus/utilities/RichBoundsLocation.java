@@ -8,6 +8,8 @@ import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 
 /**
@@ -753,16 +755,18 @@ public class RichBoundsLocation {
     }
 
     /**
-     * Check for push using the full bounding box (pistons).
+     * Check for push using the full bounding box (pistons). The given
+     * BlockChangeReference is not changed, it has to be updated externally.
      * 
      * @param blockChangeTracker
      * @param oldChangeId
      * @param direction
      * @param coverDistance
      *            The (always positive) distance to cover.
-     * @return The lowest id greater than oldChangeId, or -1 if nothing found..
+     * @return A matching BlockChangeEntry with the minimal id. If no entry was
+     *         found, null is returned.
      */
-    public long getBlockChangeIdPush(final BlockChangeTracker blockChangeTracker, final long oldChangeId, final Direction direction, final double coverDistance) {
+    public BlockChangeEntry getBlockChangeIdPush(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
         final int tick = TickTask.getTick();
         final UUID worldId = world.getUID();
         final int iMinX = Location.locToBlock(minX);
@@ -771,21 +775,35 @@ public class RichBoundsLocation {
         final int iMaxY = Location.locToBlock(maxY);
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
-        long minId = Long.MAX_VALUE;
+        BlockChangeEntry minEntry = null;
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
                 for (int y = iMinY; y <= iMaxY; y++) {
-                    final long tempId = blockChangeTracker.getChangeIdPush(oldChangeId, tick, worldId, x, y, z, direction);
-                    if (tempId != -1 && tempId < minId) {
+                    final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntry(ref, tick, worldId, x, y, z, direction);
+                    if (entry != null && (minEntry == null || entry.id < minEntry.id)) {
                         // Check vs. coverDistance, exclude cases where the piston can't push that far.
                         if (coverDistance > 0.0 && coversDistance(x, y, z, direction, coverDistance)) {
-                            minId = tempId;
+                            minEntry = entry;
                         }
                     }
                 }
             }
         }
-        return minId == Long.MAX_VALUE ? -1 : minId;
+        return minEntry;
+    }
+
+    /**
+     * Test, if the block intersects the bounding box, if assuming full bounds.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public boolean isBlockIntersecting(final int x, final int y, final int z) {
+        return TrigUtil.intersectsBlock(minX, maxX, x)
+                && TrigUtil.intersectsBlock(minY, maxY, y)
+                && TrigUtil.intersectsBlock(minZ, maxZ, z);
     }
 
     /**

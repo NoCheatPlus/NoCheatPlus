@@ -14,8 +14,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocUtil;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
@@ -25,9 +25,12 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
@@ -128,11 +131,12 @@ public class MovingData extends ACheckData {
     /////////////////
 
     // Violation levels -----
-    public double         creativeFlyVL            = 0D;
-    public double         morePacketsVL            = 0D;
-    public double         vehicleMorePacketsVL     = 0D;
-    public double         noFallVL                 = 0D;
-    public double         survivalFlyVL            = 0D;
+    public double         creativeFlyVL            = 0.0;
+    public double         morePacketsVL            = 0.0;
+    public double         noFallVL                 = 0.0;
+    public double         survivalFlyVL            = 0.0;
+    public double         vehicleMorePacketsVL     = 0.0;
+    public double         vehicleEnvelopeVL        = 0.0;
 
     // Data shared between the fly checks -----
     public int            bunnyhopDelay;
@@ -145,7 +149,7 @@ public class MovingData extends ACheckData {
     /** Compatibility entry for bouncing of slime blocks and the like. */
     public SimpleEntry verticalBounce = null;
     /** Last used block change id (BlockChangeTracker). */
-    public long blockChangeId = 0; // TODO: Need split into several?
+    public final BlockChangeReference blockChangeRef = new BlockChangeReference();
 
     /** Tick at which walk/fly speeds got changed last time. */
     public int speedTick = 0;
@@ -271,6 +275,16 @@ public class MovingData extends ACheckData {
     public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT;
     /** Set to true after login/respawn, only if the set-back is reset there. Reset in MovingListener after handling PlayerMoveEvent */
     public boolean joinOrRespawn = false;
+    /**
+     * Number of (vehicle) move events since set.back. Update after running
+     * standard checks on that EventPriority level (not MONITOR).
+     */
+    public int timeSinceSetBack = 0;
+    /**
+     * Location hash value of the last set-back, for checking independently of
+     * which set-back location had been used.
+     */
+    public int lastSetBackHash = 0;
 
     public MovingData(final MovingConfig config) {
         super(config);
@@ -332,6 +346,7 @@ public class MovingData extends ACheckData {
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verVelUsed = null;
         verticalBounce = null;
+        blockChangeRef.valid = false;
     }
 
     /**
@@ -343,7 +358,7 @@ public class MovingData extends ACheckData {
      */
     public void onSetBack(final PlayerLocation setBack) {
         // Reset positions (a teleport should follow, though).
-        this.morePacketsSetback = this.vehicleMorePacketsSetback = null;
+        this.morePacketsSetback = null;
         clearAccounting(); // Might be more safe to do this.
         // Keep no-fall data.
         // Fly data: problem is we don't remember the settings for the set back location.
@@ -363,10 +378,13 @@ public class MovingData extends ACheckData {
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verticalBounce = null;
+        timeSinceSetBack = 0;
+        lastSetBackHash = setBack == null ? 0 : setBack.hashCode();
         // Reset to setBack.
         resetPositions(setBack);
         adjustMediumProperties(setBack);
         setSetBack(setBack);
+        setVehicleMorePacketsSetBack(setBack); // TODO: Switch to the one making most sense, once implemented.
     }
 
     /**
@@ -441,7 +459,7 @@ public class MovingData extends ACheckData {
             clearFlyData();
         }
         if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || vehicleMorePacketsSetback != null && worldName.equalsIgnoreCase(vehicleMorePacketsSetback.getWorld().getName())) {
-            clearMorePacketsData();
+            clearAllMorePacketsData();
             clearNoFallData(); // just in case.
         }
     }
@@ -472,6 +490,7 @@ public class MovingData extends ACheckData {
         insideMediumCount = 0;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verticalBounce = null;
+        blockChangeRef.valid = false;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
     }
@@ -484,10 +503,19 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Clear the data of the more packets checks.
+     * Clear the data of the more packets checks, both for players and vehicles.
      */
-    public void clearMorePacketsData() {
+    public void clearAllMorePacketsData() {
+        clearPlayerMorePacketsData();
+        clearVehicleMorePacketsData();
+    }
+
+    public void clearPlayerMorePacketsData() {
         morePacketsSetback = null;
+        // TODO: Also reset other data ?
+    }
+
+    public void clearVehicleMorePacketsData() {
         vehicleMorePacketsSetback = null;
         // TODO: Also reset other data ?
     }
@@ -497,7 +525,7 @@ public class MovingData extends ACheckData {
      */
     public void clearNoFallData() {
         noFallFallDistance = 0;
-        noFallMaxY = 0D;
+        noFallMaxY = 0.0;
         noFallSkipAirCheck = false;
     }
 
@@ -921,6 +949,18 @@ public class MovingData extends ACheckData {
         return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
     }
 
+    /**
+     * Standard equals for the more packets set-back location. Implies
+     * world1.equals(world2).
+     * 
+     * @param loc
+     * @return
+     */
+    public boolean equalsVehicleMorePacketsSetBack(final Location loc) {
+        return vehicleMorePacketsSetback != null && vehicleMorePacketsSetback.equals(loc)
+                || loc == null && vehicleMorePacketsSetback == null;
+    }
+
     public void adjustWalkSpeed(final float walkSpeed, final int tick, final int speedGrace) {
         if (walkSpeed > this.walkSpeed) {
             this.walkSpeed = walkSpeed;
@@ -1072,6 +1112,23 @@ public class MovingData extends ACheckData {
         clearAccounting(); // Not sure: adding up might not be nice.
         removeAllVelocity(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
+    }
+
+    /**
+     * Update the block change tracking reference by the given entry, assuming
+     * to to be the move end-point to continue from next time.
+     * 
+     * @param entry
+     * @param to
+     */
+    public void updateBlockChangeReference(final BlockChangeEntry entry, final RichBoundsLocation to) {
+        blockChangeRef.entry = entry; // Unchecked.
+        if (to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
+            blockChangeRef.valid = true;
+        }
+        else {
+            blockChangeRef.valid = false;
+        }
     }
 
 }

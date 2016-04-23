@@ -123,7 +123,71 @@ public class BlockChangeTracker {
             this.direction = direction;
         }
 
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null || !(obj instanceof BlockChangeEntry)) {
+                return false;
+            }
+            final BlockChangeEntry other = (BlockChangeEntry) obj;
+            return id == other.id && tick == other.tick && x == other.x && z == other.z && y == other.y && direction == other.direction;
+        }
+
         // Might follow: Id, data, block shape. Convenience methods for testing.
+
+    }
+
+    /**
+     * Simple class for helping with query functionality. Reference a
+     * BlockChangeEntry and contain more information, such as validity for
+     * further use/effects. This is meant for storing the state of last-consumed
+     * ids for a context within some data.
+     * 
+     * @author asofold
+     *
+     */
+    public static class BlockChangeReference {
+
+        /** Last used block change id.*/
+        public BlockChangeEntry entry = null;
+
+        /** Indicate if the set id can still be used.*/
+        public boolean valid = false;
+
+        /**
+         * Check if this reference can be updated with the given entry,
+         * considering set validity information. By default, the given id either
+         * must be greater than the stored one, or the ids are the same and
+         * valid is set to true. The internal state is not changed by calling
+         * this.
+         * 
+         * @param id
+         * @return
+         */
+        public boolean canUpdateWith(final BlockChangeEntry entry) {
+            return this.entry == null || entry.id > this.entry.id || entry.id == this.entry.id && valid;
+        }
+
+        /**
+         * Retrieve a shallow copy of this object.
+         * 
+         * @return
+         */
+        public BlockChangeReference copy() {
+            final BlockChangeReference copy = new BlockChangeReference();
+            copy.entry = this.entry;
+            copy.valid = this.valid;
+            return copy;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null || !(obj instanceof BlockChangeReference)) {
+                return false;
+            }
+            final BlockChangeReference other = (BlockChangeReference) obj;
+            return valid == other.valid && (entry != null && entry.equals(other.entry) || entry == null && other.entry == null);
+        }
+
     }
 
     public static class BlockChangeListener implements Listener {
@@ -378,9 +442,10 @@ public class BlockChangeTracker {
     /**
      * Query if there is a push available into the indicated direction.
      * 
-     * @param gtChangeId
-     *            A matching entry must have a greater id than the given one
-     *            (all ids are greater than 0).
+     * @param ref
+     *            Reference for checking the validity of BlockChangeEntry
+     *            instances. No changes are made to the passed instance,
+     *            canUpdateWith is called.
      * @param tick
      *            The current tick. Used for lazy expiration.
      * @param worldId
@@ -390,22 +455,24 @@ public class BlockChangeTracker {
      * @param z
      * @param direction
      *            Desired direction of the push.
-     * @return The id of a matching entry, or -1 if there is no matching entry.
+     * @return The matching entry, or null if there is no matching entry.
      */
-    public long getChangeIdPush(final long gtChangeId, final long tick, final UUID worldId, final int x, final int y, final int z, final Direction direction) {
+    public BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final UUID worldId, 
+            final int x, final int y, final int z, final Direction direction) {
         final WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
-            return -1;
+            return null;
         }
-        return getChangeIdPush(gtChangeId, tick, worldNode, x, y, z, direction);
+        return getBlockChangeEntry(ref, tick, worldNode, x, y, z, direction);
     }
 
     /**
      * Query if there is a push available into the indicated direction.
      * 
-     * @param gtChangeId
-     *            A matching entry must have a greater id than the given one
-     *            (all ids are greater than 0).
+     * @param ref
+     *            Reference for checking the validity of BlockChangeEntry
+     *            instances. No changes are made to the passed instance,
+     *            canUpdateWith is called.
      * @param tick
      *            The current tick. Used for lazy expiration.
      * @param worldNode
@@ -415,10 +482,10 @@ public class BlockChangeTracker {
      * @param z
      * @param direction
      *            Desired direction of the push. Pass null to ignore direction.
-     * @return The id of the oldest matching entry, or -1 if there is no
-     *         matching entry.
+     * @return The oldest matching entry, or null if there is no matching entry.
      */
-    private long getChangeIdPush(final long gtChangeId, final long tick, final WorldNode worldNode, final int x, final int y, final int z, final Direction direction) {
+    private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final WorldNode worldNode, 
+            final int x, final int y, final int z, final Direction direction) {
         // TODO: Might add some policy (start at age, oldest first, newest first).
         final long olderThanTick = tick - expirationAgeTicks;
         // Lazy expiration of entire world nodes.
@@ -426,13 +493,13 @@ public class BlockChangeTracker {
             worldNode.clear();
             worldMap.remove(worldNode.worldId);
             //DebugUtil.debug("EXPIRE WORLD"); // TODO: REMOVE
-            return -1;
+            return null;
         }
         // Check individual entries.
         final LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z);
         if (entries == null) {
             //DebugUtil.debug("NO ENTRIES: " + x + "," + y + "," + z);
-            return -1;
+            return null;
         }
         //DebugUtil.debug("Entries at: " + x + "," + y + "," + z);
         final Iterator<BlockChangeEntry> it = entries.iterator();
@@ -442,8 +509,8 @@ public class BlockChangeTracker {
                 //DebugUtil.debug("Lazy expire: " + x + "," + y + "," + z + " " + entry.id);
                 it.remove();
             } else {
-                if (entry.id > gtChangeId && (direction == null || entry.direction == direction)) {
-                    return entry.id;
+                if (ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
+                    return entry;
                 }
             }
         }
@@ -454,7 +521,7 @@ public class BlockChangeTracker {
                 worldMap.remove(worldNode.worldId);
             }
         }
-        return -1;
+        return null;
     }
 
     public void clear() {

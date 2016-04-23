@@ -451,6 +451,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel");
 
         set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, "default");
+        set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, "cancel vl>100 cancel log:vehicleenvelope:0:15:icf");
 
         // NET
 
@@ -553,6 +554,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
+        set(ConfPaths.STRINGS + ".vehicleenvelope", start + "moved a vehicle too fast ([tags])" + end);
 
         // Compatibility settings.
         set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);

@@ -44,7 +44,8 @@ public class VehicleMorePackets extends Check {
      * @param data 
      * @return the location
      */
-    public Location check(final Player player, final Location from, final Location to, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final Location from, final Location to, 
+            final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
 
@@ -95,9 +96,12 @@ public class VehicleMorePackets extends Check {
             // Set the new "last" time.
             data.vehicleMorePacketsLastTime = time;
 
-            // Set the new "setback" location.
-            if (newTo == null) {
+            // Set the new set-back location.
+            if (allowSetSetBack && newTo == null) {
                 data.setVehicleMorePacketsSetBack(from);
+                if (data.debug) {
+                    debug(player, "Update vehicle morepackets set-back: " + from);
+                }
             }
         } else if (data.vehicleMorePacketsLastTime > time) {
             // Security check, maybe system time changed.

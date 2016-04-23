@@ -179,11 +179,12 @@ public class MovingConfig extends ACheckConfig {
     // Vehicles
     public final boolean vehicleEnforceLocation;
     public final boolean vehiclePreventDestroyOwn;
-    
+
     public final boolean    vehicleMorePacketsCheck;
     public final ActionList vehicleMorePacketsActions;
-    
+
     public final boolean vehicleEnvelopeActive;
+    public final ActionList vehicleEnvelopeActions;
 
     // Trace
     public final int traceSize;
@@ -300,7 +301,7 @@ public class MovingConfig extends ACheckConfig {
 
         traceSize = config.getInt(ConfPaths.MOVING_TRACE_SIZE);
         traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
-        
+
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, AlmostBoolean.MAYBE);
         vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
         vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN);
@@ -308,6 +309,7 @@ public class MovingConfig extends ACheckConfig {
         vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, AlmostBoolean.MAYBE);
         vehicleEnvelopeActive = ref == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") >= 0 : ref.decide();
+        vehicleEnvelopeActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, Permissions.MOVING_VEHICLE_ENVELOPE);
 
     }
 

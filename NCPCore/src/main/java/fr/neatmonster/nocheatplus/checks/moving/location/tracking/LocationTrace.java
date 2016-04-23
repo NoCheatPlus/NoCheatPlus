@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving.locations;
+package fr.neatmonster.nocheatplus.checks.moving.location.tracking;
 
 import java.util.Iterator;
 

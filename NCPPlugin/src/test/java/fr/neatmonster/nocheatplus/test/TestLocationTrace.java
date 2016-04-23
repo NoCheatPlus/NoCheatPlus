@@ -7,9 +7,9 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceEntry;
-import fr.neatmonster.nocheatplus.checks.moving.locations.LocationTrace.TraceIterator;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceIterator;
 
 
 public class TestLocationTrace {

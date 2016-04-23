@@ -586,4 +586,18 @@ public class TrigUtil {
         return x1 == Location.locToBlock(x2) && z1 == Location.locToBlock(z2) && y1 == Location.locToBlock(y2);
     }
 
+    /**
+     * Test if the block coordinate is intersecting with min+max bounds,
+     * assuming the a full block. Excludes the case of only the edges intersecting. 
+     * 
+     * @param min
+     * @param max
+     * @param block Block coordinate of the block.
+     * @return
+     */
+    public static boolean intersectsBlock(final double min, final double max, final int block) {
+        final double db = (double) block;
+        return db + 1.0 > min && db < max;
+    }
+
 }

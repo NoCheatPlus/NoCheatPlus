@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -553,15 +554,22 @@ public class SurvivalFly extends Check {
      * @return
      */
     private double[] getPushResultVertical(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
-        final long oldChangeId = data.blockChangeId;
+        /*
+         * TODO: Once horizontal push is allowed too, a maxIdEntry has to be
+         * passed as argument and data.updateBlockChangeReference has to be
+         * called after processing all pushing. Return the new maxEntry if
+         * updated, or the old one.
+         */
         // TODO: Allow push up to 1.0 (or 0.65 something) even beyond block borders, IF COVERED [adapt PlayerLocation].
+        // TODO: Might have to allow pushing up to a distance of 1.0 if covered.
+        // TODO: Cleanup todo.
         // Push (/pull) up.
         if (yDistance > 0.0) {
             // TODO: Other conditions? [some will be in passable later].
-            double maxDistYPos = 1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
-            final long changeIdYPos = from.getBlockChangeIdPush(blockChangeTracker, oldChangeId, Direction.Y_POS, yDistance);
-            if (changeIdYPos != -1) {
-                data.blockChangeId = Math.max(data.blockChangeId, changeIdYPos);
+            final double maxDistYPos = 1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
+            final BlockChangeEntry entryYPos = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, yDistance);
+            if (entryYPos != null) {
+                data.updateBlockChangeReference(entryYPos, to);
                 tags.add("push_y_pos");
                 return new double[]{maxDistYPos, 0.0};
             }
@@ -569,12 +577,12 @@ public class SurvivalFly extends Check {
         // Push (/pull) down.
         else if (yDistance < 0.0) {
             // TODO: Other conditions? [some will be in passable later].
-            double maxDistYPos = from.getY() - from.getBlockY(); // TODO: Margin ?
-            final long changeIdYPos = from.getBlockChangeIdPush(blockChangeTracker, oldChangeId, Direction.Y_NEG, -yDistance);
-            if (changeIdYPos != -1) {
-                data.blockChangeId = Math.max(data.blockChangeId, changeIdYPos);
+            final double maxDistYNeg = from.getY() - from.getBlockY(); // TODO: Margin ?
+            final BlockChangeEntry entryYNeg = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
+            if (entryYNeg != null) {
+                data.updateBlockChangeReference(entryYNeg, to);
                 tags.add("push_y_neg");
-                return new double[]{maxDistYPos, 0.0};
+                return new double[]{maxDistYNeg, 0.0};
             }
         }
         // Nothing found.

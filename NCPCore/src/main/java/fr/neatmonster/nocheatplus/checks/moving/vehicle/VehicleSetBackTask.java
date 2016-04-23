@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.moving.locations;
+package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -9,34 +9,35 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 
 /**
- * Task for scheduling a vehicle set back. Resets the vehicleSetBackTaskId in the MovingData for the player.
+ * Task for scheduling a vehicle set back. Resets the vehicleSetBackTaskId in
+ * the MovingData for the player.
+ * 
  * @author mc_dev
  *
  */
-public class VehicleSetBack implements Runnable{
+public class VehicleSetBackTask implements Runnable{
     private final Entity  vehicle;
     private final Player player;
     private final Location location;
     private final boolean debug;
-    
-	public VehicleSetBack(Entity vehicle, Player player, Location location, boolean debug) {
-		this.vehicle = vehicle;
+
+    public VehicleSetBackTask(Entity vehicle, Player player, Location location, boolean debug) {
+        this.vehicle = vehicle;
         this.player = player;
         this.location = location;
         this.debug = debug;
-	}
+    }
 
     @Override
     public void run() {
-    	final MovingData data = MovingData.getData(player);
-    	data.vehicleSetBackTaskId = -1;
+        final MovingData data = MovingData.getData(player);
+        data.vehicleSetBackTaskId = -1;
         try{
-    		data.prepareSetBack(location);
-        	TeleportUtil.teleport(vehicle, player, location, debug);
+            TeleportUtil.teleport(vehicle, player, location, debug);
         }
         catch(Throwable t){
-        	StaticLog.logSevere(t);
+            StaticLog.logSevere(t);
         }
     }
-    
+
 }

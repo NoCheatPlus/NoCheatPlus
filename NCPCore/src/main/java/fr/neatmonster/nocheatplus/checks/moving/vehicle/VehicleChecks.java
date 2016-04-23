@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.locations.VehicleSetBack;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
@@ -31,9 +31,9 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
@@ -144,7 +144,7 @@ public class VehicleChecks extends CheckListener {
      * @param to
      * @param fake
      */
-    public void onVehicleMove(final Entity vehicle, final Location from, final Location to, final boolean fake) {   
+    public void onVehicleMove(final Entity vehicle, final Location from, final Location to, final boolean fake) {
         // (No re-check for vehicles that have vehicles, pre condition is that this has already been checked.)
         // TODO: If fake: Use the last known position of the vehicle instead of from (if available, once implemented).
         final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
@@ -192,9 +192,12 @@ public class VehicleChecks extends CheckListener {
 
         // Ensure a common set-back for now.
         // TODO: Check activation of any check?
-        if (!data.hasVehicleMorePacketsSetBack()){
+        if (!data.hasVehicleMorePacketsSetBack()) {
             // TODO: Check if other set-back is appropriate or if to set on other events.
             data.setVehicleMorePacketsSetBack(from);
+            if (data.debug) {
+                debug(player, "Ensure vehicle set-back: " + from);
+            }
             if (data.vehicleSetBackTaskId != -1) {
                 // TODO: Set back outdated or not?
                 Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
@@ -203,13 +206,24 @@ public class VehicleChecks extends CheckListener {
 
         // Moving envelope check(s).
         if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
-            newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
+            // Skip if this is the first move after set-back, with to=set-back.
+            if (data.timeSinceSetBack == 0 || to.hashCode() == data.lastSetBackHash) {
+                // TODO: This is a hot fix, to prevent a set-back loop. Depends on having only the morepackets set-back for vehicles.
+                // TODO: Perhaps might want to add || !data.equalsAnyVehicleSetBack(to)
+                if (data.debug) {
+                    debug(player, "Skip envelope check on first move after set-back acknowledging the set-back with an odd starting point (from).");
+                }
+            }
+            else {
+                newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
+            }
         }
 
         // More packets: Sort this in last, to avoid setting the set-back early. Always check to adjust set-back, for now.
         if (vehicleMorePackets.isEnabled(player, data, cc)) {
             // If the player is handled by the vehicle more packets check, execute it.
-            final Location mpNewTo = vehicleMorePackets.check(player, from, to, data, cc);
+            final Location mpNewTo = vehicleMorePackets.check(player, from, to, 
+                    newTo == null && data.vehicleSetBackTaskId == -1, data, cc);
             if (mpNewTo != null) {
                 // Just prefer this for now.
                 newTo = mpNewTo;
@@ -217,22 +231,39 @@ public class VehicleChecks extends CheckListener {
         }
         else {
             // Otherwise we need to clear their data.
-            data.clearMorePacketsData();
+            data.clearVehicleMorePacketsData();
         }
 
         // Schedule a set-back?
-        if (newTo != null && data.vehicleSetBackTaskId == -1) {
+        if (newTo == null) {
+            // Increase time since set-back.
+            data.timeSinceSetBack ++;
+        }
+        else {
+            setBack(player, vehicle, newTo, data);;
+        }
+        useLoc.setWorld(null);
+    }
+
+    private void setBack(final Player player, final Entity vehicle, final Location newTo, final MovingData data) {
+        // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
+        if (data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
             // (Only schedule if not already scheduled.)
             // TODO: Might log debug if skipping.
             // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
             // TODO: Reset on world changes or not?
             // TODO: Prevent vehicle data resetting due to dismount/mount/teleport.
-            // TODO: Once there is dismount penalties, teleport individually (!).
-            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
+            // (Future: Dismount penalty does not need extra handling, both are teleported anyway.)
+            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo, data.debug));
             // TODO: Handle scheduling failure.
+            if (data.debug) {
+                debug(player, "Vehicle set-back task scheduled: " + newTo + " id=" + data.vehicleSetBackTaskId);
+            }
         }
-        useLoc.setWorld(null);
+        else if (data.debug) {
+            debug(player, "Vehicle set-back task already scheduled, skip this time.");
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -246,8 +277,12 @@ public class VehicleChecks extends CheckListener {
         data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
-        data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
-        useLoc.setWorld(null); // TODO: A pool ?
+        final Entity vehicle = event.getVehicle();
+        data.vehicleConsistency = MoveConsistency.getConsistency(vehicle.getLocation(), null, player.getLocation(useLoc));
+        if (data.debug) {
+            debug(player, "Vehicle enter: " + vehicle.getType() + "@" + useLoc + " c=" + data.vehicleConsistency);
+        }
+        useLoc.setWorld(null);
         // TODO: more resetting, visible check ?
     }
 
@@ -293,6 +328,7 @@ public class VehicleChecks extends CheckListener {
                         || CheckUtils.isEnabled(CheckType.MOVING_CREATIVEFLY, player, data, cc)) {
                 }
                 event.setCancelled(true);
+                // TODO: This message must be configurable.
                 player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
             }
         }
@@ -373,6 +409,26 @@ public class VehicleChecks extends CheckListener {
         useLoc.setWorld(null);
     }
 
+    //    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+    //    public void onEntityTeleport(final EntityTeleportEvent event) {
+    //        final Entity entity = event.getEntity();
+    //        if (entity == null) {
+    //            return;
+    //        }
+    //        final Player player = CheckUtils.getFirstPlayerPassenger(entity);
+    //        if (player != null && MovingData.getData(player).debug) {
+    //            debug(player, "Entity teleport with player as passenger: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
+    //        }
+    //        else {
+    //            // Log if the debug config flag is set.
+    //            final World world = LocUtil.getFirstWorld(event.getFrom(), event.getTo());
+    //            if (world != null && MovingConfig.getConfig(world.getName()).debug) {
+    //                // TODO: Keep (expiring) entity data, for recently mounted, possibly for fight checks too?
+    //                debug(null, "Entity teleport: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
+    //            }
+    //        }
+    //    }
+
     /**
      * Intended for vehicle-move events.
      * 
@@ -390,13 +446,19 @@ public class VehicleChecks extends CheckListener {
         final Entity actualVehicle = player.getVehicle();
         final boolean wrongVehicle = actualVehicle == null || actualVehicle.getEntityId() != vehicle.getEntityId();
         builder.append(CheckUtils.getLogMessagePrefix(player, checkType));
-        builder.append("VEHICLE MOVE " + (fake ? "(fake)" : "") + " in world " + from.getWorld().getName() + ":\n");
-        DebugUtil.addMove(from, to, null, builder);
+        builder.append("VEHICLE MOVE " + (fake ? "(fake)" : "") + " in world " + from.getWorld().getName() + ":");
+        builder.append("\nFrom: ");
+        builder.append(LocUtil.simpleFormat(from));
+        builder.append("\nTo: ");
+        builder.append(LocUtil.simpleFormat(to));
         builder.append("\n Vehicle: ");
-        DebugUtil.addLocation(vLoc, builder);
+        builder.append(LocUtil.simpleFormat(vLoc));
         builder.append("\n Player: ");
-        DebugUtil.addLocation(loc, builder);
+        builder.append(LocUtil.simpleFormat(loc));
         builder.append("\n Vehicle type: " + vehicle.getType() + (wrongVehicle ? (actualVehicle == null ? " (exited?)" : " actual: " + actualVehicle.getType()) : ""));
+        builder.append("\n hdist: " + TrigUtil.xzDistance(from, to));
+        builder.append(" vdist: " + (to.getY() - from.getY()));
+        builder.append(" fake: " + fake);
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 

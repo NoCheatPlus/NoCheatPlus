@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.locations.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
@@ -80,6 +80,7 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
     @Override
     public void setMCAccess(MCAccess mcAccess) {
         this.mcAccess = mcAccess;
+        clear();
     }
 
     @Override
@@ -88,7 +89,8 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
     }
 
     /**
-     * Clear parked MovingInfo instances. Called on reload and data removal.
+     * Clear parked MovingInfo instances. Called on reload and data removal and
+     * setMCAccess.
      */
     public void clear() {
         // Call cleanup on all parked info, just in case.
