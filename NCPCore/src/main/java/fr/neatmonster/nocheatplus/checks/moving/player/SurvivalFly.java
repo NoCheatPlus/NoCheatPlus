@@ -1639,6 +1639,11 @@ public class SurvivalFly extends Check {
                 }
             }
         }
+        // Do allow vertical velocity.
+        // TODO: Looks like less velocity is used here (normal hitting 0.361 of 0.462).
+        if (vDistanceAboveLimit > 0.0 && data.getOrUseVerticalVelocity(yDistance) != null) {
+            vDistanceAboveLimit = 0.0;
+        }
         return vDistanceAboveLimit;
     }
 
