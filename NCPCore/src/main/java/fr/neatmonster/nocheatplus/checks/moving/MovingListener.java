@@ -1619,7 +1619,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                                     StaticLog.logWarning("SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
                                 }
                                 else {
-                                    StaticLog.logInfo("Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
+                                    StaticLog.logInfo("Set back player " + player.getName() + ": " + LocUtil.simpleFormat(refLoc));
                                     data.prepareSetBack(refLoc);
                                     if (!player.teleport(refLoc)) {
                                         StaticLog.logWarning("FAILED to set back player " + player.getName());
@@ -1927,15 +1927,31 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             builder.setLength(0);
             // Note: the block flags are for normal on-ground checking, not with yOnGrond set to 0.5.
             from.collectBlockFlags(maxYOnGround);
-            if (from.getBlockFlags() != 0) builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
-            if (from.getTypeId() != 0) DebugUtil.addBlockInfo(builder, from, "\nfrom");
-            if (from.getTypeIdBelow() != 0) DebugUtil.addBlockBelowInfo(builder, from, "\nfrom");
-            if (!from.isOnGround() && from.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+            if (from.getBlockFlags() != 0) {
+                builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
+            }
+            if (from.getTypeId() != 0) {
+                DebugUtil.addBlockInfo(builder, from, "\nfrom");
+            }
+            if (from.getTypeIdBelow() != 0) {
+                DebugUtil.addBlockBelowInfo(builder, from, "\nfrom");
+            }
+            if (!from.isOnGround() && from.isOnGround(0.5)) {
+                builder.append(" (ground within 0.5)");
+            }
             to.collectBlockFlags(maxYOnGround);
-            if (to.getBlockFlags() != 0) builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
-            if (to.getTypeId() != 0) DebugUtil.addBlockInfo(builder, to, "\nto");
-            if (to.getTypeIdBelow() != 0) DebugUtil.addBlockBelowInfo(builder, to, "\nto");
-            if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+            if (to.getBlockFlags() != 0) {
+                builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
+            }
+            if (to.getTypeId() != 0) {
+                DebugUtil.addBlockInfo(builder, to, "\nto");
+            }
+            if (to.getTypeIdBelow() != 0) {
+                DebugUtil.addBlockBelowInfo(builder, to, "\nto");
+            }
+            if (!to.isOnGround() && to.isOnGround(0.5)) {
+                builder.append(" (ground within 0.5)");
+            }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         }
     }
