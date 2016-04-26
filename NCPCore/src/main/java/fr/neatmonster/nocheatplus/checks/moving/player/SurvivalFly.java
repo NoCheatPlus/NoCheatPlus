@@ -358,7 +358,7 @@ public class SurvivalFly extends Check {
         }
 
         // Post-check recovery.
-        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.0 && cc.blockChangeTrackerPush) {
+        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015 && cc.blockChangeTrackerPush) {
             // TODO: Better place for checking for push [redesign for intermediate result objects?].
             // Vertical push/pull.
             double[] pushResult = getPushResultVertical(yDistance, from, to, data);
@@ -564,24 +564,27 @@ public class SurvivalFly extends Check {
         // TODO: Might have to allow pushing up to a distance of 1.0 if covered.
         // TODO: Cleanup todo.
         // Push (/pull) up.
-        if (yDistance > 0.0) {
+        if (yDistance > 0.0 && (yDistance <= 1.0 
+                // Extra condition for full blocks: slightly more possible.
+                // Extreme case: 1.51 blocks up (details pending).
+                || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
             // TODO: Other conditions? [some will be in passable later].
-            final double maxDistYPos = 1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
-            final BlockChangeEntry entryYPos = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, yDistance);
+            final BlockChangeEntry entryYPos = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0));
             if (entryYPos != null) {
                 data.updateBlockChangeReference(entryYPos, to);
                 tags.add("push_y_pos");
+                final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                 return new double[]{maxDistYPos, 0.0};
             }
         }
         // Push (/pull) down.
-        else if (yDistance < 0.0) {
+        else if (yDistance < 0.0 && yDistance >= -1.0) {
             // TODO: Other conditions? [some will be in passable later].
-            final double maxDistYNeg = from.getY() - from.getBlockY(); // TODO: Margin ?
             final BlockChangeEntry entryYNeg = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
             if (entryYNeg != null) {
                 data.updateBlockChangeReference(entryYNeg, to);
                 tags.add("push_y_neg");
+                final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?
                 return new double[]{maxDistYNeg, 0.0};
             }
         }
