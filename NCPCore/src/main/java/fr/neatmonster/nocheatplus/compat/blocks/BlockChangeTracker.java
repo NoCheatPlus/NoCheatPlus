@@ -101,6 +101,9 @@ public class BlockChangeTracker {
      *
      */
     public static class BlockChangeEntry {
+
+        // TODO: Might implement IBlockPosition.
+
         public final long id;
         public final int tick, x, y, z;
         public final Direction direction;

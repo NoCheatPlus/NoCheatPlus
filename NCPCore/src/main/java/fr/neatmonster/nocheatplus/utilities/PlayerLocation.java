@@ -14,13 +14,6 @@ public class PlayerLocation extends RichLivingEntityLocation {
 
     // TODO: Rather RichLivingEntityLocation, the rest: compile/JIT.
 
-
-    // Light object members //
-
-    /** Is the player on ice? */
-    private Boolean onIce = null;
-
-
     // "Heavy" object members that need to be set to null on cleanup. //
 
     private Player player = null;
@@ -40,7 +33,7 @@ public class PlayerLocation extends RichLivingEntityLocation {
      * @return true, if the player is on ice
      */
     public boolean isOnIce() {
-        // TODO: Move to entity or bounds, other way of telling sneaking? Might have another on-ice method for boats, though.
+        // TODO: Move fully to entity or bounds, other way of telling sneaking? Might have another on-ice method for boats, though.
         if (onIce == null) {
             // TODO: Use a box here too ?
             // TODO: check if player is really sneaking (refactor from survivalfly to static access in Combined ?)!
@@ -88,7 +81,6 @@ public class PlayerLocation extends RichLivingEntityLocation {
         super.set(location, player, yOnGround);
         // Entity reference.
         this.player = player;
-        this.onIce = null;
     }
 
     /**
@@ -106,7 +98,6 @@ public class PlayerLocation extends RichLivingEntityLocation {
      */
     public void prepare(final PlayerLocation other) {
         super.prepare(other);
-        this.onIce = other.isOnIce();
     }
 
     /**

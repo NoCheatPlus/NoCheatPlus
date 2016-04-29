@@ -11,6 +11,9 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
+import fr.neatmonster.nocheatplus.components.location.IBlockPosition;
+import fr.neatmonster.nocheatplus.components.location.IBukkitLocation;
+import fr.neatmonster.nocheatplus.components.location.IPosition;
 
 /**
  * A location with bounds with a lot of extra stuff.
@@ -18,7 +21,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
  * @author asofold
  *
  */
-public class RichBoundsLocation {
+public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
 
     // TODO: Consider switching back from default to private visibility (use getters for other places).
 
@@ -80,6 +83,9 @@ public class RichBoundsLocation {
     /** Is the player is web? */
     Boolean inWeb = null;
 
+    /** Is the player on ice? */
+    Boolean onIce = null;
+
     /** Is the player on the ground? */
     Boolean onGround = null;
 
@@ -97,37 +103,27 @@ public class RichBoundsLocation {
         this.blockCache = blockCache;
     }
 
-    /**
-     * Get the world!
-     * @return
-     */
+    @Override
     public World getWorld() {
         return world;
     }
 
-    /**
-     * Gets the blockX.
-     * 
-     * @return the blockX
-     */
+    @Override
+    public String getWorldName() {
+        return world.getName();
+    }
+
+    @Override
     public double getX() {
         return x;
     }
 
-    /**
-     * Gets the boundY.
-     * 
-     * @return the boundY
-     */
+    @Override
     public double getY() {
         return y;
     }
 
-    /**
-     * Gets the blockZ.
-     * 
-     * @return the blockZ
-     */
+    @Override
     public double getZ() {
         return z;
     }
@@ -167,14 +163,17 @@ public class RichBoundsLocation {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
+    @Override
     public int getBlockX() {
         return blockX;
     }
 
+    @Override
     public int getBlockY() {
         return blockY;
     }
 
+    @Override
     public int getBlockZ() {
         return blockZ;
     }
@@ -195,7 +194,7 @@ public class RichBoundsLocation {
      * @param other
      * @return
      */
-    public final boolean isSameBlock(final PlayerLocation other) {
+    public final boolean isSameBlock(final IBlockPosition other) {
         return blockX == other.getBlockX() && blockZ == other.getBlockZ() && blockY == other.getBlockY();
     }
 
@@ -224,7 +223,7 @@ public class RichBoundsLocation {
      * @param loc
      * @return
      */
-    public boolean isBlockAbove(final PlayerLocation loc) {
+    public boolean isBlockAbove(final IBlockPosition loc) {
         return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
     }
 
@@ -243,7 +242,7 @@ public class RichBoundsLocation {
      * @param loc
      * @return
      */
-    public boolean isSamePos(final PlayerLocation loc) {
+    public boolean isSamePos(final IPosition loc) {
         return x == loc.getX() && z == loc.getZ() && y == loc.getY();
     }
 
@@ -262,9 +261,9 @@ public class RichBoundsLocation {
      * @param other
      * @return
      */
-    public int manhattan(final PlayerLocation other) {
+    public int manhattan(final IBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
-        return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+        return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
     /**
@@ -272,9 +271,9 @@ public class RichBoundsLocation {
      * @param other
      * @return
      */
-    public int maxBlockDist(final PlayerLocation other) {
+    public int maxBlockDist(final IBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
-        return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+        return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
     /**
@@ -531,6 +530,27 @@ public class RichBoundsLocation {
             inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB);
         }
         return inWeb;
+    }
+
+    /**
+     * Check the location is on ice, only regarding the center. Currently
+     * demands to be on ground as well.
+     * 
+     * @return
+     */
+    public boolean isOnIce() {
+        if (onIce == null) {
+            // TODO: Use a box here too ?
+            // TODO: check if player is really sneaking (refactor from survivalfly to static access in Combined ?)!
+            if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_ICE) == 0) {
+                // TODO: check onGroundMinY !?
+                onIce = false;
+            } else {
+                // TODO: Might skip the isOnGround part, e.g. if boats sink in slightly. Needs testing.
+                onIce = isOnGround() && BlockProperties.collides(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, BlockProperties.F_ICE);
+            }
+        }
+        return onIce;
     }
 
     /**
@@ -849,20 +869,25 @@ public class RichBoundsLocation {
      * @param other
      */
     public void prepare(final RichBoundsLocation other) {
+        // Simple first.
+        this.blockFlags = other.blockFlags; //  Assume set.
+        this.notOnGroundMaxY = other.notOnGroundMaxY;
+        this.onGroundMinY = other.onGroundMinY;
+        this.passable = other.passable;
+        // Access methods.
+        this.typeId = other.getTypeId();
+        this.typeIdBelow = other.getTypeIdBelow();
         this.onGround = other.isOnGround();
         this.inWater = other.isInWater();
         this.inLava = other.isInLava();
         this.inWeb = other.isInWeb();
+        this.onIce = other.isOnIce();
         this.onClimbable = other.isOnClimbable();
+        // Complex checks last.
         if (!onGround && !isResetCond()) {
+            // TODO: if resetCond is checked, set on the other !?
             this.aboveStairs = other.isAboveStairs();
         }
-        this.passable = other.passable;
-        this.typeId = other.getTypeId();
-        this.typeIdBelow = other.getTypeIdBelow();
-        this.notOnGroundMaxY = other.notOnGroundMaxY;
-        this.onGroundMinY = other.onGroundMinY;
-        this.blockFlags = other.blockFlags; //  Assume set.
     }
 
     public void set(final Location location, final double fullWidth, final double fullHeight, final double yOnGround) {
@@ -896,7 +921,7 @@ public class RichBoundsLocation {
 
         // Reset cached values.
         typeId = typeIdBelow = data = null;
-        aboveStairs = inLava = inWater = inWeb = onGround = onClimbable = passable = null;
+        aboveStairs = inLava = inWater = inWeb = onIce = onGround = onClimbable = passable = null;
         onGroundMinY = Double.MAX_VALUE;
         notOnGroundMaxY = Double.MIN_VALUE;
         blockFlags = null;

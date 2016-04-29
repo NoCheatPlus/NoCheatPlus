@@ -89,7 +89,7 @@ public class RichEntityLocation extends RichBoundsLocation {
         boolean res = super.isOnGround();
         if (!res) {
             // Check if standing on an entity.
-            // TODO: Get rid of needing an entity for checking this (!). Move to bounds.
+            // TODO: Get rid of needing an entity for checking this (!). Move to RichBoundsLocation.
             final double d1 = 0.25;
             if (blockCache.standsOnEntity(entity, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1)) {
                 res = onGround = standsOnEntity = true;

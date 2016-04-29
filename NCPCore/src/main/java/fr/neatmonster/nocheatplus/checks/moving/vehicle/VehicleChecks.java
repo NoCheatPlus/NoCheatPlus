@@ -16,6 +16,7 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -65,6 +66,37 @@ public class VehicleChecks extends CheckListener {
 
     public VehicleChecks() {
         super(CheckType.MOVING_VEHICLE);
+    }
+
+    /**
+     * TEST
+     * @param event
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onVehicleUpdate(final VehicleUpdateEvent event) {
+        // TODO: VehicleUpdateEvent. How to track teleporting of the vehicle?
+        // TODO: No problem: (?) update 'authorized state' if no player passenger.
+        final Vehicle vehicle = event.getVehicle();
+        // TODO: Detect if a VehicleMove event will fire (not strictly possible without nms, depends on visibility of fields, possibly estimate instead?). 
+        // TODO: normalVehicles handling.
+        if (vehicle.getVehicle() != null) {
+            // Do ignore events for vehicles inside of other vehicles.
+            return;
+        }
+        final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
+        if (player == null) {
+            return;
+        }
+        if (vehicle.isDead() || !vehicle.isValid()) {
+            // TODO: Actually force dismount?
+            onPlayerVehicleLeave(player, vehicle);
+            return;
+        }
+        //        final MovingData data = MovingData.getData(player);
+        //        final MovingConfig cc = MovingConfig.getConfig(player);
+        final Location loc = vehicle.getLocation(useLoc);
+        debug(player, "Vehicle update: " + vehicle.getType() + " " + loc);
+        useLoc.setWorld(null);
     }
 
     /**
@@ -152,6 +184,7 @@ public class VehicleChecks extends CheckListener {
             return;
         }
         if (vehicle.isDead() || !vehicle.isValid()) {
+            // TODO: Actually force dismount?
             onPlayerVehicleLeave(player, vehicle);
             return;
         }

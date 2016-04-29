@@ -94,6 +94,7 @@ public class RichLivingEntityLocation extends RichEntityLocation {
      *             If marginAboveEyeHeight is smaller than 0.
      */
     public boolean isHeadObstructed(double marginAboveEyeHeight, boolean stepCorrection) {
+        // TODO: Add an isObstructed method with extra height parameter to RichBoundsLocation?
         if (marginAboveEyeHeight < 0.0) {
             throw new IllegalArgumentException("marginAboveEyeHeight must be greater than 0.");
         }
