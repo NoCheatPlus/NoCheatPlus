@@ -128,20 +128,12 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
         return z;
     }
 
-    /**
-     * Gets the yaw.
-     * 
-     * @return the yaw
-     */
+    @Override
     public float getYaw() {
         return yaw;
     }
 
-    /**
-     * Gets the pitch.
-     * 
-     * @return the pitch
-     */
+    @Override
     public float getPitch() {
         return pitch;
     }

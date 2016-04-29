@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 
 import org.bukkit.Location;
 
+import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 
 /**
@@ -35,6 +36,15 @@ public class SetBackStorage {
     }
 
     /**
+     * Maximum number of stored locations, disregarding validity.
+     * 
+     * @return
+     */
+    public int size() {
+        return entries.length;
+    }
+
+    /**
      * Oldest by time value.
      * 
      * @return
@@ -53,6 +63,24 @@ public class SetBackStorage {
     }
 
     /**
+     * Latest by time value.
+     * 
+     * @return
+     */
+    public SetBackEntry getLatestValidEntry() {
+        int latestTime = 0;
+        SetBackEntry latestEntry = null;
+        for (int i = 0; i < entries.length; i++) {
+            final SetBackEntry entry = entries[i];
+            if (entry.isValid() && entry.getTime() > latestTime) {
+                latestTime = entry.getTime();
+                latestEntry = entry;
+            }
+        }
+        return latestEntry;
+    }
+
+    /**
      * Retrieve the entry at a given index, only if valid. Set fallBack to true,
      * in order to fall back to the default entry, if a default index is set,
      * and if that entry is valid
@@ -62,7 +90,7 @@ public class SetBackStorage {
      *            If to allow falling back to the default entry.
      * @return
      */
-    public SetBackEntry getEntry(final int index, final boolean fallBack) {
+    public SetBackEntry getValidEntry(final int index, final boolean fallBack) {
         if (entries[index].isValid()) {
             return entries[index];
         }
@@ -92,7 +120,20 @@ public class SetBackStorage {
     }
 
     /**
-     * Invalidate all entries and reset the default to the given location.
+     * Hard-reset all entries to the given location. All will have the same time
+     * value.
+     * 
+     * @param loc
+     */
+    public void resetAll(final ILocationWithLook loc) {
+        time ++;
+        for (int i = 0; i < entries.length; i++) {
+            entries[i].set(loc, time, Monotonic.millis());
+        }
+    }
+
+    /**
+     * Invalidate all entries and reset the default entry to the given location.
      * Internal time is increased. If no default is set, resetAll is called.
      * 
      * @param loc
@@ -108,12 +149,19 @@ public class SetBackStorage {
     }
 
     /**
-     * Maximum number of stored locations, disregarding validity.
+     * Invalidate all entries and reset the default entry to the given location.
+     * Internal time is increased. If no default is set, resetAll is called.
      * 
-     * @return
+     * @param loc
      */
-    public int size() {
-        return entries.length;
+    public void resetAllLazily(final ILocationWithLook loc) {
+        if (defaultIndex < 0) {
+            resetAll(loc);
+        }
+        else {
+            invalidateAll();
+            entries[defaultIndex].set(loc, ++time, Monotonic.millis());
+        }
     }
 
     /**
@@ -121,7 +169,7 @@ public class SetBackStorage {
      * 
      * @return
      */
-    public boolean isAnySetBackValid() {
+    public boolean isAnyEntryValid() {
         for (int i = 0; i < entries.length; i++) {
             if (entries[i].isValid()) {
                 return true;
@@ -136,15 +184,42 @@ public class SetBackStorage {
      * @param index
      * @return
      */
-    public boolean isSetBackValid(final int index) {
+    public boolean isEntryValid(final int index) {
         return entries[index].isValid();
     }
 
-
-    public boolean isDefaultSetBackValid() {
+    public boolean isDefaultEntryValid() {
         return defaultIndex >= 0 && entries[defaultIndex].isValid();
     }
 
-    // TODO: Has/get/set for location, ILocation (IPosition for keeping the world + default world?).
+    /**
+     * Get the default set-back entry, disregarding validity.
+     * 
+     * @return In case no default is set, null is returned. Otherwise the
+     *         default entry is returned disregarding validity.
+     */
+    public SetBackEntry getDefaultEntry() {
+        return defaultIndex < 0 ? null : entries[defaultIndex];
+    }
+
+    /**
+     * Update the location for the default entry in-place. Time values are set
+     * as well.
+     * 
+     * @param loc
+     */
+    public void setDefaultEntry(final Location loc) {
+        getDefaultEntry().set(loc, ++time, Monotonic.millis());
+    }
+
+    /**
+     * Update the location for the default entry in-place. Time values are set
+     * as well.
+     * 
+     * @param loc
+     */
+    public void setDefaultEntry(final ILocationWithLook loc) {
+        getDefaultEntry().set(loc, ++time, Monotonic.millis());
+    }
 
 }

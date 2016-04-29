@@ -8,7 +8,7 @@ import org.bukkit.World;
  * @author asofold
  *
  */
-public interface IBukkitLocation extends ILocation {
+public interface IBukkitLocation extends ILocationWithLook {
 
     public World getWorld();
 
