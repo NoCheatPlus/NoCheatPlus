@@ -72,7 +72,7 @@ public class TeleportUtil {
                 // TODO: VehicleEnter fires.
                 // TODO: Not enter if vehicle teleport failed?
                 vehicle.setPassenger(player);
-                data.setVehicleMorePacketsSetBack(location); // HACK, needed due to teleportation resetting the set-back.
+                data.vehicleSetBacks.setDefaultEntry(location); // HACK, needed due to teleportation resetting the set-back.
                 // TODO: What on failure of setPassenger?
             }
         }

@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
@@ -44,19 +45,20 @@ public class VehicleMorePackets extends Check {
      * @param data 
      * @return the location
      */
-    public Location check(final Player player, final Location from, final Location to, 
+    public SetBackEntry check(final Player player, final Location from, final Location to, 
             final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
 
-        Location newTo = null;
+        SetBackEntry newTo = null;
 
         // Take a packet from the buffer.
         data.vehicleMorePacketsBuffer--;
 
         if (data.vehicleSetBackTaskId != -1){
             // Short version !
-            return data.getVehicleMorePacketsSetBack();
+            // TODO: This is bad. Needs to check if still scheduled (a BukkitTask thing) and just skip.
+            return data.vehicleSetBacks.getValidMidTermEntry();
         }
 
         // Player used up buffer, they fail the check.
@@ -72,7 +74,7 @@ public class VehicleMorePackets extends Check {
                 vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.vehicleMorePacketsBuffer));
             }
             if (executeActions(vd).willCancel()){
-                newTo = data.getVehicleMorePacketsSetBack();
+                newTo = data.vehicleSetBacks.getValidMidTermEntry();
             }
         }
 
@@ -98,7 +100,7 @@ public class VehicleMorePackets extends Check {
 
             // Set the new set-back location.
             if (allowSetSetBack && newTo == null) {
-                data.setVehicleMorePacketsSetBack(from);
+                data.vehicleSetBacks.setMidTermEntry(from);
                 if (data.debug) {
                     debug(player, "Update vehicle morepackets set-back: " + from);
                 }
@@ -108,13 +110,7 @@ public class VehicleMorePackets extends Check {
             data.vehicleMorePacketsLastTime = time;
         }
 
-        if (newTo == null) {
-            return null;
-        }
-
-        // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to allow the
-        // player to look somewhere else despite getting pulled back by NoCheatPlus.
-        return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
+        return newTo;
     }
 
 }

@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
@@ -208,7 +209,7 @@ public class VehicleChecks extends CheckListener {
                 break;
         }
 
-        Location newTo = null;
+        SetBackEntry newTo = null;
         data.sfNoLowJump = true;
 
         if (cc.noFallVehicleReset) {
@@ -223,11 +224,12 @@ public class VehicleChecks extends CheckListener {
             outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
 
-        // Ensure a common set-back for now.
         // TODO: Check activation of any check?
-        if (!data.hasVehicleMorePacketsSetBack()) {
+
+        // Ensure a common set-back for now.
+        if (!data.vehicleSetBacks.isDefaultEntryValid()) {
             // TODO: Check if other set-back is appropriate or if to set on other events.
-            data.setVehicleMorePacketsSetBack(from);
+            data.vehicleSetBacks.setDefaultEntry(from);
             if (data.debug) {
                 debug(player, "Ensure vehicle set-back: " + from);
             }
@@ -238,7 +240,9 @@ public class VehicleChecks extends CheckListener {
         }
 
         // Moving envelope check(s).
-        if (newTo == null && vehicleEnvelope.isEnabled(player, data, cc)) {
+        // TODO: Use set-back storage for testing if this is appropriate (use SetBackEntry instead, remove Location retrieval then?).
+        if ((newTo == null || data.vehicleSetBacks.getSafeMediumEntry().isValidAndOlderThan(newTo))
+                && vehicleEnvelope.isEnabled(player, data, cc)) {
             // Skip if this is the first move after set-back, with to=set-back.
             if (data.timeSinceSetBack == 0 || to.hashCode() == data.lastSetBackHash) {
                 // TODO: This is a hot fix, to prevent a set-back loop. Depends on having only the morepackets set-back for vehicles.
@@ -248,23 +252,27 @@ public class VehicleChecks extends CheckListener {
                 }
             }
             else {
-                newTo = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
+                final SetBackEntry tempNewTo  = vehicleEnvelope.check(player, vehicle, from, to, fake, data, cc);
+                if (tempNewTo != null) {
+                    newTo = tempNewTo;
+                }
             }
         }
 
         // More packets: Sort this in last, to avoid setting the set-back early. Always check to adjust set-back, for now.
-        if (vehicleMorePackets.isEnabled(player, data, cc)) {
-            // If the player is handled by the vehicle more packets check, execute it.
-            final Location mpNewTo = vehicleMorePackets.check(player, from, to, 
-                    newTo == null && data.vehicleSetBackTaskId == -1, data, cc);
-            if (mpNewTo != null) {
-                // Just prefer this for now.
-                newTo = mpNewTo;
+        // TODO: Still always update the frequency part?
+        if ((newTo == null || data.vehicleSetBacks.getMidTermEntry().isValidAndOlderThan(newTo))) {
+            if (vehicleMorePackets.isEnabled(player, data, cc)) {
+                final SetBackEntry tempNewTo = vehicleMorePackets.check(player, from, to, newTo == null && data.vehicleSetBackTaskId == -1, data, cc);
+                if (tempNewTo != null) {
+                    newTo = tempNewTo;
+                }
             }
-        }
-        else {
-            // Otherwise we need to clear their data.
-            data.clearVehicleMorePacketsData();
+            else {
+                // Otherwise we need to clear their data.
+                // TODO: Should only if disabled.
+                data.clearVehicleMorePacketsData();
+            }
         }
 
         // Schedule a set-back?
@@ -273,7 +281,7 @@ public class VehicleChecks extends CheckListener {
             data.timeSinceSetBack ++;
         }
         else {
-            setBack(player, vehicle, newTo, data);;
+            setBack(player, vehicle, newTo.getLocation(from.getWorld()), data);
         }
         useLoc.setWorld(null);
     }

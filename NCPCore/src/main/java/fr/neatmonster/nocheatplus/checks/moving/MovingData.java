@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.location.setback.DefaultSetBackStorage;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
@@ -211,14 +212,6 @@ public class MovingData extends ACheckData {
     public final ActionFrequency    morePacketsBurstFreq;
     private Location                morePacketsSetback = null;
 
-    // Data of the more packets vehicle check.
-    public int              vehicleMorePacketsBuffer = 50;
-    public long             vehicleMorePacketsLastTime;
-    private Location        vehicleMorePacketsSetback = null;
-    /** Task id of the vehicle set-back task. */ 
-    public int              vehicleSetBackTaskId = -1;
-
-
     // Data of the no fall check.
     public float            noFallFallDistance = 0;
     /** Last y coordinate from when the player was on ground. */
@@ -247,20 +240,32 @@ public class MovingData extends ACheckData {
     public boolean sfLowJump = false;
     public boolean sfNoLowJump = false; // Hacks.
 
-    /** Counting while the player is not on ground and not moving. A value <0 means not hovering at all. */
-    public int 			sfHoverTicks = -1;
-    /** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
-    public int 			sfHoverLoginTicks = 0;
-    public int			sfOnIce = 0; // TODO: Replace by allowed speed + friction.
-    public long			sfCobwebTime = 0;
-    public double		sfCobwebVL = 0;
-    public long			sfVLTime = 0;
+    /**
+     * Counting while the player is not on ground and not moving. A value <0
+     * means not hovering at all.
+     */
+    public int          sfHoverTicks = -1;
+    /**
+     * First count these down before incrementing sfHoverTicks. Set on join, if
+     * configured so.
+     */
+    public int          sfHoverLoginTicks = 0;
+    public int          sfOnIce = 0; // TODO: Replace by allowed speed + friction.
+    public long         sfCobwebTime = 0;
+    public double       sfCobwebVL = 0;
+    public long         sfVLTime = 0;
 
     // Accounting info.
     public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
-    /** Rough friction factor estimate, 0.0 is the reset value (maximum with lift-off/burst speed is used). */
+    /**
+     * Rough friction factor estimate, 0.0 is the reset value (maximum with
+     * lift-off/burst speed is used).
+     */
     public double lastFrictionHorizontal = 0.0;
-    /** Rough friction factor estimate, 0.0 is the reset value (maximum with lift-off/burst speed is used). */
+    /**
+     * Rough friction factor estimate, 0.0 is the reset value (maximum with
+     * lift-off/burst speed is used).
+     */
     public double lastFrictionVertical = 0.0;
     /** Used during processing, no resetting necessary.*/
     public double nextFrictionHorizontal = 0.0;
@@ -269,22 +274,33 @@ public class MovingData extends ACheckData {
     /** Workarounds */
     public final WorkaroundSet ws;
 
-    // HOT FIX
-    /** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
-    public boolean wasInVehicle = false;
-    public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT;
-    /** Set to true after login/respawn, only if the set-back is reset there. Reset in MovingListener after handling PlayerMoveEvent */
+    // HOT FIX / WORKAROUND
+    /**
+     * Set to true after login/respawn, only if the set-back is reset there.
+     * Reset in MovingListener after handling PlayerMoveEvent
+     */
     public boolean joinOrRespawn = false;
     /**
-     * Number of (vehicle) move events since set.back. Update after running
-     * standard checks on that EventPriority level (not MONITOR).
+     * Number of (player/vehicle) move events since set.back. Update after
+     * running standard checks on that EventPriority level (not MONITOR).
      */
     public int timeSinceSetBack = 0;
     /**
-     * Location hash value of the last set-back, for checking independently of
-     * which set-back location had been used.
+     * Location hash value of the last (player/vehicle) set-back, for checking
+     * independently of which set-back location had been used.
      */
     public int lastSetBackHash = 0;
+
+    // Vehicles.
+    /** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
+    public boolean wasInVehicle = false; // Workaround
+    public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT; // Workaround
+    public final DefaultSetBackStorage vehicleSetBacks = new DefaultSetBackStorage();
+    // Data of the more packets vehicle check.
+    public int              vehicleMorePacketsBuffer = 50;
+    public long             vehicleMorePacketsLastTime;
+    /** Task id of the vehicle set-back task. */ 
+    public int              vehicleSetBackTaskId = -1;
 
     public MovingData(final MovingConfig config) {
         super(config);
@@ -384,7 +400,7 @@ public class MovingData extends ACheckData {
         resetPositions(setBack);
         adjustMediumProperties(setBack);
         setSetBack(setBack);
-        setVehicleMorePacketsSetBack(setBack); // TODO: Switch to the one making most sense, once implemented.
+        vehicleSetBacks.resetAllLazily(setBack);
     }
 
     /**
@@ -458,10 +474,7 @@ public class MovingData extends ACheckData {
         if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
             clearFlyData();
         }
-        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || vehicleMorePacketsSetback != null && worldName.equalsIgnoreCase(vehicleMorePacketsSetback.getWorld().getName())) {
-            clearAllMorePacketsData();
-            clearNoFallData(); // just in case.
-        }
+        vehicleSetBacks.resetByWorldName(worldName);
     }
 
     /**
@@ -516,7 +529,7 @@ public class MovingData extends ACheckData {
     }
 
     public void clearVehicleMorePacketsData() {
-        vehicleMorePacketsSetback = null;
+        vehicleSetBacks.getMidTermEntry().setValid(false);
         // TODO: Also reset other data ?
     }
 
@@ -671,32 +684,6 @@ public class MovingData extends ACheckData {
 
     public Location getMorePacketsSetBack() {
         return LocUtil.clone(morePacketsSetback);
-    }
-
-    public boolean hasVehicleMorePacketsSetBack() {
-        return vehicleMorePacketsSetback != null;
-    }
-
-    public final void setVehicleMorePacketsSetBack(final PlayerLocation loc) {
-        if (vehicleMorePacketsSetback == null) {
-            vehicleMorePacketsSetback = loc.getLocation();
-        }
-        else {
-            LocUtil.set(vehicleMorePacketsSetback, loc);
-        }
-    }
-
-    public final void setVehicleMorePacketsSetBack(final Location loc) {
-        if (vehicleMorePacketsSetback == null) {
-            vehicleMorePacketsSetback = LocUtil.clone(loc);
-        }
-        else {
-            LocUtil.set(vehicleMorePacketsSetback, loc);
-        }
-    }
-
-    public final Location getVehicleMorePacketsSetBack() {
-        return LocUtil.clone(vehicleMorePacketsSetback);
     }
 
     public final void resetTeleported() {
@@ -947,18 +934,6 @@ public class MovingData extends ACheckData {
             return false;
         }
         return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
-    }
-
-    /**
-     * Standard equals for the more packets set-back location. Implies
-     * world1.equals(world2).
-     * 
-     * @param loc
-     * @return
-     */
-    public boolean equalsVehicleMorePacketsSetBack(final Location loc) {
-        return vehicleMorePacketsSetback != null && vehicleMorePacketsSetback.equals(loc)
-                || loc == null && vehicleMorePacketsSetback == null;
     }
 
     public void adjustWalkSpeed(final float walkSpeed, final int tick, final int speedGrace) {

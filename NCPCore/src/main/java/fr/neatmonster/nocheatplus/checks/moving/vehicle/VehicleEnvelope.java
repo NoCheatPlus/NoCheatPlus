@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicVehicle;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -53,7 +54,7 @@ public class VehicleEnvelope extends Check {
         super(CheckType.MOVING_VEHICLE_ENVELOPE);
     }
 
-    public Location check(final Player player, final Entity vehicle, final Location from, final Location to, final boolean isFake, final MovingData data, final MovingConfig cc) {
+    public SetBackEntry check(final Player player, final Entity vehicle, final Location from, final Location to, final boolean isFake, final MovingData data, final MovingConfig cc) {
         // Delegate to a sub-check.
         tags.clear();
         tags.add("entity." + vehicle.getType());
@@ -71,11 +72,12 @@ public class VehicleEnvelope extends Check {
             final ViolationData vd = new ViolationData(this, player, data.vehicleEnvelopeVL, 1, cc.vehicleEnvelopeActions);
             vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             if (executeActions(vd).willCancel()) {
-                return data.getVehicleMorePacketsSetBack();
+                return data.vehicleSetBacks.getValidMidTermEntry();
             }
         }
         else {
-            data.vehicleEnvelopeVL *= 0.99; // Random cooldown for now.
+            data.vehicleEnvelopeVL *= 0.99; // Random cool down for now.
+            data.vehicleSetBacks.setSafeMediumEntry(to); // TODO: Set only if it is safe to set. Set on monitor rather.
         }
         return null;
     }

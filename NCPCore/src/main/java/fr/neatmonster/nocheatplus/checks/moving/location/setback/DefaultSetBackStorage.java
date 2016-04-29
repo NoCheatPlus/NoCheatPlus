@@ -47,6 +47,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
 
     /**
      * Get the 'mid-term' set-back entry, disregarding validity.
+     * 
      * @return
      */
     public SetBackEntry getMidTermEntry() {
@@ -55,6 +56,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
 
     /**
      * Get the 'safe-medium' set-back entry, disregarding validity.
+     * 
      * @return
      */
     public SetBackEntry getSafeMediumEntry() {
@@ -62,7 +64,9 @@ public class DefaultSetBackStorage extends SetBackStorage {
     }
 
     /**
-     * Get the 'last-move' set-back entry, disregarding validity of the entry itself.
+     * Get the 'last-move' set-back entry, disregarding validity of the entry
+     * itself.
+     * 
      * @return
      */
     public SetBackEntry getLastMoveEntry() {
@@ -129,6 +133,37 @@ public class DefaultSetBackStorage extends SetBackStorage {
         getLastMoveEntry().set(loc, ++time, Monotonic.millis());
     }
 
-    // TODO: Getter methods with fall-back to default entry. Not sure: get a Location instance or just the entry?
+    /**
+     * Get a valid 'mid-term' entry. If that entry is not valid, fall back to
+     * the default entry. If neither entry is valid, return null. returned.
+     * 
+     * @param world
+     * @return
+     */
+    public SetBackEntry getValidMidTermEntry() {
+        return getValidEntry(indexMidTerm, true);
+    }
+
+    /**
+     * Get a valid 'safe-medium' entry. If that entry is not valid, fall back to
+     * the default entry. If neither entry is valid, return null.
+     * 
+     * @param world
+     * @return
+     */
+    public SetBackEntry getValidSafeMediumEntry() {
+        return getValidEntry(indexSafeMedium, true);
+    }
+
+    /**
+     * Get a valid 'last-move' entry. If that entry is not valid, fall back to
+     * the default entry. If neither entry is valid, return null.
+     * 
+     * @param world
+     * @return
+     */
+    public SetBackEntry getValidLastMoveEntry() {
+        return getValidEntry(indexLastMove, true);
+    }
 
 }

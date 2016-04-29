@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
@@ -16,6 +17,9 @@ import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
  *
  */
 public class SetBackStorage {
+
+    // TODO: Support a hash for locations (can't be Location.hashCode()).
+    // TODO: Support for last-used set-back (on retrieving a Location instance)?
 
     final SetBackEntry[] entries;
     final int defaultIndex;
@@ -164,6 +168,15 @@ public class SetBackStorage {
         }
     }
 
+    public void resetByWorldName(final String worldName) {
+        // TODO: Not needed for memory leaks, possibly tie resetAll to a global world?
+        for (int i = 0; i < entries.length; i++) {
+            if (worldName.equals(entries[i].getWorldName())) {
+                entries[i].setValid(false);
+            }
+        }
+    }
+
     /**
      * Test if any of the stored set-back location is valid.
      * 
@@ -220,6 +233,18 @@ public class SetBackStorage {
      */
     public void setDefaultEntry(final ILocationWithLook loc) {
         getDefaultEntry().set(loc, ++time, Monotonic.millis());
+    }
+
+    /**
+     * Retrieve the default location as a Location instance, if valid. If not
+     * valid, null is returned.
+     * 
+     * @param world
+     * @return
+     */
+    public Location getValidDefaultLocation(final World world) {
+        final SetBackEntry entry = getDefaultEntry();
+        return entry.isValid() ? entry.getLocation(world) : null;
     }
 
 }
