@@ -16,7 +16,7 @@ public class MagicVehicle {
 
     // Entity.
     public static final double minecartMaxDistanceHorizontal = maxDistanceHorizontal; // 13.0 / 20.0; // Include turn.
-    public static final double boatMaxDistanceHorizontal = 0.7; // maxDistanceHorizontal; // 18.0 / 20.0; // Including some downstream, rough testing.
+    public static final double boatMaxDistanceHorizontal = maxDistanceHorizontal; // 18.0 / 20.0; // Including some downstream, rough testing.
     // TODO: Boat on ice: 42 / 20. 
     public static final double entityMaxDistanceHorizontal = maxDistanceHorizontal; // (No idea, cannon balls?)
 
