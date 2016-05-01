@@ -9,6 +9,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 
 public class TeleportUtil {
 
@@ -65,7 +66,8 @@ public class TeleportUtil {
             data.prepareSetBack(location);
             playerTeleported = player.teleport(LocUtil.clone(location));
             data.resetTeleported(); // Just in case.
-            // TODO: Consider resetting player set-backs.
+            // Workarounds.
+            data.ws.resetConditions(WRPT.G_RESET_NOTINAIR); // Allow re-use of certain workarounds. Hack/shouldbedoneelsewhere?
             player.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Likely not relevant, should remove.
             // TODO: Magic 1.0, plus is this valid with horse, dragon...
             if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.0) {

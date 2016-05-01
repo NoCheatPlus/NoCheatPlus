@@ -84,12 +84,12 @@ public class VehicleEnvelope extends Check {
             final ViolationData vd = new ViolationData(this, player, data.vehicleEnvelopeVL, 1, cc.vehicleEnvelopeActions);
             vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             if (executeActions(vd).willCancel()) {
-                return data.vehicleSetBacks.getValidMidTermEntry();
+                return data.vehicleSetBacks.getValidSafeMediumEntry();
             }
         }
         else {
             data.vehicleEnvelopeVL *= 0.99; // Random cool down for now.
-            data.vehicleSetBacks.setSafeMediumEntry(to); // TODO: Set only if it is safe to set. Set on monitor rather.
+            // Do not set a set-back here.
         }
         return null;
     }
@@ -211,6 +211,7 @@ public class VehicleEnvelope extends Check {
         final boolean toIsSafeMedium = to.isInWater() || to.isOnGround() || to.isInWeb();
         final boolean inAir = !fromIsSafeMedium && !toIsSafeMedium;
         // TODO: Split code to methods.
+        // TODO: Get extended liquid specs (allow confine to certain flags, here: water). Contains info if water is only flowing down, surface properties (non liquid blocks?), still water.
         if (from.isInWeb()) {
             // TODO: Check anything?
             if (data.debug) {
@@ -276,11 +277,11 @@ public class VehicleEnvelope extends Check {
             //                    return true;
             //                }
             //            }
-            // Slow falling (vdist).
+            // Enforce falling speed (vdist) envelope by in-air phase count.
+            // Slow falling (vdist), do not bind to descending in general.
             final double minDescend = -MagicVehicle.boatGravityMin * data.sfJumpPhase;
             final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
-            if (data.sfJumpPhase > 1 && thisMove.vDistance > -MagicVehicle.boatVerticalFallTarget
-                    && thisMove.vDistance > minDescend) {
+            if (data.sfJumpPhase > 1 && thisMove.vDistance > Math.max(minDescend, -MagicVehicle.boatVerticalFallTarget)) {
                 tags.add("slow_fall_vdist");
                 violation = true;
             }
@@ -295,6 +296,10 @@ public class VehicleEnvelope extends Check {
                     violation = false;
                     checkDescendMuch = checkAscendMuch = false; // (Full envelope has been checked.)
                 }
+                if (data.debug) {
+                    debugDetails.add("minDescend: " + minDescend);
+                    debugDetails.add("maxDescend: " + maxDescend);
+                }
             }
         }
         else {
@@ -302,7 +307,8 @@ public class VehicleEnvelope extends Check {
             if (data.debug) {
                 debugDetails.add("?-?");
             }
-            // TODO: Something needed here?
+            // TODO: Clearly overlaps other cases.
+            // TODO: Skipped vehicle move events happen here as well (...).
             if (!toIsSafeMedium) {
                 // TODO: At least do something here?
             }
@@ -340,8 +346,6 @@ public class VehicleEnvelope extends Check {
                 data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
             }
             data.vehicleSetBacks.setLastMoveEntry(to);
-            // TODO: Workaround - reset moving set-backs.
-            
         }
 
         return violation;

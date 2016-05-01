@@ -42,7 +42,7 @@ public class MagicVehicle {
     public static final double maxAscend = 0.27;
 
     public static final double boatGravityMin = Magic.GRAVITY_MIN / 2.0;
-    public static final double boatGravityMax = Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN;
+    public static final double boatGravityMax = (Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN) / 2.0;
     /** The speed up to which gravity mechanics roughly work. */
     public static final double boatVerticalFallTarget = 3.7;
     public static final double boatMaxBackToSurfaceAscend = 3.25;
@@ -75,11 +75,12 @@ public class MagicVehicle {
     private static boolean oddInAirDescend(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final MovingData data) {
         // TODO: Guard by past move tracking, instead of minDescend and maxDescend.
         // (Try individual if this time, let JIT do the rest.)
-        if (thisMove.vDistance < 2.0 * minDescend && thisMove.vDistance > 2.0 * maxDescend
+        if (data.sfJumpPhase > 54 && thisMove.vDistance < 2.0 * minDescend && thisMove.vDistance > 2.0 * maxDescend
                 // TODO: Past move tracking.
                 // TODO: Fall distances?
                 && data.ws.use(WRPT.W_M_V_ENV_INAIR_SKIP)
                 ) {
+            // (In-air count usually > 60.)
             return true;
         }
         return false;
