@@ -53,7 +53,7 @@ public class TeleportUtil {
                 vehicle.eject();
                 // TODO: Confirm eject worked, handle if not.
                 vehicleTeleported = vehicle.teleport(LocUtil.clone(location), TeleportCause.PLUGIN);
-                vehicle.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Does not solve 1.9.2 rubber band issue.
+                vehicle.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Likely not relevant, should remove.
             }
         }
         else if (passenger == null) {
@@ -65,7 +65,8 @@ public class TeleportUtil {
             data.prepareSetBack(location);
             playerTeleported = player.teleport(LocUtil.clone(location));
             data.resetTeleported(); // Just in case.
-            player.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Does not solve 1.9.2 rubber band issue.
+            // TODO: Consider resetting player set-backs.
+            player.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Likely not relevant, should remove.
             // TODO: Magic 1.0, plus is this valid with horse, dragon...
             if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.0) {
                 // Somewhat check against tp showing something wrong (< 1.0).

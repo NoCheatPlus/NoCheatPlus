@@ -35,8 +35,8 @@ public class WRPT extends SimpleWorkaroundRegistry {
     public static final String W_M_SF_WEB_MICROGRAVITY2 = "m.sf.web.microgravity2";
 
     // oddSlope
-    public static final String W_M_SF_SLOPE1 = "m.sf.WRPT.SLOPE1";
-    public static final String W_M_SF_SLOPE2 = "m.sf.WRPT.SLOPE2";
+    public static final String W_M_SF_SLOPE1 = "m.sf.slope1";
+    public static final String W_M_SF_SLOPE2 = "m.sf.slope2";
 
     // TODO: oddLiquid
 
@@ -46,12 +46,24 @@ public class WRPT extends SimpleWorkaroundRegistry {
 
     // (TODO: oddElytra)
 
+    // Vehicle: oddInAirDescend
+    /**
+     * Vehicle descending in-air, skip one vehicle move event during late in-air
+     * phase.
+     */
+    public static final String W_M_V_ENV_INAIR_SKIP = "m.v.env.inair.skip";
+    /** Just a counter for back to surface for in-water moves (water-water). */
+    public static final String W_M_V_ENV_INWATER_BTS = "m.v.env.inwater.bts";
+
     ///////////////////////
     // Group ids.
     ///////////////////////
 
     // MOVING_SURVIVALFLY
-    /** Group: Reset when not in air jump phase. */
+    /**
+     * Group: Reset when not in air jump phase. Both used for players and
+     * vehicles with players inside.
+     */
     public static final String G_RESET_NOTINAIR = "reset.notinair";
 
     ///////////////////////
@@ -73,6 +85,7 @@ public class WRPT extends SimpleWorkaroundRegistry {
         // Reset once on ground or reset-condition.
         final WorkaroundCountDown[] resetNotInAir = new WorkaroundCountDown[] {
                 new WorkaroundCountDown(W_M_SF_SLIME_JP_2X0, 1),
+                new WorkaroundCountDown(W_M_V_ENV_INAIR_SKIP, 1),
         };
         ws_moving.addAll(Arrays.asList(resetNotInAir));
         setWorkaroundBluePrint(resetNotInAir);
@@ -80,13 +93,15 @@ public class WRPT extends SimpleWorkaroundRegistry {
 
         // Just counters.
         final String[] counters = new String[] {
+                // Player
                 W_M_SF_WEB_0V1,
                 W_M_SF_WEB_0V2,
                 W_M_SF_WEB_MICROGRAVITY1,
                 W_M_SF_WEB_MICROGRAVITY2,
                 W_M_SF_SLOPE1,
                 W_M_SF_SLOPE2,
-                // TODO: ALL workaorunds.
+                // Vehicle
+                W_M_V_ENV_INWATER_BTS
         };
         for (final String id : counters) {
             final WorkaroundCounter counter = new WorkaroundCounter(id);
