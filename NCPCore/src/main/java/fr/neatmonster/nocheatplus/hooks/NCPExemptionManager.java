@@ -121,6 +121,7 @@ public class NCPExemptionManager {
     public static final boolean isExempted(final Player player, final CheckType checkType) {
         // TODO: Settings: If to check meta data at all.
         // TODO: Settings: check types to exempt npcs from (and if to use) -> implement setSettings
+        // TODO: Is meta-data lookup thread-safe? Suggest: Per-check-type config if to check for meta-data at all.
         return isExempted(player.getUniqueId(), checkType) || player.hasMetadata("nocheat.exempt");
     }
 
@@ -132,6 +133,7 @@ public class NCPExemptionManager {
      */
     public static final boolean isNpc(final Player player) {
         // TODO: Configurability: Which metadata key(s + if).
+        // TODO: Is meta-data lookup thread-safe? Suggest: Per-check-type config if to check for meta-data at all.
         return (player instanceof NPC) || player.hasMetadata("npc");
     }
 

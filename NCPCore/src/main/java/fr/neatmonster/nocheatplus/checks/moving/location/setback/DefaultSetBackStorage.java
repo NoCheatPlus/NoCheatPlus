@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
  */
 public class DefaultSetBackStorage extends SetBackStorage {
 
+    // TODO: Might rename mid-term to short-term, as that's the next step after last-valid (safe-medium is special anyway).
     // TODO: In case of keeping track of past moves, last valid could be skipped (vehicles are currently not planned to have past moves accessible).
 
     public static final int indexDefault = 0;
