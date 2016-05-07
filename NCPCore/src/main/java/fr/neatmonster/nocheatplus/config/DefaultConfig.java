@@ -545,6 +545,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent too many moves ([packets] [tags])" + end);
+        set(ConfPaths.STRINGS + ".msgtempdenylogin", "You are temporarily denied to join this server.");
         set(ConfPaths.STRINGS + ".munchhausen", start + "almost made it off the pit" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage" + end);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);

@@ -1212,16 +1212,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             @EventHandler(priority = EventPriority.NORMAL)
             public void onPlayerLogin(final PlayerLoginEvent event) {
                 // (NORMAL to have chat checks come after this.)
-                if (event.getResult() != Result.ALLOWED) return;
+                if (event.getResult() != Result.ALLOWED) {
+                    return;
+                }
                 final Player player = event.getPlayer();
                 // Check if login is denied:
                 checkDenyLoginsNames();
-                if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
+                if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) {
+                    return;
+                }
                 if (isLoginDenied(player.getName())) {
-                    // TODO: display time for which the player is banned.
+                    // TODO: Consider using the vanilla temporary ban feature instead (for an alternative?).
+                    // TODO: Display time for which the player is banned.
                     event.setResult(Result.KICK_OTHER);
-                    // TODO: Make message configurable.
-                    event.setKickMessage("You are temporarily denied to join this server.");
+                    // TODO: Some basic/language configuration object, possibly independent of checks.
+                    event.setKickMessage(ColorUtil.replaceColors(ConfigManager.getConfigFile(player.getWorld().getName()).getString(ConfPaths.STRINGS + ".msgtempdenylogin")));
                 }
             }
 
