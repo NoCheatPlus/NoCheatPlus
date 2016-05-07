@@ -474,6 +474,10 @@ public class MovingData extends ACheckData {
         if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
             clearFlyData();
         }
+        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName())) {
+            clearPlayerMorePacketsData();
+            clearNoFallData(); // just in case.
+        }
         vehicleSetBacks.resetByWorldName(worldName);
     }
 
