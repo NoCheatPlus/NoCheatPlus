@@ -86,7 +86,7 @@ public class MorePackets extends Check {
             }
             if (executeActions(vd).willCancel()) {
                 // Set to cancel the move.
-                return data.getMorePacketsSetBack(); 
+                return data.hasMorePacketsSetBack() ? data.getMorePacketsSetBack() : data.getSetBack(to);
             }
         } 
         else if (allowSetSetBack) {
