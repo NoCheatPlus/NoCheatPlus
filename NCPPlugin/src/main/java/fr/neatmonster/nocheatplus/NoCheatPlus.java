@@ -53,6 +53,7 @@ import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
+import fr.neatmonster.nocheatplus.compat.EntityAccessFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
@@ -1120,7 +1121,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     @Override
     public MCAccess getMCAccess() {
-        if (mcAccess == null) initMCAccess();
+        if (mcAccess == null) {
+            initMCAccess();
+        }
         return mcAccess;
     }
 
@@ -1128,13 +1131,23 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Fall-back method to initialize from factory, only if not yet set. Uses the BukkitScheduler to ensure this works if called from async checks.
      */
     private void initMCAccess() {
-        getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
-            @Override
-            public MCAccess call() throws Exception {
-                if (mcAccess != null) return mcAccess;
-                return initMCAccess(ConfigManager.getConfigFile());
-            }
-        });
+        // TODO: Remove or log.
+        if (Bukkit.isPrimaryThread()) {
+            initMCAccess(ConfigManager.getConfigFile());
+        }
+        else {
+            getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
+                @Override
+                public MCAccess call() throws Exception {
+                    if (mcAccess != null) {
+                        return mcAccess;
+                    }
+                    else {
+                        return initMCAccess(ConfigManager.getConfigFile());
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -1144,7 +1157,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public MCAccess initMCAccess(final ConfigFile config) {
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(new MCAccessConfig(config));
+        final MCAccessConfig mcaC = new MCAccessConfig(config);
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
+        new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC); // TODO: Registry listeners/events are missing.
         setMCAccess(mcAccess);
         return mcAccess;
     }

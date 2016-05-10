@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
+import fr.neatmonster.nocheatplus.components.location.ISetLocationWithLook;
 
 /**
  * Mutable location with timing and validity information. Not complex objects
@@ -12,7 +13,7 @@ import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
  * @author asofold
  *
  */
-public class SetBackEntry implements ILocationWithLook {
+public class SetBackEntry implements ILocationWithLook, ISetLocationWithLook {
 
     // TODO: Support a hash for locations (can't be Location.hashCode()).
 
@@ -87,22 +88,32 @@ public class SetBackEntry implements ILocationWithLook {
         return isValid;
     }
 
+    @Override
+    public void setWorldName(String worldName) {
+        this.worldName = worldName;
+    }
+
+    @Override
     public void setX(double x) {
         this.x = x;
     }
 
+    @Override
     public void setY(double y) {
         this.y = y;
     }
 
+    @Override
     public void setZ(double z) {
         this.z = z;
     }
 
+    @Override
     public void setPitch(float pitch) {
         this.pitch = pitch;
     }
 
+    @Override
     public void setYaw(float yaw) {
         this.yaw = yaw;
     }
@@ -117,10 +128,6 @@ public class SetBackEntry implements ILocationWithLook {
 
     public void setValid (boolean isValid) {
         this.isValid = isValid;
-    }
-
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
     }
 
     /**
