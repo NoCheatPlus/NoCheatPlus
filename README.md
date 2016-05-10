@@ -37,7 +37,10 @@ All profiles for reference:
 | `-P all` | `cbdedicated` | All compat modules. |
 | `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8_R3. |
 | `-P spigot1_9_r1` | `spigot1_9_r1` | Just Spigot 1.9_R1. |
-| `-P cbdev` | `cbdev` | Only the dev-module, usually the latest. Might get removed on very stable versions, in favor of a dedicated module (!). |
+| `-P spigot1_9_r2` | `spigot1_9_r2` | Just Spigot 1.9_R2. |
+| `-P cbdev` | `cbdev` | The latest version in development. |
+
+(On the long run, only the latest module for a major Minecraft release will be kept, such as 1_8_r3.)
 
 Links
 ---------
