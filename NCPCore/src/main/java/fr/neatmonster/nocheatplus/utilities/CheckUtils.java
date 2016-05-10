@@ -100,7 +100,12 @@ public class CheckUtils {
             if (vehicle instanceof Player){
                 return null;
             }
-            vehicle = vehicle.getVehicle();
+            else if (vehicle.isInsideVehicle()) {
+                vehicle = vehicle.getVehicle();
+            }
+            else {
+                break;
+            }
         }
         return vehicle;
     }

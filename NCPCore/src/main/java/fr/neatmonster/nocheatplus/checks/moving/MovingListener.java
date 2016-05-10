@@ -378,6 +378,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (earlyReturn) {
             // TODO: Remove player from enforceLocation ?
             // TODO: Log "early return: " + tags.
+            if (data.debug) {
+                debug(player, "Early return on PlayerMoveEvent: from: " + from + " , to: " + to);
+            }
             if (newTo != null) {
                 // Illegal Yaw/Pitch.
                 if (LocUtil.needsYawCorrection(newTo.getYaw())) {
@@ -389,6 +392,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Set.
                 // TODO: Reset positions? enforceLocation?
                 event.setTo(newTo);
+                if (data.debug) {
+                    debug(player, "Early return on PlayerMoveEvent, set back to: " + newTo);
+                }
             }
             data.joinOrRespawn = false;
             return;

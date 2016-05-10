@@ -138,6 +138,9 @@ public class VehicleChecks extends CheckListener {
         // Note that with 1.6 not even PlayerMove fires for horses and pigs.
         // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
         final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
+        if (data.debug) {
+            debug(player, "onPlayerMoveVehicle: vehicle: " + vehicle);
+        }
         data.wasInVehicle = true;
         data.sfHoverTicks = -1;
         data.removeAllVelocity();
