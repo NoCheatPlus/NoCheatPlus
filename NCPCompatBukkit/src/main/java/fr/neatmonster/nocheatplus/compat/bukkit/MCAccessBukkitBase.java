@@ -40,7 +40,7 @@ public class MCAccessBukkitBase implements MCAccess {
     public String getMCVersion() {
         // Bukkit API.
         // TODO: maybe output something else.
-        return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x|1.8.x|?"; // 1.8.x is bold!
+        return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x|1.8.x|1.9.x|?"; // 1.8.x is bold!
     }
 
     @Override

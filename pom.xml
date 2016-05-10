@@ -48,6 +48,7 @@
 				<module>NCPCompatSpigotCB1_8_R1</module>
 				<module>NCPCompatSpigotCB1_8_R2</module>
 				<module>NCPCompatSpigotCB1_8_R3</module>
+				<module>NCPCompatSpigotCB1_9_R1</module>
 				<module>NCPCompatCBDev</module>
 				<!-- Non minimal above. -->
 				<module>NCPCompatProtocolLib</module>
@@ -92,7 +93,7 @@
 				<module>NCPCore</module>
 				<module>NCPCompatBukkit</module>
 				<!-- Non minimal below. -->
-				<module>NCPCompatCBDev</module>
+				<module>NCPCompatSpigotCB1_9_R1</module>
 				<!-- Non minimal above. -->
 				<module>NCPCompatProtocolLib</module>
 				<module>NCPCompatGlowstone</module>
@@ -114,7 +115,7 @@
 				<module>NCPCore</module>
 				<module>NCPCompatBukkit</module>
 				<!-- Non minimal below. -->
-				<module>NCPCompatCBDev</module>
+				<module>NCPCompatSpigotCB1_9_R1</module>
 				<!-- Non minimal above. -->
 				<module>NCPCompatProtocolLib</module>
 				<module>NCPCompatGlowstone</module>

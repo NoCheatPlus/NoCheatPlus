@@ -125,6 +125,11 @@
 				</dependency>
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatspigotcb1_9_r1</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatcbdev</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
@@ -225,7 +230,7 @@
 				<!-- Non minimal below. -->
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcbdev</artifactId>
+					<artifactId>ncpcompatspigotcb1_9_r1</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
 				<!-- Non minimal above. -->
@@ -275,7 +280,7 @@
 				<!-- Non minimal below. -->
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcbdev</artifactId>
+					<artifactId>ncpcompatspigotcb1_9_r1</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
 				<!-- Non minimal above. -->
