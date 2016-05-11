@@ -49,12 +49,12 @@ public class ReflectHelper {
     protected final ReflectBase reflectBase;
 
     protected final ReflectBlockPosition reflectBlockPosition;
-    protected final ReflectBlock reflectBlock;
+    protected final ReflectBlockSix reflectBlock;
     protected final ReflectMaterial reflectMaterial;
     protected final ReflectWorld reflectWorld;
 
     protected final ReflectDamageSource reflectDamageSource;
-    protected final ReflectEntity reflectEntity;
+    protected final ReflectEntityDamage reflectEntity;
     protected final ReflectPlayer reflectPlayer;
 
     protected final ReflectGenericAttributes reflectGenericAttributes;
@@ -72,12 +72,12 @@ public class ReflectHelper {
             }
             catch (ClassNotFoundException ex) {}
             this.reflectBlockPosition = reflectBlockPosition;
-            this.reflectBlock = new ReflectBlock(this.reflectBase, this.reflectBlockPosition);
+            this.reflectBlock = new ReflectBlockSix(this.reflectBase, this.reflectBlockPosition);
             this.reflectMaterial = new ReflectMaterial(this.reflectBase);
             this.reflectWorld = new ReflectWorld(this.reflectBase);
 
             this.reflectDamageSource = new ReflectDamageSource(this.reflectBase);
-            this.reflectEntity = new ReflectEntity(this.reflectBase, this.reflectDamageSource);
+            this.reflectEntity = new ReflectEntityDamage(this.reflectBase, this.reflectDamageSource);
             this.reflectPlayer = new ReflectPlayer(this.reflectBase, this.reflectDamageSource);
             ReflectGenericAttributes reflectGenericAttributes = null;
             ReflectAttributeInstance reflectAttributeInstance = null;

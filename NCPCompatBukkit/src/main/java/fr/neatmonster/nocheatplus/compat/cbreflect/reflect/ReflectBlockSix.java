@@ -14,7 +14,14 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class ReflectBlock {
+/**
+ * Classic Block with 6 consecutive getter methods for the shape and
+ * updateShape.
+ * 
+ * @author asofold
+ *
+ */
+public class ReflectBlockSix {
     
     /** Obfuscated nms names, allowing to find the order in the source code under certain circumstances. */
     private static final List<String> possibleNames = new ArrayList<String>();
@@ -41,7 +48,7 @@ public class ReflectBlock {
     public final Method nmsGetMinZ;
     public final Method nmsGetMaxZ;
 
-    public ReflectBlock(ReflectBase base, ReflectBlockPosition blockPosition) throws ClassNotFoundException {
+    public ReflectBlockSix(ReflectBase base, ReflectBlockPosition blockPosition) throws ClassNotFoundException {
         final Class<?> clazz = Class.forName(base.nmsPackageName + ".Block");
         // byID (static)
         nmsGetById = ReflectionUtil.getMethod(clazz, "getById", int.class);

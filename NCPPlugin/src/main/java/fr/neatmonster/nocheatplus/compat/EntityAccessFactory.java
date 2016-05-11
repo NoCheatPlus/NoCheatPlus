@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.compat;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectEntityLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.logging.Streams;
 
@@ -28,11 +29,33 @@ public class EntityAccessFactory {
     }
 
     private void setupLastPositionWithLook() {
-        final String[] names = new String[] {
-
-        };
         IEntityAccessLastPositionAndLook res = null;
-        // TODO:
+//        // Reference by class name (native access).
+//        final String[] names = new String[] {
+//                // TODO: Spigot 1.9: fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.EntityAccessLastPositionAndLook
+//        };
+//        for (final String name : names) {
+//            try {
+//                res = (IEntityAccessLastPositionAndLook) Class.forName(name).newInstance();
+//                if (res != null) {
+//                    break;
+//                }
+//            }
+//            catch (Throwable t) {
+//                // Skip.
+//            }
+//        }
+        // Reflection based.
+        if (res == null) {
+            try {
+                res = new ReflectEntityLastPositionAndLook();
+            }
+            catch (Throwable t) {
+                // Ignore.
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, t);
+            }
+        }
+        // Register / log.
         register(IEntityAccessLastPositionAndLook.class, res);
     }
 

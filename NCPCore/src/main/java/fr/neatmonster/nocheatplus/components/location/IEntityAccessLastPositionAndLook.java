@@ -17,6 +17,6 @@ public interface IEntityAccessLastPositionAndLook {
      *            This instance gets updated by last coordinates and looking
      *            direction.
      */
-    public void setPositionAndLook(Entity entity, ISetLocationWithLook location);
+    public void setPositionAndLook(Entity entity, ISetPositionWithLook location);
 
 }

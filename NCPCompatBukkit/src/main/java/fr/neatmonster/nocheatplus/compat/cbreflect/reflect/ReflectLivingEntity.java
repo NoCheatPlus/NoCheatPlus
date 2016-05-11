@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-public class ReflectLivingEntity extends ReflectEntity {
+public class ReflectLivingEntity extends ReflectEntityDamage {
 
     public final Method nmsGetHealth;
 
