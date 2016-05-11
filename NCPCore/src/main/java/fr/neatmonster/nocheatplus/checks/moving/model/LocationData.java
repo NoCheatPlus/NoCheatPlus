@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 
 /**
  * Some useful data about a location. Used in MoveData to keep track of
@@ -35,7 +36,7 @@ public class LocationData {
      * Set all that can be set.
      * @param loc
      */
-    public void set(final PlayerLocation loc) {
+    public void set(final RichBoundsLocation loc) {
         setLocation(loc);
         setExtraProperties(loc);
     }
@@ -44,7 +45,7 @@ public class LocationData {
      * Set location data.
      * @param loc
      */
-    public void setLocation(final PlayerLocation loc) {
+    public void setLocation(final IPositionWithLook loc) {
         setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
@@ -69,7 +70,7 @@ public class LocationData {
      * 
      * @param loc
      */
-    public void setExtraProperties(final PlayerLocation loc) {
+    public void setExtraProperties(final RichBoundsLocation loc) {
         loc.collectBlockFlags(); // Just ensure.
         onClimbable = loc.isOnClimbable();
         inWeb = loc.isInWeb();

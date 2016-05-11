@@ -1,7 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -141,7 +142,7 @@ public class MoveData {
 
     public boolean mightBeMultipleMoves;
 
-    private void setPositions(final PlayerLocation from, final PlayerLocation to) {
+    private void setPositions(final IPositionWithLook from, final IPositionWithLook to) {
         this.from.setLocation(from);
         this.to.setLocation(to);
         yDistance = this.to.y - this.from.y;
@@ -193,7 +194,7 @@ public class MoveData {
      * @param from
      * @param to
      */
-    public void set(final PlayerLocation from, final PlayerLocation to) {
+    public void set(final IPositionWithLook from, final IPositionWithLook to) {
         setPositions(from, to);
         resetBase();
         // TODO: this.from/this.to setExtraProperties ?
@@ -205,7 +206,7 @@ public class MoveData {
      * 
      * @param loc
      */
-    public void set(final PlayerLocation loc) {
+    public void set(final IPositionWithLook loc) {
         setPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         resetBase();
     }
@@ -215,7 +216,7 @@ public class MoveData {
      * 
      * @param loc
      */
-    public void setWithExtraProperties(final PlayerLocation loc) {
+    public void setWithExtraProperties(final RichBoundsLocation loc) {
         set(loc);
         from.setExtraProperties(loc);
         if (this.from.onGround) {
@@ -230,7 +231,7 @@ public class MoveData {
      * @param from
      * @param to
      */
-    public void setExtraProperties(final PlayerLocation from, final PlayerLocation to) {
+    public void setExtraProperties(final RichBoundsLocation from, final RichBoundsLocation to) {
         this.from.setExtraProperties(from);
         this.to.setExtraProperties(to);
         if (this.from.onGround || this.to.onGround) {
