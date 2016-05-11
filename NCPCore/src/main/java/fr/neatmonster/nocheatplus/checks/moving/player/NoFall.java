@@ -126,7 +126,7 @@ public class NoFall extends Check {
      */
     public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, final MovingData data, final MovingConfig cc) {
 
-        final MoveData thisMove = data.thisMove;
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         final LocationData from = thisMove.from;
         final LocationData to = thisMove.to;
 

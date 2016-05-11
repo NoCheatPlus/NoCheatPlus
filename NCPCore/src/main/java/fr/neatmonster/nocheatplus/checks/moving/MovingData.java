@@ -1,8 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.bukkit.Location;
@@ -21,6 +19,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveTrace;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
@@ -170,17 +169,12 @@ public class MovingData extends ACheckData {
      */
     private int morePacketsSetBackResetTime = 0;
 
-    /**
-     * Keep track of past moves edge data. First entry always is the last fully
-     * processed move, or invalid, even during processing. The currently
-     * processed move always is thisMove. The list length always stays the same.
-     */
-    public final LinkedList<MoveData> moveData = new LinkedList<MoveData>();
-    /**
-     * The move currently being processed. Will be inserted to first position
-     * when done, and exchanged for the invalidated last element of moveData.
-     */
-    public MoveData thisMove = new MoveData();
+    /** Keep track of currently processed (if) and past moves for player moving. */
+    public final MoveTrace playerMoves = new MoveTrace();
+
+    /** Keep track of currently processed (if) and past moves for vehicle moving. */
+    // TODO: There may be need to store such data with vehicles, or detect tandem abuse in a different way.
+    public final MoveTrace vehicleMoves = new MoveTrace();
 
     // Velocity handling.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
@@ -310,39 +304,30 @@ public class MovingData extends ACheckData {
         // A new set of workaround conters.
         ws = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(WRPT.class).getWorkaroundSet(WRPT.WS_MOVING);
 
-        // Past moves data: initialize with dummies.
-        for (int i = 0; i < 2; i++) { // Two past moves allow better workarounds than 1.
-            moveData.add(new MoveData());
-        }
     }
 
     /**
-     * Invalidate thisMove and all elements in moveData.
+     * Clear fly and more packets check data for both vehicles and players.
      */
-    private void invalidateMoveData() {
-        final Iterator<MoveData> it = moveData.iterator();
-        while (it.hasNext()) {
-            // TODO: If using many elements ever, stop at the first already invalidated one.
-            it.next().invalidate();
-        }
-        thisMove.invalidate();
+    public void clearMostMovingCheckData() {
+        clearFlyData();
+        clearVehicleData();
+        clearAllMorePacketsData();
     }
 
     /**
-     * Call after processing with a valid thisMove field. Insert thisMove as
-     * first in moveData, set thisMove to invalidated last element of moveData.
+     * Clear vehicle related data, except more packets.
      */
-    public void finishThisMove() {
-        moveData.addFirst(thisMove);
-        thisMove = moveData.removeLast();
-        thisMove.invalidate();
+    public void clearVehicleData() {
+        // TODO: Not entirely sure what to do here.
+        vehicleMoves.invalidate();
     }
 
     /**
      * Clear the data of the fly checks (not more-packets).
      */
     public void clearFlyData() {
-        invalidateMoveData();
+        playerMoves.invalidate();
         bunnyhopDelay = 0;
         sfJumpPhase = 0;
         jumpAmplifier = 0;
@@ -407,7 +392,8 @@ public class MovingData extends ACheckData {
      * Move event: Mildly reset some data, prepare setting a new to-Location.
      */
     public void prepareSetBack(final Location loc) {
-        invalidateMoveData();
+        playerMoves.invalidate();
+        vehicleMoves.invalidate();
         clearAccounting();
         sfJumpPhase = 0;
         sfZeroVdistRepeat = 0;
@@ -459,7 +445,8 @@ public class MovingData extends ACheckData {
     public void onPlayerLeave() {
         removeAllVelocity();
         deleteTrace();
-        invalidateMoveData();
+        playerMoves.invalidate();
+        vehicleMoves.invalidate();
     }
 
     /**
@@ -478,6 +465,7 @@ public class MovingData extends ACheckData {
             clearPlayerMorePacketsData();
             clearNoFallData(); // just in case.
         }
+        // (Assume vehicle data needn't really reset here.)
         vehicleSetBacks.resetByWorldName(worldName);
     }
 
@@ -489,7 +477,7 @@ public class MovingData extends ACheckData {
     public void resetPositions(PlayerLocation loc) {
         resetPositions();
         if (loc != null) {
-            final MoveData lastMove = moveData.getFirst();
+            final MoveData lastMove = playerMoves.getFirstPastMove();
             // Always set with extra properties.
             lastMove.setWithExtraProperties(loc);
         }
@@ -499,7 +487,8 @@ public class MovingData extends ACheckData {
      * Invalidate all past moves data.
      */
     private void resetPositions() {
-        invalidateMoveData();
+        playerMoves.invalidate();
+        vehicleMoves.invalidate(); // TODO: Not sure.
         sfZeroVdistRepeat = 0;
         sfDirty = false;
         sfLowJump = false;

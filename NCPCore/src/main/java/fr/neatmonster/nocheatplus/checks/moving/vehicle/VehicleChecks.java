@@ -420,7 +420,8 @@ public class VehicleChecks extends CheckListener {
                 // TODO: What with the case of vehicle moved to another world !?
                 loc = vLoc; // 
                 if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
-                    final MoveData lastMove = data.moveData.getFirst();
+                    // TODO: This may need re-setting on player move -> vehicle move.
+                    final MoveData lastMove = data.playerMoves.getFirstPastMove();
                     if (lastMove.toIsValid) {
                         final Location oldLoc = new Location(pLoc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
                         if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {

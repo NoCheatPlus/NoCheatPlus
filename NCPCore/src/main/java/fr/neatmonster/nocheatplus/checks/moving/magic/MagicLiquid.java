@@ -26,11 +26,11 @@ public class MagicLiquid {
      *         If no workaround applies, null is returned.
      */
     public static Double liquidWorkarounds(final PlayerLocation from, final PlayerLocation to, final double baseSpeed, final double frictDist, final MoveData lastMove, final MovingData data) {
-        final MoveData thisMove = data.thisMove;
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         final double yDistance = thisMove.yDistance;
         // Special cases.
         // TODO: Re-arrange.
-        final MoveData pastMove1 = data.moveData.get(1);
+        final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
         if (yDistance >= 0) {
             // TODO: liftOffEnvelope: refine conditions (general) , should be near water level.
             // TODO: 1.5 high blocks ?

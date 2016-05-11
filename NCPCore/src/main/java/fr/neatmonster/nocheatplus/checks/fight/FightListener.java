@@ -321,7 +321,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) < 4.5){
             final MovingData mData = MovingData.getData(player);
             // Check if fly checks is an issue at all, re-check "real sprinting".
-            final MoveData lastMove = mData.moveData.getFirst();
+            final MoveData lastMove = mData.playerMoves.getFirstPastMove();
             if (lastMove.valid && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
                 final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), lastMove.from.x, lastMove.from.z);
                 if (hDist >= 0.23) {

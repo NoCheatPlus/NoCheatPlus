@@ -19,7 +19,8 @@ public class MagicAir {
      * @param data
      * @return If to skip those sub-checks.
      */
-    public static boolean venvHacks(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final MoveData lastMove, final MovingData data) {
+    public static boolean venvHacks(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, 
+            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
         return 
                 // 0: Intended for cobweb.
                 // TODO: Bounding box issue ?
@@ -40,7 +41,7 @@ public class MagicAir {
                         // 1: Keep yDist == 0.0 on first falling.
                         // TODO: Do test if hdist == 0.0 or something small can be assumed.
                         || yDistance == 0.0 && data.sfZeroVdistRepeat > 0 && data.sfZeroVdistRepeat < 10 
-                        && data.thisMove.hDistance < 0.125 && lastMove.hDistance < 0.125
+                        && thisMove.hDistance < 0.125 && lastMove.hDistance < 0.125
                         && to.getY() - data.getSetBackY() < 0.0 && to.getY() - data.getSetBackY() > -2.0 // Quite coarse.
                         && data.ws.use(WRPT.W_M_SF_WEB_0V2)
                         )
@@ -86,7 +87,8 @@ public class MagicAir {
      * 
      * @return If the exemption condition applies.
      */
-    private static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, final MoveData lastMove, final MovingData data) {
+    private static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, 
+            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
         // TODO: Relate jump phase to last/second-last move fromWasReset (needs keeping that data in classes).
         // TODO: And distinguish where JP=2 is ok?
         // TODO: Most are medium transitions with the possibility to keep/alter friction or even speed on 1st/2nd move (counting in the transition).
@@ -106,7 +108,7 @@ public class MagicAir {
                                 // Moving out of lava with velocity.
                                 // TODO: Generalize / fix friction there (max/min!?)
                                 || lastMove.from.extraPropertiesValid && lastMove.from.inLava
-                                && Magic.enoughFrictionEnvelope(data.thisMove, lastMove, Magic.FRICTION_MEDIUM_LAVA, 0.0, 2.0 * Magic.GRAVITY_MAX, 4.0)
+                                && Magic.enoughFrictionEnvelope(thisMove, lastMove, Magic.FRICTION_MEDIUM_LAVA, 0.0, 2.0 * Magic.GRAVITY_MAX, 4.0)
                                 )
                         )
                 // 0: Not normal envelope.
@@ -158,7 +160,9 @@ public class MagicAir {
      * @param data
      * @return If the condition applies, i.e. if to exempt.
      */
-    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, 
+            final double yDistance, final double yDistChange, final double yDistDiffEx, 
+            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
         // TODO: Identify spots only to apply with limited LiftOffEnvelope (some guards got removed before switching to that).
         // TODO: Cleanup pending.
         // Old condition (normal lift-off envelope).
@@ -181,7 +185,7 @@ public class MagicAir {
                         // 1: Head is obstructed. 
                         // TODO: Cover this in a more generic way elsewhere (<= friction envelope + obstructed).
                         || lastMove.yDistance >= 0.0 && yDistance < Magic.GRAVITY_ODD
-                        && (data.thisMove.headObstructed || lastMove.headObstructed)
+                        && (thisMove.headObstructed || lastMove.headObstructed)
                         // 1: Break the block underneath.
                         || lastMove.yDistance < 0.0 && lastMove.to.extraPropertiesValid && lastMove.to.onGround
                         && yDistance >= -Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN && yDistance <= Magic.GRAVITY_MIN
@@ -272,11 +276,11 @@ public class MagicAir {
      */
     private static boolean oddFriction(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // Use past move data for two moves.
-        final MoveData pastMove1 = data.moveData.get(1);
+        final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
         if (!lastMove.to.extraPropertiesValid || !pastMove1.toIsValid || !pastMove1.to.extraPropertiesValid) {
             return false;
         }
-        final MoveData thisMove = data.thisMove;
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         return 
                 // 0: First move into air, moving out of liquid.
                 // (These should probably be oddLiquid cases, might pull pastMove1 to vDistAir later.)
@@ -349,8 +353,8 @@ public class MagicAir {
     @SuppressWarnings("unused")
     private static boolean oddElytra(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
         // Organize cases differently here, at the cost of reaching some nesting level, in order to see if it's better to overview.
-        final MoveData thisMove = data.thisMove;
-        final MoveData pastMove1 = data.moveData.get(1); // Checked below, if needed.
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final MoveData pastMove1 = data.playerMoves.getSecondPastMove(); // Checked below, if needed.
         // Both descending moves.
         if (thisMove.yDistance < 0.0 && lastMove.yDistance < 0.0) {
             // Falling too slow.
@@ -403,13 +407,13 @@ public class MagicAir {
     public static boolean oddJunction(final PlayerLocation from, final PlayerLocation to,
             final double yDistance, final double yDistChange, final double yDistDiffEx, 
             final double maxJumpGain, final boolean resetTo,
-            final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+            final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
         // TODO: Cleanup/reduce signature (accept thisMove.yDistance etc.).
-        if (MagicAir.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, lastMove, data)) {
+        if (MagicAir.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data)) {
             // Jump after leaving the liquid near ground.
             return true;
         }
-        if (MagicAir.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, lastMove, data)) {
+        if (MagicAir.oddGravity(from, to, yDistance, yDistChange, yDistDiffEx, thisMove, lastMove, data)) {
             // Starting to fall / gravity effects.
             return true;
         }

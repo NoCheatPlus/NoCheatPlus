@@ -82,10 +82,11 @@ public class LostGround {
      * @return
      */
     private static boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         final double setBackYDistance = to.getY() - data.getSetBackY();
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
-        // TODO: || yDistance <= jump estimate? 
+        // TODO: || yDistance <= jump estimate?
         if (yDistance <= cc.sfStepHeight && hDistance <= 1.5) { // hDistance is arbitrary, just to confine.
             if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier)) {
                 // Half block step up (definitive).
@@ -93,7 +94,7 @@ public class LostGround {
                 if (to.isOnGround()) {
                     // TODO: hDistance > 0.0
                     if (lastMove.yDistance < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
-                        return applyLostGround(player, from, true, data, "step", tags);
+                        return applyLostGround(player, from, true, thisMove, data, "step", tags);
                     }
                 }
                 // Noob tower (moving up placing blocks underneath). Rather since 1.9: player jumps off with 0.4 speed but ground within 0.42.
@@ -102,7 +103,7 @@ public class LostGround {
                 if (yDistance > 0.0 && yDistance < maxJumpGain && lastMove.yDistance < 0.0 && maxJumpGain > yDistance 
                         && Math.abs(lastMove.yDistance) + Magic.GRAVITY_MAX > cc.yOnGround + maxJumpGain - yDistance
                         && from.isOnGround(cc.yOnGround + maxJumpGain - yDistance)) {
-                    return applyLostGround(player, from, true, data, "nbtwr", tags);
+                    return applyLostGround(player, from, true, thisMove, data, "nbtwr", tags);
                 }
             }
 
@@ -114,7 +115,7 @@ public class LostGround {
                 if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
                     // TODO: Set a data property, so vdist does not trigger (currently: scan for tag)
                     // TODO: !to.isOnGround?
-                    return applyLostGround(player, from, false, data, "couldstep", tags);
+                    return applyLostGround(player, from, false, thisMove, data, "couldstep", tags);
                 }
                 // Close by ground miss (client side blocks y move, but allows h move fully/mostly, missing the edge on server side).
                 // Possibly confine by more criteria.
@@ -143,7 +144,7 @@ public class LostGround {
                     else if (from.isOnGround(from.getyOnGround(), 0.0625, 0.0)) {
                         // (Minimal margin.)
                         //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
-                        return applyLostGround(player, from, false, data, "edgeasc2", tags); // Maybe true ?
+                        return applyLostGround(player, from, false, thisMove, data, "edgeasc2", tags); // Maybe true ?
                     }
                 }
             }
@@ -221,7 +222,7 @@ public class LostGround {
         if (BlockProperties.isOnGroundShuffled(blockCache, x1, y1, z1, x2, y1, z2, xzMargin, yOnGround, 0.0)) {
             //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
             // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
-            return applyLostGround(player, new Location(world, x2, y2, z2), true, data, "edge" + tag, tags, mcAccess); // Maybe true ?
+            return applyLostGround(player, new Location(world, x2, y2, z2), true, data.playerMoves.getCurrentMove(), data, "edge" + tag, tags, mcAccess); // Maybe true ?
         } else {
             return false;
         }
@@ -246,7 +247,7 @@ public class LostGround {
     private static boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
-
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         final double setBackYDistance = to.getY() - data.getSetBackY();
 
         // Collides vertically.
@@ -259,7 +260,7 @@ public class LostGround {
             ref.setY(to.getY());
             if (BlockProperties.isPassable(from.getLocation(), ref)) {
                 // TODO: Needs new model (store detailed on-ground properties).
-                return applyLostGround(player, from, false, data, "vcollide", tags);
+                return applyLostGround(player, from, false, thisMove, data, "vcollide", tags);
             }
         }
 
@@ -278,7 +279,7 @@ public class LostGround {
                     // TODO: further narrow down bounds ?
                     // Temporary "fix".
                     // TODO: Seems to virtually always be preceded by a "vcollide" move.
-                    return applyLostGround(player, from, true, data, "pyramid", tags);
+                    return applyLostGround(player, from, true, thisMove, data, "pyramid", tags);
                 }
             }
 
@@ -288,7 +289,7 @@ public class LostGround {
                 if (from.isOnGround(0.25, 0.4, 0, 0L) ) {
                     // Temporary "fix".
                     //data.sfThisAllowBunny = true;
-                    return applyLostGround(player, from, true, data, "ministep", tags);
+                    return applyLostGround(player, from, true, thisMove, data, "ministep", tags);
                 }
             }
         }
@@ -299,7 +300,7 @@ public class LostGround {
             // Also clear accounting data.
             //			if (to.isOnGround(0.5) || from.isOnGround(0.5)) {
             if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))) {
-                return applyLostGround(player, from, true, data, "edgedesc", tags);
+                return applyLostGround(player, from, true, thisMove, data, "edgedesc", tags);
             }
         }
 
@@ -336,7 +337,7 @@ public class LostGround {
             // TODO: Interpolation method (from to)?
             if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.3, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))) {
                 // (Usually yDistance should be -0.078)
-                return applyLostGround(player, from, true, data, "fastedge", tags);
+                return applyLostGround(player, from, true, data.playerMoves.getCurrentMove(), data, "fastedge", tags);
             }
         }
         return false;
@@ -351,14 +352,14 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         if (setBackSafe) {
             data.setSetBack(refLoc);
         }
         else {
             // Keep Set-back.
         }
-        return applyLostGround(player, data, tag, tags, mcAccess);
+        return applyLostGround(player, thisMove, data, tag, tags, mcAccess);
     }
 
     /**
@@ -370,7 +371,7 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MovingData data, final String tag, final Collection<String> tags) {
+    private static boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags) {
         // Set the new setBack and reset the jumpPhase.
         if (setBackSafe) {
             data.setSetBack(refLoc);
@@ -378,7 +379,7 @@ public class LostGround {
         else {
             // Keep Set-back.
         }
-        return applyLostGround(player, data, tag, tags, refLoc.getMCAccess());
+        return applyLostGround(player, thisMove, data, tag, tags, refLoc.getMCAccess());
     }
 
     /**
@@ -390,15 +391,15 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean applyLostGround(final Player player, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         // Reset the jumpPhase.
         // ? set jumpphase to 1 / other, depending on stuff ?
         data.sfJumpPhase = 0;
         data.jumpAmplifier = MovingUtil.getJumpAmplifier(player, mcAccess);
         data.clearAccounting();
         // Tell NoFall that we assume the player to have been on ground somehow.
-        data.thisMove.touchedGround = true;
-        data.thisMove.touchedGroundWorkaround = true;
+        thisMove.touchedGround = true;
+        thisMove.touchedGroundWorkaround = true;
         tags.add("lostground_" + tag);
         return true;
     }

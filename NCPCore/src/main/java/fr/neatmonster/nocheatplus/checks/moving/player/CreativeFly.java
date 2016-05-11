@@ -60,13 +60,13 @@ public class CreativeFly extends Check {
         // Some edge data for this move.
         final GameMode gameMode = player.getGameMode();
         final ModelFlying model = cc.getModelFlying(player, from);
-        final MoveData thisMove = data.thisMove;
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         //        if (!data.thisMove.from.extraPropertiesValid) {
         //            // TODO: Confine by model config flag or just always do [if the latter: do it in the listener]?
         //            data.thisMove.setExtraProperties(from, to);
         //        }
         thisMove.modelFlying = model;
-        final MoveData lastMove = data.moveData.getFirst();
+        final MoveData lastMove = data.playerMoves.getFirstPastMove();
 
         // Calculate some distances.
         final double yDistance = thisMove.yDistance;
@@ -416,7 +416,7 @@ public class CreativeFly extends Check {
             }
             else if (thisMove.hDistance > Magic.GRAVITY_MIN && yDistance < lastMove.yDistance) {
                 // (Decreasing y-distance.)
-                final MoveData pastMove1 = data.moveData.get(1);
+                final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
                 if (pastMove1.toIsValid && pastMove1.to.extraPropertiesValid) {
                     // Demand this being the first one, or decreasing by a decent amount with past two moves.
                     if (
@@ -483,13 +483,14 @@ public class CreativeFly extends Check {
     }
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
-        final MoveData lastMove = data.moveData.getFirst();
+        final MoveData lastMove = data.playerMoves.getFirstPastMove();
         StringBuilder builder = new StringBuilder(350);
         final String dHDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(hDistance, lastMove.hDistance) + ")" : "";
         final String dYDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(yDistance, lastMove.yDistance)+ ")" : "";
         builder.append("hDist: " + hDistance + dHDist + " / " + limitH + " , vDist: " + yDistance + dYDist + " / " + limitV);
+        final MoveData thisMove = data.playerMoves.getCurrentMove();
         if (lastMove.toIsValid) {
-            builder.append(" , fdsq: " + StringUtil.fdec3.format(data.thisMove.distanceSquared / lastMove.distanceSquared));
+            builder.append(" , fdsq: " + StringUtil.fdec3.format(thisMove.distanceSquared / lastMove.distanceSquared));
         }
         if (data.verVelUsed != null) {
             builder.append(" , vVelUsed: " + data.verVelUsed);
@@ -500,7 +501,7 @@ public class CreativeFly extends Check {
             builder.append(StringUtil.join(tags, "+"));
         }
         builder.append(" , jumpphase: " + data.sfJumpPhase);
-        data.thisMove.addExtraProperties(builder, " , ");
+        thisMove.addExtraProperties(builder, " , ");
         debug(player, builder.toString());
     }
 

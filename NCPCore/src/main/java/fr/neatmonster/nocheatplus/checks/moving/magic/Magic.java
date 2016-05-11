@@ -33,10 +33,10 @@ public class Magic {
     public static final double modBlock             = 0.16D / WALK_SPEED;
     public static final double modSwim              = 0.115D / WALK_SPEED;
     public static final double[] modDepthStrider    = new double[] {
-        1.0,
-        0.1645 / modSwim / WALK_SPEED,
-        0.1995 / modSwim / WALK_SPEED,
-        1.0 / modSwim, // Results in walkspeed.
+            1.0,
+            0.1645 / modSwim / WALK_SPEED,
+            0.1995 / modSwim / WALK_SPEED,
+            1.0 / modSwim, // Results in walkspeed.
     };
     public static final double modWeb               = 0.105D / WALK_SPEED; // TODO: walkingSpeed * 0.15D; <- does not work
     public static final double modIce                 = 2.5D; // 
@@ -264,9 +264,9 @@ public class Magic {
      * @return
      */
     public static boolean fallAfterHeadObstructed(final MovingData data, int limit) {
-        limit = Math.min(limit, data.moveData.size());
+        limit = Math.min(limit, data.playerMoves.getNumberOfPastMoves());
         for (int i = 0; i < limit; i++) {
-            final MoveData move = data.moveData.get(i);
+            final MoveData move = data.playerMoves.getPastMove(i);
             if (!move.toIsValid || move.yDistance >= 0.0) {
                 return false;
             }
