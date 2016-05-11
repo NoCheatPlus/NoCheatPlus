@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks.moving.magic;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -20,7 +20,7 @@ public class MagicAir {
      * @return If to skip those sub-checks.
      */
     public static boolean venvHacks(final PlayerLocation from, final PlayerLocation to, final double yDistance, final double yDistChange, 
-            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         return 
                 // 0: Intended for cobweb.
                 // TODO: Bounding box issue ?
@@ -64,7 +64,7 @@ public class MagicAir {
      * @param data
      * @return
      */
-    private static boolean oddSlope(final PlayerLocation to, final double yDistance, final double maxJumpGain, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddSlope(final PlayerLocation to, final double yDistance, final double maxJumpGain, final double yDistDiffEx, final PlayerMoveData lastMove, final MovingData data) {
         return data.sfJumpPhase == 1 //&& data.fromWasReset 
                 && Math.abs(yDistDiffEx) < 2.0 * Magic.GRAVITY_SPAN 
                 && lastMove.yDistance > 0.0 && yDistance < lastMove.yDistance
@@ -88,7 +88,7 @@ public class MagicAir {
      * @return If the exemption condition applies.
      */
     private static boolean oddLiquid(final double yDistance, final double yDistDiffEx, final double maxJumpGain, final boolean resetTo, 
-            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Relate jump phase to last/second-last move fromWasReset (needs keeping that data in classes).
         // TODO: And distinguish where JP=2 is ok?
         // TODO: Most are medium transitions with the possibility to keep/alter friction or even speed on 1st/2nd move (counting in the transition).
@@ -162,7 +162,7 @@ public class MagicAir {
      */
     private static boolean oddGravity(final PlayerLocation from, final PlayerLocation to, 
             final double yDistance, final double yDistChange, final double yDistDiffEx, 
-            final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Identify spots only to apply with limited LiftOffEnvelope (some guards got removed before switching to that).
         // TODO: Cleanup pending.
         // Old condition (normal lift-off envelope).
@@ -274,13 +274,13 @@ public class MagicAir {
      * @param data
      * @return
      */
-    private static boolean oddFriction(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddFriction(final double yDistance, final double yDistDiffEx, final PlayerMoveData lastMove, final MovingData data) {
         // Use past move data for two moves.
-        final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
+        final PlayerMoveData pastMove1 = data.playerMoves.getSecondPastMove();
         if (!lastMove.to.extraPropertiesValid || !pastMove1.toIsValid || !pastMove1.to.extraPropertiesValid) {
             return false;
         }
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         return 
                 // 0: First move into air, moving out of liquid.
                 // (These should probably be oddLiquid cases, might pull pastMove1 to vDistAir later.)
@@ -351,10 +351,10 @@ public class MagicAir {
      * @return
      */
     @SuppressWarnings("unused")
-    private static boolean oddElytra(final double yDistance, final double yDistDiffEx, final MoveData lastMove, final MovingData data) {
+    private static boolean oddElytra(final double yDistance, final double yDistDiffEx, final PlayerMoveData lastMove, final MovingData data) {
         // Organize cases differently here, at the cost of reaching some nesting level, in order to see if it's better to overview.
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
-        final MoveData pastMove1 = data.playerMoves.getSecondPastMove(); // Checked below, if needed.
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData pastMove1 = data.playerMoves.getSecondPastMove(); // Checked below, if needed.
         // Both descending moves.
         if (thisMove.yDistance < 0.0 && lastMove.yDistance < 0.0) {
             // Falling too slow.
@@ -407,7 +407,7 @@ public class MagicAir {
     public static boolean oddJunction(final PlayerLocation from, final PlayerLocation to,
             final double yDistance, final double yDistChange, final double yDistDiffEx, 
             final double maxJumpGain, final boolean resetTo,
-            final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
         // TODO: Cleanup/reduce signature (accept thisMove.yDistance etc.).
         if (MagicAir.oddLiquid(yDistance, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data)) {
             // Jump after leaving the liquid near ground.

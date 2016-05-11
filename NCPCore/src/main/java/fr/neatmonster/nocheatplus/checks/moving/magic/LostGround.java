@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -36,7 +36,7 @@ public class LostGround {
      * @param cc
      * @return If touching the ground was lost.
      */
-    public static boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+    public static boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         // TODO: Regroup with appropriate conditions (toOnGround first?).
         // TODO: Some workarounds allow step height (0.6 on MC 1.8).
         // TODO: yDistance limit does not seem to be appropriate.
@@ -81,8 +81,8 @@ public class LostGround {
      * @param cc
      * @return
      */
-    private static boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+    private static boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final double setBackYDistance = to.getY() - data.getSetBackY();
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
@@ -168,7 +168,7 @@ public class LostGround {
      * @param cc
      * @return
      */
-    public static boolean lostGroundStill(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+    public static boolean lostGroundStill(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         if (lastMove.yDistance <= -0.23) {
             // TODO: Code duplication with edgeasc5 above.
             if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc7", tags, from.getMCAccess())) {
@@ -195,7 +195,7 @@ public class LostGround {
      * @param tag
      * @return
      */
-    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final MoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final PlayerMoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.x, lastMove.from.y, lastMove.from.z, lastMove.hDistance, width, yOnGround, data, tag, tags, mcAccess);
     }
 
@@ -244,10 +244,10 @@ public class LostGround {
      * @param cc
      * @return
      */
-    private static boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+    private static boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final double setBackYDistance = to.getY() - data.getSetBackY();
 
         // Collides vertically.
@@ -324,7 +324,7 @@ public class LostGround {
      * @param cc
      * @return
      */
-    private static boolean lostGroundFastDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+    private static boolean lostGroundFastDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         // TODO: re-organize for faster exclusions (hDistance, yDistance).
         // TODO: more strict conditions 
         // Lost ground while falling onto/over edges of blocks.
@@ -352,7 +352,7 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean applyLostGround(final Player player, final Location refLoc, final boolean setBackSafe, final PlayerMoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         if (setBackSafe) {
             data.setSetBack(refLoc);
         }
@@ -371,7 +371,7 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags) {
+    private static boolean applyLostGround(final Player player, final PlayerLocation refLoc, final boolean setBackSafe, final PlayerMoveData thisMove, final MovingData data, final String tag, final Collection<String> tags) {
         // Set the new setBack and reset the jumpPhase.
         if (setBackSafe) {
             data.setSetBack(refLoc);
@@ -391,7 +391,7 @@ public class LostGround {
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
      */
-    private static boolean applyLostGround(final Player player, final MoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    private static boolean applyLostGround(final Player player, final PlayerMoveData thisMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         // Reset the jumpPhase.
         // ? set jumpphase to 1 / other, depending on stuff ?
         data.sfJumpPhase = 0;

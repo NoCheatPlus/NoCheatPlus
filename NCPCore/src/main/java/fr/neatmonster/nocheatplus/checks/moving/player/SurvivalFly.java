@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicAir;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicLiquid;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -99,8 +99,8 @@ public class SurvivalFly extends Check {
             justUsedWorkarounds.clear();
             data.ws.setJustUsedIds(justUsedWorkarounds);
         }
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         final boolean isSamePos = from.isSamePos(to);
 
         // Calculate some distances.
@@ -643,10 +643,10 @@ public class SurvivalFly extends Check {
      *            Only set to true after having failed with it set to false.
      * @return Allowed distance.
      */
-    private double setAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final MoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+    private double setAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final PlayerMoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         double hAllowedDistance = 0D;
 
         final boolean sfDirty = data.isVelocityJumpPhase();
@@ -804,8 +804,8 @@ public class SurvivalFly extends Check {
      * Core y-distance checks for in-air movement (may include air -> other).
      * @return
      */
-    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, final boolean mightBeMultipleMoves, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, final boolean mightBeMultipleMoves, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;
         double vDistanceAboveLimit = 0.0;
@@ -1107,7 +1107,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private double vAllowedDistanceNoData(final MoveData thisMove, final MoveData lastMove, 
+    private double vAllowedDistanceNoData(final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
             final double maxJumpGain, final double jumpGainMargin, 
             final MovingData data, final MovingConfig cc) {
         if (lastMove.valid) {
@@ -1149,7 +1149,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
         double vDistanceAboveLimit = 0;
 
         // y direction change detection.
@@ -1239,7 +1239,7 @@ public class SurvivalFly extends Check {
      * @param vDistanceAboveLimit
      * @return vDistanceAboveLimit
      */
-    private double yDirChange(final PlayerLocation from, final PlayerLocation to, final double yDistance, double vDistanceAboveLimit, final MoveData lastMove, final MovingData data) {
+    private double yDirChange(final PlayerLocation from, final PlayerLocation to, final double yDistance, double vDistanceAboveLimit, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Does this account for velocity in a sufficient way?
         if (yDistance > 0) {
             // TODO: Clear active vertical velocity here ?
@@ -1314,7 +1314,7 @@ public class SurvivalFly extends Check {
      * @param skipPermChecks
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
-    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
+    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
 
         // TODO: Still not entirely sure about this checking order.
         // TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
@@ -1382,7 +1382,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return hDistanceAboveLimit
      */
-    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final MoveData thisMove, final MoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
         boolean allowHop = true;
         boolean double_bunny = false;
@@ -1556,7 +1556,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return vAllowedDistance, vDistanceAboveLimit
      */
-    private double[] vDistLiquid(final PlayerLocation from, final PlayerLocation to, final boolean toOnGround, final double yDistance, final MoveData lastMove, final MovingData data) {
+    private double[] vDistLiquid(final PlayerLocation from, final PlayerLocation to, final boolean toOnGround, final double yDistance, final PlayerMoveData lastMove, final MovingData data) {
         data.sfNoLowJump = true;
 
         // Expected envelopes.
@@ -1844,8 +1844,8 @@ public class SurvivalFly extends Check {
             final double hDistance, final double hAllowedDistance, final double hFreedom, final double yDistance, final double vAllowedDistance,
             final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
         // TODO: Show player name once (!)
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         final StringBuilder builder = new StringBuilder(500);
         builder.append(CheckUtils.getLogMessagePrefix(player, type));
         final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");

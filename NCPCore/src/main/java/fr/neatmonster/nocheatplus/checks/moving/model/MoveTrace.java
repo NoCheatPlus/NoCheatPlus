@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
 
 /**
  * Encapsulate past move tracking here.
@@ -9,10 +10,10 @@ import java.util.LinkedList;
  * @author asofold
  *
  */
-public class MoveTrace {
+public class MoveTrace <MD extends MoveData> {
 
     // TODO: Class name.
-    // TODO: With splitting to PlayerMoveData and VehicleMoveData, a generic type parameter would be needed here. 
+    // TODO: With splitting to MD and VehicleMoveData, a generic type parameter would be needed here. 
 
     /**
      * Keep track of past moves edge data. First entry always is the last fully
@@ -20,26 +21,40 @@ public class MoveTrace {
      * processed move always is currentMove. The list length always stays the
      * same.
      */
-    private final LinkedList<MoveData> pastMoves = new LinkedList<MoveData>();
+    private final LinkedList<MD> pastMoves = new LinkedList<MD>();
 
     /**
      * The move currently being processed. Will be inserted to first position
      * when done, and exchanged for the invalidated last element of the past
      * moves.
      */
-    private MoveData currentMove = new MoveData();
+    private MD currentMove;
 
     /**
      * Minimal and default size is 2 past moves with current move set extra.
+     * 
+     * @param factory
+     *            Just abused to get instances of the desired type. Not intended
+     *            to throw an Exception.
+     * @param size
+     *            Number of past moves to store extra to the current move.
      */
-    public MoveTrace() {
-        // Past moves data: initialize with dummies.
-        for (int i = 0; i < 2; i++) { // Two past moves allow better workarounds than 1.
-            pastMoves.add(new MoveData());
+    public MoveTrace(final Callable<MD> factory, final int size) {
+        try {
+            // Past moves data: initialize with dummies.
+            for (int i = 0; i < size; i++) { // Two past moves allow better workarounds than 1.
+                pastMoves.add(factory.call());
+            }
+            // Current move as well.
+            currentMove = factory.call();
+        }
+        catch (Exception dummy) {
+            // Must not happen.
+            throw new RuntimeException(dummy);
         }
     }
 
-    public MoveData getCurrentMove() {
+    public MD getCurrentMove() {
         return currentMove;
     }
 
@@ -58,7 +73,7 @@ public class MoveTrace {
      * 
      * @return
      */
-    public MoveData getFirstPastMove() {
+    public MD getFirstPastMove() {
         return pastMoves.getFirst();
     }
 
@@ -68,7 +83,7 @@ public class MoveTrace {
      * 
      * @return
      */
-    public MoveData getSecondPastMove() {
+    public MD getSecondPastMove() {
         return pastMoves.get(1);
     }
 
@@ -79,7 +94,7 @@ public class MoveTrace {
      * @param index
      * @return
      */
-    public MoveData getPastMove(final int index) {
+    public MD getPastMove(final int index) {
         return pastMoves.get(index);
     }
 
@@ -87,7 +102,7 @@ public class MoveTrace {
      * Invalidate the current move and all past moves.
      */
     public void invalidate() {
-        final Iterator<MoveData> it = pastMoves.iterator();
+        final Iterator<MD> it = pastMoves.iterator();
         while (it.hasNext()) {
             // TODO: If using many elements ever, stop at the first already invalidated one.
             it.next().invalidate();

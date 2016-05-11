@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -14,11 +13,6 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  *
  */
 public class MoveData {
-
-    /**
-     * Not enforced, but meant to be an invalidated MoveData instance.
-     */
-    public static final MoveData alwaysInvalidated = new MoveData();
 
     //////////////////////////////////////////
     // Guaranteed to be initialized with set.
@@ -70,20 +64,14 @@ public class MoveData {
     // Reset with set, could be lazily set during checking.
     //////////////////////////////////////////////////////////
 
-    // Properties of the player.
-
-    /**
-     * Typical maximum walk speed, accounting for player capabilities. Set in
-     * SurvivalFly.check.
-     */
-    public double walkSpeed;
-
     // Properties involving the environment.
 
     /**
-     * Head is obstructed. Should expect descending next move, if in air. <br>
+     * Head is obstructed for a living entity, or can't/couldn't move up due to
+     * being blocked somehow. Should expect descending next move, if in air.
+     * <br>
      * Set at the beginning of SurvivalFly.check, if either end-point is not on
-     * ground.
+     * ground. (Not sure if used for vehicles.)
      */
     public boolean headObstructed;
 
@@ -107,41 +95,6 @@ public class MoveData {
      */
     public boolean touchedGroundWorkaround;
 
-    // Bounds set by checks.
-
-    /**
-     * Allowed horizontal base distance (as if moving off the spot, excluding
-     * bunny/friction). Set in SurvivalFly.check.
-     */
-    public double hAllowedDistanceBase;
-
-    /**
-     * Allowed horizontal distance (including frictions, workarounds like bunny
-     * hopping). Set in SurvivalFly.check.
-     */
-    public double hAllowedDistance;
-
-    /** This move was a bunny hop. */
-    public boolean bunnyHop;
-
-    // TODO: verVel/horvel used?
-
-    // Meta stuff.
-
-    /**
-     * The fly check that was using the current data. One of MOVING_SURVIVALFLY,
-     * MOVING_CREATIVEFLY, UNKNOWN.
-     */
-    public CheckType flyCheck;
-
-    /**
-     * The ModelFlying instance used with this move, will be null if it doesn't
-     * apply.
-     */
-    public ModelFlying modelFlying;
-
-    public boolean mightBeMultipleMoves;
-
     private void setPositions(final IPositionWithLook from, final IPositionWithLook to) {
         this.from.setLocation(from);
         this.to.setLocation(to);
@@ -164,25 +117,18 @@ public class MoveData {
         toIsValid = false;
     }
 
-    private void resetBase() {
+    /**
+     * Valid is set to true here, so call this last on overriding.
+     */
+    protected void resetBase() {
         // Reset extra properties.
         from.extraPropertiesValid = false;
         to.extraPropertiesValid = false;
-        // Properties of the player.
-        walkSpeed = 0.2;
         // Properties involving the environment.
         headObstructed = false;
         downStream = false;
         touchedGround = false;
         touchedGroundWorkaround = false;
-        bunnyHop = false;
-        // Bounds set by checks.
-        hAllowedDistanceBase = 0.0;
-        hAllowedDistance = 0.0;
-        // Meta stuff.
-        flyCheck = CheckType.UNKNOWN;
-        modelFlying = null;
-        mightBeMultipleMoves = false;
         // Done.
         valid = true;
     }

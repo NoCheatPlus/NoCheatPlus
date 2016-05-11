@@ -49,7 +49,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.player.CreativeFly;
 import fr.neatmonster.nocheatplus.checks.moving.player.MorePackets;
@@ -405,7 +405,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MoveInfo moveInfo = aux.useMoveInfo();
         final Location loc = player.getLocation(moveInfo.useLoc);
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
         if (
                 // Handling split moves has been disabled.
@@ -552,12 +552,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Set some data for this move.
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         thisMove.set(pFrom, pTo);
         if (mightBeMultipleMoves) {
             thisMove.mightBeMultipleMoves = true;
         }
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
 
         // Potion effect "Jump".
         final double jumpAmplifier = aux.getJumpAmplifier(player);
@@ -804,7 +804,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      * @return True, if bounce has been used, i.e. to do without fall damage.
      */
-    private boolean onPreparedBounceSupport(Player player, Location from, Location to, MoveData lastMove, int tick, MovingData data) {
+    private boolean onPreparedBounceSupport(Player player, Location from, Location to, PlayerMoveData lastMove, int tick, MovingData data) {
         if (to.getY() > from.getY() || to.getY() == from.getY() && data.verticalBounce.value < 0.13) {
             // Apply bounce.
             if (to.getY() == from.getY()) {
@@ -841,8 +841,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     @SuppressWarnings("unused")
     private Location checkExtremeMove(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         // TODO: Latency effects.
         double violation = 0.0; // h + v violation (full move).
         // Vertical move.
@@ -926,7 +926,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      */
     private void workaroundFlyNoFlyTransition(final Player player, final int tick, final MovingData data) {
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         final double amount = guessFlyNoFlyVelocity(player, data.playerMoves.getCurrentMove(), lastMove, data);
         data.clearActiveHorVel(); // Clear active velocity due to adding actual speed here.
         data.addHorizontalVelocity(new AccountEntry(tick, amount, 1, MovingData.getHorVelValCount(amount)));
@@ -942,14 +942,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
     }
 
-    private static double guessFlyNoFlyVelocity(final Player player, final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+    private static double guessFlyNoFlyVelocity(final Player player, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // Default margin: Allow slightly less than the previous speed.
         final double defaultAmount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0;
         // Test for exceptions.
         if (thisMove.hDistance > defaultAmount && Bridge1_9.isGlidingWithElytra(player)) {
             // Allowing the same speed won't always work on elytra (still increasing, differing modeling on client side with motXYZ).
             // (Doesn't seem to be overly effective.)
-            final MoveData secondPastMove = data.playerMoves.getSecondPastMove();
+            final PlayerMoveData secondPastMove = data.playerMoves.getSecondPastMove();
             if (lastMove.modelFlying != null && secondPastMove.modelFlying != null && Magic.glideEnvelopeWithHorizontalGain(thisMove, lastMove, secondPastMove)) {
                 return thisMove.hDistance + Magic.GLIDE_HORIZONTAL_GAIN_MAX;
             }
@@ -973,7 +973,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
         double effect = Math.min(3.5, base + Math.min(base / 10.0, Magic.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         if (effect > 0.42 && lastMove.toIsValid) {
             // Extra cap by last y distance(s).
             final double max_gain = Math.abs(lastMove.yDistance < 0.0 ? Math.min(lastMove.yDistance, toY - fromY) : (toY - fromY)) - Magic.GRAVITY_SPAN;
@@ -1118,7 +1118,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else {
             // TODO: Detect differing location (a teleport event would follow).
-            final MoveData lastMove = mData.playerMoves.getFirstPastMove();
+            final PlayerMoveData lastMove = mData.playerMoves.getFirstPastMove();
             if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.x, lastMove.to.y, lastMove.to.z)) {
                 // Something odd happened.
                 aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
@@ -1609,7 +1609,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Force-load chunks [log if (!)] ?
             // TODO: Consider to catch all, at least (debug-) logging-wise.
             if (!BlockProperties.isPassable(loc)) {
-                final MoveData lastMove = data.playerMoves.getFirstPastMove();
+                final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
                 if (lastMove.toIsValid) {
                     final Location refLoc = new Location(loc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
                     final double d = refLoc.distanceSquared(loc);
@@ -1772,7 +1772,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
             // Teleport back. 
             // TODO: Add history / alert?

@@ -1,7 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.magic;
 
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 
 /**
  * Keeping some of the magic confined in here.
@@ -134,7 +134,7 @@ public class Magic {
      *            must fit into the decrease from lastMove to thisMove.
      * @return
      */
-    public static boolean enoughFrictionEnvelope(final MoveData thisMove, final MoveData lastMove, final double friction, 
+    public static boolean enoughFrictionEnvelope(final PlayerMoveData thisMove, final PlayerMoveData lastMove, final double friction, 
             final double minGravity, final double maxOff, final double decreaseByOff) {
         // TODO: Elaborate... could have one method to test them all?
         final double frictDist = lastMove.yDistance * friction - minGravity;
@@ -151,7 +151,7 @@ public class Magic {
      *            Move before thisMove.
      * @return
      */
-    static boolean splashMove(final MoveData thisMove, final MoveData lastMove) {
+    static boolean splashMove(final PlayerMoveData thisMove, final PlayerMoveData lastMove) {
         // Use past move data for two moves.
         return !thisMove.touchedGround && thisMove.from.inWater && !thisMove.to.resetCond // Out of water.
                 && !lastMove.touchedGround && !lastMove.from.resetCond && lastMove.to.inWater // Into water.
@@ -168,7 +168,7 @@ public class Magic {
      *            Move before thisMove.
      * @return
      */
-    static boolean splashMoveNonStrict(final MoveData thisMove, final MoveData lastMove) {
+    static boolean splashMoveNonStrict(final PlayerMoveData thisMove, final PlayerMoveData lastMove) {
         // Use past move data for two moves.
         return !thisMove.touchedGround && thisMove.from.inWater && !thisMove.to.resetCond // Out of water.
                 && !lastMove.from.resetCond && lastMove.to.inWater // Into water.
@@ -182,7 +182,7 @@ public class Magic {
      *            Not strictly the latest move in MovingData.
      * @return
      */
-    public static boolean inAir(final MoveData thisMove) {
+    public static boolean inAir(final PlayerMoveData thisMove) {
         return !thisMove.touchedGround && !thisMove.from.resetCond && !thisMove.to.resetCond;
     }
 
@@ -192,7 +192,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    static boolean inLiquid(final MoveData thisMove) {
+    static boolean inLiquid(final PlayerMoveData thisMove) {
         return thisMove.from.inLiquid && thisMove.to.inLiquid && excludeStaticSpeed(thisMove);
     }
 
@@ -202,7 +202,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    static boolean resetCond(final MoveData thisMove) {
+    static boolean resetCond(final PlayerMoveData thisMove) {
         return thisMove.from.resetCond || thisMove.to.resetCond;
     }
 
@@ -212,7 +212,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    static boolean leavingLiquid(final MoveData thisMove) {
+    static boolean leavingLiquid(final PlayerMoveData thisMove) {
         return thisMove.from.inLiquid && !thisMove.to.inLiquid && excludeStaticSpeed(thisMove);
     }
 
@@ -222,7 +222,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    static boolean intoLiquid(final MoveData thisMove) {
+    static boolean intoLiquid(final PlayerMoveData thisMove) {
         return !thisMove.from.inLiquid && thisMove.to.inLiquid && excludeStaticSpeed(thisMove);
     }
 
@@ -233,7 +233,7 @@ public class Magic {
      * @param thisMove
      * @return
      */
-    public static boolean excludeStaticSpeed(final MoveData thisMove) {
+    public static boolean excludeStaticSpeed(final PlayerMoveData thisMove) {
         return !thisMove.from.inWeb && !thisMove.to.inWeb
                 && !thisMove.from.onClimbable && !thisMove.to.onClimbable;
     }
@@ -248,7 +248,7 @@ public class Magic {
      * @param data
      * @return
      */
-    public static boolean skipPaper(final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+    public static boolean skipPaper(final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Confine to from at block level (offset 0)?
         final double setBackYDistance = thisMove.to.y - data.getSetBackY();
         return !lastMove.toIsValid && data.sfJumpPhase == 0 && thisMove.mightBeMultipleMoves
@@ -266,7 +266,7 @@ public class Magic {
     public static boolean fallAfterHeadObstructed(final MovingData data, int limit) {
         limit = Math.min(limit, data.playerMoves.getNumberOfPastMoves());
         for (int i = 0; i < limit; i++) {
-            final MoveData move = data.playerMoves.getPastMove(i);
+            final PlayerMoveData move = data.playerMoves.getPastMove(i);
             if (!move.toIsValid || move.yDistance >= 0.0) {
                 return false;
             }
@@ -301,7 +301,7 @@ public class Magic {
      *            Is checked for validity in here (needed).
      * @return
      */
-    public static boolean glideEnvelopeWithHorizontalGain(final MoveData thisMove, final MoveData lastMove, final MoveData pastMove1) {
+    public static boolean glideEnvelopeWithHorizontalGain(final PlayerMoveData thisMove, final PlayerMoveData lastMove, final PlayerMoveData pastMove1) {
         return pastMove1.toIsValid 
                 && Magic.glideVerticalGainEnvelope(thisMove.yDistance, lastMove.yDistance)
                 && Magic.glideVerticalGainEnvelope(lastMove.yDistance, pastMove1.yDistance)

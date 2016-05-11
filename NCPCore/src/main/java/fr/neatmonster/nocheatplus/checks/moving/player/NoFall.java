@@ -12,7 +12,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -126,7 +126,7 @@ public class NoFall extends Check {
      */
     public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, final MovingData data, final MovingConfig cc) {
 
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final LocationData from = thisMove.from;
         final LocationData to = thisMove.to;
 

@@ -1,17 +1,34 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import java.util.UUID;
 
-public class VehicleMoveData {
+import org.bukkit.entity.EntityType;
 
-    public double hDistance;
-    public double vDistance;
+/**
+ * Include vehicle move data for a move.
+ * 
+ * @author asofold
+ *
+ */
+public class VehicleMoveData extends PlayerMoveData {
 
-    public VehicleMoveData set(final RichEntityLocation from, final RichEntityLocation to) {
-        hDistance = TrigUtil.xzDistance(from, to);
-        vDistance = to.getY() - from.getY();
-        return this;
+    // Vehicle properties.
+    /**
+     * Unique identifier for the vehicle. Set at the start of some check (-ing).
+     */
+    public UUID vehicleId = null;
+    /** Type of the vehicle. Set at the start of some check (-ing). */
+    public EntityType vehicleType = null;
+
+    @Override
+    protected void resetBase() {
+        // Vehicle properties.
+        vehicleId = null;
+        vehicleType = null;
+        // Super class last, because it'll set valid to true in the end.
+        super.resetBase();
     }
+
+
 
 }

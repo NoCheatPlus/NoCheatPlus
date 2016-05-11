@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -18,7 +19,8 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveTrace;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
@@ -170,11 +172,21 @@ public class MovingData extends ACheckData {
     private int morePacketsSetBackResetTime = 0;
 
     /** Keep track of currently processed (if) and past moves for player moving. */
-    public final MoveTrace playerMoves = new MoveTrace();
+    public final MoveTrace <PlayerMoveData> playerMoves = new MoveTrace<PlayerMoveData>(new Callable<PlayerMoveData>() {
+        @Override
+        public PlayerMoveData call() throws Exception {
+            return new PlayerMoveData();
+        }
+    }, 2);
 
     /** Keep track of currently processed (if) and past moves for vehicle moving. */
     // TODO: There may be need to store such data with vehicles, or detect tandem abuse in a different way.
-    public final MoveTrace vehicleMoves = new MoveTrace();
+    public final MoveTrace <VehicleMoveData> vehicleMoves = new MoveTrace<VehicleMoveData>(new Callable<VehicleMoveData>() {
+        @Override
+        public VehicleMoveData call() throws Exception {
+            return new VehicleMoveData();
+        }
+    }, 2);
 
     // Velocity handling.
     /** Vertical velocity modeled as an axis (positive and negative possible) */
@@ -477,7 +489,7 @@ public class MovingData extends ACheckData {
     public void resetPositions(PlayerLocation loc) {
         resetPositions();
         if (loc != null) {
-            final MoveData lastMove = playerMoves.getFirstPastMove();
+            final PlayerMoveData lastMove = playerMoves.getFirstPastMove();
             // Always set with extra properties.
             lastMove.setWithExtraProperties(loc);
         }

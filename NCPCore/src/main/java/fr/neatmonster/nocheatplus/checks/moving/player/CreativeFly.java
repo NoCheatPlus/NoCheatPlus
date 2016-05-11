@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.LostGround;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -60,13 +60,13 @@ public class CreativeFly extends Check {
         // Some edge data for this move.
         final GameMode gameMode = player.getGameMode();
         final ModelFlying model = cc.getModelFlying(player, from);
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         //        if (!data.thisMove.from.extraPropertiesValid) {
         //            // TODO: Confine by model config flag or just always do [if the latter: do it in the listener]?
         //            data.thisMove.setExtraProperties(from, to);
         //        }
         thisMove.modelFlying = model;
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
 
         // Calculate some distances.
         final double yDistance = thisMove.yDistance;
@@ -247,7 +247,7 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitH, resultH (not normalized).
      */
-    private double[] hDist(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final boolean flying, final MoveData lastMove, final long time, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] hDist(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final boolean flying, final PlayerMoveData lastMove, final long time, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         // Modifiers.
         double fSpeed;
 
@@ -323,7 +323,7 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitV, resultV (not normalized).
      */
-    private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData thisMove, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         double limitV = model.vModAscendSpeed / 100.0 * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
         double resultV = 0.0;
         if (model.applyModifiers && flying && yDistance > 0.0) {
@@ -392,7 +392,7 @@ public class CreativeFly extends Check {
         return new double[] {limitV, resultV};
     }
 
-    private double hackLytra(final double yDistance, final double limitV, final MoveData thisMove, final MoveData lastMove, final MovingData data) {
+    private double hackLytra(final double yDistance, final double limitV, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Further: jumpphase vs. y-distance to set-back. Problem: velocity
         // TODO: Further: record max h and descend speeds and relate to those.
         // TODO: Demand total speed to decrease.
@@ -416,7 +416,7 @@ public class CreativeFly extends Check {
             }
             else if (thisMove.hDistance > Magic.GRAVITY_MIN && yDistance < lastMove.yDistance) {
                 // (Decreasing y-distance.)
-                final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
+                final PlayerMoveData pastMove1 = data.playerMoves.getSecondPastMove();
                 if (pastMove1.toIsValid && pastMove1.to.extraPropertiesValid) {
                     // Demand this being the first one, or decreasing by a decent amount with past two moves.
                     if (
@@ -448,7 +448,7 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitV, resultV
      */
-    private double[] vDistDescend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] vDistDescend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final PlayerMoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         double limitV = 0.0;
         double resultV = 0.0;
         // Note that 'extreme moves' are covered by the extreme move check.
@@ -471,7 +471,7 @@ public class CreativeFly extends Check {
      * @param cc
      * @return limitV, resultV
      */
-    private double[] vDistZero(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final MoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
+    private double[] vDistZero(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final PlayerMoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
         double limitV = 0.0;
         double resultV = 0.0;
         // TODO: Deny on enforcing mingain.
@@ -483,12 +483,12 @@ public class CreativeFly extends Check {
     }
 
     private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
-        final MoveData lastMove = data.playerMoves.getFirstPastMove();
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         StringBuilder builder = new StringBuilder(350);
         final String dHDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(hDistance, lastMove.hDistance) + ")" : "";
         final String dYDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(yDistance, lastMove.yDistance)+ ")" : "";
         builder.append("hDist: " + hDistance + dHDist + " / " + limitH + " , vDist: " + yDistance + dYDist + " / " + limitV);
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         if (lastMove.toIsValid) {
             builder.append(" , fdsq: " + StringUtil.fdec3.format(thisMove.distanceSquared / lastMove.distanceSquared));
         }

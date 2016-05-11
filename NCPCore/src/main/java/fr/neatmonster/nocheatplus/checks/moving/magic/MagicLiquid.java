@@ -1,7 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.magic;
 
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -25,12 +25,12 @@ public class MagicLiquid {
      * @return The allowed distance for reference, in case the move is allowed.
      *         If no workaround applies, null is returned.
      */
-    public static Double liquidWorkarounds(final PlayerLocation from, final PlayerLocation to, final double baseSpeed, final double frictDist, final MoveData lastMove, final MovingData data) {
-        final MoveData thisMove = data.playerMoves.getCurrentMove();
+    public static Double liquidWorkarounds(final PlayerLocation from, final PlayerLocation to, final double baseSpeed, final double frictDist, final PlayerMoveData lastMove, final MovingData data) {
+        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final double yDistance = thisMove.yDistance;
         // Special cases.
         // TODO: Re-arrange.
-        final MoveData pastMove1 = data.playerMoves.getSecondPastMove();
+        final PlayerMoveData pastMove1 = data.playerMoves.getSecondPastMove();
         if (yDistance >= 0) {
             // TODO: liftOffEnvelope: refine conditions (general) , should be near water level.
             // TODO: 1.5 high blocks ?

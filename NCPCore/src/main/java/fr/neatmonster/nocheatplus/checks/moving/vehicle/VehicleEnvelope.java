@@ -127,7 +127,9 @@ public class VehicleEnvelope extends Check {
             tags.add("illegalcoords");
             return true;
         }
-        final VehicleMoveData thisMove = new VehicleMoveData().set(rFrom, rTo);
+        final VehicleMoveData thisMove = new VehicleMoveData();
+        thisMove.set(rFrom, rTo);
+        // TODO: thisMove.setExtraProperties(rFrom, rTo);
 
         // TODO: Set up the minimum with illegal + extreme move checking.
         // TODO: Can attributes be used for generic checking jump + speed for all types?
@@ -170,7 +172,9 @@ public class VehicleEnvelope extends Check {
             tags.add("illegalcoords");
             return true;
         }
-        final VehicleMoveData thisMove = new VehicleMoveData().set(rFrom, rTo);
+        final VehicleMoveData thisMove = new VehicleMoveData();
+        thisMove.set(rFrom, rTo);
+        // TODO: thisMove.setExtraProperties(rFrom, rTo);
 
         // Delegate to sub checks by type of entity.
         if (vehicle instanceof Boat) {
@@ -217,7 +221,7 @@ public class VehicleEnvelope extends Check {
             if (data.debug) {
                 debugDetails.add("");
             }
-            //            if (thisMove.vDistance > 0.0) {
+            //            if (thisMove.yDistance > 0.0) {
             //                tags.add("ascend_web");
             //                return true;
             //            }
@@ -262,7 +266,7 @@ public class VehicleEnvelope extends Check {
             if (data.debug) {
                 debugDetails.add("air-air");
             }
-            if (thisMove.vDistance > 0.0) {
+            if (thisMove.yDistance > 0.0) {
                 tags.add("ascend_at_all");
                 return true;
             }
@@ -281,12 +285,12 @@ public class VehicleEnvelope extends Check {
             // Slow falling (vdist), do not bind to descending in general.
             final double minDescend = -MagicVehicle.boatGravityMin * data.sfJumpPhase;
             final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
-            if (data.sfJumpPhase > 1 && thisMove.vDistance > Math.max(minDescend, -MagicVehicle.boatVerticalFallTarget)) {
+            if (data.sfJumpPhase > 1 && thisMove.yDistance > Math.max(minDescend, -MagicVehicle.boatVerticalFallTarget)) {
                 tags.add("slow_fall_vdist");
                 violation = true;
             }
             // Fast falling (vdist).
-            else if (data.sfJumpPhase > 1 && thisMove.vDistance < maxDescend) {
+            else if (data.sfJumpPhase > 1 && thisMove.yDistance < maxDescend) {
                 tags.add("fast_fall_vdist");
                 violation = true;
             }
@@ -314,12 +318,12 @@ public class VehicleEnvelope extends Check {
             }
         }
         // Maximum ascend speed.
-        if (checkAscendMuch && thisMove.vDistance > MagicVehicle.maxAscend) {
+        if (checkAscendMuch && thisMove.yDistance > MagicVehicle.maxAscend) {
             tags.add("ascend_much");
             violation = true;
         }
         // Maximum descend speed.
-        if (checkDescendMuch && thisMove.vDistance < -MagicVehicle.maxDescend) {
+        if (checkDescendMuch && thisMove.yDistance < -MagicVehicle.maxDescend) {
             // TODO: At times it looks like one move is skipped, resulting in double distance ~ -5 and at the same time 'vehicle moved too quickly'. 
             // TODO: Test with log this to console to see the order of things.
             tags.add("descend_much");

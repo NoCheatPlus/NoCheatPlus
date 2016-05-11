@@ -27,7 +27,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
@@ -421,7 +421,7 @@ public class VehicleChecks extends CheckListener {
                 loc = vLoc; // 
                 if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
                     // TODO: This may need re-setting on player move -> vehicle move.
-                    final MoveData lastMove = data.playerMoves.getFirstPastMove();
+                    final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
                     if (lastMove.toIsValid) {
                         final Location oldLoc = new Location(pLoc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
                         if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {

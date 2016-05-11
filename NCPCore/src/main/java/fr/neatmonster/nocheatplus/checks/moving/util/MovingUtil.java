@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -159,7 +159,7 @@ public class MovingUtil {
             if (TrigUtil.isSamePos(loc, refLoc) && (entity instanceof Player)) {
                 final Player other = (Player) entity;
                 final MovingData otherData = MovingData.getData(other);
-                final MoveData otherLastMove = otherData.playerMoves.getFirstPastMove();
+                final PlayerMoveData otherLastMove = otherData.playerMoves.getFirstPastMove();
                 if (!otherLastMove.toIsValid) {
                     // Data might have been removed.
                     // TODO: Consider counting as tracked?
@@ -187,7 +187,7 @@ public class MovingUtil {
         }
         else {
             // TODO: Count and log to TRACE_FILE, if multiple locations would match (!).
-            final MoveData lastMove = untrackedData.playerMoves.getFirstPastMove();
+            final PlayerMoveData lastMove = untrackedData.playerMoves.getFirstPastMove();
             return new Location(loc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getYaw(), loc.getPitch());
         }
     }
@@ -252,7 +252,7 @@ public class MovingUtil {
         }
     }
 
-    public static void prepareFullCheck(final PlayerLocation from, final PlayerLocation to, final MoveData thisMove, final double yOnGround) {
+    public static void prepareFullCheck(final PlayerLocation from, final PlayerLocation to, final PlayerMoveData thisMove, final double yOnGround) {
         // Collect block flags.
         from.collectBlockFlags(yOnGround);
         if (from.isSamePos(to)) {

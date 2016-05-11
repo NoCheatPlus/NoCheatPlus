@@ -58,7 +58,7 @@ public class MagicVehicle {
     public static boolean oddInAir(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final MovingData data) {
         // TODO: Guard by past move tracking, instead of minDescend and maxDescend.
         // (Try individual if this time, let JIT do the rest.)
-        if (thisMove.vDistance < 0 && oddInAirDescend(thisMove, minDescend, maxDescend, data)) {
+        if (thisMove.yDistance < 0 && oddInAirDescend(thisMove, minDescend, maxDescend, data)) {
             return true;
         }
         return false;
@@ -75,7 +75,7 @@ public class MagicVehicle {
     private static boolean oddInAirDescend(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final MovingData data) {
         // TODO: Guard by past move tracking, instead of minDescend and maxDescend.
         // (Try individual if this time, let JIT do the rest.)
-        if (data.sfJumpPhase > 54 && thisMove.vDistance < 2.0 * minDescend && thisMove.vDistance > 2.0 * maxDescend
+        if (data.sfJumpPhase > 54 && thisMove.yDistance < 2.0 * minDescend && thisMove.yDistance > 2.0 * maxDescend
                 // TODO: Past move tracking.
                 // TODO: Fall distances?
                 && data.ws.use(WRPT.W_M_V_ENV_INAIR_SKIP)
@@ -93,7 +93,7 @@ public class MagicVehicle {
      */
     public static boolean oddInWater(final RichEntityLocation from, final RichEntityLocation to, 
             final VehicleMoveData thisMove, final MovingData data) {
-        if (thisMove.vDistance > 0.0) {
+        if (thisMove.yDistance > 0.0) {
             if (oddInWaterAscend(from, to, thisMove, data)) {
                 return true;
             }
@@ -109,7 +109,7 @@ public class MagicVehicle {
     private static boolean oddInWaterAscend(final RichEntityLocation from, final RichEntityLocation to, 
             final VehicleMoveData thisMove, final MovingData data) {
         // (Try individual if this time, let JIT do the rest.)
-        if (thisMove.vDistance > MagicVehicle.maxAscend && thisMove.vDistance < MagicVehicle.boatMaxBackToSurfaceAscend
+        if (thisMove.yDistance > MagicVehicle.maxAscend && thisMove.yDistance < MagicVehicle.boatMaxBackToSurfaceAscend
                 && data.ws.use(WRPT.W_M_V_ENV_INWATER_BTS)) {
             // (Assume players can't control sinking boats for now.)
             // TODO: Limit by more side conditions (e.g. to is on the surface and in-medium count is about 1, past moves).
