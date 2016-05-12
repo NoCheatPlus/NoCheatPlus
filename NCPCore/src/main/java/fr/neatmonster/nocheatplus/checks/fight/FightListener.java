@@ -32,7 +32,7 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -87,20 +87,20 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private final Location useLoc2 = new Location(null, 0, 0, 0);
 
     /** MoveInfo instance for temporary use with shouldCheckSurvivalFly. */
-    private MoveInfo moveInfo;
+    private PlayerMoveInfo moveInfo;
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
 
     public FightListener(){
         super(CheckType.FIGHT);
-        moveInfo = new MoveInfo(mcAccess);
+        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     @Override
     public void setMCAccess(MCAccess mcAccess) {
         super.setMCAccess(mcAccess);
-        moveInfo = new MoveInfo(mcAccess);
+        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     /**

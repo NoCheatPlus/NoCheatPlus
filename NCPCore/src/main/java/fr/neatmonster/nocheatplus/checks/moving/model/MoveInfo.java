@@ -1,57 +1,70 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 
 /**
- * Coupling from and to PlayerLocation objects with a block cache for easy
- * storage and reuse.
+ * Represent a move with start and end point. Short-term use of
+ * RichEntityLocation instances (from and to), and a Location for temporary use.
  * 
- * @author mc_dev
+ * @author asofold
  *
+ * @param <REL>
+ *            Location type to use.
  */
-public class MoveInfo {
+public abstract class MoveInfo <REL extends RichEntityLocation, E extends Entity> {
 
     /**
-     * Might need cloning for passing to external API. This is not initialized
+     * Would need cloning for passing to external API. This is not initialized
      * in set. World is set to null on cleanup!
      */
     public final Location useLoc = new Location(null, 0, 0, 0);
     public final BlockCache cache;
-    public final PlayerLocation from;
-    public final PlayerLocation to;
+    public final REL from;
+    public final REL to;
 
-    public MoveInfo(final MCAccess mcAccess){
+    public MoveInfo(final MCAccess mcAccess, REL from, REL to){
         cache = mcAccess.getBlockCache(null);
-        from = new PlayerLocation(mcAccess, null);
-        to = new PlayerLocation(mcAccess, null);
+        this.from = from;
+        this.to = to;
     }
 
     /**
      * Initialize from, and if given to. Note that useLoc and data are left
      * untouched.
      * 
-     * @param player
+     * @param entity
      * @param from
      *            Must not be null.
      * @param to
      *            Can be null.
      * @param yOnGround
      */
-    public final void set(final Player player, final Location from, final Location to, final double yOnGround){
+    public final void set(final E entity, final Location from, final Location to, final double yOnGround){
         this.cache.setAccess(from.getWorld());
-        this.from.set(from, player, yOnGround);
         this.from.setBlockCache(cache);
+        set(this.from, from, entity, yOnGround);
         if (to != null){
-            this.to.set(to, player, yOnGround);
             this.to.setBlockCache(cache);
+            set(this.to, to, entity, yOnGround);
         }
         // Note: using set to reset to by passing null won't work. 
     }
+
+    /**
+     * Called after setting BlockCache for the passed rLoc. (Needed to avoid
+     * issues with generics.)
+     * 
+     * @param rLoc
+     * @param loc
+     * @param entity
+     * @param yOnGround
+     */
+    protected abstract void set(REL rLoc, Location loc, E entity, double yOnGround);
 
     /**
      * Clear caches and remove World references and such. Also resets the world
@@ -63,5 +76,4 @@ public class MoveInfo {
         to.cleanup();
         cache.cleanup();
     }
-
 }

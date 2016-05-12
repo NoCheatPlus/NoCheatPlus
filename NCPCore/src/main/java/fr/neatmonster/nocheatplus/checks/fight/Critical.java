@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -25,20 +25,20 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class Critical extends Check {
 
-    private MoveInfo moveInfo;
+    private PlayerMoveInfo moveInfo;
 
     /**
      * Instantiates a new critical check.
      */
     public Critical() {
         super(CheckType.FIGHT_CRITICAL);
-        moveInfo = new MoveInfo(mcAccess);
+        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     @Override
     public void setMCAccess(MCAccess mcAccess) {
         super.setMCAccess(mcAccess);
-        moveInfo = new MoveInfo(mcAccess);
+        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     /**

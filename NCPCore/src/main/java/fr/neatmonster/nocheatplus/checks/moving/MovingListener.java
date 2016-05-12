@@ -50,7 +50,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.player.CreativeFly;
 import fr.neatmonster.nocheatplus.checks.moving.player.MorePackets;
 import fr.neatmonster.nocheatplus.checks.moving.player.NoFall;
@@ -184,15 +184,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = aux.useMoveInfo();
+        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, cc.yOnGround);
         if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
-            aux.returnMoveInfo(moveInfo);
+            aux.returnPlayerMoveInfo(moveInfo);
             useLoc.setWorld(null);
             return;
         }
-        aux.returnMoveInfo(moveInfo);
+        aux.returnPlayerMoveInfo(moveInfo);
 
         if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) {
             useLoc.setWorld(null);
@@ -242,10 +242,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Location loc = player.getLocation(useLoc);
             final MovingData data = MovingData.getData(player);
             Location target = null;
-            final MoveInfo moveInfo = aux.useMoveInfo();
+            final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
             moveInfo.set(player, loc, null, cc.yOnGround);
             final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc);
-            aux.returnMoveInfo(moveInfo);
+            aux.returnPlayerMoveInfo(moveInfo);
             if (sfCheck) {
                 target = data.getSetBack(loc);
             }
@@ -403,7 +403,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Fire one or two moves here.
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = aux.useMoveInfo();
+        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final Location loc = player.getLocation(moveInfo.useLoc);
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
@@ -443,7 +443,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         // Cleanup.
         data.joinOrRespawn = false;
-        aux.returnMoveInfo(moveInfo);
+        aux.returnPlayerMoveInfo(moveInfo);
     }
 
     /**
@@ -459,7 +459,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @return If cancelled/done, i.e. not to process further split moves.
      */
     private boolean checkPlayerMove(final Player player, final Location from, final Location to, 
-            final boolean mightBeMultipleMoves, final MoveInfo moveInfo, final MovingData data, final MovingConfig cc, 
+            final boolean mightBeMultipleMoves, final PlayerMoveInfo moveInfo, final MovingData data, final MovingConfig cc, 
             final PlayerMoveEvent event) {
 
         Location newTo = null;
@@ -1320,10 +1320,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (data.isTeleported(to)) {
             // Set-back.
             final Location teleported = data.getTeleported();
-            final MoveInfo moveInfo = aux.useMoveInfo();
+            final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
             moveInfo.set(player, teleported, null, cc.yOnGround);
             data.onSetBack(moveInfo.from);
-            aux.returnMoveInfo(moveInfo);
+            aux.returnPlayerMoveInfo(moveInfo);
 
             // Reset stuff.
             Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
@@ -1414,7 +1414,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = aux.useMoveInfo();
+        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final double yOnGround = Math.max(cc.noFallyOnGround, cc.yOnGround);
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, yOnGround);
@@ -1423,7 +1423,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, pLoc, data, cc) || !noFall.isEnabled(player, cc)) {
             data.clearNoFallData();
             useLoc.setWorld(null);
-            aux.returnMoveInfo(moveInfo);
+            aux.returnPlayerMoveInfo(moveInfo);
             return;
         }
         boolean allowReset = true;
@@ -1447,7 +1447,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Also reset in other cases (moved too quickly)?
             }
         }
-        aux.returnMoveInfo(moveInfo);
+        aux.returnPlayerMoveInfo(moveInfo);
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
@@ -1675,17 +1675,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
-        final MoveInfo moveInfo = aux.useMoveInfo();
+        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, cc.yOnGround);
         // TODO: data.isVelocityJumpPhase() might be too harsh, but prevents too easy abuse.
         if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc) || data.isVelocityJumpPhase() ||
                 BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround)) {
             useLoc.setWorld(null);
-            aux.returnMoveInfo(moveInfo);
+            aux.returnPlayerMoveInfo(moveInfo);
             return;
         }
-        aux.returnMoveInfo(moveInfo);
+        aux.returnPlayerMoveInfo(moveInfo);
         useLoc.setWorld(null);
         // TODO: Configurable.
         // TODO: Confine to minimum activation ticks.
@@ -1724,7 +1724,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Only check every so and so ticks.
             return;
         }
-        final MoveInfo info = aux.useMoveInfo();
+        final PlayerMoveInfo info = aux.usePlayerMoveInfo();
         for (final String playerName : hoverTicks) {
             // TODO: put players into the set (+- one tick would not matter ?)
             // TODO: might add an online flag to data !
@@ -1767,7 +1767,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         hoverTicks.removeAll(rem);
         rem.clear();
-        aux.returnMoveInfo(info);
+        aux.returnPlayerMoveInfo(info);
         useLoc.setWorld(null);
     }
 
@@ -1799,7 +1799,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param info
      * @return
      */
-    private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
+    private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final PlayerMoveInfo info) {
         // Check if player is on ground.
         final Location loc = player.getLocation(useLoc); // useLoc.setWorld(null) is done in onTick.
         info.set(player, loc, null, cc.yOnGround);
@@ -1818,7 +1818,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else {
             if (data.sfHoverTicks > cc.sfHoverTicks) {
                 // Re-Check if survivalfly can apply at all.
-                final MoveInfo moveInfo = aux.useMoveInfo();
+                final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, cc.yOnGround);
                 if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
                     handleHoverViolation(player, loc, cc, data);
@@ -1831,7 +1831,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     res = false;
                     data.sfHoverTicks = 0;
                 }
-                aux.returnMoveInfo(moveInfo);
+                aux.returnPlayerMoveInfo(moveInfo);
             }
             else res = false;
         }

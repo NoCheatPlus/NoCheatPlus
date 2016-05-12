@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
@@ -29,14 +29,14 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      * Unused instances.<br>
      * Might be better due to cascading events in case of actions or plugins doing strange things.
      */
-    private final List<MoveInfo> parkedInfo = new ArrayList<MoveInfo>(10);
+    private final List<PlayerMoveInfo> parkedPlayerMoveInfo = new ArrayList<PlayerMoveInfo>(10);
 
-    public MoveInfo useMoveInfo() {
-        if (parkedInfo.isEmpty()) {
-            return new MoveInfo(mcAccess);
+    public PlayerMoveInfo usePlayerMoveInfo() {
+        if (parkedPlayerMoveInfo.isEmpty()) {
+            return new PlayerMoveInfo(mcAccess);
         }
         else {
-            return parkedInfo.remove(parkedInfo.size() - 1);
+            return parkedPlayerMoveInfo.remove(parkedPlayerMoveInfo.size() - 1);
         }
     }
 
@@ -44,9 +44,9 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      * Cleanup and add to parked.
      * @param moveInfo
      */
-    public void returnMoveInfo(final MoveInfo moveInfo) {
+    public void returnPlayerMoveInfo(final PlayerMoveInfo moveInfo) {
         moveInfo.cleanup();
-        parkedInfo.add(moveInfo);
+        parkedPlayerMoveInfo.add(moveInfo);
     }
 
     /**
@@ -70,11 +70,11 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      * @param cc
      */
     public void resetPositionsAndMediumProperties(final Player player, final Location loc, final MovingData data, final MovingConfig cc) {
-        final MoveInfo moveInfo = useMoveInfo();
+        final PlayerMoveInfo moveInfo = usePlayerMoveInfo();
         moveInfo.set(player, loc, null, cc.yOnGround);
         data.resetPositions(moveInfo.from);
         data.adjustMediumProperties(moveInfo.from);
-        returnMoveInfo(moveInfo);
+        returnPlayerMoveInfo(moveInfo);
     }
 
     @Override
@@ -94,10 +94,10 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      */
     public void clear() {
         // Call cleanup on all parked info, just in case.
-        for (final MoveInfo info : parkedInfo) {
+        for (final PlayerMoveInfo info : parkedPlayerMoveInfo) {
             info.cleanup();
         }
-        parkedInfo.clear();
+        parkedPlayerMoveInfo.clear();
     }
 
 }
