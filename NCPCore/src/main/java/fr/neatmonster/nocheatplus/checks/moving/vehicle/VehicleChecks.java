@@ -93,11 +93,13 @@ public class VehicleChecks extends CheckListener {
             onPlayerVehicleLeave(player, vehicle);
             return;
         }
-        //        final MovingData data = MovingData.getData(player);
+        final MovingData data = MovingData.getData(player);
         //        final MovingConfig cc = MovingConfig.getConfig(player);
-        final Location loc = vehicle.getLocation(useLoc);
-        debug(player, "Vehicle update: " + vehicle.getType() + " " + loc);
-        useLoc.setWorld(null);
+        if (data.debug) {
+            final Location loc = vehicle.getLocation(useLoc);
+            debug(player, "Vehicle update: " + vehicle.getType() + " " + loc);
+            useLoc.setWorld(null);
+        }
     }
 
     /**
