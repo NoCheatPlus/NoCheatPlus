@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 
 /**
@@ -18,7 +18,7 @@ import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
  */
 public class SetBackStorage {
 
-    // TODO: Support a hash for locations (can't be Location.hashCode()).
+    // TODO: Support a hash for locations (LocUtil.hashCode).
     // TODO: Support for last-used set-back (on retrieving a Location instance)?
 
     final SetBackEntry[] entries;
@@ -129,7 +129,7 @@ public class SetBackStorage {
      * 
      * @param loc
      */
-    public void resetAll(final ILocationWithLook loc) {
+    public void resetAll(final IGetLocationWithLook loc) {
         time ++;
         for (int i = 0; i < entries.length; i++) {
             entries[i].set(loc, time, Monotonic.millis());
@@ -158,7 +158,7 @@ public class SetBackStorage {
      * 
      * @param loc
      */
-    public void resetAllLazily(final ILocationWithLook loc) {
+    public void resetAllLazily(final IGetLocationWithLook loc) {
         if (defaultIndex < 0) {
             resetAll(loc);
         }
@@ -231,7 +231,7 @@ public class SetBackStorage {
      * 
      * @param loc
      */
-    public void setDefaultEntry(final ILocationWithLook loc) {
+    public void setDefaultEntry(final IGetLocationWithLook loc) {
         getDefaultEntry().set(loc, ++time, Monotonic.millis());
     }
 

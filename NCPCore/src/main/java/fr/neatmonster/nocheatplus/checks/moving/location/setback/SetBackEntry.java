@@ -3,7 +3,8 @@ package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetLocationWithLook;
 
 /**
@@ -13,7 +14,7 @@ import fr.neatmonster.nocheatplus.components.location.ISetLocationWithLook;
  * @author asofold
  *
  */
-public class SetBackEntry implements ILocationWithLook, ISetLocationWithLook {
+public class SetBackEntry implements IGetLocationWithLook, ISetLocationWithLook {
 
     // TODO: Support a hash for locations (can't be Location.hashCode()).
 
@@ -29,7 +30,7 @@ public class SetBackEntry implements ILocationWithLook, ISetLocationWithLook {
         return set(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), time, msTime);
     }
 
-    public SetBackEntry set(final ILocationWithLook loc, final int time, final long msTime) {
+    public SetBackEntry set(final IGetLocationWithLook loc, final int time, final long msTime) {
         return set(loc.getWorldName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), time, msTime);
     }
 
@@ -164,5 +165,12 @@ public class SetBackEntry implements ILocationWithLook, ISetLocationWithLook {
         }
         return new Location(world, x, y, z, yaw, pitch);
     }
+
+    @Override
+    public int hashCode() {
+        return LocUtil.hashCode(this);
+    }
+
+    // TODO: Equals !?
 
 }

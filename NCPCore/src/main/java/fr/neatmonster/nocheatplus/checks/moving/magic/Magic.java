@@ -250,7 +250,7 @@ public class Magic {
      */
     public static boolean skipPaper(final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Confine to from at block level (offset 0)?
-        final double setBackYDistance = thisMove.to.y - data.getSetBackY();
+        final double setBackYDistance = thisMove.to.getY() - data.getSetBackY();
         return !lastMove.toIsValid && data.sfJumpPhase == 0 && thisMove.mightBeMultipleMoves
                 && setBackYDistance > 0.0 && setBackYDistance < PAPER_DIST 
                 && thisMove.yDistance > 0.0 && thisMove.yDistance < PAPER_DIST && inAir(thisMove);

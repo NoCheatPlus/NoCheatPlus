@@ -19,9 +19,9 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveTrace;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
-import fr.neatmonster.nocheatplus.checks.moving.model.MoveTrace;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
@@ -394,7 +395,7 @@ public class MovingData extends ACheckData {
         timeSinceSetBack = 0;
         lastSetBackHash = setBack == null ? 0 : setBack.hashCode();
         // Reset to setBack.
-        resetPositions(setBack);
+        resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
         setSetBack(setBack);
         vehicleSetBacks.resetAllLazily(setBack);
@@ -482,14 +483,29 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Invalidate all past moves data and set last position if not null.
+     * Invalidate all past player moves data and set last position if not null.
      * 
      * @param loc
      */
-    public void resetPositions(PlayerLocation loc) {
+    public void resetPlayerPositions(PlayerLocation loc) {
         resetPositions();
         if (loc != null) {
             final PlayerMoveData lastMove = playerMoves.getFirstPastMove();
+            // Always set with extra properties.
+            lastMove.setWithExtraProperties(loc);
+        }
+    }
+
+    /**
+     * Invalidate all past vehicle moves data and set last position if not null.
+     * 
+     * @param loc
+     */
+    public void resetVehiclePositions(RichEntityLocation loc) {
+        // TODO: Other properties (convenience, e.g. set back?) ?
+        vehicleMoves.invalidate();
+        if (loc != null) {
+            final VehicleMoveData lastMove = vehicleMoves.getFirstPastMove();
             // Always set with extra properties.
             lastMove.setWithExtraProperties(loc);
         }

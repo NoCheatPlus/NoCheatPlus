@@ -1,7 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -10,7 +10,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
  * Lots of content for a location a player is supposed to be at. Constructors
  * for convenient use.
  */
-public class PlayerLocation extends RichLivingEntityLocation {
+public class PlayerLocation extends RichEntityLocation {
 
     // TODO: Rather RichLivingEntityLocation, the rest: compile/JIT.
 
@@ -28,7 +28,8 @@ public class PlayerLocation extends RichLivingEntityLocation {
     }
 
     /**
-     * Checks if the player is on ice.
+     * Checks if the player is on ice (special handling for players, much legacy
+     * code).
      * 
      * @return true, if the player is on ice
      */
@@ -87,8 +88,16 @@ public class PlayerLocation extends RichLivingEntityLocation {
      * Not supported.
      */
     @Override
-    public void set(Location location, LivingEntity livingEntity, double yOnGround) {
-        throw new UnsupportedOperationException("Set must specify an instance of Player.");
+    public void set(Location location, Entity entity, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
+    }
+
+    /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, Entity entity, double fullHeight, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
     }
 
     /**

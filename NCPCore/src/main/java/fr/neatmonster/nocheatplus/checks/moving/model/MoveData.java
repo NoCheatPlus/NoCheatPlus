@@ -1,13 +1,14 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
-import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Carry data of a move, involving from- and to- locations. This is for
  * temporary storage and often resetting, also to encapsulate some data during
- * checking.
+ * checking. The I/Location instead of I/Position is used in order to be
+ * compatible with passing these to set-back handling and similar.
  * 
  * @author asofold
  *
@@ -95,11 +96,11 @@ public class MoveData {
      */
     public boolean touchedGroundWorkaround;
 
-    private void setPositions(final IPositionWithLook from, final IPositionWithLook to) {
+    private void setPositions(final IGetLocationWithLook from, final IGetLocationWithLook to) {
         this.from.setLocation(from);
         this.to.setLocation(to);
-        yDistance = this.to.y - this.from.y;
-        hDistance = TrigUtil.distance(this.from.x, this.from.z, this.to.x, this.to.z);
+        yDistance = this.to.getY() - this.from.getY();
+        hDistance = TrigUtil.xzDistance(from, to);
         distanceSquared = yDistance * yDistance + hDistance * hDistance;
         toIsValid = true;
     }
@@ -112,8 +113,8 @@ public class MoveData {
      * @param yaw
      * @param pitch
      */
-    private void setPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
-        from.setLocation(x, y, z, yaw, pitch);
+    private void setPositions(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch) {
+        from.setLocation(worldName, x, y, z, yaw, pitch);
         toIsValid = false;
     }
 
@@ -140,7 +141,7 @@ public class MoveData {
      * @param from
      * @param to
      */
-    public void set(final IPositionWithLook from, final IPositionWithLook to) {
+    public void set(final IGetLocationWithLook from, final IGetLocationWithLook to) {
         setPositions(from, to);
         resetBase();
         // TODO: this.from/this.to setExtraProperties ?
@@ -152,8 +153,8 @@ public class MoveData {
      * 
      * @param loc
      */
-    public void set(final IPositionWithLook loc) {
-        setPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    public void set(final IGetLocationWithLook loc) {
+        setPositions(loc.getWorldName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         resetBase();
     }
 

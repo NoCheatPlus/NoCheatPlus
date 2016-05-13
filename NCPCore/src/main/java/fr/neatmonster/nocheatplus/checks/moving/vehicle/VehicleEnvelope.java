@@ -5,14 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -27,13 +22,8 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.MagicVehicle;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
-import fr.neatmonster.nocheatplus.utilities.RichLivingEntityLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Vehicle moving envelope check, for Minecraft 1.9 and higher.
@@ -58,7 +48,7 @@ public class VehicleEnvelope extends Check {
         super(CheckType.MOVING_VEHICLE_ENVELOPE);
     }
 
-    public SetBackEntry check(final Player player, final Entity vehicle, final Location from, final Location to, final boolean isFake, final MovingData data, final MovingConfig cc) {
+    public SetBackEntry check(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
         // Delegate to a sub-check.
         tags.clear();
         tags.add("entity." + vehicle.getType());
@@ -66,14 +56,7 @@ public class VehicleEnvelope extends Check {
             debugDetails.clear();
             data.ws.setJustUsedIds(debugDetails); // Add just used workaround ids to this list directly, for now.
         }
-        final boolean violation;
-        if (vehicle instanceof LivingEntity) {
-            // TODO: No events (neither player move nor vehicle move). Flying packets with look.
-            violation = checkLivingEntity(player, (LivingEntity) vehicle, from, to, isFake, data, cc);
-        }
-        else {
-            violation = checkEntity(player, vehicle, from, to, isFake, data, cc);
-        }
+        final boolean violation = checkEntity(player, vehicle, thisMove, isFake, data, cc);
         if (data.debug && !debugDetails.isEmpty()) {
             debugDetails(player);
             debugDetails.clear();
@@ -109,79 +92,10 @@ public class VehicleEnvelope extends Check {
         debugDetails.clear();
     }
 
-    private boolean checkLivingEntity(final Player player, final LivingEntity vehicle, final Location from, final Location to, final boolean isFake, final MovingData data, final MovingConfig cc) {
-        // TODO: Some kind of pool for reuse.
-        final BlockCache blockCache = mcAccess.getBlockCache(from.getWorld());
-        final RichLivingEntityLocation rFrom = new RichLivingEntityLocation(mcAccess, blockCache);
-        rFrom.set(from, vehicle, cc.yOnGround);
-        setupLivingEntity(rFrom);
-        final RichLivingEntityLocation rTo = new RichLivingEntityLocation(mcAccess, blockCache);
-        rTo.set(to, vehicle, cc.yOnGround);
-        if (TrigUtil.isSamePos(from, to)) {
-            rTo.prepare(rFrom);
-        }
-        else {
-            setupLivingEntity(rTo);
-        }
-        if (checkIllegal(rFrom, rTo)) {
-            tags.add("illegalcoords");
-            return true;
-        }
-        final VehicleMoveData thisMove = new VehicleMoveData();
-        thisMove.set(rFrom, rTo);
-        // TODO: thisMove.setExtraProperties(rFrom, rTo);
-
-        // TODO: Set up the minimum with illegal + extreme move checking.
-        // TODO: Can attributes be used for generic checking jump + speed for all types?
-        final double maxDistanceHorizontal;
-        if (vehicle instanceof Horse) {
-            maxDistanceHorizontal = MagicVehicle.horseMaxDistanceHorizontal;
-        }
-        else if (vehicle instanceof Pig) {
-            maxDistanceHorizontal = MagicVehicle.pigMaxDistanceHorizontal;
-        }
-        else {
-            // Might prevent / dismount or use 'other' settings.
-            maxDistanceHorizontal = MagicVehicle.livingEntityMaxDistanceHorizontal;
-        }
-        // Max h dist.
-        // TODO: Must at least account for speed potions.
-        if (maxDistHorizontal(thisMove, maxDistanceHorizontal)) {
-            return true;
-        }
-        // TODO: incomplete.
-        onNotHandle(vehicle);
-        return false;
-    }
-
-    private boolean checkEntity(final Player player, final Entity vehicle, final Location from, final Location to, final boolean isFake, final MovingData data, final MovingConfig cc) {
-        // TODO: Some kind of pool for reuse.
-        final BlockCache blockCache = mcAccess.getBlockCache(from.getWorld());
-        final RichEntityLocation rFrom = new RichEntityLocation(mcAccess, blockCache);
-        rFrom.set(from, vehicle, cc.yOnGround);
-        setupEntity(rFrom);
-        final RichEntityLocation rTo = new RichEntityLocation(mcAccess, blockCache);
-        rTo.set(to, vehicle, cc.yOnGround);
-        if (TrigUtil.isSamePos(from, to)) {
-            rTo.prepare(rFrom);
-        }
-        else {
-            setupEntity(rTo);
-        }
-        if (checkIllegal(rFrom, rTo)) {
-            tags.add("illegalcoords");
-            return true;
-        }
-        final VehicleMoveData thisMove = new VehicleMoveData();
-        thisMove.set(rFrom, rTo);
-        // TODO: thisMove.setExtraProperties(rFrom, rTo);
-
+    private boolean checkEntity(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
         // Delegate to sub checks by type of entity.
         if (vehicle instanceof Boat) {
-            return checkBoat(player, vehicle, rFrom, rTo, thisMove, isFake, data, cc);
-        }
-        else if (vehicle instanceof Minecart) {
-            return checkMinecart(player, vehicle, rFrom, rTo, thisMove, isFake, data, cc);
+            return checkBoat(player, vehicle, thisMove, isFake, data, cc);
         }
         else {
             // Might prevent / dismount or use 'other' settings.
@@ -194,7 +108,6 @@ public class VehicleEnvelope extends Check {
     }
 
     private boolean checkBoat(final Player player, final Entity vehicle, 
-            final RichEntityLocation from, final RichEntityLocation to, 
             final VehicleMoveData thisMove, 
             final boolean isFake, final MovingData data, final MovingConfig cc) {
         //        boolean violation = false;
@@ -211,12 +124,12 @@ public class VehicleEnvelope extends Check {
         boolean checkAscendMuch = true;
         boolean checkDescendMuch = true;
         // (Assume boats can't climb.)
-        final boolean fromIsSafeMedium = from.isInWater() || from.isOnGround() || from.isInWeb();
-        final boolean toIsSafeMedium = to.isInWater() || to.isOnGround() || to.isInWeb();
+        final boolean fromIsSafeMedium = thisMove.from.inWater || thisMove.from.onGround || thisMove.from.inWeb;
+        final boolean toIsSafeMedium = thisMove.to.inWater || thisMove.to.onGround || thisMove.to.inWeb;
         final boolean inAir = !fromIsSafeMedium && !toIsSafeMedium;
         // TODO: Split code to methods.
         // TODO: Get extended liquid specs (allow confine to certain flags, here: water). Contains info if water is only flowing down, surface properties (non liquid blocks?), still water.
-        if (from.isInWeb()) {
+        if (thisMove.from.inWeb) {
             // TODO: Check anything?
             if (data.debug) {
                 debugDetails.add("");
@@ -226,7 +139,7 @@ public class VehicleEnvelope extends Check {
             //                return true;
             //            }
         }
-        else if (from.isInWater() && to.isInWater()) {
+        else if (thisMove.from.inWater && thisMove.to.inWater) {
             // Default in-medium move.
             if (data.debug) {
                 debugDetails.add("water-water");
@@ -237,16 +150,16 @@ public class VehicleEnvelope extends Check {
             // TODO: Move to MagicVehicle.oddInWater
             // TODO: Check past moves for falling (not yet available).
             // TODO: Check if the target location somehow is the surface.
-            if (MagicVehicle.oddInWater(from, to, thisMove, data)) {
+            if (MagicVehicle.oddInWater(thisMove, data)) {
                 // (Assume players can't control sinking boats for now.)
                 checkDescendMuch = checkAscendMuch = false;
                 violation = false;
             }
         }
-        else if (from.isOnGround() && to.isOnGround()) {
+        else if (thisMove.from.onGround && thisMove.to.onGround) {
             // Default on-ground move.
             // TODO: Should still cover extreme moves here.
-            if (from.isOnIce() && to.isOnIce()) {
+            if (thisMove.from.onIce && thisMove.to.onIce) {
                 // Default on-ice move.
                 if (data.debug) {
                     debugDetails.add("ice-ice");
@@ -339,37 +252,20 @@ public class VehicleEnvelope extends Check {
             else {
                 // Adjust set-back.
                 if (toIsSafeMedium) {
-                    data.vehicleSetBacks.setSafeMediumEntry(to);
+                    data.vehicleSetBacks.setSafeMediumEntry(thisMove.to);
                     data.sfJumpPhase = 0;
                 }
                 else if (fromIsSafeMedium) {
-                    data.vehicleSetBacks.setSafeMediumEntry(from);
+                    data.vehicleSetBacks.setSafeMediumEntry(thisMove.from);
                     data.sfJumpPhase = 0;
                 }
                 // Reset the resetNotInAir workarounds.
                 data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
             }
-            data.vehicleSetBacks.setLastMoveEntry(to);
+            data.vehicleSetBacks.setLastMoveEntry(thisMove.to);
         }
 
         return violation;
-    }
-
-    private boolean checkMinecart(final Player player, final Entity vehicle, 
-            final RichEntityLocation from, final RichEntityLocation to, 
-            final VehicleMoveData thisMove, 
-            final boolean isFake, final MovingData data, final MovingConfig cc) {
-        // Maximum thinkable horizontal speed.
-        if (maxDistHorizontal(thisMove, MagicVehicle.minecartMaxDistanceHorizontal)) {
-            return true;
-        }
-        // TODO: rails, lava, ground, other?
-        onNotHandle(vehicle);
-        return false;
-    }
-
-    private boolean checkIllegal(final RichBoundsLocation from, final RichBoundsLocation to) {
-        return from.hasIllegalCoords() || to.hasIllegalCoords();
     }
 
     private boolean maxDistHorizontal(final VehicleMoveData thisMove, final double maxDistanceHorizontal) {
@@ -380,14 +276,6 @@ public class VehicleEnvelope extends Check {
         else {
             return false;
         }
-    }
-
-    private void setupEntity(final RichEntityLocation loc) {
-        loc.collectBlockFlags();
-    }
-
-    private void setupLivingEntity(final RichEntityLocation loc) {
-        loc.collectBlockFlags();
     }
 
     private void onNotHandle(final Entity vehicle) {

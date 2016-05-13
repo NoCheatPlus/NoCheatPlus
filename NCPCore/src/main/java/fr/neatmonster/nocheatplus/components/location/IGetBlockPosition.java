@@ -6,7 +6,7 @@ package fr.neatmonster.nocheatplus.components.location;
  * @author asofold
  *
  */
-public interface IBlockPosition {
+public interface IGetBlockPosition {
 
     public int getBlockX();
 

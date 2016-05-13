@@ -1,12 +1,11 @@
 package fr.neatmonster.nocheatplus.components.location;
 
 /**
- * Standard 3d position (double) with looking direction represented by yaw and
- * pitch (float).
+ * Combine get + set.
  * 
  * @author asofold
  *
  */
-public interface IPositionWithLook extends IPosition, ILook {
+public interface IPositionWithLook extends IGetPositionWithLook, ISetPositionWithLook {
 
 }

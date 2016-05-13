@@ -2,7 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 
 import org.bukkit.Location;
 
-import fr.neatmonster.nocheatplus.components.location.ILocationWithLook;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 
 /**
@@ -91,7 +91,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
      * 
      * @param loc
      */
-    public void setMidTermEntry(final ILocationWithLook loc) {
+    public void setMidTermEntry(final IGetLocationWithLook loc) {
         getMidTermEntry().set(loc, ++time, Monotonic.millis());
     }
 
@@ -111,7 +111,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
      * 
      * @param loc
      */
-    public void setSafeMediumEntry(final ILocationWithLook loc) {
+    public void setSafeMediumEntry(final IGetLocationWithLook loc) {
         getSafeMediumEntry().set(loc, ++time, Monotonic.millis());
     }
 
@@ -131,7 +131,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
      * 
      * @param loc
      */
-    public void setLastMoveEntry(final ILocationWithLook loc) {
+    public void setLastMoveEntry(final IGetLocationWithLook loc) {
         getLastMoveEntry().set(loc, ++time, Monotonic.millis());
     }
 

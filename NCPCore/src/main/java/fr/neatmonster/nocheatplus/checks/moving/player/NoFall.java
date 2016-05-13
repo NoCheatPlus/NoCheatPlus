@@ -130,8 +130,8 @@ public class NoFall extends Check {
         final LocationData from = thisMove.from;
         final LocationData to = thisMove.to;
 
-        final double fromY = from.y;
-        final double toY = to.y;
+        final double fromY = from.getY();
+        final double toY = to.getY();
 
         final double yDiff = toY - fromY;
 

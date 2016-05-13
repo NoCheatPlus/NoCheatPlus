@@ -6,7 +6,7 @@ package fr.neatmonster.nocheatplus.components.location;
  * @author asofold
  *
  */
-public interface ILocation extends IPosition {
+public interface IGetLocation extends IGetPosition {
 
     public String getWorldName();
 

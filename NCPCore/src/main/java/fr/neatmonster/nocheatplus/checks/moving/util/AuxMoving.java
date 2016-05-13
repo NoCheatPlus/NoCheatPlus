@@ -72,7 +72,7 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
     public void resetPositionsAndMediumProperties(final Player player, final Location loc, final MovingData data, final MovingConfig cc) {
         final PlayerMoveInfo moveInfo = usePlayerMoveInfo();
         moveInfo.set(player, loc, null, cc.yOnGround);
-        data.resetPositions(moveInfo.from);
+        data.resetPlayerPositions(moveInfo.from);
         data.adjustMediumProperties(moveInfo.from);
         returnPlayerMoveInfo(moveInfo);
     }

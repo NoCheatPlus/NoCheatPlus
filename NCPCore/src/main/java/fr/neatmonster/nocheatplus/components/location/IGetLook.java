@@ -6,7 +6,7 @@ package fr.neatmonster.nocheatplus.components.location;
  * @author asofold
  *
  */
-public interface ILook {
+public interface IGetLook {
 
     /**
      * Angle for vertical looking direction component in grad.

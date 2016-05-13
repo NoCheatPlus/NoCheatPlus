@@ -6,7 +6,7 @@ package fr.neatmonster.nocheatplus.components.location;
  * @author asofold
  *
  */
-public interface IPosition {
+public interface IGetPosition {
 
     public double getX();
 

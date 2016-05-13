@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
@@ -24,6 +25,12 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /** Some entity collision height. */
     private double height; // TODO: Move to entity / replace.
+
+    /** Indicate that this is a living entity. */
+    private boolean isLiving;
+
+    /** Living entity eye height, otherwise same as height.*/
+    private double eyeHeight;
 
     /**
      * Entity is on ground, due to standing on an entity. (Might not get
@@ -50,8 +57,21 @@ public class RichEntityLocation extends RichBoundsLocation {
         return height;
     }
 
+    public double getEyeHeight() {
+        return eyeHeight;
+    }
+
     public Entity getEntity() {
         return entity;
+    }
+
+    /**
+     * Test if this is a LivingEntity instance.
+     * 
+     * @return
+     */
+    public boolean isLiving() {
+        return isLiving;
     }
 
     /**
@@ -108,6 +128,92 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
+     * Check if a player may climb upwards (isOnClimbable returned true, player does not move from/to ground).<br>
+     * Having checked the other stuff is prerequisite for calling this (!).
+     * @param jumpHeigth Height the player is allowed to have jumped.
+     * @return
+     */
+    public boolean canClimbUp(double jumpHeigth) {
+        // TODO: distinguish vines.
+        if (BlockProperties.isAttachedClimbable(getTypeId())) {
+            // Check if vine is attached to something solid
+            if (BlockProperties.canClimbUp(blockCache, blockX, blockY, blockZ)) {
+                return true;
+            }
+            // Check the block at head height.
+            final int headY = Location.locToBlock(maxY);
+            if (headY > blockY) {
+                for (int cy = blockY + 1; cy <= headY; cy ++) {
+                    if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)) {
+                        return true;
+                    }
+                }
+            }
+            // Finally check possible jump height.
+            // TODO: This too is inaccurate.
+            if (isOnGround(jumpHeigth)) {
+                // Here ladders are ok.
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Test if something solid/ground-like collides within the given margin
+     * above the eye height of the player.
+     * 
+     * @param marginAboveEyeHeight
+     * @return
+     */
+    public boolean isHeadObstructed(double marginAboveEyeHeight) {
+        return isHeadObstructed(marginAboveEyeHeight, true); // TODO: This is changed behavior, need to check calls.
+    }
+
+    /**
+     * Test if something solid/ground-like collides within the given margin
+     * above the eye height of the player.
+     * 
+     * @param marginAboveEyeHeight
+     *            Must be greater than or equal zero.
+     * @param stepCorrection
+     *            If set to true, a correction method is used for leniency.
+     * @return
+     * @throws IllegalArgumentException
+     *             If marginAboveEyeHeight is smaller than 0.
+     */
+    public boolean isHeadObstructed(double marginAboveEyeHeight, boolean stepCorrection) {
+        // TODO: Add an isObstructed method with extra height parameter to RichBoundsLocation?
+        if (marginAboveEyeHeight < 0.0) {
+            throw new IllegalArgumentException("marginAboveEyeHeight must be greater than 0.");
+        }
+        // TODO: Add test for this bit of code.
+        if (stepCorrection) {
+            double ref = maxY + marginAboveEyeHeight;
+            ref = ref - (double) Location.locToBlock(ref) + 0.35;
+            for (double bound = 1.0; bound > 0.0; bound -= 0.25) {
+                if (ref >= bound) {
+                    // Use this level for correction.
+                    marginAboveEyeHeight += bound + 0.35 - ref;
+                    break;
+                }
+            }
+        }
+        return BlockProperties.collides(blockCache, minX , maxY, minZ, maxX, maxY + marginAboveEyeHeight, maxZ, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+    }
+
+    /**
+     * Test if something solid/ground-like collides within a default
+     * margin/estimation above the eye height of the player.
+     * 
+     * @return
+     */
+    public boolean isHeadObstructed() {
+        return isHeadObstructed(0.0, true);
+    }
+
+    /**
      * Convenience constructor for using mcAccess.getHeight for fullHeight.
      * @param location
      * @param entity
@@ -121,10 +227,21 @@ public class RichEntityLocation extends RichBoundsLocation {
      * 
      * @param location
      * @param entity
-     * @param fullHeight Allows to specify eyeHeight here.
+     * @param fullHeight
+     *            Allows to specify eyeHeight here. Currently might be
+     *            overridden by eyeHeight, if that is greater.
      * @param yOnGround
      */
-    public void set(final Location location, final Entity entity, final double fullHeight, final double yOnGround) {
+    public void set(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
+        if (entity instanceof LivingEntity) {
+            isLiving = true;
+            eyeHeight = ((LivingEntity) entity).getEyeHeight();
+            fullHeight = Math.max(fullHeight, eyeHeight);
+        }
+        else {
+            isLiving = false;
+            eyeHeight = fullHeight;
+        }
         super.set(location, mcAccess.getWidth(entity), fullHeight, yOnGround);
         this.entity = entity;
         this.width = mcAccess.getWidth(entity);

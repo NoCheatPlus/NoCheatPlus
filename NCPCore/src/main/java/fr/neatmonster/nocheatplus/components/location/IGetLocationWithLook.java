@@ -6,7 +6,7 @@ package fr.neatmonster.nocheatplus.components.location;
  * @author asofold
  *
  */
-public interface ILocationWithLook extends ILocation, IPositionWithLook {
+public interface IGetLocationWithLook extends IGetLocation, IGetPositionWithLook {
 
     // (Interface inheritance doesn't look perfect.)
 

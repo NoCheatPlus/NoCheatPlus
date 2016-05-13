@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -10,6 +9,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
+import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
@@ -45,7 +45,7 @@ public class VehicleMorePackets extends Check {
      * @param data 
      * @return the location
      */
-    public SetBackEntry check(final Player player, final Location from, final Location to, 
+    public SetBackEntry check(final Player player, final VehicleMoveData thisMove, 
             final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
@@ -100,9 +100,9 @@ public class VehicleMorePackets extends Check {
 
             // Set the new set-back location.
             if (allowSetSetBack && newTo == null) {
-                data.vehicleSetBacks.setMidTermEntry(from);
+                data.vehicleSetBacks.setMidTermEntry(thisMove.from);
                 if (data.debug) {
-                    debug(player, "Update vehicle morepackets set-back: " + from);
+                    debug(player, "Update vehicle morepackets set-back: " + thisMove.from);
                 }
             }
         } else if (data.vehicleMorePacketsLastTime > time) {

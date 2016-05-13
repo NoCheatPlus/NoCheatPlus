@@ -196,7 +196,7 @@ public class LostGround {
      * @return
      */
     private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final PlayerMoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
-        return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.x, lastMove.from.y, lastMove.from.z, lastMove.hDistance, width, yOnGround, data, tag, tags, mcAccess);
+        return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ(), lastMove.hDistance, width, yOnGround, data, tag, tags, mcAccess);
     }
 
     private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, double x2, final double y2, double z2, final double hDistance2, final double width, final double yOnGround, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {

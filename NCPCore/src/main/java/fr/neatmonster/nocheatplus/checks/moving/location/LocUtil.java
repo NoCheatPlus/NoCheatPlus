@@ -3,44 +3,156 @@ package fr.neatmonster.nocheatplus.checks.moving.location;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
+import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 
 /**
- * Auxiliary methods for Location handling, mainly intended for use with set-back locations.
- * @author mc_dev
+ * Auxiliary methods for Location handling, mainly intended for use with
+ * set-back locations.
+ * 
+ * @author asofold
  *
  */
 public class LocUtil {
 
+    public static int hashCode(final Location location) {
+        final World world = location.getWorld();
+        return hashCode(world == null ? null : world.getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    public static int hashCode(final IGetLocationWithLook location) {
+        return hashCode(location.getWorldName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    public static int hashCode(final IGetPositionWithLook location) {
+        return hashCode(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    /**
+     * Internal standard for hashing locations like this. Hash of world name XOR
+     * hashCode(x, y, ...).
+     * 
+     * @param worldName
+     * @param x
+     * @param y
+     * @param z
+     * @param yaw
+     * @param pitch
+     * @return
+     */
+    public static int hashCode(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch) {
+        return (worldName == null ? 0 : worldName.hashCode()) ^ hashCode(worldName, x, y, z, yaw, pitch);
+    }
+
+    /**
+     * Implementation partly copied from the Bukkit API
+     * (org.bukkit.bukkit.Location#hashCode).
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param yaw
+     * @param pitch
+     * @return
+     */
+    public static int hashCode(final double x, final double y, final double z, final float yaw, final float pitch) {
+        int hash = 3;
+        // Left out the world hash.
+        hash = 19 * hash + (int) (Double.doubleToLongBits(x) ^ Double.doubleToLongBits(x) >>> 32);
+        hash = 19 * hash + (int) (Double.doubleToLongBits(y) ^ Double.doubleToLongBits(y) >>> 32);
+        hash = 19 * hash + (int) (Double.doubleToLongBits(z) ^ Double.doubleToLongBits(z) >>> 32);
+        hash = 19 * hash + Float.floatToIntBits(pitch);
+        hash = 19 * hash + Float.floatToIntBits(yaw);
+        return hash;
+    }
+
+    /**
+     * Get a Location instance for the given position in the given world.
+     * 
+     * @param world
+     * @param loc
+     * @return
+     */
+    public static Location getLocation(final World world, final IGetPositionWithLook loc) {
+        return new Location(world, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
+
+    /**
+     * Set loc to the given world and pos.
+     * 
+     * @param loc
+     * @param world
+     * @param pos
+     * @return The given Location instance (loc), updated by the world and pos.
+     * @throws NullPointerException
+     *             if World is null.
+     */
+    public static Location set(final Location loc, final World world, final IGetPositionWithLook pos) {
+        loc.setWorld(testWorld(world));
+        loc.setX(pos.getX());
+        loc.setY(pos.getY());
+        loc.setZ(pos.getZ());
+        loc.setYaw(pos.getYaw());
+        loc.setPitch(pos.getPitch());
+        return loc;
+    }
+
+    /**
+     * Set pos to coordinates and looking direction contained in loc.
+     * 
+     * @param pos
+     * @param loc
+     * @return The given pos, updated by position and look from loc.
+     */
+    public static ISetPositionWithLook set(final ISetPositionWithLook pos, final Location loc) {
+        pos.setX(loc.getX());
+        pos.setY(loc.getY());
+        pos.setZ(loc.getZ());
+        pos.setYaw(loc.getYaw());
+        pos.setPitch(loc.getPitch());
+        return pos;
+    }
+
     /**
      * Get a copy of a location (not actually using cloning).
+     * 
      * @param loc
      * @return A new Location instance.
-     * @throws NullPointerException if World is null.
+     * @throws NullPointerException
+     *             if World is null.
      */
     public static final Location clone(final Location loc){
         return new Location(testWorld(loc.getWorld()), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
     /**
-     * Get a copy of a location (not actually using cloning), override yaw and pitch with given values. 
+     * Get a copy of a location (not actually using cloning), override yaw and
+     * pitch with given values.
+     * 
      * @param loc
      * @param yaw
      * @param pitch
      * @return A new Location instance.
-     * @throws NullPointerException if the resulting world is null.
+     * @throws NullPointerException
+     *             if the resulting world is null.
      */
     public static final Location clone(final Location loc, final float yaw, final float pitch){
         return new Location(testWorld(loc.getWorld()), loc.getX(), loc.getY(), loc.getZ(), yaw, pitch);
     }
 
     /**
-     * Clone setBack, with yaw and pitch taken from ref, if setBack is null, ref is cloned fully.
-     * @param setBack Can be null.
-     * @param ref Must not be null.
+     * Clone setBack, with yaw and pitch taken from ref, if setBack is null, ref
+     * is cloned fully.
+     * 
+     * @param setBack
+     *            Can be null.
+     * @param ref
+     *            Must not be null.
      * @return A new Location instance.
-     * @throws NullPointerException if the resulting world is null.
+     * @throws NullPointerException
+     *             if the resulting world is null.
      */
     public static final Location clone(final Location setBack, final Location ref) {
         if (setBack == null){
@@ -51,8 +163,18 @@ public class LocUtil {
         }
     }
 
-    public static final Location clone(final Location setBack, final PlayerLocation ref) {
-        if (setBack == null) return ref.getLocation();
+    /**
+     * Clone setBack, with yaw and pitch taken from ref, if setBack is null, ref
+     * is cloned fully.
+     * 
+     * @param setBack
+     * @param ref
+     * @return
+     */
+    public static final Location clone(final Location setBack, final RichBoundsLocation ref) {
+        if (setBack == null) {
+            return ref.getLocation();
+        }
         else{
             return clone(setBack, ref.getYaw(), ref.getPitch());
         }
@@ -60,9 +182,11 @@ public class LocUtil {
 
     /**
      * Update setBack by loc.
+     * 
      * @param setBack
      * @param loc
-     * @throws NullPointerException if loc.getWorld() is null.
+     * @throws NullPointerException
+     *             if loc.getWorld() is null.
      */
     public static final void set(final Location setBack, final Location loc) {
         setBack.setWorld(testWorld(loc.getWorld()));
@@ -75,11 +199,13 @@ public class LocUtil {
 
     /**
      * Update setBack by loc.
+     * 
      * @param setBack
      * @param loc
-     * @throws NullPointerException if loc.getWorld() is null.
+     * @throws NullPointerException
+     *             if loc.getWorld() is null.
      */
-    public static final void set(final Location setBack, final PlayerLocation loc) {
+    public static final void set(final Location setBack, final RichBoundsLocation loc) {
         setBack.setWorld(testWorld(loc.getWorld()));
         setBack.setX(loc.getX());
         setBack.setY(loc.getY());
@@ -90,6 +216,7 @@ public class LocUtil {
 
     /**
      * Throw a NullPointerException if world is null.
+     * 
      * @param world
      * @return
      */
@@ -103,6 +230,7 @@ public class LocUtil {
 
     /**
      * Quick out of bounds check for yaw.
+     * 
      * @param yaw
      * @return
      */
@@ -112,6 +240,7 @@ public class LocUtil {
 
     /**
      * Quick out of bounds check for pitch.
+     * 
      * @param pitch
      * @return
      */
@@ -121,6 +250,7 @@ public class LocUtil {
 
     /**
      * Quick out of bounds check for yaw and pitch.
+     * 
      * @param yaw
      * @param pitch
      * @return
@@ -131,6 +261,7 @@ public class LocUtil {
 
     /**
      * Ensure 0 <= yaw < 360.
+     * 
      * @param yaw
      * @return
      */
@@ -161,6 +292,7 @@ public class LocUtil {
 
     /**
      * Ensure -90 <= pitch <= 90.
+     * 
      * @param pitch
      * @return
      */
@@ -213,7 +345,7 @@ public class LocUtil {
      * @param loc
      * @return
      */
-    public static String simpleFormat(final RichBoundsLocation loc) {
+    public static String simpleFormat(final IGetPositionWithLook loc) {
         return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ() + ",pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw();
     }
 

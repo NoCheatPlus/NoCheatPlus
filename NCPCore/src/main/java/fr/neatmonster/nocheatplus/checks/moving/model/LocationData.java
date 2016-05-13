@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
-import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 
 /**
@@ -10,16 +11,18 @@ import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
  * @author asofold
  *
  */
-public class LocationData {
+public class LocationData implements IGetLocationWithLook {
 
-    public double x, y, z;
+    private String worldName;
 
-    public float yaw, pitch;
+    private double x, y, z;
+
+    private float yaw, pitch;
 
     /** Must be checked before using any of the flags. */
     public boolean extraPropertiesValid = false;
     /** Basic environmental properties. */
-    public boolean onClimbable, inWeb, inLava, inWater, inLiquid, onGround;
+    public boolean onClimbable, inWeb, inLava, inWater, inLiquid, onGround, onIce;
     /** Aggregate properties (reset means potentially resetting fall damage). */
     public boolean resetCond, onGroundOrResetCond;
 
@@ -28,7 +31,7 @@ public class LocationData {
      * @param other
      */
     public void set(final LocationData other) {
-        setLocation(other.x, other.y, other.z, other.yaw, other.pitch);
+        setLocation(other.worldName, other.x, other.y, other.z, other.yaw, other.pitch);
         setExtraProperties(other);
     }
 
@@ -45,8 +48,8 @@ public class LocationData {
      * Set location data.
      * @param loc
      */
-    public void setLocation(final IPositionWithLook loc) {
-        setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    public void setLocation(final IGetLocationWithLook loc) {
+        setLocation(loc.getWorldName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
     /**
@@ -57,7 +60,7 @@ public class LocationData {
      * @param yaw
      * @param pitch
      */
-    public void setLocation(final double x, final double y, final double z, final float yaw, final float pitch) {
+    public void setLocation(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -83,6 +86,7 @@ public class LocationData {
             inLava = inWater = false;
         }
         onGround = loc.isOnGround();
+        onIce = loc.isOnIce();
         resetCond = inLiquid || inWeb || onClimbable;
         onGroundOrResetCond = onGround || resetCond;
         // Set valid flag last.
@@ -102,6 +106,7 @@ public class LocationData {
             inLava = other.inLava;
             inWater = other.inWater;
             onGround = other.onGround;
+            onIce = other.onIce;
             // Use aggregate properties 1:1, allowing for hacks.
             resetCond = other.resetCond;
             onGroundOrResetCond = other.onGroundOrResetCond;
@@ -118,6 +123,7 @@ public class LocationData {
         inLava = false;
         inWater = false;
         onGround = false;
+        onIce = false;
         resetCond = false;
         onGroundOrResetCond = false;
     }
@@ -132,6 +138,46 @@ public class LocationData {
         if (resetCond) {
             builder.append(" resetcond");
         }
+    }
+
+    @Override
+    public String getWorldName() {
+        return worldName;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public double getZ() {
+        return z;
+    }
+
+    @Override
+    public float getPitch() {
+        return pitch;
+    }
+
+    @Override
+    public float getYaw() {
+        return yaw;
+    }
+
+    @Override
+    public int hashCode() {
+        return LocUtil.hashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return "LocationData(" + LocUtil.simpleFormat(this) + ")";
     }
 
 }

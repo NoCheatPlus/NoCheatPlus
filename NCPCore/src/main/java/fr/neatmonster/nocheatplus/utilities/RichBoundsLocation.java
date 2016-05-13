@@ -7,13 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
-import fr.neatmonster.nocheatplus.components.location.IBlockPosition;
-import fr.neatmonster.nocheatplus.components.location.IBukkitLocation;
-import fr.neatmonster.nocheatplus.components.location.IPosition;
+import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
+import fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation;
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 
 /**
  * A location with bounds with a lot of extra stuff.
@@ -21,7 +22,7 @@ import fr.neatmonster.nocheatplus.components.location.IPosition;
  * @author asofold
  *
  */
-public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
+public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition {
 
     // TODO: Consider switching back from default to private visibility (use getters for other places).
 
@@ -186,7 +187,7 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
      * @param other
      * @return
      */
-    public final boolean isSameBlock(final IBlockPosition other) {
+    public final boolean isSameBlock(final IGetBlockPosition other) {
         return blockX == other.getBlockX() && blockZ == other.getBlockZ() && blockY == other.getBlockY();
     }
 
@@ -215,7 +216,7 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
      * @param loc
      * @return
      */
-    public boolean isBlockAbove(final IBlockPosition loc) {
+    public boolean isBlockAbove(final IGetBlockPosition loc) {
         return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
     }
 
@@ -234,7 +235,7 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
      * @param loc
      * @return
      */
-    public boolean isSamePos(final IPosition loc) {
+    public boolean isSamePos(final IGetPosition loc) {
         return x == loc.getX() && z == loc.getZ() && y == loc.getY();
     }
 
@@ -253,7 +254,7 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
      * @param other
      * @return
      */
-    public int manhattan(final IBlockPosition other) {
+    public int manhattan(final IGetBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
         return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
@@ -263,7 +264,7 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
      * @param other
      * @return
      */
-    public int maxBlockDist(final IBlockPosition other) {
+    public int maxBlockDist(final IGetBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
         return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
@@ -927,6 +928,11 @@ public class RichBoundsLocation implements IBukkitLocation, IBlockPosition {
     public void cleanup() {
         world = null;
         blockCache = null; // No reset here.
+    }
+
+    @Override
+    public int hashCode() {
+        return LocUtil.hashCode(this);
     }
 
     @Override

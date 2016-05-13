@@ -5,7 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.components.location.IPosition;
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 
 /**
  * Auxiliary methods for trigonometry related tasks, such as distances, directions, angles.
@@ -216,7 +216,7 @@ public class TrigUtil {
      *            the location2
      * @return The distance between the locations.
      */
-    public static final double distance(final IPosition location1, final Location location2)
+    public static final double distance(final IGetPosition location1, final Location location2)
     {
         return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -230,7 +230,7 @@ public class TrigUtil {
      *            the location2
      * @return The distance between the locations.
      */
-    public static final double distance(final IPosition location1, final IPosition location2)
+    public static final double distance(final IGetPosition location1, final IGetPosition location2)
     {
         return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -268,12 +268,12 @@ public class TrigUtil {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
-    public static final double distanceSquared(final IPosition location1, final IPosition location2)
+    public static final double distanceSquared(final IGetPosition location1, final IGetPosition location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
-    public static final double distanceSquared(final IPosition location1, final Location location2)
+    public static final double distanceSquared(final IGetPosition location1, final Location location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
@@ -308,7 +308,18 @@ public class TrigUtil {
      * @param location2
      * @return
      */
-    public static final double xzDistance(final IPosition location1, final IPosition location2)
+    public static final double xzDistance(final IGetPosition location1, final IGetPosition location2)
+    {
+        return distance(location1.getX(), location1.getZ(), location2.getX(), location2.getZ());
+    }
+
+    /**
+     * 2D-distance in x-z plane.
+     * @param location1
+     * @param location2
+     * @return
+     */
+    public static final double xzDistance(final Location location1, final IGetPosition location2)
     {
         return distance(location1.getX(), location1.getZ(), location2.getX(), location2.getZ());
     }

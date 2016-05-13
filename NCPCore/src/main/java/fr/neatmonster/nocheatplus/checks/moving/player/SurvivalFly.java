@@ -238,7 +238,7 @@ public class SurvivalFly extends Check {
 
         // Handle ice.
         // TODO: Re-model ice stuff and other (e.g. general thing: ground-modifier + reset conditions).
-        if (from.isOnIce() || to.isOnIce()) {
+        if (thisMove.from.onIce || thisMove.to.onIce) {
             data.sfOnIce = 20;
         }
         else if (data.sfOnIce > 0) {

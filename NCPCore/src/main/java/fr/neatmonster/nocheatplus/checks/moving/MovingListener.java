@@ -413,7 +413,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // The usual case: no micro move happened.
                 TrigUtil.isSamePos(from, loc)
                 // Special case / bug? TODO: Which/why, which version of MC/spigot?
-                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.from.x, lastMove.from.y, lastMove.from.z)
+                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ())
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
                 //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN
                 ) {
@@ -1119,7 +1119,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else {
             // TODO: Detect differing location (a teleport event would follow).
             final PlayerMoveData lastMove = mData.playerMoves.getFirstPastMove();
-            if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.x, lastMove.to.y, lastMove.to.z)) {
+            if (!lastMove.toIsValid || !TrigUtil.isSamePos(to, lastMove.to.getX(), lastMove.to.getY(), lastMove.to.getZ())) {
                 // Something odd happened.
                 aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
             }
@@ -1611,7 +1611,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (!BlockProperties.isPassable(loc)) {
                 final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
                 if (lastMove.toIsValid) {
-                    final Location refLoc = new Location(loc.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z);
+                    final Location refLoc = new Location(loc.getWorld(), lastMove.to.getX(), lastMove.to.getY(), lastMove.to.getZ());
                     final double d = refLoc.distanceSquared(loc);
                     if (d > 0.0) {
                         // TODO: Consider to always set back here. Might skip on big distances.
@@ -1773,7 +1773,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
-        if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
+        if (lastMove.toIsValid && TrigUtil.distanceSquared(lastMove.to.getX(), lastMove.to.getY(), lastMove.to.getZ(), loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
             // Teleport back. 
             // TODO: Add history / alert?
             //player.sendMessage(ChatColor.RED + "NCP: enforce location !"); // TODO: DEBUG - REMOVE.
@@ -1783,7 +1783,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 return data.getSetBack(loc);
             }
             else {
-                return new Location(player.getWorld(), lastMove.to.x, lastMove.to.y, lastMove.to.z, loc.getYaw(), loc.getPitch());
+                return new Location(player.getWorld(), lastMove.to.getX(), lastMove.to.getY(), lastMove.to.getZ(), loc.getYaw(), loc.getPitch());
             }
         }
         else {

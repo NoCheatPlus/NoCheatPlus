@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.moving.magic;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 
 /**
  * Magic for vehicles.
@@ -23,13 +22,12 @@ public class MagicVehicle {
     public static final double minecartMaxDistanceHorizontal = maxDistanceHorizontal; // 13.0 / 20.0; // Include turn.
     public static final double boatMaxDistanceHorizontal = maxDistanceHorizontal; // 18.0 / 20.0; // Including some downstream, rough testing.
     // TODO: Boat on ice: 42 / 20. 
-    public static final double entityMaxDistanceHorizontal = maxDistanceHorizontal; // (No idea, cannon balls?)
+    public static final double entityMaxDistanceHorizontal = maxDistanceHorizontal; // (No idea... Dragons? Cannon balls?)
 
     // LivingEntity.
     public static final double horseMaxDistanceHorizontal = maxDistanceHorizontal; // 15.0 / 20.0; // TODO: Doesn't fire anything.
     public static final double donkeyMaxDistanceHorizontal = maxDistanceHorizontal; // 7.7 / 20.0; // TODO: 
     public static final double pigMaxDistanceHorizontal = maxDistanceHorizontal; // 8.2 / 20.0; // TODO: Doesn't fire anything.
-    public static final double livingEntityMaxDistanceHorizontal = maxDistanceHorizontal; // (No idea, dragons?)
 
 
     // Vertical distances //
@@ -91,10 +89,9 @@ public class MagicVehicle {
      * @param thisMove
      * @return
      */
-    public static boolean oddInWater(final RichEntityLocation from, final RichEntityLocation to, 
-            final VehicleMoveData thisMove, final MovingData data) {
+    public static boolean oddInWater(final VehicleMoveData thisMove, final MovingData data) {
         if (thisMove.yDistance > 0.0) {
-            if (oddInWaterAscend(from, to, thisMove, data)) {
+            if (oddInWaterAscend(thisMove, data)) {
                 return true;
             }
         }
@@ -106,8 +103,7 @@ public class MagicVehicle {
      * @param thisMove
      * @return
      */
-    private static boolean oddInWaterAscend(final RichEntityLocation from, final RichEntityLocation to, 
-            final VehicleMoveData thisMove, final MovingData data) {
+    private static boolean oddInWaterAscend(final VehicleMoveData thisMove, final MovingData data) {
         // (Try individual if this time, let JIT do the rest.)
         if (thisMove.yDistance > MagicVehicle.maxAscend && thisMove.yDistance < MagicVehicle.boatMaxBackToSurfaceAscend
                 && data.ws.use(WRPT.W_M_V_ENV_INWATER_BTS)) {

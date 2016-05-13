@@ -30,21 +30,22 @@ public class EntityAccessFactory {
 
     private void setupLastPositionWithLook() {
         IEntityAccessLastPositionAndLook res = null;
-//        // Reference by class name (native access).
-//        final String[] names = new String[] {
-//                // TODO: Spigot 1.9: fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.EntityAccessLastPositionAndLook
-//        };
-//        for (final String name : names) {
-//            try {
-//                res = (IEntityAccessLastPositionAndLook) Class.forName(name).newInstance();
-//                if (res != null) {
-//                    break;
-//                }
-//            }
-//            catch (Throwable t) {
-//                // Skip.
-//            }
-//        }
+        // Reference by class name (native access).
+        final String[] names = new String[] {
+                "fr.neatmonster.nocheatplus.compat.cbdev.EntityAccessLastPositionAndLook",
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.EntityAccessLastPositionAndLook"
+        };
+        for (final String name : names) {
+            try {
+                res = (IEntityAccessLastPositionAndLook) Class.forName(name).newInstance();
+                if (res != null) {
+                    break;
+                }
+            }
+            catch (Throwable t) {
+                // Skip.
+            }
+        }
         // Reflection based.
         if (res == null) {
             try {

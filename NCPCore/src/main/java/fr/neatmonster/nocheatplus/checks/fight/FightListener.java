@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
@@ -204,7 +205,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         // 1.9: sweep attack.
-        final int locHashCode = loc.hashCode();
+        final int locHashCode = LocUtil.hashCode(loc);
         if (damage == 1.0) {
             // Might be a sweep attack.
             if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
@@ -323,7 +324,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             // Check if fly checks is an issue at all, re-check "real sprinting".
             final PlayerMoveData lastMove = mData.playerMoves.getFirstPastMove();
             if (lastMove.valid && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
-                final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), lastMove.from.x, lastMove.from.z);
+                final double hDist = TrigUtil.xzDistance(loc, lastMove.from);
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
                     final MovingConfig mCc = MovingConfig.getConfig(player);
