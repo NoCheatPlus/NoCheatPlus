@@ -515,14 +515,52 @@ public class VehicleChecks extends CheckListener {
         if (!(entity instanceof Player)) {
             return;
         }
-        final Player player = (Player) entity;
+        onPlayerVehicleEnter((Player) entity, event.getVehicle());
+    }
+
+    /**
+     * Assume entering a vehicle, event or join with being inside a vehicle.
+     * 
+     * @param player
+     * @param vehicle
+     */
+    public void onPlayerVehicleEnter(final Player player,  final Entity vehicle) {
         final MovingData data = MovingData.getData(player);
+        // Check for nested vehicles.
+        final Entity lastVehicle = CheckUtils.getLastNonPlayerVehicle(vehicle);
+        if (lastVehicle == null) {
+            data.clearVehicleData();
+            if (data.debug) {
+                debug(player, "Vehicle enter: Skip on nested vehicles, possibly with multiple players involved, who would do that?");
+            }
+            return;
+        }
+        else if (!lastVehicle.equals(vehicle)) {
+            // Nested vehicles.
+            // TODO: Should in general skip checking these? Set backs don't yet work with these anyway (either... or ...).
+            dataOnVehicleEnter(player, lastVehicle, data);
+        }
+        else {
+            // Proceed normally.
+            dataOnVehicleEnter(player, vehicle, data);
+        }
+
+    }
+
+    /**
+     * Adjust data with given last non player vehicle.
+     * 
+     * @param player
+     * @param vehicle
+     */
+    private void dataOnVehicleEnter(final Player player,  final Entity vehicle, final MovingData data) {
+        // Adjust data.
         final MovingConfig cc = MovingConfig.getConfig(player);
         // TODO: Scheduled set-backs.
         data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
-        final Entity vehicle = event.getVehicle();
+
         final Location vLoc = vehicle.getLocation(useLoc1);
         data.vehicleConsistency = MoveConsistency.getConsistency(vLoc, null, player.getLocation(useLoc2));
         // TODO: Check the set-back for consistency, verify if it is the same?

@@ -1568,6 +1568,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         //		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
         //			DataManager.getPlayerData(player).task.correctDirection();
         //		}
+
+        // Check for vehicles.
+        // TODO: Order / exclusion of items.
+        if (player.isInsideVehicle()) {
+            vehicleChecks.onPlayerVehicleEnter(player, player.getVehicle());
+        }
+
         if (data.debug) {
             // Log location.
             debug(player, tag + ": " + loc);
