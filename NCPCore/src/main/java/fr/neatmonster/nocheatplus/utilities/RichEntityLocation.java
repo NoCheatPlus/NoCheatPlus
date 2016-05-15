@@ -220,7 +220,7 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      */
     public void set(final Location location, final Entity entity, final double yOnGround) {
-        set(location, entity, mcAccess.getHeight(entity), yOnGround);
+        doSet(location, entity, mcAccess.getHeight(entity), yOnGround);
     }
 
     /**
@@ -233,6 +233,10 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      */
     public void set(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
+        doSet(location, entity, fullHeight, yOnGround);
+    }
+
+    protected void doSet(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
         if (entity instanceof LivingEntity) {
             isLiving = true;
             eyeHeight = ((LivingEntity) entity).getEyeHeight();

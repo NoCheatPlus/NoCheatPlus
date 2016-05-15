@@ -884,7 +884,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     public void set(final Location location, final double fullWidth, final double fullHeight, final double yOnGround) {
+        doSet(location, fullWidth, fullHeight, yOnGround);
+    }
 
+    protected void doSet(final Location location, final double fullWidth, final double fullHeight, final double yOnGround) {
         // Set coordinates.
         blockX = location.getBlockX();
         blockY = location.getBlockY();

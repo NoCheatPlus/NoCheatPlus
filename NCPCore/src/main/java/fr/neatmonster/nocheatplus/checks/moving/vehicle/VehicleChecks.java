@@ -30,7 +30,9 @@ import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -41,7 +43,6 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
@@ -68,6 +69,7 @@ public class VehicleChecks extends CheckListener {
     /** Temporary use, avoid nesting. */
     private final SimplePositionWithLook usePos1 = new SimplePositionWithLook();
     /** Temporary use, avoid nesting. */
+    @SuppressWarnings("unused")
     private final SimplePositionWithLook usePos2 = new SimplePositionWithLook();
 
     /** Auxiliary functionality. */
@@ -159,7 +161,7 @@ public class VehicleChecks extends CheckListener {
         // TODO: Actually here consistency with past position tracking should be tested.
 
         // TODO: Abstraction creation before calling checkVehicleMove, compare/align with onVehicleUpdate.
-        onVehicleMove(vehicle, vehicleType, from, to, player, false, data);
+        checkVehicleMove(vehicle, vehicleType, from, to, player, false, data);
     }
 
     private void outputDebugVehicleMoveEvent(final Player player, final Location from, final Location to) {
@@ -284,22 +286,76 @@ public class VehicleChecks extends CheckListener {
     private void onVehicleUpdate(final Entity vehicle, final EntityType vehicleType, final Player player, final boolean fake,
             final MovingData data) {
         // TODO: (private or public?)
-        // TODO: Use useLoc to use usePos1 and usePos2 (updatable). Make some choice on what to set lastPos to, continue with MoveData or MoveInfo.
-        // TODO: Use VehicleMoveInfo ?
-        final Location vLoc = vehicle.getLocation(useLoc1);
-        LocUtil.set(usePos2, vLoc);
-        if (lastPosLook != null) {
-            // TODO: Check consistency with last position anyway, detect teleport/oddities.
-            // Retrieve last pos.
-            lastPosLook.setPositionAndLook(vehicle, usePos1);
-            lastLoc = LocUtil.getLocation(vLoc.getWorld(), usePos);
+        // TODO: Might pass last position for reference.
+        if (data.debug) {
+            if (lastPosLook != null) {
+                // Retrieve last pos.
+                lastPosLook.setPositionAndLook(vehicle, usePos1);
+                debug(player, "Last location is: " + usePos1);
+            }
         }
-        else {
+        checkVehicleMove(vehicle, vehicleType, null, null, player, true, data);
+    }
 
+    /**
+     * Uses both useLoc1 and useLoc2, possibly others too.
+     * 
+     * @param vehicle
+     * @param vehicleType
+     * @param from
+     *            May be null, may be ignored anyway. Might be used as
+     *            firstPastMove, in case of data missing.
+     * @param to
+     *            May be null, may be ignored anyway.
+     * @param player
+     * @param fake
+     * @param data
+     */
+    private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, 
+            final Location from, final Location to, final Player player, final boolean fake, 
+            final MovingData data) {
+        // TODO: Detect teleportation and similar.
+        final World world = vehicle.getWorld();
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        final VehicleMoveInfo moveInfo = aux.useVehicleMoveInfo();
+        final Location vehicleLocation = vehicle.getLocation(moveInfo.useLoc);
+        final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
+        // Ensure firstPastMove is valid.
+        if (!firstPastMove.valid) {
+            // Determine the best location to use as past move.
+            // TODO: Could also check the set-backs for plausible entries, however that would lead to a violation by default. Could use an indicator.
+            aux.resetVehiclePositions(vehicle, from == null ? vehicleLocation : from, data, cc);
+            if (data.debug) {
+                // TODO: Might warn instead.
+                debug(player, "Missing past move data, set to: " + firstPastMove.from);
+            }
         }
-
-        // TODO: Abstraction creation before calling checkVehicleMove, compare/align with VehicleUMoveEvent.
-        onVehicleMove(vehicle, vehicleType, lastLoc, vLoc, player, true, data);
+        // Determine best locations to use.
+        // (Currently always use firstPastMove and vehicleLocation.)
+        final Location useFrom = LocUtil.set(useLoc1, world, firstPastMove.toIsValid ? firstPastMove.to : firstPastMove.from);
+        final Location useTo = vehicleLocation;
+        // Initialize moveInfo.
+        moveInfo.set(vehicle, useFrom, useTo, cc.yOnGround);
+        // TODO: Check consistency for given/set and log debug/warnings if necessary (to = vehicleLocation? from = firstPastMove).
+        // Check coordinates, just in case.
+        if (checkIllegal(moveInfo.from, moveInfo.to)) {
+            // Likely superfluous.
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
+            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry().getLocation(vehicle.getWorld()), data);
+            aux.returnVehicleMoveInfo(moveInfo);
+            return;
+        }
+        // Initialize currentMove.
+        final VehicleMoveData thisMove = data.vehicleMoves.getCurrentMove();
+        thisMove.set(moveInfo.from, moveInfo.to);
+        thisMove.vehicleId = vehicle.getUniqueId();
+        thisMove.vehicleType = vehicle.getType();
+        // Prepare all extra properties by default for now.
+        MovingUtil.prepareFullCheck(moveInfo.from, moveInfo.to, thisMove, cc.yOnGround);
+        // Call checkVehicleMove for actual checks.
+        checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, thisMove, firstPastMove, player, fake, data, cc);
+        // Cleanup.
+        aux.returnVehicleMoveInfo(moveInfo);
     }
 
     private boolean checkIllegal(final RichBoundsLocation from, final RichBoundsLocation to) {
@@ -309,7 +365,7 @@ public class VehicleChecks extends CheckListener {
 
     /**
      * The actual checks for vehicle moving. Nested passengers are not handled
-     * here.
+     * here. Demands firstPastMove to be valid.
      * <hr>
      * Prerequisite is having currentMove set in the most appropriate way for
      * data.vehicleMoves.
@@ -319,6 +375,8 @@ public class VehicleChecks extends CheckListener {
      *            dead.
      * @param vehicleType
      *            Type of that vehicle.
+     * @param firstPastMove 
+     * @param thisMove2 
      * @param player
      *            The first player passenger of that vehicle. Not null, not
      *            dead.
@@ -330,15 +388,13 @@ public class VehicleChecks extends CheckListener {
      *            (should be legacy or real errors). True if called from
      *            onVehicleUpdate.
      * @param data
+     * @param cc2 
      */
-    private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, final Player player, final boolean fake, 
-            final MovingData data) {
+    private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, final Location vehicleLocation,
+            final World world, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
+            final Player player, final boolean fake, final MovingData data, MovingConfig cc) {
         // TODO: (private or public?)
-        // TODO: Alter signature to more abstracted classes, have the method with Location instances be just for VehicleMoveEvent (legacy/fallback).
-        // TODO: Alter from/to according to past positions for further handling, unify with vehicle position and/or detect oddities.
-        final World world = vehicle.getWorld();
-        final VehicleMoveData thisMove = data.vehicleMoves.getCurrentMove();
-        final MovingConfig cc = MovingConfig.getConfig(player);
+
         data.joinOrRespawn = false;
         data.vehicleConsistency = MoveConsistency.getConsistency(thisMove, player.getLocation(useLoc1));
         switch (data.vehicleConsistency) {
@@ -422,15 +478,18 @@ public class VehicleChecks extends CheckListener {
         if (newTo == null) {
             // Increase time since set-back.
             data.timeSinceSetBack ++;
+            // Finally finish processing the current move and move it to past ones.
+            data.vehicleMoves.finishCurrentMove();
         }
         else {
-            setBack(player, vehicle, newTo.getLocation(world), data);
+            setBack(player, vehicle, newTo.getLocation(vehicle.getWorld()), data);
         }
         useLoc1.setWorld(null);
     }
 
     private void setBack(final Player player, final Entity vehicle, final Location newTo, final MovingData data) {
         // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
+        data.vehicleMoves.invalidate();
         if (data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
             // (Only schedule if not already scheduled.)
@@ -458,6 +517,7 @@ public class VehicleChecks extends CheckListener {
         }
         final Player player = (Player) entity;
         final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
         // TODO: Scheduled set-backs.
         data.joinOrRespawn = false;
         data.removeAllVelocity();
@@ -466,6 +526,7 @@ public class VehicleChecks extends CheckListener {
         final Location vLoc = vehicle.getLocation(useLoc1);
         data.vehicleConsistency = MoveConsistency.getConsistency(vLoc, null, player.getLocation(useLoc2));
         data.vehicleSetBacks.resetAll(vLoc);
+        aux.resetVehiclePositions(vehicle, vLoc, data, cc);
         // TODO: Get VehicleMoveInfo + data.resetVehiclePositions with this position for now.
         if (data.debug) {
             debug(player, "Vehicle enter: " + vehicle.getType() + " , player: " + useLoc2 + " c=" + data.vehicleConsistency);
@@ -554,7 +615,8 @@ public class VehicleChecks extends CheckListener {
         //  TODO: Which vehicle to use ?
         // final Entity vehicle = player.getVehicle();
         if (vehicle != null) {
-            final Location vLoc = vehicle.getLocation();
+            final Location vLoc = vehicle.getLocation(useLoc2);
+            // (Don't override vehicle set-back and last position here.)
             // Workaround for some entities/animals that don't fire VehicleMoveEventS.
             if (!normalVehicles.contains(vehicle.getType()) || cc.noFallVehicleReset) {
                 data.noFallSkipAirCheck = true; // Might allow one time cheat.
@@ -575,7 +637,6 @@ public class VehicleChecks extends CheckListener {
                         }
                     }
                 }
-
             }
             if (data.debug) {
                 debug(player, "Vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
@@ -598,6 +659,7 @@ public class VehicleChecks extends CheckListener {
         data.addHorizontalVelocity(new AccountEntry(0.9, 1, 1));
         data.addVerticalVelocity(new SimpleEntry(0.6, 1)); // TODO: Typical margin?
         useLoc1.setWorld(null);
+        useLoc2.setWorld(null);
     }
 
     //    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)

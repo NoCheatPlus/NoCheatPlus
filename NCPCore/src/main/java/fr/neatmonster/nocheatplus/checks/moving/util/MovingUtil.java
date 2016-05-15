@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -24,6 +25,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -252,7 +254,7 @@ public class MovingUtil {
         }
     }
 
-    public static void prepareFullCheck(final PlayerLocation from, final PlayerLocation to, final PlayerMoveData thisMove, final double yOnGround) {
+    public static void prepareFullCheck(final RichBoundsLocation from, final RichBoundsLocation to, final MoveData thisMove, final double yOnGround) {
         // Collect block flags.
         from.collectBlockFlags(yOnGround);
         if (from.isSamePos(to)) {

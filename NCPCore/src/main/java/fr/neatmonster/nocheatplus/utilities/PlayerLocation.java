@@ -89,7 +89,7 @@ public class PlayerLocation extends RichEntityLocation {
      */
     @Override
     public void set(Location location, Entity entity, double yOnGround) {
-        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
+        throw new UnsupportedOperationException("Set must specify an instance of Player.");
     }
 
     /**
@@ -97,7 +97,7 @@ public class PlayerLocation extends RichEntityLocation {
      */
     @Override
     public void set(Location location, Entity entity, double fullHeight, double yOnGround) {
-        throw new UnsupportedOperationException("Set must specify an instance of LivingEntity.");
+        throw new UnsupportedOperationException("Set must specify an instance of Player.");
     }
 
     /**

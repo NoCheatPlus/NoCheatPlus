@@ -43,7 +43,7 @@ public class LocUtil {
      * @return
      */
     public static int hashCode(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch) {
-        return (worldName == null ? 0 : worldName.hashCode()) ^ hashCode(worldName, x, y, z, yaw, pitch);
+        return (worldName == null ? 0 : worldName.hashCode()) ^ hashCode(x, y, z, yaw, pitch);
     }
 
     /**

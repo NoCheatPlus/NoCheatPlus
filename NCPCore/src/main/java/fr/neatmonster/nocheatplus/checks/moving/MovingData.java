@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -487,8 +488,8 @@ public class MovingData extends ACheckData {
      * 
      * @param loc
      */
-    public void resetPlayerPositions(PlayerLocation loc) {
-        resetPositions();
+    public void resetPlayerPositions(final PlayerLocation loc) {
+        resetPlayerPositions();
         if (loc != null) {
             final PlayerMoveData lastMove = playerMoves.getFirstPastMove();
             // Always set with extra properties.
@@ -497,26 +498,10 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Invalidate all past vehicle moves data and set last position if not null.
-     * 
-     * @param loc
+     * Invalidate all past moves data (player).
      */
-    public void resetVehiclePositions(RichEntityLocation loc) {
-        // TODO: Other properties (convenience, e.g. set back?) ?
-        vehicleMoves.invalidate();
-        if (loc != null) {
-            final VehicleMoveData lastMove = vehicleMoves.getFirstPastMove();
-            // Always set with extra properties.
-            lastMove.setWithExtraProperties(loc);
-        }
-    }
-
-    /**
-     * Invalidate all past moves data.
-     */
-    private void resetPositions() {
+    private void resetPlayerPositions() {
         playerMoves.invalidate();
-        vehicleMoves.invalidate(); // TODO: Not sure.
         sfZeroVdistRepeat = 0;
         sfDirty = false;
         sfLowJump = false;
@@ -527,6 +512,24 @@ public class MovingData extends ACheckData {
         blockChangeRef.valid = false;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
+    }
+
+    /**
+     * Invalidate all past vehicle moves data and set last position if not null.
+     * 
+     * @param loc
+     */
+    public void resetVehiclePositions(final RichEntityLocation loc) {
+        // TODO: Other properties (convenience, e.g. set back?) ?
+        vehicleMoves.invalidate();
+        if (loc != null) {
+            final VehicleMoveData lastMove = vehicleMoves.getFirstPastMove();
+            // Always set with extra properties.
+            lastMove.setWithExtraProperties(loc);
+            final Entity entity = loc.getEntity();
+            lastMove.vehicleId = entity.getUniqueId();
+            lastMove.vehicleType = entity.getType();
+        }
     }
 
     /**
