@@ -5,8 +5,18 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositionAndLook {
+
+    public EntityAccessLastPositionAndLook() {
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_9_R1.Entity.class, double.class, new String[] {
+                "lastX", "lastY", "lastZ"
+        });
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_9_R1.Entity.class, float.class, new String[] {
+                "lastYaw", "lastPitch"
+        });
+    }
 
     @Override
     public void setPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
@@ -18,4 +28,5 @@ public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositio
         location.setYaw(nmsEntity.lastYaw);
         location.setPitch(nmsEntity.lastPitch);
     }
+
 }

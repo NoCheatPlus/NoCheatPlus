@@ -525,6 +525,7 @@ public class VehicleChecks extends CheckListener {
         final Entity vehicle = event.getVehicle();
         final Location vLoc = vehicle.getLocation(useLoc1);
         data.vehicleConsistency = MoveConsistency.getConsistency(vLoc, null, player.getLocation(useLoc2));
+        // TODO: Check the set-back for consistency, verify if it is the same?
         data.vehicleSetBacks.resetAll(vLoc);
         aux.resetVehiclePositions(vehicle, vLoc, data, cc);
         // TODO: Get VehicleMoveInfo + data.resetVehiclePositions with this position for now.
