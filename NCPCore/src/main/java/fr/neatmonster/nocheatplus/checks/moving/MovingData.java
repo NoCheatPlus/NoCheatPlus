@@ -335,6 +335,7 @@ public class MovingData extends ACheckData {
     public void clearVehicleData() {
         // TODO: Not entirely sure what to do here.
         vehicleMoves.invalidate();
+        vehicleSetBacks.invalidateAll();
     }
 
     /**
