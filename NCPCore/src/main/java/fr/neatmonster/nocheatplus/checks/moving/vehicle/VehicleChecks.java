@@ -297,7 +297,7 @@ public class VehicleChecks extends CheckListener {
             if (lastPosLook != null) {
                 // Retrieve last pos.
                 lastPosLook.setPositionAndLook(vehicle, usePos1);
-                debug(player, "Last location is: " + usePos1);
+                debug(player, "Last position is reported as: " + LocUtil.simpleFormat(usePos1));
             }
         }
         checkVehicleMove(vehicle, vehicleType, null, null, player, true, data);
@@ -453,7 +453,7 @@ public class VehicleChecks extends CheckListener {
                 // TODO: This is a hot fix, to prevent a set-back loop. Depends on having only the morepackets set-back for vehicles.
                 // TODO: Perhaps might want to add || !data.equalsAnyVehicleSetBack(to)
                 if (data.debug) {
-                    debug(player, "Skip envelope check on first move after set-back acknowledging the set-back with an odd starting point (from).");
+                    debug(player, "Skip envelope check on first move after set back acknowledging the set-back with an odd starting point (from).");
                 }
             }
             else {
@@ -511,14 +511,14 @@ public class VehicleChecks extends CheckListener {
 
             if (data.vehicleSetBackTaskId == -1) {
                 // TODO: Handle scheduling failure somehow.
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set-back task. Player: " + player.getName() + " , set-back: " + newTo);
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set-back: " + newTo);
             }
             else if (data.debug) {
-                debug(player, "Vehicle set-back task id: " + data.vehicleSetBackTaskId);
+                debug(player, "Vehicle set back task id: " + data.vehicleSetBackTaskId);
             }
         }
         else if (data.debug) {
-            debug(player, "Vehicle set-back task already scheduled, skip this time.");
+            debug(player, "Vehicle set back task already scheduled, skip this time.");
         }
     }
 

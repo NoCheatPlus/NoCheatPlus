@@ -1331,7 +1331,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
             // Log.
             if (data.debug) {
-                debug(player, "TP " + event.getCause() + " (set-back): " + to);
+                debug(player, "TP " + event.getCause() + " (set back): " + to);
             }
             return;
         }
