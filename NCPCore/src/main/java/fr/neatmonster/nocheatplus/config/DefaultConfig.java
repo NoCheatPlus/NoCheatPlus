@@ -446,6 +446,7 @@ public class DefaultConfig extends ConfigFile {
         // Vehicles.
         set(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN, true);
         set(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, "default");
+        set(ConfPaths.MOVING_VEHICLE_SCHEDULESETBACKS, "default");
 
         set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK, true);
         set(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel");

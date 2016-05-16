@@ -179,6 +179,7 @@ public class MovingConfig extends ACheckConfig {
     // Vehicles
     public final boolean vehicleEnforceLocation;
     public final boolean vehiclePreventDestroyOwn;
+    public final boolean scheduleVehicleSetBacks;
 
     public final boolean    vehicleMorePacketsCheck;
     public final ActionList vehicleMorePacketsActions;
@@ -305,6 +306,7 @@ public class MovingConfig extends ACheckConfig {
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, AlmostBoolean.MAYBE);
         vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
         vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN);
+        scheduleVehicleSetBacks = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_SCHEDULESETBACKS, AlmostBoolean.MAYBE).decideOptimistically();
         vehicleMorePacketsCheck = config.getBoolean(ConfPaths.MOVING_VEHICLE_MOREPACKETS_CHECK);
         vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, AlmostBoolean.MAYBE);

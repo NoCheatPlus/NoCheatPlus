@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
@@ -347,7 +348,7 @@ public class VehicleChecks extends CheckListener {
         if (checkIllegal(moveInfo.from, moveInfo.to)) {
             // Likely superfluous.
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
-            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry(), data);
+            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry(), data, cc);
             aux.returnVehicleMoveInfo(moveInfo);
             return;
         }
@@ -488,12 +489,12 @@ public class VehicleChecks extends CheckListener {
             data.vehicleMoves.finishCurrentMove();
         }
         else {
-            setBack(player, vehicle, newTo, data);
+            setBack(player, vehicle, newTo, data, cc);
         }
         useLoc1.setWorld(null);
     }
 
-    private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data) {
+    private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data, final MovingConfig cc) {
         // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
         data.vehicleMoves.invalidate();
         if (data.vehicleSetBackTaskId == -1) {
@@ -507,15 +508,29 @@ public class VehicleChecks extends CheckListener {
             if (data.debug) {
                 debug(player, "Will set back to: " + newTo);
             }
-            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
+            boolean scheduleSetBack = cc.scheduleVehicleSetBacks;
+            // Schedule as task, if set so.
+            if (scheduleSetBack) {
+                data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
 
-            if (data.vehicleSetBackTaskId == -1) {
-                // TODO: Handle scheduling failure somehow.
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set-back: " + newTo);
+                if (data.vehicleSetBackTaskId == -1) {
+                    // TODO: Handle scheduling failure somehow.
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set-back: " + newTo);
+                    scheduleSetBack = false; // Force direct teleport as a fall-back measure.
+                }
+                else if (data.debug) {
+                    debug(player, "Vehicle set back task id: " + data.vehicleSetBackTaskId);
+                }
             }
-            else if (data.debug) {
-                debug(player, "Vehicle set back task id: " + data.vehicleSetBackTaskId);
+            // Attempt to set back directly if set so, or if needed.
+            if (!scheduleSetBack) {
+                // NOTE: This causes nested vehicle exit+enter and player teleport events, while the current event is still being processed (one of player move, vehicle update/move).
+                if (data.debug) {
+                    debug(player, "Attempt to set the player back directly.");
+                }
+                TeleportUtil.teleport(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug);
             }
+
         }
         else if (data.debug) {
             debug(player, "Vehicle set back task already scheduled, skip this time.");

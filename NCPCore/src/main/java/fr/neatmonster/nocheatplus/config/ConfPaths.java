@@ -638,6 +638,7 @@ public abstract class ConfPaths {
     private static final String MOVING_VEHICLE                              = MOVING + "vehicle.";
     public static final String  MOVING_VEHICLE_ENFORCELOCATION              = MOVING_VEHICLE + "enforcelocation";
     public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN            = MOVING_VEHICLE + "preventdestroyown";
+    public static final String  MOVING_VEHICLE_SCHEDULESETBACKS             = MOVING_VEHICLE + "schedulesetbacks";
     private static final String MOVING_VEHICLE_MOREPACKETS                  = MOVING_VEHICLE + "morepackets.";
     public static final String  MOVING_VEHICLE_MOREPACKETS_CHECK            = MOVING_VEHICLE_MOREPACKETS + "active";
     public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS          = MOVING_VEHICLE_MOREPACKETS + "actions";
