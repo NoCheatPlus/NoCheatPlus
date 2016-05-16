@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.components.location;
 
+import org.bukkit.Location;
+
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 
 public class SimplePositionWithLook implements IPositionWithLook {
@@ -21,6 +23,30 @@ public class SimplePositionWithLook implements IPositionWithLook {
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
+    }
+
+    /**
+     * Convenience method.
+     * @param loc
+     */
+    public void set(final Location loc)  {
+        x = loc.getX();
+        y = loc.getY();
+        z = loc.getZ();
+        yaw = loc.getYaw();
+        pitch = loc.getPitch();
+    }
+
+    /**
+     * Convenience method.
+     * @param pos
+     */
+    public void set(final IGetPositionWithLook pos) {
+        x = pos.getX();
+        y = pos.getY();
+        z = pos.getZ();
+        yaw = pos.getYaw();
+        pitch = pos.getPitch();
     }
 
     @Override
