@@ -75,7 +75,7 @@ public class SimplePositionWithLook implements IPositionWithLook {
 
     @Override
     public String toString() {
-        return "SimplePositionWithLook" + LocUtil.simpleFormat(this) + ")";
+        return "SimplePositionWithLook(" + LocUtil.simpleFormat(this) + ")";
     }
 
     // TODO: hashCode, equals?
