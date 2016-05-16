@@ -76,6 +76,9 @@ public class DefaultComponentFactory {
                 pV = GenericVersion.parseVersionDelimiters(_pV, "", "-snapshot");
             }
             if (pV == null) {
+                pV = GenericVersion.parseVersionDelimiters(_pV, "", "-b");
+            }
+            if (pV == null) {
                 // TODO: Was another (specific) attempt parsing planned here !?
                 StaticLog.logWarning("Could not interpret the version of ProtocolLib, won't activate hooks.");
             }
