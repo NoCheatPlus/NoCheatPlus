@@ -61,6 +61,7 @@ public class LocationData implements IGetLocationWithLook {
      * @param pitch
      */
     public void setLocation(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch) {
+        this.worldName = worldName;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -177,7 +178,7 @@ public class LocationData implements IGetLocationWithLook {
 
     @Override
     public String toString() {
-        return "LocationData(" + LocUtil.simpleFormat(this) + ")";
+        return "LocationData(" + worldName + "/" + LocUtil.simpleFormat(this) + ")";
     }
 
 }

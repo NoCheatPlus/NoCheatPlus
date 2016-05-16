@@ -137,10 +137,16 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      */
     public void clear() {
         // Call cleanup on all parked info, just in case.
+        // (Players)
         for (final PlayerMoveInfo info : parkedPlayerMoveInfo) {
             info.cleanup();
         }
         parkedPlayerMoveInfo.clear();
+        // (Vehicles)
+        for (final VehicleMoveInfo info : parkedVehicleMoveInfo) {
+            info.cleanup();
+        }
+        parkedVehicleMoveInfo.clear();
     }
 
 }
