@@ -616,6 +616,7 @@ public class BlockProperties {
         // Fence gate(s).
         for (final Material mat : new Material[]{
                 Material.FENCE_GATE,
+                // TODO: Consider TRAP_DOOR too, for the case someone removes the ign_passable entry.
         }) {
             blockFlags[mat.getId()] |= F_PASSABLE_X4;
         }

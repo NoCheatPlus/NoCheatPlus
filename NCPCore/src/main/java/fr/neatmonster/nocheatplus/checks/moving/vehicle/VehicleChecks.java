@@ -593,7 +593,6 @@ public class VehicleChecks extends CheckListener {
     private void dataOnVehicleEnter(final Player player,  final Entity vehicle, final MovingData data) {
         // Adjust data.
         final MovingConfig cc = MovingConfig.getConfig(player);
-        // TODO: Scheduled set-backs.
         data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
@@ -601,7 +600,7 @@ public class VehicleChecks extends CheckListener {
         final Location vLoc = vehicle.getLocation(useLoc1);
         data.vehicleConsistency = MoveConsistency.getConsistency(vLoc, null, player.getLocation(useLoc2));
         // TODO: Check the set-back for consistency, verify if it is the same?
-        data.vehicleSetBacks.resetAll(vLoc);
+        data.vehicleSetBacks.resetAll(vLoc); // TODO: Detect set-back and keep those then.
         aux.resetVehiclePositions(vehicle, vLoc, data, cc);
         // TODO: Get VehicleMoveInfo + data.resetVehiclePositions with this position for now.
         if (data.debug) {
