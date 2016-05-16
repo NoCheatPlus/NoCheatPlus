@@ -90,12 +90,15 @@ public class CheckUtils {
     }
 
     /**
-     * Check recursively for vehicles, returns null if players are vehicles, otherwise the lowest vehicle (that has no vehicle).
-     * @param entity
+     * Check recursively for vehicles, returns null if players are vehicles,
+     * otherwise the lowest vehicle (that has no vehicle).
+     * 
+     * @param passenger
+     *            The passenger of vehicles. Typically the player.
      * @return
      */
-    public static Entity getLastNonPlayerVehicle(final Entity entity) {
-        Entity vehicle = entity.getVehicle();
+    public static Entity getLastNonPlayerVehicle(final Entity passenger) {
+        Entity vehicle = passenger.getVehicle();
         while (vehicle != null){
             if (vehicle instanceof Player){
                 return null;

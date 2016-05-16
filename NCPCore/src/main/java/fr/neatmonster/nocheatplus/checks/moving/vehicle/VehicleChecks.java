@@ -46,7 +46,13 @@ import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
- * hierarchy of passengers).
+ * hierarchy of passengers. Players who have other players as vehicles within
+ * the hierarchy are ignored.).
+ * <hr>
+ * Data should be adjusted on entering a vehicle (player joins or enters a
+ * vehicle). Because teleporting players with their vehicle means exit +
+ * teleport + re-enter, vehicle data should not be reset on player
+ * teleportation.
  * 
  * @author asofold
  *
@@ -519,22 +525,28 @@ public class VehicleChecks extends CheckListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVehicleEnter(final VehicleEnterEvent event) {
         final Entity entity = event.getEntered();
-        if (!(entity instanceof Player)) {
-            return;
+        if ((entity instanceof Player)) {
+            onPlayerVehicleEnter((Player) entity, event.getVehicle());
         }
-        onPlayerVehicleEnter((Player) entity, event.getVehicle());
     }
 
     /**
      * Assume entering a vehicle, event or join with being inside a vehicle.
+     * Set-back and past move overriding are done here, performing the necessary
+     * consistency checking. Because teleporting players with their vehicle
+     * means exit + teleport + re-enter, vehicle data should not be reset on
+     * player teleportation.
      * 
      * @param player
      * @param vehicle
      */
     public void onPlayerVehicleEnter(final Player player,  final Entity vehicle) {
         final MovingData data = MovingData.getData(player);
+        if (data.debug) {
+            debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
+        }
         // Check for nested vehicles.
-        final Entity lastVehicle = CheckUtils.getLastNonPlayerVehicle(vehicle);
+        final Entity lastVehicle = CheckUtils.getLastNonPlayerVehicle(player);
         if (lastVehicle == null) {
             data.clearVehicleData();
             if (data.debug) {
@@ -545,6 +557,9 @@ public class VehicleChecks extends CheckListener {
         else if (!lastVehicle.equals(vehicle)) {
             // Nested vehicles.
             // TODO: Should in general skip checking these? Set backs don't yet work with these anyway (either... or ...).
+            if (data.debug) {
+                debug(player, "Vehicle enter: last of nested vehicles: " + lastVehicle.getClass().getName());
+            }
             dataOnVehicleEnter(player, lastVehicle, data);
         }
         else {

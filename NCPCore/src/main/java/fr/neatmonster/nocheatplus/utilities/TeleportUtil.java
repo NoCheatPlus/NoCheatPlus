@@ -6,9 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 
 public class TeleportUtil {
@@ -50,8 +53,7 @@ public class TeleportUtil {
             //                }
             //            }
             if (!playerTeleported){
-                // TODO: VehicleExit fires.
-                vehicle.eject();
+                vehicle.eject(); // NOTE: VehicleExit fires.
                 // TODO: Confirm eject worked, handle if not.
                 vehicleTeleported = vehicle.teleport(LocUtil.clone(location), TeleportCause.PLUGIN);
                 vehicle.setVelocity(new Vector(0.0, 0.0, 0.0)); // TODO: Likely not relevant, should remove.
@@ -72,11 +74,19 @@ public class TeleportUtil {
             // TODO: Magic 1.0, plus is this valid with horse, dragon...
             if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.0) {
                 // Somewhat check against tp showing something wrong (< 1.0).
-                // TODO: VehicleEnter fires.
-                // TODO: Not enter if vehicle teleport failed?
-                vehicle.setPassenger(player);
-                data.vehicleSetBacks.setDefaultEntry(location); // HACK, needed due to teleportation resetting the set-back.
+                vehicle.setPassenger(player); // NOTE: VehicleEnter fires.
                 // TODO: What on failure of setPassenger?
+                // Ensure a set-back.
+                // TODO: Player teleportation leads to resetting the vehicle set-back, which is bad, because there are multiple possible set-back locations stored, then possibly interfering.
+                if (!data.vehicleSetBacks.isAnyEntryValid()) {
+                    if (data.debug) {
+                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No valid vehicle set-back present after setting back with vehicle. Set new Location as default: " + location);
+                    }
+                    data.vehicleSetBacks.setDefaultEntry(location);
+                }
+                // Set this location as past move.
+                final MovingConfig cc = MovingConfig.getConfig(player);
+                NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class).resetVehiclePositions(vehicle, location, data, cc);
             }
         }
         if (debug) { 
