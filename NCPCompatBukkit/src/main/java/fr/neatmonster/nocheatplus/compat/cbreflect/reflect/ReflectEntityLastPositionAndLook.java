@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
@@ -42,22 +43,41 @@ public class ReflectEntityLastPositionAndLook extends ReflectGetHandleBase<Entit
     }
 
     @Override
-    public void setPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
+    public void getPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
         try {
-            performSet(entity, location);
+            performGet(entity, location);
         }
         catch (Throwable t) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Could not retrieve last location for Entity: " + entity.getClass().getName());
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Could not retrieve last position and look for Entity: " + entity.getClass().getName());
         }
     }
 
-    private void performSet(final Entity entity, final ISetPositionWithLook location) throws IllegalArgumentException, IllegalAccessException {
+    private void performGet(final Entity entity, final ISetPositionWithLook location) throws IllegalArgumentException, IllegalAccessException {
         final Object nmsObject = getHandle(entity);
         location.setX(lastX.getDouble(nmsObject));
         location.setY(lastY.getDouble(nmsObject));
         location.setZ(lastZ.getDouble(nmsObject));
         location.setYaw(lastYaw.getFloat(nmsObject));
         location.setPitch(lastPitch.getFloat(nmsObject));
+    }
+
+    @Override
+    public void setPositionAndLook(Entity entity, IGetPositionWithLook location) {
+        try {
+            performSet(entity, location);
+        }
+        catch (Throwable t) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Could not set last position and look for Entity: " + entity.getClass().getName());
+        }
+    }
+
+    private void performSet(Entity entity, IGetPositionWithLook location) throws IllegalArgumentException, IllegalAccessException {
+        final Object nmsObject = getHandle(entity);
+        lastX.setDouble(nmsObject, location.getX());
+        lastY.setDouble(nmsObject, location.getY());
+        lastZ.setDouble(nmsObject, location.getZ());
+        lastYaw.setFloat(nmsObject, location.getYaw());
+        lastPitch.setFloat(nmsObject, location.getPitch());
     }
 
     @Override

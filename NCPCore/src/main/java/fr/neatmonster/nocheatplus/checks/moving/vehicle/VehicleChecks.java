@@ -296,7 +296,7 @@ public class VehicleChecks extends CheckListener {
         if (data.debug) {
             if (lastPosLook != null) {
                 // Retrieve last pos.
-                lastPosLook.setPositionAndLook(vehicle, usePos1);
+                lastPosLook.getPositionAndLook(vehicle, usePos1);
                 debug(player, "Last position is reported as: " + LocUtil.simpleFormat(usePos1));
             }
         }

@@ -4,6 +4,7 @@ import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -19,7 +20,7 @@ public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositio
     }
 
     @Override
-    public void setPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
+    public void getPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
         // TODO: Error handling / conventions.
         final net.minecraft.server.v1_9_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
         location.setX(nmsEntity.lastX);
@@ -27,6 +28,16 @@ public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositio
         location.setZ(nmsEntity.lastZ);
         location.setYaw(nmsEntity.lastYaw);
         location.setPitch(nmsEntity.lastPitch);
+    }
+
+    @Override
+    public void setPositionAndLook(Entity entity, IGetPositionWithLook location) {
+        final net.minecraft.server.v1_9_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+        nmsEntity.lastX = location.getX();
+        nmsEntity.lastY = location.getY();
+        nmsEntity.lastZ = location.getZ();
+        nmsEntity.lastYaw = location.getYaw();
+        nmsEntity.lastPitch = location.getPitch();
     }
 
 }
