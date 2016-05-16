@@ -341,7 +341,7 @@ public class VehicleChecks extends CheckListener {
         if (checkIllegal(moveInfo.from, moveInfo.to)) {
             // Likely superfluous.
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
-            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry().getLocation(vehicle.getWorld()), data);
+            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry(), data);
             aux.returnVehicleMoveInfo(moveInfo);
             return;
         }
@@ -482,12 +482,12 @@ public class VehicleChecks extends CheckListener {
             data.vehicleMoves.finishCurrentMove();
         }
         else {
-            setBack(player, vehicle, newTo.getLocation(vehicle.getWorld()), data);
+            setBack(player, vehicle, newTo, data);
         }
         useLoc1.setWorld(null);
     }
 
-    private void setBack(final Player player, final Entity vehicle, final Location newTo, final MovingData data) {
+    private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data) {
         // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
         data.vehicleMoves.invalidate();
         if (data.vehicleSetBackTaskId == -1) {
@@ -498,10 +498,17 @@ public class VehicleChecks extends CheckListener {
             // TODO: Reset on world changes or not?
             // TODO: Prevent vehicle data resetting due to dismount/mount/teleport.
             // (Future: Dismount penalty does not need extra handling, both are teleported anyway.)
-            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo, data.debug));
-            // TODO: Handle scheduling failure.
             if (data.debug) {
-                debug(player, "Vehicle set-back task scheduled: " + newTo + " id=" + data.vehicleSetBackTaskId);
+                debug(player, "Will set back to: " + newTo);
+            }
+            data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
+
+            if (data.vehicleSetBackTaskId == -1) {
+                // TODO: Handle scheduling failure somehow.
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set-back task. Player: " + player.getName() + " , set-back: " + newTo);
+            }
+            else if (data.debug) {
+                debug(player, "Vehicle set-back task id: " + data.vehicleSetBackTaskId);
             }
         }
         else if (data.debug) {

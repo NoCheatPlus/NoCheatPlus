@@ -34,7 +34,11 @@ public class SetBackEntry implements IGetLocationWithLook, ISetLocationWithLook 
         return set(loc.getWorldName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), time, msTime);
     }
 
+    // TODO: @throws
     public SetBackEntry set(final String worldName, final double x, final double y, final double z, final float yaw, final float pitch, final int time, final long msTime) {
+        if (worldName == null) {
+            throw new NullPointerException("World name must not be null.");
+        }
         this.worldName = worldName;
         this.x = x;
         this.y = y;
@@ -172,5 +176,10 @@ public class SetBackEntry implements IGetLocationWithLook, ISetLocationWithLook 
     }
 
     // TODO: Equals !?
+
+    @Override
+    public String toString() {
+        return "SetBackEntry(" + worldName + "/" + LocUtil.simpleFormat(this) + ")";
+    }
 
 }
