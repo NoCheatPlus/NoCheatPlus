@@ -24,7 +24,7 @@ public class SetBackStorage {
     final SetBackEntry[] entries;
     final int defaultIndex;
     /** Count times setting a set-back. */
-    int time;
+    int time; // TODO: Switch to a counter/clock implementation, in order to allow the same provider for player + vehicle?
 
     /**
      * 
@@ -246,5 +246,7 @@ public class SetBackStorage {
         final SetBackEntry entry = getDefaultEntry();
         return entry.isValid() ? entry.getLocation(world) : null;
     }
+
+    // TODO: Method to reset only newer entries to a certain location [a) pass a set-back entry b) find it first, then compare age].
 
 }

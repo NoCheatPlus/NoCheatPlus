@@ -1294,9 +1294,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (data.isTeleported(to)) {
                 // TODO: Schedule a teleport to set-back with PlayerData (+ failure count)?
                 // TODO: Log once per player always?
-                if (data.debug) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (set-back was prevented): " + to);
-                }
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) +  " TP " + event.getCause() + " (set-back was prevented): " + to);
             }
             else {
                 if (data.debug) {
@@ -1317,23 +1315,30 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        if (data.isTeleported(to)) {
-            // Set-back.
-            final Location teleported = data.getTeleported();
-            final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
-            moveInfo.set(player, teleported, null, cc.yOnGround);
-            data.onSetBack(moveInfo.from);
-            aux.returnPlayerMoveInfo(moveInfo);
+        // Detect our own set-backs.
+        if (data.hasTeleported()) {
+            if (data.isTeleported(to)) {
+                // Set-back.
+                final Location teleported = data.getTeleported();
+                final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
+                moveInfo.set(player, teleported, null, cc.yOnGround);
+                data.onSetBack(moveInfo.from);
+                aux.returnPlayerMoveInfo(moveInfo);
 
-            // Reset stuff.
-            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
-            data.resetTeleported();
+                // Reset stuff.
+                Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+                data.resetTeleported();
 
-            // Log.
-            if (data.debug) {
-                debug(player, "TP " + event.getCause() + " (set back): " + to);
+                // Log.
+                if (data.debug) {
+                    debug(player, "TP " + event.getCause() + " (set back): " + to);
+                }
+                return;
             }
-            return;
+            else {
+                // Another plugin overrides the set-back location.
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) + " TP " + event.getCause() + " (set-back was overridden): " + to);
+            }
         }
 
         // Normal teleport
@@ -1650,7 +1655,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.onPlayerLeave();
         if (data.vehicleSetBackTaskId != -1) {
             // Reset the id, assume the task will still teleport the vehicle.
-            // TODO: Does this need extra handling?
+            // TODO: Should rather force teleport (needs storing the task + data).
             data.vehicleSetBackTaskId = -1;
         }
     }

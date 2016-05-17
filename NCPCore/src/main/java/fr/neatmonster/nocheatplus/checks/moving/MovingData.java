@@ -399,7 +399,7 @@ public class MovingData extends ACheckData {
         // Reset to setBack.
         resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
-        setSetBack(setBack);
+        setSetBack(setBack); // Problematic with multiple set-back locations stored (currently the safe-medium one is preferred, but later...)
         vehicleSetBacks.resetAllLazily(setBack);
     }
 
@@ -643,6 +643,15 @@ public class MovingData extends ACheckData {
     public void setSetBackY(final double y) {
         setBack.setY(y);
         // (Skip setting/increasing the reset count.)
+    }
+
+    /**
+     * Test, if the 'teleported' location is set, e.g. on a scheduled set-back.
+     * 
+     * @return
+     */
+    public boolean hasTeleported() {
+        return teleported != null;
     }
 
     /**

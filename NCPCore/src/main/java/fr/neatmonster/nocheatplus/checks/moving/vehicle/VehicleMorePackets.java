@@ -37,28 +37,32 @@ public class VehicleMorePackets extends Check {
      * 
      * @param player
      *            the player
-     * @param from
-     *            the from
-     * @param to
-     *            the to
+     * @param thisMove
+     * @param setBack Already decided set-back, if not null.
      * @param cc 
      * @param data 
      * @return the location
      */
     public SetBackEntry check(final Player player, final VehicleMoveData thisMove, 
-            final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
+            final SetBackEntry setBack, final MovingData data, final MovingConfig cc) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
+        final boolean allowSetSetBack = setBack == null && data.vehicleSetBackTaskId == -1;
 
         SetBackEntry newTo = null;
 
         // Take a packet from the buffer.
         data.vehicleMorePacketsBuffer--;
 
-        if (data.vehicleSetBackTaskId != -1){
+        if (setBack != null || data.vehicleSetBackTaskId != -1){
             // Short version !
             // TODO: This is bad. Needs to check if still scheduled (a BukkitTask thing) and just skip.
-            return data.vehicleSetBacks.getValidMidTermEntry();
+            if (allowSetSetBack) {
+                return data.vehicleSetBacks.getValidMidTermEntry();
+            }
+            else {
+                return null;
+            }
         }
 
         // Player used up buffer, they fail the check.

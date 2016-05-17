@@ -469,7 +469,7 @@ public class VehicleChecks extends CheckListener {
         // TODO: Still always update the frequency part?
         if ((newTo == null || data.vehicleSetBacks.getMidTermEntry().isValidAndOlderThan(newTo))) {
             if (vehicleMorePackets.isEnabled(player, data, cc)) {
-                final SetBackEntry tempNewTo = vehicleMorePackets.check(player, thisMove, newTo == null && data.vehicleSetBackTaskId == -1, data, cc);
+                final SetBackEntry tempNewTo = vehicleMorePackets.check(player, thisMove, newTo, data, cc);
                 if (tempNewTo != null) {
                     newTo = tempNewTo;
                 }
@@ -514,7 +514,6 @@ public class VehicleChecks extends CheckListener {
                 data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
 
                 if (data.vehicleSetBackTaskId == -1) {
-                    // TODO: Handle scheduling failure somehow.
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set-back: " + newTo);
                     scheduleSetBack = false; // Force direct teleport as a fall-back measure.
                 }
