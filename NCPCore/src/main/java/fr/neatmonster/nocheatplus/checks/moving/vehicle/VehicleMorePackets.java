@@ -57,12 +57,7 @@ public class VehicleMorePackets extends Check {
         if (setBack != null || data.vehicleSetBackTaskId != -1){
             // Short version !
             // TODO: This is bad. Needs to check if still scheduled (a BukkitTask thing) and just skip.
-            if (allowSetSetBack) {
-                return data.vehicleSetBacks.getValidMidTermEntry();
-            }
-            else {
-                return null;
-            }
+            return data.vehicleSetBacks.getValidMidTermEntry();
         }
 
         // Player used up buffer, they fail the check.
