@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -280,8 +281,10 @@ public class VehicleEnvelope extends Check {
 
     private void onNotHandle(final Entity vehicle) {
         if (!notHandled.contains(vehicle.getType())) {
-            notHandled.add(vehicle.getType());
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(null, type) + "Can't handle entity type: " + vehicle.getType());
+            if (Bukkit.getServer().getAllowFlight()) {
+                notHandled.add(vehicle.getType());
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(null, type) + "Can't handle entity type " + vehicle.getType() + " yet, and allow-flight (server.properties) is set to true. Set allow-flight to false, in order to prevent other types of vehicle flying for now.");
+            }
         }
     }
 
