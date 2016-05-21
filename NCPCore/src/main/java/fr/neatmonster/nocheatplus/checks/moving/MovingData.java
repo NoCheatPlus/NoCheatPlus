@@ -125,6 +125,8 @@ public class MovingData extends ACheckData {
      */
     private static final LiftOffEnvelope defaultLiftOffEnvelope = LiftOffEnvelope.UNKNOWN;
 
+    public static final int              vehicleMorePacketsBufferDefault = 50;
+
     /** Tolerance value for using vertical velocity (the client sends different values than received with fight damage). */
     private static final double TOL_VVEL = 0.0625;
 
@@ -305,7 +307,7 @@ public class MovingData extends ACheckData {
     public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT; // Workaround
     public final DefaultSetBackStorage vehicleSetBacks = new DefaultSetBackStorage();
     // Data of the more packets vehicle check.
-    public int              vehicleMorePacketsBuffer = 50;
+    public int              vehicleMorePacketsBuffer = vehicleMorePacketsBufferDefault;
     public long             vehicleMorePacketsLastTime;
     /** Task id of the vehicle set-back task. */ 
     public int              vehicleSetBackTaskId = -1;
@@ -554,7 +556,9 @@ public class MovingData extends ACheckData {
     }
 
     public void clearVehicleMorePacketsData() {
-        vehicleSetBacks.getMidTermEntry().setValid(false);
+        vehicleMorePacketsLastTime = 0;
+        vehicleMorePacketsBuffer = vehicleMorePacketsBufferDefault;
+        vehicleSetBacks.getMidTermEntry().setValid(false); // TODO: Will have other resetting conditions later on.
         // TODO: Also reset other data ?
     }
 

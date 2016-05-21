@@ -79,7 +79,7 @@ public class VehicleMorePackets extends Check {
 
         if (data.vehicleMorePacketsLastTime + 1000 < time) {
             // More than 1 second elapsed, but how many?
-            final double seconds = (time - data.vehicleMorePacketsLastTime) / 1000D;
+            final double seconds = (time - data.vehicleMorePacketsLastTime) / 1000.0;
 
             // For each second, fill the buffer.
             data.vehicleMorePacketsBuffer += packetsPerTimeframe * seconds;
@@ -89,9 +89,9 @@ public class VehicleMorePackets extends Check {
                 if (data.vehicleMorePacketsBuffer > 100) {
                     data.vehicleMorePacketsBuffer = 100;
                 }
-            } else if (data.vehicleMorePacketsBuffer > 50) {
+            } else if (data.vehicleMorePacketsBuffer > MovingData.vehicleMorePacketsBufferDefault) {
                 // Only allow growth up to 50.
-                data.vehicleMorePacketsBuffer = 50;
+                data.vehicleMorePacketsBuffer = MovingData.vehicleMorePacketsBufferDefault;
             }
 
             // Set the new "last" time.
