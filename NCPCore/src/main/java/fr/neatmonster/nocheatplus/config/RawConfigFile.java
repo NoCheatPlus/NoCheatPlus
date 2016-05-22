@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.yaml.snakeyaml.DumperOptions;
@@ -220,8 +221,15 @@ public class RawConfigFile  extends YamlConfiguration{
      *            ignoring case.
      */
     public void readDoubleValuesForEntityTypes(final String sectionPath, final Map<EntityType, Double> map, double defaultValue, final boolean allowDefault) {
+        final ConfigurationSection section = getConfigurationSection(sectionPath);
+        if (section == null) {
+            if (allowDefault && !map.containsKey(null)) {
+                map.put(null, defaultValue);
+            }
+            return;
+        }
         if (allowDefault) {
-            for (final String key : getConfigurationSection(sectionPath).getKeys(false)) {
+            for (final String key : section.getKeys(false)) {
                 final String ucKey = key.trim().toUpperCase();
                 final String path = sectionPath + "." + key;
                 if (ucKey.equals("DEFAULT")) {
@@ -233,7 +241,7 @@ public class RawConfigFile  extends YamlConfiguration{
                 map.put(null, defaultValue);
             }
         }
-        for (final String key : getConfigurationSection(sectionPath).getKeys(false)) {
+        for (final String key : section.getKeys(false)) {
             final String ucKey = key.trim().toUpperCase();
             final String path = sectionPath + "." + key;
             if (allowDefault && ucKey.equals("DEFAULT")) {
