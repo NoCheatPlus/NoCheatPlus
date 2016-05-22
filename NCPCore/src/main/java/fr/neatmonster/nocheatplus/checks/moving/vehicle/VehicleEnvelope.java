@@ -93,6 +93,16 @@ public class VehicleEnvelope extends Check {
         debugDetails.clear();
     }
 
+    private double getHDistCap(final EntityType type, final MovingConfig cc) {
+        final Double v = cc.vehicleEnvelopeHorizontalSpeedCap.get(type);
+        if (v == null) {
+            return cc.vehicleEnvelopeHorizontalSpeedCap.get(null);
+        }
+        else {
+            return v;
+        }
+    }
+
     private boolean checkEntity(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
         // Delegate to sub checks by type of entity.
         if (vehicle instanceof Boat) {
@@ -100,7 +110,7 @@ public class VehicleEnvelope extends Check {
         }
         else {
             // Might prevent / dismount or use 'other' settings.
-            if (maxDistHorizontal(thisMove, MagicVehicle.entityMaxDistanceHorizontal)) {
+            if (maxDistHorizontal(thisMove, getHDistCap(vehicle.getType(), cc))) {
                 return true;
             }
             onNotHandle(vehicle);
@@ -116,7 +126,7 @@ public class VehicleEnvelope extends Check {
             debugDetails.add("inair: " + data.sfJumpPhase);
         }
         // Maximum thinkable horizontal speed.
-        if (maxDistHorizontal(thisMove, MagicVehicle.boatMaxDistanceHorizontal)) {
+        if (maxDistHorizontal(thisMove, getHDistCap(EntityType.BOAT, cc))) { // Override type for now.
             return true;
         }
         // TODO: Could limit descend by 2*maxDescend, ascend by much less.

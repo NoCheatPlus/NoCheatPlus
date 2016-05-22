@@ -3,14 +3,18 @@ package fr.neatmonster.nocheatplus.config;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
 import org.yaml.snakeyaml.DumperOptions;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.Streams;
 
 public class RawConfigFile  extends YamlConfiguration{
 
@@ -200,6 +204,55 @@ public class RawConfigFile  extends YamlConfiguration{
             }
             else{
                 target.add(mat);
+            }
+        }
+    }
+
+    /**
+     * Read double for entity type, ignoring case, bukkit names.
+     * 
+     * @param path
+     * @param map
+     * @param defaultValue
+     * @param allowDefault
+     *            If set to true, the default value will be added for the null
+     *            key, unless present, and only if section key equals 'default',
+     *            ignoring case.
+     */
+    public void readDoubleValuesForEntityTypes(final String sectionPath, final Map<EntityType, Double> map, double defaultValue, final boolean allowDefault) {
+        if (allowDefault) {
+            for (final String key : getConfigurationSection(sectionPath).getKeys(false)) {
+                final String ucKey = key.trim().toUpperCase();
+                final String path = sectionPath + "." + key;
+                if (ucKey.equals("DEFAULT")) {
+                    defaultValue = getDouble(path, defaultValue);
+                    map.put(null, defaultValue);
+                }
+            }
+            if (!map.containsKey(null)) {
+                map.put(null, defaultValue);
+            }
+        }
+        for (final String key : getConfigurationSection(sectionPath).getKeys(false)) {
+            final String ucKey = key.trim().toUpperCase();
+            final String path = sectionPath + "." + key;
+            if (allowDefault && ucKey.equals("DEFAULT")) {
+                // Ignore.
+            }
+            else {
+                // TODO: Validate values further.
+                EntityType type = null;
+                try {
+                    type = EntityType.valueOf(ucKey);
+                }
+                catch (IllegalArgumentException e) {}
+                if (type == null) {
+                    // TODO: Log once per file only (needs new framework)?
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Bad entity type at '" + path + "': " + key);
+                }
+                else {
+                    map.put(type, getDouble(path, defaultValue));
+                }
             }
         }
     }

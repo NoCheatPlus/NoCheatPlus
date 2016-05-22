@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -185,6 +186,7 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList vehicleMorePacketsActions;
 
     public final boolean vehicleEnvelopeActive;
+    public final HashMap<EntityType, Double> vehicleEnvelopeHorizontalSpeedCap = new HashMap<EntityType, Double>();
     public final ActionList vehicleEnvelopeActions;
 
     // Trace
@@ -311,6 +313,7 @@ public class MovingConfig extends ACheckConfig {
         vehicleMorePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, AlmostBoolean.MAYBE);
         vehicleEnvelopeActive = ref == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") >= 0 : ref.decide();
+        config.readDoubleValuesForEntityTypes(ConfPaths.MOVING_VEHICLE_ENVELOPE_HSPEEDCAP, vehicleEnvelopeHorizontalSpeedCap, 4.0, true);
         vehicleEnvelopeActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, Permissions.MOVING_VEHICLE_ENVELOPE);
 
     }

@@ -644,6 +644,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS          = MOVING_VEHICLE_MOREPACKETS + "actions";
     private static final String MOVING_VEHICLE_ENVELOPE                     = MOVING_VEHICLE + "envelope.";
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIVE              = MOVING_VEHICLE_ENVELOPE + "active";
+    public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP              = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIONS             = MOVING_VEHICLE_ENVELOPE + "actions";
 
     public static final String  NET                                         = CHECKS + "net.";
