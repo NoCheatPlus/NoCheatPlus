@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 
 /**
  * Auxiliary methods for trigonometry related tasks, such as distances, directions, angles.
@@ -523,10 +524,54 @@ public class TrigUtil {
      * @return Returns false if either is null.
      */
     public static boolean isSamePos(final Location loc1, final Location loc2) {
-        if (loc1 == null || loc2 == null) {
-            return false;
-        }
-        return loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
+        return loc1 != null && loc2 != null 
+                && loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
+    }
+
+    /**
+     * Compare position and looking direction.
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePosAndLook(final IGetPositionWithLook loc1, final Location loc2) {
+        return isSamePos(loc1, loc2) && loc1.getPitch() == loc2.getPitch() && loc1.getYaw() == loc2.getYaw();
+    }
+
+    /**
+     * Test if both locations have the exact same coordinates. Does not check
+     * yaw/pitch.
+     * 
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePos(final IGetPositionWithLook loc1, final Location loc2) {
+        return loc1 != null && loc2 != null 
+                && loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
+    }
+
+    /**
+     * Compare position and looking direction.
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePosAndLook(final IGetPositionWithLook loc1, final IGetPositionWithLook loc2) {
+        return isSamePos(loc1, loc2) && loc1.getPitch() == loc2.getPitch() && loc1.getYaw() == loc2.getYaw();
+    }
+
+    /**
+     * Test if both locations have the exact same coordinates. Does not check
+     * yaw/pitch.
+     * 
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePos(final IGetPositionWithLook loc1, final IGetPositionWithLook loc2) {
+        return loc1 != null && loc2 != null 
+                && loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
     }
 
     /**

@@ -37,6 +37,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -434,15 +435,7 @@ public class VehicleChecks extends CheckListener {
 
         // Ensure a common set-back for now.
         if (!data.vehicleSetBacks.isDefaultEntryValid()) {
-            // TODO: Check if other set-back is appropriate or if to set on other events.
-            data.vehicleSetBacks.setDefaultEntry(thisMove.from);
-            if (data.debug) {
-                debug(player, "Ensure vehicle set-back: " + thisMove.from);
-            }
-            if (data.vehicleSetBackTaskId != -1) {
-                // TODO: Set back outdated or not?
-                Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
-            }
+            ensureSetBack(player, thisMove, data);
         }
 
         // Moving envelope check(s).
@@ -476,7 +469,7 @@ public class VehicleChecks extends CheckListener {
             }
             else {
                 // Otherwise we need to clear their data.
-                // TODO: Should only if disabled.
+                // TODO: Make mid-term set-back resetting independent of more packets.
                 data.clearVehicleMorePacketsData();
             }
         }
@@ -494,9 +487,37 @@ public class VehicleChecks extends CheckListener {
         useLoc1.setWorld(null);
     }
 
+    /**
+     * Called if the default set-back entry isn't valid.
+     * 
+     * @param player
+     * @param thisMove
+     * @param data
+     */
+    private void ensureSetBack(final Player player, final VehicleMoveData thisMove, final MovingData data) {
+        final IGetLocationWithLook ensureLoc;
+        if (!data.vehicleSetBacks.isAnyEntryValid()) {
+            ensureLoc = thisMove.from;
+        }
+        else {
+            ensureLoc = data.vehicleSetBacks.getOldestValidEntry();
+        }
+        data.vehicleSetBacks.setDefaultEntry(ensureLoc);
+        if (data.debug) {
+            debug(player, "Ensure vehicle set-back: " + ensureLoc);
+        }
+        //        if (data.vehicleSetBackTaskId != -1) {
+        //            // TODO: This is likely the wrong thing to do!
+        //            Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
+        //            data.vehicleSetBackTaskId = -1;
+        //            if (data.debug) {
+        //                debug(player, "Cancel set-back task on ensureSetBack.");
+        //            }
+        //        }
+    }
+
     private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data, final MovingConfig cc) {
         // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
-        data.vehicleMoves.invalidate();
         if (data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
             // (Only schedule if not already scheduled.)
@@ -511,6 +532,7 @@ public class VehicleChecks extends CheckListener {
             boolean scheduleSetBack = cc.scheduleVehicleSetBacks;
             // Schedule as task, if set so.
             if (scheduleSetBack) {
+                aux.resetVehiclePositions(vehicle, LocUtil.set(useLoc2, vehicle.getWorld(), newTo), data, cc); // Heavy-ish, though.
                 data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
 
                 if (data.vehicleSetBackTaskId == -1) {
@@ -523,7 +545,13 @@ public class VehicleChecks extends CheckListener {
             }
             // Attempt to set back directly if set so, or if needed.
             if (!scheduleSetBack) {
-                // NOTE: This causes nested vehicle exit+enter and player teleport events, while the current event is still being processed (one of player move, vehicle update/move).
+                /*
+                 * NOTE: This causes nested vehicle exit+enter and player
+                 * teleport events, while the current event is still being
+                 * processed (one of player move, vehicle update/move). Position
+                 * resetting and updating the set-back (if needed) is done there
+                 * (hack, subject to current review).
+                 */
                 if (data.debug) {
                     debug(player, "Attempt to set the player back directly.");
                 }
@@ -532,6 +560,8 @@ public class VehicleChecks extends CheckListener {
 
         }
         else if (data.debug) {
+            // TODO: Reset positions.
+            data.vehicleMoves.invalidate();
             debug(player, "Vehicle set back task already scheduled, skip this time.");
         }
     }
@@ -595,13 +625,19 @@ public class VehicleChecks extends CheckListener {
         data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
-
         final Location vLoc = vehicle.getLocation(useLoc1);
         data.vehicleConsistency = MoveConsistency.getConsistency(vLoc, null, player.getLocation(useLoc2));
-        // TODO: Check the set-back for consistency, verify if it is the same?
-        data.vehicleSetBacks.resetAll(vLoc); // TODO: Detect set-back and keep those then.
+        if (data.isVehicleSetBack) {
+            /*
+             * Currently checking for consistency is done in
+             * TeleportUtil.teleport, so we skip that here: if
+             * (data.vehicleSetBacks.getFirstValidEntry(vLoc) == null) {
+             */
+        }
+        else {
+            data.vehicleSetBacks.resetAll(vLoc);
+        }
         aux.resetVehiclePositions(vehicle, vLoc, data, cc);
-        // TODO: Get VehicleMoveInfo + data.resetVehiclePositions with this position for now.
         if (data.debug) {
             debug(player, "Vehicle enter: " + vehicle.getType() + " , player: " + useLoc2 + " c=" + data.vehicleConsistency);
         }

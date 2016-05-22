@@ -5,6 +5,7 @@ import org.bukkit.World;
 
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Represent a set-back location storage, allowing for more or less efficient
@@ -100,6 +101,23 @@ public class SetBackStorage {
         }
         if (fallBack && defaultIndex >= 0 && entries[defaultIndex].isValid()) {
             return entries[defaultIndex];
+        }
+        return null;
+    }
+
+    /**
+     * Get the first entry that is valid and matches the location (position +
+     * look, ignore world name).
+     * 
+     * @param location
+     * @return
+     */
+    public SetBackEntry getFirstValidEntry(final Location location) {
+        for (int i = 0; i < entries.length; i++) {
+            final SetBackEntry entry = entries[i];
+            if (entry.isValid() && TrigUtil.isSamePosAndLook(entry, location)) {
+                return entry;
+            }
         }
         return null;
     }

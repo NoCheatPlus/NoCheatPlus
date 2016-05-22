@@ -302,8 +302,16 @@ public class MovingData extends ACheckData {
     public int lastSetBackHash = 0;
 
     // Vehicles.
-    /** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
+    /**
+     * Inconsistency-flag. Set on moving inside of vehicles, reset on exiting
+     * properly. Workaround for VehicleLeaveEvent missing.
+     */
     public boolean wasInVehicle = false; // Workaround
+    /**
+     * Set to indicate that events happen during a vehicle set back. Allows
+     * skipping some resetting.
+     */
+    public boolean isVehicleSetBack = false; // Workaround
     public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT; // Workaround
     public final DefaultSetBackStorage vehicleSetBacks = new DefaultSetBackStorage();
     // Data of the more packets vehicle check.
@@ -402,7 +410,7 @@ public class MovingData extends ACheckData {
         resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
         setSetBack(setBack); // Problematic with multiple set-back locations stored (currently the safe-medium one is preferred, but later...)
-        vehicleSetBacks.resetAllLazily(setBack);
+        // vehicleSetBacks.resetAllLazily(setBack); // Not good: Overrides older set-back locations.
     }
 
     /**

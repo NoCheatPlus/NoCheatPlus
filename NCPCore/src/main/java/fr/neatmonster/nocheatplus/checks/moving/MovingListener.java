@@ -727,7 +727,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else {
             // Otherwise we need to clear their data.
-            data.clearAllMorePacketsData();
+            data.clearPlayerMorePacketsData();
         }
 
         // Reset jump amplifier if needed.
@@ -1315,7 +1315,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        // Detect our own set-backs.
+        // Detect our own player set-backs.
         if (data.hasTeleported()) {
             if (data.isTeleported(to)) {
                 // Set-back.
@@ -1341,26 +1341,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
 
+        boolean skipExtras = false; // Skip extra data adjustments during special teleport, e.g. vehicle set back.
+        // Detect our own vehicle set-backs (...).
+        if (data.isVehicleSetBack) {
+            // Uncertain if this is vehicle leave or vehicle enter.
+            if (event.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+                // TODO: Unexpected, what now?
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Unexpected teleport cause on vehicle set back: " + event.getCause());
+            }
+            // TODO: Consider to verify, if this is somewhere near the vehicle as expected (might need storing more data for a set back).
+            skipExtras = true;
+        }
+
         // Normal teleport
         double fallDistance = data.noFallFallDistance;
         //        final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
-        data.clearMostMovingCheckData();
+        data.clearFlyData();
+        data.clearPlayerMorePacketsData();
         data.setSetBack(to);
-        // TODO: How to account for plugins that reset the fall distance here?
-        if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
-            // Reset fall distance if set so in the config.
-            if (!cc.noFallTpReset) {
-                // (Set fall distance if set to not reset.)
-                player.setFallDistance((float) fallDistance);
-            }
-            else if (fallDistance >= 3.0) {
-                data.noFallSkipAirCheck = true;
-            }
-        }
-        if (event.getCause() == TeleportCause.ENDER_PEARL) {
-            // Prevent NoFall violations for ender-pearls.
-            data.noFallSkipAirCheck = true;
-        }
         data.sfHoverTicks = -1; // Important against concurrent modification exception.
         aux.resetPositionsAndMediumProperties(player, to, data, cc);
         // TODO: Decide to remove the LiftOffEnvelope thing completely.
@@ -1373,6 +1371,26 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Reset stuff.
         Combined.resetYawRate(player, to.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
         data.resetTeleported();
+
+        if (!skipExtras) {
+            // Adjust fall distance, if set so.
+            // TODO: How to account for plugins that reset the fall distance here?
+            // TODO: Detect transition from valid flying that needs resetting the fall distance.
+            if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
+                // Reset fall distance if set so in the config.
+                if (!cc.noFallTpReset) {
+                    // (Set fall distance if set to not reset.)
+                    player.setFallDistance((float) fallDistance);
+                }
+                else if (fallDistance >= 3.0) {
+                    data.noFallSkipAirCheck = true;
+                }
+            }
+            if (event.getCause() == TeleportCause.ENDER_PEARL) {
+                // Prevent NoFall violations for ender-pearls.
+                data.noFallSkipAirCheck = true;
+            }
+        }
 
         // Log.
         if (data.debug) {

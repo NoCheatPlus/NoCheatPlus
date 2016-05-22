@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 
@@ -30,12 +31,15 @@ public class TeleportUtil {
         // TODO: Rubber band issue needs synchronizing with packet level and ignore certain incoming ones?
         // TODO: This handling could conflict with WorldGuard region flags.
         // TODO: Account for nested passengers and inconsistencies.
+        final MovingData data = MovingData.getData(player);
+        data.isVehicleSetBack = true;
         final Entity passenger = vehicle.getPassenger();
         boolean vehicleTeleported = false;
         final boolean playerIsPassenger = player.equals(passenger);
         boolean playerTeleported = false;
         // TODO: TeleportCause needs some central configuration (plugin vs. unknown vs. future).
         if (vehicle.isDead() || !vehicle.isValid()) {
+            // TODO: Still consider teleporting the player.
             vehicleTeleported = false;
         }
         else if (playerIsPassenger) { // && vehicle.equals(player.getVehicle).
@@ -52,7 +56,7 @@ public class TeleportUtil {
             //                }
             //            }
             if (!playerTeleported){
-                vehicle.eject(); // NOTE: VehicleExit fires.
+                vehicle.eject(); // NOTE: VehicleExit fires, unknown TP fires.
                 // TODO: Confirm eject worked, handle if not.
                 vehicleTeleported = vehicle.teleport(LocUtil.clone(location), TeleportCause.PLUGIN);
             }
@@ -61,8 +65,7 @@ public class TeleportUtil {
             vehicleTeleported = vehicle.teleport(location, TeleportCause.PLUGIN);
         }
         if (!playerTeleported && player.isOnline() && !player.isDead()) {
-            // Mask teleport as set-back.
-            final MovingData data = MovingData.getData(player);
+            // Mask player teleport as a set-back.
             data.prepareSetBack(location);
             playerTeleported = player.teleport(LocUtil.clone(location));
             data.resetTeleported(); // Just in case.
@@ -71,21 +74,26 @@ public class TeleportUtil {
             // TODO: Magic 1.0, plus is this valid with horse, dragon...
             if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.5) {
                 // Somewhat check against tp showing something wrong (< 1.0).
-                vehicle.setPassenger(player); // NOTE: VehicleEnter fires.
+                vehicle.setPassenger(player); // NOTE: VehicleEnter fires, unknown TP fires.
                 // TODO: What on failure of setPassenger?
                 // Ensure a set-back.
-                // TODO: Player teleportation leads to resetting the vehicle set-back, which is bad, because there are multiple possible set-back locations stored, then possibly interfering.
-                if (!data.vehicleSetBacks.isAnyEntryValid()) {
+                // TODO: Set-backs get invalidated somewhere, likely on an extra unknown TP. Use data.isVehicleSetBack in MovingListener/teleport.
+                if (data.vehicleSetBacks.getFirstValidEntry(location) == null) {
+                    // At least ensure one of the entries has to match the location we teleported the vehicle to.
                     if (data.debug) {
-                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No valid vehicle set-back present after setting back with vehicle. Set new Location as default: " + location);
+                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No set-back is matching the vehicle location that it has just been set back to. Reset all lazily to: " + location);
                     }
-                    data.vehicleSetBacks.setDefaultEntry(location);
+                    data.vehicleSetBacks.resetAllLazily(location);
                 }
                 // Set this location as past move.
-                final MovingConfig cc = MovingConfig.getConfig(player);
-                NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class).resetVehiclePositions(vehicle, location, data, cc);
+                final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
+                if (!firstPastMove.valid || firstPastMove.toIsValid || !TrigUtil.isSamePos(firstPastMove.from, location)) {
+                    final MovingConfig cc = MovingConfig.getConfig(player);
+                    NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class).resetVehiclePositions(vehicle, location, data, cc);
+                }
             }
         }
+        data.isVehicleSetBack = false;
         if (debug) { 
             CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Vehicle set back resolution: " + location + " pt=" + playerTeleported + " vt=" + vehicleTeleported);
         }
