@@ -105,18 +105,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
 
     /**
-     * A player attacked something with DamageCause ENTITY_ATTACK. That's most likely what we want to really check.
+     * A player attacked something with DamageCause ENTITY_ATTACK. That's most
+     * likely what we want to really check.
      * 
-     * @param event
-     *            The EntityDamageByEntityEvent
-     * @return 
+     * @param player
+     * @param damaged
+     * @param originalDamage Damage before applying modifiers.
+     * @param finalDamage Damage after applying modifiers.
+     * @param tick
+     * @param data
+     * @return
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged, final double damage, final int tick, final FightData data) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged, final double originalDamage, final double finalDamage, final int tick, final FightData data) {
         final FightConfig cc = FightConfig.getConfig(player);
 
         // Hotfix attempt for enchanted books.
-        // TODO: maybe a generaluzed version for the future...
-        final ItemStack stack = player.getItemInHand();
+        // TODO: maybe a generalized version for the future...
+        final ItemStack stack = player.getItemInHand(); // TODO: Appropriate off-hand checking.
         // Illegal enchantments hotfix check.
         if (Items.checkIllegalEnchantments(player, stack)) return true;
 
@@ -190,7 +195,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // Log generic properties of this attack.
         if (data.debug) {
-            debug(player, "Attacks " + (damagedPlayer == null ? ("entity " + damaged.getType()) : ("player" + damagedPlayer.getName())) + " damage=" + damage);
+            debug(player, "Attacks " + (damagedPlayer == null ? ("entity " + damaged.getType()) : ("player" + damagedPlayer.getName())) + " damage=" + (finalDamage == originalDamage ? finalDamage : (originalDamage + "/" + finalDamage)));
         }
 
         // Can't fight dead.
@@ -206,7 +211,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // 1.9: sweep attack.
         final int locHashCode = LocUtil.hashCode(loc);
-        if (damage == 1.0) {
+        if (originalDamage == 1.0) {
             // Might be a sweep attack.
             if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
                 // TODO: Might limit the amount of 'too far off' sweep hits, possibly silent cancel for low frequency.
@@ -223,7 +228,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         // LEGACY: thorns.
-        if (BridgeHealth.DAMAGE_THORNS == null && damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
+        if (BridgeHealth.DAMAGE_THORNS == null && originalDamage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
             // Don't handle further, but do respect selfhit/canceldead.
             // TODO: Remove soon, at least version-dependent.
             data.thornsId = Integer.MIN_VALUE;
@@ -509,14 +514,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 return;
             }
             if (player != null){
-                final double damage = BridgeHealth.getDamage(e);
                 final FightData data = FightData.getData(player);
                 if (damageCause == DamageCause.ENTITY_ATTACK){
                     // TODO: Might/should skip the damage comparison, though checking on lowest priority.
                     if (damaged.getEntityId() == data.lastExplosionEntityId && tick == data.lastExplosionDamageTick) {
                         data.lastExplosionDamageTick = -1;
                         data.lastExplosionEntityId = Integer.MAX_VALUE;
-                    } else if (handleNormalDamage(player, damaged, damage, tick, data)){
+                    } else if (handleNormalDamage(player, damaged, 
+                            BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
+                            tick, data)){
                         e.setCancelled(true);
                     }
                 }

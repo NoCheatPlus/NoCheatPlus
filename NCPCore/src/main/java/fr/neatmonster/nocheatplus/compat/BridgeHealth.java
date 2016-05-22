@@ -85,10 +85,14 @@ public class BridgeHealth {
     }
 
     /**
-     * Get the damage from an EntityDamageEvent.
+     * Get the damage from an EntityDamageEvent (damage before applying
+     * modifiers).
+     * 
      * @param event
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static double getDamage(final EntityDamageEvent event){
         try{
@@ -99,9 +103,30 @@ public class BridgeHealth {
         }
     }
 
+    /**
+     * Damage amount after applying modifiers (if/as available).
+     * 
+     * @param event
+     * @return
+     */
     public static double getFinalDamage(final EntityDamageEvent event) {
         try {
             return event.getFinalDamage();
+        }
+        catch (Throwable t) {
+            return getDamage(event);
+        }
+    }
+
+    /**
+     * Damage amount before applying modifiers.
+     * 
+     * @param event
+     * @return
+     */
+    public static double getOriginalDamage(final EntityDamageEvent event) {
+        try {
+            return event.getDamage();
         }
         catch (Throwable t) {
             return getDamage(event);
