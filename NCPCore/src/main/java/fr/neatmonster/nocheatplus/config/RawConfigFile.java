@@ -210,15 +210,16 @@ public class RawConfigFile  extends YamlConfiguration{
     }
 
     /**
-     * Read double for entity type, ignoring case, bukkit names.
+     * Read double for entity type, ignoring case. Uses bukkit names for
+     * EntityType.
      * 
      * @param path
      * @param map
      * @param defaultValue
      * @param allowDefault
      *            If set to true, the default value will be added for the null
-     *            key, unless present, and only if section key equals 'default',
-     *            ignoring case.
+     *            key, unless present, and it will be set/overridden if a
+     *            section key equals 'default', ignoring case.
      */
     public void readDoubleValuesForEntityTypes(final String sectionPath, final Map<EntityType, Double> map, double defaultValue, final boolean allowDefault) {
         final ConfigurationSection section = getConfigurationSection(sectionPath);
