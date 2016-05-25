@@ -105,6 +105,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    noFallCheck;
     /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
     public final boolean    noFallDealDamage;
+    public final boolean    noFallSkipAllowFlight;
     /** Reset data on violation, i.e. a player taking fall damage without being on ground. */
     public final boolean    noFallViolationReset;
     /** Reset data on tp. */
@@ -225,6 +226,7 @@ public class MovingConfig extends ACheckConfig {
 
         noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
         noFallDealDamage = config.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
+        noFallSkipAllowFlight = config.getBoolean(ConfPaths.MOVING_NOFALL_SKIPALLOWFLIGHT);
         noFallViolationReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
         noFallTpReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
         noFallVehicleReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVEHICLE);

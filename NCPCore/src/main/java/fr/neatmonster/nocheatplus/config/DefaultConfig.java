@@ -394,6 +394,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
         set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
+        set(ConfPaths.MOVING_NOFALL_SKIPALLOWFLIGHT, true);
         set(ConfPaths.MOVING_NOFALL_RESETONVL, false);
         set(ConfPaths.MOVING_NOFALL_RESETONTP, false);
         set(ConfPaths.MOVING_NOFALL_RESETONVEHICLE, true);

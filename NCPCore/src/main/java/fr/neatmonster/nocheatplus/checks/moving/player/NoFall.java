@@ -43,26 +43,33 @@ public class NoFall extends Check {
     }
 
     /**
-     * Deal damage if appropriate. To be used for if the player is on ground somehow.
+     * Deal damage if appropriate. To be used for if the player is on ground
+     * somehow. Contains checking for skipping conditions (getAllowFlight set +
+     * configured to skip).
+     * 
      * @param mcPlayer
      * @param data
      * @param y
      */
     private void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
-        //        final int pD = getDamage(mcPlayer.fallDistance);
-        //        final int nfD = getDamage(data.noFallFallDistance);
-        //        final int yD = getDamage((float) (data.noFallMaxY - y));
-        //        final int maxD = Math.max(Math.max(pD, nfD), yD);
+     // Damage to be dealt.
         final double maxD = estimateDamage(player, y, data);
         if (maxD >= 1.0) {
-            // Damage to be dealt.
-            // TODO: more effects like sounds, maybe use custom event with violation added.
-            if (data.debug) {
-                debug(player, "NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
+            // Check skipping conditions.
+            if (cc.noFallSkipAllowFlight && player.getAllowFlight()) {
+                data.noFallSkipAirCheck = true;
+                data.clearNoFallData();
+                // Not resetting the fall distance here, let Minecraft or the issue tracker deal with that.
             }
-            // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
-            data.noFallSkipAirCheck = true;
-            dealFallDamage(player, maxD);
+            else {
+                // TODO: more effects like sounds, maybe use custom event with violation added.
+                if (data.debug) {
+                    debug(player, "NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
+                }
+                // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
+                data.noFallSkipAirCheck = true;
+                dealFallDamage(player, maxD);
+            }
         }
         else {
             data.clearNoFallData();
@@ -261,7 +268,8 @@ public class NoFall extends Check {
         if (data.noFallFallDistance - fallDistance > 0.0) {
             final double playerY = player.getLocation(useLoc).getY();
             useLoc.setWorld(null);
-            if (player.getAllowFlight() || player.isFlying() || player.getGameMode() == GameMode.CREATIVE) {
+            if (player.isFlying() || player.getGameMode() == GameMode.CREATIVE
+                    || player.getAllowFlight() && MovingConfig.getConfig(player).noFallSkipAllowFlight) {
                 // Forestall potential issues with flying plugins.
                 player.setFallDistance(0f);
                 data.noFallFallDistance = 0f;

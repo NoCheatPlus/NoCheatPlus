@@ -559,6 +559,8 @@ public abstract class ConfPaths {
     private static final String MOVING_NOFALL                            = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                      = MOVING_NOFALL + "active";
     public static final String  MOVING_NOFALL_DEALDAMAGE                 = MOVING_NOFALL + "dealdamage";
+    public static final String  MOVING_NOFALL_SKIPALLOWFLIGHT            = MOVING_NOFALL + "skipallowflight";
+    // TODO: A reset section (violation, teleport, vehicle) + @Moved.
     public static final String  MOVING_NOFALL_RESETONVL                  = MOVING_NOFALL + "resetonviolation";
     public static final String  MOVING_NOFALL_RESETONTP                  = MOVING_NOFALL + "resetonteleport";
     public static final String  MOVING_NOFALL_RESETONVEHICLE             = MOVING_NOFALL + "resetonvehicle";
