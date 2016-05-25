@@ -1954,6 +1954,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (strider != 0) {
             builder.append("(e_depth_strider=" + strider + ")");
         }
+        if (Bridge1_9.isGliding(player)) {
+            builder.append("(gliding)");
+        }
+        if (player.getAllowFlight()) {
+            builder.append("(allow_flight)");
+        }
+        if (player.isFlying()) {
+            builder.append("(flying)");
+        }
         // Print basic info first in order
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         // Extended info.
