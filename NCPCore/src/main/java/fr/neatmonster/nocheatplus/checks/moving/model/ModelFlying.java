@@ -36,6 +36,10 @@ public class ModelFlying {
     /** Default ground moving mechanics (jump, lost ground). */
     public final boolean ground;
 
+    /** Ugly, but true. */
+    private boolean scaleLevitationEffect = false;
+
+    // TODO: Switch to something else (non final, chaining with getters and setters)? [though models are referenced in past moves]
     public ModelFlying(String id, double hModSpeed, double hModSprint, double vModAscendSpeed, double maxHeight, 
             boolean applyModifiers, boolean gravity, final boolean ground) {
         // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
@@ -67,6 +71,14 @@ public class ModelFlying {
 
     public ModelFlying() {
         this(null, 100.0, 1.92, 100.0, 128, true, true, true);
+    }
+
+    public boolean isScaleLevitationEffect() {
+        return scaleLevitationEffect;
+    }
+
+    public void setScaleLevitationEffect(boolean scaleLevitationEffect) {
+        this.scaleLevitationEffect = scaleLevitationEffect;
     }
 
 }

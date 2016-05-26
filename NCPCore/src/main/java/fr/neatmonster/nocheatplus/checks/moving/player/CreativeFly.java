@@ -330,6 +330,16 @@ public class CreativeFly extends Check {
             // Let fly speed apply with moving upwards.
             limitV *= data.flySpeed / 0.1;
         }
+        else if (model.isScaleLevitationEffect() && Bridge1_9.hasLevitation()) {
+            // Exclude modifiers for now.
+            final double levitation = Bridge1_9.getLevitationAmplifier(from.getPlayer());
+            if (levitation > 0.0) {
+                // (Double checked.)
+                // TODO: Perhaps do with a modifier instead, to avoid confusion.
+                limitV += 0.046 * levitation; // (It ends up like 0.5 added extra for some levels of levitation, roughly.)
+                tags.add("levitation:" + levitation);
+            }
+        }
 
         // TODO: Hack, move / config / something.
         // TODO: Confine more. hdist change relates to ydist change

@@ -212,6 +212,7 @@ public class MovingConfig extends ACheckConfig {
             flyingModelGameMode.put(gameMode, new ModelFlying("gamemode." + gameMode.name().toLowerCase(), config, ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
         }
         flyingModelLevitation = new ModelFlying("potion.levitation", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "levitation.", defaultModel);
+        flyingModelLevitation.setScaleLevitationEffect(true); // Pirate.
         flyingModelElytra = new ModelFlying("jetpack.elytra", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", defaultModel);
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
