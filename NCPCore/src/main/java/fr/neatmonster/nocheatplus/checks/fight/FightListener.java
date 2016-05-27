@@ -35,6 +35,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -121,9 +122,13 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // Hotfix attempt for enchanted books.
         // TODO: maybe a generalized version for the future...
-        final ItemStack stack = player.getItemInHand(); // TODO: Appropriate off-hand checking.
         // Illegal enchantments hotfix check.
-        if (Items.checkIllegalEnchantments(player, stack)) return true;
+        if (Items.checkIllegalEnchantments(player, Bridge1_9.getItemInMainHand(player))) {
+            return true;
+        }
+        if (Bridge1_9.hasGetItemInOffHand() && Items.checkIllegalEnchantments(player, Bridge1_9.getItemInOffHand(player))) {
+            return true;
+        }
 
         boolean cancelled = false;
 
@@ -293,6 +298,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         // Check angle with allowed window.
+        // TODO: Actual angle needs to be related to the best matching trace element(s) (loop checks).
         if (angle.isEnabled(player)) {
             // TODO: Revise, use own trace.
             // The "fast turning" checks are checked in any case because they accumulate data.
@@ -320,6 +326,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         //    	data.lastAttackedDist = targetDist;
 
         // Care for the "lost sprint problem": sprint resets, client moves as if still...
+        // TODO: If this is just in-air, model with friction, so this can be removed.
         // TODO: Use stored distance calculation same as reach check?
         // TODO: For pvp: make use of "player was there" heuristic later on.
         // TODO: Confine further with simple pre-conditions.
@@ -564,18 +571,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param damagedData
      */
     private void applyKnockBack(final Player attacker, final Player damagedPlayer, final FightData damagedData) {
-        double level = 1.0; // Assume "some knock-back" always.
-        if (attacker.isSprinting()) {
-            level += 1.0;
-        }
-        final ItemStack stack = attacker.getItemInHand();
-        if (!BlockProperties.isAir(stack)) {
-            level += (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
-        }
+        final double level = getKnockBackLevel(attacker);
         final MovingData mdata = MovingData.getData(damagedPlayer);
         final MovingConfig mcc = MovingConfig.getConfig(damagedPlayer);
-        // Cap the level to something reasonable. TODO: Config.
-        level = Math.min(20.0, level);
         // TODO: How is the direction really calculated?
         // Aim at sqrt(vx * vx + vz * vz, 2), not the exact direction.
         final double vx = level / Math.sqrt(8.0);
@@ -586,6 +584,37 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             debug(damagedPlayer, "Received knockback level: " + level);
         }
         mdata.addVelocity(damagedPlayer, mcc,  vx, vy, vz);
+    }
+
+    /**
+     * Get the knock-back "level", a player can deal based on sprinting +
+     * item(s) in hand. The minimum knock-back level is 1.0 (1 + 1 for sprinting
+     * + knock-back level), currently capped at 20. Since detecting relevance of
+     * items in main vs. off hand, we use the maximum of both, for now.
+     * 
+     * @param player
+     * @return
+     */
+    private double getKnockBackLevel(final Player player) {
+        double level = 0.0;
+        // TODO: Get the RELEVANT item (...).
+        ItemStack stack = Bridge1_9.getItemInMainHand(player);
+        if (!BlockProperties.isAir(stack)) {
+            level = (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
+        }
+        if (Bridge1_9.hasGetItemInOffHand()) {
+            stack = Bridge1_9.getItemInOffHand(player);
+            if (!BlockProperties.isAir(stack)) {
+                level = Math.max(level, (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK));
+            }
+        }
+        level += 1.0; // 1.0 is the minimum knock-back value.
+        if (player.isSprinting()) {
+            // TODO: Lost sprint?
+            level += 1.0;
+        }
+        // Cap the level to something reasonable. TODO: Config / cap the velocity anyway.
+        return Math.min(20.0, level);
     }
 
     /**
