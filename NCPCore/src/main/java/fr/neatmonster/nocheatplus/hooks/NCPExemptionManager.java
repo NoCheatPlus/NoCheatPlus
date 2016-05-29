@@ -51,7 +51,7 @@ public class NCPExemptionManager {
      *            the instance is stored as is (see note about cleanup for
      *            custom implementations).
      */
-    public void setExemptionSettings(ExemptionSettings settings) {
+    public static void setExemptionSettings(ExemptionSettings settings) {
         NCPExemptionManager.settings = settings;
     }
 
