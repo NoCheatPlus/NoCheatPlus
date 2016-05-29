@@ -84,6 +84,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
+import fr.neatmonster.nocheatplus.hooks.ExemptionSettings;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.hooks.allviolations.AllViolationsConfig;
@@ -811,6 +812,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         if (!ConfigManager.isInitialized()) {
             ConfigManager.init(this);
+            // Basic setup for exemption (uses CheckType). This is redundant, but should not hurt.
+            NCPExemptionManager.setExemptionSettings(new ExemptionSettings(ConfigManager.getConfigFile()));
         }
         if (logManager == null || logManager.getStreamID(Streams.STATUS.name) != Streams.STATUS) {
             logManager = new BukkitLogManager(this);
@@ -1097,6 +1100,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
         clearExemptionsOnJoin = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN);
         clearExemptionsOnLeave = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE);
+        NCPExemptionManager.setExemptionSettings(new ExemptionSettings(config));
     }
 
     private void updateBlockChangeTracker(final ConfigFile config) {

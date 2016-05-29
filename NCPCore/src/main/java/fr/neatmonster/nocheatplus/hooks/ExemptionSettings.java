@@ -9,6 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.NPC;
 
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+
 /**
  * Encapsulate generic settings and checking functionality for exemption.
  * 
@@ -26,11 +29,9 @@ public class ExemptionSettings {
      */
     public static final class MetaDataListCheck {
 
-        private final String[] metaDataKeys;
-
-        public MetaDataListCheck(final Collection<String> keys) {
+        private static String[] getKeys(final Collection<String> keys) {
             if (keys == null) {
-                this.metaDataKeys = null;
+                return null;
             }
             else {
                 final List<String> notNull = new ArrayList<String>(keys.size());
@@ -40,12 +41,22 @@ public class ExemptionSettings {
                     }
                 }
                 if (notNull.isEmpty()) {
-                    this.metaDataKeys = null;
+                    return null;
                 }
                 else {
-                    this.metaDataKeys = notNull.toArray(new String[notNull.size()]);
+                    return notNull.toArray(new String[notNull.size()]);
                 }
             }
+        }
+
+        private final String[] metaDataKeys;
+
+        public MetaDataListCheck(final ConfigFile config, final String pathActive, final String pathKeys) {
+            this(config.getBoolean(pathActive) ? config.getStringList(pathKeys) : null);
+        }
+
+        public MetaDataListCheck(final Collection<String> keys) {
+            this.metaDataKeys = getKeys(keys);
         }
 
         public boolean hasAnyMetaDataKey(final Entity entity) {
@@ -95,7 +106,22 @@ public class ExemptionSettings {
                 true, true, new MetaDataListCheck(Arrays.asList("NPC")));
     }
 
-    // TODO: From config file (with a path prefix or just with hard coded paths).
+    /**
+     * Read the settings from the given configuration file, using default paths,
+     * assuming DefaultConfig as defaults.
+     * 
+     * @param config
+     */
+    public ExemptionSettings(final ConfigFile config) {
+        this(
+                new MetaDataListCheck(config, ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE, 
+                        ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_KEYS), 
+                config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_ACTIVE), 
+                config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_BUKKITINTERFACE), 
+                new MetaDataListCheck(config, ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_ACTIVE, 
+                        ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_KEYS)
+                );
+    }
 
     /**
      * 

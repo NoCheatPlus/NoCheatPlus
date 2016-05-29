@@ -693,10 +693,20 @@ public abstract class ConfPaths {
 
     public static final String COMPATIBILITY_EXEMPTIONS                  = COMPATIBILITY + "exemptions.";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE           = COMPATIBILITY_EXEMPTIONS + "remove.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD         = COMPATIBILITY_EXEMPTIONS + "wildcard.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT = COMPATIBILITY_EXEMPTIONS_WILDCARD + "default.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT + "metadata.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA + "active";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_KEYS = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA + "keys";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC     = COMPATIBILITY_EXEMPTIONS_WILDCARD + "npc.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "active";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_BUKKITINTERFACE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "bukkitnpc";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "metadata.";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA + "active";
+    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_KEYS = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA + "keys";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN      = COMPATIBILITY_EXEMPTIONS_REMOVE + "join";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE     = COMPATIBILITY_EXEMPTIONS_REMOVE + "leave";
-    // TODO: remove: tick, metadata.
-    // TODO: npcs: active, checks (default: fight, moving, all the noswings, wrongblock etc.)
+    // TODO: remove: tick, check / remove metadata on tick/leave?.
 
     public static final String COMPATIBILITY_SERVER                      = COMPATIBILITY + "server.";
     public static final String COMPATIBILITY_SERVER_CBDEDICATED          = COMPATIBILITY_SERVER + "cbdedicated.";

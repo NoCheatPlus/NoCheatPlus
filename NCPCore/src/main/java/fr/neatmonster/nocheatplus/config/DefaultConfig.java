@@ -561,6 +561,12 @@ public class DefaultConfig extends ConfigFile {
 
         // Compatibility settings.
         set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE, true);
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_KEYS, Arrays.asList("nocheat.exempt"));
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_ACTIVE, true);
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_BUKKITINTERFACE, true);
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_ACTIVE, true);
+        set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_KEYS, Arrays.asList("NPC"));
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN, true);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE, true);
         set(ConfPaths.COMPATIBILITY_SERVER_CBDEDICATED_ENABLE, true);
