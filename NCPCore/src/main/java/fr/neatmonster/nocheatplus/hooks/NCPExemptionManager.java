@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -20,7 +19,12 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
  */
 public class NCPExemptionManager {
 
-    /** A map associating a check type with the unique ids of its exempted players. */
+    private static ExemptionSettings settings = new ExemptionSettings();
+
+    /**
+     * A map associating a check type with the unique ids of its exempted
+     * players.
+     */
     private static final Map<CheckType, Set<UUID>> exempted          = new HashMap<CheckType, Set<UUID>>();
 
     static {
@@ -28,17 +32,42 @@ public class NCPExemptionManager {
     }
 
     /**
+     * Get the current settings.
+     * 
+     * @return
+     */
+    public static ExemptionSettings getExemptionSettings() {
+        return settings;
+    }
+
+    /**
+     * Set the settings to apply from that moment on. <br>
+     * Note that there is no cleanup, thus you should perform cleanup yourself,
+     * in case of passing a custom sub class of ExemptionSettings, for the case
+     * of your plugin disabling or NPC disabling.
+     * 
+     * @param settings
+     *            If null, the default implementation will be used, otherwise
+     *            the instance is stored as is (see note about cleanup for
+     *            custom implementations).
+     */
+    public void setExemptionSettings(ExemptionSettings settings) {
+        NCPExemptionManager.settings = settings;
+    }
+
+    /**
      * Remove all exemptions.
      */
     public static final void clear() {
         // Use put with a new map to keep entries to stay thread safe.
-        for (final CheckType checkType : CheckType.values())
+        for (final CheckType checkType : CheckType.values()) {
             if (APIUtils.needsSynchronization(checkType)) {
                 exempted.put(checkType, Collections.synchronizedSet(new HashSet<UUID>()));
             }
             else {
                 exempted.put(checkType, new HashSet<UUID>());
             }
+        }
     }
 
     /**
@@ -94,8 +123,8 @@ public class NCPExemptionManager {
      * <hr>
      * This might help exempting NPCs from checks for all time, making
      * performance a lot better. A future purpose might be to exempt vehicles
-     * and similar (including passengers) from checks. Includes players, note that this can not
-     * check for exemption by meta data.
+     * and similar (including passengers) from checks. Includes players, note
+     * that this can not check for exemption by meta data.
      * 
      * @param id
      *            The unique id.
@@ -111,7 +140,7 @@ public class NCPExemptionManager {
     /**
      * Check if a player is exempted from a check right now. This also checks
      * for exemption by meta data, iff it's called from within execution of the
-     * primary thread.
+     * primary thread. Wild card exemption for NPCs is also checked.
      * 
      * @param player
      *            The player to exempt from checks
@@ -121,25 +150,8 @@ public class NCPExemptionManager {
      * @return If the player is exempted from the check right now.
      */
     public static final boolean isExempted(final Player player, final CheckType checkType) {
-        // TODO: Settings: If to check meta data at all.
-        // TODO: Settings: check types to exempt npcs from (and if to use) -> implement setSettings.
-        return isExempted(player.getUniqueId(), checkType) || 
-                Bukkit.isPrimaryThread() && player.hasMetadata("nocheat.exempt");
-    }
-
-    /**
-     * Check if a player is an npc, using current settings. Checks for metada,
-     * iff called from within the primary thread.
-     * 
-     * @param player
-     * @return
-     */
-    public static final boolean isNpc(final Player player) {
-        // TODO: Configurability: Which meta data key(s) and what to check for.
-        // TODO: Other NPC detection methods, e.g. registered interface implementations for isNPC(Entity).
-        // TODO: Performance tweaks with optimism for last returned results for this Player/UUID, possibly with timing constraints and invalidation conditions, such as logout or kick events.
-        return (player instanceof NPC) || 
-                Bukkit.isPrimaryThread() && player.hasMetadata("npc");
+        return isExempted(player.getUniqueId(), checkType) 
+                || settings.isExemptedBySettings(player, Bukkit.isPrimaryThread());
     }
 
     /**
