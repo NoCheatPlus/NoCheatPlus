@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.pool.AbstractPool;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * This class is meant to record locations for players moving, in order to allow
@@ -34,17 +33,16 @@ public class LocationTrace {
 
         public long getTime();
 
-        public double getLastDistSq();
-
     }
 
     public static class TraceEntry implements ITraceEntry {
+        
+        // TODO: Consider using a simple base implementation for IGetSetPosiotion.
 
         /** We keep it open, if ticks or ms are used. */
         private long time;
         /** Coordinates. */
         private double x, y, z;
-        private double lastDistSq;
 
         /** Older/next. */
         private TraceEntry next;
@@ -58,14 +56,12 @@ public class LocationTrace {
          * @param x
          * @param y
          * @param z
-         * @param lastDistSq
          */
-        public void set(long time, double x, double y, double z, double lastDistSq) {
+        public void set(long time, double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.time = time;
-            this.lastDistSq = lastDistSq;
         }
 
         @Override
@@ -86,11 +82,6 @@ public class LocationTrace {
         @Override
         public long getTime() {
             return time;
-        }
-
-        @Override
-        public double getLastDistSq() {
-            return lastDistSq;
         }
 
     }
@@ -188,19 +179,15 @@ public class LocationTrace {
     }
 
     public final void addEntry(final long time, final double x, final double y, final double z) {
-        double lastDistSq = 0.0;
         if (size > 0) {
-            final TraceEntry latestEntry = firstEntry;
-            if (x == latestEntry.x && y == latestEntry.y && z == latestEntry.z) {
+            if (x == firstEntry.x && y == firstEntry.y && z == firstEntry.z) {
                 // (No update of time. firstEntry ... now always counts.)
                 return;
             }
-            // TODO: Is lastdistSq used at all?
-            lastDistSq = TrigUtil.distanceSquared(x, y, z, latestEntry.x, latestEntry.y, latestEntry.z);
         }
         // Add a new entry.
         final TraceEntry newEntry = pool.getInstance();
-        newEntry.set(time, x, y, z, lastDistSq);
+        newEntry.set(time, x, y, z);
         setFirst(newEntry);
         // Remove the last entry, if maxSize is exceeded.
         if (size > maxSize) {
