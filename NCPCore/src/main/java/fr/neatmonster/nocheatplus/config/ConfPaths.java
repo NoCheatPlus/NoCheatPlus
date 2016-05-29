@@ -634,8 +634,8 @@ public abstract class ConfPaths {
     public static final String  MOVING_ENFORCELOCATION                      = MOVING + "enforcelocation";
 
     private static final String MOVING_TRACE                                = MOVING + "trace.";
-    public  static final String MOVING_TRACE_SIZE                           = MOVING_TRACE + "size";
-    public  static final String MOVING_TRACE_MERGEDIST                      = MOVING_TRACE + "mergedist";
+    public static final String  MOVING_TRACE_MAXAGE                         = MOVING_TRACE + "maxage";
+    public static final String  MOVING_TRACE_MAXSIZE                        = MOVING_TRACE + "maxsize";
 
     private static final String MOVING_VEHICLE                              = MOVING + "vehicle.";
     public static final String  MOVING_VEHICLE_ENFORCELOCATION              = MOVING_VEHICLE + "enforcelocation";
@@ -691,17 +691,17 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY                             = "compatibility.";
     public static final String COMPATIBILITY_MANAGELISTENERS             = COMPATIBILITY + "managelisteners";
 
-    public static final String COMPATIBILITY_EXEMPTIONS                  = COMPATIBILITY + "exemptions.";
-    public static final String COMPATIBILITY_EXEMPTIONS_REMOVE           = COMPATIBILITY_EXEMPTIONS + "remove.";
-    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD         = COMPATIBILITY_EXEMPTIONS + "wildcard.";
-    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT = COMPATIBILITY_EXEMPTIONS_WILDCARD + "default.";
-    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT + "metadata.";
+    private static final String COMPATIBILITY_EXEMPTIONS                 = COMPATIBILITY + "exemptions.";
+    private static final String COMPATIBILITY_EXEMPTIONS_REMOVE          = COMPATIBILITY_EXEMPTIONS + "remove.";
+    private static final String COMPATIBILITY_EXEMPTIONS_WILDCARD        = COMPATIBILITY_EXEMPTIONS + "wildcard.";
+    private static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT = COMPATIBILITY_EXEMPTIONS_WILDCARD + "default.";
+    private static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT + "metadata.";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA + "active";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_KEYS = COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA + "keys";
-    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC     = COMPATIBILITY_EXEMPTIONS_WILDCARD + "npc.";
+    private static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC    = COMPATIBILITY_EXEMPTIONS_WILDCARD + "npc.";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "active";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_BUKKITINTERFACE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "bukkitnpc";
-    public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "metadata.";
+    private static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC + "metadata.";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_ACTIVE = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA + "active";
     public static final String COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA_KEYS = COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_METADATA + "keys";
     public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN      = COMPATIBILITY_EXEMPTIONS_REMOVE + "join";
@@ -795,6 +795,10 @@ public abstract class ConfPaths {
     public static final String  NET_FLYINGFREQUENCY_STRAYPACKETS_CANCEL  = "checks.net.flyingfrequency.straypackets.cancel";
     @Deprecated // Elytra: Deprecate to force override the old config value (also auto-added to moved).
     public static final String  MOVING_CREATIVEFLY_MODEL_ELYTRA_HORIZONTALSPEED = "checks.moving.creativefly.model.elytra.horizontalspeed";
+    @Deprecated
+    public  static final String MOVING_TRACE_SIZE                           = "checks.moving.trace.size";
+    @Deprecated
+    public  static final String MOVING_TRACE_MERGEDIST                      = "checks.moving.trace.mergedist";
 
     /**
      * Get moved paths for which an annotation doesn't work.

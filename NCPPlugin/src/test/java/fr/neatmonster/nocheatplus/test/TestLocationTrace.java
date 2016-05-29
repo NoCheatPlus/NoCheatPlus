@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceIterator;
 
 
@@ -45,11 +46,13 @@ public class TestLocationTrace {
         return center + (random.nextBoolean() ? step : -step);
     }
 
+    // TODO: Test pool as well.
+    private TraceEntryPool pool = new TraceEntryPool(1000);
+
     @Test
     public void testSize() {
         int size = 80;
-        double mergeDist = -0.1;
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         // Empty
         if (!trace.isEmpty()) {
             fail("Trace must be empty on start.");
@@ -76,8 +79,7 @@ public class TestLocationTrace {
     @Test
     public void testMergeZeroDist() {
         int size = 80;
-        double mergeDist = 0.0;
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         for (int i = 0; i < 1000; i ++) {
             trace.addEntry(i + size, 0 , 0, 0);
             if (trace.size() != 1) {
@@ -87,59 +89,10 @@ public class TestLocationTrace {
     }
 
     @Test
-    public void testMergeUpdateAlwaysDist() {
-        // Extreme merge dist.
-        int size = 80;
-        double mergeDist = 1000.0;
-        LocationTrace trace = new LocationTrace(size, mergeDist);
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        trace.addEntry(0 , x, y, z);
-        // Note that entries might get split, if the distance to the second last gets too big, so the maximum number of steps must be limited.
-        for (int i = 0; i < 1000; i ++) {
-            x = randStep(x, 0.5);
-            y = randStep(y, 0.5);
-            z = randStep(z, 0.5);
-            trace.addEntry(i + 1, x, y, z);
-            if (trace.size() != 2) {
-                fail("Wrong size, expect 2, got instead: " + trace.size());
-            }
-        }
-    }
-
-    @Test
-    public void testMergeDist() {
-        // Deterministic steps => calculatable size.
-        int size = 80;
-        double mergeDist = 0.5;
-        LocationTrace trace = new LocationTrace(size, mergeDist);
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        trace.addEntry(0 , x, y, z);
-        for (int i = 0; i < size * 2; i ++) {
-            x += 0.5;
-            trace.addEntry(i + 1, x, y, z);
-            if (Math.abs(trace.size() - (1 + i / 2)) > 1 ) {
-                fail("Wrong size, expect roughly half of " + (i + 1) + ", got instead: " + trace.size());
-            }
-        }
-        Iterator<ITraceEntry> it = trace.oldestIterator();
-        while (it.hasNext()) {
-            if (it.next().getLastDistSq() > 1.0) {
-                fail("Spacing should be smaller than 1.0 (sq / actual).");
-            }
-        }
-
-    }
-
-    @Test
     public void testEmptyIterator() {
         // Expected to fail.
         int size = 80;
-        double mergeDist = -0.1;
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         try {
             trace.oldestIterator();
             fail("Expect an exception on trying to get an empty iterator (oldest).");
@@ -163,8 +116,7 @@ public class TestLocationTrace {
     @Test
     public void testIteratorSizeAndOrder() {
         int size = 80;
-        double mergeDist = -0.1; // Never merge.
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         // Adding up to size elements.
         for (int i = 0; i < size; i++) {
             trace.addEntry(i, i, i, i);
@@ -223,8 +175,7 @@ public class TestLocationTrace {
     @Test
     public void testMaxAgeIterator() {
         int size = 80;
-        double mergeDist = -0.1; // Never merge.
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         // Adding up to size elements.
         for (int i = 0; i < size; i++) {
             trace.addEntry(i, i, i, i);
@@ -249,8 +200,7 @@ public class TestLocationTrace {
     @Test
     public void testMaxAgeFirstElementAnyway() {
         int size = 80;
-        double mergeDist = -0.1; // Never merge.
-        LocationTrace trace = new LocationTrace(size, mergeDist);
+        LocationTrace trace = new LocationTrace(size, size, pool);
         trace.addEntry(0, 0, 0, 0);
         if (!trace.maxAgeIterator(1000).hasNext()) {
             fail("Expect iterator (maxAge) to always contain the latest element.");
@@ -265,5 +215,7 @@ public class TestLocationTrace {
             fail("Expect iterator (maxAge) to have only the latest element for all out of range entries.");
         }
     }
+
+    // TODO: Tests with expiration of entries (size and iterators).
 
 }

@@ -292,7 +292,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(useLoc);
         data.setSetBack(loc);
         aux.resetPositionsAndMediumProperties(player, loc, data, cc);
-        data.resetTrace(loc, TickTask.getTick(), cc.traceSize, cc.traceMergeDist);
+        data.resetTrace(loc, TickTask.getTick(), cc);
         if (cc.enforceLocation) {
             // Just in case.
             playersEnforce.add(player.getName());
@@ -1573,7 +1573,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearVehicleData(); // TODO: Uncertain here, what to check.
         data.clearAllMorePacketsData();
         data.removeAllVelocity();
-        data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist); // Might reset to loc instead of set-back ?
+        data.resetTrace(loc, tick, cc); // Might reset to loc instead of set-back ?
 
         // More resetting.
         data.vDistAcc.clear();

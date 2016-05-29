@@ -191,8 +191,8 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList vehicleEnvelopeActions;
 
     // Trace
-    public final int traceSize;
-    public final double traceMergeDist;
+    public final int traceMaxAge;
+    public final int traceMaxSize;
 
     /**
      * Instantiates a new moving configuration.
@@ -305,8 +305,8 @@ public class MovingConfig extends ACheckConfig {
         }
         blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
 
-        traceSize = config.getInt(ConfPaths.MOVING_TRACE_SIZE);
-        traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
+        traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
+        traceMaxSize = config.getInt(ConfPaths.MOVING_TRACE_MAXSIZE, 200);
 
         ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLE_ENFORCELOCATION, AlmostBoolean.MAYBE);
         vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.

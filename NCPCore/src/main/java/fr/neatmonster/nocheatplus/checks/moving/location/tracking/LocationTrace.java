@@ -3,18 +3,29 @@ package fr.neatmonster.nocheatplus.checks.moving.location.tracking;
 import java.util.Iterator;
 
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
+import fr.neatmonster.nocheatplus.components.pool.AbstractPool;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
- * This class is meant to record locations for players moving, in order to allow to be more   
- * lenient for the case of latency for player-player interaction such as with fighting.
- * <br>
+ * This class is meant to record locations for players moving, in order to allow
+ * to be more lenient for the case of latency, e.g. with player-player
+ * interaction such as with fighting. <br>
  * NOTES on intended use:<br>
- * <li>Is meant to always carry some location.</li>
- * <li>Records only the end-positions of a move.</li>
- * <li>Prefer calling add(...) with the current location, before iterating. Alternative: guard with isEmpty().</li>
- * <li>Updating on teleport events is not intended - if the distance is too big, Minecraft should prevent interaction anyway.</li>
- * @author mc_dev
+ * <li>Is meant to always carry some location, however right after
+ * initialization it may throw NullPointerException if you use it without
+ * updating to a location.</li>
+ * <li>Records only the end-positions of a move. Typically also updated, when a
+ * player is attacked.</li>
+ * <li>Prefer calling add(...) with the current location, before iterating.
+ * Alternative: guard with isEmpty().</li>
+ * <li>Updating on teleport events is not intended - if the distance is too big,
+ * Minecraft should prevent interaction anyway.</li>
+ * <li>There is no merging done on small distances. Neither is the time updated
+ * for the latest entry, if the position stays the same. Always consider the
+ * time difference to now for the first entry, and the time difference to the
+ * previous entry for other entries.</li>
+ * 
+ * @author asofold
  *
  */
 public class LocationTrace {
@@ -35,6 +46,20 @@ public class LocationTrace {
         private double x, y, z;
         private double lastDistSq;
 
+        /** Older/next. */
+        private TraceEntry next;
+        /** Newer/previous. */
+        private TraceEntry previous;
+
+        /**
+         * Previous and next are not touched here (!).
+         * 
+         * @param time
+         * @param x
+         * @param y
+         * @param z
+         * @param lastDistSq
+         */
         public void set(long time, double x, double y, double z, double lastDistSq) {
             this.x = x;
             this.y = y;
@@ -67,32 +92,49 @@ public class LocationTrace {
         public double getLastDistSq() {
             return lastDistSq;
         }
+
+    }
+
+    public static final class TraceEntryPool extends AbstractPool<TraceEntry> {
+
+        public TraceEntryPool(int maxPoolSize) {
+            super(maxPoolSize);
+        }
+
+        @Override
+        protected TraceEntry newInstance() {
+            return new TraceEntry();
+        }
+
     }
 
     /**
-     * Iterate from oldest to latest. Not a fully featured Iterator.
-     * @author mc_dev
+     * Iterate over a slice of entries with given start and direction. Not a
+     * fully featured Iterator.
+     * 
+     * @author asofold
      *
      */
-    public static final class TraceIterator implements Iterator<ITraceEntry>{
-        private final TraceEntry[] entries;
-        /** Index as in LocationTrace */
-        private final int index;
-        private final int size;
-        private int currentIndex;
-        private final boolean ascend;
+    public static final class TraceIterator implements Iterator<ITraceEntry> {
+        /** Element the iteration starts with. */
+        final TraceEntry first;
+        /** The next element to return for calling next(). */
+        private TraceEntry next;
 
-        protected TraceIterator(TraceEntry[] entries, int index, int size, int currentIndex, boolean ascend) {
-            if (currentIndex >= entries.length || currentIndex < 0 || 
-                    currentIndex <= index - size || currentIndex > index && currentIndex <= index - size + entries.length) {
-                // This should also prevent iterators for size == 0, for the moment (!).
-                throw new IllegalArgumentException("startIndex out of bounds.");
+        /**
+         * If set to true, calling next means to advance in direction of
+         * entry.next.
+         */
+        final boolean nextIsNext;
+
+        protected TraceIterator(final TraceEntry first, boolean nextIsNext) {
+            this.first = first;
+            this.nextIsNext = nextIsNext;
+            next = first;
+            if (!hasNext()) {
+                // TODO: Consider IllegalStateException?
+                throw new IllegalArgumentException("Empty iterators are not allowed.");
             }
-            this.entries = entries;
-            this.index = index;
-            this.size = size;
-            this.currentIndex = currentIndex;
-            this.ascend = ascend;
         }
 
         @Override
@@ -100,37 +142,15 @@ public class LocationTrace {
             if (!hasNext()) {
                 throw new IndexOutOfBoundsException("No more entries to iterate.");
             }
-            final TraceEntry entry = entries[currentIndex];
-            if (ascend) {
-                currentIndex ++;
-                if (currentIndex >= entries.length) {
-                    currentIndex = 0;
-                }
-                int ref = index - size + 1;
-                if (ref < 0) {
-                    ref  += entries.length;
-                }
-                if (currentIndex == ref) {
-                    // Invalidate the iterator.
-                    currentIndex = -1;
-                }
-            } else {
-                currentIndex --;
-                if (currentIndex < 0) {
-                    currentIndex = entries.length - 1;
-                }
-                if (currentIndex == index) {
-                    // Invalidate the iterator.
-                    currentIndex = - 1;
-                }
-            }
-            return entry;
+            final TraceEntry next = this.next;
+            this.next = nextIsNext ? next.next : next.previous;
+            return next;
         }
 
         @Override
         public final boolean hasNext() {
             // Just check if currentIndex is within range.
-            return currentIndex >= 0 && currentIndex <= index && currentIndex > index - size || currentIndex > index && currentIndex >= index - size + entries.length;
+            return next != null;
         }
 
         @Override
@@ -140,92 +160,169 @@ public class LocationTrace {
 
     }
 
-    /** A Ring. */
-    private final TraceEntry[] entries;
-    /** Last element index. */
-    private int index = -1;
+    private final TraceEntryPool pool;
+    /** Maximum age for an entry. */
+    private long maxAge;
+    /** Maximum number of entries to keep. */
+    private int maxSize;
     /** Number of valid entries. */
     private int size = 0;
-    private final double mergeDist;
-    private final double mergeDistSq;
+    /** First (latest) entry. */
+    private TraceEntry firstEntry = null;
+    /** Last (oldest) entry. */
+    private TraceEntry lastEntry = null;
 
     // (No world name stored: Should be reset on world changes.)
 
-    public LocationTrace(int bufferSize, double mergeDist) {
-        // TODO: Might consider a cut-off distance/age (performance saving for iteration). 
-        if (bufferSize < 1) {
-            throw new IllegalArgumentException("Expect bufferSize > 0, got instead: " + bufferSize);
-        }
-        entries = new TraceEntry[bufferSize];
-        for (int i = 0; i < bufferSize; i++) {
-            entries[i] = new TraceEntry();
-        }
-        this.mergeDist = mergeDist;
-        this.mergeDistSq = mergeDist * mergeDist;
+    /**
+     * 
+     * @param maxAge
+     *            Stored as long here for efficiency of comparison.
+     * @param maxSize
+     * @param pool
+     */
+    public LocationTrace(final long maxAge, final int maxSize, final TraceEntryPool pool) {
+        this.pool = pool;
+        this.maxAge = maxAge;
+        this.maxSize = maxSize;
     }
 
     public final void addEntry(final long time, final double x, final double y, final double z) {
         double lastDistSq = 0.0;
         if (size > 0) {
-            final TraceEntry latestEntry = entries[index];
-            // TODO: Consider duration of staying there ?
+            final TraceEntry latestEntry = firstEntry;
             if (x == latestEntry.x && y == latestEntry.y && z == latestEntry.z) {
-                latestEntry.time = time;
+                // (No update of time. firstEntry ... now always counts.)
                 return;
             }
+            // TODO: Is lastdistSq used at all?
             lastDistSq = TrigUtil.distanceSquared(x, y, z, latestEntry.x, latestEntry.y, latestEntry.z);
-            // TODO: Think about minMergeSize (1 = never merge the first two, size = first fill the ring).
-            if (size > 1 && lastDistSq <= mergeDistSq) {
-                // TODO: Could use Manhattan, after all.
-                // Only merge if last distance was not greater than mergeDist, to prevent too-far-off entries.
-                if (latestEntry.lastDistSq <= mergeDistSq) {
-                    // Update lastDistSq, due to shifting the elements position.
-                    final TraceEntry secondLatest = index - 1 < 0 ? entries[index - 1 + entries.length] : entries[index - 1];
-                    lastDistSq = TrigUtil.distanceSquared(x, y, z, secondLatest.x, secondLatest.y, secondLatest.z);
-                    latestEntry.set(time, x, y, z, lastDistSq);
-                    return;
-                }
-            }
         }
-        // Advance index.
-        index++;
-        if (index == entries.length) {
-            index = 0;
-        }
-        if (size < entries.length) {
-            size ++;
-        }
-        final TraceEntry newEntry = entries[index];
+        // Add a new entry.
+        final TraceEntry newEntry = pool.getInstance();
         newEntry.set(time, x, y, z, lastDistSq);
-    }
-
-    /** Reset content pointers - call with world changes. */
-    public void reset() {
-        index = 0;
-        size = 0;
+        setFirst(newEntry);
+        // Remove the last entry, if maxSize is exceeded.
+        if (size > maxSize) {
+            returnToPool(lastEntry);
+        }
+        // Remove too old entries.
+        // TODO: Call externally rather or only call every so and so time?
+        checkMaxAge(time);
     }
 
     /**
-     * Get the actual number of valid elements. After some time of moving this should be entries.length.
+     * Set entry as first element. Updates size.
+     * 
+     * @param entry
+     */
+    private void setFirst(final TraceEntry entry) {
+        entry.previous = null;
+        if (this.firstEntry != null) {
+            entry.next = this.firstEntry;
+            this.firstEntry.previous = entry;
+            // lastEntry remains unchanged.
+        }
+        else {
+            // The first entry to be here.
+            entry.next = null;
+            this.lastEntry = entry;
+        }
+        this.firstEntry = entry;
+        size ++;
+    }
+
+    /**
+     * Return entries older than maxAge to the pool. Always keeps the latest
+     * entry.
+     * 
+     * @param time
+     *            The time now.
+     */
+    public void checkMaxAge(final long time) {
+        // TODO: Visibility to private? [can set to null or reset on logout]
+        // Ensure we have entries to expire at all.
+        if (time - lastEntry.time < maxAge || size == 1) {
+            return;
+        }
+        // Find the earliest entry to expire and return to pool.
+        TraceEntry entry = lastEntry;
+        while (time - entry.previous.time > maxAge) {
+            entry = entry.previous;
+        }
+        returnToPool(entry);
+    }
+
+    /** Reset/invalidate all elements. */
+    public void reset() {
+        returnToPool(firstEntry);
+        firstEntry = lastEntry = null;
+        size = 0; // Redundant.
+    }
+
+    /**
+     * Unlink and return this entry and all older entries to the pool. This does
+     * adjust size.
+     * 
+     * @param entry
+     */
+    private void returnToPool(TraceEntry entry) {
+        if (entry == null) {
+            return;
+        }
+        // Unlink from a newer entry.
+        if (entry.previous != null) {
+            entry.previous.next = null;
+        }
+        // Reset lastEntry.
+        this.lastEntry = entry.previous; // Assume it's always correct.
+        // Reset first entry, if this is was the first.
+        if (entry == this.firstEntry) {
+            this.firstEntry = null;
+        }
+        // Unlink and return this and all following entries.
+        TraceEntry nextEntry;
+        while (entry != null) {
+            nextEntry = entry.next;
+            entry.next = entry.previous = null;
+            pool.returnInstance(entry);
+            entry = nextEntry;
+            size --;
+        }
+    }
+
+    /**
+     * Get the number of stored elements.
+     * 
      * @return
      */
     public int size() {
         return size;
     }
+
+    /**
+     * Test if no elements are stored.
+     * 
+     * @return
+     */
     public boolean isEmpty() {
         return size == 0;
     }
 
     /**
-     * Get size of ring buffer (maximal possible number of elements).
+     * Get the maximum number of stored entries.
      * @return
      */
     public int getMaxSize() {
-        return entries.length;
+        return maxSize;
     }
 
-    public double getMergeDist() {
-        return mergeDist;
+    /**
+     * Get the maximum age of stored entries.
+     * @return
+     */
+    public long getMaxAge() {
+        return maxAge;
     }
 
     /**
@@ -233,7 +330,7 @@ public class LocationTrace {
      * @return
      */
     public TraceIterator latestIterator() {
-        return new TraceIterator(entries, index, size, index, false);
+        return new TraceIterator(firstEntry, true);
     }
 
     /**
@@ -241,35 +338,55 @@ public class LocationTrace {
      * @return
      */
     public TraceIterator oldestIterator() {
-        final int currentIndex = index - size + 1;
-        return new TraceIterator(entries, index, size, currentIndex < 0 ? currentIndex + entries.length : currentIndex, true);
+        return new TraceIterator(lastEntry, false);
     }
-
 
     /**
      * Iterate from entry with max. age to latest, always includes latest.
      * @param time Absolute time value for oldest accepted entries.
      * @return TraceIterator containing entries that have not been created before the given time, iterating ascending with time.
      */
-    public TraceIterator maxAgeIterator(long time) {
-        int currentIndex = index;
-        int tempIndex = currentIndex;
-        int steps = 1;
-        while (steps < size) {
-            tempIndex --;
-            if (tempIndex < 0) {
-                tempIndex += size;
+    public TraceIterator maxAgeIterator(final long time) {
+        TraceEntry start = firstEntry;
+        while (start != null) {
+            if (start.next != null && start.next.time >= time) {
+                start = start.next;
             }
-            final TraceEntry entry = entries[tempIndex];
-            if (entry.time >= time) {
-                // Continue.
-                currentIndex = tempIndex;
-            } else {
+            else {
                 break;
             }
-            steps ++;
         }
-        return new TraceIterator(entries, index, size, currentIndex, true);
+        return new TraceIterator(start, false);
+    }
+
+    /**
+     * Adjust settings and expire entries if needed.
+     * 
+     * @param traceMaxAge
+     * @param traceMaxSize
+     * @param time The time now.
+     */
+    public void adjustSettings(final long maxAge, final int maxSize, final long time) {
+        // Time run backwards check (full reset).
+        if (size > 0 && time < firstEntry.time) {
+            reset();
+        }
+        // maxAge.
+        if (this.maxAge != maxAge ) {
+            this.maxAge = maxAge;
+            checkMaxAge(time);
+        }
+        // maxSize.
+        if (this.maxSize != maxSize) {
+            this.maxSize = maxSize;
+            TraceEntry entry = this.lastEntry;
+            int size = this.size;
+            while (size > maxSize) {
+                entry = entry.previous;
+                size --;
+            }
+            returnToPool(entry);
+        }
     }
 
 }

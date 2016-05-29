@@ -46,6 +46,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
@@ -876,6 +877,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         registerGenericInstance(new Counters());
         registerGenericInstance(new WRPT());
         registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
+        registerGenericInstance(new TraceEntryPool(1000)); // Random number.
 
         // Initialize MCAccess.
         initMCAccess(config);

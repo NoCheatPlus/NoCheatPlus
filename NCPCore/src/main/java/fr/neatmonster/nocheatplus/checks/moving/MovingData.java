@@ -17,6 +17,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.DefaultSetBackStorage;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveConsistency;
@@ -112,8 +113,10 @@ public class MovingData extends ACheckData {
     }
 
     public static void onReload() {
+        final MovingConfig globalCc = MovingConfig.getConfig((String) null);
+        final int tick = TickTask.getTick();
         for (final MovingData data : playersMap.values()) {
-            data.deleteTrace(); // Safe side.
+            data.adjustOnReload(globalCc, tick);
         }
     }
 
@@ -201,7 +204,7 @@ public class MovingData extends ACheckData {
 
     // Coordinates.
     /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves." */
-    private LocationTrace trace = null; 
+    private final LocationTrace trace;
 
     // sf rather
     /** Basic envelope constraints for switching into air. */
@@ -324,6 +327,9 @@ public class MovingData extends ACheckData {
         super(config);
         morePacketsFreq = new ActionFrequency(config.morePacketsEPSBuckets, 500);
         morePacketsBurstFreq = new ActionFrequency(12, 5000);
+
+        // Location trace.
+        trace = new LocationTrace(config.traceMaxAge, config.traceMaxSize, NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(TraceEntryPool.class));
 
         // A new set of workaround conters.
         ws = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(WRPT.class).getWorkaroundSet(WRPT.WS_MOVING);
@@ -469,7 +475,7 @@ public class MovingData extends ACheckData {
      */
     public void onPlayerLeave() {
         removeAllVelocity();
-        deleteTrace();
+        trace.reset();
         playerMoves.invalidate();
         vehicleMoves.invalidate();
     }
@@ -1023,21 +1029,22 @@ public class MovingData extends ACheckData {
      * @return
      */
     public LocationTrace getTrace(final Player player) {
-        if (trace == null) {
-            final MovingConfig cc = MovingConfig.getConfig(player);
-            trace = new LocationTrace(cc.traceSize, cc.traceMergeDist);
-        }
         return trace;
     }
 
     /**
-     * Convenience
-     * @param player
-     * @param loc
+     * Ensure to have a LocationTrace instance with the given parameters.
+     * 
+     * @param maxAge
+     * @param maxSize
+     * @return
      */
-    public void resetTrace(final Player player, final Location loc, final long time) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        resetTrace(loc, time, cc.traceSize, cc.traceMergeDist);
+    private LocationTrace getTrace(final int maxAge, final int maxSize) {
+        if (trace.getMaxSize() != maxSize || trace.getMaxAge() != maxAge) {
+            // TODO: Might want to have tick passed as argument?
+            trace.adjustSettings(maxAge, maxSize, TickTask.getTick());
+        } 
+        return trace;
     }
 
     /**
@@ -1054,23 +1061,44 @@ public class MovingData extends ACheckData {
     }
 
     /**
+     * Convenience
+     * @param player
+     * @param loc
+     */
+    public void resetTrace(final Player player, final Location loc, final long time) {
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        resetTrace(loc, time, cc);
+    }
+
+    /**
+     * Convenience.
+     * @param loc
+     * @param time
+     * @param cc
+     */
+    public void resetTrace(final Location loc, final long time, final MovingConfig cc) {
+        resetTrace(loc, time, cc.traceMaxAge, cc.traceMaxSize);
+    }
+
+    /**
      * Convenience: Create or just reset the trace, add the current location.
      * @param loc 
      * @param size
      * @param mergeDist
      * @param traceMergeDist 
      */
-    public void resetTrace(final Location loc, final long time, final int size, double mergeDist) {
-        if (trace == null || trace.getMaxSize() != size || trace.getMergeDist() != mergeDist) {
-            trace = new LocationTrace(size, mergeDist);
-        } else {
+    public void resetTrace(final Location loc, final long time, final int maxAge, final int maxSize) {
+        if (trace != null) {
             trace.reset();
         }
-        trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ());
+        getTrace(maxAge, maxSize).addEntry(time, loc.getX(), loc.getY(), loc.getZ());
     }
 
-    public void deleteTrace() {
-        trace = null;
+    /**
+     * Adjust to new parameters.
+     */
+    protected void adjustOnReload(final MovingConfig cc, final int tick) {
+        trace.adjustSettings(cc.traceMaxAge, cc.traceMaxSize, tick);
     }
 
     /**
@@ -1126,10 +1154,6 @@ public class MovingData extends ACheckData {
         vehicleMorePacketsLastTime = Math.min(vehicleMorePacketsLastTime, time);
         sfCobwebTime = Math.min(sfCobwebTime, time);
         sfVLTime = Math.min(sfVLTime, time);
-        if (trace != null) {
-            // Might implement something better some time (trace.handleTimeRanBackwards -> set time values, object pool).
-            trace = null;
-        }
         clearAccounting(); // Not sure: adding up might not be nice.
         removeAllVelocity(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
