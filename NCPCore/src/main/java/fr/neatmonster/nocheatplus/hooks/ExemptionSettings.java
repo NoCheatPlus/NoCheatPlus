@@ -137,7 +137,8 @@ public class ExemptionSettings {
      * @return
      */
     public boolean isExemptedBySettings(final Entity entity, final boolean isPrimaryThread) {
-        return isPrimaryThread && defaultMetaData.hasAnyMetaDataKey(entity) || npcWildCardExempt && isRegardedAsNpc(entity);
+        return isPrimaryThread && defaultMetaData.hasAnyMetaDataKey(entity) 
+                || npcWildCardExempt && isRegardedAsNpc(entity, isPrimaryThread);
     }
 
     /**
