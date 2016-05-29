@@ -30,7 +30,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
-import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
@@ -398,7 +398,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         final long traceOldest = tick - cc.loopMaxLatencyTicks; // TODO: Set by latency-window.
         // TODO: Iterating direction, which, static/dynamic choice.
-        final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
+        final Iterator<ITraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
 
         boolean violation = true; // No tick with all checks passed.
         boolean reachPassed = !reachEnabled; // Passed individually for some tick.
@@ -407,7 +407,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: Consider a max-distance to "now", for fast invalidation.
         long latencyEstimate = -1;
         while (traceIt.hasNext()) {
-            final TraceEntry entry = traceIt.next();
+            final ITraceEntry entry = traceIt.next();
             // Simplistic just check both until end or hit.
             // TODO: Other default distances/tolerances.
             boolean thisPassed = true;
@@ -429,7 +429,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (thisPassed) {
                 // TODO: Log/set estimated latency.
                 violation = false;
-                latencyEstimate = now - entry.time;
+                latencyEstimate = now - entry.getTime();
                 break;
             }
         }

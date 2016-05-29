@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving.location.tracking;
 
 import java.util.Iterator;
 
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -18,13 +19,21 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  */
 public class LocationTrace {
 
-    public static final class TraceEntry {
+    public static interface ITraceEntry extends IGetPosition {
+
+        public long getTime();
+
+        public double getLastDistSq();
+
+    }
+
+    public static class TraceEntry implements ITraceEntry {
 
         /** We keep it open, if ticks or ms are used. */
-        public long time;
+        private long time;
         /** Coordinates. */
-        public double x, y, z;
-        public double lastDistSq;
+        private double x, y, z;
+        private double lastDistSq;
 
         public void set(long time, double x, double y, double z, double lastDistSq) {
             this.x = x;
@@ -33,6 +42,31 @@ public class LocationTrace {
             this.time = time;
             this.lastDistSq = lastDistSq;
         }
+
+        @Override
+        public double getX() {
+            return x;
+        }
+
+        @Override
+        public double getY() {
+            return y;
+        }
+
+        @Override
+        public double getZ() {
+            return z;
+        }
+
+        @Override
+        public long getTime() {
+            return time;
+        }
+
+        @Override
+        public double getLastDistSq() {
+            return lastDistSq;
+        }
     }
 
     /**
@@ -40,7 +74,7 @@ public class LocationTrace {
      * @author mc_dev
      *
      */
-    public static final class TraceIterator implements Iterator<TraceEntry>{
+    public static final class TraceIterator implements Iterator<ITraceEntry>{
         private final TraceEntry[] entries;
         /** Index as in LocationTrace */
         private final int index;
@@ -62,7 +96,7 @@ public class LocationTrace {
         }
 
         @Override
-        public final TraceEntry next() {
+        public final ITraceEntry next() {
             if (!hasNext()) {
                 throw new IndexOutOfBoundsException("No more entries to iterate.");
             }

@@ -7,7 +7,7 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -118,7 +118,7 @@ public class Direction extends Check {
      * @param cc
      * @return
      */
-    public boolean loopCheck(final Player player, final Location loc, final Entity damaged, final TraceEntry dLoc, final DirectionContext context, final FightData data, final FightConfig cc) {
+    public boolean loopCheck(final Player player, final Location loc, final Entity damaged, final ITraceEntry dLoc, final DirectionContext context, final FightData data, final FightConfig cc) {
 
         // Ignore complex entities for the moment.
         if (context.damagedComplex) {
@@ -134,16 +134,16 @@ public class Direction extends Check {
 
         final double off;
         if (cc.directionStrict){
-            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
+            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + context.damagedHeight / 2D, dLoc.getZ(), context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
         }
         else{
             // Also take into account the angle.
-            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION);
+            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + context.damagedHeight / 2D, dLoc.getZ(), context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
         if (off > 0.1) {
             // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
-            final Vector blockEyes = new Vector(dLoc.x - loc.getX(),  dLoc.y + context.damagedHeight / 2D - loc.getY() - player.getEyeHeight(), dLoc.z - loc.getZ());
+            final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + context.damagedHeight / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
             context.minViolation = Math.min(context.minViolation, distance);
             cancel = true;

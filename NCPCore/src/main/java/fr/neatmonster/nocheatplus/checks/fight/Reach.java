@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -136,7 +136,7 @@ public class Reach extends Check {
     }
 
     /**
-     * Data context for iterating over TraceEntry instances.
+     * Data context for iterating over ITraceEntry instances.
      * @param player
      * @param pLoc
      * @param damaged
@@ -166,12 +166,12 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public boolean loopCheck(final Player player, final Location pLoc, final Entity damaged, final TraceEntry dRef, final ReachContext context, final FightData data, final FightConfig cc) {
+    public boolean loopCheck(final Player player, final Location pLoc, final Entity damaged, final ITraceEntry dRef, final ReachContext context, final FightData data, final FightConfig cc) {
         boolean cancel = false;
 
         // Refine y position.
-        final double dY = dRef.y;
-        double y = dRef.y;
+        final double dY = dRef.getY();
+        double y = dRef.getY();
 
         if (context.pY <= dY) {
             // Keep the foot level y.
@@ -186,7 +186,7 @@ public class Reach extends Check {
         // Distance is calculated from eye location to center of targeted. If the player is further away from their target
         // than allowed, the difference will be assigned to "distance".
         // TODO: Run check on squared distances (quite easy to change to stored boundary-sq values).
-        final double lenpRel = TrigUtil.distance(dRef.x, y, dRef.z, pLoc.getX(), context.pY, pLoc.getZ());
+        final double lenpRel = TrigUtil.distance(dRef.getX(), y, dRef.getZ(), pLoc.getX(), context.pY, pLoc.getZ());
 
         double violation = lenpRel - context.distanceLimit;
 
