@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 
@@ -109,7 +110,8 @@ public class NCPExemptionManager {
 
     /**
      * Check if a player is exempted from a check right now. This also checks
-     * for exemption by meta data.
+     * for exemption by meta data, iff it's called from within execution of the
+     * primary thread.
      * 
      * @param player
      *            The player to exempt from checks
@@ -120,21 +122,24 @@ public class NCPExemptionManager {
      */
     public static final boolean isExempted(final Player player, final CheckType checkType) {
         // TODO: Settings: If to check meta data at all.
-        // TODO: Settings: check types to exempt npcs from (and if to use) -> implement setSettings
-        // TODO: Is meta-data lookup thread-safe? Suggest: Per-check-type config if to check for meta-data at all.
-        return isExempted(player.getUniqueId(), checkType) || player.hasMetadata("nocheat.exempt");
+        // TODO: Settings: check types to exempt npcs from (and if to use) -> implement setSettings.
+        return isExempted(player.getUniqueId(), checkType) || 
+                Bukkit.isPrimaryThread() && player.hasMetadata("nocheat.exempt");
     }
 
     /**
-     * Check if a player is an npc, using current settings.
+     * Check if a player is an npc, using current settings. Checks for metada,
+     * iff called from within the primary thread.
      * 
      * @param player
      * @return
      */
     public static final boolean isNpc(final Player player) {
-        // TODO: Configurability: Which metadata key(s + if).
-        // TODO: Is meta-data lookup thread-safe? Suggest: Per-check-type config if to check for meta-data at all.
-        return (player instanceof NPC) || player.hasMetadata("npc");
+        // TODO: Configurability: Which meta data key(s) and what to check for.
+        // TODO: Other NPC detection methods, e.g. registered interface implementations for isNPC(Entity).
+        // TODO: Performance tweaks with optimism for last returned results for this Player/UUID, possibly with timing constraints and invalidation conditions, such as logout or kick events.
+        return (player instanceof NPC) || 
+                Bukkit.isPrimaryThread() && player.hasMetadata("npc");
     }
 
     /**
