@@ -223,8 +223,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // Could further guard by checking equality of loc to last location.
                 if (data.debug) {
                     debug(player, "(Assume sweep attack follow up damage.)");
-                    return cancelled;
                 }
+                return cancelled;
             }
         } else {
             // TODO: More side conditions for a sweep attack.
