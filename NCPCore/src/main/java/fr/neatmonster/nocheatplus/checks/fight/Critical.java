@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -15,6 +16,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -25,20 +27,18 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class Critical extends Check {
 
-    private PlayerMoveInfo moveInfo;
+    private AuxMoving auxMoving = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     /**
      * Instantiates a new critical check.
      */
     public Critical() {
         super(CheckType.FIGHT_CRITICAL);
-        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     @Override
     public void setMCAccess(MCAccess mcAccess) {
         super.setMCAccess(mcAccess);
-        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     /**
@@ -70,6 +70,7 @@ public class Critical extends Check {
                     || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
                 final MovingConfig ccM = MovingConfig.getConfig(player);
                 // TODO: Use past move tracking to check for SurvivalFly and the like?
+                final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, ccM.yOnGround);
                 if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, dataM, ccM)) {
                     data.criticalVL += 1.0;
@@ -85,13 +86,11 @@ public class Critical extends Check {
                     }
                     cancel = executeActions(vd).willCancel();
                 }
-                moveInfo.cleanup();
+                auxMoving.returnPlayerMoveInfo(moveInfo);
             }
         }
 
         return cancel;
     }
-
-
 
 }

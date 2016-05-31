@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
@@ -88,21 +89,18 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc2 = new Location(null, 0, 0, 0);
 
-    /** MoveInfo instance for temporary use with shouldCheckSurvivalFly. */
-    private PlayerMoveInfo moveInfo;
+    private final AuxMoving auxMoving = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
 
     public FightListener() {
         super(CheckType.FIGHT);
-        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     @Override
     public void setMCAccess(MCAccess mcAccess) {
         super.setMCAccess(mcAccess);
-        moveInfo = new PlayerMoveInfo(mcAccess);
     }
 
     /**
@@ -343,6 +341,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
                     final MovingConfig mCc = MovingConfig.getConfig(player);
+                    final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                     moveInfo.set(player, loc, null, mCc.yOnGround);
                     if (now <= mData.timeSprinting + mCc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, mData, mCc)) {
                         // Judge as "lost sprint" problem.
@@ -352,7 +351,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                             debug(player, "lostsprint: hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
                         }
                     }
-                    moveInfo.cleanup();
+                    auxMoving.returnPlayerMoveInfo(moveInfo);
                 }
             }
         }
@@ -671,7 +670,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityRegainHealthLow(final EntityRegainHealthEvent event) {
         final Entity entity = event.getEntity();
-        if (!(entity instanceof Player)) return;
+        if (!(entity instanceof Player)) {
+            return;
+        }
         final Player player = (Player) entity;
         if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
             // Heal after death.
@@ -691,7 +692,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
         final Entity entity = event.getEntity();
-        if (!(entity instanceof Player)) return;
+        if (!(entity instanceof Player)) {
+            return;
+        }
         final Player player = (Player) entity;
         final FightData data = FightData.getData(player);
         // Adjust god mode data:
