@@ -122,17 +122,20 @@ public class TestLocationTrace {
             trace.addEntry(i, i, i, i);
         }
         // Test size with one time filled up.
-        testIteratorSizeAndOrder(trace);
+        testIteratorSizeAndOrder(trace, 80);
         // Add size / 2 elements, to test cross-boundary iteration.
         for (int i = 0; i < size / 2; i++) {
             trace.addEntry(i + size, i, i, i);
         }
         // Test size again.
-        testIteratorSizeAndOrder(trace);
+        testIteratorSizeAndOrder(trace, 80);
     }
 
-    private void testIteratorSizeAndOrder(LocationTrace trace) {
+    private void testIteratorSizeAndOrder(LocationTrace trace, int expectedSize) {
         int size = trace.size();
+        if (size != expectedSize) {
+            fail("LocationTrace size differs from expected. Expect " + expectedSize +", got instead: " + size);
+        }
         TraceIterator[] iterators = new TraceIterator[] {
                 trace.oldestIterator(),
                 trace.latestIterator(),
