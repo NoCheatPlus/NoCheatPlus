@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -263,6 +264,16 @@ public class CheckUtils {
      */
     public static Random getRandom() {
         return NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Random.class);
+    }
+
+    /**
+     * Test if the item is consumable, like food, potions, milk bucket.
+     * 
+     * @param type
+     * @return
+     */
+    public static boolean isConsumable(final Material type) {
+        return type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET;
     }
 
 }

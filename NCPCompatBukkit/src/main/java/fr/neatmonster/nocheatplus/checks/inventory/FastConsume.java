@@ -13,12 +13,14 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -122,7 +124,17 @@ public class FastConsume extends Check implements Listener{
         // Reset interaction.
         if (cancel) {
             // Fake interaction to prevent violation loops with false positives.
-            final ItemStack actualStack = player.getItemInHand();
+            ItemStack actualStack = Bridge1_9.getItemInMainHand(player);
+            if (
+                    Bridge1_9.hasGetItemInOffHand()
+                    && (actualStack == null || !CheckUtils.isConsumable(actualStack.getType()))
+                    ) {
+                // Assume this to make sense.
+                actualStack = Bridge1_9.getItemInOffHand(player);
+                if (actualStack == null || !CheckUtils.isConsumable(actualStack.getType())) {
+                    actualStack = null;
+                }
+            }
             data.instantEatFood = actualStack == null ? null : actualStack.getType();
             // TODO: Allows some abuse: 1. try instantly eat (cancelled) 2. consume item directly when needed.
         } else  {

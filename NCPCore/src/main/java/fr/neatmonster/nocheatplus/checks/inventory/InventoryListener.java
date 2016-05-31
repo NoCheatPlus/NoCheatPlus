@@ -37,6 +37,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /**
@@ -316,7 +317,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                 // It was a bow, the player starts to pull the string, remember this time.
                 data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
             }
-            else if (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET) {
+            else if (CheckUtils.isConsumable(type)) {
                 final long now = System.currentTimeMillis();
                 // It was food, the player starts to eat some food, remember this time and the type of food.
                 data.instantEatFood = type;
