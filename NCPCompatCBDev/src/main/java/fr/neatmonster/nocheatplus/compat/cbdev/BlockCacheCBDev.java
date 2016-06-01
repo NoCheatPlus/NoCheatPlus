@@ -62,6 +62,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
         }
         final BlockPosition pos = new BlockPosition(x, y, z);
         // TODO: Deprecation warning below (reason / substitute?).
+        @SuppressWarnings("deprecation")
         final AxisAlignedBB bb = block.a(getType(pos), this, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.

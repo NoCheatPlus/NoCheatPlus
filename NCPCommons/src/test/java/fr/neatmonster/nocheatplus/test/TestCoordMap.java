@@ -116,7 +116,7 @@ public class TestCoordMap {
      */
     public void matchAll(CoordMap<Integer> map, int[][] coords) {
         for (int i = 0; i < coords.length ; i++){
-            Integer value = map.get(coords[i][0], coords[i][1], coords[i][2]).intValue();
+            Integer value = map.get(coords[i][0], coords[i][1], coords[i][2]);
             if (value == null) fail("Value is null instead of " + i);
             if (value.intValue() != i) fail("Wrong value: " + value + " vs. " + i);
             if (!map.contains(coords[i][0], coords[i][1], coords[i][2])) fail("Contains returns false.");
