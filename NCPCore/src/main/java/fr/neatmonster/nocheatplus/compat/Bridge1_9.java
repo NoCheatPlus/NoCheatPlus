@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffectType;
@@ -141,6 +143,54 @@ public class Bridge1_9 {
         }
         else {
             return player.isGliding();
+        }
+    }
+
+    /**
+     * Get the item that was used with this event, assume clicking left or right rather (not feet etc.).
+     * @param player
+     * @param event
+     */
+    public static ItemStack getUsedItem(final Player player, final PlayerInteractEvent event) {
+        if (!hasGetItemInOffHand()) { // Optimistic check.
+            return getItemInMainHand(player);
+        }
+        else {
+            switch (event.getHand()) {
+                case HAND: {
+                    return getItemInMainHand(player);
+                }
+                case OFF_HAND: {
+                    return getItemInOffHand(player);
+                }
+                default: {
+                    return null;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Get the item that was used with this event, assume right click (not feet etc.).
+     * @param player
+     * @param event
+     */
+    public static ItemStack getUsedItem(final Player player, final PlayerInteractEntityEvent event) {
+        if (!hasGetItemInOffHand()) { // Optimistic check.
+            return getItemInMainHand(player);
+        }
+        else {
+            switch (event.getHand()) {
+                case HAND: {
+                    return getItemInMainHand(player);
+                }
+                case OFF_HAND: {
+                    return getItemInOffHand(player);
+                }
+                default: {
+                    return null;
+                }
+            }
         }
     }
 

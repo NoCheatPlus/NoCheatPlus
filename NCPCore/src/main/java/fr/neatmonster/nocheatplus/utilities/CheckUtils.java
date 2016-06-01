@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -19,6 +20,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -269,11 +271,46 @@ public class CheckUtils {
     /**
      * Test if the item is consumable, like food, potions, milk bucket.
      * 
+     * @param stack
+     *            May be null.
+     * @return
+     */
+    public static boolean isConsumable(final ItemStack stack) {
+        return stack == null ? false : isConsumable(stack.getType());
+    }
+
+    /**
+     * Test if the item is consumable, like food, potions, milk bucket.
+     * 
      * @param type
+     *            May be null.
      * @return
      */
     public static boolean isConsumable(final Material type) {
-        return type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET;
+        return type != null &&
+                (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET);
+    }
+
+    /**
+     * Return the first consumable item found, checking main hand first and then
+     * off hand, if available. Concerns food/edible, potions, milk bucket.
+     * 
+     * @param player
+     * @return null in case no item is consumable.
+     */
+    public static ItemStack getFirstConsumableItemInHand(final Player player) {
+        ItemStack actualStack = Bridge1_9.getItemInMainHand(player);
+        if (
+                Bridge1_9.hasGetItemInOffHand()
+                && (actualStack == null || !CheckUtils.isConsumable(actualStack.getType()))
+                ) {
+            // Assume this to make sense.
+            actualStack = Bridge1_9.getItemInOffHand(player);
+            if (actualStack == null || !CheckUtils.isConsumable(actualStack.getType())) {
+                actualStack = null;
+            }
+        }
+        return actualStack;
     }
 
 }

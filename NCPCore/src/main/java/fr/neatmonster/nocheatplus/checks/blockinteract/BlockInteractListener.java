@@ -16,9 +16,11 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
  * Central location to listen to events that are relevant for the block interact checks.
@@ -83,7 +85,7 @@ public class BlockInteractListener extends CheckListener {
             case LEFT_CLICK_BLOCK:
                 break;
             case RIGHT_CLICK_BLOCK:
-                final ItemStack stack = player.getItemInHand();
+                final ItemStack stack = Bridge1_9.getUsedItem(player, event);
                 if (stack != null && stack.getType() == Material.ENDER_PEARL) {
                     if (!BlockProperties.isPassable(block.getType())) {
                         final CombinedConfig ccc = CombinedConfig.getConfig(player);
@@ -135,15 +137,20 @@ public class BlockInteractListener extends CheckListener {
                 // Just prevent using the block.
                 event.setUseInteractedBlock(Result.DENY);
             } else {
+                final Result previousUseItem = event.useItemInHand();
                 event.setCancelled(true);
                 event.setUseInteractedBlock(Result.DENY);
-                final ItemStack stack = player.getItemInHand();
-                final Material mat = stack == null ? Material.AIR : stack.getType();
-                if (!preventUseItem && (mat.isEdible() || mat == Material.POTION)) {
+                if (
+                        previousUseItem == Result.DENY || preventUseItem
+                        // Allow consumption still.
+                        || !CheckUtils.isConsumable(Bridge1_9.getUsedItem(player, event))
+                        ) {
+                    event.setUseItemInHand(Result.DENY);
+                }
+                else {
+                    // Consumable and not prevented otherwise.
                     // TODO: Ender pearl?
                     event.setUseItemInHand(Result.ALLOW);
-                } else {
-                    event.setUseItemInHand(Result.DENY);
                 }
             }
         }

@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -111,7 +112,7 @@ public class FastBreak extends Check {
                 player.sendMessage(data.stats.getStatsStr(true));
             }
             // Send info about current break:
-            final ItemStack stack = player.getItemInHand();
+            final ItemStack stack = Bridge1_9.getItemInMainHand(player);
             final boolean isValidTool = BlockProperties.isValidTool(blockType, stack);
             final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
             String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockType + "] "+ elapsedTime + "u / " + expectedBreakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));

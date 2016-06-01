@@ -116,7 +116,7 @@ public class BlockPlaceListener extends CheckListener {
         // TODO: Revise material use (not block.get... ?)
         //final Material mat = block.getType();
         final Player player = event.getPlayer();
-        final Material placedMat = hasReplacedState ? event.getBlockPlaced().getType() : player.getItemInHand().getType(); // Safety first.
+        final Material placedMat = hasReplacedState ? event.getBlockPlaced().getType() : Bridge1_9.getItemInMainHand(player).getType(); // Safety first.
         boolean cancelled = false;
 
         final BlockPlaceData data = BlockPlaceData.getData(player);
@@ -239,7 +239,7 @@ public class BlockPlaceListener extends CheckListener {
         }
         final Player player = event.getPlayer();
 
-        final ItemStack stack = player.getItemInHand();
+        final ItemStack stack = Bridge1_9.getUsedItem(player, event);
         if (stack == null) {
             return;
         }

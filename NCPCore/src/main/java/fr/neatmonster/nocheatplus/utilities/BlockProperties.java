@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
@@ -263,33 +264,33 @@ public class BlockProperties {
     private static BlockProps defaultBlockProps = instantType;
 
     protected static final Material[] instantMat = new Material[]{
-        // Named in wiki.
-        Material.CROPS,
-        Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
-        Material.TORCH,
-        Material.TNT,
-        Material.SUGAR_CANE_BLOCK,
-        Material.SAPLING,
-        Material.RED_ROSE, Material.YELLOW_FLOWER,
-        Material.REDSTONE_WIRE, 
-        Material.REDSTONE_TORCH_ON, Material.REDSTONE_TORCH_OFF,
-        Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
-        Material.PUMPKIN_STEM,
-        Material.NETHER_WARTS,
-        Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
-        Material.MELON_STEM,
-        Material.WATER_LILY,
-        Material.LONG_GRASS,
-        Material.FIRE,
-        Material.DEAD_BUSH,
-        //
-        Material.CROPS,
+            // Named in wiki.
+            Material.CROPS,
+            Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
+            Material.TORCH,
+            Material.TNT,
+            Material.SUGAR_CANE_BLOCK,
+            Material.SAPLING,
+            Material.RED_ROSE, Material.YELLOW_FLOWER,
+            Material.REDSTONE_WIRE, 
+            Material.REDSTONE_TORCH_ON, Material.REDSTONE_TORCH_OFF,
+            Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+            Material.PUMPKIN_STEM,
+            Material.NETHER_WARTS,
+            Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
+            Material.MELON_STEM,
+            Material.WATER_LILY,
+            Material.LONG_GRASS,
+            Material.FIRE,
+            Material.DEAD_BUSH,
+            //
+            Material.CROPS,
 
-        // 1.4
-        Material.COMMAND,
-        Material.FLOWER_POT,
-        Material.CARROT,
-        Material.POTATO,
+            // 1.4
+            Material.COMMAND,
+            Material.FLOWER_POT,
+            Material.CARROT,
+            Material.POTATO,
     };
 
     private static BlockCache blockCache = null; 
@@ -983,7 +984,9 @@ public class BlockProperties {
      * @return
      */
     public static long getBreakingDuration(final int blockId, final Player player) {
-        final long res = getBreakingDuration(blockId, player.getItemInHand(), player.getInventory().getHelmet(), player, player.getLocation(useLoc));
+        final long res = getBreakingDuration(blockId, 
+                Bridge1_9.getItemInMainHand(player), player.getInventory().getHelmet(), 
+                player, player.getLocation(useLoc));
         useLoc.setWorld(null);
         return res;
     }

@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -356,7 +357,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             return;
         }
         // TODO: Activate mob-egg check only for specific server versions.
-        final ItemStack stack = player.getItemInHand();
+        final ItemStack stack = Bridge1_9.getUsedItem(player, event);
         Entity entity = event.getRightClicked();
         if (stack != null && stack.getType() == Material.MONSTER_EGG
                 && (entity == null || entity instanceof LivingEntity  || entity instanceof ComplexEntityPart)

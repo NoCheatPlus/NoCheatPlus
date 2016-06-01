@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -72,7 +73,8 @@ public class BlockBreakListener extends CheckListener {
         final Player player = event.getPlayer();
 
         // Illegal enchantments hotfix check.
-        if (Items.checkIllegalEnchantments(player, player.getItemInHand())) {
+        // TODO: Legacy / encapsulate fully there.
+        if (Items.checkIllegalEnchantmentsAllHands(player)) {
             event.setCancelled(true);
             counters.addPrimaryThread(idCancelDIllegalItem, 1);
         }
@@ -242,7 +244,7 @@ public class BlockBreakListener extends CheckListener {
 
         final int tick = TickTask.getTick();
         // Skip if already set to the same block without breaking within one tick difference.
-        final ItemStack stack = player.getItemInHand();
+        final ItemStack stack = Bridge1_9.getItemInMainHand(player);
         final Material tool = stack == null ? null: stack.getType();
         if (data.toolChanged(tool)) {
             // Update.

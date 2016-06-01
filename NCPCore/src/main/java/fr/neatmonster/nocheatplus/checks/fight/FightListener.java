@@ -121,10 +121,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // Hotfix attempt for enchanted books.
         // TODO: maybe a generalized version for the future...
         // Illegal enchantments hotfix check.
-        if (Items.checkIllegalEnchantments(player, Bridge1_9.getItemInMainHand(player))) {
-            return true;
-        }
-        if (Bridge1_9.hasGetItemInOffHand() && Items.checkIllegalEnchantments(player, Bridge1_9.getItemInOffHand(player))) {
+        if (Items.checkIllegalEnchantmentsAllHands(player)) {
             return true;
         }
 
@@ -616,19 +613,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @return
      */
     private double getKnockBackLevel(final Player player) {
-        double level = 0.0;
+        double level = 1.0; // 1.0 is the minimum knock-back value.
         // TODO: Get the RELEVANT item (...).
-        ItemStack stack = Bridge1_9.getItemInMainHand(player);
+        final ItemStack stack = Bridge1_9.getItemInMainHand(player);
         if (!BlockProperties.isAir(stack)) {
             level = (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
         }
-        if (Bridge1_9.hasGetItemInOffHand()) {
-            stack = Bridge1_9.getItemInOffHand(player);
-            if (!BlockProperties.isAir(stack)) {
-                level = Math.max(level, (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK));
-            }
-        }
-        level += 1.0; // 1.0 is the minimum knock-back value.
         if (player.isSprinting()) {
             // TODO: Lost sprint?
             level += 1.0;
