@@ -2,7 +2,8 @@ package fr.neatmonster.nocheatplus.checks.moving.velocity;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * Simple per-axis velocity (positive + negative), only accounting for queuing
@@ -18,7 +19,10 @@ public class SimpleAxisVelocity {
     /** Margin for accepting a demanded 0.0 amount, regardless sign. */
     private static final double marginAcceptZero = 0.005;
 
-    private final List<SimpleEntry> queued = new LinkedList<SimpleEntry>();
+    /** Size of queued for which to force cleanup on add. */
+    private static final double thresholdCleanup = 10;
+
+    private final LinkedList<SimpleEntry> queued = new LinkedList<SimpleEntry>();
 
     /** Activation flag for tracking unused velocity. */
     private boolean unusedActive = true;
@@ -38,7 +42,7 @@ public class SimpleAxisVelocity {
      * @param entry
      */
     public void addToFront(SimpleEntry entry) {
-        queued.add(0, entry);
+        queued.addFirst(entry);
     }
 
     /**
@@ -47,6 +51,9 @@ public class SimpleAxisVelocity {
      */
     public void add(SimpleEntry entry) {
         queued.add(entry);
+        if (queued.size() > thresholdCleanup) {
+            removeInvalid(TickTask.getTick());
+        }
     }
 
     public boolean hasQueued() {
@@ -126,8 +133,10 @@ public class SimpleAxisVelocity {
     }
 
     public void clear() {
+        if (unusedActive && !queued.isEmpty()) {
+            removeInvalid(TickTask.getTick());
+        }
         queued.clear();
-        // (Not added to unused.)
     }
 
     /**
@@ -170,6 +179,14 @@ public class SimpleAxisVelocity {
             // Positive value.
             unusedTrackerPos.addValue(entry.tick, entry.value);
         }
+    }
+
+    public boolean isUnusedActive() {
+        return unusedActive;
+    }
+
+    public void setUnusedActive(final boolean unusedActive) {
+        this.unusedActive = unusedActive;
     }
 
 }
