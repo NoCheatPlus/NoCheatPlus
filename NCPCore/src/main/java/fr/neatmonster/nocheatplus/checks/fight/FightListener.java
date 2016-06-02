@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
+import fr.neatmonster.nocheatplus.checks.moving.player.UnusedVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -485,6 +486,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // Set reference time.
                 damagedData.fastHealRefTime = System.currentTimeMillis();
             }
+            // TODO: TEST: Check unused velocity for the damaged player. (Needs more efficient pre condition checks.)
+            if (damagedData.debug) {
+                // TODO: Pass result to further checks for reference?
+                UnusedVelocity.checkUnusedVelocity(damagedPlayer, CheckType.FIGHT);
+            }
         }
         // Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
@@ -507,12 +513,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final int tick = TickTask.getTick();
         if (damagedPlayer != null && !damagedIsDead) {
             // TODO: check once more when to set this (!) in terms of order.
-            FightData.getData(damagedPlayer).damageTakenByEntityTick = tick;
+            damagedData.damageTakenByEntityTick = tick;
             // Legacy workaround: Before thorns damage cause existed (orchid).
             // TODO: Disable efficiently, if the damage cause exists.
             // TODO: Remove workaround anyway, if the issue only exists on a minor CB version.
             if (BridgeEnchant.hasThorns(damagedPlayer)) {
-                // TODO: Cleanup here.
                 // Remember the id of the attacker to allow counter damage.
                 damagedData.thornsId = damager.getEntityId();
             }
@@ -530,24 +535,37 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 attacker = (Player) source;
             }
         }
-        if (attacker != null && (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION)) {
-            // NOTE: Pigs don't have data.
-            final FightData data = FightData.getData(attacker);
-            data.lastExplosionEntityId = damaged.getEntityId();
-            data.lastExplosionDamageTick = tick;
-            return;
+        final FightData attackerData;
+        if (attacker != null) {
+            attackerData = FightData.getData(attacker);
+            // TODO: TEST: Check unused velocity for the attacker. (Needs more efficient pre condition checks.)
+            if (attackerData.debug) {
+                // TODO: Pass result to further checks for reference?
+                // TODO: attackerData.debug flag.
+                UnusedVelocity.checkUnusedVelocity(attacker, CheckType.FIGHT);
+            }
+            // Workaround for subsequent melee damage eventsfor explosions. TODO: Legacy or not, need a KB.
+            if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
+                // NOTE: Pigs don't have data.
+                attackerData.lastExplosionEntityId = damaged.getEntityId();
+                attackerData.lastExplosionDamageTick = tick;
+                return;
+            }
+        }
+        else {
+            attackerData = null;
         }
         if (player != null) {
-            final FightData data = FightData.getData(player);
+            // Actual fight checks.
             if (damageCause == DamageCause.ENTITY_ATTACK) {
                 // TODO: Might/should skip the damage comparison, though checking on lowest priority.
-                if (damaged.getEntityId() == data.lastExplosionEntityId && tick == data.lastExplosionDamageTick) {
-                    data.lastExplosionDamageTick = -1;
-                    data.lastExplosionEntityId = Integer.MAX_VALUE;
+                if (damaged.getEntityId() == attackerData.lastExplosionEntityId && tick == attackerData.lastExplosionDamageTick) {
+                    attackerData.lastExplosionDamageTick = -1;
+                    attackerData.lastExplosionEntityId = Integer.MAX_VALUE;
                 }
                 else if (handleNormalDamage(player, damaged, 
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
-                        tick, data)) {
+                        tick, attackerData)) {
                     event.setCancelled(true);
                 }
             }

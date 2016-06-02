@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 
@@ -534,9 +535,24 @@ public class SurvivalFly extends Check {
             // debug(player, "*** INVALIDATE ON SPEED");
             data.clearActiveHorVel();
         }
+        
+        // Update unused velocity tracking.
+        // TODO: Hide and seek with API.
+        // TODO: Pull down tick / timing data (perhaps add an API object for millis + source + tick + sequence count (+ source of sequence count).
+        if (data.debug) {
+            data.getVerticalVelocityTracker().updateBlockedState(TickTask.getTick(), 
+                    // Assume blocked with being in web/water, despite not entirely correct.
+                    thisMove.headObstructed || thisMove.from.resetCond,
+                    // (Similar here.)
+                    thisMove.touchedGround || thisMove.to.resetCond);
+            // TODO: TEST: Check unused velocity here too. (Should have more efficient process, pre-conditions for checking.)
+            UnusedVelocity.checkUnusedVelocity(player, type, data, cc);
+        }
+
         // Adjust data.
         data.lastFrictionHorizontal = data.nextFrictionHorizontal;
         data.lastFrictionVertical = data.nextFrictionVertical;
+
         // Log tags added after violation handling.
         if (data.debug && tags.size() > tagsLength) {
             logPostViolationTags(player);

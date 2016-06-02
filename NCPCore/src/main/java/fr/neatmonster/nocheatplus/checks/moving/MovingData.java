@@ -854,7 +854,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Active or queued.
+     * Queued velocity only.
      * @return
      */
     public boolean hasAnyVerVel() {
@@ -1174,6 +1174,15 @@ public class MovingData extends ACheckData {
         else {
             blockChangeRef.valid = false;
         }
+    }
+
+    /**
+     * Get the y-axis velocity tracker. Rather for testing purposes.
+     * 
+     * @return
+     */
+    public SimpleAxisVelocity getVerticalVelocityTracker() {
+        return verVel;
     }
 
 }

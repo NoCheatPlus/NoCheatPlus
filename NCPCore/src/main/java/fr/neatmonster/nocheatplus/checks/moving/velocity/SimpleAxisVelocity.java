@@ -20,6 +20,19 @@ public class SimpleAxisVelocity {
 
     private final List<SimpleEntry> queued = new LinkedList<SimpleEntry>();
 
+    /** Activation flag for tracking unused velocity. */
+    private boolean unusedActive = true;
+    /**
+     * Sensitivity for tracking unused velocity (absolute amount, counts for
+     * positive and negative).
+     */
+    // TODO: Ignoring 0-dist velocity allows 'moving on', though.
+    private double unusedSensitivity = 0.1;
+    // TODO: Visibility of trackers, concept, etc.
+    public final UnusedTracker unusedTrackerPos = new UnusedTracker();
+    // TODO: Might do without tracking negative velocity.
+    public final UnusedTracker unusedTrackerNeg = new UnusedTracker();
+
     /**
      * Add to the front of the queue.
      * @param entry
@@ -59,9 +72,13 @@ public class SimpleAxisVelocity {
             if (matchesEntry(entry, amount, tolerance)) {
                 // Success.
                 return entry;
-            } 
-            // (Entry can not be used.)
-            // TODO: Note unused velocity.
+            }
+            else {
+                // Track unused velocity.
+                if (unusedActive) {
+                    addUnused(entry);
+                }
+            }
         }
         // None found.
         return null;
@@ -87,7 +104,9 @@ public class SimpleAxisVelocity {
     }
 
     /**
-     * Remove all entries that have been added before the given tick, or for which the activation count has reached 0.
+     * Remove all entries that have been added before the given tick, or for
+     * which the activation count has reached 0.
+     * 
      * @param tick
      */
     public void removeInvalid(final int tick) {
@@ -98,22 +117,58 @@ public class SimpleAxisVelocity {
             entry.actCount --; // Let others optimize this.
             if (entry.actCount <= 0 || entry.tick < tick) {
                 it.remove();
+                // Track unused velocity.
+                if (unusedActive) {
+                    addUnused(entry);
+                }
             }
         }
     }
 
     public void clear() {
         queued.clear();
+        // (Not added to unused.)
     }
 
     /**
      * Debugging.
+     * 
      * @param builder
      */
     public void addQueued(final StringBuilder builder) {
         for (final SimpleEntry vel: queued) {
             builder.append(" ");
             builder.append(vel);
+        }
+    }
+
+    // TODO: Might add the yDistance for a move here (and if to use it for external calls), but that needs a more complex modeling anyway!?
+    public void updateBlockedState(final int tick, final boolean posBlocked, final boolean negBlocked) {
+        // Store state, ignoring the activation flag.
+        unusedTrackerPos.updateState(tick, posBlocked);
+        unusedTrackerNeg.updateState(tick, negBlocked);
+    }
+
+    /**
+     * Having checked the activation flag, call this with velocity entries, that
+     * have just been invalidated.
+     * 
+     * @param entry
+     */
+    private void addUnused(final SimpleEntry entry) {
+        // Global pre-conditions (sensitivity, skip entries that are supposed to be even more fake than default).
+        if (Math.abs(entry.value) < unusedSensitivity || entry.initialActCount < 5) {
+            return;
+        }
+        // Add to the tracker for the given direction.
+        // TODO: Consider evaluating activation count + have a flag to ignore an entry.
+        if (entry.value < 0.0) {
+            // Negative value.
+            unusedTrackerNeg.addValue(entry.tick, -entry.value); // Add absolute amount.
+        }
+        else {
+            // Positive value.
+            unusedTrackerPos.addValue(entry.tick, entry.value);
         }
     }
 
