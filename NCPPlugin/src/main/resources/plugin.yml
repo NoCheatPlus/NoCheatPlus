@@ -330,6 +330,8 @@ permissions:
                         description: Reset statistics or debugging counters.
                     nocheatplus.command.debug:
                         description: Start logging debug information for a player (lots of output, log file).
+                    nocheatplus.command.stopwatch:
+                        description: Stop watch functionality. See tab-completion and feedback.
                     # Legacy:
                     nocheatplus.command.tempkick:
                         description: Obsolete, use nocheatplus.command.denylogin instead.
@@ -360,6 +362,7 @@ permissions:
                             nocheatplus.command.exemptions: true
                             nocheatplus.command.denylist: true
                             nocheatplus.command.commands: true
+                            nocheatplus.command.stopwatch: true
                             # TODO: Put lag here ?
                     nocheatplus.shortcut.monitor:
                         description: All monitoring commands such as player and system info (including plugins).
