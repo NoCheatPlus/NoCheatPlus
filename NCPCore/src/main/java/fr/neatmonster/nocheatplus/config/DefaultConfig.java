@@ -164,6 +164,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_SPEED_ACTIONS,
                 "cancel vl>150 log:bpspeed:3:5:if cancel vl>1000 log:bpspeed:3:5:cif cancel");
 
+        set(ConfPaths.BLOCKPLACE_PREVENTMISC_BOATSANYWHERE, true);
+
         // Captcha.
         set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
         set(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS, false);

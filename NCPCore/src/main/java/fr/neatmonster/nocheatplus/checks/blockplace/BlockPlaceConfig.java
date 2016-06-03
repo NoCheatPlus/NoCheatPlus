@@ -102,42 +102,46 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final long       speedInterval;
     public final ActionList speedActions;
 
+    public final boolean preventBoatsAnywhere;
+
     /**
      * Instantiates a new block place configuration.
      * 
-     * @param data
-     *            the data
+     * @param config
+     * 
      */
-    public BlockPlaceConfig(final ConfigFile data) {
-        super(data, ConfPaths.BLOCKPLACE);
+    public BlockPlaceConfig(final ConfigFile config) {
+        super(config, ConfPaths.BLOCKPLACE);
 
-        againstCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AGAINST_CHECK);
-        againstActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, Permissions.BLOCKPLACE_AGAINST);
+        againstCheck = config.getBoolean(ConfPaths.BLOCKPLACE_AGAINST_CHECK);
+        againstActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, Permissions.BLOCKPLACE_AGAINST);
 
-        autoSignCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
-        autoSignSkipEmpty = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_SKIPEMPTY);
-        autoSignActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
+        autoSignCheck = config.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
+        autoSignSkipEmpty = config.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_SKIPEMPTY);
+        autoSignActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
 
 
-        directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
-        directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
+        directionCheck = config.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
+        directionActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
-        fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
-        fastPlaceLimit = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_LIMIT);
-        fastPlaceShortTermTicks = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS);
-        fastPlaceShortTermLimit = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT);
-        fastPlaceActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
+        fastPlaceCheck = config.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
+        fastPlaceLimit = config.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_LIMIT);
+        fastPlaceShortTermTicks = config.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS);
+        fastPlaceShortTermLimit = config.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT);
+        fastPlaceActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
-        noSwingCheck = data.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);
-        data.readMaterialFromList(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, noSwingExceptions);
-        noSwingActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
+        noSwingCheck = config.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);
+        config.readMaterialFromList(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, noSwingExceptions);
+        noSwingActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
 
-        reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
-        reachActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);
+        reachCheck = config.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
+        reachActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);
 
-        speedCheck = data.getBoolean(ConfPaths.BLOCKPLACE_SPEED_CHECK);
-        speedInterval = data.getLong(ConfPaths.BLOCKPLACE_SPEED_INTERVAL);
-        speedActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
+        speedCheck = config.getBoolean(ConfPaths.BLOCKPLACE_SPEED_CHECK);
+        speedInterval = config.getLong(ConfPaths.BLOCKPLACE_SPEED_INTERVAL);
+        speedActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
+
+        preventBoatsAnywhere = config.getBoolean(ConfPaths.BLOCKPLACE_PREVENTMISC_BOATSANYWHERE);
     }
 
     /* (non-Javadoc)

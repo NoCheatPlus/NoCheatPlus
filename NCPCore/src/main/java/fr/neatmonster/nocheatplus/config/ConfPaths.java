@@ -266,6 +266,9 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_SPEED_INTERVAL                = BLOCKPLACE_SPEED + "interval";
     public static final String  BLOCKPLACE_SPEED_ACTIONS                 = BLOCKPLACE_SPEED + "actions";
 
+    private static final String BLOCKPLACE_PREVENTMISC                   = BLOCKPLACE + "preventmisc.";
+    public static final String  BLOCKPLACE_PREVENTMISC_BOATSANYWHERE     = BLOCKPLACE_PREVENTMISC + "boatsanywhere";
+
     public static final String  CHAT                                     = CHECKS + "chat.";
 
     private static final String CHAT_CAPTCHA                             = CHAT + "captcha.";

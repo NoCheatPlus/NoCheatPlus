@@ -36,10 +36,10 @@ public class Speed extends Check {
      * 
      * @param player
      *            the player
+     * @param cc 
      * @return true, if successful
      */
-    public boolean check(final Player player) {
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+    public boolean check(final Player player, final BlockPlaceConfig cc) {
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;

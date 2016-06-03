@@ -61,13 +61,13 @@ public class BlockPlaceListener extends CheckListener {
         return p1 * x ^ p2 * y ^ p3 * z;
     }
 
-    public static int getCoordHash(final Block block){
+    public static int getCoordHash(final Block block) {
         return getHash(block.getX(), block.getY(), block.getZ());
     }
 
-    public static int getBlockPlaceHash(final Block block, final Material mat){
+    public static int getBlockPlaceHash(final Block block, final Material mat) {
         int hash = getCoordHash(block);
-        if (mat != null){
+        if (mat != null) {
             hash |= mat.name().hashCode();
         }
         hash |= block.getWorld().getName().hashCode();
@@ -105,7 +105,7 @@ public class BlockPlaceListener extends CheckListener {
     private final Class<?> blockMultiPlaceEvent = ReflectionUtil.getClass("org.bukkit.event.block.BlockMultiPlaceEvent");
     private final boolean hasReplacedState = ReflectionUtil.getMethodNoArgs(BlockPlaceEvent.class, "getReplacedState", BlockState.class) != null;
 
-    public BlockPlaceListener(){
+    public BlockPlaceListener() {
         super(CheckType.BLOCKPLACE);
     }
 
@@ -152,7 +152,7 @@ public class BlockPlaceListener extends CheckListener {
             shouldSkipSome = false;
         }
 
-        if (placedMat == Material.SIGN){
+        if (placedMat == Material.SIGN) {
             // Might move to MONITOR priority.
             data.autoSignPlacedTime = System.currentTimeMillis();
             // Always hash as sign post for improved compatibility with Lockette etc.
@@ -160,10 +160,11 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Fast place check.
-        if (fastPlace.isEnabled(player)){
+        if (fastPlace.isEnabled(player)) {
             if (fastPlace.check(player, block, data, cc)) {
                 cancelled = true;
-            } else {
+            }
+            else {
                 // Feed the improbable.
                 Improbable.feed(player, 0.5f, System.currentTimeMillis());
             }
@@ -193,7 +194,8 @@ public class BlockPlaceListener extends CheckListener {
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
             event.setCancelled(cancelled);
-        } else {
+        }
+        else {
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
                 debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
@@ -204,8 +206,8 @@ public class BlockPlaceListener extends CheckListener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onSignChange(final SignChangeEvent event){
-        if (event.getClass() != SignChangeEvent.class){
+    public void onSignChange(final SignChangeEvent event) {
+        if (event.getClass() != SignChangeEvent.class) {
             // Built in plugin compatibility.
             // TODO: Don't understand why two consecutive events editing the same block are a problem.
             return;
@@ -213,11 +215,11 @@ public class BlockPlaceListener extends CheckListener {
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
         final String[] lines = event.getLines();
-        if (block == null || lines == null || player == null){
+        if (block == null || lines == null || player == null) {
             // Somewhat defensive.
             return;
         }
-        if (autoSign.isEnabled(player) && autoSign.check(player, block, lines)){
+        if (autoSign.isEnabled(player) && autoSign.check(player, block, lines)) {
             event.setCancelled(true);
         }
     }
@@ -258,42 +260,48 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
+        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final Material type = stack.getType();
         if (type == Material.BOAT) {
-            // Check boats-anywhere.
-            final org.bukkit.block.Block block = event.getClickedBlock();
-            final Material mat = block.getType();
-
-            // TODO: allow lava ?
-            if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
-                return;
+            if (cc.preventBoatsAnywhere) {
+                checkBoatsAnywhere(player, event);
             }
-
-            final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
-            final Material relMat = relBlock.getType();
-
-            // TODO: Placing inside of water, but not "against" ?
-            if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) {
-                return;
-            }
-
-            // TODO: Add a check type for exemption?
-            if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
-                final Result previousUseBlock = event.useInteractedBlock();
-                event.setCancelled(true);
-                event.setUseItemInHand(Result.DENY);
-                event.setUseInteractedBlock(previousUseBlock == Result.DEFAULT ? Result.ALLOW : previousUseBlock);
-                counters.addPrimaryThread(idBoatsAnywhere, 1);
-            }
-
         }
         else if (type == Material.MONSTER_EGG) {
             // Check blockplace.speed.
-            if (speed.isEnabled(player) && speed.check(player)) {
+            if (speed.isEnabled(player, cc) && speed.check(player, cc)) {
                 // If the check was positive, cancel the event.
                 event.setCancelled(true);
             }
-        } 
+        }
+    }
+
+    private void checkBoatsAnywhere(final Player player, final PlayerInteractEvent event) {
+        // Check boats-anywhere.
+        final org.bukkit.block.Block block = event.getClickedBlock();
+        final Material mat = block.getType();
+
+        // TODO: allow lava ?
+        if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
+            return;
+        }
+
+        final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
+        final Material relMat = relBlock.getType();
+
+        // TODO: Placing inside of water, but not "against" ?
+        if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) {
+            return;
+        }
+
+        // TODO: Add a check type for exemption?
+        if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
+            final Result previousUseBlock = event.useInteractedBlock();
+            event.setCancelled(true);
+            event.setUseItemInHand(Result.DENY);
+            event.setUseInteractedBlock(previousUseBlock == Result.DEFAULT ? Result.ALLOW : previousUseBlock);
+            counters.addPrimaryThread(idBoatsAnywhere, 1);
+        }
     }
 
     /**
@@ -332,48 +340,49 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Do the actual check...
+        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         boolean cancel = false;
-        if (speed.isEnabled(player)){
+        if (speed.isEnabled(player)) {
             final long now = System.currentTimeMillis();
             final Location loc = player.getLocation(useLoc);
-            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
+            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())) {
                 // Yawrate (checked extra).
                 cancel = true;
             }
-            if (speed.check(player)){
+            if (speed.check(player, cc)) {
                 // If the check was positive, cancel the event.
                 cancel = true;
             }
-            else if (Improbable.check(player, 0.6f, now, "blockplace.speed")){
+            else if (Improbable.check(player, 0.6f, now, "blockplace.speed")) {
                 // Combined fighting speed.
                 cancel = true;
             }
         }
 
         // Ender pearl glitch (ab-) use.
-        if (!cancel && type == EntityType.ENDER_PEARL){
-            if (!CombinedConfig.getConfig(player).enderPearlCheck){
+        if (!cancel && type == EntityType.ENDER_PEARL) {
+            if (!CombinedConfig.getConfig(player).enderPearlCheck) {
                 // Do nothing !
                 // TODO: Might have further flags?
             }
-            else if (!BlockProperties.isPassable(projectile.getLocation(useLoc))){
+            else if (!BlockProperties.isPassable(projectile.getLocation(useLoc))) {
                 // Launch into a block.
                 // TODO: This might be a general check later.       		
                 cancel = true;
             }
-            else{
-                if (!BlockProperties.isPassable(player.getEyeLocation(), projectile.getLocation(useLoc))){
+            else {
+                if (!BlockProperties.isPassable(player.getEyeLocation(), projectile.getLocation(useLoc))) {
                     // (Spare a useLoc2, for this is seldom rather.)
                     // Something between player 
                     // TODO: This might be a general check later.
                     cancel = true;
                 }
-                else{
+                else {
                     final Material mat = player.getLocation(useLoc).getBlock().getType();
                     final long flags = BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE;
-                    if (!BlockProperties.isAir(mat) && (BlockProperties.getBlockFlags(mat) & flags) == 0 && !mcAccess.hasGravity(mat)){
+                    if (!BlockProperties.isAir(mat) && (BlockProperties.getBlockFlags(mat) & flags) == 0 && !mcAccess.hasGravity(mat)) {
                         // Still fails on piston traps etc.
-                        if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)){
+                        if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)) {
                             cancel = true;
                         }
                     }
@@ -385,7 +394,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Cancelled ?
-        if (cancel){
+        if (cancel) {
             event.setCancelled(true);
         }
         // Cleanup.
