@@ -16,7 +16,10 @@ package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import java.util.UUID;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
  * Include vehicle move data for a move.
@@ -34,15 +37,32 @@ public class VehicleMoveData extends PlayerMoveData {
     /** Type of the vehicle. Set at the start of some check (-ing). */
     public EntityType vehicleType = null;
 
+    // Simple vehicle properties.
+    /** Lazily set for minecarts. */
+    public boolean fromOnRails, toOnRails;
+
     @Override
     protected void resetBase() {
         // Vehicle properties.
         vehicleId = null;
         vehicleType = null;
+        fromOnRails = toOnRails = false;
         // Super class last, because it'll set valid to true in the end.
         super.resetBase();
     }
 
+    public void setExtraVehicleProperties(final Entity vehicle) {
+        vehicleId = vehicle.getUniqueId();
+        vehicleType = vehicle.getType();
+    }
 
+    public void setExtraMinecartProperties(final VehicleMoveInfo moveInfo) {
+        if (BlockProperties.isRails(moveInfo.from.getTypeId())) {
+            fromOnRails = true;
+        }
+        if (BlockProperties.isRails(moveInfo.to.getTypeId())) {
+            toOnRails = true;
+        }
+    }
 
 }

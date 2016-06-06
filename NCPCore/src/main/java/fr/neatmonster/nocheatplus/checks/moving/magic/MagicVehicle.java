@@ -14,8 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.magic;
 
+import org.bukkit.entity.EntityType;
+
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.vehicle.VehicleEnvelope.CheckDetails;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 
 /**
@@ -41,6 +44,9 @@ public class MagicVehicle {
     public static final double boatVerticalFallTarget = 3.7;
     public static final double boatMaxBackToSurfaceAscend = 3.25;
 
+    /** Max ascending in-air jump phase. */
+    public static final int maxJumpPhaseAscend = 8;
+
     /**
      * 
      * @param thisMove
@@ -49,10 +55,10 @@ public class MagicVehicle {
      * @param data
      * @return
      */
-    public static boolean oddInAir(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final MovingData data) {
+    public static boolean oddInAir(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final CheckDetails checkDetails, final MovingData data) {
         // TODO: Guard by past move tracking, instead of minDescend and maxDescend.
         // (Try individual if this time, let JIT do the rest.)
-        if (thisMove.yDistance < 0 && oddInAirDescend(thisMove, minDescend, maxDescend, data)) {
+        if (thisMove.yDistance < 0 && oddInAirDescend(thisMove, minDescend, maxDescend, checkDetails, data)) {
             return true;
         }
         return false;
@@ -66,16 +72,20 @@ public class MagicVehicle {
      * @param data
      * @return
      */
-    private static boolean oddInAirDescend(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final MovingData data) {
+    private static boolean oddInAirDescend(final VehicleMoveData thisMove, final double minDescend, final double maxDescend, final CheckDetails checkDetails, final MovingData data) {
         // TODO: Guard by past move tracking, instead of minDescend and maxDescend.
         // (Try individual if this time, let JIT do the rest.)
-        if (data.sfJumpPhase > 54 && thisMove.yDistance < 2.0 * minDescend && thisMove.yDistance > 2.0 * maxDescend
-                // TODO: Past move tracking.
-                // TODO: Fall distances?
-                && data.ws.use(WRPT.W_M_V_ENV_INAIR_SKIP)
-                ) {
-            // (In-air count usually > 60.)
-            return true;
+        // Boat.
+        if (checkDetails.simplifiedType == EntityType.BOAT) {
+            // Boat descending in-air, skip one vehicle move event during late in-air phase.
+            if (data.sfJumpPhase > 54 && thisMove.yDistance < 2.0 * minDescend && thisMove.yDistance > 2.0 * maxDescend
+                    // TODO: Past move tracking.
+                    // TODO: Fall distances?
+                    && data.ws.use(WRPT.W_M_V_ENV_INAIR_SKIP)
+                    ) {
+                // (In-air count usually > 60.)
+                return true;
+            }
         }
         return false;
     }
@@ -85,9 +95,9 @@ public class MagicVehicle {
      * @param thisMove
      * @return
      */
-    public static boolean oddInWater(final VehicleMoveData thisMove, final MovingData data) {
+    public static boolean oddInWater(final VehicleMoveData thisMove, final CheckDetails checkDetails, final MovingData data) {
         if (thisMove.yDistance > 0.0) {
-            if (oddInWaterAscend(thisMove, data)) {
+            if (oddInWaterAscend(thisMove, checkDetails, data)) {
                 return true;
             }
         }
@@ -99,15 +109,19 @@ public class MagicVehicle {
      * @param thisMove
      * @return
      */
-    private static boolean oddInWaterAscend(final VehicleMoveData thisMove, final MovingData data) {
+    private static boolean oddInWaterAscend(final VehicleMoveData thisMove, final CheckDetails checkDetails, final MovingData data) {
         // (Try individual if this time, let JIT do the rest.)
-        if (thisMove.yDistance > MagicVehicle.maxAscend && thisMove.yDistance < MagicVehicle.boatMaxBackToSurfaceAscend
-                && data.ws.use(WRPT.W_M_V_ENV_INWATER_BTS)) {
-            // (Assume players can't control sinking boats for now.)
-            // TODO: Limit by more side conditions (e.g. to is on the surface and in-medium count is about 1, past moves).
-            // TODO: Checking for surface can be complicated. Might check blocks at location and above and accept if any is not liquid.
-            // (Always smaller than previous descending move, roughly to below 0.5 above water.)
-            return true;
+        // Boat.
+        if (checkDetails.simplifiedType == EntityType.BOAT) {
+            if (thisMove.yDistance > MagicVehicle.maxAscend 
+                    && thisMove.yDistance < MagicVehicle.boatMaxBackToSurfaceAscend
+                    && data.ws.use(WRPT.W_M_V_ENV_INWATER_BTS)) {
+                // (Assume players can't control sinking boats for now.)
+                // TODO: Limit by more side conditions (e.g. to is on the surface and in-medium count is about 1, past moves).
+                // TODO: Checking for surface can be complicated. Might check blocks at location and above and accept if any is not liquid.
+                // (Always smaller than previous descending move, roughly to below 0.5 above water.)
+                return true;
+            }
         }
         return false;
     }

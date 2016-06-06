@@ -14,18 +14,17 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -35,9 +34,8 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicVehicle;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
-import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -48,16 +46,49 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class VehicleEnvelope extends Check {
 
-    // TODO: Generic debug log with speed vs allowed speed.
+    /**
+     * Check specific details for re-use.
+     * 
+     * @author asofold
+     *
+     */
+    public class CheckDetails {
 
-    /** Types of entities not handled. For logging once. */
-    private final Set<EntityType> notHandled = new HashSet<EntityType>();
+        public boolean canJump, canStepUpBlock;
+        public double maxAscend;
+
+        /** Simplified type, like BOAT, MINECART. */
+        public EntityType simplifiedType; // Not sure can be kept up.
+
+        public boolean checkAscendMuch;
+        public boolean checkDescendMuch;
+
+        /** From could be a new set-back location. */
+        public boolean fromIsSafeMedium;
+        /** To could be a new set-back location. */
+        public boolean toIsSafeMedium;
+
+        /** Interpreted differently depending on check. */
+        public boolean inAir;
+
+        public void reset() {
+            canJump = canStepUpBlock = false;
+            maxAscend = 0.0;
+            checkAscendMuch = checkDescendMuch = true;
+            fromIsSafeMedium = toIsSafeMedium = inAir = false;
+            simplifiedType = null;
+        }
+
+    }
 
     /** Tags for checks. */
     private final List<String> tags = new LinkedList<String>();
 
     /** Extra details to log on debug. */
     private final List<String> debugDetails = new LinkedList<String>();
+
+    /** Details for re-use. */
+    private final CheckDetails checkDetails = new CheckDetails();
 
     public VehicleEnvelope() {
         super(CheckType.MOVING_VEHICLE_ENVELOPE);
@@ -118,40 +149,23 @@ public class VehicleEnvelope extends Check {
     }
 
     private boolean checkEntity(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
-        // Delegate to sub checks by type of entity.
-        if (vehicle instanceof Boat) {
-            return checkBoat(player, vehicle, thisMove, isFake, data, cc);
-        }
-        else {
-            // Might prevent / dismount or use 'other' settings.
-            if (maxDistHorizontal(thisMove, getHDistCap(vehicle.getType(), cc))) {
-                return true;
-            }
-            onNotHandle(vehicle);
-            return false;
-        }
-    }
-
-    private boolean checkBoat(final Player player, final Entity vehicle, 
-            final VehicleMoveData thisMove, 
-            final boolean isFake, final MovingData data, final MovingConfig cc) {
-        //        boolean violation = false;
+        boolean violation = false;
         if (data.debug) {
             debugDetails.add("inair: " + data.sfJumpPhase);
         }
+
+        // Medium dependent checking.
+
+        // TODO: Try pigs on layered snow. Consider actual bounding box / lost-ground / ...
+
         // Maximum thinkable horizontal speed.
-        if (maxDistHorizontal(thisMove, getHDistCap(EntityType.BOAT, cc))) { // Override type for now.
+        // TODO: Further distinguish, best set in CheckDetails.
+        if (maxDistHorizontal(thisMove, getHDistCap(checkDetails.simplifiedType, cc))) { // Override type for now.
             return true;
         }
+
         // TODO: Could limit descend by 2*maxDescend, ascend by much less.
-        // Medium dependent checking.
-        boolean violation = false;
-        boolean checkAscendMuch = true;
-        boolean checkDescendMuch = true;
-        // (Assume boats can't climb.)
-        final boolean fromIsSafeMedium = thisMove.from.inWater || thisMove.from.onGround || thisMove.from.inWeb;
-        final boolean toIsSafeMedium = thisMove.to.inWater || thisMove.to.onGround || thisMove.to.inWeb;
-        final boolean inAir = !fromIsSafeMedium && !toIsSafeMedium;
+
         // TODO: Split code to methods.
         // TODO: Get extended liquid specs (allow confine to certain flags, here: water). Contains info if water is only flowing down, surface properties (non liquid blocks?), still water.
         if (thisMove.from.inWeb) {
@@ -163,6 +177,8 @@ public class VehicleEnvelope extends Check {
             //                tags.add("ascend_web");
             //                return true;
             //            }
+            // TODO: Enforce not ascending ?
+            // TODO: max speed.
         }
         else if (thisMove.from.inWater && thisMove.to.inWater) {
             // Default in-medium move.
@@ -175,15 +191,19 @@ public class VehicleEnvelope extends Check {
             // TODO: Move to MagicVehicle.oddInWater
             // TODO: Check past moves for falling (not yet available).
             // TODO: Check if the target location somehow is the surface.
-            if (MagicVehicle.oddInWater(thisMove, data)) {
+            if (MagicVehicle.oddInWater(thisMove, checkDetails, data)) {
                 // (Assume players can't control sinking boats for now.)
-                checkDescendMuch = checkAscendMuch = false;
+                checkDetails.checkDescendMuch = checkDetails.checkAscendMuch = false;
                 violation = false;
             }
         }
         else if (thisMove.from.onGround && thisMove.to.onGround) {
             // Default on-ground move.
             // TODO: Should still cover extreme moves here.
+            if (checkDetails.canStepUpBlock && thisMove.yDistance > 0.0 && thisMove.yDistance <= 1.0) {
+                checkDetails.checkAscendMuch = false;
+                tags.add("step_up");
+            }
             if (thisMove.from.onIce && thisMove.to.onIce) {
                 // Default on-ice move.
                 if (data.debug) {
@@ -198,50 +218,10 @@ public class VehicleEnvelope extends Check {
                 }
             }
         }
-        else if (inAir) {
+        else if (checkDetails.inAir) {
             // In-air move.
-            // TODO: Common in-air accounting check with parameters.
-            if (data.debug) {
-                debugDetails.add("air-air");
-            }
-            if (thisMove.yDistance > 0.0) {
-                tags.add("ascend_at_all");
-                return true;
-            }
-            // TODO: Workaround: 60+ in-air phase  for 2* lastyDist > yDist > 2 * (lastyDist + MagicVehicle.boatGravityMax). Possibly once per in-air phase.
-            // Absolute vertical distance to set back.
-            // TODO: Add something like this.
-            //            final double setBackYdistance = to.getY() - data.vehicleSetBacks.getValidSafeMediumEntry().getY();
-            //            if (data.sfJumpPhase > 4) {
-            //                double estimate = Math.min(2.0, MagicVehicle.boatGravityMin * ((double) data.sfJumpPhase / 4.0) * ((double) data.sfJumpPhase / 4.0 + 1.0) / 2.0);
-            //                if (setBackYdistance > -estimate) {
-            //                    tags.add("slow_fall_vdistsb");
-            //                    return true;
-            //                }
-            //            }
-            // Enforce falling speed (vdist) envelope by in-air phase count.
-            // Slow falling (vdist), do not bind to descending in general.
-            final double minDescend = -MagicVehicle.boatGravityMin * data.sfJumpPhase;
-            final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
-            if (data.sfJumpPhase > 1 && thisMove.yDistance > Math.max(minDescend, -MagicVehicle.boatVerticalFallTarget)) {
-                tags.add("slow_fall_vdist");
+            if (checkInAir(thisMove, data)) {
                 violation = true;
-            }
-            // Fast falling (vdist).
-            else if (data.sfJumpPhase > 1 && thisMove.yDistance < maxDescend) {
-                tags.add("fast_fall_vdist");
-                violation = true;
-            }
-            if (violation) {
-                // Post violation detection workarounds.
-                if (MagicVehicle.oddInAir(thisMove, minDescend, maxDescend, data)) {
-                    violation = false;
-                    checkDescendMuch = checkAscendMuch = false; // (Full envelope has been checked.)
-                }
-                if (data.debug) {
-                    debugDetails.add("minDescend: " + minDescend);
-                    debugDetails.add("maxDescend: " + maxDescend);
-                }
             }
         }
         else {
@@ -249,19 +229,20 @@ public class VehicleEnvelope extends Check {
             if (data.debug) {
                 debugDetails.add("?-?");
             }
+            // TODO: Lift off speed etc.
             // TODO: Clearly overlaps other cases.
             // TODO: Skipped vehicle move events happen here as well (...).
-            if (!toIsSafeMedium) {
+            if (!checkDetails.toIsSafeMedium) {
                 // TODO: At least do something here?
             }
         }
         // Maximum ascend speed.
-        if (checkAscendMuch && thisMove.yDistance > MagicVehicle.maxAscend) {
+        if (checkDetails.checkAscendMuch && thisMove.yDistance > checkDetails.maxAscend) {
             tags.add("ascend_much");
             violation = true;
         }
         // Maximum descend speed.
-        if (checkDescendMuch && thisMove.yDistance < -MagicVehicle.maxDescend) {
+        if (checkDetails.checkDescendMuch && thisMove.yDistance < -MagicVehicle.maxDescend) {
             // TODO: At times it looks like one move is skipped, resulting in double distance ~ -5 and at the same time 'vehicle moved too quickly'. 
             // TODO: Test with log this to console to see the order of things.
             tags.add("descend_much");
@@ -271,16 +252,16 @@ public class VehicleEnvelope extends Check {
         if (!violation) {
             // No violation.
             // TODO: sfJumpPhase is abused for in-air move counting here.
-            if (inAir) {
+            if (checkDetails.inAir) {
                 data.sfJumpPhase ++;
             }
             else {
                 // Adjust set-back.
-                if (toIsSafeMedium) {
+                if (checkDetails.toIsSafeMedium) {
                     data.vehicleSetBacks.setSafeMediumEntry(thisMove.to);
                     data.sfJumpPhase = 0;
                 }
-                else if (fromIsSafeMedium) {
+                else if (checkDetails.fromIsSafeMedium) {
                     data.vehicleSetBacks.setSafeMediumEntry(thisMove.from);
                     data.sfJumpPhase = 0;
                 }
@@ -293,6 +274,123 @@ public class VehicleEnvelope extends Check {
         return violation;
     }
 
+    /**
+     * Prepare checkDetails according to vehicle-specific interpretation of side
+     * conditions.
+     * 
+     * @param vehicle
+     * @param moveInfo Cheating.
+     * @param thisMove
+     */
+    protected void prepareCheckDetails(final Entity vehicle, final VehicleMoveInfo moveInfo, final VehicleMoveData thisMove) {
+        checkDetails.reset();
+        // TODO: These properties are for boats, might need to distinguish further.
+        checkDetails.fromIsSafeMedium = thisMove.from.inWater || thisMove.from.onGround || thisMove.from.inWeb;
+        checkDetails.toIsSafeMedium = thisMove.to.inWater || thisMove.to.onGround || thisMove.to.inWeb;
+        checkDetails.inAir = !checkDetails.fromIsSafeMedium && !checkDetails.toIsSafeMedium;
+        // Distinguish by entity class (needs future proofing at all?).
+        if (vehicle instanceof Boat) {
+            checkDetails.simplifiedType = EntityType.BOAT;
+            checkDetails.maxAscend = MagicVehicle.maxAscend;
+        }
+        else if (vehicle instanceof Minecart) {
+            checkDetails.simplifiedType = EntityType.MINECART;
+            // Bind to rails.
+            thisMove.setExtraMinecartProperties(moveInfo); // Cheating.
+            if (thisMove.fromOnRails) {
+                checkDetails.fromIsSafeMedium = true;
+                checkDetails.inAir = false;
+            }
+            if (thisMove.toOnRails) {
+                checkDetails.toIsSafeMedium = true;
+                checkDetails.inAir = false;
+            }
+        }
+        else if (vehicle instanceof Horse) {
+            checkDetails.simplifiedType = EntityType.HORSE;
+            checkDetails.canJump = checkDetails.canStepUpBlock = true;
+        }
+        else if (vehicle instanceof Pig) {
+            checkDetails.simplifiedType = EntityType.PIG;
+            checkDetails.canJump = false;
+            checkDetails.canStepUpBlock = true;
+        }
+        else {
+            checkDetails.simplifiedType = thisMove.vehicleType;
+        }
+
+        // Generic settings.
+        // (maxAscend is not checked for stepping up blocks)
+        if (checkDetails.canJump) {
+            checkDetails.maxAscend = 1.0; // Coarse envelope. Actual lift off gain should be checked on demand.
+        }
+    }
+
+    /**
+     * Generic in-air check.
+     * @param thisMove
+     * @param data
+     * @return
+     */
+    private boolean checkInAir(final VehicleMoveData thisMove, final MovingData data) {
+
+        // TODO: Distinguish sfJumpPhase and inAirDescendCount (after reaching the highest point).
+
+        if (data.debug) {
+            debugDetails.add("air-air");
+        }
+
+        if (checkDetails.canJump) {
+            // TODO: Max. y-distance to set-back.
+            // TODO: Friction.
+        }
+        else {
+            if (thisMove.yDistance > 0.0) {
+                tags.add("ascend_at_all");
+                return true;
+            }
+        }
+
+        boolean violation = false;
+        // Absolute vertical distance to set back.
+        // TODO: Add something like this.
+        //            final double setBackYdistance = to.getY() - data.vehicleSetBacks.getValidSafeMediumEntry().getY();
+        //            if (data.sfJumpPhase > 4) {
+        //                double estimate = Math.min(2.0, MagicVehicle.boatGravityMin * ((double) data.sfJumpPhase / 4.0) * ((double) data.sfJumpPhase / 4.0 + 1.0) / 2.0);
+        //                if (setBackYdistance > -estimate) {
+        //                    tags.add("slow_fall_vdistsb");
+        //                    return true;
+        //                }
+        //            }
+        // Enforce falling speed (vdist) envelope by in-air phase count.
+        // Slow falling (vdist), do not bind to descending in general.
+        // TODO: Distinguish gravity by vehicle type or not (plus max fall target).
+        final double minDescend = -MagicVehicle.boatGravityMin * (checkDetails.canJump ? Math.max(data.sfJumpPhase - MagicVehicle.maxJumpPhaseAscend, 0) : data.sfJumpPhase);
+        final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
+        if (data.sfJumpPhase > (checkDetails.canJump ? MagicVehicle.maxJumpPhaseAscend : 1)
+                && thisMove.yDistance > Math.max(minDescend, -MagicVehicle.boatVerticalFallTarget)) {
+            tags.add("slow_fall_vdist");
+            violation = true;
+        }
+        // Fast falling (vdist).
+        else if (data.sfJumpPhase > 1 && thisMove.yDistance < maxDescend) {
+            tags.add("fast_fall_vdist");
+            violation = true;
+        }
+        if (violation) {
+            // Post violation detection workarounds.
+            if (MagicVehicle.oddInAir(thisMove, minDescend, maxDescend, checkDetails, data)) {
+                violation = false;
+                checkDetails.checkDescendMuch = checkDetails.checkAscendMuch = false; // (Full envelope has been checked.)
+            }
+            if (data.debug) {
+                debugDetails.add("minDescend: " + minDescend);
+                debugDetails.add("maxDescend: " + maxDescend);
+            }
+        }
+        return violation;
+    }
+
     private boolean maxDistHorizontal(final VehicleMoveData thisMove, final double maxDistanceHorizontal) {
         if (thisMove.hDistance > maxDistanceHorizontal) {
             tags.add("hdist");
@@ -300,15 +398,6 @@ public class VehicleEnvelope extends Check {
         }
         else {
             return false;
-        }
-    }
-
-    private void onNotHandle(final Entity vehicle) {
-        if (!notHandled.contains(vehicle.getType())) {
-            if (Bukkit.getServer().getAllowFlight()) {
-                notHandled.add(vehicle.getType());
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(null, type) + "Can't handle entity type " + vehicle.getType() + " yet, and allow-flight (server.properties) is set to true. Set allow-flight to false, in order to prevent other types of vehicle flying for now.");
-            }
         }
     }
 

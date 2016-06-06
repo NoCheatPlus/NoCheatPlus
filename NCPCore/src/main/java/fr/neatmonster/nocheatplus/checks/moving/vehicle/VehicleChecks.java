@@ -370,12 +370,11 @@ public class VehicleChecks extends CheckListener {
         // Initialize currentMove.
         final VehicleMoveData thisMove = data.vehicleMoves.getCurrentMove();
         thisMove.set(moveInfo.from, moveInfo.to);
-        thisMove.vehicleId = vehicle.getUniqueId();
-        thisMove.vehicleType = vehicle.getType();
         // Prepare all extra properties by default for now.
         MovingUtil.prepareFullCheck(moveInfo.from, moveInfo.to, thisMove, cc.yOnGround);
+        thisMove.setExtraVehicleProperties(vehicle);
         // Call checkVehicleMove for actual checks.
-        checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, thisMove, firstPastMove, player, fake, data, cc);
+        checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, moveInfo, thisMove, firstPastMove, player, fake, data, cc);
         // Cleanup.
         aux.returnVehicleMoveInfo(moveInfo);
     }
@@ -397,6 +396,7 @@ public class VehicleChecks extends CheckListener {
      *            dead.
      * @param vehicleType
      *            Type of that vehicle.
+     * @param moveInfo 
      * @param firstPastMove 
      * @param thisMove2 
      * @param player
@@ -413,7 +413,7 @@ public class VehicleChecks extends CheckListener {
      * @param cc2 
      */
     private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, final Location vehicleLocation,
-            final World world, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
+            final World world, final VehicleMoveInfo moveInfo, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
             final Player player, final boolean fake, final MovingData data, MovingConfig cc) {
         // TODO: (private or public?)
 
@@ -465,6 +465,9 @@ public class VehicleChecks extends CheckListener {
                 }
             }
             else {
+                // Set up basic details about what/how to check.
+                vehicleEnvelope.prepareCheckDetails(vehicle, moveInfo, thisMove);
+                // Check.
                 final SetBackEntry tempNewTo  = vehicleEnvelope.check(player, vehicle, thisMove, fake, data, cc);
                 if (tempNewTo != null) {
                     newTo = tempNewTo;
