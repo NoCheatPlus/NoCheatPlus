@@ -459,21 +459,35 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Checks if the player is on a ladder or vine.
+     * Checks if the player is on a ladder or vine. Contains special casing for
+     * trap doors above climbable.
      * 
      * @return If so.
      */
     public boolean isOnClimbable() {
         if (onClimbable == null) {
-            // Climbable blocks.
-            if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ) {
+            // Early return with flags set and no climbable nearby.
+            final int typeId = getTypeId();
+            if (blockFlags != null && (blockFlags & BlockProperties.F_CLIMBABLE) == 0
+                    // Special case trap doors: // Better than increasing maxYOnGround.
+                    && (blockFlags & BlockProperties.F_PASSABLE_X4) == 0
+                    ) {
                 onClimbable = false;
                 return false;
             }
-            onClimbable = (BlockProperties.getBlockFlags(getTypeId()) & BlockProperties.F_CLIMBABLE) != 0;
+            final long thisFlags = BlockProperties.getBlockFlags(typeId);
+            onClimbable = (thisFlags & BlockProperties.F_CLIMBABLE) != 0;
             // TODO: maybe use specialized bounding box.
             //          final double d = 0.1d;
             //          onClimbable = BlockProperties.collides(getBlockAccess(), minX - d, minY - d, minZ - d, maxX + d, minY + 1.0, maxZ + d, BlockProperties.F_CLIMBABLE);
+            if (!onClimbable) {
+                // Special case trap door (simplified preconditions check).
+                // TODO: Distance to the wall?
+                if ((thisFlags & BlockProperties.F_PASSABLE_X4) != 0
+                        && BlockProperties.isTrapDoorAboveLadderSpecialCase(blockCache, blockX, blockY, blockZ)) {
+                    onClimbable = true;
+                }
+            }
         }
         return onClimbable;
     }

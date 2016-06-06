@@ -30,6 +30,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -390,7 +391,24 @@ public class BlockProperties {
     /** Like slime block: bounce back 25% of fall height without taking fall damage [TODO: Check/adjust]. */
     public static final long F_BOUNCE25             = 0x400000;
 
+    /**
+     * The facing direction is described by the lower 3 data bits in order of
+     * NSWE, starting at and defaulting to 2, which includes invalid states.
+     * Main purpose is ladders, no guarantees on defaults for other blocks yet.
+     */
+    public static final long F_FACING_LOW3D2_NSWE     = 0x800000;
+
+    /**
+     * The direction the block is attached to is described by the lower 2 bits
+     * in order of SNEW.
+     */
+    public static final long F_ATTACHED_LOW2_SNEW       = 0x1000000;
+
     // TODO: When flags are out, switch to per-block classes :p.
+
+    // Special case activation flags.
+    /** Trap door is climbable with ladder underneath, both facing distinct. */
+    private static boolean specialCaseTrapDoorAboveLadder = false;
 
     /**
      * Map flag to names.
@@ -628,12 +646,26 @@ public class BlockProperties {
             blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE | F_THICK_FENCE;
         }
 
-        // Fence gate(s).
+        // F_PASSABLE_X4
         for (final Material mat : new Material[]{
                 Material.FENCE_GATE,
-                // TODO: Consider TRAP_DOOR too, for the case someone removes the ign_passable entry.
+                Material.TRAP_DOOR,
         }) {
             blockFlags[mat.getId()] |= F_PASSABLE_X4;
+        }
+
+        // F_FACING_LOW3D2_NSWE
+        for (final Material mat : new Material[]{
+                Material.LADDER
+        }) {
+            blockFlags[mat.getId()] |= F_FACING_LOW3D2_NSWE;
+        }
+
+        // F_FACING_LOW2_SNEW
+        for (final Material mat : new Material[]{
+                Material.TRAP_DOOR,
+        }) {
+            blockFlags[mat.getId()] |= F_ATTACHED_LOW2_SNEW;
         }
 
         // Thin fences (iron fence, glass panes).
@@ -1575,6 +1607,105 @@ public class BlockProperties {
      */
     public static final boolean isAir(ItemStack stack) {
         return stack == null || isAir(stack.getType());
+    }
+
+    /**
+     * Get the facing direction as BlockFace, unified approach with attached to
+     * = opposite of facing. Likely the necessary flags are just set where it's
+     * been needed so far.
+     * 
+     * @param flags
+     * @param data
+     * @return Return null, if facing can not be determined.
+     */
+    public static final BlockFace getFacing(final long flags, final int data) {
+        if ((flags & F_FACING_LOW3D2_NSWE) != 0L) {
+            switch(data & 7) {
+                case 3:
+                    return BlockFace.SOUTH;
+                case 4:
+                    return BlockFace.WEST;
+                case 5:
+                    return BlockFace.EAST;
+                default: // 2 and invalid states.
+                    return BlockFace.NORTH;
+            }
+
+        }
+        else if ((flags & F_ATTACHED_LOW2_SNEW) != 0L) {
+            switch (data & 3) {
+                case 0:
+                    return BlockFace.NORTH; // Attached to BlockFace.SOUTH;
+                case 1:
+                    return BlockFace.SOUTH; // Attached to BlockFace.NORTH;
+                case 2:
+                    return BlockFace.WEST; // Attached to BlockFace.EAST;
+                case 3:
+                    return BlockFace.EAST; // Attached to BlockFace.WEST;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Special case: Trap door above ladder attached to lower and of block, same
+     * facing. Thus the trap door can be climbed up like a ladder.<br>
+     * Suggested fast precondition checks are for nearby flags covering this and
+     * below:
+     * <ul>
+     * <li>F_PASSABLE_X4 (trap door at these coordinates).</li>
+     * <li>F_CLIMBABLE (ladder below).</li>
+     * </ul>
+     * 
+     * @param access
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static final boolean isTrapDoorAboveLadderSpecialCase(final BlockCache access, final int x, final int y, final int z) {
+        // Special case activation.
+        if (!isSpecialCaseTrapDoorAboveLadder()) {
+            return false;
+        }
+        // Basic flags and facing for trap door.
+        final long flags1 = blockFlags[access.getTypeId(x, y, z)];
+        if ((flags1 & F_PASSABLE_X4) == 0) {
+            return false;
+        }
+        // TODO: Really confine to trap door types (add a flag or something else)?
+        final int data1 = access.getData(x, y, z);
+        // Trap door must be attached to the bottom half of the block.
+        if ((data1 & 0x08) != 0) {
+            return false;
+        }
+        // Trap door must be open (really?).
+        if ((data1 & 0x04) != 0x04) {
+            return false;
+        }
+        // Need the facing direction.
+        final BlockFace face1 = getFacing(flags1, data1);
+        if (face1 == null) {
+            return false;
+        }
+        // Basic flags and facing for ladder.
+        final int belowId = access.getTypeId(x, y - 1, z);
+        // Really confine to ladder here.
+        if (belowId != getId(Material.LADDER)) {
+            return false;
+        }
+        final long flags2 = blockFlags[belowId];
+        // (Type has already been checked.)
+        //if ((flags2 & F_CLIMBABLE) == 0) {
+        //    return false;
+        //}
+        final int data2 = access.getData(x, y - 1, z);
+        final BlockFace face2 = getFacing(flags2, data2);
+        // Compare faces.
+        if (face1 != face2) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -2947,6 +3078,26 @@ public class BlockProperties {
         // TODO: "Wrong" moves through edges of blocks (not sure, needs reproducing).
         // (Could allow start-end if passable + check first collision time or some estimate.)
         return false;
+    }
+
+    /**
+     * Test for special case activation: trap door is climbable above ladder
+     * with distinct facing.
+     * 
+     * @return
+     */
+    public static boolean isSpecialCaseTrapDoorAboveLadder() {
+        return specialCaseTrapDoorAboveLadder;
+    }
+
+    /**
+     * Set special case activation: trap door is climbable above ladder with
+     * distinct facing.
+     * 
+     * @param specialCaseTrapDoorAboveLadder
+     */
+    public static void setSpecialCaseTrapDoorAboveLadder(boolean specialCaseTrapDoorAboveLadder) {
+        BlockProperties.specialCaseTrapDoorAboveLadder = specialCaseTrapDoorAboveLadder;
     }
 
 }

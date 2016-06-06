@@ -80,6 +80,9 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         // 255(STRUCTURE_BLOCK / SOLID+GROUND) 
         BlockInit.setAs(255, Material.BEDROCK);
 
+        // Special case activation.
+        BlockProperties.setSpecialCaseTrapDoorAboveLadder(true);
+
         StaticLog.logInfo("Added block-info for Minecraft 1.9 blocks.");
     }
 
