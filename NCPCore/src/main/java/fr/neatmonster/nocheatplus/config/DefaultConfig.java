@@ -368,7 +368,7 @@ public class DefaultConfig extends ConfigFile {
 
         // MOVING
         set(ConfPaths.MOVING_CREATIVEFLY_CHECK, true);
-        set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, false); // TODO: -> true ?
+        set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, true);
         set(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE, false); // TODO: -> true ?
         set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative." + ConfPaths.SUB_HORIZONTAL_SPEED, 100);
         set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative." + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, 100);
