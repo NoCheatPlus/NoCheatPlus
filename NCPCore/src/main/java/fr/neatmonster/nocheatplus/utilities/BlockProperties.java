@@ -385,24 +385,24 @@ public class BlockProperties {
     public static final long F_THICK_FENCE          = 0x200000;
 
     /** Fence gate style with 0x04 being fully passable. */
-    public static final long F_PASSABLE_X4          = 0x200000;
+    public static final long F_PASSABLE_X4          = 0x400000;
 
     // TODO: Separate no fall damage flag ? [-> on ground could return "dominating" flags, or extra flags]
     /** Like slime block: bounce back 25% of fall height without taking fall damage [TODO: Check/adjust]. */
-    public static final long F_BOUNCE25             = 0x400000;
+    public static final long F_BOUNCE25             = 0x800000;
 
     /**
      * The facing direction is described by the lower 3 data bits in order of
      * NSWE, starting at and defaulting to 2, which includes invalid states.
      * Main purpose is ladders, no guarantees on defaults for other blocks yet.
      */
-    public static final long F_FACING_LOW3D2_NSWE     = 0x800000;
+    public static final long F_FACING_LOW3D2_NSWE     = 0x1000000;
 
     /**
      * The direction the block is attached to is described by the lower 2 bits
      * in order of SNEW.
      */
-    public static final long F_ATTACHED_LOW2_SNEW       = 0x1000000;
+    public static final long F_ATTACHED_LOW2_SNEW       = 0x2000000;
 
     // TODO: When flags are out, switch to per-block classes :p.
 
