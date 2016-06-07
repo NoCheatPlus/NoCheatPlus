@@ -2054,6 +2054,9 @@ public class BlockProperties {
                 return 0.5;
             }
         }
+        else if ((flags & F_THICK_FENCE) != 0) {
+            return Math.min(1.0, bounds[4]);
+        }
         else if (id == Material.SOUL_SAND.getId()) {
             return 0.875;
         }
@@ -2081,6 +2084,7 @@ public class BlockProperties {
         }
         else {
             // Nothing found.
+            // TODO: Consider using Math.min(1.0, bounds[4]) for compatibility rather?
             return bounds[4];
         }
     }
