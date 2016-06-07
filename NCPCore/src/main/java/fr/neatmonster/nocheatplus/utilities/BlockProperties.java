@@ -1675,10 +1675,7 @@ public class BlockProperties {
         }
         // TODO: Really confine to trap door types (add a flag or something else)?
         final int data1 = access.getData(x, y, z);
-        // Trap door must be attached to the bottom half of the block.
-        if ((data1 & 0x08) != 0) {
-            return false;
-        }
+        // (Trap door may be attached to top or bottom, regardless.)
         // Trap door must be open (really?).
         if ((data1 & 0x04) != 0x04) {
             return false;
