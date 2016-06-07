@@ -307,10 +307,12 @@ public class VehicleEnvelope extends Check {
             }
         }
         else if (vehicle instanceof Horse) {
+            // TODO: Climbable?
             checkDetails.simplifiedType = EntityType.HORSE;
             checkDetails.canJump = checkDetails.canStepUpBlock = true;
         }
         else if (vehicle instanceof Pig) {
+            // TODO: Climbable!
             checkDetails.simplifiedType = EntityType.PIG;
             checkDetails.canJump = false;
             checkDetails.canStepUpBlock = true;

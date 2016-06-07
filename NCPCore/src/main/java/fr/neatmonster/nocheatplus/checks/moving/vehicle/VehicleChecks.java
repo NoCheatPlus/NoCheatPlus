@@ -357,7 +357,15 @@ public class VehicleChecks extends CheckListener {
         final Location useFrom = LocUtil.set(useLoc1, world, firstPastMove.toIsValid ? firstPastMove.to : firstPastMove.from);
         final Location useTo = vehicleLocation;
         // Initialize moveInfo.
-        moveInfo.set(vehicle, useFrom, useTo, cc.yOnGround);
+        if (vehicleType == EntityType.PIG) {
+            // TODO: Special cases by config rather.
+            // TODO: Likely will fail with passable.
+            moveInfo.setExtendFullWidth(0.52);
+        }
+        // TODO: Test yOnGround at 0.13 instead of xz-margin
+        moveInfo.set(vehicle, useFrom, useTo, 
+                vehicleType == EntityType.PIG ? Math.max(0.13, cc.yOnGround) : cc.yOnGround); // TODO: Extra config.
+        moveInfo.setExtendFullWidth(0.0);
         // TODO: Check consistency for given/set and log debug/warnings if necessary (to = vehicleLocation? from = firstPastMove).
         // Check coordinates, just in case.
         if (checkIllegal(moveInfo.from, moveInfo.to)) {

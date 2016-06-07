@@ -234,7 +234,7 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      */
     public void set(final Location location, final Entity entity, final double yOnGround) {
-        doSet(location, entity, mcAccess.getHeight(entity), yOnGround);
+        doSet(location, entity, mcAccess.getWidth(entity), mcAccess.getHeight(entity), yOnGround);
     }
 
     /**
@@ -247,10 +247,25 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      */
     public void set(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
-        doSet(location, entity, fullHeight, yOnGround);
+        doSet(location, entity, mcAccess.getWidth(entity), fullHeight, yOnGround);
     }
 
-    protected void doSet(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
+    /**
+     * 
+     * @param location
+     * @param entity
+     * @param fullWidth
+     *            Override the bounding box width (full width).
+     * @param fullHeight
+     *            Allows to specify eyeHeight here. Currently might be
+     *            overridden by eyeHeight, if that is greater.
+     * @param yOnGround
+     */
+    public void set(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
+        doSet(location, entity, fullWidth, fullHeight, yOnGround);
+    }
+
+    protected void doSet(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
         if (entity instanceof LivingEntity) {
             isLiving = true;
             eyeHeight = ((LivingEntity) entity).getEyeHeight();
@@ -260,11 +275,11 @@ public class RichEntityLocation extends RichBoundsLocation {
             isLiving = false;
             eyeHeight = fullHeight;
         }
-        super.set(location, mcAccess.getWidth(entity), fullHeight, yOnGround);
         this.entity = entity;
         this.width = mcAccess.getWidth(entity);
         this.height = mcAccess.getHeight(entity);
         standsOnEntity = false;
+        super.set(location, fullWidth, fullHeight, yOnGround);
     }
 
     /**

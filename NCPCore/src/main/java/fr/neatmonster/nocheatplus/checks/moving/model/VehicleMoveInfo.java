@@ -22,13 +22,29 @@ import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 
 public class VehicleMoveInfo extends MoveInfo<RichEntityLocation, Entity> {
 
+    /** Add to fullWidth for the bounding box. */
+    private double extendFullWidth = 0.0;
+
     public VehicleMoveInfo(final MCAccess mcAccess){
         super(mcAccess, new RichEntityLocation(mcAccess, null), new RichEntityLocation(mcAccess, null));
     }
 
     @Override
-    protected void set(RichEntityLocation rLoc, Location loc, Entity entity, double yOnGround) {
-        rLoc.set(loc, entity, yOnGround);
+    protected void set(final RichEntityLocation rLoc, final Location loc, final Entity entity, final double yOnGround) {
+        if (getExtendFullWidth() > 0.0) {
+            final MCAccess mcAccess = from.getMCAccess();
+            rLoc.set(loc, entity, mcAccess.getWidth(entity) + getExtendFullWidth(), mcAccess.getHeight(entity), yOnGround);
+        } else {
+            rLoc.set(loc, entity, yOnGround);
+        }
+    }
+
+    public double getExtendFullWidth() {
+        return extendFullWidth;
+    }
+
+    public void setExtendFullWidth(double extendFullWidth) {
+        this.extendFullWidth = extendFullWidth;
     }
 
 }

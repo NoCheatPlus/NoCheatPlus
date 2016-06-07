@@ -66,7 +66,7 @@ public interface MCAccess {
     public double  getHeight(Entity entity);
 
     /**
-     * Return some width.
+     * Return some width (rather the full bounding box width).
      * @param entity
      * @return
      */

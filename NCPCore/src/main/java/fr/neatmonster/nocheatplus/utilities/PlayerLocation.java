@@ -115,6 +115,14 @@ public class PlayerLocation extends RichEntityLocation {
     }
 
     /**
+     * Not supported.
+     */
+    @Override
+    public void set(Location location, Entity entity, double fullWidth, double fullHeight, double yOnGround) {
+        throw new UnsupportedOperationException("Set must specify an instance of Player.");
+    }
+
+    /**
      * Set cached info according to other.<br>
      * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
      * @param other
