@@ -54,7 +54,8 @@ public class VehicleEnvelope extends Check {
      */
     public class CheckDetails {
 
-        public boolean canJump, canStepUpBlock;
+        public boolean canClimb;
+        public boolean canJump, canStepUpBlock; // TODO: Model as heights?
         public double maxAscend;
 
         /** Simplified type, like BOAT, MINECART. */
@@ -72,7 +73,7 @@ public class VehicleEnvelope extends Check {
         public boolean inAir;
 
         public void reset() {
-            canJump = canStepUpBlock = false;
+            canClimb = canJump = canStepUpBlock = false;
             maxAscend = 0.0;
             checkAscendMuch = checkDescendMuch = true;
             fromIsSafeMedium = toIsSafeMedium = inAir = false;
@@ -179,6 +180,14 @@ public class VehicleEnvelope extends Check {
             //            }
             // TODO: Enforce not ascending ?
             // TODO: max speed.
+        }
+        else if (checkDetails.canClimb && thisMove.from.onClimbable) {
+            // TODO: Order.
+            checkDetails.checkAscendMuch = checkDetails.checkDescendMuch = false;
+            if (Math.abs(thisMove.yDistance) > MagicVehicle.climbSpeed) {
+                violation = true;
+                tags.add("climbspeed");
+            }
         }
         else if (thisMove.from.inWater && thisMove.to.inWater) {
             // Default in-medium move.
@@ -307,7 +316,7 @@ public class VehicleEnvelope extends Check {
             }
         }
         else if (vehicle instanceof Horse) {
-            // TODO: Climbable?
+            // TODO: Climbable? -> seems not.
             checkDetails.simplifiedType = EntityType.HORSE;
             checkDetails.canJump = checkDetails.canStepUpBlock = true;
         }
@@ -316,6 +325,7 @@ public class VehicleEnvelope extends Check {
             checkDetails.simplifiedType = EntityType.PIG;
             checkDetails.canJump = false;
             checkDetails.canStepUpBlock = true;
+            checkDetails.canClimb = true;
         }
         else {
             checkDetails.simplifiedType = thisMove.vehicleType;
@@ -325,6 +335,17 @@ public class VehicleEnvelope extends Check {
         // (maxAscend is not checked for stepping up blocks)
         if (checkDetails.canJump) {
             checkDetails.maxAscend = 1.0; // Coarse envelope. Actual lift off gain should be checked on demand.
+        }
+        // Climbable
+        if (checkDetails.canClimb) {
+            if (thisMove.from.onClimbable) {
+                checkDetails.fromIsSafeMedium = true;
+                checkDetails.inAir = false;
+            }
+            if (thisMove.to.onClimbable) {
+                checkDetails.toIsSafeMedium = true;
+                checkDetails.inAir = false;
+            }
         }
     }
 

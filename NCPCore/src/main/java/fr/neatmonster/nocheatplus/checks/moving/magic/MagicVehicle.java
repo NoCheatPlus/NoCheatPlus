@@ -47,6 +47,9 @@ public class MagicVehicle {
     /** Max ascending in-air jump phase. */
     public static final int maxJumpPhaseAscend = 8;
 
+    /** Absolute max. speed. */
+    public static final double climbSpeed = 0.1625;
+
     /**
      * 
      * @param thisMove
