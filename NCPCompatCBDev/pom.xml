@@ -21,8 +21,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-server</artifactId>
+			<groupId>org.bukkit</groupId>
+			<artifactId>craftbukkit</artifactId>
 			<version>1.10-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
