@@ -22,8 +22,6 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
 
-        // TODO: Actual similarly fast/slow breaking blocks ?
-
         final long ground = BlockProperties.F_GROUND;
         final BlockProps instant = BlockProperties.instantType;
 
@@ -81,6 +79,7 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         BlockInit.setAs(255, Material.BEDROCK);
 
         // Special case activation.
+        // TODO: Is this the right place?
         BlockProperties.setSpecialCaseTrapDoorAboveLadder(true);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.9 blocks.");
