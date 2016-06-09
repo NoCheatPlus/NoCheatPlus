@@ -103,8 +103,10 @@ public class DefaultComponentFactory {
                     boolean vP3_6_6 = GenericVersion.compareVersions("3.6.6", pV) == 0;
                     boolean vP3_7_0 = GenericVersion.isVersionBetween(pV, "3.7", true, "3.7.0", true);
                     boolean vP4_0_0 = GenericVersion.compareVersions("4.0.0", pV)  <= 0; // 4.0.0 or later until next MC version is out.
+                    boolean vP4_0_2 = GenericVersion.compareVersions("4.0.2", pV)  <= 0; // 4.0.2 or later until next MC version is out.
                     if (
-                            ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP4_0_0
+                            ServerVersion.isMinecraftVersionBetween("1.10", true, "1.11", false) && vP4_0_2
+                            || ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP4_0_0
                             || ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP3_7_0
                             || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false)  && (vP3_6_4 || vP3_6_5) 
                             || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) && vP3_6_6
