@@ -5,11 +5,18 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
 import fr.neatmonster.nocheatplus.utilities.AttribUtil;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import net.minecraft.server.v1_6_R3.AttributeInstance;
 import net.minecraft.server.v1_6_R3.AttributeModifier;
 import net.minecraft.server.v1_6_R3.GenericAttributes;
 
 public class AttributeAccess implements IAttributeAccess {
+
+    public AttributeAccess() {
+        if (ReflectionUtil.getClass("net.minecraft.server.v1_6_R3.AttributeInstance") == null) {
+            throw new RuntimeException("Service not available.");
+        }
+    }
 
     @Override
     public double getSpeedAttributeMultiplier(Player player) {

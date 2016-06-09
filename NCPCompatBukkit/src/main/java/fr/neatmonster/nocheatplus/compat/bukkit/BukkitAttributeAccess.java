@@ -10,8 +10,15 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
 import fr.neatmonster.nocheatplus.utilities.AttribUtil;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class BukkitAttributeAccess implements IAttributeAccess {
+
+    public BukkitAttributeAccess() {
+        if (ReflectionUtil.getClass("org.bukkit.attribute.AttributeInstance") == null) {
+            throw new RuntimeException("Service not available.");
+        }
+    }
 
     private int operationToInt(final Operation operation) {
         switch (operation) {
