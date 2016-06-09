@@ -89,6 +89,7 @@ import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.TickListener;
+import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -153,6 +154,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     /** Auxiliary functionality. */
     private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
+
+    private IAttributeAccess attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
 
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
@@ -533,7 +536,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Hard to confine assumesprint further (some logics change with hdist or sprinting).
             if (player.getFoodLevel() > 5 || player.isFlying()) {
                 data.timeSprinting = time;
-                data.multSprinting = mcAccess.getSprintAttributeMultiplier(player);
+                data.multSprinting = attributeAccess.getSprintAttributeMultiplier(player);
                 if (data.multSprinting == Double.MAX_VALUE) {
                     data.multSprinting = 1.30000002;
                 }
@@ -2011,6 +2014,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         }
+    }
+
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        super.setMCAccess(mcAccess);
+        attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
     }
 
 }

@@ -42,9 +42,11 @@ import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
+import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -88,6 +90,9 @@ public class SurvivalFly extends Check {
     private final BlockChangeTracker blockChangeTracker;
 
     private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
+
+    private IAttributeAccess attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
+
 
     /**
      * Instantiates a new survival fly check.
@@ -739,7 +744,7 @@ public class SurvivalFly extends Check {
                 hAllowedDistance *= data.multSprinting;
             }
             // Note: Attributes count in slowness potions, thus leaving out isn't possible.
-            final double attrMod = mcAccess.getSpeedAttributeMultiplier(player);
+            final double attrMod = attributeAccess.getSpeedAttributeMultiplier(player);
             if (attrMod == Double.MAX_VALUE) {
                 // TODO: Slowness potion.
                 // Count in speed potions.
@@ -1927,6 +1932,12 @@ public class SurvivalFly extends Check {
 
     private void logPostViolationTags(final Player player) {
         debug(player, "SurvivalFly Post violation handling tag update:\n" + StringUtil.join(tags, "+"));
+    }
+
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        super.setMCAccess(mcAccess);
+        attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
     }
 
 }

@@ -26,7 +26,6 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -71,11 +70,6 @@ public class ReflectHelper {
     protected final ReflectEntityDamage reflectEntity;
     protected final ReflectPlayer reflectPlayer;
 
-    protected final ReflectGenericAttributes reflectGenericAttributes;
-    protected final ReflectAttributeInstance reflectAttributeInstance;
-    protected final ReflectAttributeModifier reflectAttributeModifier;
-    protected final boolean hasAttributes;
-
     public ReflectHelper() throws ReflectFailureException {
         // TODO: Allow some to not work?
         try {
@@ -93,21 +87,6 @@ public class ReflectHelper {
             this.reflectDamageSource = new ReflectDamageSource(this.reflectBase);
             this.reflectEntity = new ReflectEntityDamage(this.reflectBase, this.reflectDamageSource);
             this.reflectPlayer = new ReflectPlayer(this.reflectBase, this.reflectDamageSource);
-            ReflectGenericAttributes reflectGenericAttributes = null;
-            ReflectAttributeInstance reflectAttributeInstance = null;
-            ReflectAttributeModifier reflectAttributeModifier = null;
-            boolean hasAttributes = false;
-            try {
-                reflectGenericAttributes = new ReflectGenericAttributes(this.reflectBase);
-                reflectAttributeInstance = new ReflectAttributeInstance(this.reflectBase);
-                reflectAttributeModifier = new ReflectAttributeModifier(this.reflectBase);
-                hasAttributes = true; // TODO: null checks (...).
-            }
-            catch (ClassNotFoundException ex) {}
-            this.reflectGenericAttributes = reflectGenericAttributes;
-            this.reflectAttributeInstance = reflectAttributeInstance;
-            this.reflectAttributeModifier = reflectAttributeModifier;
-            this.hasAttributes = hasAttributes;
         }
         catch (ClassNotFoundException ex) {
             throw new ReflectFailureException(ex);
@@ -237,69 +216,6 @@ public class ReflectHelper {
         Object handle = getHandle(player);
         if (!ReflectionUtil.set(this.reflectPlayer.nmsInvulnerableTicks, handle, ticks)) {
             fail();
-        }
-    }
-
-    /**
-     * Get the speed attribute (MOVEMENT_SPEED) for a player.
-     * @param handle EntityPlayer
-     * @return AttributeInstance
-     */
-    public Object getMovementSpeedAttributeInstance(Player player) {
-        if (!hasAttributes || this.reflectPlayer.nmsGetAttributeInstance == null || this.reflectGenericAttributes.nmsMOVEMENT_SPEED == null) {
-            fail();
-        }
-        return ReflectionUtil.invokeMethod(this.reflectPlayer.nmsGetAttributeInstance, getHandle(player), this.reflectGenericAttributes.nmsMOVEMENT_SPEED);
-    }
-
-    /**
-     * 
-     * @param player
-     * @param removeSprint If to calculate away the sprint boost modifier.
-     * @return
-     */
-    public double getSpeedAttributeMultiplier(Player player, boolean removeSprint) {
-        if (!hasAttributes || this.reflectAttributeInstance.nmsGetValue == null || 
-                this.reflectAttributeInstance.nmsGetBaseValue == null) {
-            fail();
-        }
-        Object attributeInstance = getMovementSpeedAttributeInstance(player);
-        double val = ((Double) ReflectionUtil.invokeMethodNoArgs(this.reflectAttributeInstance.nmsGetValue, attributeInstance)).doubleValue() / ((Double) ReflectionUtil.invokeMethodNoArgs(this.reflectAttributeInstance.nmsGetBaseValue, attributeInstance)).doubleValue();
-        if (!removeSprint) {
-            return val;
-        }
-        else {
-            return val / nmsAttributeInstance_getAttributeModifierMultiplier(attributeInstance);
-        }
-    }
-
-    public double getSprintAttributeMultiplier(Player player) {
-
-        if (!hasAttributes || this.reflectAttributeModifier.nmsGetOperation == null || this.reflectAttributeModifier.nmsGetValue == null) {
-            fail();
-        }
-        Object attributeInstance = getMovementSpeedAttributeInstance(player);
-        if (attributeInstance == null) {
-            fail();
-        }
-        return nmsAttributeInstance_getAttributeModifierMultiplier(attributeInstance);
-    }
-
-    /**
-     * (Not an existing method.)
-     * @param attributeInstance
-     */
-    public double nmsAttributeInstance_getAttributeModifierMultiplier(Object attributeInstance) {
-        if (this.reflectAttributeInstance.nmsGetAttributeModifier == null) {
-            fail();
-        }
-        // TODO: Need to fall back in case of errors.
-        Object mod = ReflectionUtil.invokeMethod(this.reflectAttributeInstance.nmsGetAttributeModifier, attributeInstance, AttribUtil.ID_SPRINT_BOOST);
-        if (mod == null) {
-            return 1.0;
-        }
-        else {
-            return AttribUtil.getMultiplier((Integer) ReflectionUtil.invokeMethodNoArgs(this.reflectAttributeModifier.nmsGetOperation, mod), (Double) ReflectionUtil.invokeMethodNoArgs(this.reflectAttributeModifier.nmsGetValue, mod));
         }
     }
 

@@ -31,7 +31,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public class MCAccessCBReflect extends MCAccessBukkitBase {
 
     protected final ReflectHelper helper;
-    
+
     /** Generally supported Minecraft version (know for sure). */
     protected final boolean knownSupportedVersion;
     /** We know for sure that dealFallDamage will fire a damage event. */
@@ -146,26 +146,6 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
         }
         catch (ReflectFailureException ex) {
             super.setInvulnerableTicks(player, ticks);
-        }
-    }
-
-    @Override
-    public double getSpeedAttributeMultiplier(Player player) {
-        try {
-            return helper.getSpeedAttributeMultiplier(player, true);
-        }
-        catch (ReflectFailureException ex) {
-            return super.getSpeedAttributeMultiplier(player);
-        }
-    }
-
-    @Override
-    public double getSprintAttributeMultiplier(Player player) {
-        try {
-            return helper.getSprintAttributeMultiplier(player);
-        }
-        catch (ReflectFailureException ex) {
-            return super.getSprintAttributeMultiplier(player);
         }
     }
 

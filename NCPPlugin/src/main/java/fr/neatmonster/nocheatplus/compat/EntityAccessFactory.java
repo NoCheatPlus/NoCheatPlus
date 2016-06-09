@@ -29,8 +29,10 @@ import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionA
 public class EntityAccessFactory {
 
     /**
-     * Set up alongside with MCAccess. This is called before setMCAccess is used
-     * internally, so the MCAccess instance is passed here.
+     * Set up alongside with MCAccess. The MCAccess instance is passed here,
+     * before it has been set internally and before it has been advertised to
+     * MCAccessHolder instances, so the latter can get other specific access
+     * providers during handling setMCAccess.
      * 
      * @param mcAccess
      * @param config

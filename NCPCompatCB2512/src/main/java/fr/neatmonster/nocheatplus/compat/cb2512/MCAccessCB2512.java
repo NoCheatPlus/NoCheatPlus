@@ -127,16 +127,6 @@ public class MCAccessCB2512 implements MCAccess{
     }
 
     @Override
-    public double getSpeedAttributeMultiplier(Player player) {
-        return Double.MAX_VALUE;
-    }
-
-    @Override
-    public double getSprintAttributeMultiplier(Player player) {
-        return Double.MAX_VALUE;
-    }
-
-    @Override
     public int getInvulnerableTicks(final Player player) {
         return ((CraftPlayer) player).getHandle().invulnerableTicks;
     }

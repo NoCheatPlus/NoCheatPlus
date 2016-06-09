@@ -14,26 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.compat.spigotcb1_9_R2;
 
-import net.minecraft.server.v1_9_R2.AttributeInstance;
-import net.minecraft.server.v1_9_R2.AttributeModifier;
-import net.minecraft.server.v1_9_R2.AxisAlignedBB;
-import net.minecraft.server.v1_9_R2.Block;
-import net.minecraft.server.v1_9_R2.BlockPosition;
-import net.minecraft.server.v1_9_R2.DamageSource;
-import net.minecraft.server.v1_9_R2.EntityComplexPart;
-import net.minecraft.server.v1_9_R2.EntityPlayer;
-import net.minecraft.server.v1_9_R2.GenericAttributes;
-import net.minecraft.server.v1_9_R2.IBlockAccess;
-import net.minecraft.server.v1_9_R2.IBlockData;
-import net.minecraft.server.v1_9_R2.MobEffectList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_9_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -41,9 +27,17 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import net.minecraft.server.v1_9_R2.AxisAlignedBB;
+import net.minecraft.server.v1_9_R2.Block;
+import net.minecraft.server.v1_9_R2.BlockPosition;
+import net.minecraft.server.v1_9_R2.DamageSource;
+import net.minecraft.server.v1_9_R2.EntityComplexPart;
+import net.minecraft.server.v1_9_R2.EntityPlayer;
+import net.minecraft.server.v1_9_R2.IBlockAccess;
+import net.minecraft.server.v1_9_R2.IBlockData;
+import net.minecraft.server.v1_9_R2.MobEffectList;
 
 public class MCAccessSpigotCB1_9_R2 implements MCAccess {
 
@@ -210,28 +204,6 @@ public class MCAccessSpigotCB1_9_R2 implements MCAccess {
         }
         else {
             return Double.NEGATIVE_INFINITY;
-        }
-    }
-
-    @Override
-    public double getSpeedAttributeMultiplier(Player player) {
-        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED);
-        final double val = attr.getValue() / attr.b();
-        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
-        if (mod == null) {
-            return val;
-        } else {
-            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
-        }
-    }
-
-    @Override
-    public double getSprintAttributeMultiplier(Player player) {
-        final AttributeModifier mod = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).a(AttribUtil.ID_SPRINT_BOOST);
-        if (mod == null) {
-            return 1.0;
-        } else {
-            return AttribUtil.getMultiplier(mod.c(), mod.d());
         }
     }
 

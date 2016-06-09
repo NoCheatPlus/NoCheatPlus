@@ -8,25 +8,48 @@ public class RegistryHelper {
     /**
      * Set up a generic instance, according to settings. On success it will be
      * registered with the default GenericInstanceRegistry (NoCheatPlusAPI).
-     * 
      * @param cbDedicatedNames
      * @param cbReflectNames
      * @param registerFor
      * @param config
-     * @param logDebug
      * @return
      */
     public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, Class<T> registerFor, MCAccessConfig config) {
+        return setupGenericInstance(cbDedicatedNames, cbReflectNames, registerFor, config, null);
+    }
+
+    /**
+     * Set up a generic instance, according to settings. On success it will be
+     * registered with the default GenericInstanceRegistry (NoCheatPlusAPI).
+     * 
+     * @param cbDedicatedNames
+     *            May be null.
+     * @param cbReflectNames
+     *            May be null.
+     * @param registerFor
+     * @param config
+     * @param fallBackInstance
+     *            Use this as a fall back, in case none of the classes could be
+     *            instantiated.
+     * @return
+     */
+    public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, 
+            Class<T> registerFor, MCAccessConfig config, T fallBackInstance) {
         T res = null;
 
         // Reference by class name (native access).
-        if (config.enableCBDedicated) {
+        if (config.enableCBDedicated && cbDedicatedNames != null) {
             res = getFirstAvailable(cbDedicatedNames, registerFor, true);
         }
 
         // Reflection based.
-        if (res == null && config.enableCBReflect) {
+        if (res == null && config.enableCBReflect && cbReflectNames != null) {
             res = getFirstAvailable(cbReflectNames, registerFor, true);
+        }
+
+        // Fall back.
+        if (res == null && fallBackInstance != null) {
+            res = fallBackInstance;
         }
 
         // Register / log.

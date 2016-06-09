@@ -112,33 +112,25 @@ public interface MCAccess {
     public double getFasterMovementAmplifier(Player player);
 
     /**
-     * Generic speed modifier as a multiplier.
-     * 
-     * @param player
-     * @return A multiplier for the allowed speed, excluding the sprint boost
-     *         modifier (!). If not possible to determine, it should
-     *         Double.MAX_VALUE.
-     */
-    public double getSpeedAttributeMultiplier(Player player);
-
-    /**
-     * Sprint boost modifier as a multiplier.
-     * 
-     * @param player
-     * @return The sprint boost modifier as a multiplier. If not possible to
-     *         determine, it should be Double.MAX_VALUE.
-     */
-    public double getSprintAttributeMultiplier(Player player);
-
-    /**
      * 
      * @param player
      * @return Integer.MAX_VALUE if not available (!).
      */
     public int getInvulnerableTicks(Player player);
 
+    /**
+     * 
+     * @param player
+     * @param ticks
+     */
     public void setInvulnerableTicks(Player player, int ticks);
 
+    /**
+     * Deal damage with DamageCause.FALL as cause.
+     * 
+     * @param player
+     * @param damage
+     */
     public void dealFallDamage(Player player, double damage);
 
     /**

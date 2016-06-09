@@ -66,6 +66,7 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
+import fr.neatmonster.nocheatplus.compat.AttributeAccessFactory;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.EntityAccessFactory;
@@ -1179,8 +1180,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
         final MCAccessConfig mcaC = new MCAccessConfig(config);
         final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
-        new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC); // TODO: Registry listeners/events are missing.
-        
+        // TODO: Consider registry events for generic instances too.
+        new AttributeAccessFactory().setupAttributeAccess(mcAccess, mcaC);
+        new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC);
+
         setMCAccess(mcAccess);
         return mcAccess;
     }

@@ -14,16 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.compat.cb2922;
 
-import net.minecraft.server.v1_7_R1.AxisAlignedBB;
-import net.minecraft.server.v1_7_R1.Block;
-import net.minecraft.server.v1_7_R1.DamageSource;
-import net.minecraft.server.v1_7_R1.EntityComplexPart;
-import net.minecraft.server.v1_7_R1.EntityPlayer;
-import net.minecraft.server.v1_7_R1.MobEffectList;
-import net.minecraft.server.v1_7_R1.AttributeInstance;
-import net.minecraft.server.v1_7_R1.AttributeModifier;
-import net.minecraft.server.v1_7_R1.GenericAttributes;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -31,16 +21,20 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_7_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_7_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import net.minecraft.server.v1_7_R1.AxisAlignedBB;
+import net.minecraft.server.v1_7_R1.Block;
+import net.minecraft.server.v1_7_R1.DamageSource;
+import net.minecraft.server.v1_7_R1.EntityComplexPart;
+import net.minecraft.server.v1_7_R1.EntityPlayer;
+import net.minecraft.server.v1_7_R1.MobEffectList;
 
 public class MCAccessCB2922 implements MCAccess{
 
@@ -133,28 +127,6 @@ public class MCAccessCB2922 implements MCAccess{
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
         else return Double.NEGATIVE_INFINITY;
-    }
-
-    @Override
-    public double getSpeedAttributeMultiplier(Player player) {
-        final AttributeInstance attr = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d);
-        final double val = attr.getValue() / attr.b();
-        final AttributeModifier mod = attr.a(AttribUtil.ID_SPRINT_BOOST);
-        if (mod == null) {
-            return val;
-        } else {
-            return val / AttribUtil.getMultiplier(mod.c(), mod.d());
-        }
-    }
-
-    @Override
-    public double getSprintAttributeMultiplier(Player player) {
-        final AttributeModifier mod = ((CraftLivingEntity) player).getHandle().getAttributeInstance(GenericAttributes.d).a(AttribUtil.ID_SPRINT_BOOST);
-        if (mod == null) {
-            return 1.0;
-        } else {
-            return AttribUtil.getMultiplier(mod.c(), mod.d());
-        }
     }
 
     @Override
