@@ -130,6 +130,11 @@
 				</dependency>
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatcbdev</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
@@ -251,6 +256,56 @@
 			<activation>
 				<property>
 					<name>spigot1_9_r2</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+					<version>4.8.2</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.bukkit</groupId>
+					<artifactId>bukkit</artifactId>
+					<version>1.8.8-R0.1-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcore</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatbukkit</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<!-- Non minimal below. -->
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<!-- Non minimal above. -->
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatprotocollib</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatglowstone</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>spigot1_10_r1</id>
+			<activation>
+				<property>
+					<name>spigot1_10_r1</name>
 					<value>true</value>
 				</property>
 			</activation>

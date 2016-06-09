@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.neatmonster</groupId>
+	<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
+	<packaging>jar</packaging>
+	<name>NCPCompatSpigotCB1_9_R2</name>
+	<version>1.1-SNAPSHOT</version>
+
+	<parent>
+		<groupId>fr.neatmonster</groupId>
+		<artifactId>nocheatplus-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcore</artifactId>
+			<version>1.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>craftbukkit</artifactId>
+			<version>1.9.4-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<description>Compatibility for Minecraft 1.9.4 with CraftBukkit/Spigot (1_9_R2).</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

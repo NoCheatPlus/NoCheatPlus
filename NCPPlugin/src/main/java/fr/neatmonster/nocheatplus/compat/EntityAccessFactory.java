@@ -47,6 +47,7 @@ public class EntityAccessFactory {
         // Reference by class name (native access).
         final String[] names = new String[] {
                 "fr.neatmonster.nocheatplus.compat.cbdev.EntityAccessLastPositionAndLook",
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R2.EntityAccessLastPositionAndLook",
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.EntityAccessLastPositionAndLook"
         };
         for (final String name : names) {

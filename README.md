@@ -35,9 +35,10 @@ All profiles for reference:
 | :------------------ | :----------------------------- | :-------------- |
 | `-P minimal` | _default_ | Default profile without native access modules, likely problematic with moving checks. |
 | `-P all` | `cbdedicated` | All compat modules. |
-| `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8_R3 (MC 1.8.4-1.8.8). |
-| `-P spigot1_9_r1` | `spigot1_9_r1` | Just Spigot 1.9_R1 (MC 1.9-1.9.3). |
-| `-P spigot1_9_r2` | `spigot1_9_r2` | Just Spigot 1.9_R2 (MC 1.9.4). |
+| `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
+| `-P spigot1_9_r1` | `spigot1_9_r1` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
+| `-P spigot1_9_r2` | `spigot1_9_r2` | Just Spigot 1.9 R2 (MC 1.9.4). |
+| `-P spigot1_10_r1` | `spigot1_10_r1` | Just Spigot 1.10 R1 (MC 1.10). |
 | `-P cbdev` | `cbdev` | The latest version in development. |
 
 (On the long run, only the latest module for a major Minecraft release will be kept, such as 1_8_r3.)
