@@ -12,9 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.collision;
 
 import org.bukkit.Location;
+
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
 
 
 

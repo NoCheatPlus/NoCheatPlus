@@ -12,9 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.collision;
 
-public class PassableRayTracing extends RayTracing{
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+
+public class PassableRayTracing extends RayTracing implements ICollidePassable {
 
     protected BlockCache blockCache = null;
 
@@ -22,19 +26,17 @@ public class PassableRayTracing extends RayTracing{
 
     protected boolean ignorefirst = false;
 
+    @Override
     public BlockCache getBlockCache() {
         return blockCache;
     }
 
+    @Override
     public void setBlockCache(BlockCache blockCache) {
         this.blockCache = blockCache;
     }
 
-    /**
-     * Set from PlayerLocation instances. Currently takes BlockCache from the from-location.
-     * @param from
-     * @param to
-     */
+    @Override
     public void set(final PlayerLocation from, final PlayerLocation to){
         set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
         setBlockCache(from.getBlockCache()); // TODO: This might better be done extra.
@@ -50,32 +52,24 @@ public class PassableRayTracing extends RayTracing{
         ignorefirst = false;
     }
 
+    @Override
     public boolean collides(){
         return collides;
     }
 
-    /**
-     * Ignore the first block. Must be called after set, because set will override this with false.
-     */
-    public void setIgnorefirst(){
+    @Override
+    public void setIgnoreFirst(){
         this.ignorefirst = true;
     }
 
-    /**
-     * Test if the first block is set to be ignored (resets to false with set).
-     * @return
-     */
+    @Override
     public boolean getIgnoreFirst(){
         return ignorefirst;
     }
 
-    /**
-     * Remove reference to BlockCache.
-     */
+    @Override
     public void cleanup(){
-        if (blockCache != null){
-            blockCache = null;
-        }
+        blockCache = null;
     }
 
     @Override
@@ -91,6 +85,16 @@ public class PassableRayTracing extends RayTracing{
             collides = true;
             return false;
         }
+    }
+
+    @Override
+    public boolean mightNeedSplitAxisHandling() {
+        return true;
+    }
+
+    @Override
+    public void setMargins(double height, double xzMargin) {
+        // (No effect.)
     }
 
 }

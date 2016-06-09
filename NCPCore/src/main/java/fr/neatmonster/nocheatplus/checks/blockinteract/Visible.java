@@ -32,9 +32,9 @@ import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.InteractRayTracing;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
 
 public class Visible extends Check {
 

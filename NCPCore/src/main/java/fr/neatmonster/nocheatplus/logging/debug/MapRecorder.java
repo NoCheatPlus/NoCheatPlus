@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.logging.debug;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
-import fr.neatmonster.nocheatplus.utilities.RayTracing;
+import fr.neatmonster.nocheatplus.utilities.collision.RayTracing;
 
 /**
  * Record blocks along a ray (and potentially other). Changes to blocks are not

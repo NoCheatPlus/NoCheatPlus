@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.player.Passable;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -272,7 +273,7 @@ public class LostGround {
             // TODO: Full bounds check (!).
             final Location ref = from.getLocation();
             ref.setY(to.getY());
-            if (BlockProperties.isPassable(from.getLocation(), ref)) {
+            if (Passable.isPassable(from.getLocation(), ref)) {
                 // TODO: Needs new model (store detailed on-ground properties).
                 return applyLostGround(player, from, false, thisMove, data, "vcollide", tags);
             }

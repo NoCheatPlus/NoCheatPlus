@@ -48,6 +48,9 @@ import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
+import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
+import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 
 /**
  * Properties of blocks.
@@ -308,6 +311,8 @@ public class BlockProperties {
             Material.POTATO,
     };
 
+    private static ICollidePassable rtRay = null;
+    private static ICollidePassable rtAxis = null;
     private static BlockCache blockCache = null; 
     private static PlayerLocation pLoc = null;
 
@@ -450,6 +455,8 @@ public class BlockProperties {
      */
     public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         blockCache = mcAccess.getBlockCache(null);
+        rtRay = new PassableRayTracing();
+        rtAxis = new PassableAxisTracing();
         pLoc = new PlayerLocation(mcAccess, null);
         final Set<String> blocksFeatures = new LinkedHashSet<String>(); // getClass().getName() or some abstract.
         try{
@@ -2126,8 +2133,22 @@ public class BlockProperties {
      * @return
      */
     public static final boolean isPassable(final Location from, final Location to) {
+        return isPassable(rtRay, from, to);
+    }
+
+    /**
+     * Axis-wise checking, like the client does.
+     * 
+     * @param from
+     * @param to
+     * @return
+     */
+    public static final boolean isPassableAxisWise(final Location from, final Location to) {
+        return isPassable(rtAxis, from, to);
+    }
+
+    private static boolean isPassable(final ICollidePassable rt, final Location from, final Location to) {
         blockCache.setAccess(from.getWorld());
-        final PassableRayTracing rt = new PassableRayTracing();
         rt.setMaxSteps(60); // TODO: Configurable ?
         rt.setBlockCache(blockCache);
         rt.set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
@@ -3066,7 +3087,6 @@ public class BlockProperties {
         }
 
         // TODO: Actual ray-collision checking?
-        // TODO: Heuristic workaround for certain situations [might be better outside of this, probably a simplified version ofr the normal case]?
 
         // Check for workarounds.
         // TODO: check f_itchy once exists.
@@ -3074,10 +3094,50 @@ public class BlockProperties {
             return true;
         }
         // Does collide (most likely).
-        // TODO: This is not entirely accurate.
-        // TODO: Moving such that the full move rect overlaps, but no real collision (diagonal moves).
-        // TODO: "Wrong" moves through edges of blocks (not sure, needs reproducing).
         // (Could allow start-end if passable + check first collision time or some estimate.)
+        return false;
+    }
+
+    /**
+     * Check passability with an arbitrary bounding box vs. a block.
+     * 
+     * @param access
+     * @param blockX
+     * @param blockY
+     * @param blockZ
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static final boolean isPassableBox(final BlockCache access, 
+            final int blockX, final int blockY, final int blockZ,
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        // TODO: This mostly is copy and paste from isPassableRay.
+        final int id = access.getTypeId(blockX, blockY, blockZ);
+        if (BlockProperties.isPassable(id)) {
+            return true;
+        }
+        double[] bounds = access.getBounds(blockX, blockY, blockZ);
+        if (bounds == null) {
+            return true;
+        }
+        // (Coordinates are already passed in an ordered form.)
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id] | F_COLLIDE_EDGES)) {
+            return true;
+        }
+
+        // Check for workarounds.
+        // TODO: Adapted to use the version initially intended for ray-tracing. Should have an explicit thing for the box, and let the current ray-tracing variant use that, until THEY implement something real.
+        // TODO: check f_itchy once exists.
+        if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, minX - blockX, minY - blockY, minZ - blockZ, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+            return true;
+        }
+        // Does collide (most likely).
         return false;
     }
 

@@ -27,13 +27,27 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
+import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 
 public class Passable extends Check {
 
-    private final PassableRayTracing rayTracing = new PassableRayTracing();
+    /**
+     * Convenience for player moving, to keep a better overview.
+     * 
+     * @param from
+     * @param to
+     * @return
+     */
+    public static boolean isPassable(Location from, Location to) {
+        return BlockProperties.isPassable(from, to);
+        //return BlockProperties.isPassableAxisWise(from, to);
+    }
+
+    private final ICollidePassable rayTracing = new PassableRayTracing();
+    //private final ICollidePassable rayTracing = new PassableAxisTracing();
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
@@ -62,6 +76,7 @@ public class Passable extends Check {
         boolean toPassable = to.isPassable();
         // General condition check for using ray-tracing.
         if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
+            rayTracing.setMargins(from.getEyeHeight(), from.getWidth() / 2.0); // max from/to + resolution ?
             rayTracing.set(from, to);
             rayTracing.loop();
             if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
@@ -191,7 +206,7 @@ public class Passable extends Check {
      */
     private boolean collidesIgnoreFirst(PlayerLocation from, PlayerLocation to) {
         rayTracing.set(from, to);
-        rayTracing.setIgnorefirst();
+        rayTracing.setIgnoreFirst();
         rayTracing.loop();
         return rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
     }
@@ -204,6 +219,9 @@ public class Passable extends Check {
      * @return
      */
     private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, final int manhattan) {
+        if (!rayTracing.mightNeedSplitAxisHandling()) {
+            return false;
+        }
         // Always check y first.
         rayTracing.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
         rayTracing.loop();

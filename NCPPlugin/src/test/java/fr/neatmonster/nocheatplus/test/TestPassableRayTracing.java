@@ -19,10 +19,12 @@ import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
-import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
+import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 
 public class TestPassableRayTracing {
+    
+    // TODO: Which tests to run on ICollidePassable with PassableAxisRayTracing as well...
 
     // TODO: Moving into a block, 
     // TODO: Moving out of a block

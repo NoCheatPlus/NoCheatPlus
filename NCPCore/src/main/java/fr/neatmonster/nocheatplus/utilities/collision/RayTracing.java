@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.collision;
 
 import org.bukkit.Location;
 
@@ -21,7 +21,7 @@ import org.bukkit.Location;
  * @author mc_dev
  *
  */
-public abstract class RayTracing {
+public abstract class RayTracing implements ICollide {
 
     //	/** End point coordinates (from, to) */
     protected double x0, y0, z0; // x1, y1, z1;
@@ -72,15 +72,7 @@ public abstract class RayTracing {
         set(0, 0, 0, 0, 0, 0);
     }
 
-    /**
-     * After this calling loop is possible.
-     * @param x0
-     * @param y0
-     * @param z0
-     * @param x1
-     * @param y1
-     * @param z1
-     */
+    @Override
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
         this.x0 = x0;
         this.y0 = y0;
@@ -135,9 +127,7 @@ public abstract class RayTracing {
         }
     }
 
-    /**
-     * Loop through blocks.
-     */
+    @Override
     public void loop() {
 
         // Time to block edge.
@@ -367,7 +357,9 @@ public abstract class RayTracing {
      * Indicate if a collision appeared during loop(). This must be overridden to return a result other than false.
      * @return 
      */
+    @Override
     public boolean collides() {
+        // TODO: Switch to using a protected flag right away.
         return false;
     }
 
@@ -387,22 +379,17 @@ public abstract class RayTracing {
      * 
      * @return
      */
+    @Override
     public int getStepsDone() {
         return step;
     }
 
-    /**
-     * Get the maximal number of steps that loop will do.
-     * @return
-     */
+    @Override
     public int getMaxSteps() {
         return maxSteps;
     }
 
-    /**
-     * Set the maximal number of steps that loop will do.
-     * @return
-     */
+    @Override
     public void setMaxSteps(int maxSteps) {
         this.maxSteps = maxSteps;
     }

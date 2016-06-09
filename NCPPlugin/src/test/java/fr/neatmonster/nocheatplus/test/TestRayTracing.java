@@ -22,10 +22,10 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.junit.Test;
 
-import fr.neatmonster.nocheatplus.utilities.RayTracing;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
+import fr.neatmonster.nocheatplus.utilities.collision.RayTracing;
 
 public class TestRayTracing {
 
