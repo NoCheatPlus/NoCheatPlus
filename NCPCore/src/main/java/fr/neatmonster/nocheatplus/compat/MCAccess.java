@@ -97,6 +97,7 @@ public interface MCAccess {
     public AlmostBoolean isIllegalBounds(Player player);
 
     /**
+     * Potion effect jump amplifier.
      * 
      * @param player
      * @return Double.NEGATIVE_INFINITY if not present.
@@ -104,6 +105,7 @@ public interface MCAccess {
     public double getJumpAmplifier(Player player);
 
     /**
+     * Potion effect speed amplifier.
      * 
      * @return Double.NEGATIVE_INFINITY if not present.
      */

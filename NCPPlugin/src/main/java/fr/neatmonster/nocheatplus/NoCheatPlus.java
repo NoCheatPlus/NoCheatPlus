@@ -1180,6 +1180,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final MCAccessConfig mcaC = new MCAccessConfig(config);
         final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
         new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC); // TODO: Registry listeners/events are missing.
+        
         setMCAccess(mcAccess);
         return mcAccess;
     }
