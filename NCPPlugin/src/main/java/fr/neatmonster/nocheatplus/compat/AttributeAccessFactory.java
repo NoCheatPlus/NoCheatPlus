@@ -16,9 +16,10 @@ public class AttributeAccessFactory {
      * @param config
      */
     public void setupAttributeAccess(final MCAccess mcAccess, final MCAccessConfig config) {
-        IAttributeAccess fallBack = new DummyAttributeAccess();
+        final IAttributeAccess fallBackReflect = new DummyAttributeAccess();
+        IAttributeAccess fallBackDedicated = null;
         try {
-            fallBack = new BukkitAttributeAccess();
+            fallBackDedicated = new BukkitAttributeAccess();
         }
         catch (Throwable t) {}
         RegistryHelper.setupGenericInstance(new String[] {
@@ -35,7 +36,9 @@ public class AttributeAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.cb2882.AttributeAccess",
                 "fr.neatmonster.nocheatplus.compat.cb2808.AttributeAccess",
                 "fr.neatmonster.nocheatplus.compat.cb2794.AttributeAccess"
-        }, null, IAttributeAccess.class, config, fallBack);
+        }, fallBackDedicated, new String[] {
+                // TODO: Reflection based (legacy).
+        }, fallBackReflect, IAttributeAccess.class, config);
     }
 
 }

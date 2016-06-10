@@ -15,7 +15,7 @@ public class RegistryHelper {
      * @return
      */
     public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, Class<T> registerFor, MCAccessConfig config) {
-        return setupGenericInstance(cbDedicatedNames, cbReflectNames, registerFor, config, null);
+        return setupGenericInstance(cbDedicatedNames, cbReflectNames, null, registerFor, config);
     }
 
     /**
@@ -34,12 +34,43 @@ public class RegistryHelper {
      * @return
      */
     public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, 
-            Class<T> registerFor, MCAccessConfig config, T fallBackInstance) {
+            T fallBackInstance, Class<T> registerFor, MCAccessConfig config) {
+        return setupGenericInstance(cbDedicatedNames, null, cbReflectNames, fallBackInstance, registerFor, config);
+    }
+
+    /**
+     * Set up a generic instance, according to settings. On success it will be
+     * registered with the default GenericInstanceRegistry (NoCheatPlusAPI).
+     * 
+     * @param cbDedicatedNames
+     *            May be null.
+     * @param fallBackDedicatedInstance
+     *            Fall back to this, in case none of cbDedicatedNames could be
+     *            instantiated. This will be used, even if dedicated modules are
+     *            deactivated.
+     * @param cbReflectNames
+     *            May be null.
+     * @param fallBackReflectInstance
+     *            Fall back to this, in case no other could be
+     *            instantiated/used. This will be used, even if reflection-based
+     *            modules are deactivated.
+     * @param registerFor
+     * @param config
+     * @return
+     */
+    public static <T> T setupGenericInstance(String[] cbDedicatedNames, T fallBackDedicatedInstance,
+            String[] cbReflectNames, T fallBackReflectInstance,
+            Class<T> registerFor, MCAccessConfig config) {
         T res = null;
 
-        // Reference by class name (native access).
+        // Reference by class name (dedicated/native access).
         if (config.enableCBDedicated && cbDedicatedNames != null) {
             res = getFirstAvailable(cbDedicatedNames, registerFor, true);
+        }
+
+        // Fall back (after dedicated/native).
+        if (res == null && fallBackDedicatedInstance != null) {
+            res = fallBackDedicatedInstance;
         }
 
         // Reflection based.
@@ -47,9 +78,9 @@ public class RegistryHelper {
             res = getFirstAvailable(cbReflectNames, registerFor, true);
         }
 
-        // Fall back.
-        if (res == null && fallBackInstance != null) {
-            res = fallBackInstance;
+        // Fall back (after reflection).
+        if (res == null && fallBackReflectInstance != null) {
+            res = fallBackReflectInstance;
         }
 
         // Register / log.
