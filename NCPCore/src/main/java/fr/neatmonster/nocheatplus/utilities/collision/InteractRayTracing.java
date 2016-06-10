@@ -40,8 +40,6 @@ public class InteractRayTracing extends RayTracing {
 
     protected BlockCache blockCache = null;
 
-    protected boolean collides = false;
-
     protected final boolean strict;
 
     protected int lastBx, lastBy, lastBz;
@@ -92,10 +90,6 @@ public class InteractRayTracing extends RayTracing {
         this.targetX = targetX;
         this.targetY = targetY;
         this.targetZ = targetZ;
-    }
-
-    public boolean collides() {
-        return collides;
     }
 
     /**

@@ -22,8 +22,6 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
 
     protected BlockCache blockCache = null;
 
-    protected boolean collides = false;
-
     protected boolean ignorefirst = false;
 
     @Override
@@ -50,11 +48,6 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
         super.set(x0, y0, z0, x1, y1, z1);
         collides = false;
         ignorefirst = false;
-    }
-
-    @Override
-    public boolean collides(){
-        return collides;
     }
 
     @Override

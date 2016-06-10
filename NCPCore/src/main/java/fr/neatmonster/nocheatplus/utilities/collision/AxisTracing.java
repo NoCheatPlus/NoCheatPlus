@@ -15,13 +15,6 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
 
     // TODO: Consider an extra loop(coordinates + margins...) for convenience.
 
-    public static enum Axis {
-        X_AXIS,
-        Y_AXIS,
-        Z_AXIS,
-        NONE;
-    }
-
     /** The order of axis to be checked. */
     private final Axis[] axisOrder = new Axis[3];
 
@@ -34,6 +27,9 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
 
     /** Result returned with collides() and reset to false on set/loop. */
     protected boolean collides;
+
+    /** */
+    protected Axis collidesAxis;
 
     /**
      * Number of steps, counting advancing on one axis for all axes. Does not
@@ -84,6 +80,11 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         return collides;
     }
 
+    @Override
+    public Axis getCollidingAxis() {
+        return collidesAxis;
+    }
+
     public void setDefaultAxisOrder() {
         setAxisOrder(Axis.Y_AXIS, Axis.X_AXIS, Axis.Z_AXIS);
     }
@@ -121,28 +122,27 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         double y = this.y0;
         double z = this.z0;
         for (int i = 0; i < 3; i++) {
-            switch (axisOrder[i]) {
-                case Y_AXIS: {
-                    runAxisY(x, y, z);
-                    y = this.y1;
-                    break;
-                }
-                case X_AXIS: {
-                    runAxisX(x, y, z);
-                    x = this.x1;
-                    break;
-                }
-                case Z_AXIS: {
-                    runAxisZ(x, y, z);
-                    z = this.z1;
-                    break;
-                }
-                default: {
-                    // Just skip.
-                    break;
-                }
+            final Axis axis = axisOrder[i];
+            if (axis == Axis.Y_AXIS) {
+                runAxisY(x, y, z);
+                y = this.y1;
             }
+            else if (axis == Axis.X_AXIS) {
+                runAxisX(x, y, z);
+                x = this.x1;
+            }
+            else if (axis == Axis.Z_AXIS) {
+                runAxisZ(x, y, z);
+                z = this.z1;
+            }
+            else if (axis != Axis.NONE) {
+                // TODO: Might still just skip these.
+                // TODO: Should throw IllegalArgumentException with setting to this.
+                throw new IllegalStateException("Can not ");
+            }
+            // NONE = skip
             if (collides) {
+                collidesAxis = axis;
                 break;
             }
         }

@@ -50,4 +50,12 @@ public interface ICollide {
      */
     public boolean collides();
 
+    /**
+     * Optional information about which (sub-) type of checking lead to
+     * collision. Should only be considered valid, if collides() returns true.
+     * 
+     * @return
+     */
+    public Axis getCollidingAxis();
+
 }

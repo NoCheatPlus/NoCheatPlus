@@ -30,9 +30,13 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
+import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 
 public class Passable extends Check {
+
+    /** TESTING RATHER. */
+    private static boolean preferAxisWise = false;
 
     /**
      * Convenience for player moving, to keep a better overview.
@@ -42,12 +46,10 @@ public class Passable extends Check {
      * @return
      */
     public static boolean isPassable(Location from, Location to) {
-        return BlockProperties.isPassable(from, to);
-        //return BlockProperties.isPassableAxisWise(from, to);
+        return preferAxisWise ? BlockProperties.isPassableAxisWise(from, to) : BlockProperties.isPassable(from, to);
     }
 
-    private final ICollidePassable rayTracing = new PassableRayTracing();
-    //private final ICollidePassable rayTracing = new PassableAxisTracing();
+    private final ICollidePassable rayTracing = preferAxisWise ? new PassableAxisTracing() : new PassableRayTracing();
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
@@ -80,19 +82,25 @@ public class Passable extends Check {
             rayTracing.set(from, to);
             rayTracing.loop();
             if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
+                if (data.debug) {
+                    debugExtraCollisionDetails(player, rayTracing, "initial");
+                }
                 final int maxBlockDist = manhattan <= 1 ? manhattan : from.maxBlockDist(to);
                 if (maxBlockDist <= 1 && rayTracing.getStepsDone() == 1 && !from.isPassable()) {
                     // Redo ray-tracing for moving out of blocks.
                     if (collidesIgnoreFirst(from, to)) {
                         toPassable = false;
                         tags = "raytracing_2x_";
+                        if (data.debug) {
+                            debugExtraCollisionDetails(player, rayTracing, "ingorFirst");
+                        }
                     }
                     else if (data.debug) {
                         debug(player, "Allow moving out of a block.");
                     }
                 }
                 else{
-                    if (!allowsSplitMove(from, to, manhattan)) {
+                    if (!allowsSplitMove(from, to, manhattan, data)) {
                         toPassable = false;
                         tags = "raytracing_";
                     }
@@ -218,7 +226,7 @@ public class Passable extends Check {
      * @param manhattan
      * @return
      */
-    private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, final int manhattan) {
+    private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, final int manhattan, final MovingData data) {
         if (!rayTracing.mightNeedSplitAxisHandling()) {
             return false;
         }
@@ -252,7 +260,19 @@ public class Passable extends Check {
         //                }
         //            }
         //        }
+        if (data.debug) {
+            debug(from.getPlayer(), "Raytracing collision (split move): (no details)");
+        }
         return false;
+    }
+
+    private void debugExtraCollisionDetails(Player player, ICollidePassable rayTracing, String tag) {
+        if (rayTracing.collides()) {
+            debug(player, "Raytracing collision (" + tag + "): " + rayTracing.getCollidingAxis());
+        }
+        else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
+            debug(player, "Raytracing collision (" + tag + "): max steps exceeded.");
+        }
     }
 
 }

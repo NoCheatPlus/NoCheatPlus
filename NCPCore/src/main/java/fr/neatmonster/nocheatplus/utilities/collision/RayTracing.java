@@ -64,6 +64,8 @@ public abstract class RayTracing implements ICollide {
     /** Maximum steps that will be done. */
     private int maxSteps = Integer.MAX_VALUE;
 
+    protected boolean collides = false;
+
     public RayTracing(double x0, double y0, double z0, double x1, double y1, double z1) {
         set(x0, y0, z0, x1, y1, z1);
     }
@@ -95,6 +97,7 @@ public abstract class RayTracing implements ICollide {
         oZ = z0 - (double) blockZ;
         t = 0.0;
         step = 0;
+        collides = false;
     }
 
     /**
@@ -353,14 +356,14 @@ public abstract class RayTracing implements ICollide {
         return true;
     }
 
-    /**
-     * Indicate if a collision appeared during loop(). This must be overridden to return a result other than false.
-     * @return 
-     */
     @Override
     public boolean collides() {
-        // TODO: Switch to using a protected flag right away.
-        return false;
+        return collides;
+    }
+
+    @Override
+    public Axis getCollidingAxis() {
+        return Axis.XYZ_AXES;
     }
 
     /**
@@ -419,7 +422,8 @@ public abstract class RayTracing implements ICollide {
     }
 
     /**
-     * One step in the loop.
+     * One step in the loop. Set the collides flag to indicate a specific
+     * result.
      * 
      * @param blockX
      *            The block coordinates regarded in this step.
@@ -436,7 +440,9 @@ public abstract class RayTracing implements ICollide {
      *            If this is along the primary line, for which all transitions
      *            are done at once. The secondary line would cover all
      *            combinations of transitions off the primary line.
-     * @return If to continue processing at all.
+     * @return If to continue processing at all. Mind that the collides flag is
+     *         not set based on the result, instead has to be set from within
+     *         handling this method.
      */
     protected abstract boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT, boolean isPrimary);
 
