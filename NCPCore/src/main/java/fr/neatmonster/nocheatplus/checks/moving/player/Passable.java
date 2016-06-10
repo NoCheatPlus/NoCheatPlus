@@ -36,7 +36,14 @@ import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 public class Passable extends Check {
 
     /** TESTING RATHER. */
-    private static boolean preferAxisWise = false;
+
+    // TODO: Make this configurable once a working set of settings has been found.
+    // TODO: Once made configurable... intense testing... and test cases.
+    private static boolean rt_legacy = true;
+    // TODO: rt_xzFactor = 1.0; // Problems: Doors, fences. 
+    private static double rt_xzFactor = 0.98;
+    // TODO: Test bumping head into things.
+    private static double rt_heightFactor = 1.0;
 
     /**
      * Convenience for player moving, to keep a better overview.
@@ -46,10 +53,11 @@ public class Passable extends Check {
      * @return
      */
     public static boolean isPassable(Location from, Location to) {
-        return preferAxisWise ? BlockProperties.isPassableAxisWise(from, to) : BlockProperties.isPassable(from, to);
+        return rt_legacy ? BlockProperties.isPassable(from, to) : BlockProperties.isPassableAxisWise(from, to);
     }
 
-    private final ICollidePassable rayTracing = preferAxisWise ? new PassableAxisTracing() : new PassableRayTracing();
+    // TODO: Store both and select on check (with config then).
+    private final ICollidePassable rayTracing = rt_legacy ? new PassableRayTracing() : new PassableAxisTracing();
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
@@ -78,7 +86,7 @@ public class Passable extends Check {
         boolean toPassable = to.isPassable();
         // General condition check for using ray-tracing.
         if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            rayTracing.setMargins(from.getEyeHeight(), from.getWidth() / 2.0); // max from/to + resolution ?
+            rayTracing.setMargins(from.getEyeHeight() * rt_heightFactor, from.getWidth() / 2.0 * rt_xzFactor); // max from/to + resolution ?
             rayTracing.set(from, to);
             rayTracing.loop();
             if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
@@ -271,7 +279,7 @@ public class Passable extends Check {
             debug(player, "Raytracing collision (" + tag + "): " + rayTracing.getCollidingAxis());
         }
         else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
-            debug(player, "Raytracing collision (" + tag + "): max steps exceeded.");
+            debug(player, "Raytracing max steps exceeded (" + tag + "): "+ rayTracing.getCollidingAxis());
         }
     }
 

@@ -123,6 +123,7 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         double z = this.z0;
         for (int i = 0; i < 3; i++) {
             final Axis axis = axisOrder[i];
+            collidesAxis = axis; // Ensure here, to get it on max steps.
             if (axis == Axis.Y_AXIS) {
                 runAxisY(x, y, z);
                 y = this.y1;
@@ -142,7 +143,6 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
             }
             // NONE = skip
             if (collides) {
-                collidesAxis = axis;
                 break;
             }
         }
@@ -161,24 +161,26 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final double zMin = zIn - marginZneg;
         final double zMax = zIn + marginZpos;
         final double yStart, yEnd;
+        final int iEndY;
         if (yIn < this.y1) {
             increment = 1;
             yStart = yIn - marginYneg;
             yEnd = this.y1 + marginYpos;
+            iEndY = Location.locToBlock(yEnd) + 1;
         }
         else {
             increment = -1;
             yStart = yIn + marginYpos;
             yEnd = this.y1 - marginYneg;
+            iEndY = Location.locToBlock(yEnd) - 1;
         }
         final int iMinX = Location.locToBlock(xMin);
         final int iMaxX = Location.locToBlock(xMax);
         final int iMinZ = Location.locToBlock(zMin);
         final int iMaxZ = Location.locToBlock(zMax);
         final int iStartY = Location.locToBlock(yStart);
-        final int iEndY = Location.locToBlock(yEnd);
         axisStep = 0;
-        for (int y = iStartY; y <= iEndY; y += increment) {
+        for (int y = iStartY; y != iEndY; y += increment) {
             ++step;
             ++axisStep;
             if (step > maxSteps) {
@@ -210,24 +212,26 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final double zMin = zIn - marginZneg;
         final double zMax = zIn + marginZpos;
         final double xStart, xEnd;
+        final int iEndX;
         if (xIn < this.x1) {
             increment = 1;
             xStart = xIn - marginXneg;
             xEnd = this.x1 + marginXpos;
+            iEndX = Location.locToBlock(xEnd) + 1;
         }
         else {
             increment = -1;
             xStart = xIn + marginXpos;
             xEnd = this.x1 - marginXneg;
+            iEndX = Location.locToBlock(xEnd) - 1;
         }
         final int iMinY = Location.locToBlock(yMin);
         final int iMaxY = Location.locToBlock(yMax);
         final int iMinZ = Location.locToBlock(zMin);
         final int iMaxZ = Location.locToBlock(zMax);
         final int iStartX = Location.locToBlock(xStart);
-        final int iEndX = Location.locToBlock(xEnd);
         axisStep = 0;
-        for (int x = iStartX; x <= iEndX; x += increment) {
+        for (int x = iStartX; x != iEndX; x += increment) {
             ++step;
             ++axisStep;
             if (step > maxSteps) {
@@ -259,24 +263,26 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final double xMin = xIn - marginXneg;
         final double xMax = xIn + marginXpos;
         final double zStart, zEnd;
+        final int iEndZ;
         if (zIn < this.z1) {
             increment = 1;
             zStart = zIn - marginZneg;
             zEnd = this.z1 + marginZpos;
+            iEndZ = Location.locToBlock(zEnd + 1);
         }
         else {
             increment = -1;
             zStart = zIn + marginZpos;
             zEnd = this.z1 - marginZneg;
+            iEndZ = Location.locToBlock(zEnd - 1);
         }
         final int iMinY = Location.locToBlock(yMin);
         final int iMaxY = Location.locToBlock(yMax);
         final int iMinX = Location.locToBlock(xMin);
         final int iMaxX = Location.locToBlock(xMax);
         final int iStartZ = Location.locToBlock(zStart);
-        final int iEndZ = Location.locToBlock(zEnd);
         axisStep = 0;
-        for (int z = iStartZ; z <= iEndZ; z += increment) {
+        for (int z = iStartZ; z != iEndZ; z += increment) {
             ++step;
             ++axisStep;
             if (step > maxSteps) {

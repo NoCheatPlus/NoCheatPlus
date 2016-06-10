@@ -1886,7 +1886,7 @@ public class BlockProperties {
             return true; 
         }
         else if ((flags & F_THICK_FENCE) != 0) {
-            if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) {
+            if (!collidesFence(fx, fz, dX, dZ, dT, 0.125)) {
                 return true;
             }
         }
@@ -1939,11 +1939,11 @@ public class BlockProperties {
     public static boolean collidesFence(final double fx, final double fz, final double dX, final double dZ, final double dT, final double d) {
         final double dFx = 0.5 - fx;
         final double dFz = 0.5 - fz;
-        if (Math.abs(dFx) > 0.05 && Math.abs(dFz) > d) {
+        if (Math.abs(dFx) > d && Math.abs(dFz) > d) {
             // Check moving between quadrants.
             final double dFx2 = 0.5 - (fx + dX * dT);
             final double dFz2 = 0.5 - (fz + dZ * dT);
-            if (Math.abs(dFx2) > 0.05 && Math.abs(dFz2) > d) {
+            if (Math.abs(dFx2) > d && Math.abs(dFz2) > d) {
                 if (dFx * dFx2 > 0.0 && dFz * dFz2 > 0.0) {
                     return false;
                 }

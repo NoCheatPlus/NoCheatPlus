@@ -10,6 +10,7 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
 
     private boolean ignoreFirst = false;
 
+    // TODO: Might need another option for margins (option to skip margin for the axis-start point, or alter ignoreFirst behavior).
     // TODO: Consider an iteration margin as well (0.5 below for fences).
 
     public BlockCache getBlockCache() {
