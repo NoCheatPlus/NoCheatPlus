@@ -29,7 +29,9 @@ public interface ICollidePassable extends ICollide, ISetMargins {
      * Ignore the first block. Must be called after set, because set should
      * override internal state with false.
      */
-    // TODO: Switch to ignoreBlock(int, int, int) rather.
+    // TODO: Switch to ignoreBlock(int, int, int) rather?
+    // TODO: Remove resetting on set?
+    // TODO: Consider to imply setCutOppositeDirectionMargin(true) with this (needs not reset with set)?
     public void setIgnoreFirst();
 
     /**

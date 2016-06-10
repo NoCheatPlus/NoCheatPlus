@@ -12,4 +12,15 @@ public interface ISetMargins {
      */
     public void setMargins(final double height, final double xzMargin);
 
+    /**
+     * Allow cutting off the margins opposite to a checking direction. Call
+     * before loop. MAy or may not have any effect.
+     * 
+     * @param cutOppositeDirectionMargin
+     *            If set to true, margins that are opposite to the moving
+     *            direction are cut off. This is meant for setups like with
+     *            moving out of blocks.
+     */
+    public void setCutOppositeDirectionMargin(boolean cutOppositeDirectionMargin);
+
 }

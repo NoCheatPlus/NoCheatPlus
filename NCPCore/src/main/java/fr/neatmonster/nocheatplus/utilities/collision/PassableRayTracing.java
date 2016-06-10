@@ -90,4 +90,9 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
         // (No effect.)
     }
 
+    @Override
+    public void setCutOppositeDirectionMargin(boolean cutOppositeDirectionMargin) {
+        // (No effect.)
+    }
+
 }

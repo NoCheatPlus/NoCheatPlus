@@ -4,9 +4,12 @@ import org.bukkit.Location;
 
 /**
  * Similar to ray-tracing, attempt to model how the client processes move vs.
- * block collision via y-x-z or similar (TODO: xz vs zx). Rough orientation is
- * the RayTracing classes or a thinkable interface, to be able to use similar
- * test cases later on.
+ * block collision via y-x-z or similar. Rough orientation is the RayTracing
+ * classes or a thinkable interface, to be able to use similar test cases later
+ * on.
+ * <hr>
+ * This implementation is meant to provide some optimum of ease of
+ * implementation and performance, not necessarily elegance.
  * 
  * @author asofold
  *
@@ -24,6 +27,12 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
     private double x1, y1, z1;
     /** Margins for the bounding box, seen from center / start coordinates. Positive values. */
     private double marginXpos, marginXneg, marginYpos, marginYneg, marginZpos, marginZneg;
+
+    /**
+     * Indicate to cut margins that are opposite the moving direction (for
+     * runAxis_).
+     */
+    private boolean cutOppositeDirectionMargin = false;
 
     /** Result returned with collides() and reset to false on set/loop. */
     protected boolean collides;
@@ -102,6 +111,11 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         this.marginYpos = height;
     }
 
+    @Override
+    public void setCutOppositeDirectionMargin(final boolean cutOppositeDirectionMargin) {
+        this.cutOppositeDirectionMargin = cutOppositeDirectionMargin;
+    }
+
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
         collides = false;
         step = 0;
@@ -164,13 +178,13 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final int iEndY;
         if (yIn < this.y1) {
             increment = 1;
-            yStart = yIn - marginYneg;
+            yStart = cutOppositeDirectionMargin ? yIn : (yIn -marginYneg);
             yEnd = this.y1 + marginYpos;
             iEndY = Location.locToBlock(yEnd) + 1;
         }
         else {
             increment = -1;
-            yStart = yIn + marginYpos;
+            yStart = cutOppositeDirectionMargin ? yIn : (yIn + marginYpos);
             yEnd = this.y1 - marginYneg;
             iEndY = Location.locToBlock(yEnd) - 1;
         }
@@ -215,13 +229,13 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final int iEndX;
         if (xIn < this.x1) {
             increment = 1;
-            xStart = xIn - marginXneg;
+            xStart = cutOppositeDirectionMargin ? xIn : (xIn - marginXneg);
             xEnd = this.x1 + marginXpos;
             iEndX = Location.locToBlock(xEnd) + 1;
         }
         else {
             increment = -1;
-            xStart = xIn + marginXpos;
+            xStart = cutOppositeDirectionMargin ? xIn : (xIn + marginXpos);
             xEnd = this.x1 - marginXneg;
             iEndX = Location.locToBlock(xEnd) - 1;
         }
@@ -266,13 +280,13 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final int iEndZ;
         if (zIn < this.z1) {
             increment = 1;
-            zStart = zIn - marginZneg;
+            zStart = cutOppositeDirectionMargin ? zIn : (zIn - marginZneg);
             zEnd = this.z1 + marginZpos;
             iEndZ = Location.locToBlock(zEnd + 1);
         }
         else {
             increment = -1;
-            zStart = zIn + marginZpos;
+            zStart = cutOppositeDirectionMargin ? zIn : (zIn + marginZpos);
             zEnd = this.z1 - marginZneg;
             iEndZ = Location.locToBlock(zEnd - 1);
         }

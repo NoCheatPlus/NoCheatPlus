@@ -45,6 +45,8 @@ public class Passable extends Check {
     // TODO: Test bumping head into things.
     private static double rt_heightFactor = 1.0;
 
+    // TODO: Option to ignore initially colliding blocks in general? (Alternative: interpret ignoreFirst as such.)
+
     /**
      * Convenience for player moving, to keep a better overview.
      * 
@@ -86,7 +88,7 @@ public class Passable extends Check {
         boolean toPassable = to.isPassable();
         // General condition check for using ray-tracing.
         if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            rayTracing.setMargins(from.getEyeHeight() * rt_heightFactor, from.getWidth() / 2.0 * rt_xzFactor); // max from/to + resolution ?
+            setNormalMargins(rayTracing, from);
             rayTracing.set(from, to);
             rayTracing.loop();
             if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
@@ -100,7 +102,7 @@ public class Passable extends Check {
                         toPassable = false;
                         tags = "raytracing_2x_";
                         if (data.debug) {
-                            debugExtraCollisionDetails(player, rayTracing, "ingorFirst");
+                            debugExtraCollisionDetails(player, rayTracing, "ingoreFirst");
                         }
                     }
                     else if (data.debug) {
@@ -128,6 +130,15 @@ public class Passable extends Check {
             return potentialViolation(player, from, to, manhattan, tags, data, cc);
         }
 
+    }
+
+    /**
+     * Default/normal margins.
+     * @param rayTracing
+     * @param from
+     */
+    private void setNormalMargins(final ICollidePassable rayTracing, final PlayerLocation from) {
+        rayTracing.setMargins(from.getEyeHeight() * rt_heightFactor, from.getWidth() / 2.0 * rt_xzFactor); // max from/to + resolution ?
     }
 
     private Location potentialViolation(final Player player, final PlayerLocation from, final PlayerLocation to, final int manhattan, String tags, final MovingData data, final MovingConfig cc) {
@@ -221,9 +232,12 @@ public class Passable extends Check {
      * @return
      */
     private boolean collidesIgnoreFirst(PlayerLocation from, PlayerLocation to) {
+        // TODO: Set (and reset?) margins?
         rayTracing.set(from, to);
         rayTracing.setIgnoreFirst();
+        rayTracing.setCutOppositeDirectionMargin(true);
         rayTracing.loop();
+        rayTracing.setCutOppositeDirectionMargin(false);
         return rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
     }
 
