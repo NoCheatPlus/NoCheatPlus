@@ -55,6 +55,7 @@ public class VehicleEnvelope extends Check {
     public class CheckDetails {
 
         public boolean canClimb;
+        public boolean canRails;
         public boolean canJump, canStepUpBlock; // TODO: Model as heights?
         public double maxAscend;
 
@@ -73,7 +74,7 @@ public class VehicleEnvelope extends Check {
         public boolean inAir;
 
         public void reset() {
-            canClimb = canJump = canStepUpBlock = false;
+            canClimb = canRails = canJump = canStepUpBlock = false;
             maxAscend = 0.0;
             checkAscendMuch = checkDescendMuch = true;
             fromIsSafeMedium = toIsSafeMedium = inAir = false;
@@ -187,6 +188,12 @@ public class VehicleEnvelope extends Check {
             if (Math.abs(thisMove.yDistance) > MagicVehicle.climbSpeed) {
                 violation = true;
                 tags.add("climbspeed");
+            }
+        }
+        else if (checkDetails.canRails && thisMove.fromOnRails) {
+            // TODO: Might invert to trigger violation if exceeds distance (always disable a/d_much).
+            if (Math.abs(thisMove.yDistance) < MagicVehicle.maxRailsVertical) {
+                checkDetails.checkAscendMuch = checkDetails.checkDescendMuch = false;
             }
         }
         else if (thisMove.from.inWater && thisMove.to.inWater) {
@@ -305,6 +312,7 @@ public class VehicleEnvelope extends Check {
         else if (vehicle instanceof Minecart) {
             checkDetails.simplifiedType = EntityType.MINECART;
             // Bind to rails.
+            checkDetails.canRails = true;
             thisMove.setExtraMinecartProperties(moveInfo); // Cheating.
             if (thisMove.fromOnRails) {
                 checkDetails.fromIsSafeMedium = true;

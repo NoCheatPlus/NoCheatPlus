@@ -37,6 +37,8 @@ public class MagicVehicle {
     // TODO: Likely needs adjustments, many thinkable edge cases, also pistons (!).
     // TODO: Does trigger on vehicle enter somehow some time.
     public static final double maxAscend = 0.27;
+    
+    public static final double maxRailsVertical = 0.5;
 
     public static final double boatGravityMin = Magic.GRAVITY_MIN / 2.0;
     public static final double boatGravityMax = (Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN) / 2.0;

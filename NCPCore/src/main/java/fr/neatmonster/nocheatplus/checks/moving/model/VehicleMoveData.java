@@ -19,8 +19,6 @@ import java.util.UUID;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-
 /**
  * Include vehicle move data for a move.
  * 
@@ -57,10 +55,10 @@ public class VehicleMoveData extends PlayerMoveData {
     }
 
     public void setExtraMinecartProperties(final VehicleMoveInfo moveInfo) {
-        if (BlockProperties.isRails(moveInfo.from.getTypeId())) {
+        if (moveInfo.from.isOnRails()) {
             fromOnRails = true;
         }
-        if (BlockProperties.isRails(moveInfo.to.getTypeId())) {
+        if (moveInfo.to.isOnRails()) {
             toOnRails = true;
         }
     }

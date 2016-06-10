@@ -575,6 +575,18 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
+     * Test if the location is on rails (assuming minecarts with some magic
+     * bounds/behavior).
+     * 
+     * @return
+     */
+    public boolean isOnRails() {
+        return BlockProperties.isRails(getTypeId())
+                // TODO: Checking the block below might be over-doing it.
+                || y - blockY < 0.3625 && BlockProperties.isAscendingRails(getTypeIdBelow(), getData(blockX, blockY - 1, blockZ));
+    }
+
+    /**
      * Checks if the thing is on ground, including entities such as Minecart, Boat.
      * 
      * @return true, if the player is on ground

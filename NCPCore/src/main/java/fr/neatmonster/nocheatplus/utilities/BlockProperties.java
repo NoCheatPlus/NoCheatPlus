@@ -1749,6 +1749,18 @@ public class BlockProperties {
     }
 
     /**
+     * Test if the id is rails and if data means ascending.
+     * 
+     * @param id
+     * @param data
+     * @return
+     */
+    public static final boolean isAscendingRails(final int id, final int data) {
+        // TODO: Configurable magic.
+        return isRails(id) && (data & 7) > 1;
+    }
+
+    /**
      * Test if a position can be passed through (collidesBlock + passable test, no fences yet).<br>
      * NOTE: This is experimental.
      * @param world
