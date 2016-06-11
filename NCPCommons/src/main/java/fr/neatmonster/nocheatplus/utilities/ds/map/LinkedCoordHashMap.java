@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
  *
  * @param <V>
  */
-public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.LinkedHashEntry<V>> {
+public class LinkedCoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.LinkedHashEntry<V>> implements CoordMap<V> {
 
     // TODO: Add default order for get/put?
     // TODO: Tests.

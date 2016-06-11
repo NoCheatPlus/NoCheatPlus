@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  *
  * @param <V>
  */
-public class CoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonster.nocheatplus.utilities.ds.map.AbstractCoordHashMap.HashEntry<V>> {
+public class CoordHashMap<V> extends AbstractCoordHashMap<V, fr.neatmonster.nocheatplus.utilities.ds.map.AbstractCoordHashMap.HashEntry<V>> implements CoordMap<V> {
 
     // TODO: Move parts of abstract map here.
 
