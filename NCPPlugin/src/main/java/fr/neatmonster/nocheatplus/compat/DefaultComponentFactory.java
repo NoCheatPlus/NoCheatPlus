@@ -126,7 +126,7 @@ public class DefaultComponentFactory {
         }
         if (!protocolLibAvailable) {
             if (pluginProtocolLib != null) {
-                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9, ProtocolLib 4.0.0 or later on Minecraft 1.9 [EXPERIMENTAL].");
+                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9, ProtocolLib 4.0.0 or later on Minecraft 1.9, ProtocolLib 4.0.2 or later on Minecraft 1.10.");
             }
             StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
