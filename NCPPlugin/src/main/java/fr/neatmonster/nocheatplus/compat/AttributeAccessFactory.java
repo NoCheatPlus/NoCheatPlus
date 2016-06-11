@@ -37,7 +37,7 @@ public class AttributeAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.cb2808.AttributeAccess",
                 "fr.neatmonster.nocheatplus.compat.cb2794.AttributeAccess"
         }, fallBackDedicated, new String[] {
-                // TODO: Reflection based (legacy).
+                "fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectAttributeAccess" // Legacy
         }, fallBackReflect, IAttributeAccess.class, config);
     }
 
