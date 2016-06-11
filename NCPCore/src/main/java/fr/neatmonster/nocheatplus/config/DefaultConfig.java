@@ -587,12 +587,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE, true);
         set(ConfPaths.COMPATIBILITY_SERVER_CBDEDICATED_ENABLE, true);
         set(ConfPaths.COMPATIBILITY_SERVER_CBREFLECT_ENABLE, true);
-        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
-                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
-                Material.TRAP_DOOR.name(),
-                Material.PISTON_EXTENSION.name(), 
-                Material.PISTON_MOVING_PIECE.name() // TODO: ?
-                ));
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + ".snow", "default");
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, false); // TODO: Activate once it really works?

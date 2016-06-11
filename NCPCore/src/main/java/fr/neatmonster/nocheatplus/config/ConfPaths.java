@@ -37,7 +37,6 @@ public abstract class ConfPaths {
     public static final String SUB_GROUND                                = "ground";
     public static final String SUB_HORIZONTAL                            = "horizontal";
     public static final String SUB_HORIZONTALSPEED                       = "horizontalspeed"; // Phase out.
-    public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
     public static final String SUB_LAG                                   = "lag";
     public static final String SUB_MAXHEIGHT                             = "maxheight";
     public static final String SUB_MODEL                                 = "model";
@@ -816,6 +815,8 @@ public abstract class ConfPaths {
     public  static final String MOVING_TRACE_SIZE                           = "checks.moving.trace.size";
     @Deprecated
     public  static final String MOVING_TRACE_MERGEDIST                      = "checks.moving.trace.mergedist";
+    @Deprecated
+    public static final String COMPATIBILITY_BLOCKS_IGNOREPASSABLE = "compatibility.blocks.ignorepassable";
 
     /**
      * Get moved paths for which an annotation doesn't work.

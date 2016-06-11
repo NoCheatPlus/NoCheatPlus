@@ -2188,16 +2188,6 @@ public class BlockProperties {
      * @param config
      */
     public static void applyConfig(final RawConfigFile config, final String pathPrefix) {
-        // Ignore passable.
-        for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)) {
-            final Integer id = RawConfigFile.parseTypeId(input);
-            if (id == null || id < 0 || id >= 4096) {
-                StaticLog.logWarning("Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
-            }
-            else {
-                blockFlags[id] |= F_IGN_PASSABLE;
-            }
-        }
 
         // Allow instant breaking.
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK)) {
