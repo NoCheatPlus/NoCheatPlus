@@ -11,8 +11,10 @@ import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
  * A kept-simple container for block positions, meant to provide fast adding and
  * fast contains checks (and fast clear). Intended use is to add blocks first,
  * then query if blocks are contained with advancing coordinates like with
- * ray-tracing or axis-tracing. Currently adding blocks twice is not meant to
- * happen, and we assume blocks to be few.
+ * ray-tracing or axis-tracing.
+ * <hr>
+ * Currently adding blocks twice is not meant to happen, and we assume blocks to
+ * be few, in fact the size is assumed to be 0 most of the time.
  * 
  * @author asofold
  *
@@ -22,7 +24,7 @@ public class BlockPositionContainer implements IAddBlockPosition, IContainBlockP
     // TODO: Not sure where to put this.
     // TODO: Future use / interfacing could involve collecting cuboids from block positions (mining/activity/areas).
 
-    // TODO: Consider switching to HashSet or CoordMap.
+    // TODO: Consider switching to a HashSet or an ArrayList.
     private final LinkedList<BlockPositionGet> blocks = new LinkedList<BlockPositionGet>();
 
     private int minX, minY, minZ, maxX, maxY, maxZ;

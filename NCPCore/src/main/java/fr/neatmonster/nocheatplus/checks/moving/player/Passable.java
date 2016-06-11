@@ -37,15 +37,13 @@ public class Passable extends Check {
 
     /** TESTING RATHER. */
 
-    // TODO: Make this configurable once a working set of settings has been found.
-    // TODO: Once made configurable... intense testing... and test cases.
+    // TODO: Configuration.
+    // TODO: Test cases.
     private static boolean rt_legacy = false;
     // TODO: rt_xzFactor = 1.0; // Problems: Doors, fences. 
     private static double rt_xzFactor = 0.98;
     // TODO: Test bumping head into things.
     private static double rt_heightFactor = 1.0;
-
-    // TODO: Option to ignore initially colliding blocks in general? (Alternative: interpret ignoreFirst as such.)
 
     /**
      * Convenience for player moving, to keep a better overview.
@@ -76,9 +74,9 @@ public class Passable extends Check {
         String tags = "";
         // Block distances (sum, max) for from-to (not for loc!).
         final int manhattan = from.manhattan(to);
-        
+
         if (rt_legacy) {
-         // Skip moves inside of ignored blocks right away [works as long as we only check between foot-locations].
+            // Skip moves inside of ignored blocks right away [works as long as we only check between foot-locations].
             if (manhattan <= 1 && BlockProperties.isPassable(from.getTypeId())) {
                 // TODO: Monitor: BlockProperties.isPassable checks slightly different than before.
                 if (manhattan == 0){
@@ -91,7 +89,7 @@ public class Passable extends Check {
                 }
             }
         }
-        
+
         boolean toPassable = to.isPassable();
         // General condition check for using ray-tracing.
         if ((!rt_legacy || toPassable) && cc.passableRayTracingCheck 
