@@ -55,10 +55,6 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
 
     private int maxSteps = 0;
 
-    // TODO: maxBlocks (...).
-
-    // TODO: ignoreFirst -> Should be ignore a specific block or blocks within the initial bounds or ...?
-
     // TODO: Margin only for iteration, not for the bounds (for use-cases like fences).
 
     public AxisTracing() {
@@ -135,6 +131,7 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         double x = this.x0;
         double y = this.y0;
         double z = this.z0;
+        // TODO: if (ignoreInitiallyColliding) -> fetch blocks, test in runAxis.
         for (int i = 0; i < 3; i++) {
             final Axis axis = axisOrder[i];
             collidesAxis = axis; // Ensure here, to get it on max steps.

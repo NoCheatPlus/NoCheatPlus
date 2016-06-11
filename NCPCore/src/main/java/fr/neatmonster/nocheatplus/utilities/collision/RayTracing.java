@@ -64,6 +64,9 @@ public abstract class RayTracing implements ICollide {
     /** Maximum steps that will be done. */
     private int maxSteps = Integer.MAX_VALUE;
 
+    /** Just the flag, a sub-class must make use during handling step. */
+    protected boolean ignoreInitiallyColliding = false;
+
     protected boolean collides = false;
 
     public RayTracing(double x0, double y0, double z0, double x1, double y1, double z1) {
@@ -72,6 +75,16 @@ public abstract class RayTracing implements ICollide {
 
     public RayTracing() {
         set(0, 0, 0, 0, 0, 0);
+    }
+
+    @Override
+    public void setIgnoreInitiallyColliding(boolean ignoreInitiallyColliding) {
+        this.ignoreInitiallyColliding = ignoreInitiallyColliding;
+    }
+
+    @Override
+    public boolean getIgnoreInitiallyColliding() {
+        return ignoreInitiallyColliding;
     }
 
     @Override

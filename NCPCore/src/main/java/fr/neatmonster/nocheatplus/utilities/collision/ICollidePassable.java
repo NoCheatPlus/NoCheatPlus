@@ -11,14 +11,13 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public interface ICollidePassable extends ICollide, ISetMargins {
 
-    // TODO: IRayTracing
-
     public void setBlockCache(BlockCache blockCache);
     public BlockCache getBlockCache();
 
     /**
-     * Set from PlayerLocation instances. May use the BlockCache from the
-     * from-location internally.
+     * Convenience: Call set and setBlockCache with the data from the
+     * PlayerLocation instances. Should use from.getBlockCache() as BlockCache
+     * instance.
      * 
      * @param from
      * @param to
@@ -26,25 +25,13 @@ public interface ICollidePassable extends ICollide, ISetMargins {
     public void set(final PlayerLocation from, final PlayerLocation to);
 
     /**
-     * Ignore the first block. Must be called after set, because set should
-     * override internal state with false.
-     */
-    // TODO: Switch to ignoreBlock(int, int, int) rather?
-    // TODO: Remove resetting on set?
-    // TODO: Consider to imply setCutOppositeDirectionMargin(true) with this (needs not reset with set)?
-    public void setIgnoreFirst();
-
-    /**
-     * Test if the first block is set to be ignored (resets to false with set).
-     * 
-     * @return
-     */
-    public boolean getIgnoreFirst();
-
-    /**
+     * Indicate if extra workarounds may be necessary, such as running y-axis
+     * collision before xz-axes collision in case the default run yields a
+     * collision.
      * 
      * @return Return false in order to prevent workarounds with split by axis
-     *         checking.
+     *         checking. Typically should return true with ray-tracing and false
+     *         with axis-tracing.
      */
     public boolean mightNeedSplitAxisHandling();
 

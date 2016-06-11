@@ -233,10 +233,12 @@ public class Passable extends Check {
      */
     private boolean collidesIgnoreFirst(PlayerLocation from, PlayerLocation to) {
         // TODO: Set (and reset?) margins?
+        // TODO: rayTracing.setIgnoreInitiallyColliding(true);
         rayTracing.set(from, to);
-        rayTracing.setIgnoreFirst();
+        rayTracing.setIgnoreInitiallyColliding(true);
         rayTracing.setCutOppositeDirectionMargin(true);
         rayTracing.loop();
+        rayTracing.setIgnoreInitiallyColliding(false);
         rayTracing.setCutOppositeDirectionMargin(false);
         return rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
     }

@@ -8,15 +8,28 @@ package fr.neatmonster.nocheatplus.utilities.collision;
  */
 public interface ICollide {
 
+    // TODO: number of visited blocks?
+
     /**
-     * Set the maximum steps to be done during loop(). Setting to 0 should
-     * disable the upper limit. (Integer.MAX_VALUE will be on the safe side as
-     * well.)
+     * Set the maximum steps to be done during loop() along the primary line.
+     * Setting to 0 should disable the upper limit. (Integer.MAX_VALUE will be
+     * on the safe side as well.) The primary line is meant to somehow reflect
+     * run time complexity, not necessarily each visited block.
      * 
      * @param maxSteps
      */
+    // TODO: Not sure :p.
     public void setMaxSteps(int maxSteps);
     public int getMaxSteps();
+
+    /**
+     * Call before loop, in order to skip checking blocks that are found to be
+     * colliding at the start of loop. May or may not have any effect.
+     * 
+     * @param ignoreInitiallyColliding
+     */
+    public void setIgnoreInitiallyColliding(boolean ignoreInitiallyColliding);
+    public boolean getIgnoreInitiallyColliding();
 
     /**
      * Call before loop to set the coordinates of a move.
@@ -45,7 +58,9 @@ public interface ICollide {
     public int getStepsDone();
 
     /**
-     * Test if the testing found a collision during loop().
+     * Test if the testing found a collision during loop(). This should reset
+     * automatically with calling set.
+     * 
      * @return
      */
     public boolean collides();
@@ -53,6 +68,7 @@ public interface ICollide {
     /**
      * Optional information about which (sub-) type of checking lead to
      * collision. Should only be considered valid, if collides() returns true.
+     * Implementation-specific.
      * 
      * @return
      */

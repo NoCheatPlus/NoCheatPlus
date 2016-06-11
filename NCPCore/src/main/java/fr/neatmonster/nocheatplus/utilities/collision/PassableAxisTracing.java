@@ -8,7 +8,7 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
 
     private BlockCache blockCache;
 
-    private boolean ignoreFirst = false;
+    private boolean ignoreInitiallyColliding = false;
 
     // TODO: Might need another option for margins (option to skip margin for the axis-start point, or alter ignoreFirst behavior).
     // TODO: Consider an iteration margin as well (0.5 below for fences).
@@ -26,7 +26,8 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
             final double minX, final double minY, final double minZ, 
             final double maxX, final double maxY, final double maxZ, 
             final Axis axis, final int increment) {
-        if (ignoreFirst && step == 1) {
+        // TODO: Ignore blocks by coordinates (handle before calling step).
+        if (ignoreInitiallyColliding && step == 1) {
             return true;
         }
         if (BlockProperties.isPassableBox(blockCache, blockX, blockY, blockZ, minX, minY, minZ, maxX, maxY, maxZ)) {
@@ -41,7 +42,6 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
     @Override
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
         super.set(x0, y0, z0, x1, y1, z1);
-        ignoreFirst = false;
     }
 
     @Override
@@ -51,14 +51,13 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
     }
 
     @Override
-    public void setIgnoreFirst() {
-        // TODO: ignoreBlock rather.
-        ignoreFirst = true;
+    public void setIgnoreInitiallyColliding(boolean ignoreInitiallyColliding) {
+        this.ignoreInitiallyColliding = ignoreInitiallyColliding;
     }
 
     @Override
-    public boolean getIgnoreFirst() {
-        return ignoreFirst;
+    public boolean getIgnoreInitiallyColliding() {
+        return ignoreInitiallyColliding;
     }
 
     @Override

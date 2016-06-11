@@ -22,8 +22,6 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
 
     protected BlockCache blockCache = null;
 
-    protected boolean ignorefirst = false;
-
     @Override
     public BlockCache getBlockCache() {
         return blockCache;
@@ -47,17 +45,6 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
     public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
         super.set(x0, y0, z0, x1, y1, z1);
         collides = false;
-        ignorefirst = false;
-    }
-
-    @Override
-    public void setIgnoreFirst(){
-        this.ignorefirst = true;
-    }
-
-    @Override
-    public boolean getIgnoreFirst(){
-        return ignorefirst;
     }
 
     @Override
@@ -67,10 +54,11 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
 
     @Override
     protected boolean step(final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dT, final boolean isPrimary) {
-        // Just delegate.
-        if (isPrimary && step == 1 && ignorefirst){
+        // Check if initially colliding blocks are meant to be skipped.
+        if (isPrimary && step == 1 && ignoreInitiallyColliding && !BlockProperties.isPassable(blockCache, oX + blockX, oY + blockY, oZ + blockZ, blockCache.getTypeId(blockX, blockY, blockZ))){
             return true;
         }
+        // Actual collision check for this block vs. the move.
         if (BlockProperties.isPassableRay(blockCache, blockX, blockY, blockZ, oX, oY, oZ, dX, dY, dZ, dT)){
             return true;
         }
