@@ -32,14 +32,6 @@ import java.util.List;
  */
 public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatplus.utilities.ds.map.AbstractCoordHashMap.HashEntry<V>> implements CoordMap<V> {
 
-    private static final int p1 = 73856093;
-    private static final int p2 = 19349663;
-    private static final int p3 = 83492791;
-
-    protected static final int getHash(final int x, final int y, final int z) {
-        return p1 * x ^ p2 * y ^ p3 * z;
-    }
-
     public static class HashEntry<V> implements Entry<V>{
         protected final int x;
         protected final int y;
@@ -118,7 +110,7 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
      * @return
      */
     protected E getEntry(final int x, final int y, final int z) {
-        final int hash = getHash(x, y, z);
+        final int hash = CoordHash.hashCode3DPrimes(x, y, z);
         final int slot = Math.abs(hash) % entries.length;
         final List<E> bucket = entries[slot];
         if (bucket == null) {
@@ -134,7 +126,7 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
 
     @Override
     public V put(final int x, final int y, final int z, final V value) {
-        final int hash = getHash(x, y, z);
+        final int hash = CoordHash.hashCode3DPrimes(x, y, z);
         final int absHash = Math.abs(hash);
         int slot = absHash % entries.length;
         List<E> bucket = entries[slot];
@@ -163,7 +155,7 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
 
     @Override
     public V remove(final int x, final int y, final int z) {
-        final int hash = getHash(x, y, z);
+        final int hash = CoordHash.hashCode3DPrimes(x, y, z);
         final int absHash = Math.abs(hash);
         int slot = absHash % entries.length;
         final List<E> bucket = entries[slot];
