@@ -229,8 +229,10 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
 
     @Override
     public void clear() {
-        size = 0;
-        Arrays.fill(entries, null);
+        if (size > 0) {
+            size = 0;
+            Arrays.fill(entries, null);
+        }
         // TODO: resize ?
     }
 
