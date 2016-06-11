@@ -8,8 +8,6 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
 
     private BlockCache blockCache;
 
-    private boolean ignoreInitiallyColliding = false;
-
     // TODO: Might need another option for margins (option to skip margin for the axis-start point, or alter ignoreFirst behavior).
     // TODO: Consider an iteration margin as well (0.5 below for fences).
 
@@ -22,14 +20,16 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
     }
 
     @Override
+    protected void collectInitiallyCollidingBlocks(double minX, double minY, double minZ, double maxX, double maxY,
+            double maxZ, BlockPositionContainer results) {
+        BlockProperties.collectInitiallyCollidingBlocks(blockCache, minX, minY, minZ, maxX, maxY, maxZ, results);
+    }
+
+    @Override
     protected boolean step(final int blockX, final int blockY, final int blockZ, 
             final double minX, final double minY, final double minZ, 
             final double maxX, final double maxY, final double maxZ, 
             final Axis axis, final int increment) {
-        // TODO: Ignore blocks by coordinates (handle before calling step).
-        if (ignoreInitiallyColliding && step == 1) {
-            return true;
-        }
         if (BlockProperties.isPassableBox(blockCache, blockX, blockY, blockZ, minX, minY, minZ, maxX, maxY, maxZ)) {
             return true;
         }
@@ -48,16 +48,6 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
     public void set(PlayerLocation from, PlayerLocation to) {
         set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
         setBlockCache(from.getBlockCache());
-    }
-
-    @Override
-    public void setIgnoreInitiallyColliding(boolean ignoreInitiallyColliding) {
-        this.ignoreInitiallyColliding = ignoreInitiallyColliding;
-    }
-
-    @Override
-    public boolean getIgnoreInitiallyColliding() {
-        return ignoreInitiallyColliding;
     }
 
     @Override

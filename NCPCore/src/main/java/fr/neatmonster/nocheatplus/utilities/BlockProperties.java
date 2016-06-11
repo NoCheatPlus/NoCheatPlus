@@ -48,6 +48,7 @@ import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.collision.BlockPositionContainer;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
@@ -3151,6 +3152,43 @@ public class BlockProperties {
         }
         // Does collide (most likely).
         return false;
+    }
+
+    /**
+     * Add the block coordinates that are colliding via a isPassableBox check
+     * for the given bounds to the given container.
+     * 
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param results
+     */
+    public static final int collectInitiallyCollidingBlocks(final BlockCache access, 
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ,
+            final BlockPositionContainer results) {
+        int added = 0;
+        final int iMinX = Location.locToBlock(minX);
+        final int iMaxX = Location.locToBlock(maxX);
+        final int iMinY = Location.locToBlock(minY);
+        final int iMaxY = Location.locToBlock(maxY);
+        final int iMinZ = Location.locToBlock(minZ);
+        final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++) {
+            for (int z = iMinZ; z <= iMaxZ; z++) {
+                for (int y = iMinY; y <= iMaxY; y++) {
+                    if (!isPassableBox(access, x, y, z, minX, minY, minZ, maxX, maxY, maxZ)) {
+                        results.addBlockPosition(x, y, z);
+                        ++added;
+                    }
+                }
+            }
+        }
+        return added;
     }
 
     /**

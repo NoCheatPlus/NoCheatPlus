@@ -24,7 +24,8 @@ public interface ICollide {
 
     /**
      * Call before loop, in order to skip checking blocks that are found to be
-     * colliding at the start of loop. May or may not have any effect.
+     * colliding at the start of loop. May or may not have any effect. This must
+     * not be called during processing of loop.
      * 
      * @param ignoreInitiallyColliding
      */

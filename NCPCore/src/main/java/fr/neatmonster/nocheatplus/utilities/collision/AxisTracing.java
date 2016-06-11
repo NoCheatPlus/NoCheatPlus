@@ -34,6 +34,11 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
      */
     private boolean cutOppositeDirectionMargin = false;
 
+    private boolean ignoreInitiallyColliding = false;
+
+    /** Blocks that are to be ignored. */
+    private final BlockPositionContainer ignoredBlocks = new BlockPositionContainer();
+
     /** Result returned with collides() and reset to false on set/loop. */
     protected boolean collides;
 
@@ -75,6 +80,16 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
 
     public int getAxisStepsDone() {
         return axisStep;
+    }
+
+    @Override
+    public void setIgnoreInitiallyColliding(boolean ignoreInitiallyColliding) {
+        this.ignoreInitiallyColliding = ignoreInitiallyColliding;
+    }
+
+    @Override
+    public boolean getIgnoreInitiallyColliding() {
+        return ignoreInitiallyColliding;
     }
 
     /**
@@ -131,7 +146,10 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         double x = this.x0;
         double y = this.y0;
         double z = this.z0;
-        // TODO: if (ignoreInitiallyColliding) -> fetch blocks, test in runAxis.
+        if (ignoreInitiallyColliding) {
+            collectInitiallyCollidingBlocks(x0 - marginXneg, y0 - marginYneg, z0 - marginZneg, 
+                    x0 + marginXpos, y0 + marginYpos, z0 + marginZpos, ignoredBlocks);
+        }
         for (int i = 0; i < 3; i++) {
             final Axis axis = axisOrder[i];
             collidesAxis = axis; // Ensure here, to get it on max steps.
@@ -156,6 +174,9 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
             if (collides) {
                 break;
             }
+        }
+        if (ignoreInitiallyColliding) {
+            ignoredBlocks.clear();
         }
     }
 
@@ -197,10 +218,13 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
             if (step > maxSteps) {
                 return;
             }
-            // TODO: Ignore first setting?
+            final boolean checkInitiallyColliding = ignoreInitiallyColliding && !ignoredBlocks.isEmpty();
             for (int x = iMinX; x <= iMaxX; x++) {
                 for (int z = iMinZ; z <= iMaxZ; z++) {
-                    if (!step(x, y, z, xMin, increment == 1 ? yStart : yEnd, zMin, xMax, increment == 1 ? yEnd : yStart, zMax, Axis.Y_AXIS, increment)) {
+                    if (checkInitiallyColliding && ignoredBlocks.containsBlockPosition(x, y, z)) {
+                        // Ignore.
+                    }
+                    else if (!step(x, y, z, xMin, increment == 1 ? yStart : yEnd, zMin, xMax, increment == 1 ? yEnd : yStart, zMax, Axis.Y_AXIS, increment)) {
                         collides = true;
                         return;
                     }
@@ -248,10 +272,13 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
             if (step > maxSteps) {
                 return;
             }
-            // TODO: Ignore first setting?
+            final boolean checkInitiallyColliding = ignoreInitiallyColliding && !ignoredBlocks.isEmpty();
             for (int y = iMinY; y <= iMaxY; y++) {
                 for (int z = iMinZ; z <= iMaxZ; z++) {
-                    if (!step(x, y, z, increment == 1 ? xStart : xEnd, yMin, zMin, increment == 1 ? xEnd : xStart, yMax, zMax, Axis.X_AXIS, increment)) {
+                    if (checkInitiallyColliding && ignoredBlocks.containsBlockPosition(x, y, z)) {
+                        // Ignore.
+                    }
+                    else if (!step(x, y, z, increment == 1 ? xStart : xEnd, yMin, zMin, increment == 1 ? xEnd : xStart, yMax, zMax, Axis.X_AXIS, increment)) {
                         collides = true;
                         return;
                     }
@@ -293,16 +320,19 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         final int iMaxX = Location.locToBlock(xMax);
         final int iStartZ = Location.locToBlock(zStart);
         axisStep = 0;
+        final boolean checkInitiallyColliding = ignoreInitiallyColliding && !ignoredBlocks.isEmpty();
         for (int z = iStartZ; z != iEndZ; z += increment) {
             ++step;
             ++axisStep;
             if (step > maxSteps) {
                 return;
             }
-            // TODO: Ignore first setting?
             for (int y = iMinY; y <= iMaxY; y++) {
                 for (int x = iMinX; x <= iMaxX; x++) {
-                    if (!step(x, y, z, xMin, yMin, increment == 1 ? zStart : zEnd, xMax, yMax, increment == 1 ? zEnd : zStart, Axis.Z_AXIS, increment)) {
+                    if (checkInitiallyColliding && ignoredBlocks.containsBlockPosition(x, y, z)) {
+                        // Ignore.
+                    }
+                    else if (!step(x, y, z, xMin, yMin, increment == 1 ? zStart : zEnd, xMax, yMax, increment == 1 ? zEnd : zStart, Axis.Z_AXIS, increment)) {
                         collides = true;
                         return;
                     }
@@ -312,6 +342,23 @@ public abstract class AxisTracing implements ICollide, ISetMargins {
         // No collision.
         return;
     }
+
+    /**
+     * In case ignoreInitiallyColliding is set, this will be called to do the
+     * actual collision checking with the given initial margins.
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param results
+     */
+    protected abstract void collectInitiallyCollidingBlocks(
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ,
+            final BlockPositionContainer results);
 
     /**
      * Check a block position for collision with the ordered bounds of a move
