@@ -657,9 +657,9 @@ public class BlockProperties {
         // F_PASSABLE_X4
         for (final Material mat : new Material[]{
                 Material.FENCE_GATE,
-                Material.TRAP_DOOR,
+                Material.TRAP_DOOR, // TODO: Players can stand on - still passable past 1.9?
         }) {
-            blockFlags[mat.getId()] |= F_PASSABLE_X4;
+            blockFlags[mat.getId()] |= F_PASSABLE_X4; // TODO: Flag is abused for other checks, need another one.
         }
 
         // F_FACING_LOW3D2_NSWE
@@ -690,12 +690,14 @@ public class BlockProperties {
                 Material.BREWING_STAND,
                 Material.ENDER_PORTAL_FRAME,
                 // XZ-bounds issues.
-                Material.CAKE_BLOCK
+                Material.CAKE_BLOCK,
                 // Already worked around with isPassableWorkaround (kept for dev-reference).
                 //				Material.ANVIL,
                 //				Material.SKULL, Material.FLOWER_POT,
                 //				Material.DRAGON_EGG,
                 //				Material.COCOA,
+                // Issues standing on with F_PASSABLE_X4.
+                Material.TRAP_DOOR,
         }) {
             blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
         }
@@ -2095,8 +2097,11 @@ public class BlockProperties {
             return 0.8125;
         }
         else if ((flags & F_GROUND_HEIGHT) != 0) {
+            // Assume open gates/trapdoors/things to only allow standing on to, if at all.
+            if ((flags & F_PASSABLE_X4) != 0 && (access.getData(x, y, z) & 0x04) != 0) {
+                return bounds[4];
+            }
             // All blocks that are not treated individually are ground all through.
-            // TODO: Experimental workaround.
             return 0;
         }
         else {
