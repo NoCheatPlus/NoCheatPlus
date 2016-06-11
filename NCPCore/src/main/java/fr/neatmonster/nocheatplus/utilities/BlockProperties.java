@@ -3155,6 +3155,40 @@ public class BlockProperties {
     }
 
     /**
+     * Check if the bounding box collides with a block (passable + accounting
+     * for workarounds).
+     * 
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static final boolean isPassableBox(final BlockCache access, 
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        final int iMinX = Location.locToBlock(minX);
+        final int iMaxX = Location.locToBlock(maxX);
+        final int iMinY = Location.locToBlock(minY);
+        final int iMaxY = Location.locToBlock(maxY);
+        final int iMinZ = Location.locToBlock(minZ);
+        final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++) {
+            for (int z = iMinZ; z <= iMaxZ; z++) {
+                for (int y = iMinY; y <= iMaxY; y++) {
+                    if (!isPassableBox(access, x, y, z, minX, minY, minZ, maxX, maxY, maxZ)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Add the block coordinates that are colliding via a isPassableBox check
      * for the given bounds to the given container.
      * 

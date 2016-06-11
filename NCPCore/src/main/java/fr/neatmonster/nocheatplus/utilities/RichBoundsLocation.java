@@ -86,6 +86,9 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /** Simple test if the exact position is passable. */
     Boolean passable = null;
 
+    /** Bounding box collides with blocks. */
+    Boolean passableBox = null;
+
     /** Is the player above stairs? */
     Boolean aboveStairs = null;
 
@@ -756,10 +759,42 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      */
     public boolean isPassable() {
         if (passable == null) {
-            passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
-            //          passable = BlockProperties.isPassableExact(blockCache, x, y, z, getTypeId());
+            if (isBlockFlagsPassable()) {
+                passable = true;
+            }
+            else {
+                passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
+                //passable = BlockProperties.isPassableExact(blockCache, x, y, z, getTypeId());
+            }
         }
         return passable;
+    }
+
+    /**
+     * Test if the bounding box is colliding (passable check with accounting for
+     * workarounds).
+     * 
+     * @return
+     */
+    public boolean isPassableBox() {
+        // TODO: Might need a variation with margins as parameters.
+        if (passableBox == null) {
+            if (isBlockFlagsPassable()) {
+                passableBox = true;
+            }
+            else if (passable != null && !passable) {
+                passableBox = false;
+            }
+            else {
+                // Fetch.
+                passableBox = BlockProperties.isPassableBox(blockCache, minX, minY, minZ, maxX, maxY, maxZ);
+            }
+        }
+        return passableBox;
+    }
+
+    private boolean isBlockFlagsPassable() {
+        return blockFlags != null && (blockFlags & (BlockProperties.F_SOLID | BlockProperties.F_GROUND)) == 0;
     }
 
     /**
@@ -907,6 +942,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         this.notOnGroundMaxY = other.notOnGroundMaxY;
         this.onGroundMinY = other.onGroundMinY;
         this.passable = other.passable;
+        this.passableBox = other.passableBox;
         // Access methods.
         this.typeId = other.getTypeId();
         this.typeIdBelow = other.getTypeIdBelow();
@@ -957,7 +993,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
         // Reset cached values.
         typeId = typeIdBelow = data = null;
-        aboveStairs = inLava = inWater = inWeb = onIce = onGround = onClimbable = passable = null;
+        aboveStairs = inLava = inWater = inWeb = onIce = onGround = onClimbable = passable = passableBox = null;
         onGroundMinY = Double.MAX_VALUE;
         notOnGroundMaxY = Double.MIN_VALUE;
         blockFlags = null;
