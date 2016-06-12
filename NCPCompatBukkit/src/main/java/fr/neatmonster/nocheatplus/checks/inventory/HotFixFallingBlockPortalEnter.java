@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,7 +55,23 @@ public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
     @EventHandler(priority=EventPriority.MONITOR)
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
         final Entity entity = event.getEntity();
+        final Material mat;
         if (entity instanceof FallingBlock) {
+            mat = ((FallingBlock) entity).getMaterial();
+        }
+        else if (entity instanceof Item) {
+            // TODO: Not sure if needed.
+            if (((Item) entity).getItemStack().getType().hasGravity()) {
+                mat = ((Item) entity).getItemStack().getType();
+            }
+            else {
+                mat = null;
+            }
+        }
+        else {
+            mat = null;
+        }
+        if (mat != null) {
             final Location loc = entity.getLocation(useLoc);
             final World world = loc.getWorld();
             if (InventoryConfig.getConfig(world).hotFixFallingBlockEndPortalActive) {
@@ -62,10 +79,11 @@ public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
                 final boolean nearbyPortal = BlockProperties.collidesId(blockCache, loc.getX() - 2.0, loc.getY() - 2.0, loc.getZ() - 2.0, loc.getX() + 3.0, loc.getY() + 3.0, loc.getZ() + 3.0, Material.ENDER_PORTAL);
                 blockCache.cleanup();
                 if (nearbyPortal) {
+                    // Likely spigot currently removes entities entering portals anyway (cross-world teleport issues).
                     // On remove: Looks like setDropItem(false) wouldn't suffice.
                     entity.remove();
                     // TODO: STATUS: should have another stream for violations/protection.
-                    final String message = "[INVENTORY_HOTFIX] Remove falling block entering a portal near an end portal: " + ((FallingBlock) entity).getMaterial() + " at " + world.getName() + "/" + LocUtil.simpleFormatPosition(loc);
+                    final String message = "[INVENTORY_HOTFIX] Remove falling block entering a portal near an end portal: " + mat + " at " + world.getName() + "/" + LocUtil.simpleFormatPosition(loc);
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, message);
                 }
             }
