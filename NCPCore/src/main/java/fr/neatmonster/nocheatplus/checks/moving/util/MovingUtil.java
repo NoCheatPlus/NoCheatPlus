@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -36,6 +37,7 @@ import fr.neatmonster.nocheatplus.components.IDebugPlayer;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -283,6 +285,103 @@ public class MovingUtil {
 
         // Set basic properties for past move bookkeeping.
         thisMove.setExtraProperties(from, to);
+    }
+
+    /**
+     * Ensure nearby chunks are loaded so that the move can be processed at all.
+     * Assume too big moves to be cancelled anyway and/or checks like passable
+     * accounting for chunk load. Further skip chunk loading if the latest
+     * stored past move has extra properties set and is close by.
+     * 
+     * @param from
+     * @param to
+     * @param lastMove
+     * @param tag
+     *            The type of context/event for debug logging.
+     * @param data
+     * @param cc
+     */
+    public static void ensureChunksLoaded(final Player player, final Location from, final Location to, final PlayerMoveData lastMove, 
+            final String tag, final MovingData data, final MovingConfig cc) {
+        // (Worlds must be equal. Ensured in player move handling.)
+        final double x0 = from.getX();
+        final double z0 = from.getZ();
+        final double x1 = to.getX();
+        final double z1 = to.getZ();
+        if (TrigUtil.distanceSquared(x0, z0, x1, z1) > 2.0 * Magic.CHUNK_LOAD_MARGIN_MIN) {
+            // Assume extreme move to trigger.
+            return;
+        }
+        boolean loadFrom = true;
+        boolean loadTo = true;
+        double margin = Magic.CHUNK_LOAD_MARGIN_MIN;
+        // Heuristic for if loading may be necessary at all.
+        if (lastMove.toIsValid && lastMove.to.extraPropertiesValid) {
+            if (TrigUtil.distanceSquared(lastMove.to, x0, z0) < 1.0) {
+                loadFrom = false;
+            }
+            if (TrigUtil.distanceSquared(lastMove.to, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        else if (lastMove.valid && lastMove.from.extraPropertiesValid
+                && cc.loadChunksOnJoin) {
+            // TODO: Might need to distinguish join/teleport/world-change later.
+            if (TrigUtil.distanceSquared(lastMove.from, x0, z0) < 1.0) {
+                loadFrom = false;
+            }
+            if (TrigUtil.distanceSquared(lastMove.from, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        int loaded = 0;
+        if (loadFrom) {
+            loaded += BlockCache.ensureChunksLoaded(from.getWorld(), x0, z0, margin);
+            if (TrigUtil.distanceSquared(x0, z0, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        if (loadTo) {
+            loaded += BlockCache.ensureChunksLoaded(to.getWorld(), x1, z1, margin);
+        }
+        if (loaded > 0 && data.debug) {
+            StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + from.getWorld().getName() +  " for player: " + player.getName());
+        }
+    }
+
+    /**
+     * Ensure nearby chunks are loaded. Further skip chunk loading if the latest
+     * stored past move has extra properties set and is close by.
+     * 
+     * @param player
+     * @param loc
+     * @param tag
+     *            The type of context/event for debug logging.
+     * @param data
+     * @param cc
+     */
+    public static void ensureChunksLoaded(final Player player, final Location loc, final String tag, 
+            final MovingData data, final MovingConfig cc) {
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
+        final double x0 = loc.getX();
+        final double z0 = loc.getZ();
+        // Heuristic for if loading may be necessary at all.
+        if (lastMove.toIsValid && lastMove.to.extraPropertiesValid) {
+            if (TrigUtil.distanceSquared(lastMove.to, x0, z0) < 1.0) {
+                return;
+            }
+        }
+        else if (lastMove.valid && lastMove.from.extraPropertiesValid
+                && cc.loadChunksOnJoin) {
+            // TODO: Might need to distinguish join/teleport/world-change later.
+            if (TrigUtil.distanceSquared(lastMove.from, x0, z0) < 1.0) {
+                return;
+            }
+        }
+        int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
+        if (loaded > 0 && data.debug) {
+            StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+        }
     }
 
 }

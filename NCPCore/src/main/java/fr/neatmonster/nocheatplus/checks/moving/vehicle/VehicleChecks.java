@@ -240,6 +240,7 @@ public class VehicleChecks extends CheckListener {
                         return null;
                     }
                 } else {
+                    // (Skip chunk loading here.)
                     aux.resetPositionsAndMediumProperties(player, vLoc, data, cc);
                     return null;
                 }
@@ -346,7 +347,9 @@ public class VehicleChecks extends CheckListener {
         if (!firstPastMove.valid) {
             // Determine the best location to use as past move.
             // TODO: Could also check the set-backs for plausible entries, however that would lead to a violation by default. Could use an indicator.
-            aux.resetVehiclePositions(vehicle, from == null ? vehicleLocation : from, data, cc);
+            final Location refLoc = from == null ? vehicleLocation : from;
+            MovingUtil.ensureChunksLoaded(player, refLoc, "vehicle move (no past move)", data, cc);
+            aux.resetVehiclePositions(vehicle, refLoc, data, cc);
             if (data.debug) {
                 // TODO: Might warn instead.
                 debug(player, "Missing past move data, set to: " + firstPastMove.from);
@@ -356,6 +359,8 @@ public class VehicleChecks extends CheckListener {
         // (Currently always use firstPastMove and vehicleLocation.)
         final Location useFrom = LocUtil.set(useLoc1, world, firstPastMove.toIsValid ? firstPastMove.to : firstPastMove.from);
         final Location useTo = vehicleLocation;
+        // Ensure chunks are loaded.
+        MovingUtil.ensureChunksLoaded(player, useFrom, useTo, firstPastMove, "vehicle move", data, cc);
         // Initialize moveInfo.
         if (vehicleType == EntityType.PIG) {
             // TODO: Special cases by config rather.
