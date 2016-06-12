@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
+import fr.neatmonster.nocheatplus.checks.inventory.HotFixFallingBlockPortalEnter;
 import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
@@ -57,9 +58,7 @@ public class DefaultComponentFactory {
             // TODO: Static test methods !?
             FastConsume.testAvailability();
             available.add(new FastConsume());
-            if (ConfigManager.isTrueForAnyConfig(ConfPaths.INVENTORY_FASTCONSUME_CHECK)) {
-                NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(FastConsume.class.getSimpleName()));
-            }
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(FastConsume.class.getSimpleName()));
         }
         catch (Throwable t){
             StaticLog.logInfo("Inventory checks: FastConsume is not available.");
@@ -69,12 +68,18 @@ public class DefaultComponentFactory {
         try {
             Gutenberg.testAvailability();
             available.add(new Gutenberg());
-            if (ConfigManager.isTrueForAnyConfig(ConfPaths.INVENTORY_GUTENBERG_CHECK)) {
-                NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(Gutenberg.class.getSimpleName()));
-            }
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(Gutenberg.class.getSimpleName()));
         } catch (Throwable t) {
             StaticLog.logInfo("Inventory checks: Gutenberg is not available.");
         }
+
+        // Hot fix: falling block end portal.
+        try {
+            HotFixFallingBlockPortalEnter.testAvailability();
+            available.add(new HotFixFallingBlockPortalEnter());
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(HotFixFallingBlockPortalEnter.class.getSimpleName()));
+        }
+        catch (RuntimeException e) {}
 
         // Version dependent activation of components.
         final String vServerLc = Bukkit.getServer().getVersion().toLowerCase();

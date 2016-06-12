@@ -363,4 +363,13 @@ public class LocUtil {
         return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ() + ",pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw();
     }
 
+    /**
+     * Just the coordinates, no world/yaw/pitch.
+     * @param loc
+     * @return
+     */
+    public static String simpleFormatPosition(Location loc) {
+        return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ();
+    }
+
 }

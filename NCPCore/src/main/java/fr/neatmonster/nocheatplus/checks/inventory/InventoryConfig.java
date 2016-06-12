@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -70,10 +71,20 @@ public class InventoryConfig extends ACheckConfig {
      * @return the configuration
      */
     public static InventoryConfig getConfig(final Player player) {
-        if (!worldsMap.containsKey(player.getWorld().getName()))
-            worldsMap.put(player.getWorld().getName(), new InventoryConfig(
-                    ConfigManager.getConfigFile(player.getWorld().getName())));
-        return worldsMap.get(player.getWorld().getName());
+        return getConfig(player.getWorld());
+    }
+
+    public static InventoryConfig getConfig(final World world) {
+        return getWorldConfig(world.getName());
+    }
+
+    public static final InventoryConfig getWorldConfig(final String worldName) {
+        InventoryConfig cc = worldsMap.get(worldName);
+        if (cc == null) {
+            cc = new InventoryConfig(ConfigManager.getConfigFile(worldName));
+            worldsMap.put(worldName, cc);
+        }
+        return cc;
     }
 
     public final boolean    dropCheck;
@@ -110,6 +121,9 @@ public class InventoryConfig extends ACheckConfig {
     public final boolean    openCheck;
     public final boolean	openClose;
     public final boolean	openCancelOther;
+
+    // Hot fixes.
+    public final boolean hotFixFallingBlockEndPortalActive;
 
     /**
      * Instantiates a new inventory configuration.
@@ -153,6 +167,8 @@ public class InventoryConfig extends ACheckConfig {
         openCheck = data.getBoolean(ConfPaths.INVENTORY_OPEN_CHECK);
         openClose = data.getBoolean(ConfPaths.INVENTORY_OPEN_CLOSE);
         openCancelOther = data.getBoolean(ConfPaths.INVENTORY_OPEN_CANCELOTHER);
+
+        hotFixFallingBlockEndPortalActive = data.getBoolean(ConfPaths.INVENTORY_HOTFIX_DUPE_FALLINGBLOCKENDPORTAL);
     }
 
     /*

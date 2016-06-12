@@ -366,6 +366,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_OPEN_CLOSE, true);
         set(ConfPaths.INVENTORY_OPEN_CANCELOTHER, true);
 
+        set (ConfPaths.INVENTORY_HOTFIX_DUPE_FALLINGBLOCKENDPORTAL, true);
+
         // MOVING
         set(ConfPaths.MOVING_CREATIVEFLY_CHECK, true);
         set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, true);

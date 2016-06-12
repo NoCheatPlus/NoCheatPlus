@@ -552,6 +552,11 @@ public abstract class ConfPaths {
     public static final  String INVENTORY_OPEN_CLOSE                     = INVENTORY_OPEN + "close";
     public static final  String INVENTORY_OPEN_CANCELOTHER               = INVENTORY_OPEN + "cancelother";
 
+    // Inventory hot-fix.
+    private static final String INVENTORY_HOTFIX                            = INVENTORY + "hotfix.";
+    private static final String INVENTORY_HOTFIX_DUPE                       = INVENTORY_HOTFIX + "duplication.";
+    public static final String  INVENTORY_HOTFIX_DUPE_FALLINGBLOCKENDPORTAL = INVENTORY_HOTFIX_DUPE + "fallingblockendportal";
+
     public static final String  MOVING                                   = CHECKS + "moving.";
 
     private static final String MOVING_CREATIVEFLY                       = MOVING + "creativefly.";
