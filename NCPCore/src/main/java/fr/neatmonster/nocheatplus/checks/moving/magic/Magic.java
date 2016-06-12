@@ -100,6 +100,8 @@ public class Magic {
      */
     public static final double EXTREME_MOVE_DIST_VERTICAL = 4.0;
     public static final double EXTREME_MOVE_DIST_HORIZONTAL = 22.0;
+    /** Minimal xz-margin for chunk load. */
+    public static final double CHUNK_LOAD_MARGIN_MIN = 3.0;
 
     /**
      * The absolute per-tick base speed for swimming vertically.

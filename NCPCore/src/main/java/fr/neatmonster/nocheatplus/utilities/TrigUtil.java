@@ -288,6 +288,17 @@ public class TrigUtil {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
+    /**
+     * Horizontal: squared distance.
+     * @param location1
+     * @param x1
+     * @return
+     */
+    public static final double distanceSquared(final IGetPosition location, final double x, final double z)
+    {
+        return distanceSquared(location.getX(), location.getZ(), x, z);
+    }
+
     public static final double distanceSquared(final IGetPosition location1, final Location location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());

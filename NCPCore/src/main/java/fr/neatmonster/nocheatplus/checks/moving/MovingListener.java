@@ -308,6 +308,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Might omit this if neither check is activated.
         final Location loc = player.getLocation(useLoc);
         data.setSetBack(loc);
+        if (cc.loadChunksOnWorldChange) {
+            ensureChunksLoaded(player, loc, "world change", data, cc);
+        }
         aux.resetPositionsAndMediumProperties(player, loc, data, cc);
         data.resetTrace(loc, TickTask.getTick(), cc);
         if (cc.enforceLocation) {
@@ -423,6 +426,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final Location loc = player.getLocation(moveInfo.useLoc);
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
+        if (cc.loadChunksOnMove) {
+            ensureChunksLoaded(player, from, to, lastMove, data, cc);
+        }
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
         if (
                 // Handling split moves has been disabled.
@@ -461,6 +467,89 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Cleanup.
         data.joinOrRespawn = false;
         aux.returnPlayerMoveInfo(moveInfo);
+    }
+
+    /**
+     * Ensure chunks are loaded so that the move can be processed at all. Assume
+     * too big moves to be cancelled anyway and/or passable accounting for chunk
+     * load.
+     * 
+     * @param from
+     * @param to
+     * @param lastMove
+     * @param data
+     * @param cc
+     */
+    private void ensureChunksLoaded(final Player player, final Location from, final Location to, final PlayerMoveData lastMove, 
+            final MovingData data, final MovingConfig cc) {
+        // (Worlds must be equal. Ensured in player move handling.)
+        final double x0 = from.getX();
+        final double z0 = from.getZ();
+        final double x1 = to.getX();
+        final double z1 = to.getZ();
+        if (TrigUtil.distanceSquared(x0, z0, x1, z1) > 2.0 * Magic.CHUNK_LOAD_MARGIN_MIN) {
+            // Assume extreme move to trigger.
+            return;
+        }
+        boolean loadFrom = true;
+        boolean loadTo = true;
+        double margin = Magic.CHUNK_LOAD_MARGIN_MIN;
+        // Heuristic for if loading may be necessary at all.
+        if (lastMove.toIsValid && lastMove.to.extraPropertiesValid) {
+            if (TrigUtil.distanceSquared(lastMove.to, x0, z0) < 1.0) {
+                loadFrom = false;
+            }
+            if (TrigUtil.distanceSquared(lastMove.to, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        else if (lastMove.valid && lastMove.from.extraPropertiesValid
+                && cc.loadChunksOnJoin) {
+            // TODO: Might need to distinguish join/teleport/world-change later.
+            if (TrigUtil.distanceSquared(lastMove.from, x0, z0) < 1.0) {
+                loadFrom = false;
+            }
+            if (TrigUtil.distanceSquared(lastMove.from, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        int loaded = 0;
+        if (loadFrom) {
+            loaded += BlockCache.ensureChunksLoaded(from.getWorld(), x0, z0, margin);
+            if (TrigUtil.distanceSquared(x0, z0, x1, z1) < 1.0) {
+                loadTo = false;
+            }
+        }
+        if (loadTo) {
+            loaded += BlockCache.ensureChunksLoaded(to.getWorld(), x1, z1, margin);
+        }
+        if (loaded > 0 && data.debug) {
+            StaticLog.logInfo("Player move: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + from.getWorld().getName() +  " for player: " + player.getName());
+        }
+    }
+
+    private void ensureChunksLoaded(final Player player, final Location loc, final String tag, 
+            final MovingData data, final MovingConfig cc) {
+        final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
+        final double x0 = loc.getX();
+        final double z0 = loc.getZ();
+        // Heuristic for if loading may be necessary at all.
+        if (lastMove.toIsValid && lastMove.to.extraPropertiesValid) {
+            if (TrigUtil.distanceSquared(lastMove.to, x0, z0) < 1.0) {
+                return;
+            }
+        }
+        else if (lastMove.valid && lastMove.from.extraPropertiesValid
+                && cc.loadChunksOnJoin) {
+            // TODO: Might need to distinguish join/teleport/world-change later.
+            if (TrigUtil.distanceSquared(lastMove.from, x0, z0) < 1.0) {
+                return;
+            }
+        }
+        int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
+        if (loaded > 0 && data.debug) {
+            StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+        }
     }
 
     /**
@@ -882,6 +971,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Horizontal move.
         if (thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
             // Exclude valid moves first.
+            // TODO: Attributes might allow unhealthy moves as well.
             // Observed maximum use so far: 5.515
             // TODO: Velocity flag too (if combined with configurable distances)?
             final double amount = thisMove.hDistance - data.getHorizontalFreedom(); // Will change with model change.
@@ -1237,13 +1327,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Teleport to untracked locations.
         else if (cause == TeleportCause.COMMAND) { // TODO: TeleportCause.PLUGIN?
             // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
-            if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
-                final Location newTo = MovingUtil.checkUntrackedLocation(to);
-                if (newTo != null) {
-                    // Adjust the teleport to go to the last tracked to-location of the other player.
-                    event.setTo(newTo);
-                    // TODO: Consider console, consider data.debug.
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
+            if (cc.passableUntrackedTeleportCheck) {
+                if (cc.loadChunksOnTeleport) {
+                    ensureChunksLoaded(player, to, "teleport", data, cc);
+                }
+                if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
+                    final Location newTo = MovingUtil.checkUntrackedLocation(to);
+                    if (newTo != null) {
+                        // Adjust the teleport to go to the last tracked to-location of the other player.
+                        event.setTo(newTo);
+                        // TODO: Consider console, consider data.debug.
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
+                    }
                 }
             }
         }
@@ -1339,6 +1434,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 final Location teleported = data.getTeleported();
                 final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
                 moveInfo.set(player, teleported, null, cc.yOnGround);
+                if (cc.loadChunksOnTeleport) {
+                    ensureChunksLoaded(player, teleported, "teleport", data, cc);
+                }
                 data.onSetBack(moveInfo.from);
                 aux.returnPlayerMoveInfo(moveInfo);
 
@@ -1377,6 +1475,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearPlayerMorePacketsData();
         data.setSetBack(to);
         data.sfHoverTicks = -1; // Important against concurrent modification exception.
+        if (cc.loadChunksOnTeleport) {
+            ensureChunksLoaded(player, to, "teleport", data, cc);
+        }
         aux.resetPositionsAndMediumProperties(player, to, data, cc);
         // TODO: Decide to remove the LiftOffEnvelope thing completely.
         //        if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
@@ -1565,9 +1666,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final String tag = isRespawn ? "Respawn" : "Join";
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
-            final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
-            if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
-                // DEBUG
+            // (Don't use past-move heuristic for skipping here.)
+            final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
+            if (loaded > 0 && data.debug) {
                 StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
@@ -1854,7 +1955,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final boolean res;
         // TODO: Collect flags, more margin ?
         final int loaded = info.from.ensureChunksLoaded();
-        if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
+        if (loaded > 0 && data.debug) {
             // DEBUG
             StaticLog.logInfo("Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
         }

@@ -455,6 +455,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_IGNORESTANCE, "default");
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
+        set(ConfPaths.MOVING_LOADCHUNKS_MOVE, true);
+        set(ConfPaths.MOVING_LOADCHUNKS_TELEPORT, true);
+        set(ConfPaths.MOVING_LOADCHUNKS_WORLDCHANGE, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
         set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);

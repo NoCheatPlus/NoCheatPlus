@@ -186,6 +186,9 @@ public class MovingConfig extends ACheckConfig {
     public final boolean ignoreStance;
     public final boolean tempKickIllegal;
     public final boolean loadChunksOnJoin;
+    public final boolean loadChunksOnMove;
+    public final boolean loadChunksOnTeleport;
+    public final boolean loadChunksOnWorldChange;
     public final long sprintingGrace;
     public final boolean assumeSprint;
     public final int speedGrace;
@@ -308,6 +311,9 @@ public class MovingConfig extends ACheckConfig {
         ignoreStance = refIgnoreStance == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.8") >= 0 : refIgnoreStance.decide();
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
+        loadChunksOnMove = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_MOVE);
+        loadChunksOnTeleport = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_TELEPORT);
+        loadChunksOnWorldChange = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_WORLDCHANGE);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
         assumeSprint = config.getBoolean(ConfPaths.MOVING_ASSUMESPRINT);
         speedGrace = Math.max(0, (int) Math.round(config.getDouble(ConfPaths.MOVING_SPEEDGRACE) * 20.0)); // Config: seconds
