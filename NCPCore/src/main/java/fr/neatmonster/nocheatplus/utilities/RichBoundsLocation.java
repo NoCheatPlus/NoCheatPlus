@@ -56,6 +56,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /** Bounding box. */
     double minX, maxX, minY, maxY, minZ, maxZ;
 
+    /** Horizontal margin for the bounding box (center towards edge). */
+    double boxMarginHorizontal;
+    /** Vertical margin for the bounding box (y towards top)*/
+    double boxMarginVertical;
+
     // TODO: Check if onGround can be completely replaced by onGroundMinY and notOnGroundMaxY.
     /** Minimal yOnGround for which the player is on ground. No extra xz/y margin.*/
     double onGroundMinY = Double.MAX_VALUE;
@@ -196,6 +201,27 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      */
     public double[] getBoundsAsDoubles() {
         return new double[] {minX, minY, minZ, maxX, maxY, maxZ};
+    }
+
+    /**
+     * Get the bounding box margin from the center (x ,z) to the edge of the
+     * box. This value may be adapted from entity width or other input, and it
+     * might be cut down to a certain resolution (e.g. 1/1000).
+     * 
+     * @return
+     */
+    public double getBoxMarginHorizontal() {
+        return boxMarginHorizontal;
+    }
+
+    /**
+     * Get the bounding box margin from the y coordinate (feet for entities) to
+     * the top.
+     * 
+     * @return
+     */
+    public double getBoxMarginVertical() {
+        return boxMarginVertical;
     }
 
     /**
@@ -982,6 +1008,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         maxX = x + dxz;
         maxY = y + fullHeight;
         maxZ = z + dxz;
+        this.boxMarginHorizontal = dxz;
+        this.boxMarginVertical = fullHeight;
         // TODO: With current bounding box the stance is never checked.
 
         // Set world / block access.

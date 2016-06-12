@@ -127,7 +127,7 @@ public class LostGround {
                 // Generic could step.
                 // TODO: Possibly confine margin depending on side, moving direction (see client code).
                 // TODO: Should this also be checked vs. last from?
-                if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + (double) Math.round(from.getWidth() * 500.0) / 1000.0, to.getyOnGround(), 0.0)) {
+                if (BlockProperties.isOnGroundShuffled(to.getBlockCache(), from.getX(), from.getY() + cc.sfStepHeight, from.getZ(), to.getX(), to.getY(), to.getZ(), 0.1 + from.getBoxMarginHorizontal(), to.getyOnGround(), 0.0)) {
                     // TODO: Set a data property, so vdist does not trigger (currently: scan for tag)
                     // TODO: !to.isOnGround?
                     return applyLostGround(player, from, false, thisMove, data, "couldstep", tags);
@@ -140,7 +140,7 @@ public class LostGround {
                     // TODO: Otherwise cap max. amount (seems not really possible, could confine by passable checking).
                     // TODO: Might estimate by the yDist from before last from (cap x2 and y2).
                     // TODO: A ray-tracing version of isOnground?
-                    if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), from.getX(), from.getY(), from.getZ(), from.getWidth(), from.getyOnGround(), lastMove, data, "asc1", tags, from.getMCAccess())) {
+                    if (lostGroundEdgeAsc(player, from.getBlockCache(), from.getWorld(), from.getX(), from.getY(), from.getZ(), from.getBoxMarginHorizontal(), from.getyOnGround(), lastMove, data, "asc1", tags, from.getMCAccess())) {
                         return true;
                     }
 
@@ -151,7 +151,7 @@ public class LostGround {
                         // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
                         // TODO: Temporary test (should probably be covered by one of the above instead).
                         // TODO: Code duplication with edgeasc7 below.
-                        if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc5", tags, from.getMCAccess())) {
+                        if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getBoxMarginHorizontal(), 0.3, data, "asc5", tags, from.getMCAccess())) {
                             return true;
                         }
                     }
@@ -186,7 +186,7 @@ public class LostGround {
     public static boolean lostGroundStill(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         if (lastMove.yDistance <= -0.23) {
             // TODO: Code duplication with edgeasc5 above.
-            if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getWidth(), 0.3, data, "asc7", tags, from.getMCAccess())) {
+            if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getBoxMarginHorizontal(), 0.3, data, "asc7", tags, from.getMCAccess())) {
                 return true;
             }
         }
@@ -204,17 +204,42 @@ public class LostGround {
      *            Target position.
      * @param y1
      * @param z1
-     * @param width
+     * @param boxMarginHorizontal
+     *            Center to edge, at some resolution.
      * @param yOnGround
      * @param data
      * @param tag
      * @return
      */
-    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double width, final double yOnGround, final PlayerMoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
-        return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ(), lastMove.hDistance, width, yOnGround, data, tag, tags, mcAccess);
+    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, final double boxMarginHorizontal, final double yOnGround, final PlayerMoveData lastMove, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+        return lostGroundEdgeAsc(player, blockCache, world, x1, y1, z1, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ(), lastMove.hDistance, boxMarginHorizontal, yOnGround, data, tag, tags, mcAccess);
     }
 
-    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, final double x1, final double y1, final double z1, double x2, final double y2, double z2, final double hDistance2, final double width, final double yOnGround, final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
+    /**
+     * 
+     * @param player
+     * @param blockCache
+     * @param world
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param hDistance2
+     * @param boxMarginHorizontal
+     *            Center to edge, at some resolution.
+     * @param yOnGround
+     * @param data
+     * @param tag
+     * @param tags
+     * @param mcAccess
+     * @return
+     */
+    private static boolean lostGroundEdgeAsc(final Player player, final BlockCache blockCache, final World world, 
+            final double x1, final double y1, final double z1, double x2, final double y2, double z2, 
+            final double hDistance2, final double boxMarginHorizontal, final double yOnGround, 
+            final MovingData data, final String tag, final Collection<String> tags, final MCAccess mcAccess) {
         // First: calculate vector towards last from.
         x2 -= x1;
         z2 -= z1;
@@ -232,9 +257,8 @@ public class LostGround {
         x2 = fMin * x2 + x1;
         z2 = fMin * z2 + z1;
         // Finally test for ground.
-        final double xzMargin = Math.round(width * 500.0) / 1000.0; // Bounding box "radius" at some resolution.
         // (We don't add another xz-margin here, as the move should cover ground.)
-        if (BlockProperties.isOnGroundShuffled(blockCache, x1, y1, z1, x2, y1, z2, xzMargin, yOnGround, 0.0)) {
+        if (BlockProperties.isOnGroundShuffled(blockCache, x1, y1, z1, x2, y1, z2, boxMarginHorizontal, yOnGround, 0.0)) {
             //data.sfLastAllowBunny = true; // TODO: Maybe a less powerful flag (just skipping what is necessary).
             // TODO: data.fromY for set back is not correct, but currently it is more safe (needs instead: maintain a "distance to ground").
             return applyLostGround(player, new Location(world, x2, y2, z2), true, data.playerMoves.getCurrentMove(), data, "edge" + tag, tags, mcAccess); // Maybe true ?
