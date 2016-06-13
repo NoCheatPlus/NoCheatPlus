@@ -20,7 +20,7 @@ Compiling NoCheatPlus
 ---------
 * NoCheatPlus is compiled for Java 6 (same as Minecraft/Spigot).
 * We use [Maven] (http://maven.apache.org/download.cgi) 3 to handle the dependencies.
-* You can compile it with this Maven goal: `mvn clean package`, if you don't want any dedicated CraftBukkit modules, or if you are lacking the jar files. If you do have all the dependencies, you can set the parameter `cbdedicated` to `true` and activate the profile `all` adding `-P all` to the goals (e.g. on Jenkins, for some setups setting the property may suffice). For more options, see the table below. If your specific needs are not met by the provided options, you can still build only using the compat module(s) that you need, e.g. by adjusting the build/dependency profiles or adding your own profile, which means changing/adding a profile both in the root pom.xml for modules to have and in NCPPlugin/pom.xml for the dependency inclusion. The preset profiles should be enough of a hint for that. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to add the source inclusion to the NoCheatPlus/pom.xml as well.
+* You can compile with this Maven goal: `mvn clean package`, if you don't want any dedicated CraftBukkit modules, or if you are lacking the jar files - **for best performance  and compatibility, choose the appropriate build profile(s) from below**. If you do have all the legacy dependencies, you can set the parameter `cbdedicated` to `true` and activate the profile `all` adding `-P all` to the maven goals. For more options, see the table below. If your specific needs are not met by the provided options, you can still build only using the compat module(s) that you need, e.g. by adjusting the build/dependency profiles or adding your own profile, which means changing/adding a profile both in the root pom.xml for modules to have and in NCPPlugin/pom.xml for the dependency inclusion. The preset profiles should be enough of a hint for that. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to add the source inclusion to the NoCheatPlus/pom.xml as well.
 * Jar files for the dedicated compat modules, which your local maven repository might be missing, can be installed manually.
 Example for Eclipse with embedded maven:
 Add a new maven build run configuration, name it appropriately, e.g. ```Install CB 1.7.5```.
@@ -31,17 +31,21 @@ Do set the correct version alongside the file name. On newer version of maven, y
 
 All profiles for reference:
 
+**As of now, you do need to activate the ncp_base profile in addition to whichever other profile you may be using.**
+
+_For some building environments you might need to both set the profiles and set the build parameters - to be on the safe side, just set both._
+
 | Profile | Parameter set to `true` | Description |
 | :------------------ | :----------------------------- | :-------------- |
-| `-P minimal` | _default_ | Default profile without native access modules, likely problematic with moving checks. |
-| `-P all` | `cbdedicated` | All compat modules. |
-| `-P spigot1_8_r3` | `spigot1_8_r3` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
-| `-P spigot1_9_r1` | `spigot1_9_r1` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
-| `-P spigot1_9_r2` | `spigot1_9_r2` | Just Spigot 1.9 R2 (MC 1.9.4). |
-| `-P spigot1_10_r1` | `spigot1_10_r1` | Just Spigot 1.10 R1 (MC 1.10). |
-| `-P cbdev` | `cbdev` | The latest version in development. |
+| `-P ncp_base` | `ncp_base` | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. |
+| `-P all-P ncp_base` | `cbdedicated` and `ncp_base` | All compatibility modules. |
+| `-P spigot1_8_r3 -P ncp_base` | `spigot1_8_r3` and `ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
+| `-P spigot1_9_r1 -P ncp_base` | `spigot1_9_r1` and `ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
+| `-P spigot1_9_r2 -P ncp_base` | `spigot1_9_r2` and `ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
+| `-P spigot1_10_r1 -P ncp_base` | `spigot1_10_r1` and `ncp_base` | Just Spigot 1.10 R1 (MC 1.10). |
+| `-P cbdev -P ncp_base` | `cbdev` and `ncp_base` | The latest version in development. |
 
-(On the long run, only the latest module for a major Minecraft release will be kept, such as 1_8_r3.)
+(On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
 
 Links
 ---------
