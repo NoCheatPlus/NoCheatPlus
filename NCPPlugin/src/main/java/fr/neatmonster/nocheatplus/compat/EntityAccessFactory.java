@@ -44,7 +44,7 @@ public class EntityAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.EntityAccessLastPositionAndLook",
         }, new String[] {
                 "fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectEntityLastPositionAndLook",
-        }, IEntityAccessLastPositionAndLook.class, config);
+        }, IEntityAccessLastPositionAndLook.class, config, false);
     }
 
 }

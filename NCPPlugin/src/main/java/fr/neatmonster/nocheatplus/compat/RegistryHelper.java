@@ -8,14 +8,18 @@ public class RegistryHelper {
     /**
      * Set up a generic instance, according to settings. On success it will be
      * registered with the default GenericInstanceRegistry (NoCheatPlusAPI).
+     * 
      * @param cbDedicatedNames
      * @param cbReflectNames
      * @param registerFor
      * @param config
+     * @param logDebug
+     *            If true, exceptions for failed instantiation attempts will be
+     *            logged.
      * @return
      */
-    public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, Class<T> registerFor, MCAccessConfig config) {
-        return setupGenericInstance(cbDedicatedNames, cbReflectNames, null, registerFor, config);
+    public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, Class<T> registerFor, MCAccessConfig config, boolean logDebug) {
+        return setupGenericInstance(cbDedicatedNames, cbReflectNames, null, registerFor, config, logDebug);
     }
 
     /**
@@ -31,11 +35,14 @@ public class RegistryHelper {
      * @param fallBackInstance
      *            Use this as a fall back, in case none of the classes could be
      *            instantiated.
+     * @param logDebug
+     *            If true, exceptions for failed instantiation attempts will be
+     *            logged.
      * @return
      */
     public static <T> T setupGenericInstance(String[] cbDedicatedNames, String[] cbReflectNames, 
-            T fallBackInstance, Class<T> registerFor, MCAccessConfig config) {
-        return setupGenericInstance(cbDedicatedNames, null, cbReflectNames, fallBackInstance, registerFor, config);
+            T fallBackInstance, Class<T> registerFor, MCAccessConfig config, boolean logDebug) {
+        return setupGenericInstance(cbDedicatedNames, null, cbReflectNames, fallBackInstance, registerFor, config, logDebug);
     }
 
     /**
@@ -56,16 +63,19 @@ public class RegistryHelper {
      *            modules are deactivated.
      * @param registerFor
      * @param config
+     * @param logDebug
+     *            If true, exceptions for failed instantiation attempts will be
+     *            logged.
      * @return
      */
     public static <T> T setupGenericInstance(String[] cbDedicatedNames, T fallBackDedicatedInstance,
             String[] cbReflectNames, T fallBackReflectInstance,
-            Class<T> registerFor, MCAccessConfig config) {
+            Class<T> registerFor, MCAccessConfig config, boolean logDebug) {
         T res = null;
 
         // Reference by class name (dedicated/native access).
         if (config.enableCBDedicated && cbDedicatedNames != null) {
-            res = getFirstAvailable(cbDedicatedNames, registerFor, true);
+            res = getFirstAvailable(cbDedicatedNames, registerFor, logDebug);
         }
 
         // Fall back (after dedicated/native).
@@ -75,7 +85,7 @@ public class RegistryHelper {
 
         // Reflection based.
         if (res == null && config.enableCBReflect && cbReflectNames != null) {
-            res = getFirstAvailable(cbReflectNames, registerFor, true);
+            res = getFirstAvailable(cbReflectNames, registerFor, logDebug);
         }
 
         // Fall back (after reflection).
