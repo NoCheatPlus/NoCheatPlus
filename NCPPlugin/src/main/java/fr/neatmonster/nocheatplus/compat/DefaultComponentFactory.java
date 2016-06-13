@@ -14,13 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.compat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
@@ -28,12 +26,14 @@ import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
 import fr.neatmonster.nocheatplus.checks.inventory.HotFixFallingBlockPortalEnter;
 import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
-import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
-import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
+import fr.neatmonster.nocheatplus.compat.versions.Activation;
+import fr.neatmonster.nocheatplus.components.registry.IActivation;
+import fr.neatmonster.nocheatplus.components.registry.IDescriptiveActivation;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Default factory for add-in components which might only be available under certain circumstances.
@@ -41,6 +41,46 @@ import fr.neatmonster.nocheatplus.logging.Streams;
  * @author mc_dev
  */
 public class DefaultComponentFactory {
+
+    private final IActivation protocolLibPresent = new Activation().pluginExist("ProtocolLib");
+    private final List<IDescriptiveActivation> protocolLibActivation = new ArrayList<IDescriptiveActivation>();
+
+    public DefaultComponentFactory() {
+        for (Activation condition : Arrays.asList(
+                new Activation()
+                .neutralDescription("ProtocolLib 4.0.2 for Minecraft 1.10")
+                .pluginVersionEQ("ProtocolLib", "4.0.2")
+                .minecraftVersionBetween("1.10", true, "1.11", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 4.0.1 or 4.0.0 for Minecraft 1.9.x")
+                .pluginVersionBetween("ProtocolLib", "4.0.0", true, "4.0.1", true)
+                .minecraftVersionBetween("1.9", true, "1.10", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.7.0 or 3.7 for Minecraft 1.9.x")
+                .pluginVersionBetween("ProtocolLib", "3.7", true, "3.7.0", true)  // Might want other types...
+                .minecraftVersionBetween("1.9", true, "1.10", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.6.5 or 3.6.4 for Minecraft 1.8.x")
+                .pluginVersionBetween("ProtocolLib", "3.6.4", true, "3.6.5", true)
+                .minecraftVersionBetween("1.8", true, "1.9", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.6.6 for PaperSpigot 1.8.x")
+                .pluginVersionEQ("ProtocolLib", "3.6.6")
+                .serverVersionContainsIgnoreCase("paperspigot")
+                .minecraftVersionBetween("1.8", true, "1.9", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.6.4 before Minecraft 1.9")
+                .pluginVersionEQ("ProtocolLib", "3.6.4")
+                .minecraftVersionBetween("1.2.5", true, "1.9", false)
+                )) {
+            protocolLibActivation.add(condition);
+        };
+    }
 
     /**
      * This will be called from within the plugin in onEnable, after registration of all core listeners and components. After each components addition processQueuedSubComponentHolders() will be called to allow registries for further optional components.
@@ -81,58 +121,37 @@ public class DefaultComponentFactory {
         }
         catch (RuntimeException e) {}
 
-        // Version dependent activation of components.
-        final String vServerLc = Bukkit.getServer().getVersion().toLowerCase();
-        // TODO: Consider using a class for confining plugin vs. server versions.
-
         // ProtocolLib dependencies.
-        Plugin pluginProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-        boolean protocolLibAvailable = false;
-        if (pluginProtocolLib != null) {
-            String _pV = pluginProtocolLib.getDescription().getVersion().toLowerCase();
-            String pV = GenericVersion.collectVersion(_pV, 0);
-            if (pV == null) {
-                pV = GenericVersion.parseVersionDelimiters(_pV, "", "-snapshot");
+        if (protocolLibPresent.isAvailable()) {
+            // Check conditions.
+            boolean protocolLibAvailable = false;
+            for (final IActivation condition : protocolLibActivation) {
+                if (condition.isAvailable()) {
+                    protocolLibAvailable = true;
+                    break;
+                }
             }
-            if (pV == null) {
-                pV = GenericVersion.parseVersionDelimiters(_pV, "", "-b");
-            }
-            if (pV == null) {
-                // TODO: Was another (specific) attempt parsing planned here !?
-                StaticLog.logWarning("Could not interpret the version of ProtocolLib, won't activate hooks.");
-            }
-            else {
+            // Attempt to react.
+            if (protocolLibAvailable) {
                 try {
-                    boolean vP3_6_4 = GenericVersion.compareVersions("3.6.4", pV) == 0;
-                    boolean vP3_6_5 = GenericVersion.compareVersions("3.6.5", pV) == 0;
-                    boolean vP3_6_6 = GenericVersion.compareVersions("3.6.6", pV) == 0;
-                    boolean vP3_7_0 = GenericVersion.isVersionBetween(pV, "3.7", true, "3.7.0", true);
-                    boolean vP4_0_0 = GenericVersion.compareVersions("4.0.0", pV)  <= 0; // 4.0.0 or later until next MC version is out.
-                    boolean vP4_0_2 = GenericVersion.compareVersions("4.0.2", pV)  <= 0; // 4.0.2 or later until next MC version is out.
-                    if (
-                            ServerVersion.isMinecraftVersionBetween("1.10", true, "1.11", false) && vP4_0_2
-                            || ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP4_0_0
-                            || ServerVersion.isMinecraftVersionBetween("1.9", true, "1.10", false) && vP3_7_0
-                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false)  && (vP3_6_4 || vP3_6_5) 
-                            || ServerVersion.isMinecraftVersionBetween("1.8", true, "1.9", false) && vP3_6_6
-                            && vServerLc.indexOf("paperspigot") != -1
-                            || ServerVersion.isMinecraftVersionBetween("1.2.5", true, "1.9", false) && vP3_6_4
-                            ) {
-                        available.add(new ProtocolLibComponent(plugin));
-                        protocolLibAvailable = true;
-                    }
+                    available.add(new ProtocolLibComponent(plugin));
                 } catch (Throwable t){
-                    StaticLog.logWarning("Failed to set up packet level hooks.");
+                    StaticLog.logWarning("Failed to set up packet level access with ProtocolLib.");
                     if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
                         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.INIT, t);
                     }
                 }
             }
-        }
-        if (!protocolLibAvailable) {
-            if (pluginProtocolLib != null) {
-                StaticLog.logWarning("NoCheatPlus supports ProtocolLib 3.6.4 on Minecraft 1.7.10 and earlier, ProtocolLib 3.6.4 or 3.6.5 on Minecraft 1.8, ProtocolLib 3.7 on Minecraft 1.9, ProtocolLib 4.0.0 or later on Minecraft 1.9, ProtocolLib 4.0.2 or later on Minecraft 1.10.");
+            else {
+                List<String> parts = new LinkedList<String>();
+                parts.add("Packet level access via ProtocolLib not available, supported configurations: ");
+                for (IDescriptiveActivation cond : protocolLibActivation) {
+                    parts.add(cond.getNeutralDescription());
+                }
+                StaticLog.logWarning(StringUtil.join(parts, " | "));
             }
+        }
+        else {
             StaticLog.logInfo("Packet level access: ProtocolLib is not available.");
         }
 
