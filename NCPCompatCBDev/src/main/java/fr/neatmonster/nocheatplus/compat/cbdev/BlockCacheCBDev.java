@@ -17,6 +17,12 @@ package fr.neatmonster.nocheatplus.compat.cbdev;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import net.minecraft.server.v1_10_R1.AxisAlignedBB;
 import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.EntityBoat;
@@ -26,16 +32,9 @@ import net.minecraft.server.v1_10_R1.IBlockAccess;
 import net.minecraft.server.v1_10_R1.IBlockData;
 import net.minecraft.server.v1_10_R1.TileEntity;
 
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
-import org.bukkit.entity.Entity;
-
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
-
 public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
 
-    protected net.minecraft.server.v1_10_R1.WorldServer world;
+    protected net.minecraft.server.v1_10_R1.World world;
     protected World bukkitWorld;
 
     public BlockCacheCBDev(World world) {
