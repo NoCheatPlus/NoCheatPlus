@@ -62,7 +62,7 @@ public class ReflectHelper {
     protected final ReflectBase reflectBase;
 
     protected final ReflectBlockPosition reflectBlockPosition;
-    protected final ReflectBlockSix reflectBlock;
+    protected final IReflectBlock reflectBlock;
     protected final ReflectMaterial reflectMaterial;
     protected final ReflectWorld reflectWorld;
 
@@ -80,9 +80,20 @@ public class ReflectHelper {
             }
             catch (ClassNotFoundException ex) {}
             this.reflectBlockPosition = reflectBlockPosition;
-            this.reflectBlock = new ReflectBlockSix(this.reflectBase, this.reflectBlockPosition);
             this.reflectMaterial = new ReflectMaterial(this.reflectBase);
-            this.reflectWorld = new ReflectWorld(this.reflectBase);
+            this.reflectWorld = new ReflectWorld(reflectBase, reflectMaterial, reflectBlockPosition);
+            ReflectBlock reflectBlockLatest = null;
+            try {
+                reflectBlockLatest = new ReflectBlock(this.reflectBase, this.reflectBlockPosition,
+                        reflectMaterial, reflectWorld);
+            } catch (Throwable t) {}
+            if (reflectBlockLatest == null) {
+                // More lenient constructor.
+                this.reflectBlock = new ReflectBlockSix(this.reflectBase, this.reflectBlockPosition);
+            }
+            else {
+                this.reflectBlock = reflectBlockLatest;
+            }
 
             this.reflectDamageSource = new ReflectDamageSource(this.reflectBase);
             this.reflectEntity = new ReflectEntityDamage(this.reflectBase, this.reflectDamageSource);
@@ -115,6 +126,9 @@ public class ReflectHelper {
                 if (!accessible) {
                     rootField.setAccessible(false);
                 }
+            }
+            if (!reflectBlock.isFetchBoundsAvailable()) {
+                parts.add("fetch-block-shape");
             }
             if (!parts.isEmpty()) {
                 parts.add(0, "CompatCBReflect: The following properties could not be set:");
@@ -231,7 +245,7 @@ public class ReflectHelper {
     }
 
     public Object nmsBlockPosition(int x, int y, int z) {
-        if (!this.reflectBlock.useBlockPosition || this.reflectBlockPosition.new_nmsBlockPosition == null) {
+        if (this.reflectBlockPosition.new_nmsBlockPosition == null) {
             fail();
         }
         Object blockPos = ReflectionUtil.newInstance(this.reflectBlockPosition.new_nmsBlockPosition, x, y, z);
@@ -247,28 +261,17 @@ public class ReflectHelper {
      * @return Block instance (could be null).
      */
     public Object nmsBlock_getById(int id) {
-        if (this.reflectBlock.nmsGetById == null) {
+        if (reflectBlock == null) {
             fail();
         }
-        return ReflectionUtil.invokeMethod(this.reflectBlock.nmsGetById, null, id);
+        return this.reflectBlock.nms_getById(id);
     }
 
     public Object nmsBlock_getMaterial(Object block) {
-        if (this.reflectBlock.nmsGetMaterial == null) {
+        if (reflectBlock == null) {
             fail();
         }
-        return ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMaterial, block);
-    }
-
-    public void nmsBlock_updateShape(Object block, Object iBlockAccess, int x, int y, int z) {
-        if (this.reflectBlock.nmsUpdateShape == null) {
-            fail();
-        }
-        if (this.reflectBlock.useBlockPosition) {
-            ReflectionUtil.invokeMethod(this.reflectBlock.nmsUpdateShape, block, iBlockAccess, nmsBlockPosition(x, y, z));
-        } else {
-            ReflectionUtil.invokeMethod(this.reflectBlock.nmsUpdateShape, block, iBlockAccess, x, y, z);
-        }
+        return this.reflectBlock.nms_getMaterial(block);
     }
 
     public boolean nmsMaterial_isSolid(Object material) {
@@ -310,32 +313,27 @@ public class ReflectHelper {
     }
 
     /**
-     * (Not a method in world types.)
+     * Fetch the block shape for the given position in the given nms-world. (Not
+     * a method in world types.)
+     * 
      * @param nmsWorld
      * @param typeId
      * @param x
      * @param y
      * @param z
-     * @return double[6] minX, minY, minZ, maxX, maxY, maxZ. Returns null for cases like air/unspecified.
+     * @return double[6] minX, minY, minZ, maxX, maxY, maxZ. Returns null for
+     *         cases like air/unspecified.
      */
-    public double[] nmsWorld_fetchBlockShape(Object nmsWorld, int id, int x, int y, int z) {
-        if (this.reflectBlock.nmsGetMinX == null) { // Use nmsGetMinX as reference for all six methods (!).
+    public double[] nmsWorld_fetchBlockShape(final Object nmsWorld, 
+            final int id, final int x, final int y, final int z) {
+        if (reflectBlock == null) {
             fail();
         }
-        Object block = nmsBlock_getById(id);
-        if (block == null) {
+        final Object nmsBlock = nmsBlock_getById(id);
+        if (nmsBlock == null) {
             return null;
         }
-        nmsBlock_updateShape(block, nmsWorld, x, y, z);
-        // TODO: The methods could return null [better try-catch here].
-        return new double[] {
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMinX, block)).doubleValue(),
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMinY, block)).doubleValue(),
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMinZ, block)).doubleValue(),
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMaxX, block)).doubleValue(),
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMaxY, block)).doubleValue(),
-                ((Number) ReflectionUtil.invokeMethodNoArgs(this.reflectBlock.nmsGetMaxZ, block)).doubleValue(),
-        };
+        return reflectBlock.nms_fetchBounds(nmsWorld, nmsBlock, x, y, z);
     }
 
 }

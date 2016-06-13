@@ -50,7 +50,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be older than what Compat-CB-Reflect can support.");
             this.knownSupportedVersion = false;
         }
-        else if (GenericVersion.compareVersions(mcVersion, "1.9") >= 0) {
+        else if (GenericVersion.compareVersions(mcVersion, "1.10") > 0) {
             this.knownSupportedVersion = false;
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be more recent than the one Compat-CB-Reflect has been built with - this might work, but there could be incompatibilities.");
         } else {
@@ -68,7 +68,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     @Override
     public String getMCVersion() {
         // Potentially all :p.
-        return "1.4.5-1.8.8|?";
+        return "1.4.5-1.10|?";
     }
 
     @Override

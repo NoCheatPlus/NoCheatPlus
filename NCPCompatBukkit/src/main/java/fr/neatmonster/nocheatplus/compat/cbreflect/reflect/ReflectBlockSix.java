@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -35,11 +36,11 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author asofold
  *
  */
-public class ReflectBlockSix {
-    
+public class ReflectBlockSix implements IReflectBlock {
+
     /** Obfuscated nms names, allowing to find the order in the source code under certain circumstances. */
     private static final List<String> possibleNames = new ArrayList<String>();
-    
+
     static {
         // These might suffice for a while.
         for (char c : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()) {
@@ -47,11 +48,16 @@ public class ReflectBlockSix {
         }
     }
 
+    // Reference.
+    private final ReflectBlockPosition reflectBlockPosition;
+
     /** (static) */
     public final Method nmsGetById;
 
     public final Method nmsGetMaterial;
     public final boolean useBlockPosition;
+
+
     public final Method nmsUpdateShape;
     // Block bounds in the order the methods (used to) appear in the nms class.
     /** If this is null, all other nmsGetMin/Max... methods are null too. */
@@ -62,7 +68,8 @@ public class ReflectBlockSix {
     public final Method nmsGetMinZ;
     public final Method nmsGetMaxZ;
 
-    public ReflectBlockSix(ReflectBase base, ReflectBlockPosition blockPosition) throws ClassNotFoundException {
+    public ReflectBlockSix(ReflectBase base, ReflectBlockPosition reflectBlockPosition) throws ClassNotFoundException {
+        this.reflectBlockPosition = reflectBlockPosition;
         final Class<?> clazz = Class.forName(base.nmsPackageName + ".Block");
         // byID (static)
         nmsGetById = ReflectionUtil.getMethod(clazz, "getById", int.class);
@@ -71,8 +78,8 @@ public class ReflectBlockSix {
         // updateShape
         Method method = null;
         Class<?> clazzIBlockAccess = Class.forName(base.nmsPackageName + ".IBlockAccess");
-        if (blockPosition != null) {
-            method = ReflectionUtil.getMethod(clazz, "updateShape", clazzIBlockAccess, blockPosition.nmsClass);
+        if (reflectBlockPosition != null) {
+            method = ReflectionUtil.getMethod(clazz, "updateShape", clazzIBlockAccess, reflectBlockPosition.nmsClass);
         }
         if (method == null) {
             method = ReflectionUtil.getMethod(clazz, "updateShape", clazzIBlockAccess, int.class, int.class, int.class);
@@ -183,6 +190,72 @@ public class ReflectBlockSix {
             res[i] = names.get(startIndex + i);
         }
         return res;
+    }
+
+    /**
+     * Quick fail with exception.
+     */
+    private void fail() {
+        throw new ReflectFailureException();
+    }
+
+    private Object nmsBlockPosition(final int x, final int y, final int z) {
+        if (!this.useBlockPosition || this.reflectBlockPosition.new_nmsBlockPosition == null) {
+            fail();
+        }
+        Object blockPos = ReflectionUtil.newInstance(this.reflectBlockPosition.new_nmsBlockPosition, x, y, z);
+        if (blockPos == null) {
+            fail();
+        }
+        return blockPos;
+    }
+
+    @Override
+    public Object nms_getById(final int id) {
+        if (this.nmsGetById == null) {
+            fail();
+        }
+        return ReflectionUtil.invokeMethod(this.nmsGetById, null, id);
+    }
+
+    @Override
+    public Object nms_getMaterial(final Object block) {
+        if (this.nmsGetMaterial == null) {
+            fail();
+        }
+        return ReflectionUtil.invokeMethodNoArgs(this.nmsGetMaterial, block);
+    }
+
+    public void nms_updateShape(final Object block, final Object iBlockAccess, 
+            final int x, final int y, final int z) {
+        if (this.nmsUpdateShape == null) {
+            fail();
+        }
+        if (this.useBlockPosition) {
+            ReflectionUtil.invokeMethod(this.nmsUpdateShape, block, iBlockAccess, nmsBlockPosition(x, y, z));
+        } else {
+            ReflectionUtil.invokeMethod(this.nmsUpdateShape, block, iBlockAccess, x, y, z);
+        }
+    }
+
+    @Override
+    public double[] nms_fetchBounds(final Object nmsWorld, final Object nmsBlock,
+            final int x, final int y, final int z) {
+        nms_updateShape(nmsBlock, nmsWorld, x, y, z);
+        // TODO: The methods could return null [better try-catch here].
+        return new double[] {
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMinX, nmsBlock)).doubleValue(),
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMinY, nmsBlock)).doubleValue(),
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMinZ, nmsBlock)).doubleValue(),
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMaxX, nmsBlock)).doubleValue(),
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMaxY, nmsBlock)).doubleValue(),
+                ((Number) ReflectionUtil.invokeMethodNoArgs(this.nmsGetMaxZ, nmsBlock)).doubleValue(),
+        };
+    }
+
+    @Override
+    public boolean isFetchBoundsAvailable() {
+        return nmsGetById != null && nmsUpdateShape != null && nmsGetMinX != null;
     }
 
 }
