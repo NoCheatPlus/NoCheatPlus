@@ -86,7 +86,7 @@ public class BlockInteractData extends ACheckData {
     public int lastY, lastZ;
     /** null for air */
     public Material lastType = null;
-    public long lastTick;
+    public int lastTick;
     public Action lastAction = null;
 
     // Data of the reach check.
@@ -96,6 +96,15 @@ public class BlockInteractData extends ACheckData {
     public long speedTime	= 0;
     /** Number of interactions since last reset-time. */
     public int  speedCount	= 0;
+
+    /** Cancel is set, times in a row. */
+    public int subsequentCancel = 0;
+
+    /**
+     * Skipped actions due to rate limiting (debugging rather). May be reset
+     * with logging.
+     */
+    public int rateLimitSkip = 0;
 
     public BlockInteractData(final BlockInteractConfig config) {
         super(config);

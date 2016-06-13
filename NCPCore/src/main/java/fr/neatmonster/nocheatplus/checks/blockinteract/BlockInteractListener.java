@@ -30,6 +30,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -94,7 +95,9 @@ public class BlockInteractListener extends CheckListener {
         }
 
         final BlockInteractData data = BlockInteractData.getData(player);
+        final int previousLastTick = data.lastTick;
         data.setLastBlock(block, action);
+        final BlockFace face = event.getBlockFace();
         switch(action) {
             case LEFT_CLICK_BLOCK:
                 break;
@@ -105,6 +108,10 @@ public class BlockInteractListener extends CheckListener {
                         final CombinedConfig ccc = CombinedConfig.getConfig(player);
                         if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
                             event.setUseItemInHand(Result.DENY);
+                            if (data.debug) {
+                                final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+                                genericDebug(player, block, face, event, "click block: deny use ender pearl", previousLastTick, data, cc);
+                            }
                         }
                     }
                 }
@@ -114,6 +121,7 @@ public class BlockInteractListener extends CheckListener {
         }
 
         if (event.isCancelled() && event.useInteractedBlock() != Result.ALLOW) {
+            data.subsequentCancel ++;
             return;
         }
 
@@ -121,7 +129,6 @@ public class BlockInteractListener extends CheckListener {
         boolean cancelled = false;
         boolean preventUseItem = false;
 
-        final BlockFace face = event.getBlockFace();
         final Location loc = player.getLocation(useLoc);
 
         // Interaction speed.
@@ -150,6 +157,9 @@ public class BlockInteractListener extends CheckListener {
             if (event.isCancelled()) {
                 // Just prevent using the block.
                 event.setUseInteractedBlock(Result.DENY);
+                if (data.debug) {
+                    genericDebug(player, block, face, event, "already cancelled: deny use block", previousLastTick, data, cc);
+                }
             } else {
                 final Result previousUseItem = event.useItemInHand();
                 event.setCancelled(true);
@@ -160,14 +170,50 @@ public class BlockInteractListener extends CheckListener {
                         || !CheckUtils.isConsumable(Bridge1_9.getUsedItem(player, event))
                         ) {
                     event.setUseItemInHand(Result.DENY);
+                    if (data.debug) {
+                        genericDebug(player, block, face, event, "deny item use", previousLastTick, data, cc);
+                    }
                 }
                 else {
                     // Consumable and not prevented otherwise.
                     // TODO: Ender pearl?
                     event.setUseItemInHand(Result.ALLOW);
+                    if (data.debug) {
+                        genericDebug(player, block, face, event, "allow edible item use", previousLastTick, data, cc);
+                    }
                 }
             }
+            data.subsequentCancel ++;
+        }
+        else {
+            data.subsequentCancel = 0;
         }
         useLoc.setWorld(null);
     }
+
+    private void genericDebug(final Player player, final Block block, final BlockFace face, 
+            final PlayerInteractEvent event, final String tag, final int previousLastTick, 
+            final BlockInteractData data, final BlockInteractConfig cc) {
+        final StringBuilder builder = new StringBuilder(512);
+        // Rate limit.
+        if (data.lastTick == previousLastTick && data.subsequentCancel > 0) {
+            data.rateLimitSkip ++;
+            return;
+        }
+        // Debug log.
+        builder.append("Interact cancel: " + event.isCancelled());
+        builder.append(" (");
+        builder.append(tag);
+        builder.append(") block: ");
+        builder.append(block.getWorld().getName() + "/" + LocUtil.simpleFormat(block));
+        builder.append(" type: " + BlockProperties.getId(block.getType()));
+        builder.append(" data: " + BlockProperties.getData(block));
+        builder.append(" face: " + face);
+        if (data.rateLimitSkip > 0) {
+            builder.append(" skipped(rate-limit: " + data.rateLimitSkip);
+            data.rateLimitSkip = 0;
+        }
+        debug(player, builder.toString());
+    }
+
 }

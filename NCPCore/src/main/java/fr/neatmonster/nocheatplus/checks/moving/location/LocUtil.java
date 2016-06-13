@@ -16,7 +16,9 @@ package fr.neatmonster.nocheatplus.checks.moving.location;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
+import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
@@ -370,6 +372,24 @@ public class LocUtil {
      */
     public static String simpleFormatPosition(Location loc) {
         return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ();
+    }
+
+    /**
+     * Just the coordinates.
+     * @param block
+     * @return
+     */
+    public static String simpleFormat(Block block) {
+        return "x=" + block.getX() + ",y=" + block.getY() + ",z=" + block.getZ();
+    }
+
+    /**
+     * Just the coordinates.
+     * @param block
+     * @return
+     */
+    public static String simpleFormatBlock(IGetBlockPosition block) {
+        return "x=" + block.getBlockX() + ",y=" + block.getBlockY() + ",z=" + block.getBlockZ();
     }
 
 }

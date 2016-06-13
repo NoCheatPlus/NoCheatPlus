@@ -30,6 +30,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -1457,12 +1458,24 @@ public class BlockProperties {
     }
 
     /**
-     * Straw-man-method to hide warnings. Rather intended for display in debug/alert messages.
+     * Straw-man-method to hide warnings. Rather intended for display in
+     * debug/alert messages.
+     * 
      * @param blockType
      * @return
      */
     public static int getId(final Material blockType) {
         return blockType.getId();
+    }
+
+    /**
+     * Get the (legacy) data value for the block.
+     * 
+     * @param block
+     * @return
+     */
+    public static int getData(final Block block) {
+        return block.getData();
     }
 
     /**
