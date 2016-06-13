@@ -14,11 +14,14 @@
  */
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -31,6 +34,7 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class SoundDistance extends BaseAdapter {
@@ -40,6 +44,10 @@ public class SoundDistance extends BaseAdapter {
 
     /** Partly by debugging, partly from various sources, possibly including wrong spelling. */
     private static final Set<String> effectNames = new HashSet<String>(Arrays.asList(
+            ////////////
+            // PRE 1.9
+            ////////////
+
             // Weather
             "ambient.weather.thunder",
             // Wither
@@ -56,17 +64,81 @@ public class SoundDistance extends BaseAdapter {
             "mob.enderdragon.growl",
             "mob.enderdragon.hit",
             "mob.enderdragon.end",
-            "game.neutral.die" // Enderdragon 1.8.7 (debug).
+            "game.neutral.die", // Enderdragon 1.8.7 (debug).
+
+            //////////////////
+            // 1.9 AND LATER
+            //////////////////
+            // Weather
+            "ENTITY_LIGHTNING_IMPACT",
+            "ENTITY_LIGHTNING_THUNDER",
+            // Enderdragon
+            "ENTITY_ENDERDRAGON_AMBIENT",
+            "ENTITY_ENDERDRAGON_DEATH",
+            "ENTITY_ENDERDRAGON_FIREBALL_EXPLODE",
+            "ENTITY_ENDERDRAGON_FLAP",
+            "ENTITY_ENDERDRAGON_GROWL",
+            "ENTITY_ENDERDRAGON_HURT",
+            "ENTITY_ENDERDRAGON_SHOOT",
+            // Wither
+            "ENTITY_WITHER_AMBIENT",
+            "ENTITY_WITHER_BREAK_BLOCK",
+            "ENTITY_WITHER_DEATH",
+            "ENTITY_WITHER_HURT",
+            "ENTITY_WITHER_SHOOT",
+            "ENTITY_WITHER_SPAWN"
+
+
             ));
 
     private final Integer idSoundEffectCancel = counters.registerKey("packet.sound.cancel");
     private final NetConfigCache configs;
     private final Location useLoc = new Location(null, 0, 0, 0);
+    /** Legacy check behavior. */
+    private final boolean pre1_9;
 
     public SoundDistance(Plugin plugin) {
         super(plugin, ListenerPriority.LOW, PacketType.Play.Server.NAMED_SOUND_EFFECT);
         this.configs = (NetConfigCache) CheckType.NET.getConfigFactory(); // TODO: DataManager.getConfig(NetConfigCache.class);
         this.checkType = CheckType.NET_SOUNDDISTANCE;
+        pre1_9 = ServerVersion.compareMinecraftVersion("1.9") < 0;
+        inflateEffectNames();
+    }
+
+    /**
+     * Ensure both lower and upper case are contained.
+     */
+    private void inflateEffectNames() {
+        final List<String> names = new ArrayList<String>(effectNames);
+        for (String name : names) {
+            effectNames.add(name.toLowerCase());
+            effectNames.add(name.toUpperCase());
+        }
+    }
+
+    private boolean isSoundMonitoredPre1_9(final PacketContainer packetContainer) {
+        //debug(null, packetContainer.getStrings().read(0));
+        return effectNames.contains(packetContainer.getStrings().read(0));
+    }
+
+    private boolean isSoundMonitoredLatest(final PacketContainer packetContainer) {
+        StructureModifier<Sound> sounds = packetContainer.getSoundEffects();
+        for (final Sound sound : sounds.getValues()) {
+            if (effectNames.contains(sound.name())) {
+                //debug(null, "MONITOR SOUND: " + sound);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSoundMonitored(final PacketContainer packetContainer) {
+        if (pre1_9) {
+            return isSoundMonitoredPre1_9(packetContainer);
+        }
+        else {
+            return isSoundMonitoredLatest(packetContainer);
+        }
     }
 
     @Override
@@ -74,8 +146,7 @@ public class SoundDistance extends BaseAdapter {
         final PacketContainer packetContainer = event.getPacket();
 
         // Compare sound effect name.
-        final String soundName = packetContainer.getStrings().read(0);
-        if (!effectNames.contains(soundName)) {
+        if (!isSoundMonitored(packetContainer)) {
             return;
         }
 
