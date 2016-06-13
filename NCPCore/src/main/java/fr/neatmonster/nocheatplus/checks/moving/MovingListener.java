@@ -540,7 +540,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final long time = System.currentTimeMillis();
         if (player.isSprinting() || cc.assumeSprint) {
             // Hard to confine assumesprint further (some logics change with hdist or sprinting).
-            if (player.getFoodLevel() > 5 || player.isFlying()) {
+            // TODO: Collect all these properties within a context object (abstraction + avoid re-fetching). 
+            if (player.getFoodLevel() > 5 || player.getAllowFlight() || player.isFlying()) {
                 data.timeSprinting = time;
                 data.multSprinting = attributeAccess.getSprintAttributeMultiplier(player);
                 if (data.multSprinting == Double.MAX_VALUE) {
