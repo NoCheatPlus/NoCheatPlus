@@ -361,7 +361,8 @@ public class SurvivalFly extends Check {
         }
         else if (from.isOnClimbable()) {
             // Ladder types.
-            vDistanceAboveLimit = vDistClimbable(player, from, fromOnGround, toOnGround, yDistance, data);
+            vDistanceAboveLimit = vDistClimbable(player, from, to, fromOnGround, toOnGround, 
+                    thisMove, lastMove, yDistance, data);
         }
         else if (thisMove.from.inLiquid) { // && (Math.abs(yDistance) > 0.2 || to.isInLiquid())) {
             // Swimming...
@@ -1648,11 +1649,16 @@ public class SurvivalFly extends Check {
      * @param from
      * @param fromOnGround
      * @param toOnGround
+     * @param lastMove 
+     * @param thisMove 
      * @param yDistance
      * @param data
      * @return vDistanceAboveLimit
      */
-    private double vDistClimbable(final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean toOnGround, final double yDistance, final MovingData data) {
+    private double vDistClimbable(final Player player, final PlayerLocation from, final PlayerLocation to,
+            final boolean fromOnGround, final boolean toOnGround, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
+            final double yDistance, final MovingData data) {
         double vDistanceAboveLimit = 0.0;
         data.sfNoLowJump = true;
 
@@ -1689,6 +1695,14 @@ public class SurvivalFly extends Check {
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance);
                 }
             }
+        }
+        // Do allow friction with velocity.
+        if (vDistanceAboveLimit > 0.0 && data.isVelocityJumpPhase() 
+                && thisMove.yDistance > 0.0 && lastMove.yDistance - Magic.GRAVITY_MAX > thisMove.yDistance) {
+            // TODO: Actual friction or limit by absolute y-distance?
+            // TODO: Looks like it's only a problem when on ground?
+            vDistanceAboveLimit = 0.0;
+            tags.add("velfrict_climb");
         }
         // Do allow vertical velocity.
         // TODO: Looks like less velocity is used here (normal hitting 0.361 of 0.462).
