@@ -39,6 +39,7 @@ _For some building environments you might need to both set the profiles and set 
 | :------------------ | :----------------------------- | :-------------- |
 | `-P ncp_base` | `ncp_base` | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. |
 | `-P all-P ncp_base` | `cbdedicated` and `ncp_base` | All compatibility modules. |
+| `-P spigot1_7_r4 -P ncp_base` | `spigot1_7_r4` and `ncp_base` | Just Spigot 1.7 R4 (MC 1.7.10). |
 | `-P spigot1_8_r3 -P ncp_base` | `spigot1_8_r3` and `ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
 | `-P spigot1_9_r1 -P ncp_base` | `spigot1_9_r1` and `ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
 | `-P spigot1_9_r2 -P ncp_base` | `spigot1_9_r2` and `ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |

@@ -56,6 +56,24 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>spigot1_7_r4</id>
+			<activation>
+				<property>
+					<name>spigot1_7_r4</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<!-- Non minimal below. -->
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb3100</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<!-- Non minimal above. -->
+			</dependencies>
+		</profile>
+		<profile>
 			<id>spigot1_8_r3</id>
 			<activation>
 				<property>
