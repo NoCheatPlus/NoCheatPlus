@@ -56,9 +56,6 @@ public class Magic {
     public static final double modIce                 = 2.5D; // 
     /** Faster moving down stream (water mainly). */
     public static final double modDownStream    = 0.19 / (WALK_SPEED * modSwim);
-    /** Maximal horizontal buffer. It can be higher, but normal resetting should keep this limit. */
-
-    public static final double hBufMax          = 1.0;
 
     /**
      * Somewhat arbitrary horizontal speed gain maximum for advance glide phase.

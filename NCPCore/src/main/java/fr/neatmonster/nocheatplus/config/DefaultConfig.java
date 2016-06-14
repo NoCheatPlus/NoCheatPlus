@@ -431,6 +431,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
         set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true);
         set(ConfPaths.MOVING_SURVIVALFLY_STEPHEIGHT, "default");
+        set(ConfPaths.MOVING_SURVIVALFLY_HBUFMAX, 1.0);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID, true);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1500 log:flylong:0:5:cif cancel cmd:kickfly");

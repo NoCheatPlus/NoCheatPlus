@@ -422,9 +422,9 @@ public class SurvivalFly extends Check {
             }
 
             // Finally check horizontal buffer regain.
-            if (hDistanceAboveLimit < 0.0  && result <= 0.0 && !isSamePos && data.sfHorizontalBuffer < Magic.hBufMax) {
+            if (hDistanceAboveLimit < 0.0  && result <= 0.0 && !isSamePos && data.sfHorizontalBuffer < cc.hBufMax) {
                 // TODO: max min other conditions ?
-                hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data);
+                hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data, cc);
             }
         }
 
@@ -1574,7 +1574,8 @@ public class SurvivalFly extends Check {
      * @param amount Positive amount.
      * @param data
      */
-    private void hBufRegain(final double hDistance, final double amount, final MovingData data) {
+    private void hBufRegain(final double hDistance, final double amount, 
+            final MovingData data, final MovingConfig cc) {
         /*
          * TODO: Consider different concepts: 
          * 			- full resetting with harder conditions.
@@ -1582,7 +1583,7 @@ public class SurvivalFly extends Check {
          * 			- reset or regain only every x blocks h distance.
          */
         // TODO: Confine general conditions for buffer regain further (regain in air, whatever)?
-        data.sfHorizontalBuffer = Math.min(Magic.hBufMax, data.sfHorizontalBuffer + amount);
+        data.sfHorizontalBuffer = Math.min(cc.hBufMax, data.sfHorizontalBuffer + amount);
     }
 
     /**
