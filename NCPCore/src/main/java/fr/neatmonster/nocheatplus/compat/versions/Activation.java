@@ -24,6 +24,21 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 public class Activation implements IDescriptiveActivation {
 
     /**
+     * Try to find delimiters on the right side.
+     * 
+     * @param version
+     *            Lower case expected.
+     * @return null on failures.
+     */
+    private static final String rightSideDelimiters(final String version) {
+        String pV = GenericVersion.parseVersionDelimiters(version, "", "-snapshot");
+        if (pV == null) {
+            pV = GenericVersion.parseVersionDelimiters(version, "", "-b");
+        }
+        return pV;
+    }
+
+    /**
      * This attempt to transform/parse the plugin version such that the result
      * can be used for comparison with a server version. The plugin is fetched
      * for convenience.
@@ -34,13 +49,13 @@ public class Activation implements IDescriptiveActivation {
     public static String guessUsablePluginVersion(String pluginName) {
         final Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin(pluginName);
         final String version = plugin.getDescription().getVersion().toLowerCase();
+        // Assume ordinary start.
         String pV = GenericVersion.collectVersion(version, 0);
+        // Right hand side delimiters.
         if (pV == null) {
-            pV = GenericVersion.parseVersionDelimiters(version, "", "-snapshot");
+            pV = rightSideDelimiters(version);
         }
-        if (pV == null) {
-            pV = GenericVersion.parseVersionDelimiters(version, "", "-b");
-        }
+        // Try skipping initial characters like in "v1.0".
         if (pV == null) {
             int i = 0;
             while (i < version.length() && !Character.isDigit(version.charAt(i))) {
@@ -48,8 +63,9 @@ public class Activation implements IDescriptiveActivation {
             }
             if (i < version.length()) {
                 pV = GenericVersion.collectVersion(version, i);
+                // Right hand side delimiters.
                 if (pV == null) {
-                    // TODO: Consider find something in the end as delimiter.
+                    pV = rightSideDelimiters(version.substring(i));
                 }
             }
         }
