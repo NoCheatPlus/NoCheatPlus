@@ -100,7 +100,7 @@ public class NetData extends ACheckData {
     }
 
     /**
-     * Add a packet to the queue.
+     * Add a packet to the queue (under lock).
      * 
      * @param packetData
      * @return If a packet has been removed due to exceeding maximum size.
@@ -118,7 +118,7 @@ public class NetData extends ACheckData {
     }
 
     /**
-     * Clear the flying packet queue.
+     * Clear the flying packet queue (under lock).
      */
     public void clearFlyingQueue() {
         lock.lock();
@@ -126,11 +126,28 @@ public class NetData extends ACheckData {
         lock.unlock();
     }
 
+    /**
+     * Copy the entire flying queue (under lock).
+     * 
+     * @return
+     */
     public DataPacketFlying[] copyFlyingQueue() {
         lock.lock();
         final DataPacketFlying[] out = flyingQueue.toArray(new DataPacketFlying[flyingQueue.size()]);
         lock.unlock();
         return out;
+    }
+
+    /**
+     * Fetch the latest packet (under lock).
+     * 
+     * @return
+     */
+    public DataPacketFlying peekFlyingQueue() {
+        lock.lock();
+        final DataPacketFlying latest = flyingQueue.isEmpty() ? null : flyingQueue.getFirst();
+        lock.unlock();
+        return latest;
     }
 
     /**
