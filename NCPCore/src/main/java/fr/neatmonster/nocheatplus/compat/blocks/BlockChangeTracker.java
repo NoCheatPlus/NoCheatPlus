@@ -306,8 +306,10 @@ public class BlockChangeTracker {
     /** Change id/count, increasing with each entry added internally. */
     private long maxChangeId = 0;
 
-    private int expirationAgeTicks = 80; // TODO: Configurable.
-    private int worldNodeSkipSize = 500; // TODO: Configurable.
+    /** Global maximum age for entries, in ticks. */
+    private int expirationAgeTicks = 80;
+    /** Size at which entries get skipped, per world node. */
+    private int worldNodeSkipSize = 500;
 
     /**
      * Store the WorldNode instances by UUID, containing the block change
@@ -554,6 +556,22 @@ public class BlockChangeTracker {
             size += worldNode.size;
         }
         return size;
+    }
+
+    public int getExpirationAgeTicks() {
+        return expirationAgeTicks;
+    }
+
+    public void setExpirationAgeTicks(int expirationAgeTicks) {
+        this.expirationAgeTicks = expirationAgeTicks;
+    }
+
+    public int getWorldNodeSkipSize() {
+        return worldNodeSkipSize;
+    }
+
+    public void setWorldNodeSkipSize(int worldNodeSkipSize) {
+        this.worldNodeSkipSize = worldNodeSkipSize;
     }
 
 }

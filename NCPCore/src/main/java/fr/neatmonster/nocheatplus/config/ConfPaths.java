@@ -42,6 +42,7 @@ public abstract class ConfPaths {
     public static final String SUB_MODEL                                 = "model";
     public static final String SUB_MODIFIERS                             = "modifiers";
     public static final String SUB_MODSPRINT                             = "modsprint";
+    /** No trailing dot! */
     public static final String SUB_OVERRIDEFLAGS                         = "overrideflags";
     public static final String SUB_SPEED                                 = "speed";
     public static final String SUB_VERTICAL                              = "vertical";
@@ -739,10 +740,13 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_SERVER_CBREFLECT            = COMPATIBILITY_SERVER + "cbreflect.";
     public static final String COMPATIBILITY_SERVER_CBREFLECT_ENABLE     = COMPATIBILITY_SERVER_CBREFLECT + "enable";
 
-    public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
-    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER        = COMPATIBILITY_BLOCKS + "changetracker.";
-    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE = COMPATIBILITY_BLOCKS_CHANGETRACKER + "active";
-    public static final String COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS= COMPATIBILITY_BLOCKS_CHANGETRACKER + "pistons";
+    public static final  String COMPATIBILITY_BLOCKS                            = COMPATIBILITY + "blocks.";
+    public static final  String COMPATIBILITY_BLOCKS_CHANGETRACKER              = COMPATIBILITY_BLOCKS + "changetracker.";
+    public static final  String COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE       = COMPATIBILITY_BLOCKS_CHANGETRACKER + "active";
+    public static final  String COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS      = COMPATIBILITY_BLOCKS_CHANGETRACKER + "pistons";
+    public static final  String COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS  = COMPATIBILITY_BLOCKS_CHANGETRACKER + "maxageticks";
+    private static final String COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD     = COMPATIBILITY_BLOCKS_CHANGETRACKER + "perworld.";
+    public static final  String COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD_MAXENTRIES = COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD + "maxentries";
 
     // Moved paths.
     @Moved(newPath = LOGGING_BACKEND_CONSOLE_ACTIVE)

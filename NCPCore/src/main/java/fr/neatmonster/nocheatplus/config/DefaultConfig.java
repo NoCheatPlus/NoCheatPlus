@@ -603,6 +603,8 @@ public class DefaultConfig extends ConfigFile {
         }
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, false); // TODO: Activate once it really works?
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true);
+        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS, 80);
+        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD_MAXENTRIES, 1000);
 
         //        // Update internal factory based on all the new entries to the "actions" section.
         //        setActionFactory();

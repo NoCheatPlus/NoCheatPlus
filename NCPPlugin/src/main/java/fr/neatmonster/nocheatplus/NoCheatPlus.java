@@ -1121,6 +1121,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     private void updateBlockChangeTracker(final ConfigFile config) {
+        // Activation / listener.
         if (config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) 
                 && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS)) {
             if (blockChangeListener == null) {
@@ -1133,6 +1134,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             blockChangeListener.setEnabled(false);
             blockChangeTracker.clear();
         }
+        // Configuration.
+        blockChangeTracker.setExpirationAgeTicks(config.getInt(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS));
+        blockChangeTracker.setWorldNodeSkipSize(config.getInt(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD_MAXENTRIES));
     }
 
     @Override
