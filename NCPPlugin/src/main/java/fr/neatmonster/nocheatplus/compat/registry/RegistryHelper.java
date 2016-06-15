@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat;
+package fr.neatmonster.nocheatplus.compat.registry;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.logging.Streams;

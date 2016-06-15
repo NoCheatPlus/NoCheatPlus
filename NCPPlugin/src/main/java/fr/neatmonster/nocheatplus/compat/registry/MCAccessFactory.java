@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.compat;
+package fr.neatmonster.nocheatplus.compat.registry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;

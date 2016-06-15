@@ -1,5 +1,6 @@
-package fr.neatmonster.nocheatplus.compat;
+package fr.neatmonster.nocheatplus.compat.registry;
 
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.bukkit.BukkitAttributeAccess;
 import fr.neatmonster.nocheatplus.components.modifiers.DummyAttributeAccess;
 import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
