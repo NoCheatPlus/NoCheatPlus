@@ -594,7 +594,13 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_SERVER_CBDEDICATED_ENABLE, true);
         set(ConfPaths.COMPATIBILITY_SERVER_CBREFLECT_ENABLE, true);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
-        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + ".snow", "default");
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + Material.SNOW.name().toLowerCase(), "default");
+        // Make blocks ign_passable+ground_height.
+        for (final Material mat : Arrays.asList(
+                Material.PISTON_MOVING_PIECE
+                )) {
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + mat.name().toLowerCase(), "default+ign_passable+ground_height");
+        }
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, false); // TODO: Activate once it really works?
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true);
 
