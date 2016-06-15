@@ -12,29 +12,18 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
-
-import org.bukkit.entity.Player;
-
-import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * A factory for creating and accessing data.
- * 
- * @author asofold
+ * Can be registered with the TickTask. Ensure that registered objects get unregistered before the plugin gets enabled again. You can ensure it by using NoCheatPlusAPI to register a TickListener. 
+ * @author mc_dev
+ *
  */
-public interface CheckDataFactory extends IRemoveData{
-
-    /**
-     * Gets the data of the specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the data
-     */
-    public ICheckData getData(final Player player);
-    
-    @Override
-    public ICheckData removeData(final String playerName);
-
+public interface TickListener {
+	/**
+	 * 
+	 * @param tick Current tick count. This might start over at 0 if reset in onEnable.
+	 * @param timeLast Last time after processing loop. Allows to check how long the tick already took (roughly). No "system time ran backwards" check for this value.
+	 */
+	public void onTick(int tick, long timeLast);
 }

@@ -12,26 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
-
-import org.bukkit.entity.Player;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * Convenient player-specific debug messages with standard format.
+ * Register this instance as generic instance (for the class of this instance).
  * 
  * @author asofold
  *
  */
-public interface IDebugPlayer {
-
-    /**
-     * Output a message for a player with the standard format (see
-     * CheckUtils.debug(Player, CheckType, String).
-     * 
-     * @param player
-     *            May be null.
-     * @param message
-     */
-    public void debug(Player player, String message);
-
+public interface IRegisterAsGenericInstance {
 }

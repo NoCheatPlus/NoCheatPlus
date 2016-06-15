@@ -19,22 +19,35 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
+import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
+import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 
 
 
 /**
- * ComponentRegistry: 
- * <li>Supported components: Listener, TickListener, PermStateReceiver, INotifyReload, INeedConfig, IRemoveData, MCAccessHolder, ConsistencyChecker, JoinLeaveListener, DisableListener</li>
- * <li>ComponentRegistry instances will be registered as sub registries unless you use the addComponent(Object, boolean) method appropriately. </li>
- * <li>IHoldSubComponents instances will be registered in the next tick (scheduled task), those added within onEnable will get registered after looping in onEnable.</li>
+ * ComponentRegistry:
+ * <li>Supported components: Listener, TickListener, PermStateReceiver,
+ * INotifyReload, INeedConfig, IRemoveData, MCAccessHolder, ConsistencyChecker,
+ * JoinLeaveListener, DisableListener</li>
+ * <li>ComponentRegistry instances will be registered as sub registries unless
+ * you use the addComponent(Object, boolean) method appropriately.</li>
+ * <li>IHoldSubComponents instances will be registered in the next tick
+ * (scheduled task), those added within onEnable will get registered after
+ * looping in onEnable.</li>
  * <li>JoinLeaveListeners are called on EventPriority.LOW.</li>
- * <li>Registering components should be done during onEnable or any time while the plugin is enabled, all components will be unregistered in onDisable.</li>
- * <li>References to all components will be held until onDisable is finished.</li> 
- * <li>Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)</li>
+ * <li>Registering components should be done during onEnable or any time while
+ * the plugin is enabled, all components will be unregistered in onDisable.</li>
+ * <li>References to all components will be held until onDisable is
+ * finished.</li>
+ * <li>Interfaces checked for managed listeners: IHaveMethodOrder (method),
+ * ComponentWithName (tag)</li>
  * <hr>
  * Not sure about all the login-denial API, some of those might get removed.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
 public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegistryProvider, GenericInstanceRegistry, MCAccessHolder {

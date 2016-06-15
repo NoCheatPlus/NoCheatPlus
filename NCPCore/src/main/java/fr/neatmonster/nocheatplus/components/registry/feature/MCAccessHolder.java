@@ -12,19 +12,26 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
-
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 
 /**
- * Receive permission changes for certain permissions.
+ * MCAccessHolder will be updated automatically with the current MCAccess.
+ * <br>How to name this...
  * @author mc_dev
  *
  */
-public interface PermStateReceiver extends PermStateHolder{
+public interface MCAccessHolder {
+	/**
+	 * Set access.
+	 * @param mcAccess
+	 */
+	public void setMCAccess(MCAccess mcAccess);
 	
-	public void setPermission(String player, String permission, boolean state);
-	
-	public void removePlayer(String player);
-	
+	/**
+	 * Getter.
+	 * @return
+	 */
+	public MCAccess getMCAccess();
 }

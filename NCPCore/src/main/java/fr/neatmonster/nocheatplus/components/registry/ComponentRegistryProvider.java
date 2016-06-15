@@ -12,13 +12,23 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
+package fr.neatmonster.nocheatplus.components.registry;
+
+import java.util.Collection;
 
 /**
- * Some (player-related) data is held here.
+ * An object allowing to get ComponentRegistry implementations of a specific type.
+ * This class is not specialized to maintain flexibility.
  * @author mc_dev
  *
  */
-public interface IData {
-
+public interface ComponentRegistryProvider{
+	
+	/**
+	 * Get all available specialized ComponentFactory instances matching the given signature. This is not meant as a factory method but for more efficient registration for the case of the regestry being present. 
+	 * @param clazz
+	 * @return Some collection, empty collection in case no matches are found.
+	 */
+	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(Class<ComponentRegistry<T>> clazz);
+	
 }

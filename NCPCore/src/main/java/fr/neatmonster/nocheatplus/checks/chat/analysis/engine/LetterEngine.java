@@ -32,10 +32,10 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.Similar
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes.WordPrefixesSettings;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
-import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
-import fr.neatmonster.nocheatplus.components.IData;
-import fr.neatmonster.nocheatplus.components.IHaveCheckType;
-import fr.neatmonster.nocheatplus.components.IRemoveData;
+import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
+import fr.neatmonster.nocheatplus.components.registry.feature.IData;
+import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
+import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.logging.StaticLog;

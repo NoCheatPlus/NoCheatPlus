@@ -27,7 +27,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.components.ComponentWithName;
+import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry.MethodOrder;
 import fr.neatmonster.nocheatplus.logging.StaticLog;

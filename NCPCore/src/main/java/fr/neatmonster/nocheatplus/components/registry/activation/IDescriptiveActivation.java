@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.components.registry;
+package fr.neatmonster.nocheatplus.components.registry.activation;
 
 /**
  * An activation checker with description (can be checked for activation

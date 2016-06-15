@@ -26,8 +26,8 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.components.IRegisterAsGenericInstance;
-import fr.neatmonster.nocheatplus.components.MCAccessHolder;
+import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGenericInstance;
+import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 
 /**
  * Non-static utility, (to be) registered as generic instance.

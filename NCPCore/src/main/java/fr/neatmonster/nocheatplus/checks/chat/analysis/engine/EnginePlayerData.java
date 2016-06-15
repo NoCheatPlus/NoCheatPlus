@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWor
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.SimilarWordsBKL;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
-import fr.neatmonster.nocheatplus.components.IData;
+import fr.neatmonster.nocheatplus.components.registry.feature.IData;
 
 /**
  * Engine specific player data.

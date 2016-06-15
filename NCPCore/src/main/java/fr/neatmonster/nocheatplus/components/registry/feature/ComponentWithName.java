@@ -12,22 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components.order;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * Priority for order during setup/initialization of something.
+ * Interface for components that can be registered with a name.
  * @author mc_dev
  *
  */
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SetupOrder {
-	public int priority() default 0;
+public interface ComponentWithName {
+	public String getComponentName();
 }

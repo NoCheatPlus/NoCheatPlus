@@ -12,20 +12,21 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
 
 /**
- * Registers with default name "NoCheatPlus_Listener".
+ * This component might be called periodically. Might not be called ever.
  * @author mc_dev
  *
  */
-public abstract class NCPListener implements Listener, ComponentWithName {
-
-	@Override
-	public String getComponentName() {
-		return "NoCheatPlus_Listener";
-	}
-
+public interface ConsistencyChecker {
+	/**
+	 * Perform consistency checking. Depending on configuration this should clean up inconsistent states and/or log problems.
+	 * @param onlinePlayers Players as returned by Server.getOnlinePlayers, at the point of time before checking.
+	 */
+	public void checkConsistency(Player[] onlinePlayers);
+	
+	// TODO: Might add method to check consistency for single players (on join, on certain check failures).
 }

@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.compat.spigotcb1_8_R1;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.components.modifiers.IAttributeAccess;
+import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import net.minecraft.server.v1_8_R1.AttributeInstance;

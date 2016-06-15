@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.components.modifiers;
+package fr.neatmonster.nocheatplus.components.modifier;
 
 import org.bukkit.entity.Player;
 

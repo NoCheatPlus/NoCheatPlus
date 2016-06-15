@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.components.registry;
+package fr.neatmonster.nocheatplus.components.registry.activation;
 
 /**
  * The consumer side of testing for feature activation.

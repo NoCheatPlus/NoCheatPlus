@@ -12,21 +12,18 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
-
-import org.bukkit.entity.Player;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * This component might be called periodically. Might not be called ever.
+ * Interface for a component that needs to be notified about a reload. Use the annotation SetupOrder to influence when to get executed.
+ * <hr>
+ * Priorities used by NCP with SetupOrder:
+ * <li>Core: -100</li>
+ * <li>DataManager: -80</li>
+ * <li>Rest (checks): 0</li>
  * @author mc_dev
  *
  */
-public interface ConsistencyChecker {
-	/**
-	 * Perform consistency checking. Depending on configuration this should clean up inconsistent states and/or log problems.
-	 * @param onlinePlayers Players as returned by Server.getOnlinePlayers, at the point of time before checking.
-	 */
-	public void checkConsistency(Player[] onlinePlayers);
-	
-	// TODO: Might add method to check consistency for single players (on join, on certain check failures).
+public interface INotifyReload {
+	public void onReload();
 }

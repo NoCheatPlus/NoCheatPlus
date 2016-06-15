@@ -12,29 +12,26 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
-
 /**
- * A factory for creating and accessing data.
- * 
- * @author asofold
+ * Receive calls for players joining and leaving (quit/kick).
+ * @author mc_dev
+ *
  */
-public interface CheckDataFactory extends IRemoveData{
-
-    /**
-     * Gets the data of the specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the data
-     */
-    public ICheckData getData(final Player player);
-    
-    @Override
-    public ICheckData removeData(final String playerName);
-
+public interface JoinLeaveListener {
+	
+	/**
+	 * Called on join (priority level: low).
+	 * @param player
+	 */
+	public void playerJoins(final Player player);
+	
+	/**
+	 * Called both on quit/kick (priority level: monitor). Might get called twice on some server implementations.
+	 * @param player
+	 */
+	public void playerLeaves(final Player player);
 }

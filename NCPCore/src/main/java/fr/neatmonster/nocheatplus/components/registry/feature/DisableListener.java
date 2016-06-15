@@ -12,23 +12,16 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
-
-import java.util.Collection;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * An object allowing to get ComponentRegistry implementations of a specific type.
- * This class is not specialized to maintain flexibility.
+ * Component to listen to plugin/onDisable.
  * @author mc_dev
  *
  */
-public interface ComponentRegistryProvider{
-	
+public interface DisableListener {
 	/**
-	 * Get all available specialized ComponentFactory instances matching the given signature. This is not meant as a factory method but for more efficient registration for the case of the regestry being present. 
-	 * @param clazz
-	 * @return Some collection, empty collection in case no matches are found.
+	 * Called in the plugin in onDisable, before unregistration of all components.
 	 */
-	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(Class<ComponentRegistry<T>> clazz);
-	
+	public void onDisable();
 }

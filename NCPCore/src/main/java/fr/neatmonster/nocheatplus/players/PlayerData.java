@@ -17,7 +17,7 @@ package fr.neatmonster.nocheatplus.players;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.neatmonster.nocheatplus.components.IData;
+import fr.neatmonster.nocheatplus.components.registry.feature.IData;
 
 /**
  * Central player data object.

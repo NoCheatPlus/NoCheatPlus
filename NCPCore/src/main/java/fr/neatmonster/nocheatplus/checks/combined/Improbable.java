@@ -20,7 +20,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.components.DisableListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**

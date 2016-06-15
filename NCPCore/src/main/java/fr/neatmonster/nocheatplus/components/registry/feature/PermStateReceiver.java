@@ -12,13 +12,19 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
+package fr.neatmonster.nocheatplus.components.registry.feature;
+
 
 
 /**
- * Indicate that a component needs config after time of creation but in onEnable.
+ * Receive permission changes for certain permissions.
  * @author mc_dev
  *
  */
-public interface INeedConfig extends INotifyReload{
+public interface PermStateReceiver extends PermStateHolder{
+	
+	public void setPermission(String player, String permission, boolean state);
+	
+	public void removePlayer(String player);
+	
 }

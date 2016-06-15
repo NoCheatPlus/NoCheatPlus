@@ -23,10 +23,10 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.components.IDebugPlayer;
-import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
-import fr.neatmonster.nocheatplus.components.MCAccessHolder;
-import fr.neatmonster.nocheatplus.components.NCPListener;
+import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
+import fr.neatmonster.nocheatplus.components.registry.feature.IHoldSubComponents;
+import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
+import fr.neatmonster.nocheatplus.components.registry.feature.NCPListener;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**

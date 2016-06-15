@@ -12,15 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /**
- * Interface to indicate a component is associated with a CheckType.
+ * Indicate that a component needs config after time of creation but in onEnable.
  * @author mc_dev
  *
  */
-public interface IHaveCheckType {
-	public CheckType getCheckType();
+public interface INeedConfig extends INotifyReload{
 }

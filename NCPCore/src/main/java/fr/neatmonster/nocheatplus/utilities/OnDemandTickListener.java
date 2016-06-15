@@ -14,7 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities;
 
-import fr.neatmonster.nocheatplus.components.TickListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 
 /**
  * Auxiliary class for easier short term adding of TickListener. Override delegateTick.<br>

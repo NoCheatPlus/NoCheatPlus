@@ -6,8 +6,8 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.components.registry.IActivation;
-import fr.neatmonster.nocheatplus.components.registry.IDescriptiveActivation;
+import fr.neatmonster.nocheatplus.components.registry.activation.IActivation;
+import fr.neatmonster.nocheatplus.components.registry.activation.IDescriptiveActivation;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**

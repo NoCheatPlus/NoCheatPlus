@@ -48,7 +48,7 @@ import fr.neatmonster.nocheatplus.command.admin.notify.NotifyCommand;
 import fr.neatmonster.nocheatplus.command.admin.reset.ResetCommand;
 import fr.neatmonster.nocheatplus.command.admin.top.TopCommand;
 import fr.neatmonster.nocheatplus.command.testing.stopwatch.StopWatchCommand;
-import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;

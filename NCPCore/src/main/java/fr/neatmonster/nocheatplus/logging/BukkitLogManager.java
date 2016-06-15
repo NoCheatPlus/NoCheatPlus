@@ -21,8 +21,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.components.INotifyReload;
-import fr.neatmonster.nocheatplus.components.order.SetupOrder;
+import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
+import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;

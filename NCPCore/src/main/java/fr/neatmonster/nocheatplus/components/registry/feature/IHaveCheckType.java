@@ -12,29 +12,15 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
-import org.bukkit.entity.Player;
-
-import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /**
- * A factory for creating and accessing data.
- * 
- * @author asofold
+ * Interface to indicate a component is associated with a CheckType.
+ * @author mc_dev
+ *
  */
-public interface CheckDataFactory extends IRemoveData{
-
-    /**
-     * Gets the data of the specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the data
-     */
-    public ICheckData getData(final Player player);
-    
-    @Override
-    public ICheckData removeData(final String playerName);
-
+public interface IHaveCheckType {
+	public CheckType getCheckType();
 }

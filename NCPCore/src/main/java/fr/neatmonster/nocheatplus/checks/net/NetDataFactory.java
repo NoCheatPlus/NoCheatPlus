@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.components.ICanHandleTimeRunningBackwards;
+import fr.neatmonster.nocheatplus.components.registry.feature.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**

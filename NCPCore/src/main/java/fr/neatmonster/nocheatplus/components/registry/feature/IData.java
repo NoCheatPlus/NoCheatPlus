@@ -12,26 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components;
-
-import org.bukkit.entity.Player;
+package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * Receive calls for players joining and leaving (quit/kick).
+ * Some (player-related) data is held here.
  * @author mc_dev
  *
  */
-public interface JoinLeaveListener {
-	
-	/**
-	 * Called on join (priority level: low).
-	 * @param player
-	 */
-	public void playerJoins(final Player player);
-	
-	/**
-	 * Called both on quit/kick (priority level: monitor). Might get called twice on some server implementations.
-	 * @param player
-	 */
-	public void playerLeaves(final Player player);
+public interface IData {
+
 }
