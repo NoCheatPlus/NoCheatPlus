@@ -48,11 +48,6 @@
 					<artifactId>ncpcompatprotocollib</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatglowstone</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
 			</dependencies>
 		</profile>
 		<profile>

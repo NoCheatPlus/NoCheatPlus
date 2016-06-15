@@ -31,7 +31,6 @@
 				<module>NCPCore</module>
 				<module>NCPCompatBukkit</module>
 				<module>NCPCompatProtocolLib</module>
-				<module>NCPCompatGlowstone</module>
 				<module>NCPPlugin</module>
 				<module>NoCheatPlus</module>
 			</modules>

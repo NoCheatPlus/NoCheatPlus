@@ -23,7 +23,6 @@ import org.bukkit.Bukkit;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect;
-import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -65,13 +64,6 @@ public class MCAccessFactory {
             catch (Throwable t) {
                 throwables.add(t);
             }
-        }
-
-        // Glowstone.
-        try {
-            return new MCAccessGlowstone();
-        } catch(Throwable t) {
-            throwables.add(t);
         }
 
         // Try to set up api-only access (since 1.4.6).
