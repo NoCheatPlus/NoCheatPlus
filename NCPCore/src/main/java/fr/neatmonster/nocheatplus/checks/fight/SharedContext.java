@@ -15,13 +15,20 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
 public class SharedContext {
     public final double damagedHeight;
-    
-    public SharedContext(Entity damaged, MCAccess mcAccess) {
-        this.damagedHeight = mcAccess.getHeight(damaged);
+
+    public SharedContext(Entity damaged, boolean damagedIsFake, MCAccess mcAccess) {
+        if (damagedIsFake) {
+            // Assume something lenient then.
+            damagedHeight = damaged instanceof LivingEntity ? ((LivingEntity) damaged).getEyeHeight() : 1.75;
+        }
+        else {
+            this.damagedHeight = mcAccess.getHeight(damaged);
+        }
     }
 }

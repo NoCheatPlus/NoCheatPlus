@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -43,11 +44,11 @@ public class GodMode extends Check {
      * @param damage
      * @return
      */
-    public boolean check(final Player player, final double damage, final FightData data){
+    public boolean check(final Player player, final boolean playerIsFake, final double damage, final FightData data){
         final int tick = TickTask.getTick();
 
         final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
-        final int invulnerabilityTicks = mcAccess.getInvulnerableTicks(player);
+        final int invulnerabilityTicks = playerIsFake ? 0 : mcAccess.getInvulnerableTicks(player);
 
         // TODO: cleanup this leugique beume...
 
@@ -193,7 +194,8 @@ public class GodMode extends Check {
     public void death(final Player player) {
         // TODO: Is this still relevant ?
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
-        if (BridgeHealth.getHealth(player) <= 0.0 && player.isDead()) {
+        if (BridgeHealth.getHealth(player) <= 0.0 && player.isDead()
+                && NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IBridgeCrossPlugin.class).isNativeEntity(player)) {
             try {
                 // Schedule a task to be executed in roughly 1.5 seconds.
                 // TODO: Get plugin otherwise !?

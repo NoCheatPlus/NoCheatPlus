@@ -54,6 +54,7 @@ import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -109,6 +110,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
 
+    // Assume it to stay the same all time.
+    private final IBridgeCrossPlugin crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IBridgeCrossPlugin.class);
+
     public FightListener() {
         super(CheckType.FIGHT);
     }
@@ -119,18 +123,22 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
 
     /**
-     * A player attacked something with DamageCause ENTITY_ATTACK. That's most
-     * likely what we want to really check.
+     * A player attacked something with DamageCause ENTITY_ATTACK.
      * 
      * @param player
+     *            The attacking player.
      * @param damaged
-     * @param originalDamage Damage before applying modifiers.
-     * @param finalDamage Damage after applying modifiers.
+     * @param originalDamage
+     *            Damage before applying modifiers.
+     * @param finalDamage
+     *            Damage after applying modifiers.
      * @param tick
      * @param data
      * @return
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged, final double originalDamage, final double finalDamage, final int tick, final FightData data) {
+    private boolean handleNormalDamage(final Player player, final boolean attackerIsFake,
+            final Entity damaged, final boolean damagedIsFake,
+            final double originalDamage, final double finalDamage, final int tick, final FightData data) {
         final FightConfig cc = FightConfig.getConfig(player);
 
         // Hotfix attempt for enchanted books.
@@ -295,15 +303,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (reachEnabled || directionEnabled) {
                 if (damagedTrace != null) {
                     // Checks that use the LocationTrace instance of the attacked entity/player.
-                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
+                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedIsFake, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
                 }
                 else {
                     // Still use the classic methods for non-players. maybe[]
-                    if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
+                    if (reachEnabled && reach.check(player, loc, damaged, damagedIsFake, damagedLoc, data, cc)) {
                         cancelled = true;
                     }
 
-                    if (directionEnabled && direction.check(player, loc, damaged, damagedLoc, data, cc)) {
+                    if (directionEnabled && direction.check(player, loc, damaged, damagedIsFake, damagedLoc, data, cc)) {
                         cancelled = true;
                     }
                 }
@@ -399,16 +407,18 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param directionEnabled
      * @return If to cancel (true) or not (false).
      */
-    private boolean locationTraceChecks(final Player player, final Location loc, final FightData data, final FightConfig cc, 
-            final Entity damaged, final Location damagedLoc, LocationTrace damagedTrace, 
+    private boolean locationTraceChecks(final Player player, final Location loc, 
+            final FightData data, final FightConfig cc, 
+            final Entity damaged, final boolean damagedIsFake,
+            final Location damagedLoc, LocationTrace damagedTrace, 
             final long tick, final long now,  final boolean reachEnabled, final boolean directionEnabled) {
         // TODO: Order / splitting off generic stuff.
         boolean cancelled = false;
 
         // (Might pass generic context to factories, for shared + heavy properties.)
-        final SharedContext sharedContext = new SharedContext(damaged, mcAccess);
+        final SharedContext sharedContext = new SharedContext(damaged, damagedIsFake, mcAccess);
         final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
-        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
+        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedIsFake, damagedLoc, data, cc, sharedContext) : null;
 
         final long traceOldest = tick - cc.loopMaxLatencyTicks; // TODO: Set by latency-window.
         // TODO: Iterating direction, which, static/dynamic choice.
@@ -484,9 +494,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Player damagedPlayer = damaged instanceof Player ? (Player) damaged : null;
         final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
         final boolean damagedIsDead = damaged.isDead();
+        final boolean damagedIsFake = !crossPlugin.isNativeEntity(damaged);
         if (damagedPlayer != null && !damagedIsDead) {
             // God mode check.
-            if (godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, BridgeHealth.getDamage(event), damagedData)) {
+            // (Do not test the savage.)
+            if (godMode.isEnabled(damagedPlayer)
+                    && godMode.check(damagedPlayer, damagedIsFake, BridgeHealth.getDamage(event), damagedData)) {
                 // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
                 damagedPlayer.setNoDamageTicks(0);
             }
@@ -508,7 +521,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         // Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
-            onEntityDamageByEntity(damaged, damagedPlayer, damagedIsDead, damagedData, (EntityDamageByEntityEvent) event);
+            onEntityDamageByEntity(damaged, damagedPlayer, damagedIsDead, damagedIsFake, 
+                    damagedData, (EntityDamageByEntityEvent) event);
         }
     }
 
@@ -522,7 +536,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param event
      */
     private void onEntityDamageByEntity(final Entity damaged, final Player damagedPlayer, 
-            final boolean damagedIsDead, final FightData damagedData, final EntityDamageByEntityEvent event) {
+            final boolean damagedIsDead, final boolean damagedIsFake, 
+            final FightData damagedData, final EntityDamageByEntityEvent event) {
         final Entity damager = event.getDamager();
         final int tick = TickTask.getTick();
         if (damagedPlayer != null && !damagedIsDead) {
@@ -556,6 +571,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (attackerData.debug) {
                 // TODO: Pass result to further checks for reference?
                 // TODO: attackerData.debug flag.
+                // TODO: Fake players likely have unused velocity, just clear unused?
                 UnusedVelocity.checkUnusedVelocity(attacker, CheckType.FIGHT);
             }
             // Workaround for subsequent melee damage eventsfor explosions. TODO: Legacy or not, need a KB.
@@ -577,7 +593,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     attackerData.lastExplosionDamageTick = -1;
                     attackerData.lastExplosionEntityId = Integer.MAX_VALUE;
                 }
-                else if (handleNormalDamage(player, damaged, 
+                else if (handleNormalDamage(player, !crossPlugin.isNativePlayer(player),
+                        damaged, damagedIsFake,
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
                         tick, attackerData)) {
                     event.setCancelled(true);

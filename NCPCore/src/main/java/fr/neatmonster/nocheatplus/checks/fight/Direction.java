@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -45,20 +46,22 @@ public class Direction extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location loc, final Entity damaged, final Location dLoc, final FightData data, final FightConfig cc) {
+    public boolean check(final Player player, final Location loc, 
+            final Entity damaged, final boolean damagedIsFake, final Location dLoc, 
+            final FightData data, final FightConfig cc) {
         boolean cancel = false;
 
         // Safeguard, if entity is complex, this check will fail due to giant and hard to define hitboxes.
         //        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
-        if (mcAccess.isComplexPart(damaged)) {
+        if (!damagedIsFake && mcAccess.isComplexPart(damaged)) {
             return false;
         }
 
         // Find out how wide the entity is.
-        final double width = mcAccess.getWidth(damaged);
+        final double width = damagedIsFake ? 0.6 : mcAccess.getWidth(damaged);
 
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
-        final double height = mcAccess.getHeight(damaged);
+        final double height = damagedIsFake ? (damaged instanceof LivingEntity ? ((LivingEntity) damaged).getEyeHeight() : 1.75) : mcAccess.getHeight(damaged);
 
         // TODO: allow any hit on the y axis (might just adapt interface to use foot position + height)!
 
@@ -109,11 +112,20 @@ public class Direction extends Check {
      * @param cc
      * @return
      */
-    public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc, final SharedContext sharedContext) {
+    public DirectionContext getContext(final Player player, final Location loc, 
+            final Entity damaged, final boolean damagedIsFake, final Location damagedLoc, 
+            final FightData data, final FightConfig cc, final SharedContext sharedContext) {
         final DirectionContext context = new DirectionContext();
-        context.damagedComplex = mcAccess.isComplexPart(damaged);
         // Find out how wide the entity is.
-        context.damagedWidth = mcAccess.getWidth(damaged);
+        if (damagedIsFake) {
+            // Assume player / default.
+            context.damagedComplex = false; // Later prefer bukkit based provider.
+            context.damagedWidth = 0.6;
+        }
+        else {
+            context.damagedComplex = mcAccess.isComplexPart(damaged);
+            context.damagedWidth = mcAccess.getWidth(damaged);
+        }
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
         context.damagedHeight = sharedContext.damagedHeight;
         context.direction = loc.getDirection();

@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Giant;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -67,7 +68,9 @@ public class Reach extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location pLoc, final Entity damaged, final Location dRef, final FightData data, final FightConfig cc) {
+    public boolean check(final Player player, final Location pLoc, 
+            final Entity damaged, final boolean damagedIsFake, final Location dRef, 
+            final FightData data, final FightConfig cc) {
         boolean cancel = false;
 
         // The maximum distance allowed to interact with an entity in survival mode.
@@ -80,7 +83,7 @@ public class Reach extends Check {
         final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE + getDistMod(damaged);
         final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
 
-        final double height = mcAccess.getHeight(damaged);
+        final double height = damagedIsFake ? (damaged instanceof LivingEntity ? ((LivingEntity) damaged).getEyeHeight() : 1.75) : mcAccess.getHeight(damaged);
 
         // Refine y position.
         // TODO: Make a little more accurate by counting in the actual bounding box.

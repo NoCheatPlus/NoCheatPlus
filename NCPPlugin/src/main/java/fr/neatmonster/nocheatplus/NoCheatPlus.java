@@ -70,6 +70,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeListener;
+import fr.neatmonster.nocheatplus.compat.meta.BridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.compat.registry.AttributeAccessFactory;
 import fr.neatmonster.nocheatplus.compat.registry.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.registry.EntityAccessFactory;
@@ -905,6 +906,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         registerGenericInstance(new WRPT());
         registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
         registerGenericInstance(new TraceEntryPool(1000)); // Random number.
+        addComponent(new BridgeCrossPlugin());
 
         // Initialize MCAccess.
         initMCAccess(config);
@@ -913,7 +915,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         initBlockProperties(config);
 
         // Initialize data manager.
-        disableListeners.add(0, dataMan);
         dataMan.onEnable();
 
         // Register components. 
@@ -975,12 +976,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Set up the tick task.
         TickTask.start(this);
 
+        // dataMan expiration checking.
         this.dataManTaskId  = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 dataMan.checkExpiration();
             }
         }, 1207, 1207);
+
+        // Ensure dataMan is first on disableListeners.
+        disableListeners.remove(dataMan);
+        disableListeners.add(0, dataMan);
 
         // Set up consistency checking.
         scheduleConsistencyCheckers();
@@ -1211,6 +1217,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public void setMCAccess(final MCAccess mcAccess) {
         // Just sets it and propagates it.
         // TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
+        // TODO: Store a list of MCAccessHolder.
         this.mcAccess = mcAccess;
         for (final Object obj : this.allComponents) {
             if (obj instanceof MCAccessHolder) {
