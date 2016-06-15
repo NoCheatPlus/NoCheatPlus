@@ -15,7 +15,11 @@
 package fr.neatmonster.nocheatplus.components.location;
 
 /**
- * A standard (3D) block position with coordinate access (int).
+ * A standard (3D) block position with coordinate access (int). Some classes
+ * might implement both IGetPosition and IGetBlockPosition, thus utility methods
+ * that use IGetBlockPosition as arguments might better have a suffix 'Block',
+ * for the case that the same kind of method just using IGetPosition exists (see
+ * TrigUtil/LocUtil).
  * 
  * @author asofold
  *
