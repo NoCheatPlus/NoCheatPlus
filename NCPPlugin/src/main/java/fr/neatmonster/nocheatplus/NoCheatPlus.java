@@ -87,6 +87,7 @@ import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
+import fr.neatmonster.nocheatplus.components.registry.feature.IPostRegisterRunnable;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
@@ -435,8 +436,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Convenience method to add components according to implemented interfaces,
      * like Listener, INotifyReload, INeedConfig.<br>
-     * For the NoCheatPlus instance this must be done after the configuration has been initialized.
-     * This will also register ComponentRegistry instances if given.
+     * For the NoCheatPlus instance this must be done after the configuration
+     * has been initialized. This will also register ComponentRegistry instances
+     * if given.
      */
     @Override
     public boolean addComponent(final Object obj) {
@@ -446,8 +448,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Convenience method to add components according to implemented interfaces,
      * like Listener, INotifyReload, INeedConfig.<br>
-     * For the NoCheatPlus instance this must be done after the configuration has been initialized.
-     * @param allowComponentRegistry Only registers ComponentRegistry instances if this is set to true. 
+     * For the NoCheatPlus instance this must be done after the configuration
+     * has been initialized.
+     * 
+     * @param allowComponentRegistry
+     *            Only registers ComponentRegistry instances if this is set to
+     *            true.
      */
     @Override
     public boolean addComponent(final Object obj, final boolean allowComponentRegistry) {
@@ -534,6 +540,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (added) {
             allComponents.add(obj);
         }
+
+        // Post register hooks.
+        if (obj instanceof IPostRegisterRunnable) {
+            ((IPostRegisterRunnable) obj).runPostRegister();
+        }
+
         return added;
     }
 

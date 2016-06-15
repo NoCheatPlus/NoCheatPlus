@@ -15,7 +15,8 @@
 package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
- * Register this instance as generic instance (for the class of this instance).
+ * Register this instance as generic instance (for the class of this instance),
+ * once passed to a component registry that supports this.
  * 
  * @author asofold
  *
