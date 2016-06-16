@@ -82,6 +82,8 @@ import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegistry;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
@@ -110,7 +112,9 @@ import fr.neatmonster.nocheatplus.hooks.allviolations.AllViolationsHook;
 import fr.neatmonster.nocheatplus.logging.BukkitLogManager;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.StreamID;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.logging.details.IGetStreamId;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -184,9 +188,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
 
-    /** Storage for generic instances registration. */
-    private final Map<Class<?>, Object> genericInstances = new HashMap<Class<?>, Object>();
-
     /** Components that need notification on reloading.
      * (Kept here, for if during runtime some might get added.)*/
     private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
@@ -230,6 +231,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Listener for the BlockChangeTracker (register once, lazy). */
     private BlockChangeListener blockChangeListener = null;
 
+    private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
+
+
     /** Tick listener that is only needed sometimes (component registration). */
     protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
         @Override
@@ -261,6 +265,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     private boolean clearExemptionsOnJoin = true;
     private boolean clearExemptionsOnLeave = true;
+
+    private StreamID getRegistryStreamId() {
+        // TODO: Select by config, or add Streams.REGISTRY for a new default.
+        // For now prefer log file, unless extended status is set.
+        return ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS) ? Streams.STATUS : Streams.DEFAULT_FILE;
+    }
 
     /**
      * Remove expired entries.
@@ -737,7 +747,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Just in case: clear the subComponentHolders.
         subComponentholders.clear();
         // Generic instances registry.
-        genericInstances.clear();
+        genericInstanceRegistry.clear();
         // Feature tags.
         featureTags.clear();
         // BlockChangeTracker.
@@ -850,6 +860,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             StaticLog.setUseLogManager(true);
             logManager.info(Streams.INIT, "Logging system initialized.");
             logManager.info(Streams.INIT, "Detected Minecraft version: " + ServerVersion.getMinecraftVersion());
+            genericInstanceRegistry.setLogger(
+                    logManager, new IGetStreamId() {
+                        @Override
+                        public StreamID getStreamId() {
+                            // TODO Auto-generated method stub
+                            return NoCheatPlus.this.getRegistryStreamId();
+                        }
+                    }, "[GenericInstanceRegistry] ");
         }
     }
 
@@ -1469,32 +1487,28 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     @Override
+    public <T> T getGenericInstance(Class<T> registeredFor) {
+        return genericInstanceRegistry.getGenericInstance(registeredFor);
+    }
+
+    @Override
     public <T> T registerGenericInstance(T instance) {
-        @SuppressWarnings("unchecked")
-        Class<T> clazz = (Class<T>) instance.getClass();
-        T registered = getGenericInstance(clazz);
-        genericInstances.put(clazz,  instance);
-        return registered;
+        return genericInstanceRegistry.registerGenericInstance(instance);
     }
 
     @Override
     public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
-        T registered = getGenericInstance(registerFor);
-        genericInstances.put(registerFor, instance);
-        return registered;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getGenericInstance(Class<T> registeredFor) {
-        return (T) genericInstances.get(registeredFor);
+        return genericInstanceRegistry.registerGenericInstance(registerFor, instance);
     }
 
     @Override
     public <T> T unregisterGenericInstance(Class<T> registeredFor) {
-        T registered = getGenericInstance(registeredFor); // Convenience.
-        genericInstances.remove(registeredFor);
-        return registered;
+        return genericInstanceRegistry.unregisterGenericInstance(registeredFor);
+    }
+
+    @Override
+    public <T> IGenericInstanceHandle<T> getGenericInstanceHandle(Class<T> registeredFor) {
+        return genericInstanceRegistry.getGenericInstanceHandle(registeredFor);
     }
 
     @Override

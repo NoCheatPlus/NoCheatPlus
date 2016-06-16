@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -79,6 +80,11 @@ public class PluginTests {
 
         @Override
         public <T> T unregisterGenericInstance(Class<T> registeredFor) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> IGenericInstanceHandle<T> getGenericInstanceHandle(Class<T> registeredFor) {
             throw new UnsupportedOperationException();
         }
 

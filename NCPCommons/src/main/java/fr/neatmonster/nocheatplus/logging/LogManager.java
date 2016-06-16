@@ -14,7 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.logging;
 
-import java.util.logging.Level;
+import fr.neatmonster.nocheatplus.logging.details.ILogString;
+import fr.neatmonster.nocheatplus.logging.details.ILogThrowable;
 
 /**
  * Central access point log manager with a bias towards String messages.
@@ -22,7 +23,7 @@ import java.util.logging.Level;
  * @author dev1mc
  *
  */
-public interface LogManager {
+public interface LogManager extends ILogString, ILogThrowable {
 
     /**
      * A stream that skips all messages. It's not registered officially.
@@ -98,25 +99,5 @@ public interface LogManager {
      * @return Returns the registered StreamID or null, if not registered.
      */
     public StreamID getStreamID(String name);
-
-    void debug(StreamID streamID, String message);
-
-    void info(StreamID streamID, String message);
-
-    void warning(StreamID streamID, String message);
-
-    void severe(StreamID streamID, String message);
-
-    void log(StreamID streamID, Level level, String message);
-
-    void debug(StreamID streamID, Throwable t);
-
-    void info(StreamID streamID, Throwable t);
-
-    void warning(StreamID streamID, Throwable t);
-
-    void severe(StreamID streamID, Throwable t);
-
-    void log(StreamID streamID, Level level, Throwable t);
 
 }

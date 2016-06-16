@@ -141,7 +141,6 @@ public class RegistryHelper {
     public static <T, ET extends T> T registerGenericInstance(Class<T> registerFor, ET result) {
         if (result != null) {
             NCPAPIProvider.getNoCheatPlusAPI().registerGenericInstance(registerFor, result);
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Registered for " + registerFor.getName() + ": " + result.getClass().getName());
         }
         else {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Could not register an instance for: " + registerFor.getName());
