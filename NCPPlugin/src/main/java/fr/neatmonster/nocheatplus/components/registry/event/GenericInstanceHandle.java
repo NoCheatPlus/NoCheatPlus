@@ -13,7 +13,82 @@ import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
 public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListener<T>, IGenericInstanceHandle<T> {
 
     // TODO: <? extends T> ?
-    // TODO: Might move to NCPPlugin, or later split (mostly) interface based api from default implementations.
+
+    /**
+     * Delegates getHandle, disables the parent only once (meant for reference
+     * counting).
+     * 
+     * @author asofold
+     *
+     * @param <T>
+     */
+    public static class ParentDelegateHandle<T> implements IGenericInstanceHandle<T> {
+
+        private final IGenericInstanceHandle<T> parent;
+        private boolean disabled = false;
+
+        public ParentDelegateHandle(Class<T> registeredFor, GenericInstanceRegistry registry,
+                IGenericInstanceHandle<T> parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public T getHandle() {
+            if (disabled) {
+                throw new RuntimeException("Already disabled.");
+            }
+            else {
+                return parent.getHandle();
+            }
+        }
+
+        @Override
+        public void disableHandle() {
+            if (!disabled) {
+                disabled = true;
+                parent.disableHandle();
+            }
+        }
+
+    }
+
+    /**
+     * Allow fetching PrarentDelegate instances, increasing reference count with
+     * each returned one. Really unregister only with reaching a count of zero
+     * on disableHandle. This way only one instance needs to be updated.
+     * 
+     * @author asofold
+     *
+     * @param <T>
+     */
+    public static class ReferenceCountHandle<T> extends GenericInstanceHandle<T> {
+
+        private int references = 0;
+
+        public ReferenceCountHandle(Class<T> registeredFor, GenericInstanceRegistry registry,
+                IUnregisterGenericInstanceListener unregister) {
+            super(registeredFor, registry, unregister);
+        }
+
+        @Override
+        public void disableHandle() {
+            references --;
+            // Only really unregister once.
+            if (references == 0) {
+                super.disableHandle();
+            }
+        }
+
+        /**
+         * Retrieve a new instance referencing this one.
+         * @return
+         */
+        public IGenericInstanceHandle<T> getNewHandle() {
+            references ++;
+            return new ParentDelegateHandle<T>(getRegisteredFor(), getRegistry(), this);
+        }
+
+    }
 
     private GenericInstanceRegistry registry;
     private IUnregisterGenericInstanceListener unregister;
@@ -21,8 +96,6 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
     private T handle = null;
     private boolean initialized = false;
     private boolean disabled = false;
-
-    // TODO: Remove method?
 
     /**
      * Note that this doesn't register with the registry, as the registry may
@@ -81,9 +154,23 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
             handle = null;
             registeredFor = null;
             registry = null;
-            unregister.unregisterGenericInstanceListener(registeredFor, this);
+            if (unregister != null) {
+                unregister.unregisterGenericInstanceListener(registeredFor, this);
+            }
             unregister = null;
         }
+    }
+
+    public Class<T> getRegisteredFor() {
+        return registeredFor;
+    }
+
+    public GenericInstanceRegistry getRegistry() {
+        return registry;
+    }
+
+    public IUnregisterGenericInstanceListener getUnregister() {
+        return unregister;
     }
 
 }

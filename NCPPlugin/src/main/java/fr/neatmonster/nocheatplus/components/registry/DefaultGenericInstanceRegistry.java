@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import fr.neatmonster.nocheatplus.components.registry.event.GenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.event.GenericInstanceHandle.ReferenceCountHandle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceRegistryListener;
 import fr.neatmonster.nocheatplus.components.registry.event.IUnregisterGenericInstanceListener;
@@ -17,11 +18,16 @@ import fr.neatmonster.nocheatplus.logging.details.ILogString;
 
 public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, IUnregisterGenericInstanceListener {
 
+    // TODO: Test cases.
+
     /** Storage for generic instances registration. */
     private final Map<Class<?>, Object> instances = new HashMap<Class<?>, Object>();
 
     /** Listeners for registry events. */
     private final Map<Class<?>, Collection<IGenericInstanceRegistryListener<?>>> listeners = new HashMap<Class<?>, Collection<IGenericInstanceRegistryListener<?>>>();
+
+    /** Owned handles by the class they have been registered for. */
+    private final Map<Class<?>, IGenericInstanceHandle<?>> uniqueHandles = new LinkedHashMap<Class<?>, IGenericInstanceHandle<?>>();
 
     /** Handles created within this class, that have to be detached. */
     private final Set<IGenericInstanceHandle<?>> ownedHandles = new LinkedHashSet<IGenericInstanceHandle<?>>();
@@ -47,8 +53,9 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
                 listeners.remove(registeredFor);
             }
         }
-        if ((listener instanceof IGenericInstanceHandle<?>) && ownedHandles.contains(listener)) {
+        if ((listener instanceof ReferenceCountHandle<?>) && ownedHandles.contains(listener)) {
             ownedHandles.remove(listener);
+            uniqueHandles.remove(registeredFor);
             ((IGenericInstanceHandle<?>) listener).disableHandle();
         }
     }
@@ -114,22 +121,21 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     @Override
     public <T> IGenericInstanceHandle<T> getGenericInstanceHandle(Class<T> registeredFor) {
-        /*
-         * More efficient should be to return a wrapper for a unique instance,
-         * for which disableHandle runs once, so only one listener per
-         * registered class is necessary, which then uses reference counting for
-         * actual removal. That's double-wrapped then (returned instance disable
-         * once -> reference counting instance -> actual instance).
-         */
-        final IGenericInstanceHandle<T> handle = new GenericInstanceHandle<T>(registeredFor, this, this);
-        ownedHandles.add(handle);
-        Collection<IGenericInstanceRegistryListener<?>> registered = listeners.get(registeredFor);
-        if (registered == null) {
-            registered = new HashSet<IGenericInstanceRegistryListener<?>>();
-            listeners.put(registeredFor, registered);
+        @SuppressWarnings("unchecked")
+        ReferenceCountHandle<T> handle = (ReferenceCountHandle<T>) uniqueHandles.get(registeredFor);
+        if (handle == null) {
+            handle = new ReferenceCountHandle<T>(registeredFor, this, this);
+            ownedHandles.add(handle);
+            uniqueHandles.put(registeredFor, handle);
+            Collection<IGenericInstanceRegistryListener<?>> registered = listeners.get(registeredFor);
+            if (registered == null) {
+                registered = new HashSet<IGenericInstanceRegistryListener<?>>();
+                listeners.put(registeredFor, registered);
+            }
+            registered.add((IGenericInstanceRegistryListener<?>) handle);
         }
-        registered.add((IGenericInstanceRegistryListener<?>) handle);
-        return handle;
+        // else: no need to register.
+        return handle.getNewHandle();
     }
 
     public void clear() {
