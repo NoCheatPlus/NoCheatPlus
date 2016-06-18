@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 
+// TODO: Auto-generated Javadoc
 /**
  * Access to type-ids and data using caching techniques.
  * @author mc_dev
@@ -33,12 +34,16 @@ public abstract class BlockCache {
 
     // TODO: New concepts (Might switch to material, inspect MC+CB code for reliability and performance of block-ids during runtime).
 
+    /** The Constant ID_AIR. */
     private static final int ID_AIR = 0;
 
     /**
-     * Convenience method to check if the bounds as returned by getBounds cover a whole block.
-     * @param bounds Can be null, must have 6 fields.
-     * @return
+     * Convenience method to check if the bounds as returned by getBounds cover
+     * a whole block.
+     *
+     * @param bounds
+     *            Can be null, must have 6 fields.
+     * @return true, if is full bounds
      */
     public static final boolean isFullBounds(final double[] bounds) {
         if (bounds == null) return false;
@@ -50,12 +55,18 @@ public abstract class BlockCache {
     }
 
     /**
-     * Check if chunks are loaded and load all not yet loaded chunks, using normal world coordinates.<br>
+     * Check if chunks are loaded and load all not yet loaded chunks, using
+     * normal world coordinates.<br>
      * NOTE: Not sure where to put this. Method does not use any caching.
+     *
      * @param world
+     *            the world
      * @param x
+     *            the x
      * @param z
+     *            the z
      * @param xzMargin
+     *            the xz margin
      * @return Number of loaded chunks.
      */
     public static int ensureChunksLoaded(final World world, final double x, final double z, final double xzMargin) {
@@ -90,60 +101,93 @@ public abstract class BlockCache {
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMap = new CoordHashMap<double[]>(23);
 
+    /** The max block y. */
     protected int maxBlockY =  255;
 
     // TODO: Switch to nodes with all details on?
 
+    /**
+     * Instantiates a new block cache.
+     */
     public BlockCache() {
     }
 
+    /**
+     * Instantiates a new block cache.
+     *
+     * @param world
+     *            the world
+     */
     public BlockCache(final World world) {
         setAccess(world);
     }
 
     /**
      * Does not do cleanup.
+     *
      * @param world
+     *            the new access
      */
     public abstract void setAccess(final World world);
 
     /**
      * Fetch the type id from the underlying world.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the int
      */
     public abstract int fetchTypeId(int x, int y, int z);
 
     /**
      * Fetch the data from the underlying world.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the int
      */
     public abstract int fetchData(int x, int y, int z);
 
     /**
-     * Find out bounds for the block, this should not return null for performance reasons.
+     * Find out bounds for the block, this should not return null for
+     * performance reasons.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the double[]
      */
     public abstract double[] fetchBounds(int x, int y, int z);
 
     /**
      * This is a on-ground type check just for standing on minecarts / boats.
+     *
      * @param entity
+     *            the entity
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @return
+     *            the max z
+     * @return true, if successful
      */
     public abstract boolean standsOnEntity(Entity entity, final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ);
 
@@ -160,10 +204,14 @@ public abstract class BlockCache {
 
     /**
      * (convenience method, uses cache).
-     * @param eX
-     * @param eY
-     * @param eZ
-     * @return
+     *
+     * @param x
+     *            the x
+     * @param y
+     *            the y
+     * @param z
+     *            the z
+     * @return the type id
      */
     public int getTypeId(double x, double y, double z) {
         return getTypeId(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
@@ -171,8 +219,10 @@ public abstract class BlockCache {
 
     /**
      * (convenience method, uses cache).
+     *
      * @param block
-     * @return
+     *            the block
+     * @return the type id
      */
     public int getTypeId(final Block block) {
         return getTypeId(block.getX(), block.getY(), block.getZ());
@@ -180,10 +230,14 @@ public abstract class BlockCache {
 
     /**
      * Get type id with cache access.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the type id
      */
     public int getTypeId(final int x, final int y, final int z) {
         final Integer pId = idMap.get(x, y, z);
@@ -197,10 +251,14 @@ public abstract class BlockCache {
 
     /**
      * Get data value with cache access.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the data
      */
     public int getData(final int x, final int y, final int z) {
         final Integer pData = dataMap.get(x, y, z);
@@ -213,11 +271,18 @@ public abstract class BlockCache {
     }
 
     /**
-     * Get block bounds - <b>Do not change these in-place, because the returned array is cached internally.</b>
+     * Get block bounds - <b>Do not change these in-place, because the returned
+     * array is cached internally.</b>
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null theoretically. Do not change these in place, because they might get cached.
+     *            the z
+     * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null
+     *         theoretically. Do not change these in place, because they might
+     *         get cached.
      */
     public double[] getBounds(final int x, final int y, final int z) {
         final double[] pBounds = boundsMap.get(x, y, z);
@@ -231,11 +296,16 @@ public abstract class BlockCache {
     }
 
     /**
-     * Convenience method to check if the bounds for a block cover the full block.
+     * Convenience method to check if the bounds for a block cover the full
+     * block.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is full bounds
      */
     public boolean isFullBounds(final int x, final int y, final int z) {
         return isFullBounds(getBounds(x, y, z));
@@ -243,7 +313,8 @@ public abstract class BlockCache {
 
     /**
      * Get the maximal y coordinate a block can be at (non air).
-     * @return
+     *
+     * @return the max block y
      */
     public int getMaxBlockY() {
         return maxBlockY;

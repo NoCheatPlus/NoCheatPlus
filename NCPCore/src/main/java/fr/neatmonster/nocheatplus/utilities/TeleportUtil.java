@@ -28,6 +28,10 @@ import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TeleportUtil.
+ */
 public class TeleportUtil {
 
     /** Temp use. LocUtil.clone on passing. setWorld(null) after use. */
@@ -36,10 +40,15 @@ public class TeleportUtil {
     /**
      * Teleport the player with vehicle, temporarily eject the passenger and set
      * teleported in MovingData.
-     * 
+     *
      * @param vehicle
+     *            the vehicle
      * @param player
+     *            the player
      * @param location
+     *            the location
+     * @param debug
+     *            the debug
      */
     public static void teleport(final Entity vehicle, final Player player, final Location location, final boolean debug) {
         // TODO: Rubber band issue needs synchronizing with packet level and ignore certain incoming ones?
@@ -116,9 +125,11 @@ public class TeleportUtil {
 
     /**
      * Force mounting the vehicle, eject existing passenger.
-     * 
+     *
      * @param passenger
+     *            the passenger
      * @param vehicle
+     *            the vehicle
      */
     public static void forceMount(Entity passenger, Entity vehicle) {
         if (vehicle.getPassenger() != null) {

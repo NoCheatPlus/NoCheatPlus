@@ -38,6 +38,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
+// TODO: Auto-generated Javadoc
 /**
  * Task to run every tick, to update permissions and execute actions, and for lag measurement.
  * 
@@ -48,15 +49,37 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
  */
 public class TickTask implements Runnable {
 
+    /**
+     * The Class PermissionUpdateEntry.
+     */
     protected static final class PermissionUpdateEntry{ 
+        
+        /** The check type. */
         public final CheckType checkType;
+        
+        /** The player name. */
         public final String playerName;
+        
+        /** The hash code. */
         private final int hashCode;
+        
+        /**
+         * Instantiates a new permission update entry.
+         *
+         * @param playerName
+         *            the player name
+         * @param checkType
+         *            the check type
+         */
         public PermissionUpdateEntry(final String playerName, final CheckType checkType) {
             this.playerName = playerName;
             this.checkType = checkType;
             hashCode = playerName.hashCode() ^ checkType.hashCode();
         }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
         @Override
         public boolean equals(final Object obj) {
             if (!(obj instanceof PermissionUpdateEntry)) {
@@ -65,19 +88,36 @@ public class TickTask implements Runnable {
             final PermissionUpdateEntry other = (PermissionUpdateEntry) obj;
             return playerName.equals(other.playerName) && checkType.equals(other.checkType);
         }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
         @Override
         public int hashCode() {
             return hashCode;
         }
     }
 
+    /**
+     * The Class ImprobableUpdateEntry.
+     */
     protected static final class ImprobableUpdateEntry {
+        
+        /** The add level. */
         public float addLevel;
+        
+        /**
+         * Instantiates a new improbable update entry.
+         *
+         * @param addLevel
+         *            the add level
+         */
         public ImprobableUpdateEntry(float addLevel) {
             this.addLevel = addLevel;
         }
     }
 
+    /** The Constant lagMaxTicks. */
     public static final int lagMaxTicks = 80;
 
     /** Lock for accessing permissionUpdates. */
@@ -86,6 +126,8 @@ public class TickTask implements Runnable {
     private static Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
     /** Improbable entries to update. */
     private static Map<UUID, ImprobableUpdateEntry> improbableUpdates = new LinkedHashMap<UUID, TickTask.ImprobableUpdateEntry>(50);
+    
+    /** The Constant improbableLock. */
     private static final ReentrantLock improbableLock = new ReentrantLock();
 
     /** Lock for delayedActions. */
@@ -99,7 +141,7 @@ public class TickTask implements Runnable {
     /** Last n tick durations, measured from run to run.*/
     private static final long[] tickDurations = new long[lagMaxTicks];
 
-    /** Tick durations summed up in packs of n (nxn time covered) */
+    /** Tick durations summed up in packs of n (nxn time covered). */
     private static final long[] tickDurationsSq = new long[lagMaxTicks];
 
     /** Maximally covered time on ms for lag tracking, roughly. */
@@ -111,13 +153,16 @@ public class TickTask implements Runnable {
     /** Lag spikes > 150 ms counting (3 x 20 minutes). For lag spike length see spikeDurations. */
     private static ActionFrequency[] spikes = new ActionFrequency[spikeDurations.length];
 
-    /** Task id of the running TickTask */
+    /** Task id of the running TickTask. */
     protected static int taskId = -1;
 
+    /** The tick. */
     protected static int tick = 0;
 
+    /** The time start. */
     protected static long timeStart = 0;
 
+    /** The time last. */
     protected static long timeLast = 0;
 
     /** Lock flag set on disable. */
@@ -206,8 +251,11 @@ public class TickTask implements Runnable {
     /**
      * Access method to request permission updates.<br>
      * NOTE: Thread safe.
+     *
      * @param playerName
+     *            the player name
      * @param checkType
+     *            the check type
      */
     public static void requestPermissionUpdate(final String playerName, final CheckType checkType) {
         synchronized(permissionLock) {
@@ -221,7 +269,9 @@ public class TickTask implements Runnable {
     /**
      * Request actions execution.<br>
      * NOTE: Thread safe.
+     *
      * @param actions
+     *            the actions
      */
     public static void requestActionsExecution(final ViolationData actions) {
         synchronized (actionLock) {
@@ -234,8 +284,11 @@ public class TickTask implements Runnable {
 
     /**
      * NOTE: Thread-safe.
+     *
      * @param playerId
-     * @param amount
+     *            the player id
+     * @param addLevel
+     *            the add level
      */
     public static void requestImprobableUpdate(final UUID playerId, final float addLevel) {
         if (playerId == null) {
@@ -253,13 +306,18 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Add a tick listener. Can be called during processing, but will take effect on the next tick.<br>
+     * Add a tick listener. Can be called during processing, but will take
+     * effect on the next tick.<br>
      * NOTES:
      * <li>Thread safe.</li>
      * <li>Does not work if the TickTask is locked.</li>
-     * <li>For OnDemandTickListenerS, setRegistered(true) will get called if not locked.</li>
-     * <li>Will not add the same instance twice, but will call setRegistered each time for OnDemandTickListener instances.</li>
+     * <li>For OnDemandTickListenerS, setRegistered(true) will get called if not
+     * locked.</li>
+     * <li>Will not add the same instance twice, but will call setRegistered
+     * each time for OnDemandTickListener instances.</li>
+     *
      * @param listener
+     *            the listener
      */
     public static void addTickListener(TickListener listener) {
         synchronized (tickListeners) {
@@ -276,12 +334,15 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Remove a tick listener. Can be called during processing, but will take effect on the next tick.<br>
+     * Remove a tick listener. Can be called during processing, but will take
+     * effect on the next tick.<br>
      * NOTES:
      * <li>Thread safe.</li>
      * <li>Always works.</li>
      * <li>For OnDemandTickListenerS, setRegistered(false) will get called.</li>
+     *
      * @param listener
+     *            the listener
      * @return If previously contained.
      */
     public static boolean removeTickListener(TickListener listener) {
@@ -334,7 +395,8 @@ public class TickTask implements Runnable {
 
     /**
      * Get the time at which the task was started.
-     * @return
+     *
+     * @return the time start
      */
     public static final long getTimeStart() {
         return timeStart;
@@ -342,7 +404,8 @@ public class TickTask implements Runnable {
 
     /**
      * Time when last time processing was finished.
-     * @return
+     *
+     * @return the time last
      */
     public static final long getTimeLast() {
         return timeLast;
@@ -408,9 +471,11 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Get moderate lag spikes of the last hour (>150 ms, lowest tracked spike duration).
+     * Get moderate lag spikes of the last hour (>150 ms, lowest tracked spike
+     * duration).
+     *
+     * @return the moderate lag spikes
      * @deprecated What is moderate :) ?
-     * @return
      */
     public static final int getModerateLagSpikes() {
         spikes[0].update(System.currentTimeMillis());
@@ -418,9 +483,11 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Get heavy lag spikes of the last hour (> 450 ms supposedly, first duration bigger than 150 ms).
+     * Get heavy lag spikes of the last hour (> 450 ms supposedly, first
+     * duration bigger than 150 ms).
+     *
+     * @return the heavy lag spikes
      * @deprecated What is heavy :) ?
-     * @return
      */
     public static final int getHeavyLagSpikes() {
         spikes[1].update(System.currentTimeMillis());
@@ -428,8 +495,11 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Get total number of lag spikes counted at all. This is the number of lag spikes with a duration above spikeDuations[0] which should be 150 ms. This is the score of spikes[0].
-     * @return
+     * Get total number of lag spikes counted at all. This is the number of lag
+     * spikes with a duration above spikeDuations[0] which should be 150 ms.
+     * This is the score of spikes[0].
+     *
+     * @return the number of lag spikes
      */
     public static final int getNumberOfLagSpikes() {
         spikes[0].update(System.currentTimeMillis());
@@ -438,15 +508,19 @@ public class TickTask implements Runnable {
 
     /**
      * Get the stepping for lag spike duration tracking.
-     * @return
+     *
+     * @return the lag spike durations
      */
     public static final long[] getLagSpikeDurations() {
         return Arrays.copyOf(spikeDurations, spikeDurations.length);
     }
 
     /**
-     * Get lag spike count according to getLagSpikeDurations() values. Entries of lower indexes contain the entries of higher indexes (so subtraction would be necessary to get spikes from...to).
-     * @return
+     * Get lag spike count according to getLagSpikeDurations() values. Entries
+     * of lower indexes contain the entries of higher indexes (so subtraction
+     * would be necessary to get spikes from...to).
+     *
+     * @return the lag spikes
      */
     public static final int[] getLagSpikes() {
         final int[] out = new int[spikeDurations.length];
@@ -466,6 +540,13 @@ public class TickTask implements Runnable {
         return locked;
     }
 
+    /**
+     * Start.
+     *
+     * @param plugin
+     *            the plugin
+     * @return the int
+     */
     // Public methods for internal use.
     public static int start(final Plugin plugin) {
         cancel();
@@ -479,6 +560,9 @@ public class TickTask implements Runnable {
         return taskId;
     }
 
+    /**
+     * Cancel.
+     */
     public static void cancel() {
         if (taskId == -1) {
             return;
@@ -490,7 +574,9 @@ public class TickTask implements Runnable {
     /**
      * Control if new elements can be added to request queues.<br>
      * NOTE: This is just a flag, no sync is done here.
+     *
      * @param locked
+     *            the new locked
      */
     public static void setLocked(boolean locked) {
         // TODO: synchronize over lists !?
@@ -561,6 +647,9 @@ public class TickTask implements Runnable {
         }
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
     @Override
     public void run() {		
         // Actions.

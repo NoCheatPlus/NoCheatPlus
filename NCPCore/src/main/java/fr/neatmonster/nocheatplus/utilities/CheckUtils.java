@@ -41,17 +41,23 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 
+// TODO: Auto-generated Javadoc
 /**
  * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
  */
 public class CheckUtils {
 
+    /** The Constant logOnce. */
     // TODO: Quick and dirty -> other methods elsewhere.
     private static final Set<Integer> logOnce = Collections.synchronizedSet(new HashSet<Integer>());
 
     /**
      * Kick and log.
+     *
      * @param player
+     *            the player
+     * @param cc
+     *            the cc
      */
     public static void kickIllegalMove(final Player player, final MovingConfig cc){
         player.kickPlayer(cc.msgKickIllegalMove);
@@ -59,11 +65,17 @@ public class CheckUtils {
     }
 
     /**
-     * Guess some last-action time, likely to be replaced with centralized PlayerData use.
+     * Guess some last-action time, likely to be replaced with centralized
+     * PlayerData use.
+     *
      * @param player
-     * @param Timestamp of the moment of calling this.
-     * @param maxAge Maximum age in milliseconds.
-     * @return Return timestamp or Long.MIN_VALUE if not possible or beyond maxAge.
+     *            the player
+     * @param now
+     *            the now
+     * @param maxAge
+     *            Maximum age in milliseconds.
+     * @return Return timestamp or Long.MIN_VALUE if not possible or beyond
+     *         maxAge.
      */
     public static final long guessKeepAliveTime(final Player player, final long now, final long maxAge){
         final int tick = TickTask.getTick();
@@ -92,9 +104,12 @@ public class CheckUtils {
     }
 
     /**
-     * Check getPassenger recursively until a player is found, return that one or null.
+     * Check getPassenger recursively until a player is found, return that one
+     * or null.
+     *
      * @param entity
-     * @return
+     *            the entity
+     * @return the first player passenger
      */
     public static Player getFirstPlayerPassenger(final Entity entity) {
         Entity passenger = entity.getPassenger();
@@ -110,10 +125,10 @@ public class CheckUtils {
     /**
      * Check recursively for vehicles, returns null if players are vehicles,
      * otherwise the lowest vehicle (that has no vehicle).
-     * 
+     *
      * @param passenger
      *            The passenger of vehicles. Typically the player.
-     * @return
+     * @return the last non player vehicle
      */
     public static Entity getLastNonPlayerVehicle(final Entity passenger) {
         Entity vehicle = passenger.getVehicle();
@@ -133,8 +148,10 @@ public class CheckUtils {
 
     /**
      * Check for NaN, infinity.
+     *
      * @param floats
-     * @return
+     *            the floats
+     * @return true, if is bad coordinate
      */
     public static boolean isBadCoordinate(float ... floats) {
         for (int i = 0; i < floats.length; i++) {
@@ -147,8 +164,10 @@ public class CheckUtils {
 
     /**
      * Check for NaN, infinity.
+     *
      * @param doubles
-     * @return
+     *            the doubles
+     * @return true, if is bad coordinate
      */
     public static boolean isBadCoordinate(double ... doubles) {
         for (int i = 0; i < doubles.length; i++) {
@@ -162,16 +181,18 @@ public class CheckUtils {
 
     /**
      * Check for config flag and exemption (hasBypass). Meant thread-safe.
-     * 
+     *
      * @param checkType
+     *            the check type
      * @param player
+     *            the player
      * @param data
      *            If data is null, the data factory will be used for the given
      *            check type.
      * @param cc
      *            If config is null, the config factory will be used for the
      *            given check type.
-     * @return
+     * @return true, if is enabled
      */
     public static boolean isEnabled(final CheckType checkType, final Player player, final ICheckData data, final ICheckConfig cc) {
         if (cc == null) {
@@ -188,13 +209,15 @@ public class CheckUtils {
     /**
      * Check for exemption by permissions, API access, possibly other. Meant
      * thread-safe.
-     * 
-     * @param player
+     *
      * @param checkType
+     *            the check type
+     * @param player
+     *            the player
      * @param data
      *            If data is null, the data factory will be used for the given
      *            check type.
-     * @return
+     * @return true, if successful
      */
     public static boolean hasBypass(final CheckType checkType, final Player player, final ICheckData data) {
         // TODO: Checking for the thread might be a temporary measure.
@@ -222,6 +245,12 @@ public class CheckUtils {
         return NCPExemptionManager.isExempted(player, checkType);
     }
 
+    /**
+     * Improper api access.
+     *
+     * @param checkType
+     *            the check type
+     */
     private static void improperAPIAccess(final CheckType checkType) {
         // TODO: Log once + examine stack (which plugins/things are involved).
         final String trace = Arrays.toString(Thread.currentThread().getStackTrace());
@@ -247,11 +276,13 @@ public class CheckUtils {
     /**
      * Static relay for the check-specific convenience methods, logging with
      * standard format ([check_type] [player_name] ...).
-     * 
+     *
      * @param player
      *            May be null.
      * @param checkType
+     *            the check type
      * @param message
+     *            the message
      */
     public static void debug(final Player player, final CheckType checkType, final String message) {
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, getLogMessagePrefix(player, checkType) + message);
@@ -259,11 +290,12 @@ public class CheckUtils {
 
     /**
      * Get the standard log message prefix with a trailing space.
-     * 
+     *
      * @param player
      *            May be null.
      * @param checkType
-     * @return
+     *            the check type
+     * @return the log message prefix
      */
     public static String getLogMessagePrefix(final Player player, final CheckType checkType) {
         String base = "[" + checkType + "] ";
@@ -276,8 +308,8 @@ public class CheckUtils {
     /**
      * Convenience method to get a Random instance from the generic registry
      * (NoCheatPlusAPI).
-     * 
-     * @return
+     *
+     * @return the random
      */
     public static Random getRandom() {
         return NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Random.class);
@@ -285,10 +317,10 @@ public class CheckUtils {
 
     /**
      * Test if the item is consumable, like food, potions, milk bucket.
-     * 
+     *
      * @param stack
      *            May be null.
-     * @return
+     * @return true, if is consumable
      */
     public static boolean isConsumable(final ItemStack stack) {
         return stack == null ? false : isConsumable(stack.getType());
@@ -296,10 +328,10 @@ public class CheckUtils {
 
     /**
      * Test if the item is consumable, like food, potions, milk bucket.
-     * 
+     *
      * @param type
      *            May be null.
-     * @return
+     * @return true, if is consumable
      */
     public static boolean isConsumable(final Material type) {
         return type != null &&
@@ -309,8 +341,9 @@ public class CheckUtils {
     /**
      * Return the first consumable item found, checking main hand first and then
      * off hand, if available. Concerns food/edible, potions, milk bucket.
-     * 
+     *
      * @param player
+     *            the player
      * @return null in case no item is consumable.
      */
     public static ItemStack getFirstConsumableItemInHand(final Player player) {

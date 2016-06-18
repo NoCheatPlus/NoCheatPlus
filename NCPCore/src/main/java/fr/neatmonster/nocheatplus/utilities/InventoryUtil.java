@@ -22,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+// TODO: Auto-generated Javadoc
 /**
  * Auxiliary/convenience methods for inventories.
  * @author mc_dev
@@ -30,10 +31,12 @@ import org.bukkit.inventory.ItemStack;
 public class InventoryUtil {
 	
 	/**
-	 * Does not account for special slots like armor.
-	 * @param inventory
-	 * @return
-	 */
+     * Does not account for special slots like armor.
+     *
+     * @param inventory
+     *            the inventory
+     * @return the free slots
+     */
 	public static int getFreeSlots(final Inventory inventory) {
 		final ItemStack[] contents = inventory.getContents();
 		int count = 0;
@@ -46,11 +49,15 @@ public class InventoryUtil {
 	}
 
 	/**
-	 * Count slots with type-id and data (enchantments and other meta data are ignored at present).
-	 * @param inventory
-	 * @param reference
-	 * @return
-	 */
+     * Count slots with type-id and data (enchantments and other meta data are
+     * ignored at present).
+     *
+     * @param inventory
+     *            the inventory
+     * @param reference
+     *            the reference
+     * @return the stack count
+     */
 	public static int getStackCount(final Inventory inventory, final ItemStack reference) {
 		if (inventory == null) return 0;
 		if (reference == null) return getFreeSlots(inventory);
@@ -71,19 +78,27 @@ public class InventoryUtil {
 	}
 
 	/**
-	 * Sum of bottom + top inventory slots with item type / data, see: getStackCount(Inventory, reference).
-	 * @param view
-	 * @param reference
-	 * @return
-	 */
+     * Sum of bottom + top inventory slots with item type / data, see:
+     * getStackCount(Inventory, reference).
+     *
+     * @param view
+     *            the view
+     * @param reference
+     *            the reference
+     * @return the stack count
+     */
 	public static int getStackCount(final InventoryView view, final ItemStack reference) {
 		return getStackCount(view.getBottomInventory(), reference) + getStackCount(view.getTopInventory(), reference);
 	}
 	
 	/**
-	 * Search for players / passengers (broken by name: closes the inventory of first player found including entity and passengers recursively).
-	 * @param entity
-	 */
+     * Search for players / passengers (broken by name: closes the inventory of
+     * first player found including entity and passengers recursively).
+     *
+     * @param entity
+     *            the entity
+     * @return true, if successful
+     */
 	public static boolean closePlayerInventoryRecursively(Entity entity) {
 		// Find a player.
 		final Player player = getPlayerPassengerRecursively(entity);
@@ -95,10 +110,13 @@ public class InventoryUtil {
 	}
 	
 	/**
-	 * Get a player from an entity. This will return the first player found amongst the entity itself and passengers checked recursively.
-	 * @param entity
-	 * @return
-	 */
+     * Get a player from an entity. This will return the first player found
+     * amongst the entity itself and passengers checked recursively.
+     *
+     * @param entity
+     *            the entity
+     * @return the player passenger recursively
+     */
 	public static Player getPlayerPassengerRecursively(Entity entity) {
 		while (entity != null) {
 			if (entity instanceof Player) {
@@ -118,10 +136,13 @@ public class InventoryUtil {
 	}
 
 	/**
-	 * Close one players inventory, if open. This might ignore InventoryType.CRAFTING (see: hasInventoryOpen).
-	 * @param player
-	 * @return If closed.
-	 */
+     * Close one players inventory, if open. This might ignore
+     * InventoryType.CRAFTING (see: hasInventoryOpen).
+     *
+     * @param player
+     *            the player
+     * @return If closed.
+     */
 	public static boolean closeOpenInventory(final Player player) {
 		if (hasInventoryOpen(player)) {
 			player.closeInventory();
@@ -132,10 +153,13 @@ public class InventoryUtil {
 	}
 	
 	/**
-	 * Check if the players inventory is open. This might ignore InventoryType.CRAFTING.
-	 * @param player
-	 * @return
-	 */
+     * Check if the players inventory is open. This might ignore
+     * InventoryType.CRAFTING.
+     *
+     * @param player
+     *            the player
+     * @return true, if successful
+     */
 	public static boolean hasInventoryOpen(final Player player) {
 		final InventoryView view = player.getOpenInventory();
 		return view != null && view.getType() != InventoryType.CRAFTING;

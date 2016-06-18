@@ -54,6 +54,7 @@ import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 
+// TODO: Auto-generated Javadoc
 /**
  * Properties of blocks.
  * 
@@ -66,39 +67,84 @@ import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 public class BlockProperties {
 
     /**
-     * @deprecated Will be replaced by a generic way to define tools.
-     * @author mc_dev
+     * The Enum ToolType.
      *
+     * @author mc_dev
+     * @deprecated Will be replaced by a generic way to define tools.
      */
     public static enum ToolType{
+        
+        /** The none. */
         NONE,
+        
+        /** The sword. */
         SWORD,
+        
+        /** The shears. */
         SHEARS,
+        
+        /** The spade. */
         SPADE,
+        
+        /** The axe. */
         AXE,
+        
+        /** The pickaxe. */
         PICKAXE,
         //		HOE,
     }
 
     /**
-     * @deprecated Will be replaced by a generic way to define tools.
-     * @author mc_dev
+     * The Enum MaterialBase.
      *
+     * @author mc_dev
+     * @deprecated Will be replaced by a generic way to define tools.
      */
     public static enum MaterialBase{
+        
+        /** The none. */
         NONE(0, 1f),
+        
+        /** The wood. */
         WOOD(1, 2f),
+        
+        /** The stone. */
         STONE(2, 4f),
+        
+        /** The iron. */
         IRON(3, 6f),
+        
+        /** The diamond. */
         DIAMOND(4, 8f),
+        
+        /** The gold. */
         GOLD(5, 12f);
         /** Index for array. */
         public final int index;
+        
+        /** The break multiplier. */
         public final float breakMultiplier;
+        
+        /**
+         * Instantiates a new material base.
+         *
+         * @param index
+         *            the index
+         * @param breakMultiplier
+         *            the break multiplier
+         */
         private MaterialBase(int index, float breakMultiplier) {
             this.index = index;
             this.breakMultiplier = breakMultiplier;
         }
+        
+        /**
+         * Gets the by id.
+         *
+         * @param id
+         *            the id
+         * @return the by id
+         */
         public static final MaterialBase getById(final int id) {
             for (final MaterialBase base : MaterialBase.values()) {
                 if (base.index == id) {
@@ -115,15 +161,36 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static class ToolProps{
+        
+        /** The tool type. */
         public final ToolType toolType;
+        
+        /** The material base. */
         public final MaterialBase materialBase;
+        
+        /**
+         * Instantiates a new tool props.
+         *
+         * @param toolType
+         *            the tool type
+         * @param materialBase
+         *            the material base
+         */
         public ToolProps(ToolType toolType, MaterialBase materialBase) {
             this.toolType = toolType;
             this.materialBase = materialBase;
         }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
         public String toString() {
             return "ToolProps("+toolType + "/"+materialBase+")";
         }
+        
+        /**
+         * Validate.
+         */
         public void validate() {
             if (toolType == null) {
                 throw new IllegalArgumentException("ToolType must not be null.");
@@ -140,14 +207,40 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static class BlockProps{
+        
+        /** The tool. */
         public final ToolProps tool;
+        
+        /** The breaking times. */
         public final long[] breakingTimes;
+        
+        /** The hardness. */
         public final float hardness;
         /** Factor 2 = 2 times faster. */
         public final float efficiencyMod;
+        
+        /**
+         * Instantiates a new block props.
+         *
+         * @param tool
+         *            the tool
+         * @param hardness
+         *            the hardness
+         */
         public BlockProps(ToolProps tool, float hardness) {
             this(tool, hardness, 1);
         }
+        
+        /**
+         * Instantiates a new block props.
+         *
+         * @param tool
+         *            the tool
+         * @param hardness
+         *            the hardness
+         * @param efficiencyMod
+         *            the efficiency mod
+         */
         public BlockProps(ToolProps tool, float hardness, float efficiencyMod) {
             this.tool = tool;
             this.hardness = hardness;
@@ -167,18 +260,50 @@ public class BlockProperties {
             }
             this.efficiencyMod = efficiencyMod;
         }
+        
+        /**
+         * Instantiates a new block props.
+         *
+         * @param tool
+         *            the tool
+         * @param hardness
+         *            the hardness
+         * @param breakingTimes
+         *            the breaking times
+         */
         public BlockProps(ToolProps tool, float hardness, long[] breakingTimes) {
             this(tool, hardness, breakingTimes, 1f);
         }
+        
+        /**
+         * Instantiates a new block props.
+         *
+         * @param tool
+         *            the tool
+         * @param hardness
+         *            the hardness
+         * @param breakingTimes
+         *            the breaking times
+         * @param efficiencyMod
+         *            the efficiency mod
+         */
         public BlockProps(ToolProps tool, float hardness, long[] breakingTimes, float efficiencyMod) {
             this.tool = tool;
             this.breakingTimes = breakingTimes;
             this.hardness = hardness;
             this.efficiencyMod = efficiencyMod;
         }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
         public String toString() {
             return "BlockProps(" + hardness + " / " + tool.toString() + " / " + Arrays.toString(breakingTimes) + ")";
         }
+        
+        /**
+         * Validate.
+         */
         public void validate() {
             if (breakingTimes == null) {
                 throw new IllegalArgumentException("Breaking times must not be null.");
@@ -196,6 +321,7 @@ public class BlockProperties {
     /** Liquid height if no solid/full blocks are above. */
     protected static final double LIQUID_HEIGHT_LOWERED = 80000002;
 
+    /** The Constant maxBlocks. */
     protected static final int maxBlocks = 4096; 
 
     /** Properties by block id, might be extended to 4096 later for custom blocks.*/
@@ -210,79 +336,111 @@ public class BlockProperties {
     /** Default tool properties (inappropriate tool). */
     public static final ToolProps noTool = new ToolProps(ToolType.NONE, MaterialBase.NONE);
 
+    /** The Constant woodSword. */
     public static final ToolProps woodSword = new ToolProps(ToolType.SWORD, MaterialBase.WOOD);
 
+    /** The Constant woodSpade. */
     public static final ToolProps woodSpade = new ToolProps(ToolType.SPADE, MaterialBase.WOOD);
 
+    /** The Constant woodPickaxe. */
     public static final ToolProps woodPickaxe = new ToolProps(ToolType.PICKAXE, MaterialBase.WOOD);
 
+    /** The Constant woodAxe. */
     public static final ToolProps woodAxe = new ToolProps(ToolType.AXE, MaterialBase.WOOD);
 
+    /** The Constant stonePickaxe. */
     public static final ToolProps stonePickaxe = new ToolProps(ToolType.PICKAXE, MaterialBase.STONE);
 
+    /** The Constant ironPickaxe. */
     public static final ToolProps ironPickaxe = new ToolProps(ToolType.PICKAXE, MaterialBase.IRON);
 
+    /** The Constant diamondPickaxe. */
     public static final ToolProps diamondPickaxe = new ToolProps(ToolType.PICKAXE, MaterialBase.DIAMOND);
 
     /** Times for instant breaking. */
     public static final long[] instantTimes = secToMs(0);
 
+    /** The Constant leafTimes. */
     public static final long[] leafTimes = secToMs(0.3);
 
+    /** The glass times. */
     public static long[] glassTimes = secToMs(0.45);
 
+    /** The Constant gravelTimes. */
     public static final long[] gravelTimes = secToMs(0.9, 0.45, 0.25, 0.15, 0.15, 0.1);
 
+    /** The rails times. */
     public static long[] railsTimes = secToMs(1.05, 0.55, 0.3, 0.2, 0.15, 0.1);
 
+    /** The Constant woodTimes. */
     public static final long[] woodTimes = secToMs(3, 1.5, 0.75, 0.5, 0.4, 0.25);
 
+    /** The Constant indestructibleTimes. */
     private static final long[] indestructibleTimes = new long[] {indestructible, indestructible, indestructible, indestructible, indestructible, indestructible}; 
 
     /** Instantly breakable. */ 
     public static final BlockProps instantType = new BlockProps(noTool, 0, instantTimes);
 
+    /** The Constant glassType. */
     public static final BlockProps glassType = new BlockProps(noTool, 0.3f, glassTimes, 2f);
 
+    /** The Constant gravelType. */
     public static final BlockProps gravelType = new BlockProps(woodSpade, 0.6f, gravelTimes);
     /** Stone type blocks. */
     public static final BlockProps stoneType = new BlockProps(woodPickaxe, 1.5f);
 
+    /** The Constant woodType. */
     public static final BlockProps woodType = new BlockProps(woodAxe, 2, woodTimes);
 
+    /** The Constant brickType. */
     public static final BlockProps brickType = new BlockProps(woodPickaxe, 2);
 
+    /** The Constant coalType. */
     public static final BlockProps coalType = new BlockProps(woodPickaxe, 3);
 
+    /** The Constant goldBlockType. */
     public static final BlockProps goldBlockType = new BlockProps(woodPickaxe, 3, secToMs(15, 7.5, 3.75, 0.7, 0.55, 1.2));
 
+    /** The Constant ironBlockType. */
     public static final BlockProps ironBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 2.0, 1.25, 0.95, 2.0));
 
+    /** The Constant diamondBlockType. */
     public static final BlockProps diamondBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 6.0, 1.25, 0.95, 2.0));
 
+    /** The Constant hugeMushroomType. */
     public static final BlockProps hugeMushroomType = new BlockProps(woodAxe, 0.2f, secToMs(0.3, 0.15, 0.1, 0.05, 0.05, 0.05));
 
+    /** The Constant leafType. */
     public static final BlockProps leafType = new BlockProps(noTool, 0.2f, leafTimes);
 
+    /** The Constant sandType. */
     public static final BlockProps sandType = new BlockProps(woodSpade, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1));
 
+    /** The Constant leverType. */
     public static final BlockProps leverType = new BlockProps(noTool, 0.5f, secToMs(0.75));
 
+    /** The Constant sandStoneType. */
     public static final BlockProps sandStoneType = new BlockProps(woodPickaxe, 0.8f);
 
+    /** The Constant chestType. */
     public static final BlockProps chestType = new BlockProps(woodAxe, 2.5f, secToMs(3.75, 1.9, 0.95, 0.65, 0.5, 0.35));
 
+    /** The Constant woodDoorType. */
     public static final BlockProps woodDoorType = new BlockProps(woodAxe, 3.0f, secToMs(4.5, 2.25, 1.15, 0.75, 0.6, 0.4));
 
+    /** The Constant dispenserType. */
     public static final BlockProps dispenserType = new BlockProps(woodPickaxe, 3.5f);
 
+    /** The Constant ironDoorType. */
     public static final BlockProps ironDoorType = new BlockProps(woodPickaxe, 5);
 
+    /** The Constant indestructibleType. */
     public static final BlockProps indestructibleType = new BlockProps(noTool, -1f, indestructibleTimes);
 
-    /** Returned if unknown */
+    /** Returned if unknown. */
     private static BlockProps defaultBlockProps = instantType;
 
+    /** The Constant instantMat. */
     protected static final Material[] instantMat = new Material[]{
             // Named in wiki.
             Material.CROPS,
@@ -313,22 +471,36 @@ public class BlockProperties {
             Material.POTATO,
     };
 
+    /** The rt ray. */
     private static ICollidePassable rtRay = null;
+    
+    /** The rt axis. */
     private static ICollidePassable rtAxis = null;
+    
+    /** The block cache. */
     private static BlockCache blockCache = null; 
+    
+    /** The p loc. */
     private static PlayerLocation pLoc = null;
 
+    /** The Constant blockFlags. */
     protected static final long[] blockFlags = new long[maxBlocks];
 
     /** Flag position for stairs. */
     public static final long F_STAIRS               = 0x1;
+    
+    /** The Constant F_LIQUID. */
     public static final long F_LIQUID               = 0x2;
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
     public static final long F_SOLID                = 0x4;
     /** Compatibility flag: regard this block as passable always. */
     public static final long F_IGN_PASSABLE         = 0x8;
+    
+    /** The Constant F_WATER. */
     public static final long F_WATER                = 0x10;
+    
+    /** The Constant F_LAVA. */
     public static final long F_LAVA                 = 0x20;
     /** Override bounding box: 1.5 blocks high, like fences.<br>
      *  NOTE: This might have relevance for passable later.
@@ -376,13 +548,13 @@ public class BlockProperties {
     /** All rail types a minecart can move on. */
     public static final long F_RAILS                = 0x10000;
 
-    /** ICE */
+    /** ICE. */
     public static final long F_ICE                  = 0x20000;
 
-    /** LEAVES */
+    /** LEAVES. */
     public static final long F_LEAVES               = 0x40000;
 
-    /** THIN FENCE (glass panes, iron fence) */
+    /** THIN FENCE (glass panes, iron fence). */
     public static final long F_THIN_FENCE           = 0x80000;
 
     /** Meta-flag to indicate that the (max.-) edges should mean a collision, can be passed to collidesBlock. */
@@ -426,6 +598,7 @@ public class BlockProperties {
      */
     private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
 
+    /** The Constant useLoc. */
     private static final Location useLoc = new Location(null, 0, 0, 0);
 
     static{
@@ -451,9 +624,15 @@ public class BlockProperties {
     protected static float breakPenaltyOffGround = 4f;
 
     /**
-     * Initialize blocks and tools properties. This can be called at any time during runtime.
-     * @param mcAccess If mcAccess implements BlockPropertiesSetup, mcAccess.setupBlockProperties will be called directly after basic initialization but before the configuration is applied.
+     * Initialize blocks and tools properties. This can be called at any time
+     * during runtime.
+     *
+     * @param mcAccess
+     *            If mcAccess implements BlockPropertiesSetup,
+     *            mcAccess.setupBlockProperties will be called directly after
+     *            basic initialization but before the configuration is applied.
      * @param worldConfigProvider
+     *            the world config provider
      */
     public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         blockCache = mcAccess.getBlockCache(null);
@@ -493,6 +672,14 @@ public class BlockProperties {
         NCPAPIProvider.getNoCheatPlusAPI().setFeatureTags("blocks", blocksFeatures);
     }
 
+    /**
+     * Inits the tools.
+     *
+     * @param mcAccess
+     *            the mc access
+     * @param worldConfigProvider
+     *            the world config provider
+     */
     private static void initTools(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         tools.clear();
         tools.put(268, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
@@ -523,6 +710,14 @@ public class BlockProperties {
         tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
     }
 
+    /**
+     * Inits the blocks.
+     *
+     * @param mcAccess
+     *            the mc access
+     * @param worldConfigProvider
+     *            the world config provider
+     */
     private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         // Reset tool props.
         Arrays.fill(blocks, null);
@@ -862,6 +1057,12 @@ public class BlockProperties {
         blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
     }
 
+    /**
+     * Dump blocks.
+     *
+     * @param all
+     *            the all
+     */
     public static void dumpBlocks(boolean all) {
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
         List<String> missing = new LinkedList<String>();
@@ -910,8 +1111,12 @@ public class BlockProperties {
 
     /**
      * Add all flag names for existing default flags to the list.
+     *
      * @param flags
-     * @param tags Flag names will be added to this list (not with the "F_"-prefix).
+     *            the flags
+     * @param tags
+     *            Flag names will be added to this list (not with the
+     *            "F_"-prefix).
      */
     public static void addFlagNames(final long flags, final Collection<String> tags) {
         String tag = flagNameMap.get(flags);
@@ -928,8 +1133,10 @@ public class BlockProperties {
 
     /**
      * Return a collection containing all names of the flags.
+     *
      * @param flags
-     * @return
+     *            the flags
+     * @return the flag names
      */
     public static Collection<String> getFlagNames(final Long flags) {
         final ArrayList<String> tags = new ArrayList<String>(flagNameMap.size());
@@ -942,9 +1149,12 @@ public class BlockProperties {
 
     /**
      * Convenience method to parse a flag.
+     *
      * @param input
-     * @return
-     * @throws InputMismatchException if failed to parse.
+     *            the input
+     * @return the long
+     * @throws InputMismatchException
+     *             if failed to parse.
      */
     public static long parseFlag(final String input) {
         final String ucInput = input.trim().toUpperCase();
@@ -960,15 +1170,46 @@ public class BlockProperties {
         throw new InputMismatchException();
     }
 
+    /**
+     * Sec to ms.
+     *
+     * @param s1
+     *            the s1
+     * @param s2
+     *            the s2
+     * @param s3
+     *            the s3
+     * @param s4
+     *            the s4
+     * @param s5
+     *            the s5
+     * @param s6
+     *            the s6
+     * @return the long[]
+     */
     public static long[] secToMs(final double s1, final double s2, final double s3, final double s4, final double s5, final double s6) {
         return new long[] { (long) (s1 * 1000d), (long) (s2 * 1000d), (long) (s3 * 1000d), (long) (s4 * 1000d), (long) (s5 * 1000d), (long) (s6 * 1000d) };
     }
 
+    /**
+     * Sec to ms.
+     *
+     * @param s1
+     *            the s1
+     * @return the long[]
+     */
     public static long[] secToMs(final double s1) {
         final long v = (long) (s1 * 1000d);
         return new long[]{v, v, v, v, v, v};
     }
 
+    /**
+     * Gets the tool props.
+     *
+     * @param stack
+     *            the stack
+     * @return the tool props
+     */
     public static ToolProps getToolProps(final ItemStack stack) {
         if (stack == null) {
             return noTool;
@@ -978,6 +1219,13 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Gets the tool props.
+     *
+     * @param mat
+     *            the mat
+     * @return the tool props
+     */
     public static ToolProps getToolProps(final Material mat) {
         if (mat == null) {
             return noTool;
@@ -987,6 +1235,13 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Gets the tool props.
+     *
+     * @param id
+     *            the id
+     * @return the tool props
+     */
     public static ToolProps getToolProps(final Integer id) {
         final ToolProps props = tools.get(id);
         if (props == null) {
@@ -997,6 +1252,13 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Gets the block props.
+     *
+     * @param stack
+     *            the stack
+     * @return the block props
+     */
     public static BlockProps getBlockProps(final ItemStack stack) {
         if (stack == null) {
             return defaultBlockProps;
@@ -1006,6 +1268,13 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Gets the block props.
+     *
+     * @param mat
+     *            the mat
+     * @return the block props
+     */
     public static BlockProps getBlockProps(final Material mat) {
         if (mat == null) {
             return defaultBlockProps;
@@ -1015,6 +1284,13 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Gets the block props.
+     *
+     * @param blockId
+     *            the block id
+     * @return the block props
+     */
     public static BlockProps getBlockProps(final int blockId) {
         if (blockId <0 || blockId >= blocks.length || blocks[blockId] == null) {
             return defaultBlockProps;
@@ -1026,9 +1302,12 @@ public class BlockProperties {
 
     /**
      * Convenience method.
-     * @param blockType
+     *
+     * @param BlockType
+     *            the block type
      * @param player
-     * @return
+     *            the player
+     * @return the breaking duration
      */
     public static long getBreakingDuration(final Material BlockType, final Player player) {
         return getBreakingDuration(BlockType.getId(), player);
@@ -1036,9 +1315,12 @@ public class BlockProperties {
 
     /**
      * Convenience method.
+     *
      * @param blockId
+     *            the block id
      * @param player
-     * @return
+     *            the player
+     * @return the breaking duration
      */
     public static long getBreakingDuration(final int blockId, final Player player) {
         final long res = getBreakingDuration(blockId, 
@@ -1050,11 +1332,18 @@ public class BlockProperties {
 
     /**
      * TODO: repair signature some day (rid of PlayerLocation).
-     * @param BlockId
-     * @param itemInHand May be null.
-     * @param helmet May be null.
-     * @param location The normal location of a player.
-     * @return
+     *
+     * @param blockId
+     *            the block id
+     * @param itemInHand
+     *            May be null.
+     * @param helmet
+     *            May be null.
+     * @param player
+     *            the player
+     * @param location
+     *            The normal location of a player.
+     * @return the breaking duration
      */
     public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, final Player player, final Location location) {
         blockCache.setAccess(location.getWorld());
@@ -1095,10 +1384,22 @@ public class BlockProperties {
     }
 
     /**
-     * Get the normal breaking duration, including enchantments, and tool properties.
+     * Get the normal breaking duration, including enchantments, and tool
+     * properties.
+     *
      * @param blockId
+     *            the block id
      * @param itemInHand
-     * @return
+     *            the item in hand
+     * @param onGround
+     *            the on ground
+     * @param inWater
+     *            the in water
+     * @param aquaAffinity
+     *            the aqua affinity
+     * @param haste
+     *            the haste
+     * @return the breaking duration
      */
     public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final boolean onGround, final boolean inWater, final boolean aquaAffinity, final int haste) {
         // TODO: more configurability / load from file for blocks (i.e. set for shears etc.
@@ -1115,22 +1416,51 @@ public class BlockProperties {
     }
 
     /**
-     * 
+     * Gets the breaking duration.
+     *
      * @param blockId
+     *            the block id
      * @param blockProps
+     *            the block props
      * @param toolProps
+     *            the tool props
      * @param onGround
+     *            the on ground
      * @param inWater
+     *            the in water
      * @param aquaAffinity
+     *            the aqua affinity
      * @param efficiency
-     * @param haste Amplifier of haste potion effect (assume > 0 for effect there at all, so 1 is haste I, 2 is haste II).
-     * @return
+     *            the efficiency
+     * @param haste
+     *            Amplifier of haste potion effect (assume > 0 for effect there
+     *            at all, so 1 is haste I, 2 is haste II).
+     * @return the breaking duration
      */
     public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
         final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
         return haste > 0 ? (long) (Math.pow(0.8, haste) * dur) : dur;
     }
 
+    /**
+     * Gets the breaking duration.
+     *
+     * @param blockId
+     *            the block id
+     * @param blockProps
+     *            the block props
+     * @param toolProps
+     *            the tool props
+     * @param onGround
+     *            the on ground
+     * @param inWater
+     *            the in water
+     * @param aquaAffinity
+     *            the aqua affinity
+     * @param efficiency
+     *            the efficiency
+     * @return the breaking duration
+     */
     public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
         boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
         if (efficiency > 0) {
@@ -1279,12 +1609,18 @@ public class BlockProperties {
     }
 
     /**
-     * Check if the tool is officially appropriate for the block id, counting in efficiency enchantments.
+     * Check if the tool is officially appropriate for the block id, counting in
+     * efficiency enchantments.
+     *
      * @param blockId
+     *            the block id
      * @param blockProps
+     *            the block props
      * @param toolProps
+     *            the tool props
      * @param efficiency
-     * @return
+     *            the efficiency
+     * @return true, if is valid tool
      */
     public static boolean isValidTool(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final int efficiency) {
         boolean isValidTool = blockProps.tool.toolType == toolProps.toolType;
@@ -1314,9 +1650,13 @@ public class BlockProperties {
 
     /**
      * Access API for setting tool properties.<br>
-     * NOTE: No guarantee that this harmonizes with internals and workarounds, currently.
+     * NOTE: No guarantee that this harmonizes with internals and workarounds,
+     * currently.
+     *
      * @param itemId
+     *            the item id
      * @param toolProps
+     *            the tool props
      */
     public static void setToolProps(int itemId, ToolProps toolProps) {
         if (toolProps == null) {
@@ -1328,10 +1668,13 @@ public class BlockProperties {
     }
 
     /**
-     * Access API to set a blocks properties.
-     * NOTE: No guarantee that this harmonizes with internals and workarounds, currently.
+     * Access API to set a blocks properties. NOTE: No guarantee that this
+     * harmonizes with internals and workarounds, currently.
+     *
      * @param blockId
+     *            the block id
      * @param blockProps
+     *            the block props
      */
     public static void setBlockProps(int blockId, BlockProps blockProps) {
         if (blockProps == null) {
@@ -1344,10 +1687,28 @@ public class BlockProperties {
         blocks[blockId] = blockProps;
     }
 
+    /**
+     * Checks if is valid tool.
+     *
+     * @param blockType
+     *            the block type
+     * @param itemInHand
+     *            the item in hand
+     * @return true, if is valid tool
+     */
     public static boolean isValidTool(final Material blockType, final ItemStack itemInHand) {
         return isValidTool(blockType.getId(), itemInHand);
     }
 
+    /**
+     * Checks if is valid tool.
+     *
+     * @param blockId
+     *            the block id
+     * @param itemInHand
+     *            the item in hand
+     * @return true, if is valid tool
+     */
     public static boolean isValidTool(final int blockId, final ItemStack itemInHand) {
         final BlockProps blockProps = getBlockProps(blockId);
         final ToolProps toolProps = getToolProps(itemInHand);
@@ -1356,13 +1717,20 @@ public class BlockProperties {
     }
 
 
+    /**
+     * Gets the default block props.
+     *
+     * @return the default block props
+     */
     public static BlockProps getDefaultBlockProps() {
         return defaultBlockProps;
     }
 
     /**
-     * Feeding null will cause an npe - will validate. 
+     * Feeding null will cause an npe - will validate.
+     *
      * @param blockProps
+     *            the new default block props
      */
     public static void setDefaultBlockProps(BlockProps blockProps) {
         blockProps.validate();
@@ -1371,10 +1739,14 @@ public class BlockProperties {
 
     /**
      * Simple checking method, heavy. No isIllegal check.
+     *
      * @param player
+     *            the player
      * @param location
+     *            the location
      * @param yOnGround
-     * @return
+     *            the y on ground
+     * @return true, if is in liquid
      */
     public static boolean isInLiquid(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
@@ -1389,10 +1761,14 @@ public class BlockProperties {
 
     /**
      * Simple checking method, heavy. No isIllegal check.
+     *
      * @param player
+     *            the player
      * @param location
+     *            the location
      * @param yOnGround
-     * @return
+     *            the y on ground
+     * @return true, if is in web
      */
     public static boolean isInWeb(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
@@ -1407,10 +1783,14 @@ public class BlockProperties {
 
     /**
      * Simple checking method, heavy. No isIllegal check.
+     *
      * @param player
+     *            the player
      * @param location
+     *            the location
      * @param yOnGround
-     * @return
+     *            the y on ground
+     * @return true, if is on ground
      */
     public static boolean isOnGround(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
@@ -1425,10 +1805,14 @@ public class BlockProperties {
 
     /**
      * Simple checking method, heavy. No isIllegal check.
+     *
      * @param player
+     *            the player
      * @param location
+     *            the location
      * @param yOnGround
-     * @return
+     *            the y on ground
+     * @return true, if is on ground or reset cond
      */
     public static boolean isOnGroundOrResetCond(final Player player, final Location location, final double yOnGround) {
         blockCache.setAccess(location.getWorld());
@@ -1442,10 +1826,14 @@ public class BlockProperties {
 
     /**
      * Simple checking method, heavy. No isIllegal check.
+     *
      * @param player
+     *            the player
      * @param location
+     *            the location
      * @param yOnGround
-     * @return
+     *            the y on ground
+     * @return true, if is reset cond
      */
     public static boolean isResetCond(final Player player, final Location location, final double yOnGround) {
         blockCache.setAccess(location.getWorld());
@@ -1460,9 +1848,10 @@ public class BlockProperties {
     /**
      * Straw-man-method to hide warnings. Rather intended for display in
      * debug/alert messages.
-     * 
+     *
      * @param blockType
-     * @return
+     *            the block type
+     * @return the id
      */
     public static int getId(final Material blockType) {
         return blockType.getId();
@@ -1470,9 +1859,10 @@ public class BlockProperties {
 
     /**
      * Get the (legacy) data value for the block.
-     * 
+     *
      * @param block
-     * @return
+     *            the block
+     * @return the data
      */
     public static int getData(final Block block) {
         return block.getData();
@@ -1480,45 +1870,86 @@ public class BlockProperties {
 
     /**
      * Straw-man method to hide warnings.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return the material
      */
     public static Material getMaterial(final int id) {
         return Material.getMaterial(id);
     }
 
     /**
-     * @deprecated Typo in method name.
+     * Gets the b lock flags.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return the b lock flags
+     * @deprecated Typo in method name.
      */
     public static final long getBLockFlags(final int id) {
         return blockFlags[id];
     }
 
+    /**
+     * Gets the block flags.
+     *
+     * @param blockType
+     *            the block type
+     * @return the block flags
+     */
     public static final long getBlockFlags(final Material blockType) {
         return getBlockFlags(blockType.getId());
     }
 
+    /**
+     * Gets the block flags.
+     *
+     * @param id
+     *            the id
+     * @return the block flags
+     */
     public static final long getBlockFlags(final int id) {
         return blockFlags[id];
     }
 
+    /**
+     * Sets the block flags.
+     *
+     * @param blockType
+     *            the block type
+     * @param flags
+     *            the flags
+     */
     public static final void setBlockFlags(final Material blockType, final long flags) {
         setBlockFlags(blockType.getId(), flags);
     }
 
+    /**
+     * Sets the block flags.
+     *
+     * @param id
+     *            the id
+     * @param flags
+     *            the flags
+     */
     public static final void setBlockFlags(final int id, final long flags) {
         blockFlags[id] = flags;
     }
 
     /**
-     * Auxiliary check for if this block is climbable and allows climbing up. Does not account for jumping off ground etc.
+     * Auxiliary check for if this block is climbable and allows climbing up.
+     * Does not account for jumping off ground etc.
+     *
      * @param cache
+     *            the cache
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if successful
      */
     public static final boolean canClimbUp(final BlockCache cache, final int x, final int y, final int z) {
         final int id = cache.getTypeId(x, y, z);
@@ -1544,44 +1975,91 @@ public class BlockProperties {
         return false;
     }
 
+    /**
+     * Checks if is climbable.
+     *
+     * @param id
+     *            the id
+     * @return true, if is climbable
+     */
     public static final boolean isClimbable(final int id) {
         return (blockFlags[id] & F_CLIMBABLE) != 0;
     }
 
     /**
-     * Climbable material that needs to be attached to a block, to allow players to climb up.<br>
+     * Climbable material that needs to be attached to a block, to allow players
+     * to climb up.<br>
      * Currently only applies to vines. There is no flag for such, yet.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if is attached climbable
      */
     public static final boolean isAttachedClimbable(final int id) {
         return id == Material.VINE.getId();
     }
 
+    /**
+     * Checks if is stairs.
+     *
+     * @param id
+     *            the id
+     * @return true, if is stairs
+     */
     public static final boolean isStairs(final int id) {
         return (blockFlags[id] & F_STAIRS) != 0;
     }
 
+    /**
+     * Checks if is liquid.
+     *
+     * @param blockType
+     *            the block type
+     * @return true, if is liquid
+     */
     public static final boolean isLiquid(final Material blockType) {
         return isLiquid(blockType.getId());
     }
 
+    /**
+     * Checks if is liquid.
+     *
+     * @param id
+     *            the id
+     * @return true, if is liquid
+     */
     public static final boolean isLiquid(final int id) {
         return (blockFlags[id] & F_LIQUID) != 0;
     }
 
+    /**
+     * Checks if is ice.
+     *
+     * @param id
+     *            the id
+     * @return true, if is ice
+     */
     public static final boolean isIce(final int id) {
         return (blockFlags[id] & F_ICE) != 0;
     }
 
+    /**
+     * Checks if is leaves.
+     *
+     * @param id
+     *            the id
+     * @return true, if is leaves
+     */
     public static final boolean isLeaves(final int id) {
         return (blockFlags[id] & F_LEAVES) != 0;
     }
 
     /**
      * Might hold true for liquids too.
+     *
      * @param blockType
-     * @return
+     *            the block type
+     * @return true, if is solid
      */
     public static final boolean isSolid(final Material blockType) {
         return isSolid(blockType.getId());
@@ -1589,8 +2067,10 @@ public class BlockProperties {
 
     /**
      * Might hold true for liquids too.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if is solid
      */
     public static final boolean isSolid(final int id) {
         return (blockFlags[id] & F_SOLID) != 0;
@@ -1598,8 +2078,10 @@ public class BlockProperties {
 
     /**
      * Might hold true for liquids too.
+     *
      * @param blockType
-     * @return
+     *            the block type
+     * @return true, if is ground
      */
     public static final boolean isGround(final Material blockType) {
         return isGround(blockType.getId());
@@ -1607,8 +2089,10 @@ public class BlockProperties {
 
     /**
      * Might hold true for liquids too.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if is ground
      */
     public static final boolean isGround(final int id) {
         return (blockFlags[id] & F_GROUND) != 0;
@@ -1616,8 +2100,10 @@ public class BlockProperties {
 
     /**
      * Convenience method including null checks.
+     *
      * @param type
-     * @return
+     *            the type
+     * @return true, if is air
      */
     public static final boolean isAir(Material type) {
         return type == null || type == Material.AIR;
@@ -1625,8 +2111,10 @@ public class BlockProperties {
 
     /**
      * Convenience method including null checks.
+     *
      * @param stack
-     * @return
+     *            the stack
+     * @return true, if is air
      */
     public static final boolean isAir(ItemStack stack) {
         return stack == null || isAir(stack.getType());
@@ -1636,9 +2124,11 @@ public class BlockProperties {
      * Get the facing direction as BlockFace, unified approach with attached to
      * = opposite of facing. Likely the necessary flags are just set where it's
      * been needed so far.
-     * 
+     *
      * @param flags
+     *            the flags
      * @param data
+     *            the data
      * @return Return null, if facing can not be determined.
      */
     public static final BlockFace getFacing(final long flags, final int data) {
@@ -1679,12 +2169,16 @@ public class BlockProperties {
      * <li>F_PASSABLE_X4 (trap door at these coordinates).</li>
      * <li>F_CLIMBABLE (ladder below).</li>
      * </ul>
-     * 
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is trap door above ladder special case
      */
     public static final boolean isTrapDoorAboveLadderSpecialCase(final BlockCache access, final int x, final int y, final int z) {
         // Special case activation.
@@ -1729,10 +2223,13 @@ public class BlockProperties {
     }
 
     /**
-     * Just check if a position is not inside of a block that has a bounding box.<br>
+     * Just check if a position is not inside of a block that has a bounding
+     * box.<br>
      * This is an inaccurate check, it also returns false for doors etc.
+     *
      * @param blockType
-     * @return
+     *            the block type
+     * @return true, if is passable
      */
     public static final boolean isPassable(final Material blockType) {
         return isPassable(blockType.getId());
@@ -1741,8 +2238,10 @@ public class BlockProperties {
     /**
      * Just check if a block type is fully passable by default.<br>
      * This is an inaccurate check, it also returns false for doors etc.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if is passable
      */
     public static final boolean isPassable(final int id) {
         final long flags = blockFlags[id];
@@ -1757,8 +2256,10 @@ public class BlockProperties {
 
     /**
      * All rail types a minecart can move on.
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if is rails
      */
     public static final boolean isRails(final int id) {
         return (blockFlags[id] & F_RAILS) != 0; 
@@ -1766,10 +2267,12 @@ public class BlockProperties {
 
     /**
      * Test if the id is rails and if data means ascending.
-     * 
+     *
      * @param id
+     *            the id
      * @param data
-     * @return
+     *            the data
+     * @return true, if is ascending rails
      */
     public static final boolean isAscendingRails(final int id, final int data) {
         // TODO: Configurable magic.
@@ -1777,14 +2280,21 @@ public class BlockProperties {
     }
 
     /**
-     * Test if a position can be passed through (collidesBlock + passable test, no fences yet).<br>
+     * Test if a position can be passed through (collidesBlock + passable test,
+     * no fences yet).<br>
      * NOTE: This is experimental.
-     * @param world
+     *
+     * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param id
-     * @return
+     *            the id
+     * @return true, if is passable
      */
     public static final boolean isPassable(final BlockCache access, final double x, final double y, final double z, final int id) {
         // Simple exclusion check first.
@@ -1813,13 +2323,18 @@ public class BlockProperties {
     }
 
     /**
-     * Checking the block below to account for fences and such. This must be called extra to isPassable(...).
+     * Checking the block below to account for fences and such. This must be
+     * called extra to isPassable(...).
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @param id
-     * @return
+     *            the z
+     * @return true, if is passable h150
      */
     public static final boolean isPassableH150(final BlockCache access, final double x, final double y, final double z) {
         // Check for fences.
@@ -1849,11 +2364,18 @@ public class BlockProperties {
 
     /**
      * Check if passable, including blocks with height 1.5.
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @param id
+     *            the id
+     * @return true, if is passable exact
      */
     public static final boolean isPassableExact(final BlockCache access, final double x, final double y, final double z, final int id) {
         return isPassable(access, x, y, z, id) && isPassableH150(access, x, y, z);
@@ -1861,9 +2383,12 @@ public class BlockProperties {
 
     /**
      * Check if passable, including blocks with height 1.5.
+     *
      * @param access
+     *            the access
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is passable exact
      */
     public static final boolean isPassableExact(final BlockCache access, final Location loc) {
         return isPassableExact(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
@@ -1871,21 +2396,36 @@ public class BlockProperties {
 
 
     /**
-     * Requires the hit-box of the block is hit (...): this checks for special blocks properties such as glass panes and similar.<br>
+     * Requires the hit-box of the block is hit (...): this checks for special
+     * blocks properties such as glass panes and similar.<br>
      * Ray-tracing version for passable-workarounds.
+     *
      * @param access
-     * @param bx Block-coordinates.
+     *            the access
+     * @param bx
+     *            Block-coordinates.
      * @param by
+     *            the by
      * @param bz
-     * @param fx Offset from block-coordinates in [0..1].
+     *            the bz
+     * @param fx
+     *            Offset from block-coordinates in [0..1].
      * @param fy
+     *            the fy
      * @param fz
-     * @param id Type-id of the block.
-     * @param dX Total ray distance for coordinated (see dT).
+     *            the fz
+     * @param id
+     *            Type-id of the block.
+     * @param dX
+     *            Total ray distance for coordinated (see dT).
      * @param dY
+     *            the d y
      * @param dZ
-     * @param dT Time to cover from given position in [0..1], relating to dX, dY, dZ.
-     * @return
+     *            the d z
+     * @param dT
+     *            Time to cover from given position in [0..1], relating to dX,
+     *            dY, dZ.
+     * @return true, if is passable workaround
      */
     public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT) {
         // Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
@@ -1955,14 +2495,23 @@ public class BlockProperties {
     }
 
     /**
-     * XZ-collision check for (bounds / pseudo-ray) with fence type blocks (fences, glass panes), margin configurable.
+     * XZ-collision check for (bounds / pseudo-ray) with fence type blocks
+     * (fences, glass panes), margin configurable.
+     *
      * @param fx
+     *            the fx
      * @param fz
+     *            the fz
      * @param dX
+     *            the d x
      * @param dZ
+     *            the d z
      * @param dT
-     * @param d Distance to the fence middle to keep (see code of isPassableworkaround for reference).
-     * @return
+     *            the d t
+     * @param d
+     *            Distance to the fence middle to keep (see code of
+     *            isPassableworkaround for reference).
+     * @return true, if successful
      */
     public static boolean collidesFence(final double fx, final double fz, final double dX, final double dZ, final double dT, final double d) {
         final double dFx = 0.5 - fx;
@@ -1981,12 +2530,21 @@ public class BlockProperties {
     }
 
     /**
-     * Collision for x-z ray / bounds. Use this to check if a box is really outside.
+     * Collision for x-z ray / bounds. Use this to check if a box is really
+     * outside.
+     *
      * @param fx
+     *            the fx
      * @param fz
+     *            the fz
      * @param dX
+     *            the d x
      * @param dZ
+     *            the d z
      * @param dT
+     *            the d t
+     * @param inset
+     *            the inset
      * @return False if no collision with the center bounds.
      */
     public static final boolean collidesCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset) {
@@ -2010,12 +2568,21 @@ public class BlockProperties {
     }
 
     /**
-     * Collision for x-z ray / bounds. Use this to check if a box is really inside.
+     * Collision for x-z ray / bounds. Use this to check if a box is really
+     * inside.
+     *
      * @param fx
+     *            the fx
      * @param fz
+     *            the fz
      * @param dX
+     *            the d x
      * @param dZ
+     *            the d z
      * @param dT
+     *            the d t
+     * @param inset
+     *            the inset
      * @return True if the box is really inside of the center bounds.
      */
     public static final boolean isInsideCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset) {
@@ -2047,16 +2614,22 @@ public class BlockProperties {
      * This might return 0 or somewhat arbitrary values for some blocks that
      * don't have full bounds (!), might return 0 for blocks with the
      * F_GROUND_HEIGHT flag, unless they are treated individually here.
-     * 
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param id
+     *            the id
      * @param bounds
+     *            the bounds
      * @param flags
      *            Flags for this block.
-     * @return
+     * @return the ground min height
      */
     public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
         // TODO: Check which ones are really needed !
@@ -2125,9 +2698,11 @@ public class BlockProperties {
     }
 
     /**
-     * Convenience method for debugging purposes. 
+     * Convenience method for debugging purposes.
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is passable
      */
     public static final boolean isPassable(final PlayerLocation loc) {
         return isPassable(loc.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), loc.getTypeId());
@@ -2135,8 +2710,10 @@ public class BlockProperties {
 
     /**
      * Convenience method.
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is passable
      */
     public static final boolean isPassable(final Location loc) {
         return isPassable(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
@@ -2144,11 +2721,16 @@ public class BlockProperties {
 
     /**
      * Convenience method.
+     *
      * @param world
+     *            the world
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is passable
      */
     public static final boolean isPassable(final World world, final double x, final double y, final double z) {
         blockCache.setAccess(world);
@@ -2159,9 +2741,12 @@ public class BlockProperties {
 
     /**
      * Normal ray tracing.
+     *
      * @param from
+     *            the from
      * @param to
-     * @return
+     *            the to
+     * @return true, if is passable
      */
     public static final boolean isPassable(final Location from, final Location to) {
         return isPassable(rtRay, from, to);
@@ -2169,15 +2754,28 @@ public class BlockProperties {
 
     /**
      * Axis-wise checking, like the client does.
-     * 
+     *
      * @param from
+     *            the from
      * @param to
-     * @return
+     *            the to
+     * @return true, if is passable axis wise
      */
     public static final boolean isPassableAxisWise(final Location from, final Location to) {
         return isPassable(rtAxis, from, to);
     }
 
+    /**
+     * Checks if is passable.
+     *
+     * @param rt
+     *            the rt
+     * @param from
+     *            the from
+     * @param to
+     *            the to
+     * @return true, if is passable
+     */
     private static boolean isPassable(final ICollidePassable rt, final Location from, final Location to) {
         blockCache.setAccess(from.getWorld());
         rt.setMaxSteps(60); // TODO: Configurable ?
@@ -2191,10 +2789,14 @@ public class BlockProperties {
     }
 
     /**
-     * Convenience method to allow using an already fetched or prepared IBlockAccess.
+     * Convenience method to allow using an already fetched or prepared
+     * IBlockAccess.
+     *
      * @param access
+     *            the access
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is passable
      */
     public static final boolean isPassable(final BlockCache  access, final Location loc)
     {
@@ -2203,7 +2805,11 @@ public class BlockProperties {
 
     /**
      * API access to read extra properties from files.
+     *
      * @param config
+     *            the config
+     * @param pathPrefix
+     *            the path prefix
      */
     public static void applyConfig(final RawConfigFile config, final String pathPrefix) {
 
@@ -2269,14 +2875,26 @@ public class BlockProperties {
     }
 
     /**
-     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
+     * Test if the bounding box overlaps with a block of given flags (does not
+     * check the blocks bounding box).
+     *
+     * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     *            the max z
+     * @param flags
+     *            Block flags (@see
+     *            fr.neatmonster.nocheatplus.utilities.BlockProperties).
      * @return If any block has the flags.
      */
     public static final boolean hasAnyFlags(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags) {
@@ -2285,14 +2903,26 @@ public class BlockProperties {
 
 
     /**
-     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
+     * Test if the bounding box overlaps with a block of given flags (does not
+     * check the blocks bounding box).
+     *
+     * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     *            the max z
+     * @param flags
+     *            Block flags (@see
+     *            fr.neatmonster.nocheatplus.utilities.BlockProperties).
      * @return If any block has the flags.
      */
     public static final boolean hasAnyFlags(final BlockCache access,final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags) {
@@ -2311,13 +2941,15 @@ public class BlockProperties {
     /**
      * Test if the box collide with any block that matches the flags somehow.
      * Convenience method.
-     * 
+     *
+     * @param access
+     *            the access
      * @param bounds
      *            'Classic' bounds as returned for blocks (minX, minY, minZ,
      *            maxX, maxY, maxZ).
      * @param flags
      *            The flags to match.
-     * @return
+     * @return true, if successful
      */
     public static final boolean collides(final BlockCache access, double[] bounds,  final long flags) {
         return collides(access, bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5], flags);
@@ -2325,14 +2957,24 @@ public class BlockProperties {
 
     /**
      * Test if the box collide with any block that matches the flags somehow.
+     *
+     * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @param flags The flags to match.
-     * @return
+     *            the max z
+     * @param flags
+     *            The flags to match.
+     * @return true, if successful
      */
     public static final boolean collides(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags) {
         final int iMinX = Location.locToBlock(minX);
@@ -2365,31 +3007,51 @@ public class BlockProperties {
 
     /**
      * Convenience method for Material instead of block id.
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      * @param mat
-     * @return
+     *            the mat
+     * @return true, if successful
      */
     public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final Material mat) {
         return collidesId(access, minX, minY, minZ, maxX, maxY, maxZ, mat.getId());
     }
 
     /**
-     * Check if a block with the given id is overlapping with the bounds, this does not check the blocks actual bounds (All bounds of the block are seen as 0...1, for exact box match use collidesBlock). 
+     * Check if a block with the given id is overlapping with the bounds, this
+     * does not check the blocks actual bounds (All bounds of the block are seen
+     * as 0...1, for exact box match use collidesBlock).
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      * @param id
-     * @return
+     *            the id
+     * @return true, if successful
      */
     public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id) {
         final int iMinX = Location.locToBlock(minX);
@@ -2411,16 +3073,26 @@ public class BlockProperties {
     }
 
     /**
-     * Check if the given bounding box collides with a block of the given id, taking into account the actual bounds of the block. 
+     * Check if the given bounding box collides with a block of the given id,
+     * taking into account the actual bounds of the block.
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      * @param id
-     * @return
+     *            the id
+     * @return true, if successful
      */
     public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id) {
         final int iMinX = Location.locToBlock(minX);
@@ -2447,16 +3119,33 @@ public class BlockProperties {
     }
 
     /**
-     * Check if the bounds collide with the block that has the given type id at the given position.
-     * <br> Delegates: This method signature is not used internally anymore.
+     * Check if the bounds collide with the block that has the given type id at
+     * the given position. <br>
+     * Delegates: This method signature is not used internally anymore.
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
+     * @param x
+     *            the x
+     * @param y
+     *            the y
+     * @param z
+     *            the z
      * @param id
+     *            the id
+     * @return true, if successful
      */
     public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id) {
         // TODO: use internal block data unless delegation wanted?
@@ -2472,24 +3161,35 @@ public class BlockProperties {
      * Check if the bounds collide with the block for the given type id at the
      * given position. This does not check workarounds for ground_height nor
      * passable.
-     * 
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param id
+     *            the id
      * @param bounds
      *            Not null: bounds of the block at x, y, z.
      * @param flags
      *            Block flags for the block at x, y, z. Mix in F_COLLIDE_EDGES
      *            to disallow the "high edges" of blocks.
-     * @return
+     * @return true, if successful
      */
     public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
         final double bminX, bminZ, bminY;
@@ -2590,13 +3290,16 @@ public class BlockProperties {
     /**
      * Determine if the liquid block below has full height or not (provided it
      * is max. level).
-     * 
-     * @param blockCache
+     *
+     * @param access
+     *            the access
      * @param x
      *            Coordinates of the block above the liquid block in question.
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if successful
      */
     public static boolean shouldLiquidBelowBeFullHeight(final BlockCache access, final int x, final int y, final int z) {
         final int id = access.getTypeId(x, y, z);
@@ -2614,12 +3317,18 @@ public class BlockProperties {
 
     /**
      * Attempt to return the exact outside bounds, corrected by flags and other.
-     * @deprecated Not yet for real (only used in certain checks/contexts).
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return If changed, a copy is returned, otherwise the original bounds returned by the BlockCache instance.
+     *            the z
+     * @return If changed, a copy is returned, otherwise the original bounds
+     *         returned by the BlockCache instance.
+     * @deprecated Not yet for real (only used in certain checks/contexts).
      */
     public static double[] getCorrectedBounds(final BlockCache access, final int x, final int y, final int z) {
         return getCorrectedBounds(x, y, z, access.getTypeId(x, y, z), access.getBounds(x, y, z));
@@ -2627,13 +3336,20 @@ public class BlockProperties {
 
     /**
      * Attempt to return the exact outside bounds, corrected by flags and other.
-     * @deprecated Not yet for real (only used in certain checks/contexts).
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @param typeId
+     *            the z
+     * @param id
+     *            the id
      * @param bounds
-     * @return If changed, a copy is returned, otherwise the original array as given.
+     *            the bounds
+     * @return If changed, a copy is returned, otherwise the original array as
+     *         given.
+     * @deprecated Not yet for real (only used in certain checks/contexts).
      */
     public static double[] getCorrectedBounds(final int x, final int y, final int z, final int id, final double[] bounds) {
         if (bounds == null) {
@@ -2646,70 +3362,116 @@ public class BlockProperties {
     }
 
     /**
-     * Like isOnGround, just with minimum and maximum coordinates in arbitrary order.
+     * Like isOnGround, just with minimum and maximum coordinates in arbitrary
+     * order.
+     *
      * @param access
+     *            the access
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @param xzMargin Subtracted from minima and added to maxima.
-     * @param yBelow Subtracted from the minimum of y.
-     * @param yAbove Added to the maximum of y.
-     * @return
+     *            the z2
+     * @param xzMargin
+     *            Subtracted from minima and added to maxima.
+     * @param yBelow
+     *            Subtracted from the minimum of y.
+     * @param yAbove
+     *            Added to the maximum of y.
+     * @return true, if is on ground shuffled
      */
     public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove) {
         return isOnGroundShuffled(access, x1, y1, z1, x2, y2, z2, xzMargin, yBelow, yAbove, 0L);
     }
 
     /**
-     * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
-     * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
+     * Similar to collides(... , F_GROUND), but also checks the block above
+     * (against spider).<br>
+     * NOTE: This does not return true if stuck, to check for that use
+     * collidesBlock for the players location.
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @return
+     *            the max z
+     * @return true, if is on ground
      */
     public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
         return isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 0L);
     }
 
     /**
-     * Like isOnGround, just with minimum and maximum coordinates in arbitrary order.
+     * Like isOnGround, just with minimum and maximum coordinates in arbitrary
+     * order.
+     *
      * @param access
+     *            the access
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @param xzMargin Subtracted from minima and added to maxima.
-     * @param yBelow Subtracted from the minimum of y.
-     * @param yAbove Added to the maximum of y.
+     *            the z2
+     * @param xzMargin
+     *            Subtracted from minima and added to maxima.
+     * @param yBelow
+     *            Subtracted from the minimum of y.
+     * @param yAbove
+     *            Added to the maximum of y.
      * @param ignoreFlags
-     * @return
+     *            the ignore flags
+     * @return true, if is on ground shuffled
      */
     public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove, final long ignoreFlags) {
         return isOnGround(access, Math.min(x1, x2) - xzMargin, Math.min(y1, y2) - yBelow, Math.min(z1, z2) - xzMargin, Math.max(x1, x2) + xzMargin, Math.max(y1, y2) + yAbove, Math.max(z1, z2) + xzMargin, ignoreFlags);
     }
 
     /**
-     * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
-     * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
+     * Similar to collides(... , F_GROUND), but also checks the block above
+     * (against spider).<br>
+     * NOTE: This does not return true if stuck, to check for that use
+     * collidesBlock for the players location.
+     *
      * @param access
-     * @param minX Bounding box coordinates...
+     *            the access
+     * @param minX
+     *            Bounding box coordinates...
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
-     * @param maxY Meant to be the foot-level.
+     *            the max x
+     * @param maxY
+     *            Meant to be the foot-level.
      * @param maxZ
-     * @param ignoreFlags Blocks with these flags are not counted as ground.
-     * @return
+     *            the max z
+     * @param ignoreFlags
+     *            Blocks with these flags are not counted as ground.
+     * @return true, if is on ground
      */
     public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long ignoreFlags) {
         final int maxBlockY = access.getMaxBlockY();
@@ -2876,8 +3638,10 @@ public class BlockProperties {
 
     /**
      * All dimensions 0 ... 1, no null checks.
-     * @param bounds Block bounds: minX, minY, minZ, maxX, maxY, maxZ
-     * @return
+     *
+     * @param bounds
+     *            Block bounds: minX, minY, minZ, maxX, maxY, maxZ
+     * @return true, if is full bounds
      */
     public static final boolean isFullBounds(final double[] bounds) {
         for (int i = 0; i < 3; i++) {
@@ -2890,8 +3654,11 @@ public class BlockProperties {
 
     /**
      * Check if the bounds are the same. No null checks.
+     *
      * @param bounds1
+     *            the bounds1
      * @param bounds2
+     *            the bounds2
      * @return Block bounds: minX, minY, minZ, maxX, maxY, maxZ
      */
     public static final boolean isSameShape(final double[] bounds1, final double[] bounds2) {
@@ -2912,25 +3679,36 @@ public class BlockProperties {
      * only the x-z move is regarded, no envelope/consistency checks are
      * performed here, such as checking if the block is liquid at all, nor if
      * the move makes sense. performed here.
-     * 
+     *
      * @param from
+     *            the from
      * @param to
-     * @return
+     *            the to
+     * @return true, if is down stream
      */
     public static final boolean isDownStream(final PlayerLocation from, final PlayerLocation to) {
         return isDownStream(from.getBlockCache(), from.getBlockX(), from.getBlockY(), from.getBlockZ(), from.getData(), to.getX() - from.getX(), to.getZ() - from.getZ());
     }
 
     /**
-     * Check if a move determined by xDistance and zDistance is leading down stream.
+     * Check if a move determined by xDistance and zDistance is leading down
+     * stream.
+     *
      * @param access
+     *            the access
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param data
+     *            the data
      * @param dX
+     *            the d x
      * @param dZ
-     * @return
+     *            the d z
+     * @return true, if is down stream
      */
     public static final boolean isDownStream(final BlockCache access, final int x, final int y, final int z, final int data, 
             final double dX, final double dZ) {
@@ -2977,15 +3755,24 @@ public class BlockProperties {
     }
 
     /**
-     * Collect all flags of blocks touched by the bounds, this does not check versus the blocks bounding box.
+     * Collect all flags of blocks touched by the bounds, this does not check
+     * versus the blocks bounding box.
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @return
+     *            the max z
+     * @return the long
      */
     public static final long collectFlagsSimple(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
         final int iMinX = Location.locToBlock(minX);
@@ -3008,7 +3795,8 @@ public class BlockProperties {
 
     /**
      * Penalty factor for block break duration if under water.
-     * @return
+     *
+     * @return the break penalty in water
      */
     public static float getBreakPenaltyInWater() {
         return breakPenaltyInWater;
@@ -3016,7 +3804,9 @@ public class BlockProperties {
 
     /**
      * Penalty factor for block break duration if under water.
+     *
      * @param breakPenaltyInWater
+     *            the new break penalty in water
      */
     public static void setBreakPenaltyInWater(float breakPenaltyInWater) {
         BlockProperties.breakPenaltyInWater = breakPenaltyInWater;
@@ -3024,7 +3814,8 @@ public class BlockProperties {
 
     /**
      * Penalty factor for block break duration if not on ground.
-     * @return
+     *
+     * @return the break penalty off ground
      */
     public static float getBreakPenaltyOffGround() {
         return breakPenaltyOffGround;
@@ -3032,7 +3823,9 @@ public class BlockProperties {
 
     /**
      * Penalty factor for block break duration if not on ground.
+     *
      * @param breakPenaltyOffGround
+     *            the new break penalty off ground
      */
     public static void setBreakPenaltyOffGround(float breakPenaltyOffGround) {
         BlockProperties.breakPenaltyOffGround = breakPenaltyOffGround;
@@ -3050,19 +3843,31 @@ public class BlockProperties {
     }
 
     /**
-     * 
+     * Checks if is passable ray.
+     *
      * @param access
-     * @param blockX Block location.
+     *            the access
+     * @param blockX
+     *            Block location.
      * @param blockY
+     *            the block y
      * @param blockZ
-     * @param oX Origin / offset from block location.
+     *            the block z
+     * @param oX
+     *            Origin / offset from block location.
      * @param oY
+     *            the o y
      * @param oZ
-     * @param dX Direction (multiplied by dT to get end point of move).
+     *            the o z
+     * @param dX
+     *            Direction (multiplied by dT to get end point of move).
      * @param dY
+     *            the d y
      * @param dZ
-     * @param dT 
-     * @return
+     *            the d z
+     * @param dT
+     *            the d t
+     * @return true, if is passable ray
      */
     public static final boolean isPassableRay(final BlockCache access, final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dX, final double dY, final double dZ, final double dT) {
         final int id = access.getTypeId(blockX, blockY, blockZ);
@@ -3121,18 +3926,28 @@ public class BlockProperties {
 
     /**
      * Check passability with an arbitrary bounding box vs. a block.
-     * 
+     *
      * @param access
+     *            the access
      * @param blockX
+     *            the block x
      * @param blockY
+     *            the block y
      * @param blockZ
+     *            the block z
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @return
+     *            the max z
+     * @return true, if is passable box
      */
     public static final boolean isPassableBox(final BlockCache access, 
             final int blockX, final int blockY, final int blockZ,
@@ -3165,15 +3980,22 @@ public class BlockProperties {
     /**
      * Check if the bounding box collides with a block (passable + accounting
      * for workarounds).
-     * 
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
-     * @return
+     *            the max z
+     * @return true, if is passable box
      */
     public static final boolean isPassableBox(final BlockCache access, 
             final double minX, final double minY, final double minZ,
@@ -3199,15 +4021,24 @@ public class BlockProperties {
     /**
      * Add the block coordinates that are colliding via a isPassableBox check
      * for the given bounds to the given container.
-     * 
+     *
      * @param access
+     *            the access
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      * @param results
+     *            the results
+     * @return the int
      */
     public static final int collectInitiallyCollidingBlocks(final BlockCache access, 
             final double minX, final double minY, final double minZ,
@@ -3236,8 +4067,8 @@ public class BlockProperties {
     /**
      * Test for special case activation: trap door is climbable above ladder
      * with distinct facing.
-     * 
-     * @return
+     *
+     * @return true, if is special case trap door above ladder
      */
     public static boolean isSpecialCaseTrapDoorAboveLadder() {
         return specialCaseTrapDoorAboveLadder;
@@ -3246,8 +4077,9 @@ public class BlockProperties {
     /**
      * Set special case activation: trap door is climbable above ladder with
      * distinct facing.
-     * 
+     *
      * @param specialCaseTrapDoorAboveLadder
+     *            the new special case trap door above ladder
      */
     public static void setSpecialCaseTrapDoorAboveLadder(boolean specialCaseTrapDoorAboveLadder) {
         BlockProperties.specialCaseTrapDoorAboveLadder = specialCaseTrapDoorAboveLadder;

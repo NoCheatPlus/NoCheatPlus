@@ -22,6 +22,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 
+// TODO: Auto-generated Javadoc
 /**
  * Auxiliary methods for trigonometry related tasks, such as distances, directions, angles.
  * @author mc_dev
@@ -40,12 +41,13 @@ public class TrigUtil {
     /** Precision for the fight.direction check within the LocationTrace loop. */
     public static final double DIRECTION_LOOP_PRECISION = 0.5;
 
+    /** The Constant useLoc. */
     private static final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * Check if a player looks at a target of a specific size, with a specific
      * precision value (roughly).
-     * 
+     *
      * @param player
      *            the player
      * @param targetX
@@ -60,7 +62,7 @@ public class TrigUtil {
      *            the target height
      * @param precision
      *            the precision
-     * @return
+     * @return the double
      */
     public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
     {
@@ -73,12 +75,18 @@ public class TrigUtil {
 
     /**
      * Convenience method.
+     *
      * @param sourceFoot
+     *            the source foot
      * @param eyeHeight
+     *            the eye height
      * @param dir
+     *            the dir
      * @param target
-     * @param precision (width/height are set to 1)
-     * @return
+     *            the target
+     * @param precision
+     *            (width/height are set to 1)
+     * @return the double
      */
     public static double directionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final Block target, final double precision)
     {
@@ -87,16 +95,26 @@ public class TrigUtil {
 
     /**
      * Convenience method.
+     *
      * @param sourceFoot
+     *            the source foot
      * @param eyeHeight
+     *            the eye height
      * @param dir
+     *            the dir
      * @param targetX
+     *            the target x
      * @param targetY
+     *            the target y
      * @param targetZ
+     *            the target z
      * @param targetWidth
+     *            the target width
      * @param targetHeight
+     *            the target height
      * @param precision
-     * @return
+     *            the precision
+     * @return the double
      */
     public static double directionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
     {
@@ -105,18 +123,31 @@ public class TrigUtil {
 
     /**
      * Check how far the looking direction is off the target.
-     * @param sourceX Source location of looking direction.
+     *
+     * @param sourceX
+     *            Source location of looking direction.
      * @param sourceY
+     *            the source y
      * @param sourceZ
-     * @param dirX Looking direction.
+     *            the source z
+     * @param dirX
+     *            Looking direction.
      * @param dirY
+     *            the dir y
      * @param dirZ
-     * @param targetX Location that should be looked towards.
+     *            the dir z
+     * @param targetX
+     *            Location that should be looked towards.
      * @param targetY
+     *            the target y
      * @param targetZ
-     * @param targetWidth xz extent
-     * @param targetHeight y extent
+     *            the target z
+     * @param targetWidth
+     *            xz extent
+     * @param targetHeight
+     *            y extent
      * @param precision
+     *            the precision
      * @return Some offset.
      */
     public static double directionCheck(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
@@ -151,32 +182,89 @@ public class TrigUtil {
         return off;
     }
 
+    /**
+     * Combined direction check.
+     *
+     * @param sourceFoot
+     *            the source foot
+     * @param eyeHeight
+     *            the eye height
+     * @param dir
+     *            the dir
+     * @param targetX
+     *            the target x
+     * @param targetY
+     *            the target y
+     * @param targetZ
+     *            the target z
+     * @param targetWidth
+     *            the target width
+     * @param targetHeight
+     *            the target height
+     * @param precision
+     *            the precision
+     * @param anglePrecision
+     *            the angle precision
+     * @return the double
+     */
     public static double combinedDirectionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision, final double anglePrecision)
     {
         return combinedDirectionCheck(sourceFoot.getX(), sourceFoot.getY() + eyeHeight, sourceFoot.getZ(), dir.getX(), dir.getY(), dir.getZ(), targetX, targetY, targetZ, targetWidth, targetHeight, precision, anglePrecision);					
     }
 
+    /**
+     * Combined direction check.
+     *
+     * @param sourceFoot
+     *            the source foot
+     * @param eyeHeight
+     *            the eye height
+     * @param dir
+     *            the dir
+     * @param target
+     *            the target
+     * @param precision
+     *            the precision
+     * @param anglePrecision
+     *            the angle precision
+     * @return the double
+     */
     public static double combinedDirectionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final Block target, final double precision, final double anglePrecision)
     {
         return combinedDirectionCheck(sourceFoot.getX(), sourceFoot.getY() + eyeHeight, sourceFoot.getZ(), dir.getX(), dir.getY(), dir.getZ(), target.getX(), target.getY(), target.getZ(), 1, 1, precision, anglePrecision);
     }
 
     /**
-     * Combine directionCheck with angle, in order to prevent low-distance abuse.
+     * Combine directionCheck with angle, in order to prevent low-distance
+     * abuse.
+     *
      * @param sourceX
+     *            the source x
      * @param sourceY
+     *            the source y
      * @param sourceZ
+     *            the source z
      * @param dirX
+     *            the dir x
      * @param dirY
+     *            the dir y
      * @param dirZ
+     *            the dir z
      * @param targetX
+     *            the target x
      * @param targetY
+     *            the target y
      * @param targetZ
+     *            the target z
      * @param targetWidth
+     *            the target width
      * @param targetHeight
+     *            the target height
      * @param blockPrecision
-     * @param anglePrecision Precision in grad.
-     * @return
+     *            the block precision
+     * @param anglePrecision
+     *            Precision in grad.
+     * @return the double
      */
     public static double combinedDirectionCheck(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double blockPrecision, final double anglePrecision)
     {
@@ -252,9 +340,12 @@ public class TrigUtil {
 
     /**
      * 3d-distance from location (exact) to block middle.
+     *
      * @param location
+     *            the location
      * @param block
-     * @return
+     *            the block
+     * @return the double
      */
     public static final double distance(final Location location, final Block block)
     {
@@ -263,13 +354,20 @@ public class TrigUtil {
 
     /**
      * 3D-distance.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return the double
      */
     public static final double distance(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
         final double dx = Math.abs(x1 - x2);
@@ -278,11 +376,29 @@ public class TrigUtil {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    /**
+     * Distance squared.
+     *
+     * @param location1
+     *            the location1
+     * @param location2
+     *            the location2
+     * @return the double
+     */
     public static final double distanceSquared(final Location location1, final Location location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
+    /**
+     * Distance squared.
+     *
+     * @param location1
+     *            the location1
+     * @param location2
+     *            the location2
+     * @return the double
+     */
     public static final double distanceSquared(final IGetPosition location1, final IGetPosition location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
@@ -290,20 +406,51 @@ public class TrigUtil {
 
     /**
      * Horizontal: squared distance.
-     * @param location1
-     * @param x1
-     * @return
+     *
+     * @param location
+     *            the location
+     * @param x
+     *            the x
+     * @param z
+     *            the z
+     * @return the double
      */
     public static final double distanceSquared(final IGetPosition location, final double x, final double z)
     {
         return distanceSquared(location.getX(), location.getZ(), x, z);
     }
 
+    /**
+     * Distance squared.
+     *
+     * @param location1
+     *            the location1
+     * @param location2
+     *            the location2
+     * @return the double
+     */
     public static final double distanceSquared(final IGetPosition location1, final Location location2)
     {
         return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
     }
 
+    /**
+     * Distance squared.
+     *
+     * @param x1
+     *            the x1
+     * @param y1
+     *            the y1
+     * @param z1
+     *            the z1
+     * @param x2
+     *            the x2
+     * @param y2
+     *            the y2
+     * @param z2
+     *            the z2
+     * @return the double
+     */
     public static final double distanceSquared(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
         final double dx = Math.abs(x1 - x2);
         final double dy = Math.abs(y1 - y2);
@@ -311,6 +458,19 @@ public class TrigUtil {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    /**
+     * Distance squared.
+     *
+     * @param x1
+     *            the x1
+     * @param z1
+     *            the z1
+     * @param x2
+     *            the x2
+     * @param z2
+     *            the z2
+     * @return the double
+     */
     public static final double distanceSquared(final double x1, final double z1, final double x2, final double z2) {
         final double dx = Math.abs(x1 - x2);
         final double dz = Math.abs(z1 - z2);
@@ -319,9 +479,12 @@ public class TrigUtil {
 
     /**
      * 2D-distance in x-z plane.
+     *
      * @param location1
+     *            the location1
      * @param location2
-     * @return
+     *            the location2
+     * @return the double
      */
     public static final double xzDistance(final Location location1, final Location location2)
     {
@@ -330,9 +493,12 @@ public class TrigUtil {
 
     /**
      * 2D-distance in x-z plane.
+     *
      * @param location1
+     *            the location1
      * @param location2
-     * @return
+     *            the location2
+     * @return the double
      */
     public static final double xzDistance(final IGetPosition location1, final IGetPosition location2)
     {
@@ -341,9 +507,12 @@ public class TrigUtil {
 
     /**
      * 2D-distance in x-z plane.
+     *
      * @param location1
+     *            the location1
      * @param location2
-     * @return
+     *            the location2
+     * @return the double
      */
     public static final double xzDistance(final Location location1, final IGetPosition location2)
     {
@@ -352,11 +521,16 @@ public class TrigUtil {
 
     /**
      * 2D-distance.
+     *
      * @param x1
+     *            the x1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param z2
-     * @return
+     *            the z2
+     * @return the double
      */
     public static final double distance(final double x1, final double z1, final double x2, final double z2) {
         final double dx = Math.abs(x1 - x2);
@@ -365,17 +539,29 @@ public class TrigUtil {
     }
 
     /**
-     * Positive angle between vector from source to target and the vector for the given direction [0...PI].
+     * Positive angle between vector from source to target and the vector for
+     * the given direction [0...PI].
+     *
      * @param sourceX
+     *            the source x
      * @param sourceY
+     *            the source y
      * @param sourceZ
+     *            the source z
      * @param dirX
+     *            the dir x
      * @param dirY
+     *            the dir y
      * @param dirZ
+     *            the dir z
      * @param targetX
+     *            the target x
      * @param targetY
+     *            the target y
      * @param targetZ
-     * @return  Positive angle between vector from source to target and the vector for the given direction [0...PI].
+     *            the target z
+     * @return Positive angle between vector from source to target and the
+     *         vector for the given direction [0...PI].
      */
     public static float angle(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ) {
         double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
@@ -396,9 +582,12 @@ public class TrigUtil {
 
     /**
      * Angle of a 2d vector, x being the side at the angle. (radians).
+     *
      * @param x
+     *            the x
      * @param z
-     * @return
+     *            the z
+     * @return the double
      */
     public static final double angle(final double x, final double z){
         final double a;
@@ -414,9 +603,13 @@ public class TrigUtil {
     }
 
     /**
-     * Get the difference of angles (radians) as given from angle(x,z), from a1 to a2, i.e. rather a2 - a1 in principle.
+     * Get the difference of angles (radians) as given from angle(x,z), from a1
+     * to a2, i.e. rather a2 - a1 in principle.
+     *
      * @param a1
+     *            the a1
      * @param a2
+     *            the a2
      * @return Difference of angle from -pi to pi
      */
     public static final double angleDiff(final double a1, final double a2){
@@ -428,10 +621,15 @@ public class TrigUtil {
     }
 
     /**
-     * Yaw (angle in grad) difference. This ensures inputs are interpreted correctly (for 360 degree offsets).
+     * Yaw (angle in grad) difference. This ensures inputs are interpreted
+     * correctly (for 360 degree offsets).
+     *
      * @param fromYaw
+     *            the from yaw
      * @param toYaw
-     * @return Angle difference to get from fromYaw to toYaw. Result is in [-180, 180].
+     *            the to yaw
+     * @return Angle difference to get from fromYaw to toYaw. Result is in
+     *         [-180, 180].
      */
     public static final float yawDiff(float fromYaw, float toYaw){
         if (fromYaw <= -360f) fromYaw = -((-fromYaw) % 360f);
@@ -446,9 +644,12 @@ public class TrigUtil {
 
     /**
      * Manhattan distance.
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
-     * @return
+     *            the loc2
+     * @return the int
      */
     public static int manhattan(final Location loc1, final Location loc2) {
         return manhattan(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
@@ -456,47 +657,96 @@ public class TrigUtil {
 
     /**
      * Manhattan distance.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param block
-     * @return
+     *            the block
+     * @return the int
      */
     public static int manhattan(final int x1, final int y1, final int  z1, final Block block) {
         return manhattan(x1, y1, z1, block.getX(), block.getY(), block.getZ());
     }
 
+    /**
+     * Manhattan.
+     *
+     * @param x1
+     *            the x1
+     * @param z1
+     *            the z1
+     * @param x2
+     *            the x2
+     * @param z2
+     *            the z2
+     * @return the double
+     */
     public static double manhattan(final double x1,final double  z1, final double x2, final double z2){
         return manhattan(Location.locToBlock(x1), Location.locToBlock(z1), Location.locToBlock(x2), Location.locToBlock(z2));
     }
 
     /**
      * Manhattan distance (steps along the sides of an orthogonal grid).
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return the int
      */
     public static int manhattan(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
         return Math.abs(x1 - x2) + Math.abs(y1 - y2) + Math.abs(z1 - z2);
     }
 
+    /**
+     * Manhattan.
+     *
+     * @param x1
+     *            the x1
+     * @param y1
+     *            the y1
+     * @param z1
+     *            the z1
+     * @param x2
+     *            the x2
+     * @param y2
+     *            the y2
+     * @param z2
+     *            the z2
+     * @return the double
+     */
     public static double manhattan(final double x1, final double y1, final double  z1, final double x2, final double y2, final double z2){
         return manhattan(Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1), Location.locToBlock(x2), Location.locToBlock(y2), Location.locToBlock(z2));
     }
 
     /**
      * Maximum distance comparing dx, dy, dz.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return the int
      */
     public static int maxDistance(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
         return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
@@ -504,24 +754,36 @@ public class TrigUtil {
 
     /**
      * Maximum distance comparing dx, dy, dz.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return the double
      */
     public static double maxDistance(final double x1, final double y1, final double  z1, final double x2, final double y2, final double z2){
         return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
     }
 
     /**
-     * Check if the x-z plane move is "any backwards"  regarding the yaw direction.
+     * Check if the x-z plane move is "any backwards" regarding the yaw
+     * direction.
+     *
      * @param xDistance
+     *            the x distance
      * @param zDistance
+     *            the z distance
      * @param yaw
-     * @return
+     *            the yaw
+     * @return true, if is moving backwards
      */
     public static boolean isMovingBackwards(final double xDistance, final double zDistance, final float yaw) {
         return xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
@@ -532,8 +794,11 @@ public class TrigUtil {
 
     /**
      * Compare position and looking direction.
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePosAndLook(final Location loc1, final Location loc2) {
@@ -543,9 +808,11 @@ public class TrigUtil {
     /**
      * Test if both locations have the exact same coordinates. Does not check
      * yaw/pitch.
-     * 
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePos(final Location loc1, final Location loc2) {
@@ -555,8 +822,11 @@ public class TrigUtil {
 
     /**
      * Compare position and looking direction.
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePosAndLook(final IGetPositionWithLook loc1, final Location loc2) {
@@ -566,9 +836,11 @@ public class TrigUtil {
     /**
      * Test if both locations have the exact same coordinates. Does not check
      * yaw/pitch.
-     * 
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePos(final IGetPositionWithLook loc1, final Location loc2) {
@@ -578,8 +850,11 @@ public class TrigUtil {
 
     /**
      * Compare position and looking direction.
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePosAndLook(final IGetPositionWithLook loc1, final IGetPositionWithLook loc2) {
@@ -589,9 +864,11 @@ public class TrigUtil {
     /**
      * Test if both locations have the exact same coordinates. Does not check
      * yaw/pitch.
-     * 
+     *
      * @param loc1
+     *            the loc1
      * @param loc2
+     *            the loc2
      * @return Returns false if either is null.
      */
     public static boolean isSamePos(final IGetPositionWithLook loc1, final IGetPositionWithLook loc2) {
@@ -601,10 +878,15 @@ public class TrigUtil {
 
     /**
      * Test if the coordinates represent the same position.
+     *
      * @param loc
+     *            the loc
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @return Returns false if loc is null;
      */
     public static boolean isSamePos(final Location loc, final double x, final double y, final double z) {
@@ -616,13 +898,20 @@ public class TrigUtil {
 
     /**
      * Test if the coordinates represent the same position.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return true, if is same pos
      */
     public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
         return x1 == x2 && y1 == y2 && z1 == z2;
@@ -630,23 +919,34 @@ public class TrigUtil {
 
     /**
      * Test if the coordinates represent the same position (2D).
+     *
      * @param x1
+     *            the x1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param z2
-     * @return
+     *            the z2
+     * @return true, if is same pos
      */
     public static boolean isSamePos(final double x1, final double z1, final double x2, final double z2){
         return x1 == x2 && z1 == z2;
     }
 
     /**
-     * Test if the given double-coordinates are on the same block as specified by the int-coordinates.
+     * Test if the given double-coordinates are on the same block as specified
+     * by the int-coordinates.
+     *
      * @param loc
+     *            the loc
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is same block
      */
     public static boolean isSameBlock(final Location loc, final double x, final double y, final double z) {
         if (loc == null) {
@@ -656,14 +956,21 @@ public class TrigUtil {
     }
 
     /**
-     * 
+     * Checks if is same block.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
-     * @return
+     *            the z2
+     * @return true, if is same block
      */
     public static boolean isSameBlock(final int x1, final int y1, final int z1, final double x2, final double y2, final double z2) {
         return x1 == Location.locToBlock(x2) && z1 == Location.locToBlock(z2) && y1 == Location.locToBlock(y2);
@@ -671,12 +978,16 @@ public class TrigUtil {
 
     /**
      * Test if the block coordinate is intersecting with min+max bounds,
-     * assuming the a full block. Excludes the case of only the edges intersecting. 
-     * 
+     * assuming the a full block. Excludes the case of only the edges
+     * intersecting.
+     *
      * @param min
+     *            the min
      * @param max
-     * @param block Block coordinate of the block.
-     * @return
+     *            the max
+     * @param block
+     *            Block coordinate of the block.
+     * @return true, if successful
      */
     public static boolean intersectsBlock(final double min, final double max, final int block) {
         final double db = (double) block;

@@ -30,6 +30,7 @@ import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 
+// TODO: Auto-generated Javadoc
 /**
  * A location with bounds with a lot of extra stuff.
  * 
@@ -51,6 +52,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /** The exact coordinates. */
     double x, y, z;
 
+    /** The pitch. */
     float yaw, pitch; // TODO: -> entity ?
 
     /** Bounding box. */
@@ -58,7 +60,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /** Horizontal margin for the bounding box (center towards edge). */
     double boxMarginHorizontal;
-    /** Vertical margin for the bounding box (y towards top)*/
+    
+    /** Vertical margin for the bounding box (y towards top). */
     double boxMarginVertical;
 
     // TODO: Check if onGround can be completely replaced by onGroundMinY and notOnGroundMaxY.
@@ -85,7 +88,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /** All block flags collected for maximum used bounds. */
     Long blockFlags = null;
 
-    /** Is the player on ladder? */
+    /** Is the player on ladder?. */
     Boolean onClimbable = null;
 
     /** Simple test if the exact position is passable. */
@@ -94,22 +97,22 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /** Bounding box collides with blocks. */
     Boolean passableBox = null;
 
-    /** Is the player above stairs? */
+    /** Is the player above stairs?. */
     Boolean aboveStairs = null;
 
-    /** Is the player in lava? */
+    /** Is the player in lava?. */
     Boolean inLava = null;
 
-    /** Is the player in water? */
+    /** Is the player in water?. */
     Boolean inWater = null;
 
-    /** Is the player is web? */
+    /** Is the player is web?. */
     Boolean inWeb = null;
 
-    /** Is the player on ice? */
+    /** Is the player on ice?. */
     Boolean onIce = null;
 
-    /** Is the player on the ground? */
+    /** Is the player on the ground?. */
     Boolean onGround = null;
 
 
@@ -122,54 +125,85 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     World world = null;
 
 
+    /**
+     * Instantiates a new rich bounds location.
+     *
+     * @param blockCache
+     *            the block cache
+     */
     public RichBoundsLocation(final BlockCache blockCache) {
         this.blockCache = blockCache;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation#getWorld()
+     */
     @Override
     public World getWorld() {
         return world;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetLocation#getWorldName()
+     */
     @Override
     public String getWorldName() {
         return world.getName();
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetPosition#getX()
+     */
     @Override
     public double getX() {
         return x;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetPosition#getY()
+     */
     @Override
     public double getY() {
         return y;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetPosition#getZ()
+     */
     @Override
     public double getZ() {
         return z;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetLook#getYaw()
+     */
     @Override
     public float getYaw() {
         return yaw;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetLook#getPitch()
+     */
     @Override
     public float getPitch() {
         return pitch;
     }
 
+    /**
+     * Gets the vector.
+     *
+     * @return the vector
+     */
     public Vector getVector() {
         return new Vector(x, y, z);
     }
 
     /**
      * Gets a new Location instance representing this position.
-     * 
+     *
      * @return the location
-     * @throws NullPointerException, if the world stored internally is null.
      */
     public Location getLocation() {
         if (this.world == null) {
@@ -178,16 +212,25 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         return new Location(world, x, y, z, yaw, pitch);
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetBlockPosition#getBlockX()
+     */
     @Override
     public int getBlockX() {
         return blockX;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetBlockPosition#getBlockY()
+     */
     @Override
     public int getBlockY() {
         return blockY;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.location.IGetBlockPosition#getBlockZ()
+     */
     @Override
     public int getBlockZ() {
         return blockZ;
@@ -196,8 +239,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Return the bounding box as a new double array (minX, minY, minZ, maxX,
      * maxY, maxZ).
-     * 
-     * @return
+     *
+     * @return the bounds as doubles
      */
     public double[] getBoundsAsDoubles() {
         return new double[] {minX, minY, minZ, maxX, maxY, maxZ};
@@ -207,8 +250,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * Get the bounding box margin from the center (x ,z) to the edge of the
      * box. This value may be adapted from entity width or other input, and it
      * might be cut down to a certain resolution (e.g. 1/1000).
-     * 
-     * @return
+     *
+     * @return the box margin horizontal
      */
     public double getBoxMarginHorizontal() {
         return boxMarginHorizontal;
@@ -217,8 +260,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Get the bounding box margin from the y coordinate (feet for entities) to
      * the top.
-     * 
-     * @return
+     *
+     * @return the box margin vertical
      */
     public double getBoxMarginVertical() {
         return boxMarginVertical;
@@ -226,9 +269,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Compares block coordinates (not the world).
-     * 
+     *
      * @param other
-     * @return
+     *            the other
+     * @return true, if is same block
      */
     public final boolean isSameBlock(final IGetBlockPosition other) {
         return blockX == other.getBlockX() && blockZ == other.getBlockZ() && blockY == other.getBlockY();
@@ -236,10 +280,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Block coordinate comparison.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is same block
      */
     public final boolean isSameBlock(final int x, final int y, final int z) {
         return blockX == x && blockZ == z && blockY == y;
@@ -247,8 +295,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Compares block coordinates (not the world).
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is same block
      */
     public final boolean isSameBlock(final Location loc) {
         return blockX == loc.getBlockX() && blockZ == loc.getBlockZ() && blockY == loc.getBlockY();
@@ -256,8 +306,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check if this location is above the given one (blockY + 1).
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is block above
      */
     public boolean isBlockAbove(final IGetBlockPosition loc) {
         return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
@@ -265,8 +317,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check if this location is above the given one (blockY + 1).
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is block above
      */
     public boolean isBlockAbove(final Location loc) {
         return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
@@ -274,9 +328,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Compares exact coordinates (not the world).
-     * 
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is same pos
      */
     public boolean isSamePos(final IGetPosition loc) {
         return x == loc.getX() && z == loc.getZ() && y == loc.getY();
@@ -284,9 +339,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Compares exact coordinates (not the world).
-     * 
+     *
      * @param loc
-     * @return
+     *            the loc
+     * @return true, if is same pos
      */
     public boolean isSamePos(final Location loc) {
         return x == loc.getX() && z == loc.getZ() && y == loc.getY();
@@ -294,8 +350,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Manhattan distance, see Trigutil.
+     *
      * @param other
-     * @return
+     *            the other
+     * @return the int
      */
     public int manhattan(final IGetBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
@@ -304,8 +362,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Maximum block distance comparing dx, dy, dz.
+     *
      * @param other
-     * @return
+     *            the other
+     * @return the int
      */
     public int maxBlockDist(final IGetBlockPosition other) {
         // TODO: Consider using direct field access from other methods as well.
@@ -313,24 +373,31 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Quick check for really bad coordinates (actual problem, if true is returned.).
-     * @return
+     * Quick check for really bad coordinates (actual problem, if true is
+     * returned.).
+     *
+     * @return true, if successful
      */
     public boolean hasIllegalCoords() {
         return CheckUtils.isBadCoordinate(minX, maxX, minY, maxY, minZ, maxZ);
     }
 
     /**
-     * Get the collected block-flags. This will return null if collectBlockFlags has not been called.
-     * @return
+     * Get the collected block-flags. This will return null if collectBlockFlags
+     * has not been called.
+     *
+     * @return the block flags
      */
     public Long getBlockFlags() {
         return blockFlags;
     }
 
     /**
-     * Set the block flags which are usually collected on base of bounding box, yOnGround and other considerations, such as 1.5 high blocks.
+     * Set the block flags which are usually collected on base of bounding box,
+     * yOnGround and other considerations, such as 1.5 high blocks.
+     *
      * @param blockFlags
+     *            the new block flags
      */
     public void setBlockFlags(Long blockFlags) {
         this.blockFlags = blockFlags;
@@ -338,7 +405,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Not cached.
-     * @return
+     *
+     * @return the type id above
      */
     public int getTypeIdAbove() {
         return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
@@ -346,26 +414,43 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Convenience method: delegate to BlockProperties.isDoppwnStream .
-     * 
+     *
      * @param xDistance
+     *            the x distance
      * @param zDistance
-     * @return
+     *            the z distance
+     * @return true, if is down stream
      */
     public boolean isDownStream(final double xDistance, final double zDistance)
     {
         return BlockProperties.isDownStream(blockCache, blockX, blockY, blockZ, getData(), xDistance, zDistance);
     }
 
+    /**
+     * Gets the type id.
+     *
+     * @return the type id
+     */
     public Integer getTypeId() {
         if (typeId == null) typeId = getTypeId(blockX, blockY, blockZ);
         return typeId;
     }
 
+    /**
+     * Gets the type id below.
+     *
+     * @return the type id below
+     */
     public Integer getTypeIdBelow() {
         if (typeIdBelow == null) typeIdBelow = getTypeId(blockX, blockY - 1, blockZ);
         return typeIdBelow;
     }
 
+    /**
+     * Gets the data.
+     *
+     * @return the data
+     */
     public Integer getData() {
         if (data == null) data = getData(blockX, blockY, blockZ);
         return data;
@@ -373,11 +458,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Uses id cache if present.
-     * 
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the type id
      */
     public final int getTypeId(final int x, final int y, final int z) {
         return blockCache.getTypeId(x, y, z);
@@ -385,11 +473,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Uses id cache if present.
-     * 
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return the data
      */
     public final int getData(final int x, final int y, final int z) {
         return blockCache.getData(x, y, z);
@@ -397,8 +488,9 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Set the id cache for faster id getting.
-     * 
+     *
      * @param cache
+     *            the new block cache
      */
     public void setBlockCache(final BlockCache cache) {
         this.blockCache = cache;
@@ -406,7 +498,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Get the underlying BLockCache.
-     * @return
+     *
+     * @return the block cache
      */
     public final BlockCache getBlockCache() {
         return blockCache;
@@ -523,9 +616,12 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check if solid blocks hit the box.
+     *
      * @param xzMargin
+     *            the xz margin
      * @param yMargin
-     * @return
+     *            the y margin
+     * @return true, if is next to ground
      */
     public boolean isNextToGround(final double xzMargin, final double yMargin) {
         // TODO: Adjust to check block flags ?
@@ -533,8 +629,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Reset condition for flying checks (sf + nofall): liquids, web, ladder (not on-ground, though).
-     * @return
+     * Reset condition for flying checks (sf + nofall): liquids, web, ladder
+     * (not on-ground, though).
+     *
+     * @return true, if is reset cond
      */
     public boolean isResetCond() {
         // NOTE: if optimizing, setYOnGround has to be kept in mind. 
@@ -545,9 +643,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * Check if the location is on ground and if it is hitting the bounding box
      * of a block with the given id. Currently this is coarse (not checking if
      * it is really possible to stand on such a block).
-     * 
+     *
      * @param id
-     * @return
+     *            the id
+     * @return true, if successful
      */
     public boolean standsOnBlock(final int id) {
         if (!isOnGround()) {
@@ -585,8 +684,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Check the location is on ice, only regarding the center. Currently
      * demands to be on ground as well.
-     * 
-     * @return
+     *
+     * @return true, if is on ice
      */
     public boolean isOnIce() {
         if (onIce == null) {
@@ -606,8 +705,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Test if the location is on rails (assuming minecarts with some magic
      * bounds/behavior).
-     * 
-     * @return
+     *
+     * @return true, if is on rails
      */
     public boolean isOnRails() {
         return BlockProperties.isRails(getTypeId())
@@ -673,9 +772,12 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
-     * @param yOnGround Margin below the player.
-     * @return
+     * Simple block-on-ground check for given margin (no entities). Meant for
+     * checking bigger margin than the normal yOnGround.
+     *
+     * @param yOnGround
+     *            Margin below the player.
+     * @return true, if is on ground
      */
     public boolean isOnGround(final double yOnGround) {
         if (notOnGroundMaxY >= yOnGround) return false;
@@ -684,10 +786,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * SSimple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
+     * SSimple block-on-ground check for given margin (no entities). Meant for
+     * checking bigger margin than the normal yOnGround.
+     *
      * @param yOnGround
-     * @param ignoreFlags Flags to not regard as ground.
-     * @return
+     *            the y on ground
+     * @param ignoreFlags
+     *            Flags to not regard as ground.
+     * @return true, if is on ground
      */
     public boolean isOnGround(final double yOnGround, final long ignoreFlags) {
         if (ignoreFlags == 0) {
@@ -699,11 +805,16 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
 
     /**
-     * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
-     * @param yOnGround Margin below the player.
+     * Simple block-on-ground check for given margin (no entities). Meant for
+     * checking bigger margin than the normal yOnGround.
+     *
+     * @param yOnGround
+     *            Margin below the player.
      * @param xzMargin
-     * @param yMargin Extra margin added below and above.
-     * @return
+     *            the xz margin
+     * @param yMargin
+     *            Extra margin added below and above.
+     * @return true, if is on ground
      */
     public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin) {
         if (xzMargin >= 0 && onGroundMinY <= yOnGround) return true;
@@ -714,12 +825,18 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
-     * @param yOnGround Margin below the player.
+     * Simple block-on-ground check for given margin (no entities). Meant for
+     * checking bigger margin than the normal yOnGround.
+     *
+     * @param yOnGround
+     *            Margin below the player.
      * @param xzMargin
-     * @param yMargin Extra margin added below and above.
-     * @param ignoreFlags Flags to not regard as ground.
-     * @return
+     *            the xz margin
+     * @param yMargin
+     *            Extra margin added below and above.
+     * @param ignoreFlags
+     *            Flags to not regard as ground.
+     * @return true, if is on ground
      */
     public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin, final long ignoreFlags) {
         if (ignoreFlags == 0) {
@@ -747,9 +864,12 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check if solid blocks hit the box.
+     *
      * @param xzMargin
+     *            the xz margin
      * @param yMargin
-     * @return
+     *            the y margin
+     * @return true, if is next to solid
      */
     public boolean isNextToSolid(final double xzMargin, final double yMargin) {
         // TODO: Adjust to check block flags ?
@@ -758,19 +878,27 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Convenience method for testing for either.
-     * @return
+     *
+     * @return true, if is on ground or reset cond
      */
     public boolean isOnGroundOrResetCond() {
         return isOnGround() || isResetCond();
     }
 
+    /**
+     * Gets the y on ground.
+     *
+     * @return the y on ground
+     */
     public double getyOnGround() {
         return yOnGround;
     }
 
     /**
      * This resets onGround and blockFlags.
+     *
      * @param yOnGround
+     *            the new y on ground
      */
     public void setyOnGround(final double yOnGround) {
         this.yOnGround = yOnGround;
@@ -779,9 +907,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Test if the foot location is passable (not the bounding box).
-     * <br>The result is cached.
-     * @return
+     * Test if the foot location is passable (not the bounding box). <br>
+     * The result is cached.
+     *
+     * @return true, if is passable
      */
     public boolean isPassable() {
         if (passable == null) {
@@ -799,8 +928,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Test if the bounding box is colliding (passable check with accounting for
      * workarounds).
-     * 
-     * @return
+     *
+     * @return true, if is passable box
      */
     public boolean isPassableBox() {
         // TODO: Might need a variation with margins as parameters.
@@ -819,6 +948,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         return passableBox;
     }
 
+    /**
+     * Checks if is block flags passable.
+     *
+     * @return true, if is block flags passable
+     */
     private boolean isBlockFlagsPassable() {
         return blockFlags != null && (blockFlags & (BlockProperties.F_SOLID | BlockProperties.F_GROUND)) == 0;
     }
@@ -827,8 +961,6 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * Set block flags using yOnGround, unless already set. Check the maximally
      * used bounds for the block checking, to have flags ready for faster
      * denial.
-     * 
-     * @param maxYonGround
      */
     public void collectBlockFlags() {
         if (blockFlags == null) {
@@ -837,9 +969,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Check the maximally used bounds for the block checking,
-     * to have flags ready for faster denial.
+     * Check the maximally used bounds for the block checking, to have flags
+     * ready for faster denial.
+     *
      * @param maxYonGround
+     *            the max yon ground
      */
     public void collectBlockFlags(double maxYonGround) {
         maxYonGround = Math.max(yOnGround, maxYonGround);
@@ -860,8 +994,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Check chunks within xzMargin radius for if they are loaded and load unloaded chunks.
+     * Check chunks within xzMargin radius for if they are loaded and load
+     * unloaded chunks.
+     *
      * @param xzMargin
+     *            the xz margin
      * @return Number of chunks loaded.
      */
     public int ensureChunksLoaded(final double xzMargin) {
@@ -871,10 +1008,13 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /**
      * Check for push using the full bounding box (pistons). The given
      * BlockChangeReference is not changed, it has to be updated externally.
-     * 
+     *
      * @param blockChangeTracker
-     * @param oldChangeId
+     *            the block change tracker
+     * @param ref
+     *            the ref
      * @param direction
+     *            the direction
      * @param coverDistance
      *            The (always positive) distance to cover.
      * @return A matching BlockChangeEntry with the minimal id. If no entry was
@@ -908,11 +1048,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Test, if the block intersects the bounding box, if assuming full bounds.
-     * 
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if is block intersecting
      */
     public boolean isBlockIntersecting(final int x, final int y, final int z) {
         return TrigUtil.intersectsBlock(minX, maxX, x)
@@ -921,14 +1064,20 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Test if a block fully pushed into that direction can push the player by coverDistance.
-     * 
-     * @param x Block coordinates.
+     * Test if a block fully pushed into that direction can push the player by
+     * coverDistance.
+     *
+     * @param x
+     *            Block coordinates.
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param direction
+     *            the direction
      * @param coverDistance
-     * @return
+     *            the cover distance
+     * @return true, if successful
      */
     private boolean coversDistance(final int x, final int y, final int z, final Direction direction, final double coverDistance) {
         switch (direction) {
@@ -959,8 +1108,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Set cached info according to other.<br>
-     * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
+     * Minimal optimizations: take block flags directly, on-ground max/min
+     * bounds, only set stairs if not on ground and not reset-condition.
+     *
      * @param other
+     *            the other
      */
     public void prepare(final RichBoundsLocation other) {
         // Simple first.
@@ -985,10 +1137,34 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         }
     }
 
+    /**
+     * Sets the.
+     *
+     * @param location
+     *            the location
+     * @param fullWidth
+     *            the full width
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
+     */
     public void set(final Location location, final double fullWidth, final double fullHeight, final double yOnGround) {
         doSet(location, fullWidth, fullHeight, yOnGround);
     }
 
+    /**
+     * Do set.
+     *
+     * @param location
+     *            the location
+     * @param fullWidth
+     *            the full width
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
+     */
     protected void doSet(final Location location, final double fullWidth, final double fullHeight, final double yOnGround) {
         // Set coordinates.
         blockX = location.getBlockX();
@@ -1037,11 +1213,17 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         blockCache = null; // No reset here.
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return LocUtil.hashCode(this);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder(128);

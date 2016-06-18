@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
 /**
  * Utility for UUIDs, player names.
  * @author mc_dev
@@ -24,20 +25,24 @@ import java.util.UUID;
 public class IdUtil {
 	
 	/**
-	 * Valid user name check (Minecraft).<br>
-	 * (Taken from TrustCore.)
-	 * @param name Allows null input.
-	 * @return
-	 */
+     * Valid user name check (Minecraft).<br>
+     * (Taken from TrustCore.)
+     *
+     * @param name
+     *            Allows null input.
+     * @return true, if is valid minecraft user name
+     */
 	public static boolean isValidMinecraftUserName(final String name) {
 		return name != null && name.matches("[\\w]{2,16}");
 	}
 	
 	/**
-	 * Safe method to parse a UUID, using UUIDFromString internally.
-	 * @param input
-	 * @return
-	 */
+     * Safe method to parse a UUID, using UUIDFromString internally.
+     *
+     * @param input
+     *            the input
+     * @return the uuid
+     */
 	public static UUID UUIDFromStringSafe(final String input) {
 		if (input == null) {
 			return null;
@@ -50,11 +55,13 @@ public class IdUtil {
 	}
 	
 	/**
-	 * More flexible UUID parsing.<br>
-	 * (Taken from TrustCore.)
-	 * @param input
-	 * @return
-	 */
+     * More flexible UUID parsing.<br>
+     * (Taken from TrustCore.)
+     *
+     * @param input
+     *            the input
+     * @return the uuid
+     */
 	public static UUID UUIDFromString(final String input) {
 		// TODO: Add unit tests.
 		final int len = input.length();

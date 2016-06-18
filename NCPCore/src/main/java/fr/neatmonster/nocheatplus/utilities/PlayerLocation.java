@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
+// TODO: Auto-generated Javadoc
 /**
  * Lots of content for a location a player is supposed to be at. Constructors
  * for convenient use.
@@ -30,13 +31,27 @@ public class PlayerLocation extends RichEntityLocation {
 
     // "Heavy" object members that need to be set to null on cleanup. //
 
+    /** The player. */
     private Player player = null;
 
 
+    /**
+     * Instantiates a new player location.
+     *
+     * @param mcAccess
+     *            the mc access
+     * @param blockCache
+     *            the block cache
+     */
     public PlayerLocation(final MCAccess mcAccess, final BlockCache blockCache) {
         super(mcAccess, blockCache);
     }
 
+    /**
+     * Gets the player.
+     *
+     * @return the player
+     */
     public Player getPlayer() {
         return player;
     }
@@ -71,12 +86,11 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Sets the player location object.
-     * 
+     *
      * @param location
      *            the location
      * @param player
      *            the player
-     * @throws NullPointerException, if player.getLocation.getWorld() returns null.
      */
     public void set(final Location location, final Player player) {
         set(location, player, 0.001);
@@ -84,12 +98,13 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Sets the player location object. Does not set or reset blockCache.
-     * 
+     *
      * @param location
      *            the location
      * @param player
      *            the player
-     * @throws NullPointerException, if Location.getWorld() returns null.
+     * @param yOnGround
+     *            the y on ground
      */
     public void set(final Location location, final Player player, final double yOnGround)
     {
@@ -100,6 +115,13 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Not supported.
+     *
+     * @param location
+     *            the location
+     * @param entity
+     *            the entity
+     * @param yOnGround
+     *            the y on ground
      */
     @Override
     public void set(Location location, Entity entity, double yOnGround) {
@@ -108,6 +130,15 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Not supported.
+     *
+     * @param location
+     *            the location
+     * @param entity
+     *            the entity
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
      */
     @Override
     public void set(Location location, Entity entity, double fullHeight, double yOnGround) {
@@ -116,6 +147,17 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Not supported.
+     *
+     * @param location
+     *            the location
+     * @param entity
+     *            the entity
+     * @param fullWidth
+     *            the full width
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
      */
     @Override
     public void set(Location location, Entity entity, double fullWidth, double fullHeight, double yOnGround) {
@@ -124,8 +166,11 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Set cached info according to other.<br>
-     * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
+     * Minimal optimizations: take block flags directly, on-ground max/min
+     * bounds, only set stairs if not on ground and not reset-condition.
+     *
      * @param other
+     *            the other
      */
     public void prepare(final PlayerLocation other) {
         super.prepare(other);
@@ -141,9 +186,10 @@ public class PlayerLocation extends RichEntityLocation {
 
     /**
      * Check absolute coordinates and stance for (typical) exploits.
-     * 
-     * @return
-     * @deprecated Not used anymore (hasIllegalCoords and hasIllegalStance are used individually instead).
+     *
+     * @return true, if is illegal
+     * @deprecated Not used anymore (hasIllegalCoords and hasIllegalStance are
+     *             used individually instead).
      */
     public boolean isIllegal() {
         if (hasIllegalCoords()) {
@@ -154,14 +200,19 @@ public class PlayerLocation extends RichEntityLocation {
     }
 
     /**
-     * Check for bounding box properties that might crash the server (if available, not the absolute coordinates).
-     * @return
+     * Check for bounding box properties that might crash the server (if
+     * available, not the absolute coordinates).
+     *
+     * @return true, if successful
      */
     public boolean hasIllegalStance() {
         // TODO: This doesn't check this location, but the player.
         return getMCAccess().isIllegalBounds(player).decide(); // MAYBE = NO
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.RichEntityLocation#toString()
+     */
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder(128);

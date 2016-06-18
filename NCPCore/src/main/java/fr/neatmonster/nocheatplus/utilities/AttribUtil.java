@@ -16,15 +16,26 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AttribUtil.
+ */
 public class AttribUtil {
+    
+    /** The Constant ID_SPRINT_BOOST. */
     public static final UUID ID_SPRINT_BOOST = IdUtil.UUIDFromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D");
 
     /**
      * Get a multiplier for an AttributeModifier.
-     * @param operator Exclusively allows operator 2. Otherwise will throw an IllegalArgumentException.
-     * @param value The modifier value (AttributeModifier).
-     * @throws IllegalArgumentException if the modifier is not 2.
+     *
+     * @param operator
+     *            Exclusively allows operator 2. Otherwise will throw an
+     *            IllegalArgumentException.
+     * @param value
+     *            The modifier value (AttributeModifier).
      * @return A multiplier for direct use.
+     * @throws IllegalArgumentException
+     *             if the modifier is not 2.
      */
     public static double getMultiplier(final int operator, final double value) {
         // TODO: Might allow 1 too, as it should "work", despite less accurate.

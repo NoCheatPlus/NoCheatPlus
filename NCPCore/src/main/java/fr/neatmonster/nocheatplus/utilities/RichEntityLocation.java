@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
+// TODO: Auto-generated Javadoc
 /**
  * A location with an entity with a lot of extra stuff.
  * 
@@ -28,6 +29,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
  */
 public class RichEntityLocation extends RichBoundsLocation {
 
+    /** The mc access. */
     // Final members //
     private final MCAccess mcAccess;
 
@@ -55,34 +57,63 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     // "Heavy" object members that need to be set to null on cleanup. //
 
+    /** The entity. */
     private Entity entity = null;
 
 
+    /**
+     * Instantiates a new rich entity location.
+     *
+     * @param mcAccess
+     *            the mc access
+     * @param blockCache
+     *            the block cache
+     */
     public RichEntityLocation(final MCAccess mcAccess, final BlockCache blockCache) {
         super(blockCache);
         this.mcAccess = mcAccess;
     }
 
+    /**
+     * Gets the width.
+     *
+     * @return the width
+     */
     public double getWidth() {
         return width;
     }
 
+    /**
+     * Gets the height.
+     *
+     * @return the height
+     */
     public double getHeight() {
         return height;
     }
 
+    /**
+     * Gets the eye height.
+     *
+     * @return the eye height
+     */
     public double getEyeHeight() {
         return eyeHeight;
     }
 
+    /**
+     * Gets the entity.
+     *
+     * @return the entity
+     */
     public Entity getEntity() {
         return entity;
     }
 
     /**
      * Test if this is a LivingEntity instance.
-     * 
-     * @return
+     *
+     * @return true, if is living
      */
     public boolean isLiving() {
         return isLiving;
@@ -90,7 +121,8 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /**
      * Retrieve the internally stored MCAccess instance.
-     * @return
+     *
+     * @return the MC access
      */
     public MCAccess getMCAccess() {
         return mcAccess;
@@ -99,13 +131,14 @@ public class RichEntityLocation extends RichBoundsLocation {
     /**
      * Simple check with custom margins (Boat, Minecart). Does not update the
      * internally stored standsOnEntity field.
-     * 
+     *
      * @param yOnGround
      *            Margin below the player.
      * @param xzMargin
+     *            the xz margin
      * @param yMargin
      *            Extra margin added below and above.
-     * @return
+     * @return true, if successful
      */
     public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin) {
         return blockCache.standsOnEntity(entity, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
@@ -142,10 +175,13 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Check if a player may climb upwards (isOnClimbable returned true, player does not move from/to ground).<br>
+     * Check if a player may climb upwards (isOnClimbable returned true, player
+     * does not move from/to ground).<br>
      * Having checked the other stuff is prerequisite for calling this (!).
-     * @param jumpHeigth Height the player is allowed to have jumped.
-     * @return
+     *
+     * @param jumpHeigth
+     *            Height the player is allowed to have jumped.
+     * @return true, if successful
      */
     public boolean canClimbUp(double jumpHeigth) {
         // TODO: distinguish vines.
@@ -177,9 +213,10 @@ public class RichEntityLocation extends RichBoundsLocation {
     /**
      * Test if something solid/ground-like collides within the given margin
      * above the eye height of the player.
-     * 
+     *
      * @param marginAboveEyeHeight
-     * @return
+     *            the margin above eye height
+     * @return true, if is head obstructed
      */
     public boolean isHeadObstructed(double marginAboveEyeHeight) {
         return isHeadObstructed(marginAboveEyeHeight, true); // TODO: This is changed behavior, need to check calls.
@@ -188,12 +225,12 @@ public class RichEntityLocation extends RichBoundsLocation {
     /**
      * Test if something solid/ground-like collides within the given margin
      * above the eye height of the player.
-     * 
+     *
      * @param marginAboveEyeHeight
      *            Must be greater than or equal zero.
      * @param stepCorrection
      *            If set to true, a correction method is used for leniency.
-     * @return
+     * @return true, if is head obstructed
      * @throws IllegalArgumentException
      *             If marginAboveEyeHeight is smaller than 0.
      */
@@ -220,8 +257,8 @@ public class RichEntityLocation extends RichBoundsLocation {
     /**
      * Test if something solid/ground-like collides within a default
      * margin/estimation above the eye height of the player.
-     * 
-     * @return
+     *
+     * @return true, if is head obstructed
      */
     public boolean isHeadObstructed() {
         return isHeadObstructed(0.0, true);
@@ -229,42 +266,68 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /**
      * Convenience constructor for using mcAccess.getHeight for fullHeight.
+     *
      * @param location
+     *            the location
      * @param entity
+     *            the entity
      * @param yOnGround
+     *            the y on ground
      */
     public void set(final Location location, final Entity entity, final double yOnGround) {
         doSet(location, entity, mcAccess.getWidth(entity), mcAccess.getHeight(entity), yOnGround);
     }
 
     /**
-     * 
+     * Sets the.
+     *
      * @param location
+     *            the location
      * @param entity
+     *            the entity
      * @param fullHeight
      *            Allows to specify eyeHeight here. Currently might be
      *            overridden by eyeHeight, if that is greater.
      * @param yOnGround
+     *            the y on ground
      */
     public void set(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
         doSet(location, entity, mcAccess.getWidth(entity), fullHeight, yOnGround);
     }
 
     /**
-     * 
+     * Sets the.
+     *
      * @param location
+     *            the location
      * @param entity
+     *            the entity
      * @param fullWidth
      *            Override the bounding box width (full width).
      * @param fullHeight
      *            Allows to specify eyeHeight here. Currently might be
      *            overridden by eyeHeight, if that is greater.
      * @param yOnGround
+     *            the y on ground
      */
     public void set(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
         doSet(location, entity, fullWidth, fullHeight, yOnGround);
     }
 
+    /**
+     * Do set.
+     *
+     * @param location
+     *            the location
+     * @param entity
+     *            the entity
+     * @param fullWidth
+     *            the full width
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
+     */
     protected void doSet(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
         if (entity instanceof LivingEntity) {
             isLiving = true;
@@ -284,6 +347,15 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /**
      * Not supported.
+     *
+     * @param location
+     *            the location
+     * @param fullWidth
+     *            the full width
+     * @param fullHeight
+     *            the full height
+     * @param yOnGround
+     *            the y on ground
      */
     @Override
     public void set(Location location, double fullWidth, double fullHeight, double yOnGround) {
@@ -292,8 +364,11 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /**
      * Set cached info according to other.<br>
-     * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
+     * Minimal optimizations: take block flags directly, on-ground max/min
+     * bounds, only set stairs if not on ground and not reset-condition.
+     *
      * @param other
+     *            the other
      */
     public void prepare(final RichEntityLocation other) {
         super.prepare(other);
@@ -308,6 +383,9 @@ public class RichEntityLocation extends RichBoundsLocation {
         entity = null;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.RichBoundsLocation#toString()
+     */
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder(128);

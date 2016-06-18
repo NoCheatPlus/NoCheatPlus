@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry;
 
+// TODO: Auto-generated Javadoc
 /**
  * Stand-alone BlockCache for setting data by access methods, for testing purposes.
  * @author dev1mc
@@ -43,15 +44,25 @@ public class FakeBlockCache extends BlockCache {
     private final CoordMap<double[]> boundsMapStored = new CoordHashMap<double[]>(23);
 
     /**
-     * Convenience method to copy a cuboid region given by two endpoints without any order specified.
+     * Convenience method to copy a cuboid region given by two endpoints without
+     * any order specified.
+     *
      * @param other
+     *            the other
      * @param x0
+     *            the x0
      * @param y0
+     *            the y0
      * @param z0
+     *            the z0
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param margin
+     *            the margin
      */
     public void set(BlockCache other, double x0, double y0, double z0, double x1, double y1, double z1, double margin) {
         set(other, Location.locToBlock(Math.min(x0, x1) - margin), Location.locToBlock(Math.min(y0,  y1) - margin), Location.locToBlock(Math.min(z0,  z1) - margin),
@@ -60,13 +71,21 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Copy a cuboid region from the other BlockCache instance.
+     *
      * @param other
+     *            the other
      * @param minX
+     *            the min x
      * @param minY
+     *            the min y
      * @param minZ
+     *            the min z
      * @param maxX
+     *            the max x
      * @param maxY
+     *            the max y
      * @param maxZ
+     *            the max z
      */
     public void set(BlockCache other, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         for (int x = minX; x <= maxX; x++) {
@@ -80,22 +99,33 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Set with data=0 and bounds=full.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param type
+     *            the type
      */
     public void set(int x, int y, int z, Material type) {
         set(x, y, z, BlockProperties.getId(type));
     }
 
     /**
-     * Set with data=0-
+     * Set with data=0-.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param type
+     *            the type
      * @param bounds
+     *            the bounds
      */
     public void set(int x, int y, int z, Material type, double[] bounds) {
         set(x, y, z, BlockProperties.getId(type), 0, bounds);
@@ -103,10 +133,15 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Set with data=0 and bounds=full.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param typeId
+     *            the type id
      */
     public void set(int x, int y, int z, int typeId) {
         set(x, y, z, typeId, 0);
@@ -114,11 +149,17 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Set with bounds=full.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param typeId
+     *            the type id
      * @param data
+     *            the data
      */
     public void set(int x, int y, int z, int typeId, int data) {
         set(x, y, z, typeId, data, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
@@ -126,12 +167,19 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Set custom properties.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
+     *            the z
      * @param typeId
+     *            the type id
      * @param data
-     * @param bounds Stores the given bounds directly.
+     *            the data
+     * @param bounds
+     *            Stores the given bounds directly.
      */
     public void set(int x, int y, int z, int typeId, int data, double[] bounds) {
         idMapStored.put(x, y, z, typeId);
@@ -146,13 +194,21 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Fill the entire cuboid.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param type
+     *            the type
      */
     public void fill(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         fill(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
@@ -160,15 +216,25 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Fill the entire cuboid.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param typeId
+     *            the type id
      * @param data
+     *            the data
      * @param bounds
+     *            the bounds
      */
     public void fill(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
@@ -182,13 +248,21 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Horizontal walls.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param type
+     *            the type
      */
     public void walls(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         walls(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
@@ -196,15 +270,25 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Horizontal walls.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param typeId
+     *            the type id
      * @param data
+     *            the data
      * @param bounds
+     *            the bounds
      */
     public void walls(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
@@ -220,13 +304,21 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Walls, floor, ceiling.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param type
+     *            the type
      */
     public void room(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
         room(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
@@ -234,15 +326,25 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Walls, floor, ceiling.
+     *
      * @param x1
+     *            the x1
      * @param y1
+     *            the y1
      * @param z1
+     *            the z1
      * @param x2
+     *            the x2
      * @param y2
+     *            the y2
      * @param z2
+     *            the z2
      * @param typeId
+     *            the type id
      * @param data
+     *            the data
      * @param bounds
+     *            the bounds
      */
     public void room(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
@@ -258,20 +360,30 @@ public class FakeBlockCache extends BlockCache {
 
     /**
      * Test if any an id is set for this block position.
+     *
      * @param x
+     *            the x
      * @param y
+     *            the y
      * @param z
-     * @return
+     *            the z
+     * @return true, if successful
      */
     public boolean hasIdEntry(int x, int y, int z) {
         return idMapStored.contains(x, y, z);
     }
 
     /**
-     * Return a line of java code to construct a new FakeBlockCache with the same content (no newlines).
+     * Return a line of java code to construct a new FakeBlockCache with the
+     * same content (no newlines).
+     *
      * @param builder
-     * @param fbcName Variable name of the FakeBlockCache instance.
-     * @param boundsPrefix A prefix for bounds variables for the case of repeated content. If set to null, no optimization will be performed. 
+     *            the builder
+     * @param fbcName
+     *            Variable name of the FakeBlockCache instance.
+     * @param boundsPrefix
+     *            A prefix for bounds variables for the case of repeated
+     *            content. If set to null, no optimization will be performed.
      */
     public void toJava(final StringBuilder builder, final String fbcName, final String boundsPrefix) {
         builder.append("FakeBlockCache " + fbcName + " = new FakeBlockCache();");
@@ -317,11 +429,17 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#setAccess(org.bukkit.World)
+     */
     @Override
     public void setAccess(World world) {
         // Ignore.
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#fetchTypeId(int, int, int)
+     */
     @Override
     public int fetchTypeId(int x, int y, int z) {
         final Integer id = idMapStored.get(x, y, z);
@@ -332,6 +450,9 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#fetchData(int, int, int)
+     */
     @Override
     public int fetchData(int x, int y, int z) {
         final Integer data = dataMapStored.get(x,  y,  z);
@@ -342,6 +463,9 @@ public class FakeBlockCache extends BlockCache {
         }
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#fetchBounds(int, int, int)
+     */
     @Override
     public double[] fetchBounds(int x, int y, int z) {
         final double[] bounds = boundsMapStored.get(x, y, z);
@@ -349,6 +473,9 @@ public class FakeBlockCache extends BlockCache {
         return bounds;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#standsOnEntity(org.bukkit.entity.Entity, double, double, double, double, double, double)
+     */
     @Override
     public boolean standsOnEntity(Entity entity, double minX, double minY,
             double minZ, double maxX, double maxY, double maxZ) {
@@ -356,6 +483,9 @@ public class FakeBlockCache extends BlockCache {
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.utilities.BlockCache#cleanup()
+     */
     @Override
     public void cleanup() {
         super.cleanup();
