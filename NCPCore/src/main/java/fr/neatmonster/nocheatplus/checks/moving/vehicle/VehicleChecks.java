@@ -359,8 +359,6 @@ public class VehicleChecks extends CheckListener {
         // (Currently always use firstPastMove and vehicleLocation.)
         final Location useFrom = LocUtil.set(useLoc1, world, firstPastMove.toIsValid ? firstPastMove.to : firstPastMove.from);
         final Location useTo = vehicleLocation;
-        // Ensure chunks are loaded.
-        MovingUtil.ensureChunksLoaded(player, useFrom, useTo, firstPastMove, "vehicle move", data, cc);
         // Initialize moveInfo.
         if (vehicleType == EntityType.PIG) {
             // TODO: Special cases by config rather.
@@ -375,11 +373,18 @@ public class VehicleChecks extends CheckListener {
         // Check coordinates, just in case.
         if (checkIllegal(moveInfo.from, moveInfo.to)) {
             // Likely superfluous.
+            // TODO: Obviously applies under unknown conditions.
+            SetBackEntry newTo = data.vehicleSetBacks.getValidSafeMediumEntry();
+            if (newTo == null) {
+                recoverVehicleSetBack(player, vehicle, vehicleLocation, moveInfo, data);
+            }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
-            setBack(player, vehicle, data.vehicleSetBacks.getValidSafeMediumEntry(), data, cc);
+            setBack(player, vehicle, newTo, data, cc);
             aux.returnVehicleMoveInfo(moveInfo);
             return;
         }
+        // Ensure chunks are loaded.
+        MovingUtil.ensureChunksLoaded(player, useFrom, useTo, firstPastMove, "vehicle move", data, cc);
         // Initialize currentMove.
         final VehicleMoveData thisMove = data.vehicleMoves.getCurrentMove();
         thisMove.set(moveInfo.from, moveInfo.to);
@@ -390,6 +395,38 @@ public class VehicleChecks extends CheckListener {
         checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, moveInfo, thisMove, firstPastMove, player, fake, data, cc);
         // Cleanup.
         aux.returnVehicleMoveInfo(moveInfo);
+    }
+
+    /**
+     * Try to recover the vehicle / player position on illegal coordinates.
+     * 
+     * @param player
+     * @param moveInfo
+     * @param data
+     */
+    private void recoverVehicleSetBack(final Player player, final Entity vehicle, 
+            final Location vehicleLocation, final VehicleMoveInfo moveInfo, final MovingData data) {
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Illegal coordinates on vehicle moving: world: " + moveInfo.from.getWorldName() + " , from: " + LocUtil.simpleFormat(moveInfo.from)  + " , to: " + LocUtil.simpleFormat(moveInfo.to));
+        // TODO: Kick for illegal moves?
+        if (moveInfo.from.hasIllegalCoords()) {
+            // (from is from the past moves usually.)
+            // Attempt to use the current location.
+            if (CheckUtils.isBadCoordinate(vehicleLocation.getX(), vehicleLocation.getY(), vehicleLocation.getZ())) {
+                // Can't recover vehicle coordinates.
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Could not recover vehicle coordinates. Player will be kicked.");
+                // Just kick.
+                player.kickPlayer("Vehicle error.");
+            }
+            else {
+                // Better than nothing.
+                data.vehicleSetBacks.setDefaultEntry(vehicleLocation);
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Using the current vehicle location for set-back, due to not having a past location to rely on. This could be a bug.");
+            }
+        }
+        else {
+            // Perhaps safe to use.
+            data.vehicleSetBacks.setDefaultEntry(moveInfo.from);
+        }
     }
 
     private boolean checkIllegal(final RichBoundsLocation from, final RichBoundsLocation to) {
