@@ -1237,6 +1237,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
         // TODO: Store a list of MCAccessHolder.
         this.mcAccess = mcAccess;
+        // TODO: Deprecate MCAccessHolder
         for (final Object obj : this.allComponents) {
             if (obj instanceof MCAccessHolder) {
                 try{
@@ -1247,6 +1248,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 }
             }
         }
+        // Set in registry.
+        genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
+        // Log.
         logManager.info(Streams.INIT, "McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
     }
 
