@@ -120,7 +120,7 @@ public class MovingUtil {
             } else {
                 StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them.");
             }
-            CheckUtils.kickIllegalMove(player);
+            CheckUtils.kickIllegalMove(player, cc);
         }
     }
 

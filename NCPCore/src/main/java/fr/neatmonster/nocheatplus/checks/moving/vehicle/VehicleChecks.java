@@ -376,7 +376,7 @@ public class VehicleChecks extends CheckListener {
             // TODO: Obviously applies under unknown conditions.
             SetBackEntry newTo = data.vehicleSetBacks.getValidSafeMediumEntry();
             if (newTo == null) {
-                recoverVehicleSetBack(player, vehicle, vehicleLocation, moveInfo, data);
+                recoverVehicleSetBack(player, vehicle, vehicleLocation, moveInfo, data, cc);
             }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
             setBack(player, vehicle, newTo, data, cc);
@@ -405,7 +405,8 @@ public class VehicleChecks extends CheckListener {
      * @param data
      */
     private void recoverVehicleSetBack(final Player player, final Entity vehicle, 
-            final Location vehicleLocation, final VehicleMoveInfo moveInfo, final MovingData data) {
+            final Location vehicleLocation, final VehicleMoveInfo moveInfo, 
+            final MovingData data, final MovingConfig cc) {
         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Illegal coordinates on vehicle moving: world: " + moveInfo.from.getWorldName() + " , from: " + LocUtil.simpleFormat(moveInfo.from)  + " , to: " + LocUtil.simpleFormat(moveInfo.to));
         // TODO: Kick for illegal moves?
         if (moveInfo.from.hasIllegalCoords()) {
@@ -415,7 +416,7 @@ public class VehicleChecks extends CheckListener {
                 // Can't recover vehicle coordinates.
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Could not recover vehicle coordinates. Player will be kicked.");
                 // Just kick.
-                player.kickPlayer("Vehicle error.");
+                player.kickPlayer(cc.msgKickIllegalVehicleMove);
             }
             else {
                 // Better than nothing.

@@ -675,6 +675,10 @@ public abstract class ConfPaths {
     public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP              = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIONS             = MOVING_VEHICLE_ENVELOPE + "actions";
 
+    private static final String MOVING_MESSAGE                              = MOVING + "message.";
+    public static final  String MOVING_MESSAGE_ILLEGALPLAYERMOVE            = MOVING_MESSAGE + "illegalplayermove";
+    public static final  String MOVING_MESSAGE_ILLEGALVEHICLEMOVE           = MOVING_MESSAGE + "illegalvehiclemove";
+
     public static final String  NET                                         = CHECKS + "net.";
 
     private static final String NET_ATTACKFREQUENCY                         = NET + "attackfrequency.";

@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -52,8 +53,8 @@ public class CheckUtils {
      * Kick and log.
      * @param player
      */
-    public static void kickIllegalMove(final Player player){
-        player.kickPlayer("Illegal move.");
+    public static void kickIllegalMove(final Player player, final MovingConfig cc){
+        player.kickPlayer(cc.msgKickIllegalMove);
         StaticLog.logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
     }
 
