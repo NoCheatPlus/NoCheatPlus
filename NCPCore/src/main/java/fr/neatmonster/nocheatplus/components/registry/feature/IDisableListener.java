@@ -20,12 +20,13 @@ package fr.neatmonster.nocheatplus.components.registry.feature;
  * @author asofold
  *
  */
-public interface DisableListener {
+public interface IDisableListener {
 
     /**
-     * Called in the plugin in onDisable, before all components get
-     * unregistered. This is meant for general data cleanup, there may be extra
-     * registry cleanup stages for data sources and checks later on.
+     * Called in the plugin in onDisable in reversed order of registration,
+     * before all components get unregistered. This is meant for general data
+     * cleanup, there may be extra registry cleanup stages for data sources and
+     * checks later on.
      */
     public void onDisable();
 

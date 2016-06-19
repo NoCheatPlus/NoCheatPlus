@@ -40,7 +40,7 @@ import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
-import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -52,10 +52,11 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Quick and dirty ProtocolLib setup.
- * @author dev1mc
+ * 
+ * @author asofold
  *
  */
-public class ProtocolLibComponent implements DisableListener, INotifyReload, JoinLeaveListener, Listener {
+public class ProtocolLibComponent implements IDisableListener, INotifyReload, JoinLeaveListener, Listener {
 
     // TODO: Static reference is problematic (needs a static and accessible Counters instance?). 
     public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.flying.nullplayer");

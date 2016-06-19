@@ -86,7 +86,7 @@ import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegi
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
-import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
@@ -215,7 +215,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Queued sub component holders, emptied on the next tick usually. */
     protected final List<IHoldSubComponents> subComponentholders = new ArrayList<IHoldSubComponents>(20);
 
-    private final List<DisableListener> disableListeners = new ArrayList<DisableListener>();
+    private final List<IDisableListener> disableListeners = new ArrayList<IDisableListener>();
 
     /** All registered components.  */
     protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
@@ -521,8 +521,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             joinLeaveListeners.add((JoinLeaveListener) obj);
             added = true;
         }
-        if (obj instanceof DisableListener) {
-            disableListeners.add((DisableListener) obj);
+        if (obj instanceof IDisableListener) {
+            disableListeners.add((IDisableListener) obj);
             added = true;
         }
 
@@ -613,8 +613,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (obj instanceof JoinLeaveListener) {
             joinLeaveListeners.remove((JoinLeaveListener) obj);
         }
-        if (obj instanceof DisableListener) {
-            disableListeners.remove((DisableListener) obj);
+        if (obj instanceof IDisableListener) {
+            disableListeners.remove((IDisableListener) obj);
         }
 
         // Remove sub registries.
@@ -636,9 +636,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * <ul>
      * <li>Prevent further registration. For now also disable listeners, though
      * this might get shifted still.</li>
-     * <li><b>Call onDisable for DisableListener instances.</b> This includes
-     * clearing all data (Needs extensions for sorting by priority for
-     * DisableListener instances.).</li>
+     * <li><b>Call onDisable for IDisableListener instances, in reversed
+     * order of registration.</b> This includes clearing all data (Needs extensions for sorting
+     * by priority for IDisableListener instances.).</li>
      * <li>Random sequence of cleanup calls for other registries and logging
      * statistics.</li>
      * <li>Call removeComponent for all registered components.</li>
@@ -702,15 +702,18 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) {
             logManager.info(Streams.INIT, "onDisable calls (include DataManager cleanup)...");
         }
-        // TODO: Sorting order + sort now (checks and data cleanup late, data manager last, allow plugins to access stuff before data is reset).
-        for (final DisableListener dl : disableListeners) {
+        // TODO: Reliable sorting order + sort now (checks and data cleanup late, data manager last, allow plugins to access stuff before data is reset).
+        final ArrayList<IDisableListener> disableListeners = new ArrayList<IDisableListener>(this.disableListeners);
+        Collections.reverse(disableListeners);
+        for (final IDisableListener dl : disableListeners) {
             try {
                 dl.onDisable();
             } catch (Throwable t) {
-                logManager.severe(Streams.INIT, "DisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
+                logManager.severe(Streams.INIT, "IDisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
                 logManager.severe(Streams.INIT, t);
             }
         }
+        // (Component removal will clear the list, rather.)
 
         // ExemptionManager cleanup.
         if (verbose) {
@@ -755,6 +758,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) {
             logManager.info(Streams.INIT, "Cleanup some mappings...");
         }
+        // Remove IDisableListener instances.
+        disableListeners.clear(); // Just in case.
         // Remove listeners.
         listeners.clear();
         // Remove config listeners.

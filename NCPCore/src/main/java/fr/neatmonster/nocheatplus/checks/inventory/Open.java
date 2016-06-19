@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /**
@@ -28,7 +28,7 @@ import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
  * @author mc_dev
  *
  */
-public class Open extends Check implements DisableListener{
+public class Open extends Check implements IDisableListener{
 
     private static Open instance = null;
 

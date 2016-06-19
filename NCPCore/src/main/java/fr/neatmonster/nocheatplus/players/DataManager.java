@@ -50,7 +50,7 @@ import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
-import fr.neatmonster.nocheatplus.components.registry.feature.DisableListener;
+import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
@@ -77,7 +77,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 @SetupOrder(priority = -80)
-public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, DisableListener{
+public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, IDisableListener{
 
     private static DataManager instance = null;
 

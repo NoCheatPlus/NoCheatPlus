@@ -31,7 +31,7 @@ import fr.neatmonster.nocheatplus.logging.LogManager;
  * ComponentRegistry:
  * <li>Supported components: Listener, TickListener, PermStateReceiver,
  * INotifyReload, INeedConfig, IRemoveData, MCAccessHolder, ConsistencyChecker,
- * JoinLeaveListener, DisableListener</li>
+ * JoinLeaveListener, IDisableListener</li>
  * <li>ComponentRegistry instances will be registered as sub registries unless
  * you use the addComponent(Object, boolean) method appropriately.</li>
  * <li>IHoldSubComponents instances will be registered in the next tick
