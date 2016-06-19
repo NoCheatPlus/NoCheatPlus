@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -93,7 +92,6 @@ import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.IPostRegisterRunnable;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.registry.feature.NCPListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.registry.feature.PermStateReceiver;
@@ -158,9 +156,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     /** Lower case player name to milliseconds point of time of release */
     private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
-
-    /** MCAccess instance. */
-    protected MCAccess mcAccess = null;
 
     /** Configuration problems (likely put to ConfigManager later). */
     protected String configProblems = null;
@@ -233,6 +228,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
 
+    /** Self-updating MCAccess reference. */
+    protected final IGenericInstanceHandle<MCAccess> mcAccess = genericInstanceRegistry.getGenericInstanceHandle(MCAccess.class);
 
     /** Tick listener that is only needed sometimes (component registration). */
     protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
@@ -506,11 +503,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (obj instanceof PermStateReceiver) {
             // No immediate update done.
             permStateReceivers.add((PermStateReceiver) obj);
-            added = true;
-        }
-        if (obj instanceof MCAccessHolder) {
-            // These will get notified in initMcAccess (iterates over allComponents).
-            ((MCAccessHolder) obj).setMCAccess(getMCAccess());
             added = true;
         }
         if (obj instanceof ConsistencyChecker) {
@@ -1204,86 +1196,40 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         return logManager;
     }
 
-    @Override
-    public MCAccess getMCAccess() {
-        if (mcAccess == null) {
-            initMCAccess();
-        }
-        return mcAccess;
-    }
-
     /**
-     * Fall-back method to initialize from factory, only if not yet set. Uses the BukkitScheduler to ensure this works if called from async checks.
-     */
-    private void initMCAccess() {
-        // TODO: Remove or log.
-        if (Bukkit.isPrimaryThread()) {
-            initMCAccess(ConfigManager.getConfigFile());
-        }
-        else {
-            getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
-                @Override
-                public MCAccess call() throws Exception {
-                    if (mcAccess != null) {
-                        return mcAccess;
-                    }
-                    else {
-                        return initMCAccess(ConfigManager.getConfigFile());
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * Re-setup MCAccess from internal factory and pass it to MCAccessHolder components, only call from the main thread.
+     * (Re-) Setup MCAccess and other access providers from the internal
+     * factories. Only call from the primary thread.
+     * 
      * @param config
      */
-    public MCAccess initMCAccess(final ConfigFile config) {
+    private MCAccess initMCAccess(final ConfigFile config) {
+        // TODO: Auto registry with unregister on reload hooks (more clean reload).
         // Reset MCAccess.
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
         final MCAccessConfig mcaC = new MCAccessConfig(config);
         final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
-        // TODO: Consider registry events for generic instances too.
         new AttributeAccessFactory().setupAttributeAccess(mcAccess, mcaC);
         new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC);
 
-        setMCAccess(mcAccess);
+        // Set in registry.
+        // TODO: Perhaps make MCAccess an aggregate thing for the more fine grained parts.
+        genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
+
+        // TODO: Summary event or listener call-back (possibly in another place.).
+
+        // Log.
+        logManager.info(Streams.INIT, "McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
+
         return mcAccess;
     }
 
     /**
-     * Set and propagate to registered MCAccessHolder instances.
-     */
-    @Override
-    public void setMCAccess(final MCAccess mcAccess) {
-        // Just sets it and propagates it.
-        // TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
-        // TODO: Store a list of MCAccessHolder.
-        this.mcAccess = mcAccess;
-        // TODO: Deprecate MCAccessHolder
-        for (final Object obj : this.allComponents) {
-            if (obj instanceof MCAccessHolder) {
-                try{
-                    ((MCAccessHolder) obj).setMCAccess(mcAccess);
-                } catch(Throwable t) {
-                    logManager.severe(Streams.INIT, "MCAccessHolder(" + obj.getClass().getName() + ") failed to set MCAccess: " + t.getClass().getSimpleName());
-                    logManager.severe(Streams.INIT, t);
-                }
-            }
-        }
-        // Set in registry.
-        genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
-        // Log.
-        logManager.info(Streams.INIT, "McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
-    }
-
-    /**
-     * Initialize BlockProperties, including config.
+     * Initialize BlockProperties, including config. Needs initMCAccess to be
+     * called before.
      */
     protected void initBlockProperties(ConfigFile config) {
         // Set up BlockProperties.
-        BlockProperties.init(getMCAccess(), ConfigManager.getWorldConfigProvider());
+        BlockProperties.init(mcAccess, ConfigManager.getWorldConfigProvider());
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
         // Schedule dumping the blocks properties (to let other plugins override).
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {

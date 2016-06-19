@@ -40,18 +40,18 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  *
  */
 public class CombinedListener extends CheckListener {
-	
-	protected final Improbable improbable 	= addCheck(new Improbable());
-	
-	protected final MunchHausen munchHausen = addCheck(new MunchHausen());
-	
-	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+
+    protected final Improbable improbable 	= addCheck(new Improbable());
+
+    protected final MunchHausen munchHausen = addCheck(new MunchHausen());
+
+    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idFakeInvulnerable = counters.registerKey("fakeinvulnerable");
 
-	public CombinedListener(){
-		super(CheckType.COMBINED);
-	}
-	
+    public CombinedListener(){
+        super(CheckType.COMBINED);
+    }
+
     /**
      * We listen to this event to prevent players from leaving while falling, so from avoiding fall damages.
      * 
@@ -61,26 +61,26 @@ public class CombinedListener extends CheckListener {
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        
+
         // TODO: EventPriority
-        
+
         final Player player = event.getPlayer();
         final CombinedData data = CombinedData.getData(player);
         final CombinedConfig cc = CombinedConfig.getConfig(player);
-        
+
         if (cc.invulnerableCheck && (cc.invulnerableTriggerAlways || cc.invulnerableTriggerFallDistance && player.getFallDistance() > 0)){
             // TODO: maybe make a heuristic for small fall distances with ground under feet (prevents future abuse with jumping) ?
-            final int invulnerableTicks = mcAccess.getInvulnerableTicks(player);
+            final int invulnerableTicks = mcAccess.getHandle().getInvulnerableTicks(player);
             if (invulnerableTicks == Integer.MAX_VALUE) {
                 // TODO: Maybe log a warning.
             } else {
                 final int ticks = cc.invulnerableInitialTicksJoin >= 0 ? cc.invulnerableInitialTicksJoin : invulnerableTicks;
                 data.invulnerableTick = TickTask.getTick() + ticks;
-                mcAccess.setInvulnerableTicks(player, 0);
+                mcAccess.getHandle().setInvulnerableTicks(player, 0);
             }
         }
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityDamage(final EntityDamageEvent event){
         final Entity entity = event.getEntity();
@@ -101,7 +101,7 @@ public class CombinedListener extends CheckListener {
         event.setCancelled(true);
         counters.addPrimaryThread(idFakeInvulnerable, 1);
     }
-    
+
     /**
      * A workaround for cancelled PlayerToggleSprintEvents.
      * 
@@ -110,29 +110,29 @@ public class CombinedListener extends CheckListener {
      */
     @EventHandler(priority = EventPriority.MONITOR) // HIGHEST)
     public void onPlayerToggleSprintHighest(final PlayerToggleSprintEvent event) {
-//    	// TODO: Check the un-cancelling.
-//        // Some plugins cancel "sprinting", which makes no sense at all because it doesn't stop people from sprinting
-//        // and rewards them by reducing their hunger bar as if they were walking instead of sprinting.
-//        if (event.isCancelled() && event.isSprinting())
-//            event.setCancelled(false);
+        //    	// TODO: Check the un-cancelling.
+        //        // Some plugins cancel "sprinting", which makes no sense at all because it doesn't stop people from sprinting
+        //        // and rewards them by reducing their hunger bar as if they were walking instead of sprinting.
+        //        if (event.isCancelled() && event.isSprinting())
+        //            event.setCancelled(false);
         // Feed the improbable.
         Improbable.feed(event.getPlayer(), 0.35f, System.currentTimeMillis());
     }
-    
+
     @EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
         // Check also in case of cancelled events.
-    	// Feed the improbable.
+        // Feed the improbable.
         Improbable.feed(event.getPlayer(), 0.35f, System.currentTimeMillis());
     }
-    
+
     @EventHandler(priority=EventPriority.LOWEST)
     public void onPlayerFish(final PlayerFishEvent event){
         // Check also in case of cancelled events.
-    	final Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         if (munchHausen.isEnabled(player) && munchHausen.checkFish(player, event.getCaught(), event.getState())){
-        	event.setCancelled(true);
+            event.setCancelled(true);
         }
     }
-	
+
 }

@@ -20,6 +20,7 @@ import org.bukkit.entity.Entity;
 import fr.neatmonster.nocheatplus.compat.bukkit.BlockCacheBukkit;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 public class BlockCacheCBReflect extends BlockCacheBukkit {
 
@@ -35,9 +36,10 @@ public class BlockCacheCBReflect extends BlockCacheBukkit {
     }
 
     @Override
-    public void setAccess(World world) {
+    public BlockCache setAccess(World world) {
         super.setAccess(world);
         this.nmsWorld = world == null ? null : helper.getHandle(world);
+        return this;
     }
 
     @Override

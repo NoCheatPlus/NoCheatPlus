@@ -433,8 +433,9 @@ public class FakeBlockCache extends BlockCache {
      * @see fr.neatmonster.nocheatplus.utilities.BlockCache#setAccess(org.bukkit.World)
      */
     @Override
-    public void setAccess(World world) {
+    public BlockCache setAccess(World world) {
         // Ignore.
+        return this;
     }
 
     /* (non-Javadoc)

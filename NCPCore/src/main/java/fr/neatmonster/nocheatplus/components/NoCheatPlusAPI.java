@@ -22,7 +22,6 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
 import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 
 
@@ -50,7 +49,7 @@ import fr.neatmonster.nocheatplus.logging.LogManager;
  * @author asofold
  *
  */
-public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegistryProvider, GenericInstanceRegistry, MCAccessHolder {
+public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegistryProvider, GenericInstanceRegistry    {
 
     /**
      * By default addComponent(Object) will register ComponentFactories as well.

@@ -83,6 +83,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IData;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
@@ -155,7 +156,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     /** Auxiliary functionality. */
     private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
-    private IAttributeAccess attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
+    private IGenericInstanceHandle<IAttributeAccess> attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IAttributeAccess.class);
 
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
@@ -494,7 +495,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.resetTeleported();
         // Debug.
         if (data.debug) {
-            outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
+            outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess.getHandle());
         }
         // Check for illegal move and bounding box etc.
         if ((moveInfo.from.hasIllegalCoords() || moveInfo.to.hasIllegalCoords()) ||
@@ -543,7 +544,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Collect all these properties within a context object (abstraction + avoid re-fetching). 
             if (player.getFoodLevel() > 5 || player.getAllowFlight() || player.isFlying()) {
                 data.timeSprinting = time;
-                data.multSprinting = attributeAccess.getSprintAttributeMultiplier(player);
+                data.multSprinting = attributeAccess.getHandle().getSprintAttributeMultiplier(player);
                 if (data.multSprinting == Double.MAX_VALUE) {
                     data.multSprinting = 1.30000002;
                 }
@@ -2033,12 +2034,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
         }
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        super.setMCAccess(mcAccess);
-        attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IAttributeAccess.class);
     }
 
 }

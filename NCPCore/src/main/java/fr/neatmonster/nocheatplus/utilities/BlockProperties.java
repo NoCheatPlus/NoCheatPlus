@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -73,22 +74,22 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static enum ToolType{
-        
+
         /** The none. */
         NONE,
-        
+
         /** The sword. */
         SWORD,
-        
+
         /** The shears. */
         SHEARS,
-        
+
         /** The spade. */
         SPADE,
-        
+
         /** The axe. */
         AXE,
-        
+
         /** The pickaxe. */
         PICKAXE,
         //		HOE,
@@ -101,30 +102,30 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static enum MaterialBase{
-        
+
         /** The none. */
         NONE(0, 1f),
-        
+
         /** The wood. */
         WOOD(1, 2f),
-        
+
         /** The stone. */
         STONE(2, 4f),
-        
+
         /** The iron. */
         IRON(3, 6f),
-        
+
         /** The diamond. */
         DIAMOND(4, 8f),
-        
+
         /** The gold. */
         GOLD(5, 12f);
         /** Index for array. */
         public final int index;
-        
+
         /** The break multiplier. */
         public final float breakMultiplier;
-        
+
         /**
          * Instantiates a new material base.
          *
@@ -137,7 +138,7 @@ public class BlockProperties {
             this.index = index;
             this.breakMultiplier = breakMultiplier;
         }
-        
+
         /**
          * Gets the by id.
          *
@@ -161,13 +162,13 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static class ToolProps{
-        
+
         /** The tool type. */
         public final ToolType toolType;
-        
+
         /** The material base. */
         public final MaterialBase materialBase;
-        
+
         /**
          * Instantiates a new tool props.
          *
@@ -180,14 +181,14 @@ public class BlockProperties {
             this.toolType = toolType;
             this.materialBase = materialBase;
         }
-        
+
         /* (non-Javadoc)
          * @see java.lang.Object#toString()
          */
         public String toString() {
             return "ToolProps("+toolType + "/"+materialBase+")";
         }
-        
+
         /**
          * Validate.
          */
@@ -207,18 +208,18 @@ public class BlockProperties {
      * @deprecated Will be replaced by a generic way to define tools.
      */
     public static class BlockProps{
-        
+
         /** The tool. */
         public final ToolProps tool;
-        
+
         /** The breaking times. */
         public final long[] breakingTimes;
-        
+
         /** The hardness. */
         public final float hardness;
         /** Factor 2 = 2 times faster. */
         public final float efficiencyMod;
-        
+
         /**
          * Instantiates a new block props.
          *
@@ -230,7 +231,7 @@ public class BlockProperties {
         public BlockProps(ToolProps tool, float hardness) {
             this(tool, hardness, 1);
         }
-        
+
         /**
          * Instantiates a new block props.
          *
@@ -260,7 +261,7 @@ public class BlockProperties {
             }
             this.efficiencyMod = efficiencyMod;
         }
-        
+
         /**
          * Instantiates a new block props.
          *
@@ -274,7 +275,7 @@ public class BlockProperties {
         public BlockProps(ToolProps tool, float hardness, long[] breakingTimes) {
             this(tool, hardness, breakingTimes, 1f);
         }
-        
+
         /**
          * Instantiates a new block props.
          *
@@ -293,14 +294,14 @@ public class BlockProperties {
             this.hardness = hardness;
             this.efficiencyMod = efficiencyMod;
         }
-        
+
         /* (non-Javadoc)
          * @see java.lang.Object#toString()
          */
         public String toString() {
             return "BlockProps(" + hardness + " / " + tool.toString() + " / " + Arrays.toString(breakingTimes) + ")";
         }
-        
+
         /**
          * Validate.
          */
@@ -473,13 +474,13 @@ public class BlockProperties {
 
     /** The rt ray. */
     private static ICollidePassable rtRay = null;
-    
+
     /** The rt axis. */
     private static ICollidePassable rtAxis = null;
-    
+
     /** The block cache. */
-    private static BlockCache blockCache = null; 
-    
+    private static WrapBlockCache wrapBlockCache = null; 
+
     /** The p loc. */
     private static PlayerLocation pLoc = null;
 
@@ -488,7 +489,7 @@ public class BlockProperties {
 
     /** Flag position for stairs. */
     public static final long F_STAIRS               = 0x1;
-    
+
     /** The Constant F_LIQUID. */
     public static final long F_LIQUID               = 0x2;
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
@@ -496,10 +497,10 @@ public class BlockProperties {
     public static final long F_SOLID                = 0x4;
     /** Compatibility flag: regard this block as passable always. */
     public static final long F_IGN_PASSABLE         = 0x8;
-    
+
     /** The Constant F_WATER. */
     public static final long F_WATER                = 0x10;
-    
+
     /** The Constant F_LAVA. */
     public static final long F_LAVA                 = 0x20;
     /** Override bounding box: 1.5 blocks high, like fences.<br>
@@ -634,8 +635,8 @@ public class BlockProperties {
      * @param worldConfigProvider
      *            the world config provider
      */
-    public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
-        blockCache = mcAccess.getBlockCache(null);
+    public static void init(final IHandle<MCAccess> mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+        wrapBlockCache = new WrapBlockCache();
         rtRay = new PassableRayTracing();
         rtAxis = new PassableAxisTracing();
         pLoc = new PlayerLocation(mcAccess, null);
@@ -680,7 +681,7 @@ public class BlockProperties {
      * @param worldConfigProvider
      *            the world config provider
      */
-    private static void initTools(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+    private static void initTools(final IHandle<MCAccess> mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         tools.clear();
         tools.put(268, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
         tools.put(269, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
@@ -713,12 +714,13 @@ public class BlockProperties {
     /**
      * Inits the blocks.
      *
-     * @param mcAccess
-     *            the mc access
+     * @param mcAccessHandle
+     *            the mc access handle
      * @param worldConfigProvider
      *            the world config provider
      */
-    private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+    private static void initBlocks(final IHandle<MCAccess> mcAccessHandle, final WorldConfigProvider<?> worldConfigProvider) {
+        final MCAccess mcAccess = mcAccessHandle.getHandle();
         // Reset tool props.
         Arrays.fill(blocks, null);
         // Initialize block flags
@@ -1346,6 +1348,7 @@ public class BlockProperties {
      * @return the breaking duration
      */
     public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, final Player player, final Location location) {
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, 0.3);
@@ -1750,6 +1753,7 @@ public class BlockProperties {
      */
     public static boolean isInLiquid(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
@@ -1772,6 +1776,7 @@ public class BlockProperties {
      */
     public static boolean isInWeb(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
@@ -1794,6 +1799,7 @@ public class BlockProperties {
      */
     public static boolean isOnGround(final Player player, final Location location, final double yOnGround) {
         // Bit fat workaround, maybe put the object through from check listener ?
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
@@ -1815,6 +1821,7 @@ public class BlockProperties {
      * @return true, if is on ground or reset cond
      */
     public static boolean isOnGroundOrResetCond(final Player player, final Location location, final double yOnGround) {
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
@@ -1836,6 +1843,7 @@ public class BlockProperties {
      * @return true, if is reset cond
      */
     public static boolean isResetCond(final Player player, final Location location, final double yOnGround) {
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
         pLoc.set(location, player, yOnGround);
@@ -2733,6 +2741,7 @@ public class BlockProperties {
      * @return true, if is passable
      */
     public static final boolean isPassable(final World world, final double x, final double y, final double z) {
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(world);
         boolean res = isPassable(blockCache, x, y, z, blockCache.getTypeId(x, y, z));
         blockCache.cleanup();
@@ -2777,6 +2786,7 @@ public class BlockProperties {
      * @return true, if is passable
      */
     private static boolean isPassable(final ICollidePassable rt, final Location from, final Location to) {
+        final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(from.getWorld());
         rt.setMaxSteps(60); // TODO: Configurable ?
         rt.setBlockCache(blockCache);
@@ -3837,8 +3847,8 @@ public class BlockProperties {
     public static void cleanup() {
         pLoc.cleanup();
         pLoc = null;
-        blockCache.cleanup();
-        blockCache = null;
+        wrapBlockCache.cleanup();
+        wrapBlockCache = null;
         // TODO: might empty mappings...
     }
 

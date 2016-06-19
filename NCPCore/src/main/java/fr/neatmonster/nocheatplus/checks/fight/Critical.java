@@ -32,7 +32,6 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -48,11 +47,6 @@ public class Critical extends Check {
      */
     public Critical() {
         super(CheckType.FIGHT_CRITICAL);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        super.setMCAccess(mcAccess);
     }
 
     /**

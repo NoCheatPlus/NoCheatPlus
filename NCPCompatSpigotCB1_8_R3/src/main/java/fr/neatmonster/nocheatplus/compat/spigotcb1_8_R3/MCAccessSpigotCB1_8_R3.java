@@ -87,6 +87,11 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
     }
 
     @Override
+    public BlockCache getBlockCache() {
+        return getBlockCache(null);
+    }
+
+    @Override
     public BlockCache getBlockCache(final World world) {
         return new BlockCacheSpigotCB1_8_R3(world);
     }

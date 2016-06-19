@@ -48,7 +48,7 @@ public class GodMode extends Check {
         final int tick = TickTask.getTick();
 
         final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
-        final int invulnerabilityTicks = playerIsFake ? 0 : mcAccess.getInvulnerableTicks(player);
+        final int invulnerabilityTicks = playerIsFake ? 0 : mcAccess.getHandle().getInvulnerableTicks(player);
 
         // TODO: cleanup this leugique beume...
 
@@ -204,9 +204,9 @@ public class GodMode extends Check {
                     public void run() {
                         try {
                             // Check again if the player should be dead, and if the game didn't mark them as dead.
-                            if (mcAccess.shouldBeZombie(player)){
+                            if (mcAccess.getHandle().shouldBeZombie(player)){
                                 // Artificially "kill" them.
-                                mcAccess.setDead(player, 19);
+                                mcAccess.getHandle().setDead(player, 19);
                             }
                         } catch (final Exception e) {}
                     }

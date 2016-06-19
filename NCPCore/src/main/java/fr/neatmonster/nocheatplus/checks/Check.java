@@ -27,7 +27,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
@@ -71,7 +71,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * actual check.</li>
  * 
  */
-public abstract class Check implements MCAccessHolder, IDebugPlayer {
+public abstract class Check implements IDebugPlayer {
 
     // TODO: Do these get cleaned up ?
     /** The execution histories of each check. */
@@ -94,7 +94,7 @@ public abstract class Check implements MCAccessHolder, IDebugPlayer {
     /** The type. */
     protected final CheckType type;
 
-    protected MCAccess mcAccess;
+    protected final IGenericInstanceHandle<MCAccess> mcAccess;
 
     /**
      * Instantiates a new check.
@@ -104,7 +104,7 @@ public abstract class Check implements MCAccessHolder, IDebugPlayer {
      */
     public Check(final CheckType type) {
         this.type = type;
-        mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+        mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
         ViolationHistory.checkTypeMap.put(getClass().getName(), type);
         DataManager.registerExecutionHistory(type, histories);
     }
@@ -230,16 +230,6 @@ public abstract class Check implements MCAccessHolder, IDebugPlayer {
      */
     public boolean hasBypass(final Player player) {
         return CheckUtils.hasBypass(type, player, null);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        this.mcAccess = mcAccess;
-    }
-
-    @Override
-    public MCAccess getMCAccess() {
-        return mcAccess;
     }
 
     @Override

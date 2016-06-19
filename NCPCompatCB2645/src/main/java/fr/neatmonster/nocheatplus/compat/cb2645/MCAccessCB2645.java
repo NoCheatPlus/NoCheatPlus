@@ -14,13 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.compat.cb2645;
 
-import net.minecraft.server.v1_5_R1.AxisAlignedBB;
-import net.minecraft.server.v1_5_R1.Block;
-import net.minecraft.server.v1_5_R1.DamageSource;
-import net.minecraft.server.v1_5_R1.EntityComplexPart;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.MobEffectList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,6 +29,12 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import net.minecraft.server.v1_5_R1.AxisAlignedBB;
+import net.minecraft.server.v1_5_R1.Block;
+import net.minecraft.server.v1_5_R1.DamageSource;
+import net.minecraft.server.v1_5_R1.EntityComplexPart;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.MobEffectList;
 
 public class MCAccessCB2645 implements MCAccess{
 
@@ -63,6 +62,11 @@ public class MCAccessCB2645 implements MCAccess{
     @Override
     public CommandMap getCommandMap() {
         return ((CraftServer) Bukkit.getServer()).getCommandMap();
+    }
+
+    @Override
+    public BlockCache getBlockCache() {
+        return getBlockCache(null);
     }
 
     @Override

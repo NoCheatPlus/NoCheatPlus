@@ -19,10 +19,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectBase;
 import fr.neatmonster.nocheatplus.components.registry.feature.IPostRegisterRunnable;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
@@ -32,11 +30,9 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  * @author asofold
  *
  */
-public class BridgeCrossPlugin implements IBridgeCrossPlugin, IPostRegisterRunnable, MCAccessHolder {
+public class BridgeCrossPlugin implements IBridgeCrossPlugin, IPostRegisterRunnable {
 
     // TODO: More sophisticated checking ?
-
-    private MCAccess mcAccess;
 
     private final Class<?> playerClass;
     private final Class<?> entityClass;
@@ -68,17 +64,6 @@ public class BridgeCrossPlugin implements IBridgeCrossPlugin, IPostRegisterRunna
     @Override
     public void runPostRegister() {
         NCPAPIProvider.getNoCheatPlusAPI().registerGenericInstance(IBridgeCrossPlugin.class, this);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        // TODO: Should adapt to mcAccess?
-        this.mcAccess = mcAccess;
-    }
-
-    @Override
-    public MCAccess getMCAccess() {
-        return mcAccess;
     }
 
     @Override

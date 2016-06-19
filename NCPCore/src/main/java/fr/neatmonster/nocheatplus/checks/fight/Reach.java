@@ -83,7 +83,7 @@ public class Reach extends Check {
         final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE + getDistMod(damaged);
         final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
 
-        final double height = damagedIsFake ? (damaged instanceof LivingEntity ? ((LivingEntity) damaged).getEyeHeight() : 1.75) : mcAccess.getHeight(damaged);
+        final double height = damagedIsFake ? (damaged instanceof LivingEntity ? ((LivingEntity) damaged).getEyeHeight() : 1.75) : mcAccess.getHandle().getHeight(damaged);
 
         // Refine y position.
         // TODO: Make a little more accurate by counting in the actual bounding box.

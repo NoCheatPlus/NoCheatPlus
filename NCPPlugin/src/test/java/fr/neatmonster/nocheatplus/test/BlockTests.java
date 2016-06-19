@@ -20,6 +20,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.PluginTests;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
@@ -71,7 +72,7 @@ public class BlockTests {
      */
     public static void initBlockProperties() {
         PluginTests.setDummNoCheatPlusAPI(false);
-        BlockProperties.init(NCPAPIProvider.getNoCheatPlusAPI().getMCAccess(), new DefaultConfigWorldConfigProvider());
+        BlockProperties.init(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class), new DefaultConfigWorldConfigProvider());
     }
 
 }

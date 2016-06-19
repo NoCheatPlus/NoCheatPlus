@@ -13,13 +13,12 @@ import org.bukkit.event.entity.EntityPortalEnterEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import fr.neatmonster.nocheatplus.utilities.WrapBlockCache;
 
 /**
  * Hot fix for 1.9 and 1.10 (possibly later?): falling block duplication via end
@@ -30,7 +29,7 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  * @author asofold
  *
  */
-public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
+public class HotFixFallingBlockPortalEnter implements Listener {
 
     public static void testAvailability() {
         if (ReflectionUtil.getClass("org.bukkit.event.entity.EntityPortalEnterEvent") == null
@@ -45,11 +44,11 @@ public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
     /** Temporary use only: setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
 
-    private MCAccess mcAccess;
-    private BlockCache blockCache;
+    private final WrapBlockCache wrapBlockCache; // TODO: Fetch a getter from the registry.
 
     public HotFixFallingBlockPortalEnter() {
         testAvailability();
+        wrapBlockCache = new WrapBlockCache();
     }
 
     @EventHandler(priority=EventPriority.MONITOR)
@@ -75,6 +74,7 @@ public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
             final Location loc = entity.getLocation(useLoc);
             final World world = loc.getWorld();
             if (InventoryConfig.getConfig(world).hotFixFallingBlockEndPortalActive) {
+                final BlockCache blockCache = wrapBlockCache.getBlockCache();
                 blockCache.setAccess(world);
                 final boolean nearbyPortal = BlockProperties.collidesId(blockCache, loc.getX() - 2.0, loc.getY() - 2.0, loc.getZ() - 2.0, loc.getX() + 3.0, loc.getY() + 3.0, loc.getZ() + 3.0, Material.ENDER_PORTAL);
                 blockCache.cleanup();
@@ -89,17 +89,6 @@ public class HotFixFallingBlockPortalEnter implements Listener, MCAccessHolder {
             }
             useLoc.setWorld(null);
         }
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        this.mcAccess = mcAccess;
-        this.blockCache = mcAccess.getBlockCache(null);
-    }
-
-    @Override
-    public MCAccess getMCAccess() {
-        return mcAccess;
     }
 
 }

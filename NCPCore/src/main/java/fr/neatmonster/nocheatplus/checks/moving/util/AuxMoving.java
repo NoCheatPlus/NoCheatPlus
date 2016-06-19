@@ -21,13 +21,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGenericInstance;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 
 /**
  * Non-static utility, (to be) registered as generic instance.
@@ -35,11 +36,9 @@ import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
  * @author asofold
  *
  */
-public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
+public class AuxMoving implements IRegisterAsGenericInstance {
 
     // TODO: Move more non-static stuff here.
-
-    private MCAccess mcAccess = null;
 
     /**
      * Unused instances.<br>
@@ -52,6 +51,8 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      * Might be better due to cascading events in case of actions or plugins doing strange things.
      */
     private final List<VehicleMoveInfo> parkedVehicleMoveInfo = new ArrayList<VehicleMoveInfo>(10);
+
+    private final IGenericInstanceHandle<MCAccess> mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
 
     public PlayerMoveInfo usePlayerMoveInfo() {
         if (parkedPlayerMoveInfo.isEmpty()) {
@@ -96,7 +97,7 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
      * @return
      */
     public final double getJumpAmplifier(final Player player) {
-        return MovingUtil.getJumpAmplifier(player, mcAccess);
+        return MovingUtil.getJumpAmplifier(player, mcAccess.getHandle());
     }
 
     /**
@@ -132,17 +133,6 @@ public class AuxMoving implements MCAccessHolder, IRegisterAsGenericInstance {
         vMoveInfo.set(vehicle, vehicleLocation, null, cc.yOnGround);
         data.resetVehiclePositions(vMoveInfo.from);
         returnVehicleMoveInfo(vMoveInfo);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        this.mcAccess = mcAccess;
-        clear();
-    }
-
-    @Override
-    public MCAccess getMCAccess() {
-        return mcAccess;
     }
 
     /**

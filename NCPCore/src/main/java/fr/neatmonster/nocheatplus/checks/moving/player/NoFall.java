@@ -66,7 +66,7 @@ public class NoFall extends Check {
      * @param y
      */
     private void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
-     // Damage to be dealt.
+        // Damage to be dealt.
         final double maxD = estimateDamage(player, y, data);
         if (maxD >= 1.0) {
             // Check skipping conditions.
@@ -115,9 +115,9 @@ public class NoFall extends Check {
 
 
     private void dealFallDamage(final Player player, final double damage) {
-        if (mcAccess.dealFallDamageFiresAnEvent().decide()) {
+        if (mcAccess.getHandle().dealFallDamageFiresAnEvent().decide()) {
             // TODO: Better decideOptimistically?
-            mcAccess.dealFallDamage(player, damage);
+            mcAccess.getHandle().dealFallDamage(player, damage);
         }
         else {
             final EntityDamageEvent event = BridgeHealth.getEntityDamageEvent(player, DamageCause.FALL, damage);
@@ -125,7 +125,7 @@ public class NoFall extends Check {
             if (!event.isCancelled()) {
                 // TODO: account for no damage ticks etc.
                 player.setLastDamageCause(event);
-                mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
+                mcAccess.getHandle().dealFallDamage(player, BridgeHealth.getDamage(event));
             }
         }
 

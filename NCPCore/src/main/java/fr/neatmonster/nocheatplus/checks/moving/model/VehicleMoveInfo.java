@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 
 public class VehicleMoveInfo extends MoveInfo<RichEntityLocation, Entity> {
@@ -25,7 +26,7 @@ public class VehicleMoveInfo extends MoveInfo<RichEntityLocation, Entity> {
     /** Add to fullWidth for the bounding box. */
     private double extendFullWidth = 0.0;
 
-    public VehicleMoveInfo(final MCAccess mcAccess){
+    public VehicleMoveInfo(final IHandle<MCAccess> mcAccess){
         super(mcAccess, new RichEntityLocation(mcAccess, null), new RichEntityLocation(mcAccess, null));
     }
 

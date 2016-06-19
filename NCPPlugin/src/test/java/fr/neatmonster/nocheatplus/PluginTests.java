@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -36,16 +37,10 @@ public class PluginTests {
      */
     public static class DummyNoCheatPlusAPI implements NoCheatPlusAPI {
 
-        private MCAccess mcAccess = new MCAccessBukkit();
+        private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
 
-        @Override
-        public void setMCAccess(MCAccess mcAccess) {
-            this.mcAccess = mcAccess;
-        }
-
-        @Override
-        public MCAccess getMCAccess() {
-            return mcAccess;
+        public DummyNoCheatPlusAPI() {
+            genericInstanceRegistry.registerGenericInstance(MCAccess.class, new MCAccessBukkit());
         }
 
         @Override
@@ -70,22 +65,22 @@ public class PluginTests {
 
         @Override
         public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
-            throw new UnsupportedOperationException();
+            return genericInstanceRegistry.registerGenericInstance(registerFor, instance);
         }
 
         @Override
         public <T> T getGenericInstance(Class<T> registeredFor) {
-            throw new UnsupportedOperationException();
+            return genericInstanceRegistry.getGenericInstance(registeredFor);
         }
 
         @Override
         public <T> T unregisterGenericInstance(Class<T> registeredFor) {
-            throw new UnsupportedOperationException();
+            return genericInstanceRegistry.unregisterGenericInstance(registeredFor);
         }
 
         @Override
         public <T> IGenericInstanceHandle<T> getGenericInstanceHandle(Class<T> registeredFor) {
-            throw new UnsupportedOperationException();
+            return genericInstanceRegistry.getGenericInstanceHandle(registeredFor);
         }
 
         @Override

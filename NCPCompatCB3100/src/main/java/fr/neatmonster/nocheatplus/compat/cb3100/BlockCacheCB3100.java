@@ -17,18 +17,17 @@ package fr.neatmonster.nocheatplus.compat.cb3100;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R4.AxisAlignedBB;
-import net.minecraft.server.v1_7_R4.Block;
-import net.minecraft.server.v1_7_R4.EntityBoat;
-import net.minecraft.server.v1_7_R4.IBlockAccess;
-import net.minecraft.server.v1_7_R4.TileEntity;
-
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import net.minecraft.server.v1_7_R4.AxisAlignedBB;
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.EntityBoat;
+import net.minecraft.server.v1_7_R4.IBlockAccess;
+import net.minecraft.server.v1_7_R4.TileEntity;
 
 public class BlockCacheCB3100 extends BlockCache implements IBlockAccess{
 
@@ -42,13 +41,14 @@ public class BlockCacheCB3100 extends BlockCache implements IBlockAccess{
     }
 
     @Override
-    public void setAccess(World world) {
+    public BlockCache setAccess(World world) {
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
         } else {
             this.world = null;
         }
+        return this;
     }
 
     @Override

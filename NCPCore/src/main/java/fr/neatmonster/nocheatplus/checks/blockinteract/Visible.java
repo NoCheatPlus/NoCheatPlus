@@ -30,15 +30,15 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.WrapBlockCache;
 import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
 
 public class Visible extends Check {
 
-    private BlockCache blockCache;
+    private final WrapBlockCache wrapBlockCache;
 
     /**
      * Strict set to false, due to false positives.
@@ -52,18 +52,8 @@ public class Visible extends Check {
 
     public Visible() {
         super(CheckType.BLOCKINTERACT_VISIBLE);
-        blockCache = mcAccess.getBlockCache(null);
+        wrapBlockCache = new WrapBlockCache();
         rayTracing.setMaxSteps(60); // TODO: Configurable ?
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#setMCAccess(fr.neatmonster.nocheatplus.compat.MCAccess)
-     */
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        super.setMCAccess(mcAccess);
-        // Renew the BlockCache instance.
-        blockCache = mcAccess.getBlockCache(null);
     }
 
     public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
@@ -87,6 +77,7 @@ public class Visible extends Check {
             // Ray-tracing.
             Vector direction = loc.getDirection();
             // Initialize.
+            final BlockCache blockCache = this.wrapBlockCache.getBlockCache();
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
             collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);

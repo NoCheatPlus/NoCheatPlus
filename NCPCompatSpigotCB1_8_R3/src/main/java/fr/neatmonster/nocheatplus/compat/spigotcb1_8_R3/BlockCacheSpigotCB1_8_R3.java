@@ -17,6 +17,12 @@ package fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.EntityBoat;
@@ -24,13 +30,6 @@ import net.minecraft.server.v1_8_R3.EnumDirection;
 import net.minecraft.server.v1_8_R3.IBlockAccess;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.TileEntity;
-
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.entity.Entity;
-
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess{
 
@@ -42,7 +41,7 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
     }
 
     @Override
-    public void setAccess(World world) {
+    public BlockCache setAccess(World world) {
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
@@ -51,6 +50,7 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
             this.world = null;
             this.bukkitWorld = null;
         }
+        return this;
     }
 
     @SuppressWarnings("deprecation")

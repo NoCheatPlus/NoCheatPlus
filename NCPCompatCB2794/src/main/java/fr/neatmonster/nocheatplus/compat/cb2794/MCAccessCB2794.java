@@ -65,6 +65,11 @@ public class MCAccessCB2794 implements MCAccess{
     }
 
     @Override
+    public BlockCache getBlockCache() {
+        return getBlockCache(null);
+    }
+
+    @Override
     public BlockCache getBlockCache(final World world) {
         return new BlockCacheCB2794(world);
     }

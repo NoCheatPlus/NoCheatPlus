@@ -42,7 +42,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
     }
 
     @Override
-    public void setAccess(World world) {
+    public BlockCache setAccess(World world) {
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
@@ -51,6 +51,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
             this.world = null;
             this.bukkitWorld = null;
         }
+        return this;
     }
 
     @SuppressWarnings("deprecation")

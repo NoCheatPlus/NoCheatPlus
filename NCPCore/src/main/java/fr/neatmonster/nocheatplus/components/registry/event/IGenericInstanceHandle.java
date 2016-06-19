@@ -25,7 +25,7 @@ package fr.neatmonster.nocheatplus.components.registry.event;
  * @param <T>
  *            The type instances are registered for.
  */
-public interface IGenericInstanceHandle<T> {
+public interface IGenericInstanceHandle<T> extends IHandle<T> {
 
     // TODO: <? extends T> ?
 

@@ -55,7 +55,6 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -115,11 +114,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
     public FightListener() {
         super(CheckType.FIGHT);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        super.setMCAccess(mcAccess);
     }
 
     /**
@@ -197,7 +191,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //     		}
             // Log.
             if (data.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
-                damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
+                damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getHandle().getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
             }
             // Check for self hit exploits (mind that projectiles are excluded from this.)
             if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc)) {
@@ -416,7 +410,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         boolean cancelled = false;
 
         // (Might pass generic context to factories, for shared + heavy properties.)
-        final SharedContext sharedContext = new SharedContext(damaged, damagedIsFake, mcAccess);
+        final SharedContext sharedContext = new SharedContext(damaged, damagedIsFake, mcAccess.getHandle());
         final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
         final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedIsFake, damagedLoc, data, cc, sharedContext) : null;
 

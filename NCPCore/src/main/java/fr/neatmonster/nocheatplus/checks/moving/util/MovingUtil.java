@@ -88,7 +88,7 @@ public class MovingUtil {
     {
         // This might get extended to a check-like thing.
         boolean restored = false;
-        final PlayerLocation pLoc = new PlayerLocation(NCPAPIProvider.getNoCheatPlusAPI().getMCAccess(), null);
+        final PlayerLocation pLoc = new PlayerLocation(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class), null);
         // (Mind that we don't set the block cache here).
         final Location loc = player.getLocation();
         if (!restored && data.hasSetBack()) {

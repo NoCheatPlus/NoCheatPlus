@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -44,7 +45,7 @@ public class CommandUtil {
      */
     public static CommandMap getCommandMap() {
         try {
-            return NCPAPIProvider.getNoCheatPlusAPI().getMCAccess().getCommandMap();
+            return NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(MCAccess.class).getCommandMap();
         }
         catch (Throwable t) {
             StaticLog.logSevere(t);

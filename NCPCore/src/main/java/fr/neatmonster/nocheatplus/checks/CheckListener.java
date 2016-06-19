@@ -24,8 +24,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHoldSubComponents;
-import fr.neatmonster.nocheatplus.components.registry.feature.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.registry.feature.NCPListener;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -35,34 +35,24 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  * @author mc_dev
  *
  */
-public class CheckListener extends NCPListener implements MCAccessHolder, IHoldSubComponents, IDebugPlayer {
+public class CheckListener extends NCPListener implements IHoldSubComponents, IDebugPlayer {
 
     /** Check group / type which this listener is for. */
     protected final CheckType checkType;
-    protected MCAccess mcAccess;
+    protected final IGenericInstanceHandle<MCAccess> mcAccess;
 
     /** */
     protected final List<Object> queuedComponents = new LinkedList<Object>();
 
     public CheckListener(CheckType checkType){
         this.checkType = checkType; 
-        this.mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+        this.mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
     }
 
     @Override
     public String getComponentName() {
         final String part = super.getComponentName();
         return checkType == null ? part : part + "_" + checkType.name();
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        this.mcAccess = mcAccess;
-    }
-
-    @Override
-    public MCAccess getMCAccess() {
-        return mcAccess;
     }
 
     /**

@@ -53,7 +53,7 @@ public class VersionCommand extends BaseCommand{
 
     public static List<String> getVersionInfo() {
         final List<String> lines = new LinkedList<String>();
-        final MCAccess mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+        final MCAccess mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(MCAccess.class);
         lines.addAll(Arrays.asList(new String[]{
                 "---- Version information ----",
                 "#### Server ####",
@@ -97,7 +97,7 @@ public class VersionCommand extends BaseCommand{
         }
         return lines;
     }
-    
+
     private static String alt(String x) {
         return x.replace('(', '~').replace(')', '~');
     }

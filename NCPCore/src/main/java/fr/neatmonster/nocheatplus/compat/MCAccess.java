@@ -20,20 +20,25 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.components.registry.feature.IGetBlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 
 /**
- * Compatibility interface to get properties for Bukkit instances that need access of CraftBukkit or Minecraft classes.<br>
- * NOTE: All methods returning AlmostBoolean must never return null, unless stated otherwise.<br>
+ * Compatibility interface to get properties for Bukkit instances that need
+ * access of CraftBukkit or Minecraft classes.<br>
+ * NOTE: All methods returning AlmostBoolean must never return null, unless
+ * stated otherwise.<br>
  * NOTE: Expect API changes in the near future!<br>
- * NOTE: If an instance implements BlockPropertiesSetup, the setup method will be called after basic initialization but before configuration is applied.<br>
+ * NOTE: If an instance implements BlockPropertiesSetup, the setup method will
+ * be called after basic initialization but before configuration is applied.<br>
  * <hr>
  * TODO: Make minimal.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
-public interface MCAccess {
+public interface MCAccess extends IGetBlockCache {
 
     /**
      * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
@@ -54,8 +59,16 @@ public interface MCAccess {
     public CommandMap getCommandMap();
 
     /**
-     * Get a BlockCache implementation.
-     * @param world May be null to store an instance of BlockCache for future use.
+     * Retrieve a new BlockCache instance with access set to null.
+     */
+    @Override
+    public BlockCache getBlockCache();
+
+    /**
+     * Get a new BlockCache instance.
+     * 
+     * @param world
+     *            May be null to store an instance of BlockCache for future use.
      * @return
      */
     public BlockCache getBlockCache(World world);

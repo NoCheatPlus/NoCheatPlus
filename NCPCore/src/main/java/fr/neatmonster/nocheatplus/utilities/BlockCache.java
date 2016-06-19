@@ -127,8 +127,9 @@ public abstract class BlockCache {
      *
      * @param world
      *            the new access
+     * @return This BlockCache instance for chaining.
      */
-    public abstract void setAccess(final World world);
+    public abstract BlockCache setAccess(final World world);
 
     /**
      * Fetch the type id from the underlying world.

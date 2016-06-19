@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -31,7 +32,7 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /** The mc access. */
     // Final members //
-    private final MCAccess mcAccess;
+    private final IHandle<MCAccess> mcAccess;
 
 
     // Simple members //
@@ -67,9 +68,9 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param mcAccess
      *            the mc access
      * @param blockCache
-     *            the block cache
+     *            BlockCache instance, may be null.
      */
-    public RichEntityLocation(final MCAccess mcAccess, final BlockCache blockCache) {
+    public RichEntityLocation(final IHandle<MCAccess> mcAccess, final BlockCache blockCache) {
         super(blockCache);
         this.mcAccess = mcAccess;
     }
@@ -120,11 +121,21 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Retrieve the internally stored MCAccess instance.
+     * Retrieve the currently registered MCAccess instance.
      *
      * @return the MC access
      */
     public MCAccess getMCAccess() {
+        return mcAccess.getHandle();
+    }
+
+    /**
+     * Get the internally stored IHandle instance for retrieving the currently
+     * registered instance of MCAccess.
+     * 
+     * @return
+     */
+    public IHandle<MCAccess> getMCAccessHandle() {
         return mcAccess;
     }
 
@@ -275,6 +286,7 @@ public class RichEntityLocation extends RichBoundsLocation {
      *            the y on ground
      */
     public void set(final Location location, final Entity entity, final double yOnGround) {
+        final MCAccess mcAccess = this.mcAccess.getHandle();
         doSet(location, entity, mcAccess.getWidth(entity), mcAccess.getHeight(entity), yOnGround);
     }
 
@@ -292,6 +304,7 @@ public class RichEntityLocation extends RichBoundsLocation {
      *            the y on ground
      */
     public void set(final Location location, final Entity entity, double fullHeight, final double yOnGround) {
+        final MCAccess mcAccess = this.mcAccess.getHandle();
         doSet(location, entity, mcAccess.getWidth(entity), fullHeight, yOnGround);
     }
 
@@ -339,6 +352,7 @@ public class RichEntityLocation extends RichBoundsLocation {
             eyeHeight = fullHeight;
         }
         this.entity = entity;
+        final MCAccess mcAccess = this.mcAccess.getHandle();
         this.width = mcAccess.getWidth(entity);
         this.height = mcAccess.getHeight(entity);
         standsOnEntity = false;

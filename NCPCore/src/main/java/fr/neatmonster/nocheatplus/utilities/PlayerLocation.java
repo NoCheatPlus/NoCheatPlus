@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -41,9 +42,9 @@ public class PlayerLocation extends RichEntityLocation {
      * @param mcAccess
      *            the mc access
      * @param blockCache
-     *            the block cache
+     *            BlockCache instance, may be null.
      */
-    public PlayerLocation(final MCAccess mcAccess, final BlockCache blockCache) {
+    public PlayerLocation(final IHandle<MCAccess> mcAccess, final BlockCache blockCache) {
         super(mcAccess, blockCache);
     }
 

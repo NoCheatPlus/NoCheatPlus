@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
@@ -50,6 +51,8 @@ public class Direction extends Check {
             final Entity damaged, final boolean damagedIsFake, final Location dLoc, 
             final FightData data, final FightConfig cc) {
         boolean cancel = false;
+
+        final MCAccess mcAccess = this.mcAccess.getHandle();
 
         // Safeguard, if entity is complex, this check will fail due to giant and hard to define hitboxes.
         //        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
@@ -123,6 +126,7 @@ public class Direction extends Check {
             context.damagedWidth = 0.6;
         }
         else {
+            final MCAccess mcAccess = this.mcAccess.getHandle();
             context.damagedComplex = mcAccess.isComplexPart(damaged);
             context.damagedWidth = mcAccess.getWidth(damaged);
         }

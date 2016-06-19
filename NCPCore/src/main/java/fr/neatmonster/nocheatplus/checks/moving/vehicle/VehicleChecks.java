@@ -49,10 +49,10 @@ import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -99,7 +99,7 @@ public class VehicleChecks extends CheckListener {
 
     /** Access last position fields for an entity. Updated on setMCAccess. */
     // TODO: Useless.
-    private IEntityAccessLastPositionAndLook lastPosLook = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IEntityAccessLastPositionAndLook.class);
+    private final IGenericInstanceHandle<IEntityAccessLastPositionAndLook> lastPosLook = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessLastPositionAndLook.class);
 
     /** The vehicle more packets check. */
     private final VehicleMorePackets vehicleMorePackets = addCheck(new VehicleMorePackets());
@@ -109,13 +109,6 @@ public class VehicleChecks extends CheckListener {
 
     public VehicleChecks() {
         super(CheckType.MOVING_VEHICLE);
-    }
-
-    @Override
-    public void setMCAccess(MCAccess mcAccess) {
-        super.setMCAccess(mcAccess);
-        // Also update posLook.
-        lastPosLook = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IEntityAccessLastPositionAndLook.class);
     }
 
     /**
@@ -313,7 +306,7 @@ public class VehicleChecks extends CheckListener {
         if (data.debug) {
             if (lastPosLook != null) {
                 // Retrieve last pos.
-                lastPosLook.getPositionAndLook(vehicle, usePos1);
+                lastPosLook.getHandle().getPositionAndLook(vehicle, usePos1);
                 debug(player, "Last position is reported as: " + LocUtil.simpleFormat(usePos1));
             }
         }

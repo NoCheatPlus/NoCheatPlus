@@ -18,8 +18,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
+import fr.neatmonster.nocheatplus.utilities.WrapBlockCache;
 
 /**
  * Represent a move with start and end point. Short-term use of
@@ -37,12 +39,12 @@ public abstract class MoveInfo <REL extends RichEntityLocation, E extends Entity
      * in set. World is set to null on cleanup!
      */
     public final Location useLoc = new Location(null, 0, 0, 0);
-    public final BlockCache cache;
+    public final WrapBlockCache wrapCache;
     public final REL from;
     public final REL to;
 
-    public MoveInfo(final MCAccess mcAccess, REL from, REL to){
-        cache = mcAccess.getBlockCache(null);
+    public MoveInfo(final IHandle<MCAccess> mcAccess, REL from, REL to){
+        wrapCache = new WrapBlockCache();
         this.from = from;
         this.to = to;
     }
@@ -59,7 +61,8 @@ public abstract class MoveInfo <REL extends RichEntityLocation, E extends Entity
      * @param yOnGround
      */
     public final void set(final E entity, final Location from, final Location to, final double yOnGround){
-        this.cache.setAccess(from.getWorld());
+        final BlockCache cache = wrapCache.getBlockCache();
+        cache.setAccess(from.getWorld());
         this.from.setBlockCache(cache);
         set(this.from, from, entity, yOnGround);
         if (to != null){
@@ -88,6 +91,6 @@ public abstract class MoveInfo <REL extends RichEntityLocation, E extends Entity
         useLoc.setWorld(null);
         from.cleanup();
         to.cleanup();
-        cache.cleanup();
+        wrapCache.cleanup();
     }
 }

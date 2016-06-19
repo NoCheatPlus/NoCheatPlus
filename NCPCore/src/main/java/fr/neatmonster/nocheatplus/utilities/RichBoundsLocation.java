@@ -60,7 +60,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /** Horizontal margin for the bounding box (center towards edge). */
     double boxMarginHorizontal;
-    
+
     /** Vertical margin for the bounding box (y towards top). */
     double boxMarginVertical;
 
@@ -129,7 +129,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * Instantiates a new rich bounds location.
      *
      * @param blockCache
-     *            the block cache
+     *            BlockCache instance, may be null.
      */
     public RichBoundsLocation(final BlockCache blockCache) {
         this.blockCache = blockCache;
