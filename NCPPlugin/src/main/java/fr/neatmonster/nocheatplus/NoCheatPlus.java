@@ -629,8 +629,26 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         allComponents.remove(obj);
     }
 
-    /* (non-Javadoc)
-     * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
+    /**
+     * (Called on the plugin getting disabled.)
+     * <hr>
+     * Rough order of disabling:<br>
+     * <ul>
+     * <li>Prevent further registration. For now also disable listeners, though
+     * this might get shifted still.</li>
+     * <li><b>Call onDisable for DisableListener instances.</b> This includes
+     * clearing all data (Needs extensions for sorting by priority for
+     * DisableListener instances.).</li>
+     * <li>Random sequence of cleanup calls for other registries and logging
+     * statistics.</li>
+     * <li>Call removeComponent for all registered components.</li>
+     * <li>Cleanup BlockProperties and clear most internal mappings for
+     * components (needs a more clean registry approach).</li>
+     * <li>(Command changes cleanup: currently disabled due to compatibility
+     * issues, could cause other issues with dynamic plugin managers.)</li>
+     * <li>Cleanup ConfigManager.</li>
+     * <li>Shutdown LogManager.</li>
+     * </ul>
      */
     @Override
     public void onDisable() {
@@ -680,20 +698,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         sched.cancelTasks(this);
 
-        // Remove hooks.
-        allViolationsHook.unregister();
-        NCPHookManager.removeAllHooks();
-
-        // Exemptions cleanup.
-        if (verbose) {
-            logManager.info(Streams.INIT, "Reset ExemptionManager...");
-        }
-        NCPExemptionManager.clear();
-
-        // Data cleanup.
+        // DisableListener.onDisable (includes DataManager cleanup.)
         if (verbose) {
             logManager.info(Streams.INIT, "onDisable calls (include DataManager cleanup)...");
         }
+        // TODO: Sorting order + sort now (checks and data cleanup late, data manager last, allow plugins to access stuff before data is reset).
         for (final DisableListener dl : disableListeners) {
             try {
                 dl.onDisable();
@@ -702,6 +711,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 logManager.severe(Streams.INIT, t);
             }
         }
+
+        // ExemptionManager cleanup.
+        if (verbose) {
+            logManager.info(Streams.INIT, "Reset ExemptionManager...");
+        }
+        NCPExemptionManager.clear();
+
+        // Remove hooks.
+        allViolationsHook.unregister();
+        NCPHookManager.removeAllHooks();
 
         // Write some debug/statistics.
         final Counters counters = getGenericInstance(Counters.class);

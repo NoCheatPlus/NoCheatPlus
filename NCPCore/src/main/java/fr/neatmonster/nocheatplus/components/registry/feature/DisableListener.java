@@ -16,12 +16,17 @@ package fr.neatmonster.nocheatplus.components.registry.feature;
 
 /**
  * Component to listen to plugin/onDisable.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
 public interface DisableListener {
-	/**
-	 * Called in the plugin in onDisable, before unregistration of all components.
-	 */
-	public void onDisable();
+
+    /**
+     * Called in the plugin in onDisable, before all components get
+     * unregistered. This is meant for general data cleanup, there may be extra
+     * registry cleanup stages for data sources and checks later on.
+     */
+    public void onDisable();
+
 }
