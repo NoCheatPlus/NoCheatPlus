@@ -14,7 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
-import fr.neatmonster.nocheatplus.components.registry.feature.IData;
+import fr.neatmonster.nocheatplus.components.data.IData;
 
 /**
  * This is for future purposes. Might remove...<br>

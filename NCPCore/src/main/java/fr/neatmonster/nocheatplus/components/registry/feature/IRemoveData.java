@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.components.registry.feature;
 
+import fr.neatmonster.nocheatplus.components.data.IData;
+
 /**
  * Interface for component registration to allow cleanup for player data.<br>
  * NOTES:

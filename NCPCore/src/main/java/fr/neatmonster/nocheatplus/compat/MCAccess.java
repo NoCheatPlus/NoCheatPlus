@@ -20,7 +20,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.components.registry.feature.IGetBlockCache;
+import fr.neatmonster.nocheatplus.components.map.IGetBlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 

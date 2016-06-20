@@ -16,8 +16,8 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.map.IWrapBlockCache;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
-import fr.neatmonster.nocheatplus.components.registry.feature.IWrapBlockCache;
 
 /**
  * Wrap a BlockCache instance, and ensure on getting, that it is the latest

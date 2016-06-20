@@ -12,25 +12,29 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components.registry.feature;
-
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+package fr.neatmonster.nocheatplus.components.data;
 
 /**
- * Get a BlockCache instance. This may or may not be a new instance, to be
- * specified by the implementing class.
+ * Use, if something better can be done instead of removing all data, in case
+ * the system time ran backwards, applying with
+ * DataManager.handleSystemTimeRanBackwards. <br>
+ * With implementing ICanHandleTimeRunningBackwards, this takes effect as
+ * follows:
+ * <ul>
+ * <li>
+ * Instead of CheckDataFactory.removeAllData.</li>
+ * <li>
+ * Instead of IRemoveData.removeAllData.</li>
+ * </ul>
  * 
  * @author asofold
  *
  */
-public interface IGetBlockCache {
+public interface ICanHandleTimeRunningBackwards {
 
     /**
-     * Retrieve a BlockCache instance. If this is always the same one, depends
-     * on the implementation.
-     * 
-     * @return
+     * Adjust to system time having run backwards (just "a second ago").
      */
-    public BlockCache getBlockCache();
+    public void handleTimeRanBackwards();
 
 }
