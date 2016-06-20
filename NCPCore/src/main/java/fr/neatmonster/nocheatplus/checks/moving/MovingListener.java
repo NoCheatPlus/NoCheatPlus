@@ -313,7 +313,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             MovingUtil.ensureChunksLoaded(player, loc, "world change", data, cc);
         }
         aux.resetPositionsAndMediumProperties(player, loc, data, cc);
-        data.resetTrace(loc, TickTask.getTick(), cc);
+        data.resetTrace(player, loc, TickTask.getTick(), mcAccess.getHandle(), cc);
         if (cc.enforceLocation) {
             // Just in case.
             playersEnforce.add(player.getName());
@@ -1109,7 +1109,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: teleported + other resetting ?
         Combined.feedYawRate(player, from.getYaw(), now, from.getWorld().getName(), data);
         aux.resetPositionsAndMediumProperties(player, from, mData, mCc);
-        mData.resetTrace(player, from, tick); // TODO: Should probably leave this to the teleport event!
+        mData.resetTrace(player, from, tick, mcAccess.getHandle(), mCc); // TODO: Should probably leave this to the teleport event!
         if (((NetConfig) CheckType.NET_FLYINGFREQUENCY.getConfigFactory().getConfig(player)).flyingFrequencyActive) {
             ((NetData) CheckType.NET_FLYINGFREQUENCY.getDataFactory().getData(player)).teleportQueue.onTeleportEvent(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch());
         }
@@ -1135,12 +1135,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Location ref = player.getVehicle().getLocation(useLoc);
             aux.resetPositionsAndMediumProperties(player, ref, mData, mCc); // TODO: Consider using to and intercept cheat attempts in another way.
             useLoc.setWorld(null);
-            mData.updateTrace(player, to, tick); // TODO: Can you become invincible by sending special moves?
+            mData.updateTrace(player, to, tick, mcAccess.getHandle()); // TODO: Can you become invincible by sending special moves?
         }
         else if (!from.getWorld().getName().equals(toWorldName)) {
             // A teleport event should follow.
             aux.resetPositionsAndMediumProperties(player, to, mData, mCc);
-            mData.resetTrace(player, to, tick);
+            mData.resetTrace(player, to, tick, mcAccess.getHandle(), mCc);
         }
         else {
             // TODO: Detect differing location (a teleport event would follow).
@@ -1152,7 +1152,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             else {
                 // Normal move, nothing to do.
             }
-            mData.updateTrace(player, to, tick);
+            mData.updateTrace(player, to, tick, mcAccess.getHandle());
         }
     }
 
@@ -1610,7 +1610,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearVehicleData(); // TODO: Uncertain here, what to check.
         data.clearAllMorePacketsData();
         data.removeAllVelocity();
-        data.resetTrace(loc, tick, cc); // Might reset to loc instead of set-back ?
+        data.resetTrace(player, loc, tick, mcAccess.getHandle(), cc); // Might reset to loc instead of set-back ?
 
         // More resetting.
         data.vDistAcc.clear();

@@ -117,21 +117,17 @@ public class Direction extends Check {
      */
     public DirectionContext getContext(final Player player, final Location loc, 
             final Entity damaged, final boolean damagedIsFake, final Location damagedLoc, 
-            final FightData data, final FightConfig cc, final SharedContext sharedContext) {
+            final FightData data, final FightConfig cc) {
         final DirectionContext context = new DirectionContext();
         // Find out how wide the entity is.
         if (damagedIsFake) {
             // Assume player / default.
             context.damagedComplex = false; // Later prefer bukkit based provider.
-            context.damagedWidth = 0.6;
         }
         else {
             final MCAccess mcAccess = this.mcAccess.getHandle();
             context.damagedComplex = mcAccess.isComplexPart(damaged);
-            context.damagedWidth = mcAccess.getWidth(damaged);
         }
-        // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
-        context.damagedHeight = sharedContext.damagedHeight;
         context.direction = loc.getDirection();
         context.lengthDirection = context.direction.length();
         return context;
@@ -161,19 +157,20 @@ public class Direction extends Check {
 
         // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
-
+        final double damagedBoxMarginHorizontal = dLoc.getBoxMarginHorizontal();
+        final double damagedBoxMarginVertical = dLoc.getBoxMarginVertical();
         final double off;
         if (cc.directionStrict){
-            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + context.damagedHeight / 2D, dLoc.getZ(), context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
+            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
         }
         else{
             // Also take into account the angle.
-            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + context.damagedHeight / 2D, dLoc.getZ(), context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_LOOP_PRECISION);
+            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
         if (off > 0.1) {
             // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
-            final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + context.damagedHeight / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
+            final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + damagedBoxMarginVertical / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
             context.minViolation = Math.min(context.minViolation, distance);
             cancel = true;

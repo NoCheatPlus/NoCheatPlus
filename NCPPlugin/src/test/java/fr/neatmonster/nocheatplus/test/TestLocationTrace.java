@@ -76,14 +76,14 @@ public class TestLocationTrace {
         }
         // Adding up to size elements.
         for (int i = 0; i < size ; i++) {
-            trace.addEntry(i, i, i, i);
+            trace.addEntry(i, i, i, i, 0, 0);
             if (trace.size() != i + 1) {
                 fail("Wrong size, expect " + (i + 1) + ", got instead: " + trace.size());
             }
         }
         // Adding a lot of elements.
         for (int i = 0; i < 1000; i ++) {
-            trace.addEntry(i + size, i, i, i);
+            trace.addEntry(i + size, i, i, i, 0, 0);
             if (trace.size() != size) {
                 fail("Wrong size, expect " + size + ", got instead: " + trace.size());
             }
@@ -95,7 +95,7 @@ public class TestLocationTrace {
         int size = 80;
         LocationTrace trace = new LocationTrace(size, size, pool);
         for (int i = 0; i < 1000; i ++) {
-            trace.addEntry(i + size, 0 , 0, 0);
+            trace.addEntry(i + size, 0 , 0, 0, 0, 0);
             if (trace.size() != 1) {
                 fail("Wrong size, expect 1, got instead: " + trace.size());
             }
@@ -133,13 +133,13 @@ public class TestLocationTrace {
         LocationTrace trace = new LocationTrace(size, size, pool);
         // Adding up to size elements.
         for (int i = 0; i < size; i++) {
-            trace.addEntry(i, i, i, i);
+            trace.addEntry(i, i, i, i, 0, 0);
         }
         // Test size with one time filled up.
         testIteratorSizeAndOrder(trace, 80);
         // Add size / 2 elements, to test cross-boundary iteration.
         for (int i = 0; i < size / 2; i++) {
-            trace.addEntry(i + size, i, i, i);
+            trace.addEntry(i + size, i, i, i, 0, 0);
         }
         // Test size again.
         testIteratorSizeAndOrder(trace, 80);
@@ -195,7 +195,7 @@ public class TestLocationTrace {
         LocationTrace trace = new LocationTrace(size, size, pool);
         // Adding up to size elements.
         for (int i = 0; i < size; i++) {
-            trace.addEntry(i, i, i, i);
+            trace.addEntry(i, i, i, i, 0, 0);
         }
         for (int i = 0; i < size; i++) {
             Iterator<ITraceEntry> it = trace.maxAgeIterator(i);
@@ -218,11 +218,11 @@ public class TestLocationTrace {
     public void testMaxAgeFirstElementAnyway() {
         int size = 80;
         LocationTrace trace = new LocationTrace(size, size, pool);
-        trace.addEntry(0, 0, 0, 0);
+        trace.addEntry(0, 0, 0, 0, 0, 0);
         if (!trace.maxAgeIterator(1000).hasNext()) {
             fail("Expect iterator (maxAge) to always contain the latest element.");
         }
-        trace.addEntry(1, 0, 0, 0);
+        trace.addEntry(1, 0, 0, 0, 0, 0);
         final Iterator<ITraceEntry> it = trace.maxAgeIterator(2);
         if (!it.hasNext()) {
             fail("Expect iterator (maxAge) to always contain the latest element.");

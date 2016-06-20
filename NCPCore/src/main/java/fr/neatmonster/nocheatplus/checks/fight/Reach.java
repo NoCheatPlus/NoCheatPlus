@@ -162,11 +162,10 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public ReachContext getContext(final Player player, final Location pLoc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc, final SharedContext sharedContext) {
+    public ReachContext getContext(final Player player, final Location pLoc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
         final ReachContext context = new ReachContext();
         context.distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : cc.reachSurvivalDistance + getDistMod(damaged);
         context.distanceMin = (context.distanceLimit - cc.reachReduceDistance) / context.distanceLimit;
-        context.damagedHeight = sharedContext.damagedHeight;
         //context.eyeHeight = player.getEyeHeight();
         context.pY = pLoc.getY() + player.getEyeHeight();
         return context;
@@ -183,7 +182,9 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public boolean loopCheck(final Player player, final Location pLoc, final Entity damaged, final ITraceEntry dRef, final ReachContext context, final FightData data, final FightConfig cc) {
+    public boolean loopCheck(final Player player, final Location pLoc, final Entity damaged, 
+            final ITraceEntry dRef, final ReachContext context, 
+            final FightData data, final FightConfig cc) {
         boolean cancel = false;
 
         // Refine y position.
@@ -193,8 +194,8 @@ public class Reach extends Check {
         if (context.pY <= dY) {
             // Keep the foot level y.
         }
-        else if (context.pY >= dY + context.damagedHeight) {
-            y = dY + context.damagedHeight; // Highest ref y.
+        else if (context.pY >= dY + dRef.getBoxMarginVertical()) {
+            y = dY + dRef.getBoxMarginVertical(); // Highest ref y.
         }
         else {
             y = context.pY; // Level with damaged.
@@ -230,7 +231,9 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public boolean loopFinish(final Player player, final Location pLoc, final Entity damaged, final ReachContext context, final boolean forceViolation, final FightData data, final FightConfig cc) {
+    public boolean loopFinish(final Player player, final Location pLoc, final Entity damaged, 
+            final ReachContext context, final ITraceEntry traceEntry, final boolean forceViolation, 
+            final FightData data, final FightConfig cc) {
         final double lenpRel = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
         if (lenpRel == Double.MAX_VALUE) {
             return false;
@@ -281,7 +284,8 @@ public class Reach extends Check {
         }
 
         if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            player.sendMessage("NC+: Attack/reach " + damaged.getType()+ " height="+ StringUtil.fdec3.format(context.damagedHeight) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(data.reachMod));
+            // TODO: Height: remember successful ITraceEntry
+            player.sendMessage("NC+: Attack/reach " + damaged.getType()+ (traceEntry == null ? "" : (" height=" + traceEntry.getBoxMarginVertical())) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(data.reachMod));
         }
 
         return cancel;

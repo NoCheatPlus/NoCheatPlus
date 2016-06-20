@@ -18,14 +18,13 @@ import org.bukkit.util.Vector;
 
 /**
  * Context data for the direction check, for repeated use within a loop.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
 public class DirectionContext {
 
     public boolean damagedComplex;
-    public double damagedWidth;
-    public double damagedHeight;
     public Vector direction = null;
     public double lengthDirection;
 

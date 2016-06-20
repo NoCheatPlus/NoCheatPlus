@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
@@ -1062,26 +1063,28 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Convenience method to add a location to the trace, creates the trace if necessary.
+     * Convenience method to add a location to the trace, creates the trace if
+     * necessary.
+     * 
      * @param player
      * @param loc
      * @param time
-     * @return Updated LocationTrace instance, for convenient use, without sticking too much to MovingData.
+     * @param mcAccess
+     *            If null getEyeHeight and 0.3 are used (assume fake player).
+     * @return Updated LocationTrace instance, for convenient use, without
+     *         sticking too much to MovingData.
      */
-    public LocationTrace updateTrace(final Player player, final Location loc, final long time) {
+    public LocationTrace updateTrace(final Player player, final Location loc, final long time, 
+            final MCAccess mcAccess) {
         final LocationTrace trace = getTrace(player);
-        trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ());
+        if (mcAccess == null) {
+            // TODO: 0.3 from bukkit based default heights (needs extra registered classes).
+            trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ(), 0.3, player.getEyeHeight());
+        }
+        else {
+            trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ(), mcAccess.getWidth(player) / 2.0, Math.max(player.getEyeHeight(), mcAccess.getHeight(player)));
+        }
         return trace;
-    }
-
-    /**
-     * Convenience
-     * @param player
-     * @param loc
-     */
-    public void resetTrace(final Player player, final Location loc, final long time) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        resetTrace(loc, time, cc);
     }
 
     /**
@@ -1090,8 +1093,9 @@ public class MovingData extends ACheckData {
      * @param time
      * @param cc
      */
-    public void resetTrace(final Location loc, final long time, final MovingConfig cc) {
-        resetTrace(loc, time, cc.traceMaxAge, cc.traceMaxSize);
+    public void resetTrace(final Player player, final Location loc, final long time, 
+            final MCAccess mcAccess, final MovingConfig cc) {
+        resetTrace(player, loc, time, cc.traceMaxAge, cc.traceMaxSize, mcAccess);
     }
 
     /**
@@ -1101,11 +1105,13 @@ public class MovingData extends ACheckData {
      * @param mergeDist
      * @param traceMergeDist 
      */
-    public void resetTrace(final Location loc, final long time, final int maxAge, final int maxSize) {
+    public void resetTrace(final Player player, final Location loc, final long time, 
+            final int maxAge, final int maxSize, final MCAccess mcAccess) {
         if (trace != null) {
             trace.reset();
         }
-        getTrace(maxAge, maxSize).addEntry(time, loc.getX(), loc.getY(), loc.getZ());
+        getTrace(maxAge, maxSize).addEntry(time, loc.getX(), loc.getY(), loc.getZ(), 
+                mcAccess.getWidth(player) / 2.0, Math.max(player.getEyeHeight(), mcAccess.getHeight(player)));
     }
 
     /**

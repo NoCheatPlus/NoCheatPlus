@@ -18,6 +18,7 @@ import java.util.Iterator;
 
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.pool.AbstractPool;
+import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 
 /**
  * This class is meant to record locations for players moving, in order to allow
@@ -45,18 +46,22 @@ public class LocationTrace {
 
     public static interface ITraceEntry extends IGetPosition {
 
+        public double getBoxMarginHorizontal();
+
+        public double getBoxMarginVertical();
+
         public long getTime();
 
     }
 
     public static class TraceEntry implements ITraceEntry {
-        
+
         // TODO: Consider using a simple base implementation for IGetSetPosiotion.
 
         /** We keep it open, if ticks or ms are used. */
         private long time;
         /** Coordinates. */
-        private double x, y, z;
+        private double x, y, z, boxMarginHorizontal, boxMarginVertical;
 
         /** Older/next. */
         private TraceEntry next;
@@ -71,10 +76,13 @@ public class LocationTrace {
          * @param y
          * @param z
          */
-        public void set(long time, double x, double y, double z) {
+        public void set(long time, double x, double y, double z, 
+                double boxMarginHorizontal, double boxMarginVertical) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.boxMarginHorizontal = boxMarginHorizontal;
+            this.boxMarginVertical = boxMarginVertical;
             this.time = time;
         }
 
@@ -91,6 +99,14 @@ public class LocationTrace {
         @Override
         public double getZ() {
             return z;
+        }
+
+        public double getBoxMarginHorizontal() {
+            return boxMarginHorizontal;
+        }
+
+        public double getBoxMarginVertical() {
+            return boxMarginVertical;
         }
 
         @Override
@@ -192,16 +208,35 @@ public class LocationTrace {
         this.maxSize = maxSize;
     }
 
-    public final void addEntry(final long time, final double x, final double y, final double z) {
+    public final void addEntry(final long time, final RichBoundsLocation loc) {
+        addEntry(time, loc.getX(), loc.getY(), loc.getZ(), loc.getBoxMarginHorizontal(), loc.getBoxMarginVertical());
+    }
+
+    /**
+     * 
+     * @param time
+     * @param x
+     * @param y
+     * @param z
+     * @param boxMarginHorizontal
+     *            Margin from the foot position to the side(s) of the box.
+     * @param boxMarginVertical
+     *            Margin from the foot position to the top of the box.
+     */
+    public final void addEntry(final long time, final double x, final double y, final double z,
+            final double boxMarginHorizontal, final double boxMarginVertical) {
         if (size > 0) {
-            if (x == firstEntry.x && y == firstEntry.y && z == firstEntry.z) {
+            // TODO: Might update box to bigger or remove margins ?
+            if (x == firstEntry.x && y == firstEntry.y && z == firstEntry.z
+                    && boxMarginHorizontal == firstEntry.boxMarginHorizontal
+                    && boxMarginVertical == firstEntry.boxMarginVertical) {
                 // (No update of time. firstEntry ... now always counts.)
                 return;
             }
         }
         // Add a new entry.
         final TraceEntry newEntry = pool.getInstance();
-        newEntry.set(time, x, y, z);
+        newEntry.set(time, x, y, z, boxMarginHorizontal, boxMarginVertical);
         setFirst(newEntry);
         // Remove the last entry, if maxSize is exceeded.
         if (size > maxSize) {

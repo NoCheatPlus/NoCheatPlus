@@ -200,7 +200,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             // Get+update the damaged players.
             // TODO: Problem with NPCs: data stays (not a big problem).
             // (This is done even if the event has already been cancelled, to keep track, if the player is on a horse.)
-            damagedTrace = MovingData.getData(damagedPlayer).updateTrace(damagedPlayer, damagedLoc, tick);
+            damagedTrace = MovingData.getData(damagedPlayer).updateTrace(damagedPlayer, damagedLoc, tick, damagedIsFake ? null : mcAccess.getHandle());
         }
         else {
             damagedPlayer = null; // TODO: This is a temporary workaround.
@@ -410,9 +410,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         boolean cancelled = false;
 
         // (Might pass generic context to factories, for shared + heavy properties.)
-        final SharedContext sharedContext = new SharedContext(damaged, damagedIsFake, mcAccess.getHandle());
-        final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
-        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedIsFake, damagedLoc, data, cc, sharedContext) : null;
+        final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
+        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedIsFake, damagedLoc, data, cc) : null;
 
         final long traceOldest = tick - cc.loopMaxLatencyTicks; // TODO: Set by latency-window.
         // TODO: Iterating direction, which, static/dynamic choice.
@@ -424,6 +423,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: Maintain a latency estimate + max diff and invalidate completely (i.e. iterate from latest NEXT time)], or just max latency.
         // TODO: Consider a max-distance to "now", for fast invalidation.
         long latencyEstimate = -1;
+        ITraceEntry successEntry = null;
         while (traceIt.hasNext()) {
             final ITraceEntry entry = traceIt.next();
             // Simplistic just check both until end or hit.
@@ -450,6 +450,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // TODO: Log/set estimated latency.
                 violation = false;
                 latencyEstimate = now - entry.getTime();
+                successEntry = entry;
                 break;
             }
         }
@@ -458,7 +459,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: violation vs. reachPassed + directionPassed (current: fail one = fail all).
         if (reachEnabled) {
             // TODO: Might ignore if already cancelled by mixed/silent cancel.
-            if (reach.loopFinish(player, loc, damaged, reachContext, violation, data, cc)) {
+            if (reach.loopFinish(player, loc, damaged, reachContext, successEntry, violation, data, cc)) {
                 cancelled = true;
             }
         }
