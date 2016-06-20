@@ -20,6 +20,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.components.map.IGetBlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
@@ -38,7 +39,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
  * @author asofold
  *
  */
-public interface MCAccess extends IGetBlockCache {
+public interface MCAccess extends IGetBlockCache, IEntityAccessDimensions {
 
     /**
      * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
@@ -73,16 +74,10 @@ public interface MCAccess extends IGetBlockCache {
      */
     public BlockCache getBlockCache(World world);
 
-    /**
-     * Get height of an entity (attack relevant, the maximal "thing" found).
-     */
+    @Override
     public double  getHeight(Entity entity);
 
-    /**
-     * Return some width (rather the full bounding box width).
-     * @param entity
-     * @return
-     */
+    @Override
     public double getWidth(Entity entity);
 
     /**
