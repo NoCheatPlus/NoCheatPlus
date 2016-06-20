@@ -17,7 +17,7 @@ package fr.neatmonster.nocheatplus.compat.spigotcb1_9_R2;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
-import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;

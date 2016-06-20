@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.logging.Streams;

@@ -15,7 +15,7 @@
 package fr.neatmonster.nocheatplus.compat.registry;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.components.location.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
 
 /**
  * Set up more fine grained entity access providers, registered as generic

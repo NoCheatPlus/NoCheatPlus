@@ -12,9 +12,12 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components.location;
+package fr.neatmonster.nocheatplus.components.entity;
 
 import org.bukkit.entity.Entity;
+
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
+import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 
 /**
  * Retrieve last position and look for a Bukkit Entity instance.
