@@ -168,7 +168,7 @@ public class Direction extends Check {
             off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
-        if (off > 0.1) {
+        if (off > 0.11) {
             // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
             final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + damagedBoxMarginVertical / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
