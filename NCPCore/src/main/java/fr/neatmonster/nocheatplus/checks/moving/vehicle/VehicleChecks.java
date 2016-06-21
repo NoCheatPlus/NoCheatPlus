@@ -55,10 +55,11 @@ import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
+import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
@@ -130,7 +131,7 @@ public class VehicleChecks extends CheckListener {
             // Do ignore events for vehicles inside of other vehicles.
             return;
         }
-        final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
+        final Player player = PassengerUtil.getFirstPlayerPassenger(vehicle);
         if (player == null) {
             return;
         }
@@ -199,7 +200,7 @@ public class VehicleChecks extends CheckListener {
         // Workaround for pigs and other (1.5.x and before)!
         // Note that with 1.6 not even PlayerMove fires for horses and pigs.
         // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
-        final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
+        final Entity vehicle = PassengerUtil.getLastNonPlayerVehicle(player);
         if (data.debug) {
             debug(player, "onPlayerMoveVehicle: vehicle: " + vehicle);
         }
@@ -265,7 +266,7 @@ public class VehicleChecks extends CheckListener {
             // Do ignore events for vehicles inside of other vehicles.
             return;
         }
-        final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
+        final Player player = PassengerUtil.getFirstPlayerPassenger(vehicle);
         if (player == null || player.isDead()) {
             return;
         }
@@ -651,7 +652,7 @@ public class VehicleChecks extends CheckListener {
             debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
         }
         // Check for nested vehicles.
-        final Entity lastVehicle = CheckUtils.getLastNonPlayerVehicle(player);
+        final Entity lastVehicle = PassengerUtil.getLastNonPlayerVehicle(player);
         if (lastVehicle == null) {
             data.clearVehicleData();
             if (data.debug) {

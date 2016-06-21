@@ -31,7 +31,7 @@ import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * The Reach check will find out if a player interacts with something that's too far away.

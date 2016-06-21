@@ -20,9 +20,9 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.utilities.BlockFlags;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties.BlockProps;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 
 @SuppressWarnings("deprecation")
 public class BlocksMC1_6_1 implements BlockPropertiesSetup{

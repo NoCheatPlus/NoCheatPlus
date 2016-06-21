@@ -24,7 +24,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * A check used to verify if the player isn't using a forcefield in order to attack multiple entities at the same time.

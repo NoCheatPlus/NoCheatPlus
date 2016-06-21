@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.location;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -20,6 +20,8 @@ import org.bukkit.entity.LivingEntity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 // TODO: Auto-generated Javadoc
 /**

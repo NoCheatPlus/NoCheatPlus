@@ -24,7 +24,8 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * The Direction check will find out if a player tried to interact with something that's not in their field of view.
@@ -74,11 +75,11 @@ public class Direction extends Check {
 
         final double off;
         if (cc.directionStrict){
-            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION, 80.0);
+            off = CollisionUtil.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION, 80.0);
         }
         else{
             // Also take into account the angle.
-            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION);
+            off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION);
         }
 
         if (off > 0.1) {
@@ -161,11 +162,11 @@ public class Direction extends Check {
         final double damagedBoxMarginVertical = dLoc.getBoxMarginVertical();
         final double off;
         if (cc.directionStrict){
-            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
+            off = CollisionUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION, 80.0);
         }
         else{
             // Also take into account the angle.
-            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION);
+            off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
         if (off > 0.11) {

@@ -18,9 +18,9 @@ import org.bukkit.Material;
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
+import fr.neatmonster.nocheatplus.utilities.map.FakeBlockCache;
 
 public class TestInteractRayTracing {
 

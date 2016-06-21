@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 
 /**
  * Auxiliary methods for Location handling, mainly intended for use with

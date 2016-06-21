@@ -23,7 +23,7 @@ import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import net.minecraft.server.v1_4_5.AxisAlignedBB;
 import net.minecraft.server.v1_4_5.IBlockAccess;
 import net.minecraft.server.v1_4_5.Material;

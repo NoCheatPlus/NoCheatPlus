@@ -14,8 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 /**
  * Test for collision testing for passing through blocks.

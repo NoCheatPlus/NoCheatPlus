@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.map;
 
 import java.util.Iterator;
 
@@ -417,7 +417,7 @@ public class FakeBlockCache extends BlockCache {
                         builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ");");
                     }
                 }
-                else if (boundsPrefix != null && BlockCache.isFullBounds(bounds)) {
+                else if (boundsPrefix != null && MapUtil.isFullBounds(bounds)) {
                     builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ", " + data + ", " + fullBounds + ");");;
                 }
                 else {

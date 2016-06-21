@@ -21,7 +21,8 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * The Direction check will find out if a player tried to interact with something that's not in their field of view.
@@ -55,7 +56,7 @@ public class Direction extends Check {
         // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
         final Location loc = player.getLocation(useLoc);
         final Vector direction = loc.getDirection();
-        final double off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, block, TrigUtil.DIRECTION_PRECISION);
+        final double off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), direction, block, TrigUtil.DIRECTION_PRECISION);
 
         if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far they were from looking directly to the block...

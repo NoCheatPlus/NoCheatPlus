@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.pool.AbstractPool;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 
 /**
  * This class is meant to record locations for players moving, in order to allow

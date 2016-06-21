@@ -22,6 +22,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.compat.Bridge1_9;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+
 // TODO: Auto-generated Javadoc
 /**
  * Auxiliary/convenience methods for inventories.
@@ -164,5 +167,51 @@ public class InventoryUtil {
 		final InventoryView view = player.getOpenInventory();
 		return view != null && view.getType() != InventoryType.CRAFTING;
 	}
+
+    /**
+     * Return the first consumable item found, checking main hand first and then
+     * off hand, if available. Concerns food/edible, potions, milk bucket.
+     *
+     * @param player
+     *            the player
+     * @return null in case no item is consumable.
+     */
+    public static ItemStack getFirstConsumableItemInHand(final Player player) {
+        ItemStack actualStack = Bridge1_9.getItemInMainHand(player);
+        if (
+                Bridge1_9.hasGetItemInOffHand()
+                && (actualStack == null || !InventoryUtil.isConsumable(actualStack.getType()))
+                ) {
+            // Assume this to make sense.
+            actualStack = Bridge1_9.getItemInOffHand(player);
+            if (actualStack == null || !InventoryUtil.isConsumable(actualStack.getType())) {
+                actualStack = null;
+            }
+        }
+        return actualStack;
+    }
+
+    /**
+     * Test if the item is consumable, like food, potions, milk bucket.
+     *
+     * @param stack
+     *            May be null.
+     * @return true, if is consumable
+     */
+    public static boolean isConsumable(final ItemStack stack) {
+        return stack == null ? false : isConsumable(stack.getType());
+    }
+
+    /**
+     * Test if the item is consumable, like food, potions, milk bucket.
+     *
+     * @param type
+     *            May be null.
+     * @return true, if is consumable
+     */
+    public static boolean isConsumable(final Material type) {
+        return type != null &&
+                (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET);
+    }
 
 }

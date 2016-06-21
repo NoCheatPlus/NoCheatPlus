@@ -22,7 +22,7 @@ import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import net.minecraft.server.v1_7_R2.AxisAlignedBB;
 import net.minecraft.server.v1_7_R2.Block;
 import net.minecraft.server.v1_7_R2.EntityBoat;

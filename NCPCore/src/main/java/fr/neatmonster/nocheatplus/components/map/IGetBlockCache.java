@@ -14,7 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.components.map;
 
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 /**
  * Get a BlockCache instance. This may or may not be a new instance, to be

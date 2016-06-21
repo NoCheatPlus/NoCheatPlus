@@ -21,10 +21,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -35,7 +32,6 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
-import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -101,49 +97,6 @@ public class CheckUtils {
             return Long.MIN_VALUE;
         }
         return ref;
-    }
-
-    /**
-     * Check getPassenger recursively until a player is found, return that one
-     * or null.
-     *
-     * @param entity
-     *            the entity
-     * @return the first player passenger
-     */
-    public static Player getFirstPlayerPassenger(final Entity entity) {
-        Entity passenger = entity.getPassenger();
-        while (passenger != null){
-            if (passenger instanceof Player){
-                return (Player) passenger;
-            }
-            passenger = passenger.getPassenger();
-        }
-        return null;
-    }
-
-    /**
-     * Check recursively for vehicles, returns null if players are vehicles,
-     * otherwise the lowest vehicle (that has no vehicle).
-     *
-     * @param passenger
-     *            The passenger of vehicles. Typically the player.
-     * @return the last non player vehicle
-     */
-    public static Entity getLastNonPlayerVehicle(final Entity passenger) {
-        Entity vehicle = passenger.getVehicle();
-        while (vehicle != null){
-            if (vehicle instanceof Player){
-                return null;
-            }
-            else if (vehicle.isInsideVehicle()) {
-                vehicle = vehicle.getVehicle();
-            }
-            else {
-                break;
-            }
-        }
-        return vehicle;
     }
 
     /**
@@ -313,52 +266,6 @@ public class CheckUtils {
      */
     public static Random getRandom() {
         return NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Random.class);
-    }
-
-    /**
-     * Test if the item is consumable, like food, potions, milk bucket.
-     *
-     * @param stack
-     *            May be null.
-     * @return true, if is consumable
-     */
-    public static boolean isConsumable(final ItemStack stack) {
-        return stack == null ? false : isConsumable(stack.getType());
-    }
-
-    /**
-     * Test if the item is consumable, like food, potions, milk bucket.
-     *
-     * @param type
-     *            May be null.
-     * @return true, if is consumable
-     */
-    public static boolean isConsumable(final Material type) {
-        return type != null &&
-                (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET);
-    }
-
-    /**
-     * Return the first consumable item found, checking main hand first and then
-     * off hand, if available. Concerns food/edible, potions, milk bucket.
-     *
-     * @param player
-     *            the player
-     * @return null in case no item is consumable.
-     */
-    public static ItemStack getFirstConsumableItemInHand(final Player player) {
-        ItemStack actualStack = Bridge1_9.getItemInMainHand(player);
-        if (
-                Bridge1_9.hasGetItemInOffHand()
-                && (actualStack == null || !CheckUtils.isConsumable(actualStack.getType()))
-                ) {
-            // Assume this to make sense.
-            actualStack = Bridge1_9.getItemInOffHand(player);
-            if (actualStack == null || !CheckUtils.isConsumable(actualStack.getType())) {
-                actualStack = null;
-            }
-        }
-        return actualStack;
     }
 
 }

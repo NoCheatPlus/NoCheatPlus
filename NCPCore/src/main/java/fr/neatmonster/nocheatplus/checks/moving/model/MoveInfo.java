@@ -19,9 +19,9 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
-import fr.neatmonster.nocheatplus.utilities.WrapBlockCache;
+import fr.neatmonster.nocheatplus.utilities.location.RichEntityLocation;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.WrapBlockCache;
 
 /**
  * Represent a move with start and end point. Short-term use of

@@ -15,7 +15,7 @@
 package fr.neatmonster.nocheatplus.components.map;
 
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 /**
  * Wrap a BlockCache instance, update with changes of underlying

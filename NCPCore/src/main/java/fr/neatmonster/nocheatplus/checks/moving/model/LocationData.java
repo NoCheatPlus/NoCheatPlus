@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 
 /**
  * Some useful data about a location. Used in MoveData to keep track of

@@ -37,12 +37,12 @@ import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
 /**
  * Static utility methods.
@@ -336,13 +336,13 @@ public class MovingUtil {
         }
         int loaded = 0;
         if (loadFrom) {
-            loaded += BlockCache.ensureChunksLoaded(from.getWorld(), x0, z0, margin);
+            loaded += MapUtil.ensureChunksLoaded(from.getWorld(), x0, z0, margin);
             if (TrigUtil.distanceSquared(x0, z0, x1, z1) < 1.0) {
                 loadTo = false;
             }
         }
         if (loadTo) {
-            loaded += BlockCache.ensureChunksLoaded(to.getWorld(), x1, z1, margin);
+            loaded += MapUtil.ensureChunksLoaded(to.getWorld(), x1, z1, margin);
         }
         if (loaded > 0 && data.debug) {
             StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + from.getWorld().getName() +  " for player: " + player.getName());
@@ -378,7 +378,7 @@ public class MovingUtil {
                 return;
             }
         }
-        int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
+        int loaded = MapUtil.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
         if (loaded > 0 && data.debug) {
             StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
         }

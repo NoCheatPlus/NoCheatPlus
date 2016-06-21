@@ -16,9 +16,9 @@ package fr.neatmonster.nocheatplus.utilities.collision;
 
 import org.bukkit.Location;
 
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.FakeBlockCache;
 
 
 

@@ -22,7 +22,7 @@ import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertiesSetup{
 

@@ -26,7 +26,7 @@ import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.Reflect
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 public class MCAccessCBReflect extends MCAccessBukkitBase {
 

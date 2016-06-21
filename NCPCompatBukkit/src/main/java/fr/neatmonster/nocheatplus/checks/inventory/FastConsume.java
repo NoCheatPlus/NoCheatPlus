@@ -33,7 +33,7 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -137,7 +137,7 @@ public class FastConsume extends Check implements Listener{
         // Reset interaction.
         if (cancel) {
             // Fake interaction to prevent violation loops with false positives.
-            final ItemStack actualStack = CheckUtils.getFirstConsumableItemInHand(player);
+            final ItemStack actualStack = InventoryUtil.getFirstConsumableItemInHand(player);
             data.instantEatFood = actualStack == null ? null : actualStack.getType();
             // TODO: Allows some abuse: 1. try instantly eat (cancelled) 2. consume item directly when needed.
         } else  {

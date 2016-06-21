@@ -15,8 +15,8 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * Carry data of a move, involving from- and to- locations. This is for

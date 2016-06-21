@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
 /**
  * Player specific MoveInfo.

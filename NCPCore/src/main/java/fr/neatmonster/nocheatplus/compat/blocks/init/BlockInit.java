@@ -16,8 +16,8 @@ package fr.neatmonster.nocheatplus.compat.blocks.init;
 
 import org.bukkit.Material;
 
-import fr.neatmonster.nocheatplus.utilities.BlockFlags;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Auxiliary methods for block initialization.

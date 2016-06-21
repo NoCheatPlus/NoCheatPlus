@@ -19,7 +19,7 @@ import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichEntityLocation;
 
 public class VehicleMoveInfo extends MoveInfo<RichEntityLocation, Entity> {
 

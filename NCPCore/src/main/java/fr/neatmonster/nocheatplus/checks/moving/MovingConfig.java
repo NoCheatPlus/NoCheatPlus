@@ -39,8 +39,8 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
 /**
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.

@@ -17,8 +17,8 @@ package fr.neatmonster.nocheatplus.compat.cb3026;
 import org.bukkit.craftbukkit.v1_7_R2.entity.CraftLivingEntity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.compat.AttribUtil;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
-import fr.neatmonster.nocheatplus.utilities.AttribUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import net.minecraft.server.v1_7_R2.AttributeInstance;
 import net.minecraft.server.v1_7_R2.AttributeModifier;

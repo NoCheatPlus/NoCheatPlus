@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.utilities.location;
 
 import java.util.UUID;
 
@@ -29,6 +29,12 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -1002,7 +1008,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return Number of chunks loaded.
      */
     public int ensureChunksLoaded(final double xzMargin) {
-        return BlockCache.ensureChunksLoaded(world, x, z, xzMargin);
+        return MapUtil.ensureChunksLoaded(world, x, z, xzMargin);
     }
 
     /**
@@ -1058,9 +1064,9 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return true, if is block intersecting
      */
     public boolean isBlockIntersecting(final int x, final int y, final int z) {
-        return TrigUtil.intersectsBlock(minX, maxX, x)
-                && TrigUtil.intersectsBlock(minY, maxY, y)
-                && TrigUtil.intersectsBlock(minZ, maxZ, z);
+        return CollisionUtil.intersectsBlock(minX, maxX, x)
+                && CollisionUtil.intersectsBlock(minY, maxY, y)
+                && CollisionUtil.intersectsBlock(minZ, maxZ, z);
     }
 
     /**

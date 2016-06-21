@@ -48,12 +48,12 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeRe
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.RichBoundsLocation;
-import fr.neatmonster.nocheatplus.utilities.RichEntityLocation;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
+import fr.neatmonster.nocheatplus.utilities.location.RichEntityLocation;
 import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 
 /**

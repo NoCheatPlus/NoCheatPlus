@@ -23,9 +23,9 @@ import org.bukkit.util.Vector;
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.collision.RayTracing;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 public class TestRayTracing {
 

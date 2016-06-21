@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.components.map.IGetBlockCache;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 
 /**

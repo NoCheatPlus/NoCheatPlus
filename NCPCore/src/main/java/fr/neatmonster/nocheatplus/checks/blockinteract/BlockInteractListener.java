@@ -34,8 +34,8 @@ import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.stats.Counters;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Central location to listen to events that are relevant for the block interact checks.
@@ -167,7 +167,7 @@ public class BlockInteractListener extends CheckListener {
                 if (
                         previousUseItem == Result.DENY || preventUseItem
                         // Allow consumption still.
-                        || !CheckUtils.isConsumable(Bridge1_9.getUsedItem(player, event))
+                        || !InventoryUtil.isConsumable(Bridge1_9.getUsedItem(player, event))
                         ) {
                     event.setUseItemInHand(Result.DENY);
                     if (data.debug) {

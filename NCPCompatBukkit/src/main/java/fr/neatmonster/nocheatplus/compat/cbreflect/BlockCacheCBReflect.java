@@ -20,7 +20,7 @@ import org.bukkit.entity.Entity;
 import fr.neatmonster.nocheatplus.compat.bukkit.BlockCacheBukkit;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 public class BlockCacheCBReflect extends BlockCacheBukkit {
 

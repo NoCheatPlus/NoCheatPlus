@@ -26,8 +26,8 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.stats.Timings;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Player specific data for the block break checks.
