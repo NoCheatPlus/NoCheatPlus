@@ -21,7 +21,7 @@ import org.bukkit.Location;
  * @author mc_dev
  *
  */
-public abstract class RayTracing implements ICollide {
+public abstract class RayTracing implements ICollideBlocks {
 
     //	/** End point coordinates (from, to) */
     protected double x0, y0, z0; // x1, y1, z1;

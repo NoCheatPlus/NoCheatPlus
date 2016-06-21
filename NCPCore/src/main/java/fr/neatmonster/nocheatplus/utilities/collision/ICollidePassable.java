@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
  * @author asofold
  *
  */
-public interface ICollidePassable extends ICollide, ISetMargins {
+public interface ICollidePassable extends ICollideBlocks, ISetMargins {
 
     public void setBlockCache(BlockCache blockCache);
     public BlockCache getBlockCache();

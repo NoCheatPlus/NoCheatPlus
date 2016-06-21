@@ -20,7 +20,7 @@ package fr.neatmonster.nocheatplus.utilities.collision;
  * @author asofold
  *
  */
-public interface ICollide {
+public interface ICollideBlocks {
 
     // TODO: number of visited blocks?
 

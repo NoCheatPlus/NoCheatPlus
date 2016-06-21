@@ -28,7 +28,7 @@ import org.bukkit.Location;
  * @author asofold
  *
  */
-public abstract class AxisTracing implements ICollide, ISetMargins {
+public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
 
     // TODO: Consider an extra loop(coordinates + margins...) for convenience.
 
