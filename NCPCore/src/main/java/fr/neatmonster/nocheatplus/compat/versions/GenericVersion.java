@@ -14,8 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.compat.versions;
 
+import java.util.Arrays;
+
 /**
  * Some generic version parsing and comparison utility methods.
+ * 
  * @author asofold
  *
  */
@@ -51,6 +54,108 @@ public class GenericVersion {
             num[i] = Integer.parseInt(split[i]);
         }
         return num;
+    }
+
+    /**
+     * Truncate to the specified number of divisions if necessary.
+     * 
+     * @param version
+     *            A standard version that can be converted via versionToInt.
+     * @param maxDivisions
+     *            Number of divisions, separated by dots.
+     * @return A version with maximally the specified number of divisions. If no
+     *         truncating is necessary the given version is returned.
+     * @throws NumberFormatException
+     *             If parsing fails.
+     */
+    public static String truncateVersion(String version, int maxDivisions) {
+        int[] oldInts = versionToInt(version);
+        if (oldInts.length <= maxDivisions) {
+            return version;
+        }
+        int[] newInts = Arrays.copyOf(oldInts, maxDivisions);
+        StringBuilder builder = new StringBuilder(version.length());
+        builder.append(Integer.toString(newInts[0]));
+        for (int i = 1; i < newInts.length; i++) {
+            builder.append(".");
+            builder.append(Integer.toString(newInts[i]));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Pad with zeros, if the version has less than minDivisions divisions.
+     * 
+     * @param version
+     *            A standard version that can be converted via versionToInt.
+     * @param minDivisions
+     *            The number of divisions to at least have.
+     * @return A version with at least the specified number of divisions. If no
+     *         padding is necessary the given version is returned.
+     * @throws NumberFormatException
+     *             If parsing fails.
+     */
+    public static String padVersion(String version, int minDivisions) {
+        int oldSize = getVersionDivisions(version);
+        if (oldSize >= minDivisions) {
+            return version;
+        }
+        StringBuilder builder = new StringBuilder(version.length() + minDivisions * 4);
+        builder.append(version);
+        for (int i = oldSize; i < minDivisions; i++) {
+            builder.append(".0");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Ensure the returned version has exactly the specified number of
+     * divisions. If necessary, either truncating or padding with zeros will be
+     * applied.
+     * 
+     * @param version
+     * @param divisions
+     * @return A version with exactly the specified number of divisions. If the
+     *         given version already has that amount of divisions, it will be
+     *         returned as is.
+     * @throws NumberFormatException
+     *             If parsing fails.
+     */
+    public static String ensureVersionDivisions(String version, int divisions) {
+        return truncateVersion(padVersion(version, divisions), divisions);
+    }
+
+    /**
+     * Get versions padded to the maximum number of divisions found, using with
+     * zeros.
+     * 
+     * @param versions
+     * @return An new array with versions padded to the maximum number of
+     *         divisions found, where necessary. Versions that have the maximum
+     *         number of divisions are returned as is. The array has the same
+     *         order as the input.
+     */
+    public static String[] padVersions(String... versions) {
+        int maxDivisions = 0;
+        for (int i = 0; i < versions.length; i++) {
+            maxDivisions = Math.max(maxDivisions, getVersionDivisions(versions[i]));
+        }
+        String[] out = new String[versions.length];
+        for (int i = 0; i < versions.length; i++) {
+            out[i] = ensureVersionDivisions(versions[i], maxDivisions);
+        }
+        return out;
+    }
+
+    /**
+     * Get the number of divisions for a version.
+     * @param version
+     * @return
+     * @throws NumberFormatException
+     *             If parsing fails.
+     */
+    public static int getVersionDivisions(String version) {
+        return versionToInt(version).length;
     }
 
     /**
