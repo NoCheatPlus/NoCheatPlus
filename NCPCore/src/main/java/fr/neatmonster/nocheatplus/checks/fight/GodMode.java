@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -30,6 +31,8 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * The GodMode check will find out if a player tried to stay invulnerable after being hit or after dying.
  */
 public class GodMode extends Check {
+
+    private final IGenericInstanceHandle<IBridgeCrossPlugin> crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IBridgeCrossPlugin.class);
 
     /**
      * Instantiates a new god mode check.
@@ -195,7 +198,7 @@ public class GodMode extends Check {
         // TODO: Is this still relevant ?
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
         if (BridgeHealth.getHealth(player) <= 0.0 && player.isDead()
-                && NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IBridgeCrossPlugin.class).isNativeEntity(player)) {
+                && crossPlugin.getHandle().isNativeEntity(player)) {
             try {
                 // Schedule a task to be executed in roughly 1.5 seconds.
                 // TODO: Get plugin otherwise !?

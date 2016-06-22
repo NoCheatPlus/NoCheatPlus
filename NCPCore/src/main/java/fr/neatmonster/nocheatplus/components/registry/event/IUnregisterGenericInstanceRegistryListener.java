@@ -15,13 +15,14 @@
 package fr.neatmonster.nocheatplus.components.registry.event;
 
 /**
- * Rather an internal interface.
+ * Allow to unregister listeners, should also disable internally created handles
+ * if they are this listener. Rather an internal interface.
  * 
  * @author asofold
  *
  */
-public interface IUnregisterGenericInstanceListener {
+public interface IUnregisterGenericInstanceRegistryListener {
 
-    public <T> void unregisterGenericInstanceListener(Class<T> registeredFor, IGenericInstanceHandle<T> listener);
+    public <T> void unregisterGenericInstanceRegistryListener(Class<T> registeredFor, IGenericInstanceRegistryListener<T> listener);
 
 }

@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.components.registry;
 
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.exception.RegistrationLockedException;
 
 /**
  * A registry for unique instances of any class type.<br>
@@ -32,17 +33,20 @@ public interface GenericInstanceRegistry {
      * be aligned to the actual class.
      * 
      * @param instance
+     * @throws RegistrationLockedException
+     *             If the registration of the class of instance is locked.
      */
     public <T> T registerGenericInstance(T instance);
 
     /**
      * Register an instance under for a super-class.
      * 
-     * @todo The registry implementation might specify if overriding is allowed.
      * @param registerAs
      * @param instance
      * @return The previously registered instance. If none was registered, null
      *         is returned.
+     * @throws RegistrationLockedException
+     *             If the registration of registerFor is locked.
      */
     public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance);
 
@@ -61,6 +65,8 @@ public interface GenericInstanceRegistry {
      * @param registeredFor
      * @return The previously registered instance. If none was registered, null
      *         is returned.
+     * @throws RegistrationLockedException
+     *             If the registration of registerFor is locked.
      */
     public <T> T unregisterGenericInstance(Class<T> registeredFor);
 

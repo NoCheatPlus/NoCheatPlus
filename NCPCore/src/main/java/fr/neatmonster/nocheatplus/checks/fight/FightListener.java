@@ -55,6 +55,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -110,7 +111,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private final int idCancelDead = counters.registerKey("canceldead");
 
     // Assume it to stay the same all time.
-    private final IBridgeCrossPlugin crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(IBridgeCrossPlugin.class);
+    private final IGenericInstanceHandle<IBridgeCrossPlugin> crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IBridgeCrossPlugin.class);
 
     public FightListener() {
         super(CheckType.FIGHT);
@@ -489,7 +490,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Player damagedPlayer = damaged instanceof Player ? (Player) damaged : null;
         final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
         final boolean damagedIsDead = damaged.isDead();
-        final boolean damagedIsFake = !crossPlugin.isNativeEntity(damaged);
+        final boolean damagedIsFake = !crossPlugin.getHandle().isNativeEntity(damaged);
         if (damagedPlayer != null && !damagedIsDead) {
             // God mode check.
             // (Do not test the savage.)
@@ -588,7 +589,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     attackerData.lastExplosionDamageTick = -1;
                     attackerData.lastExplosionEntityId = Integer.MAX_VALUE;
                 }
-                else if (handleNormalDamage(player, !crossPlugin.isNativePlayer(player),
+                else if (handleNormalDamage(player, !crossPlugin.getHandle().isNativePlayer(player),
                         damaged, damagedIsFake,
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
                         tick, attackerData)) {

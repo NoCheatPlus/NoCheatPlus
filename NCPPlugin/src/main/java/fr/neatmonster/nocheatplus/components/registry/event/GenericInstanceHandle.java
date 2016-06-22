@@ -69,7 +69,8 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
     /**
      * Allow fetching PrarentDelegate instances, increasing reference count with
      * each returned one. Really unregister only with reaching a count of zero
-     * on disableHandle. This way only one instance needs to be updated.
+     * on disableHandle. This way only one instance needs to be updated. This
+     * doesn't self-register as listener.
      * 
      * @author asofold
      *
@@ -80,7 +81,7 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
         private int references = 0;
 
         public ReferenceCountHandle(Class<T> registeredFor, GenericInstanceRegistry registry,
-                IUnregisterGenericInstanceListener unregister) {
+                IUnregisterGenericInstanceRegistryListener unregister) {
             super(registeredFor, registry, unregister);
         }
 
@@ -102,10 +103,14 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
             return new ParentDelegateHandle<T>(getRegisteredFor(), getRegistry(), this);
         }
 
+        public int getNumberOfReferences() {
+            return references;
+        }
+
     }
 
     private GenericInstanceRegistry registry;
-    private IUnregisterGenericInstanceListener unregister;
+    private IUnregisterGenericInstanceRegistryListener unregister;
     private Class<T> registeredFor;
     private T handle = null;
     private boolean initialized = false;
@@ -119,7 +124,7 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
      * @param registry
      * @param unregister
      */
-    public GenericInstanceHandle(Class<T> registeredFor, GenericInstanceRegistry registry, IUnregisterGenericInstanceListener unregister) {
+    public GenericInstanceHandle(Class<T> registeredFor, GenericInstanceRegistry registry, IUnregisterGenericInstanceRegistryListener unregister) {
         this.registry = registry;
         this.unregister = unregister;
         this.registeredFor = registeredFor; 
@@ -169,7 +174,7 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
             registeredFor = null;
             registry = null;
             if (unregister != null) {
-                unregister.unregisterGenericInstanceListener(registeredFor, this);
+                unregister.unregisterGenericInstanceRegistryListener(registeredFor, this);
             }
             unregister = null;
         }
@@ -183,7 +188,7 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
         return registry;
     }
 
-    public IUnregisterGenericInstanceListener getUnregister() {
+    public IUnregisterGenericInstanceRegistryListener getUnregister() {
         return unregister;
     }
 

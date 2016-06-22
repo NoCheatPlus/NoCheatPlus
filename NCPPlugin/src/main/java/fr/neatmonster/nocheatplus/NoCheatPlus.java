@@ -935,11 +935,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
         // Register some generic stuff.
-        // Counters: debugging purposes, maybe integrated for statistics later.
+        // (Deny change some.)
         registerGenericInstance(new Counters());
+        genericInstanceRegistry.denyChangeExistingRegistration(Counters.class);
         registerGenericInstance(new WRPT());
-        registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
+        genericInstanceRegistry.denyChangeExistingRegistration(WRPT.class);
         registerGenericInstance(new TraceEntryPool(1000)); // Random number.
+        genericInstanceRegistry.denyChangeExistingRegistration(TraceEntryPool.class);
+        // (Allow override others.)
+        registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
         addComponent(new BridgeCrossPlugin());
 
         // Initialize MCAccess.

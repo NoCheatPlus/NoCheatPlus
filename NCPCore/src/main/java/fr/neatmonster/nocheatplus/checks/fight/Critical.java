@@ -40,7 +40,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  */
 public class Critical extends Check {
 
-    private AuxMoving auxMoving = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
+    private final AuxMoving auxMoving = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     /**
      * Instantiates a new critical check.
