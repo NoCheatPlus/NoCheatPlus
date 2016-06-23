@@ -63,7 +63,9 @@ public class Magic {
     public static final double GLIDE_HORIZONTAL_GAIN_MAX = GRAVITY_MAX / 2.0;
 
     // Vertical speeds/modifiers. 
-    public static final double climbSpeed       = WALK_SPEED * 1.3; // TODO: Check if the factor is needed!
+    public static final double climbSpeedAscend        = 0.119;
+    public static final double climbSpeedDescend       = 0.151;
+
     /**
      * Some kind of minimum y descend speed (note the negative sign), for an
      * already advanced gliding/falling phase with elytra.
