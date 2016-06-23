@@ -899,6 +899,8 @@ public class BlockProperties {
                 //				Material.COCOA,
                 // Issues standing on with F_PASSABLE_X4.
                 Material.TRAP_DOOR,
+                // 1.10.2 +- client uses the reported height.
+                Material.SOIL,
         }) {
             blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
         }
@@ -2694,6 +2696,10 @@ public class BlockProperties {
             return 0.8125;
         }
         else if ((flags & F_GROUND_HEIGHT) != 0) {
+            // Default height is used.
+            if (id == Material.SOIL.getId()) {
+                return bounds[4];
+            }
             // Assume open gates/trapdoors/things to only allow standing on to, if at all.
             if ((flags & F_PASSABLE_X4) != 0 && (access.getData(x, y, z) & 0x04) != 0) {
                 return bounds[4];
