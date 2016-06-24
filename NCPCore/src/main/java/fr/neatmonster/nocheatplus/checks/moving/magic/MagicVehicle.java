@@ -40,7 +40,11 @@ public class MagicVehicle {
     
     public static final double maxRailsVertical = 0.5;
 
-    public static final double boatGravityMin = Magic.GRAVITY_MIN / 2.0;
+    public static final double boatGravityMin = Magic.GRAVITY_MIN / 3.0;
+    /** Allow lower gravity when falling this fast. */
+    public static final double boatLowGravitySpeed = 0.5;
+    /** Simplistic approach for falling speed more than 0.5. */
+    public static final double boatGravityMinAtSpeed = Magic.GRAVITY_MIN / 12.0;
     public static final double boatGravityMax = (Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN) / 2.0;
     /** The speed up to which gravity mechanics roughly work. */
     public static final double boatVerticalFallTarget = 3.7;
