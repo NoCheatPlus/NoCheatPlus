@@ -80,6 +80,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
         final double tMaxX = CollisionUtil.getMaxTimeIncludeEdges(startX, dirX, minX, maxX, tMinX);
         final double tMaxY = CollisionUtil.getMaxTimeIncludeEdges(startY, dirY, minY, maxY, tMinY);
         final double tMaxZ = CollisionUtil.getMaxTimeIncludeEdges(startZ, dirZ, minZ, maxZ, tMinZ);
+        //System.out.println("TIMING: " + tMinX + " " + tMinY + " " + tMinZ + " " + tMaxX + " " + tMaxY + " " + tMaxZ);
         if (tMaxX != Double.NaN && tMaxY != Double.NaN && tMaxZ != Double.NaN) {
             // (Excludes any tMin value to be Double.MAX_VALUE.)
             // Determine if there is overlapping intervals.
@@ -90,6 +91,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
                 closestX = startX + dirX * tMin;
                 closestY = startY + dirY * tMin;
                 closestZ = startZ + dirZ * tMin;
+                closestTime = tMin;
             }
             else if (findNearestPointIfNotCollide) {
                 findNearestPoint(tMinX, tMinY, tMinZ, tMaxX, tMaxY, tMaxZ);
@@ -122,7 +124,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
         for (int i = 0; i < timeValues.length; i++) {
             final double time = timeValues[i];
             if (time == Double.NaN || time == Double.POSITIVE_INFINITY) {
-                // Note that Double.POSITIVE_INFINITY means that we are colliding forever.
+                // Note that Double.POSITIVE_INFINITY could mean that we are either colliding forever, or never.
                 continue;
             }
             final double x = startX + dirX * time;

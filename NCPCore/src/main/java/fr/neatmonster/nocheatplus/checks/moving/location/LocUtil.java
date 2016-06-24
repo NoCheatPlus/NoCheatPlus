@@ -20,6 +20,7 @@ import org.bukkit.block.Block;
 
 import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
@@ -363,6 +364,16 @@ public class LocUtil {
      */
     public static String simpleFormat(final IGetPositionWithLook loc) {
         return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ() + ",pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw();
+    }
+
+    /**
+     * Format like Location.toString, but without extras like the world name.
+     * 
+     * @param loc
+     * @return
+     */
+    public static String simpleFormat(final IGetPosition loc) {
+        return "x=" + loc.getX() + ",y=" + loc.getY() + ",z=" + loc.getZ();
     }
 
     /**

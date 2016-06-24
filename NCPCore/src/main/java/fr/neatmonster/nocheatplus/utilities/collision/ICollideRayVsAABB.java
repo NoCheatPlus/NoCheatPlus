@@ -127,10 +127,10 @@ public interface ICollideRayVsAABB extends IGetPosition {
     public boolean collides();
 
     /**
-     * Get some kind of squared distance for the nearest point, in case of not
-     * colliding and findNearestPointIfNotCollid being set.
+     * Get some kind of squared distance from the nearest point towards the
+     * AABB, in case of not colliding and findNearestPointIfNotCollid being set.
      * 
-     * @return 0.0 if not applicable.
+     * @return 0.0 if colliding.
      */
     public double getClosestDistanceSquared();
 

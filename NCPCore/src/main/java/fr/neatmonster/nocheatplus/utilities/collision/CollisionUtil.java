@@ -375,10 +375,10 @@ public class CollisionUtil {
             return Double.NaN;
         }
         else if (dir == 0.0) {
-            return pos < maxPos || pos > maxPos ? Double.NaN : Double.POSITIVE_INFINITY;
+            return (pos < minPos || pos > maxPos) ? Double.NaN : Double.POSITIVE_INFINITY;
         }
         else if (dir < 0.0) {
-            return pos < minPos ? Double.NaN : (Math.abs(pos - minPos) / dir);
+            return pos < minPos ? Double.NaN : (Math.abs(pos - minPos) / Math.abs(dir));
         }
         else {
             // dir > 0.0
