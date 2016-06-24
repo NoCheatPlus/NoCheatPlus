@@ -9,7 +9,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
     private double minX, minY, minZ, maxX, maxY, maxZ;
 
     /** Collision or closest point. */
-    private double closestX, closestY, closestZ, closestTime;
+    private double closestX, closestY, closestZ, closestDistanceSquared, closestTime;
     /**
      * Indicate a collision occurred. Reset with calling loop only.
      */
@@ -59,6 +59,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
         closestX = startX;
         closestY = startY;
         closestZ = startZ;
+        closestDistanceSquared = 0.0; // Not applicable by default.
         closestTime = 0.0;
         // Determine basic orientation and timing.
         final double tMinX = CollisionUtil.getMinTimeIncludeEdges(startX, dirX, minX, maxX);
@@ -79,7 +80,7 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
                 closestZ = startZ + dirZ * tMin;
             }
             else if (findNearestPointIfNotCollide) {
-                findNearestPoint(tMinX, tMinY, tMinZ, tMaxX, tMaxY, tMaxZ, tMin, tMax);
+                findNearestPoint(tMinX, tMinY, tMinZ, tMaxX, tMaxY, tMaxZ);
             }
         }
         else if (findNearestPointIfNotCollide) {
@@ -89,27 +90,9 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
     }
 
     /**
-     * Find the nearest point for the case of not hitting the box, but with
-     * hitting min-max coordinates per axis independently.
-     * 
-     * @param tMinX
-     * @param tMinY
-     * @param tMinZ
-     * @param tMaxX
-     * @param tMaxY
-     * @param tMaxZ
-     * @param tMin
-     * @param tMax
-     */
-    private void findNearestPoint(final double tMinX, final double tMinY, final double tMinZ, 
-            final double tMaxX, final double tMaxY, final double tMaxZ,
-            final double tMin, final double tMax) {
-        // TODO: Implement.
-    }
-
-    /**
      * Estimate the nearest point for the case of at least one of the
-     * coordinates not being possible to match at all.
+     * coordinates not being possible to match at all. Asserts closestX|Y|Z to
+     * be set to the start coordinates.
      * 
      * @param tMinX
      * @param tMinY
@@ -118,9 +101,31 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
      * @param tMaxY
      * @param tMaxZ
      */
-    private void findNearestPoint(final double tMinX, final double tMinY, final double tMinZ, 
-            final double tMaxX, final double tMaxY, final double tMaxZ) {
-        // TODO: Implement.
+    private void findNearestPoint(final double... timeValues) {
+        // TODO: Squared vs. Manhattan vs. maxAxis.
+        // Update squared distance to 'actual'.
+        closestDistanceSquared = CollisionUtil.getSquaredDistAABB(this.startX, this.startY, this.startZ, 
+                minX, minY, minZ, maxX, maxY, maxZ);
+        // Find the closest point using set time values.
+        for (int i = 0; i < timeValues.length; i++) {
+            final double time = timeValues[i];
+            if (time == Double.NaN || time == Double.POSITIVE_INFINITY) {
+                // Note that Double.POSITIVE_INFINITY means that we are colliding forever.
+                continue;
+            }
+            final double x = startX + dirX * time;
+            final double y = startY + dirY * time;
+            final double z = startZ + dirZ * time;
+            final double distanceSquared = CollisionUtil.getSquaredDistAABB(x, y, z, 
+                    minX, minY, minZ, maxX, maxY, maxZ);
+            if (distanceSquared < closestDistanceSquared) {
+                closestX = x;
+                closestY = y;
+                closestZ = z;
+                closestDistanceSquared = distanceSquared;
+                closestTime = time;
+            }
+        }
     }
 
     @Override
@@ -141,6 +146,11 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
     @Override
     public double getZ() {
         return closestZ;
+    }
+
+    @Override
+    public double getClosestDistanceSquared() {
+        return closestDistanceSquared;
     }
 
     @Override

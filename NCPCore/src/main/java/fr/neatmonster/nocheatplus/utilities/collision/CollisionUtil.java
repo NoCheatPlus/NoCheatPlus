@@ -386,4 +386,92 @@ public class CollisionUtil {
         }
     }
 
+    /**
+     * Get the maximum (closest) distance from the given position towards the
+     * AABB regarding axes independently.
+     * 
+     * @param x
+     *            Position of the point.
+     * @param y
+     * @param z
+     * @param minX
+     *            Minimum coordinates of the AABB.
+     * @param minY
+     * @param minZ
+     * @param maxX
+     *            Maximum coordinates of the AABB.
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static double getMaxAxisDistAABB(final double x, final double y, final double z,
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        return Math.max(axisDistance(x,  minX, maxX), Math.max(axisDistance(y, minY, maxY), axisDistance(z, minZ, maxZ)));
+    }
+
+    /**
+     * Get the maximum (closest) 'Manhattan' distance from the given position
+     * towards the AABB regarding axes independently.
+     * 
+     * @param x
+     *            Position of the point.
+     * @param y
+     * @param z
+     * @param minX
+     *            Minimum coordinates of the AABB.
+     * @param minY
+     * @param minZ
+     * @param maxX
+     *            Maximum coordinates of the AABB.
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static double getManhattanDistAABB(final double x, final double y, final double z,
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        return axisDistance(x,  minX, maxX)+ axisDistance(y, minY, maxY) + axisDistance(z, minZ, maxZ);
+    }
+
+    /**
+     * Get the squared (closest) distance from the given position towards the
+     * AABB regarding axes independently.
+     * 
+     * @param x
+     *            Position of the point.
+     * @param y
+     * @param z
+     * @param minX
+     *            Minimum coordinates of the AABB.
+     * @param minY
+     * @param minZ
+     * @param maxX
+     *            Maximum coordinates of the AABB.
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static double getSquaredDistAABB(final double x, final double y, final double z,
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        final double dX = axisDistance(x,  minX, maxX);
+        final double dY = axisDistance(y, minY, maxY);
+        final double dZ = axisDistance(z, minZ, maxZ);
+        return dX * dX + dY * dY + dZ * dZ;
+    }
+
+    /**
+     * Get the distance towards a min-max interval (inside and edge count as 0.0
+     * distance).
+     * 
+     * @param pos
+     * @param minPos
+     * @param maxPos
+     * @return Positive distance always.
+     */
+    public static double axisDistance(final double pos, final double minPos, final double maxPos) {
+        return pos < minPos ? Math.abs(pos - minPos) : (pos > maxPos ? Math.abs(pos - maxPos) : 0.0);
+    }
+
 }
