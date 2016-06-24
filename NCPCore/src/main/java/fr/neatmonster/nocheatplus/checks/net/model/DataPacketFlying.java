@@ -100,17 +100,17 @@ public class DataPacketFlying extends DataLocation {
         builder.append(onGround);
         if (hasPos) {
             builder.append(",x=");
-            builder.append(x);
+            builder.append(getX());
             builder.append(",y=");
-            builder.append(y);
+            builder.append(getY());
             builder.append(",z=");
-            builder.append(z);
+            builder.append(getZ());
         }
         if (hasLook) {
             builder.append(",pitch=");
-            builder.append(pitch);
+            builder.append(getPitch());
             builder.append(",yaw=");
-            builder.append(yaw);
+            builder.append(getYaw());
         }
         // Skip time for now.
         builder.append(")");

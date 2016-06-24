@@ -168,10 +168,10 @@ public class MovingFlying extends BaseAdapter {
     }
 
     private boolean isInvalidContent(final DataPacketFlying packetData) {
-        if (packetData.hasPos && CheckUtils.isBadCoordinate(packetData.x, packetData.y, packetData.z)) {
+        if (packetData.hasPos && CheckUtils.isBadCoordinate(packetData.getX(), packetData.getY(), packetData.getZ())) {
             return true;
         }
-        if (packetData.hasLook && CheckUtils.isBadCoordinate(packetData.yaw, packetData.pitch)) {
+        if (packetData.hasLook && CheckUtils.isBadCoordinate(packetData.getYaw(), packetData.getPitch())) {
             return true;
         }
         return false;

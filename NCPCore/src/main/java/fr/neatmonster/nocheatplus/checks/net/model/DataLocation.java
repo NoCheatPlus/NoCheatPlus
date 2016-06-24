@@ -14,18 +14,29 @@
  */
 package fr.neatmonster.nocheatplus.checks.net.model;
 
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
+
 /**
  * An immutable location data object with coordinates and pitch and yaw.
  * 
  * @author asofold
  *
  */
-public class DataLocation {
+public class DataLocation implements IGetPositionWithLook {
 
-    // TODO: hashCode + equals.
+    // TODO: equals.
+    // TODO: hashCode won't help much if sub classes will override it anyway.
 
-    public final double x, y, z;
-    public final float yaw, pitch;
+    private final double x;
+
+    private final double y;
+
+    private final double z;
+
+    private final float yaw;
+
+    private final float pitch;
 
     public DataLocation(double x, double y, double z, float yaw, float pitch) {
         this.x = x;
@@ -42,7 +53,7 @@ public class DataLocation {
      * @return
      */
     public boolean isSameLocation(final DataLocation other) {
-        return y == other.y && x == other.x && z == other.z && pitch == other.pitch && yaw == other.yaw;
+        return getY() == other.getY() && getX() == other.getX() && getZ() == other.getZ() && getPitch() == other.getPitch() && getYaw() == other.getYaw();
     }
 
     /**
@@ -56,7 +67,7 @@ public class DataLocation {
      * @return
      */
     public boolean isSameLocation(final double x, final double y, final double z, final float yaw, final float pitch) {
-        return x == this.x && y == this.y && z == this.z && yaw == this.yaw && pitch == this.pitch;
+        return x == this.getX() && y == this.getY() && z == this.getZ() && yaw == this.getYaw() && pitch == this.getPitch();
     }
 
     @Override
@@ -64,17 +75,47 @@ public class DataLocation {
         final StringBuilder builder = new StringBuilder(256);
         builder.append("Location(");
         builder.append("x=");
-        builder.append(x);
+        builder.append(getX());
         builder.append(",y=");
-        builder.append(y);
+        builder.append(getY());
         builder.append(",z=");
-        builder.append(z);
+        builder.append(getZ());
         builder.append(",pitch=");
-        builder.append(pitch);
+        builder.append(getPitch());
         builder.append(",yaw=");
-        builder.append(yaw);
+        builder.append(getYaw());
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public double getZ() {
+        return z;
+    }
+
+    @Override
+    public float getYaw() {
+        return yaw;
+    }
+
+    @Override
+    public float getPitch() {
+        return pitch;
+    }
+
+    @Override
+    public int hashCode() {
+        return LocUtil.hashCode(this);
     }
 
 }

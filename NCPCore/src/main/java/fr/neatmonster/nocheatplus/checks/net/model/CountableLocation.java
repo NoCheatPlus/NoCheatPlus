@@ -37,15 +37,15 @@ public class CountableLocation extends DataLocation {
         final StringBuilder builder = new StringBuilder(256);
         builder.append("CountableLocation(");
         builder.append("x=");
-        builder.append(x);
+        builder.append(getX());
         builder.append(",y=");
-        builder.append(y);
+        builder.append(getY());
         builder.append(",z=");
-        builder.append(z);
+        builder.append(getZ());
         builder.append(",pitch=");
-        builder.append(pitch);
+        builder.append(getPitch());
         builder.append(",yaw=");
-        builder.append(yaw);
+        builder.append(getYaw());
         builder.append(",count=");
         builder.append(count);
         // Skip time for now.

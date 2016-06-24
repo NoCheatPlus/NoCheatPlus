@@ -106,7 +106,7 @@ public class Visible extends Check {
                         continue;
                     }
                     // TODO: Might skip last pitch+yaw as well.
-                    if (packetData.pitch == oldPitch && packetData.yaw == oldYaw) {
+                    if (packetData.getPitch() == oldPitch && packetData.getYaw() == oldYaw) {
                         if (count == 0) {
                             count = 1;
                         }
@@ -118,8 +118,8 @@ public class Visible extends Check {
                         count ++;
                     }
                     // Run ray-tracing again with updated pitch and yaw.
-                    useLoc.setPitch(packetData.pitch);
-                    useLoc.setYaw(packetData.yaw);
+                    useLoc.setPitch(packetData.getPitch());
+                    useLoc.setYaw(packetData.getYaw());
                     direction = useLoc.getDirection(); // TODO: Better.
                     tags.clear();
                     tags.add("flying(" + i + ")"); // Interesting if this gets through.
