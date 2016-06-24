@@ -41,9 +41,9 @@ public interface ICollideRayVsAABB extends IGetPosition {
             double dirX, double dirY, double dirZ);
 
     /**
-     * Set the properties of the AABB. This can be called independently of
-     * setRay and loop, in order to reiterate with a different AABB to check
-     * against.
+     * Set the properties of the AABB, using foot-center positions and margins.
+     * This can be called independently of setRay and loop, in order to
+     * reiterate with a different AABB to check against.
      * 
      * @param targetX
      *            Bottom center coordinates of the AABB, e.g. the foot location
@@ -51,11 +51,45 @@ public interface ICollideRayVsAABB extends IGetPosition {
      * @param targetY
      * @param targetZ
      * @param boxMarginHorizontal
-     * @param boxMArginVertical
+     *            Margin from the center to the x/z-sides.
+     * @param boxMarginVertical
+     *            Margin from targetY to the top of the box.
      * @return The same instance for chaining.
      */
     public ICollideRayVsAABB setAABB(double targetX, double targetY, double targetZ,
-            double boxMarginHorizontal, double boxMArginVertical);
+            double boxMarginHorizontal, double boxMarginVertical);
+
+    /**
+     * Set the properties of the AABB, using block coordinates and a margin.
+     * This can be called independently of setRay and loop, in order to
+     * reiterate with a different AABB to check against.
+     * 
+     * @param targetX
+     *            The block coordinates. This is the minimum coordinates, from
+     *            which on 1.0 will be added for the maximum coordinates.
+     * @param targetY
+     * @param targetZ
+     * @param margin
+     *            A margin to apply towards all directions.
+     * @return The same instance for chaining.
+     */
+    public ICollideRayVsAABB setAABB(int targetX, int targetY, int targetZ, double margin);
+
+    /**
+     * Set the properties of the AABB directly. This can be called independently
+     * of setRay and loop, in order to reiterate with a different AABB to check
+     * against.
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return The same instance for chaining.
+     */
+    public ICollideRayVsAABB setAABB(double minX, double minY, double minZ, 
+            double maxX, double maxY, double maxZ);
 
     /**
      * Set if the nearest point is to be estimated instead, in case the ray does

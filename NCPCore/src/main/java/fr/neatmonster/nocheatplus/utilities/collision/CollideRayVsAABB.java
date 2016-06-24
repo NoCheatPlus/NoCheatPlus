@@ -31,13 +31,25 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
     @Override
     public ICollideRayVsAABB setAABB(double targetX, double targetY, double targetZ, 
             double boxMarginHorizontal, double boxMarginVertical) {
-        // Set from parameters.
-        this.minX = targetX - boxMarginHorizontal;
-        this.minY = targetY;
-        this.minZ = targetZ - boxMarginHorizontal;
-        this.maxX = targetX + boxMarginHorizontal;
-        this.maxY = targetY + boxMarginVertical;
-        this.maxZ = targetZ + boxMarginHorizontal;
+        return this.setAABB(targetX - boxMarginHorizontal, targetY, targetZ - boxMarginHorizontal,
+                targetX + boxMarginHorizontal, targetY + boxMarginVertical, targetZ + boxMarginHorizontal);
+    }
+
+    @Override
+    public ICollideRayVsAABB setAABB(int targetX, int targetY, int targetZ, double margin) {
+        return setAABB(-margin + targetX, -margin + targetY, -margin + targetZ, 
+                1.0 + margin + targetX, 1.0 + margin + targetY, 1.0 + margin + targetZ);
+    }
+
+    @Override
+    public ICollideRayVsAABB setAABB(double minX, double minY, double minZ, 
+            double maxX, double maxY, double maxZ) {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
         return this;
     }
 
