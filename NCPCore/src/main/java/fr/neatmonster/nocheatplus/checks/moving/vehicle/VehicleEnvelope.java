@@ -58,7 +58,7 @@ public class VehicleEnvelope extends Check {
         public boolean canRails;
         public boolean canJump, canStepUpBlock; // TODO: Model as heights?
         public double maxAscend;
-        public double lowGravitySpeed;
+        public double gravityTargetSpeed;
 
         /** Simplified type, like BOAT, MINECART. */
         public EntityType simplifiedType; // Not sure can be kept up.
@@ -80,7 +80,7 @@ public class VehicleEnvelope extends Check {
             checkAscendMuch = checkDescendMuch = true;
             fromIsSafeMedium = toIsSafeMedium = inAir = false;
             simplifiedType = null;
-            lowGravitySpeed = MagicVehicle.boatVerticalFallTarget;
+            gravityTargetSpeed = MagicVehicle.boatVerticalFallTarget;
         }
 
     }
@@ -324,7 +324,7 @@ public class VehicleEnvelope extends Check {
                 checkDetails.toIsSafeMedium = true;
                 checkDetails.inAir = false;
             }
-            checkDetails.lowGravitySpeed = 0.79;
+            checkDetails.gravityTargetSpeed = 0.79;
         }
         else if (vehicle instanceof Horse) {
             // TODO: Climbable? -> seems not.
@@ -398,10 +398,10 @@ public class VehicleEnvelope extends Check {
         //            }
         // Enforce falling speed (vdist) envelope by in-air phase count.
         // Slow falling (vdist), do not bind to descending in general.
-        final double minDescend = -(thisMove.yDistance < -MagicVehicle.boatGravityMinAtSpeed ? MagicVehicle.boatGravityMinAtSpeed : MagicVehicle.boatGravityMin) * (checkDetails.canJump ? Math.max(data.sfJumpPhase - MagicVehicle.maxJumpPhaseAscend, 0) : data.sfJumpPhase);
+        final double minDescend = -(thisMove.yDistance < -MagicVehicle.boatLowGravitySpeed ? MagicVehicle.boatGravityMinAtSpeed : MagicVehicle.boatGravityMin) * (checkDetails.canJump ? Math.max(data.sfJumpPhase - MagicVehicle.maxJumpPhaseAscend, 0) : data.sfJumpPhase);
         final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
         if (data.sfJumpPhase > (checkDetails.canJump ? MagicVehicle.maxJumpPhaseAscend : 1)
-                && thisMove.yDistance > Math.max(minDescend, -checkDetails.lowGravitySpeed)) {
+                && thisMove.yDistance > Math.max(minDescend, -checkDetails.gravityTargetSpeed)) {
             tags.add("slow_fall_vdist");
             violation = true;
         }
