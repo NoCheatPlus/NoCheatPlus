@@ -6,13 +6,15 @@ import fr.neatmonster.nocheatplus.components.location.IGetPosition;
  * Collide a ray with an axis aligned bounding box (AABB). Allow fetching the
  * point of time, when the ray is closest to the AABB. The methods getX|Y|Z from
  * IGetPosition will fetch the coordinates of collision or the nearest point (if
- * set so).
+ * set so). By default colliding with the edges of the box would count.
  * 
  * @author asofold
  *
  */
 public interface ICollideRayVsAABB extends IGetPosition {
 
+    // TODO: Control of counting in colliding with the edge?
+    // TODO: Method to get the maximum per-axis distance in case of not colliding and findNearest... set.
     // TODO: Convenience methods to retrieve distances (especially in case of not colliding).
     // TODO: Convenience methods for other argument types (vector, IGet..., double[], setAABB(block/ints).
     // TODO: Implement fight.visible, use in BlockBreak.direction/visible.
@@ -89,8 +91,8 @@ public interface ICollideRayVsAABB extends IGetPosition {
     public boolean collides();
 
     /**
-     * Time of collision if collides() returns true, or of the nearest point,
-     * counted in times of applying the direction.
+     * Earliest time of collision if collides() returns true, or of the nearest
+     * point, counted in times of applying the direction.
      * 
      * @return Time in multiples of the initial direction vector. In case it's
      *         not possible at all, 0.0 might be returned.

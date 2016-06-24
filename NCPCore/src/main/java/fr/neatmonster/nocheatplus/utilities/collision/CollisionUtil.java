@@ -302,4 +302,88 @@ public class CollisionUtil {
         return db + 1.0 > min && db < max;
     }
 
+    /**
+     * Test if a point is inside an AABB, including the edges.
+     * 
+     * @param x
+     *            Position of the point.
+     * @param y
+     * @param z
+     * @param minX
+     *            Minimum coordinates of the AABB.
+     * @param minY
+     * @param minZ
+     * @param maxX
+     *            Maximum coordinates of the AABB.
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static boolean isInsideAABBIncludeEdges(final double x, final double y, final double z,
+            final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        return !(x < minX || x > maxX || z < minZ || z > maxZ || y < minY || y > maxY);
+    }
+
+    /**
+     * Get the earliest time a collision with the min-max coordinates can occur,
+     * in multiples of dir, including edges.
+     * 
+     * @param pos
+     * @param dir
+     * @param minPos
+     * @param maxPos
+     * @return The multiple of dir to hit the min-max coordinates, or
+     *         Double.POSITIVE_INFINITY if not possible to hit.
+     */
+    public static double getMinTimeIncludeEdges(final double pos, final double dir, 
+            final double minPos, final double maxPos) {
+        if (pos >= minPos && pos <= maxPos) {
+            return 0.0;
+        }
+        else if (dir == 0.0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        else if (dir < 0.0) {
+            return pos < minPos ? Double.POSITIVE_INFINITY : (Math.abs(pos - maxPos) / Math.abs(dir));
+        }
+        else {
+            // dir > 0.0
+            return pos > maxPos ? Double.POSITIVE_INFINITY : (Math.abs(pos - minPos) / dir);
+        }
+    }
+
+    /**
+     * Get the maximum time for which the min-max coordinates still are hit.
+     * 
+     * @param pos
+     * @param dir
+     * @param minPos
+     * @param maxPos
+     * @param minTime
+     *            The earliest time of collision with the min-max coordinates,
+     *            as returned by getMinTimeIncludeEdges.
+     * @return The maximum time for which the min-max coordinates still are hit.
+     *         If no hit is possible, Double.NaN is returned. If minTime is
+     *         Double.POSITIVE_INFINITY, Double.NaN is returned directly.
+     *         Double.POSITIVE_INFINITY may be returned, if coordinates are
+     *         colliding always.
+     */
+    public static double getMaxTimeIncludeEdges(final double pos, final double dir, 
+            final double minPos, final double maxPos, final double minTime) {
+        if (minTime == Double.POSITIVE_INFINITY) {
+            return Double.NaN;
+        }
+        else if (dir == 0.0) {
+            return pos < maxPos || pos > maxPos ? Double.NaN : Double.POSITIVE_INFINITY;
+        }
+        else if (dir < 0.0) {
+            return pos < minPos ? Double.NaN : (Math.abs(pos - minPos) / dir);
+        }
+        else {
+            // dir > 0.0
+            return pos > maxPos ? Double.NaN : (Math.abs(pos - maxPos) / dir);
+        }
+    }
+
 }

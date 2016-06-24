@@ -229,6 +229,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         // 1.9: sweep attack.
+        // TODO: Account for charge/meter thing?
         final int locHashCode = LocUtil.hashCode(loc);
         if (originalDamage == 1.0) {
             // Might be a sweep attack.
