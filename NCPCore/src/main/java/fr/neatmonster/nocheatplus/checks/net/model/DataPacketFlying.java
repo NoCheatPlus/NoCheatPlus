@@ -25,6 +25,7 @@ public class DataPacketFlying extends DataLocation {
     public final boolean hasPos;
     public final boolean hasLook;
     public final long time;
+    private long sequence = 0;
 
     public DataPacketFlying(boolean onGround, long time) {
         super(0, 0, 0, 0, 0);
@@ -115,6 +116,20 @@ public class DataPacketFlying extends DataLocation {
         // Skip time for now.
         builder.append(")");
         return builder.toString();
+    }
+
+    /**
+     * Get the sequence number. This may or may not be set, depending on
+     * context.
+     * 
+     * @return
+     */
+    public long getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(long sequence) {
+        this.sequence = sequence;
     }
 
 }

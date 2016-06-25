@@ -82,6 +82,11 @@ public class NetData extends ACheckData {
     private final LinkedList<DataPacketFlying> flyingQueue = new LinkedList<DataPacketFlying>();
     /** Maximum amount of packets to store. */
     private final int flyingQueueMaxSize = 10;
+    /**
+     * The maximum of so far already returned sequence values, altered under
+     * lock.
+     */
+    private long maxSequence = 0;
 
     public NetData(final NetConfig config) {
         super(config);
@@ -100,7 +105,8 @@ public class NetData extends ACheckData {
     }
 
     /**
-     * Add a packet to the queue (under lock).
+     * Add a packet to the queue (under lock). The sequence number of the packet
+     * will be set here, according to a count maintained per-data.
      * 
      * @param packetData
      * @return If a packet has been removed due to exceeding maximum size.
@@ -108,6 +114,7 @@ public class NetData extends ACheckData {
     public boolean addFlyingQueue(final DataPacketFlying packetData) {
         boolean res = false;
         lock.lock();
+        packetData.setSequence(++maxSequence);
         flyingQueue.addFirst(packetData);
         if (flyingQueue.size() > flyingQueueMaxSize) {
             flyingQueue.removeLast();

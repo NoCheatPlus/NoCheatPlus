@@ -96,6 +96,7 @@ public class MovingFlying extends BaseAdapter {
         // Always update last received time.
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time; // Update without much of a contract.
+        // TODO: Leniency options too (packet order inversion).
         if (!cc.flyingFrequencyActive) {
             return;
         }
