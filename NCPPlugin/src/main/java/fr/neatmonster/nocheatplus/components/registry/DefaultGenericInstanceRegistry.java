@@ -14,10 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.components.registry;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import fr.neatmonster.nocheatplus.components.registry.event.GenericInstanceHandle.ReferenceCountHandle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
@@ -26,6 +24,7 @@ import fr.neatmonster.nocheatplus.components.registry.event.IUnregisterGenericIn
 import fr.neatmonster.nocheatplus.components.registry.exception.RegistrationLockedException;
 import fr.neatmonster.nocheatplus.logging.details.IGetStreamId;
 import fr.neatmonster.nocheatplus.logging.details.ILogString;
+import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, IUnregisterGenericInstanceRegistryListener {
 
@@ -159,7 +158,13 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     }
 
-    private final Map<Class<?>, Registration<?>> registrations = new LinkedHashMap<Class<?>, Registration<?>>();
+    /*
+     * TODO: Not sure about thread-safety here. Registration might later contain
+     * lots of objects and we might like to do some kind of opportunistic
+     * skipping of the copying, e.g. if no handles have been fetched yet, OR
+     * change implementation on the fly after 'activating' the registry.
+     */
+    private final LinkedHashMapCOW<Class<?>, Registration<?>> registrations = new LinkedHashMapCOW<Class<?>, Registration<?>>();
 
     private ILogString logger = null;
 
