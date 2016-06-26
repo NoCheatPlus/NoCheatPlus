@@ -12,6 +12,7 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.PacketFrequency;
 
 /**
@@ -52,8 +53,12 @@ public class CatchAllAdapter extends BaseAdapter {
     public void onPacketReceiving(PacketEvent event) {
         final Player player = event.getPlayer();
         final NetConfig cc = configFactory.getConfig(player);
-        if (cc.packetFrequencyActive && packetFrequency.check(player, dataFactory.getData(player), cc)) {
-            event.setCancelled(true);
+        if (cc.packetFrequencyActive) {
+            final NetData data = dataFactory.getData(player);
+            if (packetFrequency.isEnabled(player, data, cc) 
+                    && packetFrequency.check(player, data, cc)) {
+                event.setCancelled(true);
+            }
         }
     }
 
