@@ -87,7 +87,9 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
 
         @Override
         public void disableHandle() {
-            references --;
+            if (references > 0) {
+                references --;
+            }
             // Only really unregister once.
             if (references == 0) {
                 super.disableHandle();
@@ -97,8 +99,12 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
         /**
          * Retrieve a new instance referencing this one.
          * @return
+         * @throws RuntimeException If already disabled.
          */
         public IGenericInstanceHandle<T> getNewHandle() {
+            if (isDisabled()) {
+                throw new RuntimeException("Already disabled.");
+            }
             references ++;
             return new ParentDelegateHandle<T>(getRegisteredFor(), getRegistry(), this);
         }
@@ -127,7 +133,7 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
     public GenericInstanceHandle(Class<T> registeredFor, GenericInstanceRegistry registry, IUnregisterGenericInstanceRegistryListener unregister) {
         this.registry = registry;
         this.unregister = unregister;
-        this.registeredFor = registeredFor; 
+        this.registeredFor = registeredFor;
     }
 
     private T fetchHandle() {
@@ -190,6 +196,10 @@ public class GenericInstanceHandle<T> implements IGenericInstanceRegistryListene
 
     public IUnregisterGenericInstanceRegistryListener getUnregister() {
         return unregister;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
     }
 
 }
