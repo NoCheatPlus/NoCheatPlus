@@ -25,6 +25,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -309,6 +310,7 @@ public class ConfigManager {
 
     /**
      * Check if any config has a boolean set to true for the given path.
+     * 
      * @param path
      * @return True if any config has a boolean set to true for the given path.
      */
@@ -316,6 +318,37 @@ public class ConfigManager {
         for (final ConfigFile cfg : worldsMap.values()){
             if (cfg.getBoolean(path, false)) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if any config has the path set to true, or to default in case
+     * decideOptimistically is set, or not set in case trueForNotSet is set.
+     * 
+     * @param path
+     * @param decideOptimistically
+     * @param trueForNotSet
+     * @return
+     */
+    public static boolean isAlmostTrueForAnyConfig(String path, boolean decideOptimistically, boolean trueForNotSet) {
+        for (final ConfigFile cfg : worldsMap.values()){
+            AlmostBoolean ref = cfg.getAlmostBoolean(path, null);
+            if (ref == null) {
+                if (trueForNotSet) {
+                    return true;
+                }
+            }
+            else if (decideOptimistically) {
+                if (ref.decideOptimistically()) {
+                    return true;
+                }
+            }
+            else {
+                if (ref.decide()) {
+                    return true;
+                }
             }
         }
         return false;
