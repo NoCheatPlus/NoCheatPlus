@@ -88,10 +88,19 @@ public class NetData extends ACheckData {
      */
     private long maxSequence = 0;
 
+    /** Overall packet frequency. */
+    public final ActionFrequency packetFrequency;
+
     public NetData(final NetConfig config) {
         super(config);
         flyingFrequencyAll = new ActionFrequency(config.flyingFrequencySeconds, 1000L);
         flyingFrequencyRedundantFreq = new ActionFrequency(config.flyingFrequencyRedundantSeconds, 1000L);
+        if (config.packetFrequencySeconds <= 2) {
+            packetFrequency = new ActionFrequency(config.packetFrequencySeconds * 3, 333);
+        }
+        else {
+            packetFrequency = new ActionFrequency(config.packetFrequencySeconds * 2, 500);
+        }
     }
 
     public void onJoin(final Player player) {

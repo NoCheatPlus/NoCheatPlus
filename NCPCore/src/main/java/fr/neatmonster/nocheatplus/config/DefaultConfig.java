@@ -505,6 +505,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE, true);
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, "cancel vl>10 cancel log:keepalive:0:10:if vl>40 cancel log:keepalive:0:10:icf vl>100 cancel log:keepalive:0:10:icf cmd:kickalive");
 
+        // PacketFrequency (pre 1.9).
+        set(ConfPaths.NET_PACKETFREQUENCY_ACTIVE, "default");
+        set(ConfPaths.NET_PACKETFREQUENCY_PPS, 200);
+        set(ConfPaths.NET_PACKETFREQUENCY_SECONDS, 4);
+        set(ConfPaths.NET_PACKETFREQUENCY_ACTIONS, "cancel cmd:kickpacketfrequency");
+        
         // SoundDistance
         set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true);
         set(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE, 320);
@@ -568,6 +574,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] You did something too fast!");
         set(ConfPaths.STRINGS + ".kickgod", "ncp kick [player] God mode?");
         set(ConfPaths.STRINGS + ".kickinvaliddata", "ncp kick [player] Invalid data.");
+        set(ConfPaths.STRINGS + ".kickpacketfrequency", "ncp kick [player] Too many packets."); // TODO
         set(ConfPaths.STRINGS + ".kickpackets", "ncp delay ncp kick [player] Too many packets (extreme lag?)");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] You tried to hit yourself!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");

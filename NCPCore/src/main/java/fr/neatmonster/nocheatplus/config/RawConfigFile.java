@@ -205,6 +205,29 @@ public class RawConfigFile  extends YamlConfiguration{
     }
 
     /**
+     * Translate AlmostBoolean to boolean directly.
+     * 
+     * @param path
+     * @param decideOptimistically
+     *            If to use decideOptimistically() instead of decide().
+     * @param trueForNotSet
+     *            In case the property is not set, return true if this is set.
+     * @return
+     */
+    public boolean getAlmostBoolean(final String path, final boolean decideOptimistically, final boolean trueForNotSet) {
+        final AlmostBoolean ref = getAlmostBoolean(path, null);
+        if (ref == null) {
+            return trueForNotSet;
+        }
+        else if (decideOptimistically) {
+            return ref.decideOptimistically();
+        }
+        else {
+            return ref.decide();
+        }
+    }
+
+    /**
      * Outputs warnings to console.
      * @param path
      * @param target Collection to fill materials into.

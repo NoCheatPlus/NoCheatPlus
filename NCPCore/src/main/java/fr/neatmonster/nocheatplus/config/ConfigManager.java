@@ -25,7 +25,6 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
-import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -334,21 +333,8 @@ public class ConfigManager {
      */
     public static boolean isAlmostTrueForAnyConfig(String path, boolean decideOptimistically, boolean trueForNotSet) {
         for (final ConfigFile cfg : worldsMap.values()){
-            AlmostBoolean ref = cfg.getAlmostBoolean(path, null);
-            if (ref == null) {
-                if (trueForNotSet) {
-                    return true;
-                }
-            }
-            else if (decideOptimistically) {
-                if (ref.decideOptimistically()) {
-                    return true;
-                }
-            }
-            else {
-                if (ref.decide()) {
-                    return true;
-                }
+            if (cfg.getAlmostBoolean(path, decideOptimistically, trueForNotSet)) {
+                return true;
             }
         }
         return false;

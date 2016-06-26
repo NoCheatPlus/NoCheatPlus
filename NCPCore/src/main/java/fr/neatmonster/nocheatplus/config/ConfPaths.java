@@ -710,6 +710,12 @@ public abstract class ConfPaths {
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE               = NET_KEEPALIVEFREQUENCY + "active";
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS              = NET_KEEPALIVEFREQUENCY + "actions";
 
+    private static final String NET_PACKETFREQUENCY                         = NET + "packetfrequency.";
+    public static final  String NET_PACKETFREQUENCY_ACTIVE                  = NET_PACKETFREQUENCY + "active";
+    public static final  String NET_PACKETFREQUENCY_PPS                     = NET_PACKETFREQUENCY + "limitpersecond";
+    public static final  String NET_PACKETFREQUENCY_SECONDS                 = NET_PACKETFREQUENCY + "seconds";
+    public static final  String NET_PACKETFREQUENCY_ACTIONS                 = NET_PACKETFREQUENCY + "actions";
+
     private static final String NET_SOUNDDISTANCE                           = NET + "sounddistance.";
     public static final String  NET_SOUNDDISTANCE_ACTIVE                    = NET_SOUNDDISTANCE + "active";
     public static final String  NET_SOUNDDISTANCE_MAXDISTANCE               = NET_SOUNDDISTANCE + "maxdistance";

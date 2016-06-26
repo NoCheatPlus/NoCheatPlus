@@ -132,6 +132,7 @@ public class Permissions {
     public static final String  NET_ATTACKFREQUENCY          = NET + ".attackfrequency";
     public static final String  NET_FLYINGFREQUENCY          = NET + ".flyingfrequency";
     public static final String  NET_KEEPALIVEFREQUENCY       = NET + ".keepalivefrequency";
+    public static final String  NET_PACKETFREQUENCY          = NET + ".packetfrequency";
 
     public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";

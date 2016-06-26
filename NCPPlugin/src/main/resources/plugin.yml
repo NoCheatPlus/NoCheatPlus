@@ -195,8 +195,14 @@ permissions:
                     nocheatplus.checks.net:
                       description: Allow a player to bypass the net (packet) checks.
                       children:
+                        nocheatplus.checks.net.attackfrequency:
+                          description: Bypass the AttackFrequency check (attack speed).
                         nocheatplus.checks.net.flyingfrequency:
-                          description: Bypass the FlyingFrequency check (flying packet spam). 
+                          description: Bypass the FlyingFrequency check (flying packet spam).
+                        nocheatplus.checks.net.keepalivefrequency:
+                          description: Bypass the KeepAliveFrequency check (keep alive packet spam).
+                        nocheatplus.checks.net.packetfrequency:
+                          description: Bypass the PacketFrequency check (overall packet spam).  
             
             nocheatplus.mods:
                 description: Allow the player to use all the client mods.
