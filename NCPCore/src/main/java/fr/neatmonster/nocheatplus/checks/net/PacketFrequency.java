@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.net;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -16,7 +17,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class PacketFrequency extends Check {
 
     public PacketFrequency() {
-        super(null); //CheckType.NET_PACKETFREQUENCY);
+        super(CheckType.NET_PACKETFREQUENCY);
     }
 
     /**
