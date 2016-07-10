@@ -48,8 +48,8 @@ public class DefaultComponentFactory {
     public DefaultComponentFactory() {
         for (Activation condition : Arrays.asList(
                 new Activation()
-                .neutralDescription("ProtocolLib 4.0.2 for Minecraft 1.10")
-                .pluginVersionEQ("ProtocolLib", "4.0.2")
+                .neutralDescription("ProtocolLib 4.0.2 or later for Minecraft 1.10")
+                .pluginVersionGT("ProtocolLib", "4.0.2", true)
                 .minecraftVersionBetween("1.10", true, "1.11", false)
                 ,
                 new Activation()
