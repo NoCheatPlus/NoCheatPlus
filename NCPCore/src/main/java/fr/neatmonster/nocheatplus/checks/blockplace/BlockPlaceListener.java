@@ -103,7 +103,7 @@ public class BlockPlaceListener extends CheckListener {
     private final int idEnderPearl = counters.registerKey("throwenderpearl");
 
     private final Class<?> blockMultiPlaceEvent = ReflectionUtil.getClass("org.bukkit.event.block.BlockMultiPlaceEvent");
-    private final boolean hasReplacedState = ReflectionUtil.getMethodNoArgs(BlockPlaceEvent.class, "getReplacedState", BlockState.class) != null;
+    private final boolean hasGetReplacedState = ReflectionUtil.getMethodNoArgs(BlockPlaceEvent.class, "getReplacedState", BlockState.class) != null;
 
     public BlockPlaceListener() {
         super(CheckType.BLOCKPLACE);
@@ -130,7 +130,17 @@ public class BlockPlaceListener extends CheckListener {
         // TODO: Revise material use (not block.get... ?)
         //final Material mat = block.getType();
         final Player player = event.getPlayer();
-        final Material placedMat = hasReplacedState ? event.getBlockPlaced().getType() : Bridge1_9.getItemInMainHand(player).getType(); // Safety first.
+        final Material placedMat;
+        if (hasGetReplacedState) {
+            placedMat = event.getBlockPlaced().getType();
+        }
+        else if (Bridge1_9.hasGetItemInOffHand()) {
+            final ItemStack stack = event.getItemInHand();
+            placedMat = BlockProperties.isAir(stack) ? Material.AIR : stack.getType();
+        }
+        else {
+            placedMat = Bridge1_9.getItemInMainHand(player).getType(); // Safety first.
+        }
         boolean cancelled = false;
 
         final BlockPlaceData data = BlockPlaceData.getData(player);
