@@ -42,3 +42,18 @@ Comments:
 
 Other:
 * We do use 'final' modifiers, especially for variables in lengthy method bodies, but also for not-to-be-changed instance members. Occasionally for very often used static methods, rather not for instance methods.
+
+Maven:
+---------
+You can use [JitPack](https://jitpack.io/#NoCheatPlus/NoCheatPlus) to build with maven,e.g.
+```
+<repository>
+	 <id>jitpack.io</id>
+	 <url>https://jitpack.io</url>
+</repository>
+<dependency>
+	 <groupId>com.github.NoCheatPlus</groupId>
+	 <artifactId>NoCheatPlus</artifactId>
+	 <version>7243ab7538</version>
+</dependency>
+```
