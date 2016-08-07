@@ -1700,12 +1700,12 @@ public class SurvivalFly extends Check {
             }
         }
         // Do allow friction with velocity.
-        if (vDistanceAboveLimit > 0.0 && data.isVelocityJumpPhase() 
-                && thisMove.yDistance > 0.0 && lastMove.yDistance - Magic.GRAVITY_MAX > thisMove.yDistance) {
+        if (vDistanceAboveLimit > 0.0 && thisMove.yDistance > 0.0 
+                && lastMove.yDistance - (Magic.GRAVITY_MAX + Magic.GRAVITY_MIN) / 2.0 > thisMove.yDistance) {
             // TODO: Actual friction or limit by absolute y-distance?
             // TODO: Looks like it's only a problem when on ground?
             vDistanceAboveLimit = 0.0;
-            tags.add("velfrict_climb");
+            tags.add("vfrict_climb");
         }
         // Do allow vertical velocity.
         // TODO: Looks like less velocity is used here (normal hitting 0.361 of 0.462).
