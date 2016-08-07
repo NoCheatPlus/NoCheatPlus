@@ -330,7 +330,9 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Do set.
+     * Do set.<br>
+     * For the bounding box height, the maximum of given fullHeight, eyeHeight
+     * with sneaking ignored and entity height is used.
      *
      * @param location
      *            the location
@@ -346,8 +348,9 @@ public class RichEntityLocation extends RichBoundsLocation {
     protected void doSet(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
         if (entity instanceof LivingEntity) {
             isLiving = true;
-            eyeHeight = ((LivingEntity) entity).getEyeHeight();
-            fullHeight = Math.max(fullHeight, eyeHeight);
+            final LivingEntity living = (LivingEntity) entity;
+            eyeHeight = living.getEyeHeight();
+            fullHeight = Math.max(Math.max(fullHeight, eyeHeight), living.getEyeHeight(true));
         }
         else {
             isLiving = false;

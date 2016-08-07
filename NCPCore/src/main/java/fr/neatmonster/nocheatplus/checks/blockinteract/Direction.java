@@ -21,13 +21,16 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
-import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.utilities.collision.CollideRayVsAABB;
+import fr.neatmonster.nocheatplus.utilities.collision.ICollideRayVsAABB;
 
 /**
  * The Direction check will find out if a player tried to interact with something that's not in their field of view.
  */
 public class Direction extends Check {
+
+    private final ICollideRayVsAABB boulder = new CollideRayVsAABB();
 
     /**
      * Instantiates a new direction check.
@@ -49,15 +52,22 @@ public class Direction extends Check {
 
         boolean cancel = false;
 
-        // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
-        // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
+        // How far "off" is the player with their aim.
         final Vector direction = loc.getDirection();
-        final double off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), direction, block, TrigUtil.DIRECTION_PRECISION);
+        // Initialize fully each time.
+        boulder.setFindNearestPointIfNotCollide(true)
+        .setRay(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), 
+                direction.getX(), direction.getY(), direction.getZ())
+        .setAABB(block.getX(), block.getY(), block.getZ(), 0.1)
+        .loop();
+        // TODO: if (boulder.collides()) { // Check flying queue.
 
-        if (off > 0.1D) {
-            // Player failed the check. Let's try to guess how far they were from looking directly to the block...
-            final Vector blockEyes = new Vector(0.5 + block.getX() - loc.getX(), 0.5 + block.getY() - loc.getY() - player.getEyeHeight(), 0.5 + block.getZ() - loc.getZ());
-            final double distance = blockEyes.crossProduct(direction).length() / direction.length();
+        if (!boulder.collides()) {
+            final double distance = Math.sqrt(boulder.getClosestDistanceSquared());
+
+            if (data.debug) {
+                outputDebugFail(player, boulder, distance);
+            }
 
             // Add the overall violation level of the check.
             data.directionVL += distance;
@@ -67,10 +77,16 @@ public class Direction extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.directionVL, distance, cc.directionActions).willCancel();
-        } else
+        } else {
             // Player did likely nothing wrong, reduce violation counter to reward them.
             data.directionVL *= 0.9D;
+        }
 
         return cancel;
     }
+
+    private void outputDebugFail(Player player, ICollideRayVsAABB boulder, double distance) {
+        debug(player, "Failed: collides: " + boulder.collides() + " , dist: " + distance + " , pos: " + LocUtil.simpleFormat(boulder));
+    }
+
 }

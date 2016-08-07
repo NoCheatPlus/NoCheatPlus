@@ -132,7 +132,7 @@ public class Passable extends Check {
      * @param from
      */
     private void setNormalMargins(final ICollidePassable rayTracing, final PlayerLocation from) {
-        rayTracing.setMargins(from.getEyeHeight() * rt_heightFactor, from.getWidth() / 2.0 * rt_xzFactor); // max from/to + resolution ?
+        rayTracing.setMargins(from.getBoxMarginVertical() * rt_heightFactor, from.getWidth() / 2.0 * rt_xzFactor); // max from/to + resolution ?
     }
 
     /**
@@ -334,8 +334,8 @@ public class Passable extends Check {
         // Keep loc as set-back.
         //				}
         else if (manhattan == 1 && to.isBlockAbove(from) 
-                && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
-            //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
+                && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ()))) {
+            //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ()))) {
             // Allow the move up if the head is free.
             return null;
         }
