@@ -795,10 +795,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Tell the server administrator that we finished unloading NoCheatPlus.
         if (verbose) {
-            Bukkit.getLogger().info("All cleanup done."); // Bukkit logger.
+            Bukkit.getLogger().info("[NoCheatPlus] All cleanup done."); // Bukkit logger.
         }
         final PluginDescriptionFile pdfFile = getDescription();
-        Bukkit.getLogger().info("Version " + pdfFile.getVersion() + " is disabled."); // Bukkit logger.
+        Bukkit.getLogger().info("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled."); // Bukkit logger.
     }
 
     /**
@@ -851,7 +851,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     @Override
     public void onLoad() {
-        Bukkit.getLogger().info("onLoad: Early set up of static API, configuration, logging."); // Bukkit logger.
+        Bukkit.getLogger().info("[NoCheatPlus] onLoad: Early set up of static API, configuration, logging."); // Bukkit logger.
         setupBasics();
     }
 
