@@ -226,6 +226,11 @@ public class MovingData extends ACheckData {
     public LiftOffEnvelope liftOffEnvelope = defaultLiftOffEnvelope;
     /** Count how many moves have been made inside a medium (other than air). */
     public int insideMediumCount = 0;
+    // TODO: Does combinedMedium stuff need resetting on join/teleport/special?
+    /** Number of moves for horizontal moving within air + certain medium. */
+    public int combinedMediumHCount = 0;
+    /** Sum of actual speed / base speed for horizontal moving within air + certain medium. */
+    public double combinedMediumHValue = 0.0;
 
     // Locations shared between all checks.
     private Location    setBack = null;

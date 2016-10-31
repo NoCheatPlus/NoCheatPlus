@@ -275,7 +275,6 @@ public class SurvivalFly extends Check {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
             hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, false);
-
             // Judge if horizontal speed is above limit.
             hDistanceAboveLimit = hDistance - hAllowedDistance;
 
@@ -292,6 +291,39 @@ public class SurvivalFly extends Check {
                 hFreedom = 0.0;
                 if (resetFrom && data.bunnyhopDelay <= 6) {
                     data.bunnyhopDelay = 0;
+                }
+            }
+            
+            // hacc (if enabled, always update)
+            final double fcmhv = Math.max(1.0, thisMove.hDistance / thisMove.hAllowedDistanceBase);
+            data.combinedMediumHCount ++;
+            data.combinedMediumHValue += fcmhv;
+            // TODO: Balance, where to check / use (...).
+            if (data.combinedMediumHCount > 30) { // TODO: Adjust whatever way.
+                final double fcmh = data.combinedMediumHValue / (double) data.combinedMediumHCount;
+                final double limitFCMH;
+                // TODO: with buffer use, might want to skip.
+                if (data.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
+                    limitFCMH = 1.34;
+                }
+                else if (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID 
+                        || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND) {
+                    limitFCMH = 1.05;
+                }
+                else {
+                    limitFCMH = 1.0;
+                }
+                if (fcmh > limitFCMH && !data.isVelocityJumpPhase()) { // TODO: Configurable / adjust by medium type.
+                    hDistanceAboveLimit = hDistance * (fcmh - limitFCMH);
+                    tags.add("hacc");
+                    // Reset for now.
+                    data.combinedMediumHCount = 0;
+                    data.combinedMediumHValue = 0.0;
+                }
+                else {
+                    // TODO: Other cases (1.0, between, ...)?
+                    data.combinedMediumHCount = 1;
+                    data.combinedMediumHValue = fcmhv;
                 }
             }
 
@@ -487,7 +519,12 @@ public class SurvivalFly extends Check {
             // TODO: Is above stairs ?
         }
         // Count how long one is moving inside of a medium.
-        if (!resetFrom || !resetTo || oldLiftOffEnvelope != data.liftOffEnvelope) {
+        if (oldLiftOffEnvelope != data.liftOffEnvelope) {
+            data.insideMediumCount = 0;
+            data.combinedMediumHCount = 0;
+            data.combinedMediumHValue = 0.0;
+        }
+        else if (!resetFrom || !resetTo) {
             data.insideMediumCount = 0;
         } else {
             data.insideMediumCount ++;
@@ -1510,7 +1547,14 @@ public class SurvivalFly extends Check {
                     tags.add("headbangbunny");
                     allowHop = true;
                 }
-
+                // ONLY WITH ALL ABOVE BEING ABOUT HEAD OBSTRUCTED:
+                // TODO: Magic.
+                if (allowHop && data.combinedMediumHValue / (double) data.combinedMediumHCount < 1.5) {
+                    // TODO: Reset to 1 and min(allowed, actual) rather.
+                    data.combinedMediumHCount = 0;
+                    data.combinedMediumHValue = 0.0;
+                    tags.add("bunny_no_hacc");
+                }
             }
 
         }
