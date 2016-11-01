@@ -587,6 +587,14 @@ public class BlockProperties {
      */
     public static final long F_ATTACHED_LOW2_SNEW       = 0x2000000;
 
+    /**
+     * The hacky way to force sfNoLowJump when the block at from has this flag.
+     */
+    public static final long F_ALLOW_LOWJUMP            = 0x4000000;
+
+    /** One eighth block height (0.125). */
+    public static final long F_HEIGHT8_1            = 0x8000000;
+
     // TODO: When flags are out, switch to per-block classes :p.
 
     // Special case activation flags.
@@ -3273,6 +3281,10 @@ public class BlockProperties {
                     //bmaxY = 1.0;
                     bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : LIQUID_HEIGHT_LOWERED;
                 }
+            }
+            else if ((flags & F_HEIGHT8_1) != 0) {
+                bminY = 0.0;
+                bmaxY = 0.125;
             }
             else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
                 // TODO: Test

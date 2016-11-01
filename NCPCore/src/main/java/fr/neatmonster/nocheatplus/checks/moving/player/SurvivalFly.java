@@ -245,6 +245,14 @@ public class SurvivalFly extends Check {
                 //                    || to.isHeadObstructed() // Best not have this one.
                 ;
         //}
+        
+        // HACK: Force sfNoLowJump by a flag.
+        // TODO: Might remove that flag, as the issue for trying this has been resolved differently (F_HEIGHT8_1).
+        // TODO: Consider setting on ground_height always?
+        if ((from.getBlockFlags() & BlockProperties.F_ALLOW_LOWJUMP) != 0) {
+            // TODO: Specialize - test for foot region?
+            data.sfNoLowJump = true;
+        }
 
         //////////////////////
         // Horizontal move.
