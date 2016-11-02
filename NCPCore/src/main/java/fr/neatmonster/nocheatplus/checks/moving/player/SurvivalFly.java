@@ -316,7 +316,9 @@ public class SurvivalFly extends Check {
                 }
                 else if (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_LIQUID 
                         || data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND) {
-                    limitFCMH = 1.05;
+                    // limitFCMH = 1.05; // Seems to work on 1.10
+                    limitFCMH = 1.1; // 1.8.8 in-water moves with jumping near/on surface. 1.2 is max factor for one move (!).
+                    // TODO: Version+context dependent setting and/or confine by in-water moves, whatever.
                 }
                 else {
                     limitFCMH = 1.0;
