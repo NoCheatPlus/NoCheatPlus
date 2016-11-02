@@ -48,9 +48,10 @@ public class DefaultComponentFactory {
     public DefaultComponentFactory() {
         for (Activation condition : Arrays.asList(
                 new Activation()
-                .neutralDescription("ProtocolLib 4.1 or later for Minecraft 1.8.x or later")
+                .neutralDescription("ProtocolLib 4.1 or later for Minecraft 1.8.x to 1.10.x")
                 .pluginVersionGT("ProtocolLib", "4.1", true)
-                .minecraftVersionBetween("1.8", true, "1.10", true)
+                .minecraftVersionBetween("1.8", true, "1.11", false)
+                .advertise(true)
                 ,
                 new Activation()
                 .neutralDescription("ProtocolLib 4.0.2 for Minecraft 1.10.x")
@@ -63,9 +64,10 @@ public class DefaultComponentFactory {
                 .minecraftVersionBetween("1.9", true, "1.10", false)
                 ,
                 new Activation()
-                .neutralDescription("ProtocolLib 3.7.0 or 3.7 for Minecraft 1.9.x")
-                .pluginVersionBetween("ProtocolLib", "3.7", true, "3.7.0", true)  // Might want other types...
-                .minecraftVersionBetween("1.9", true, "1.10", false)
+                .neutralDescription("ProtocolLib 3.7.0 for Minecraft 1.7.x and earlier")
+                .pluginVersionBetween("ProtocolLib", "3.7", true, "3.7.0", true)
+                .minecraftVersionLT("1.10", false) // Allowed, but not necessarily recommended.
+                .advertise(true)
                 ,
                 new Activation()
                 .neutralDescription("ProtocolLib 3.6.5 or 3.6.4 for Minecraft 1.8.x")
@@ -77,6 +79,7 @@ public class DefaultComponentFactory {
                 .pluginVersionEQ("ProtocolLib", "3.6.6")
                 .serverVersionContainsIgnoreCase("paperspigot")
                 .minecraftVersionBetween("1.8", true, "1.9", false)
+                .advertise(true)
                 ,
                 new Activation()
                 .neutralDescription("ProtocolLib 3.6.4 before Minecraft 1.9")
@@ -151,7 +154,9 @@ public class DefaultComponentFactory {
                 List<String> parts = new LinkedList<String>();
                 parts.add("Packet level access via ProtocolLib not available, supported configurations: ");
                 for (IDescriptiveActivation cond : protocolLibActivation) {
-                    parts.add(cond.getNeutralDescription());
+                    if (cond.advertise()) {
+                        parts.add(cond.getNeutralDescription());
+                    }
                 }
                 StaticLog.logWarning(StringUtil.join(parts, " | "));
             }

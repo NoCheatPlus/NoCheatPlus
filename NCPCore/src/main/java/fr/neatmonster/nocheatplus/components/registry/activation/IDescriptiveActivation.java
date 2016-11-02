@@ -33,4 +33,12 @@ public interface IDescriptiveActivation extends IActivation {
      */
     public String getNeutralDescription();
 
+    /**
+     * Test if this feature/combination is intended to be advertised, e.g. on
+     * printing an overview of supported configurations.
+     * 
+     * @return
+     */
+    public boolean advertise();
+
 }

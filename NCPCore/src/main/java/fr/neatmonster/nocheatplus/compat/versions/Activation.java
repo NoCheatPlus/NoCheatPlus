@@ -90,6 +90,8 @@ public class Activation implements IDescriptiveActivation {
 
     private String neutralDescription = null;
 
+    private boolean advertise = false;
+
     @Override
     public boolean isAvailable() {
         for (IActivation condition : conditions) {
@@ -405,6 +407,20 @@ public class Activation implements IDescriptiveActivation {
             }
         });
         return this;
+    }
+
+    /**
+     * Set if to advertise presence / possibility somehow.
+     * @param advertise
+     * @return This Activation instance.
+     */
+    public Activation advertise(boolean advertise) {
+        this.advertise = advertise;
+        return this;
+    }
+
+    public boolean advertise() {
+        return this.advertise;
     }
 
     // TODO: set operation ( AND / OR ( / ...) ) + addCondition(IActivation).
