@@ -1541,8 +1541,8 @@ public class SurvivalFly extends Check {
             // Allow hop for special cases.
             if (!allowHop && (thisMove.from.onGround || thisMove.touchedGroundWorkaround)) {
                 // TODO: Better reset delay in this case ?
-                if (data.bunnyhopDelay <= 6 || yDistance >= 0.0 && thisMove.headObstructed) { // || to.isHeadObstructed()) {
-                    // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
+                if (data.bunnyhopDelay <= 6) {
+                    // TODO: Confine further ?
                     tags.add("ediblebunny");
                     allowHop = true;
                 }
@@ -1551,17 +1551,18 @@ public class SurvivalFly extends Check {
                         && lastMove.hDistance > lastMove.hAllowedDistanceBase && lastMove.hDistance < 1.34 * lastMove.hAllowedDistanceBase
                         && thisMove.hDistance > lastMove.hDistance * 1.24
                         && thisMove.hDistance < lastMove.hDistance * 1.34
+                        || yDistance >= 0.0 && thisMove.headObstructed // || to.isHeadObstructed()
                         ) {
+                    // TODO: headObstructed: check always and set a flag in data + consider regain buffer?
                     tags.add("headbangbunny");
                     allowHop = true;
-                }
-                // ONLY WITH ALL ABOVE BEING ABOUT HEAD OBSTRUCTED:
-                // TODO: Magic.
-                if (allowHop && data.combinedMediumHValue / (double) data.combinedMediumHCount < 1.5) {
-                    // TODO: Reset to 1 and min(allowed, actual) rather.
-                    data.combinedMediumHCount = 0;
-                    data.combinedMediumHValue = 0.0;
-                    tags.add("bunny_no_hacc");
+                    // TODO: Magic.
+                    if (data.combinedMediumHValue / (double) data.combinedMediumHCount < 1.5) {
+                        // TODO: Reset to 1 and min(allowed, actual) rather.
+                        data.combinedMediumHCount = 0;
+                        data.combinedMediumHValue = 0.0;
+                        tags.add("bunny_no_hacc");
+                    }
                 }
             }
 
