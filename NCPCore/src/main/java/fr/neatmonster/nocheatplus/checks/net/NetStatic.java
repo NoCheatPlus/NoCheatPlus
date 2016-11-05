@@ -16,6 +16,9 @@ package fr.neatmonster.nocheatplus.checks.net;
 
 import java.util.List;
 
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
@@ -161,6 +164,20 @@ public class NetStatic {
             }
         }
         return Math.max(0.0, violation);
+    }
+
+    /**
+     * Convenience: Check stored world names in case the world is null.
+     * 
+     * NOTE: 
+     * @param player
+     * @param configCache
+     * @param dataFactory
+     * @return
+     */
+    public static NetConfig getWorldConfig(Player player, NetConfigCache configCache, NetDataFactory dataFactory) {
+        final World world = player.getWorld();
+        return configCache.getConfig(world == null ? dataFactory.getData(player).currentWorldName : world.getName()); 
     }
 
 }

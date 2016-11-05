@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
@@ -209,6 +210,14 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
             data.teleportQueue.onTeleportEvent(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
         }
         data.clearFlyingQueue();
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+        if (!registeredPacketAdapters.isEmpty()) {
+            final Player player = event.getPlayer();
+            dataFactory.getData(player).onWorldChange(player);
+        }
     }
 
 }
