@@ -196,20 +196,22 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
-        // TODO: Might move to MovingListener.
-        // TODO: Might still add cancelled UNKNOWN events. TEST IT
-        final Location to = event.getTo();
-        if (to == null) {
-            return;
+        if (!registeredPacketAdapters.isEmpty()) {
+            // TODO: Might move to MovingListener.
+            // TODO: Might still add cancelled UNKNOWN events. TEST IT
+            final Location to = event.getTo();
+            if (to == null) {
+                return;
+            }
+            final Player player = event.getPlayer();
+            final NetConfig cc = configFactory.getConfig(player);
+            final NetData data = dataFactory.getData(player);
+            if (cc.flyingFrequencyActive) {
+                // Register expected location for comparison with outgoing packets.
+                data.teleportQueue.onTeleportEvent(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
+            }
+            data.clearFlyingQueue();
         }
-        final Player player = event.getPlayer();
-        final NetConfig cc = configFactory.getConfig(player);
-        final NetData data = dataFactory.getData(player);
-        if (cc.flyingFrequencyActive) {
-            // Register expected location for comparison with outgoing packets.
-            data.teleportQueue.onTeleportEvent(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
-        }
-        data.clearFlyingQueue();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
