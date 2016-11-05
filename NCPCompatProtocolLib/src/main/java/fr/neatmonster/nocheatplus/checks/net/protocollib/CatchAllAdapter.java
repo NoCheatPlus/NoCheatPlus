@@ -53,6 +53,11 @@ public class CatchAllAdapter extends BaseAdapter {
     @Override
     public void onPacketReceiving(PacketEvent event) {
         final Player player = event.getPlayer();
+        if (player == null) {
+            counters.add(ProtocolLibComponent.idNullPlayer, 1);
+            // TODO: Is this a problem, as the server has the player so it could break a block)?
+            return;
+        }
         final NetConfig cc = NetStatic.getWorldConfig(player, configFactory, dataFactory);
         if (cc.packetFrequencyActive) {
             final NetData data = dataFactory.getData(player);
