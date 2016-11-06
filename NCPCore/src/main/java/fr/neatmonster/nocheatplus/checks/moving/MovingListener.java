@@ -83,6 +83,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
@@ -624,29 +625,46 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Ensure we have a set-back set.
             MovingUtil.checkSetBack(player, pFrom, data, this);
 
+            // Check for special cross world teleportation issues with the end.
+            if (data.crossWorldFrom != null) {
+                if (!TrigUtil.isSamePosAndLook(pFrom, pTo) // Safety check.
+                        && TrigUtil.isSamePosAndLook(pTo, data.crossWorldFrom)) {
+                    // Assume to (and possibly the player location) to be set to the location the player teleported from within the other world.
+                    newTo = data.getSetBack(from);
+                    checkNf = false;
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) + " Player move end point seems to be set wrongly.");
+                }
+                // Always reset.
+                data.crossWorldFrom = null;
+            }
+
             // Extreme move check (sf or cf is precondition, should have their own config/actions later).
-            if ((Math.abs(thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) || thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL) {
+            if (newTo == null && 
+                    ((Math.abs(thisMove.yDistance) > Magic.EXTREME_MOVE_DIST_VERTICAL) 
+                            || thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL)) {
                 // Test for friction and velocity.
                 newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
             }
 
             // Check jumping on things like slime blocks.
             // Detect potential bounce.
-            if (to.getY() < from.getY()) {
-                if ((BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
-                        && !survivalFly.isReallySneaking(player) && checkBounceEnvelope(player, pFrom, pTo, data, cc)
-                        ) {
-                    // Prepare bounce: The center of the player must be above the block.
-                    // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
-                    verticalBounce = true;
-                    // Skip NoFall.
-                    checkNf = false;
+            if (newTo == null) {
+                if (to.getY() < from.getY()) {
+                    if ((BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
+                            && !survivalFly.isReallySneaking(player) && checkBounceEnvelope(player, pFrom, pTo, data, cc)
+                            ) {
+                        // Prepare bounce: The center of the player must be above the block.
+                        // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
+                        verticalBounce = true;
+                        // Skip NoFall.
+                        checkNf = false;
+                    }
                 }
-            }
-            else if (data.verticalBounce != null) {
-                // Prepared bounce support.
-                if (onPreparedBounceSupport(player, from, to, lastMove, tick, data)) {
-                    checkNf = false;
+                else if (data.verticalBounce != null) {
+                    // Prepared bounce support.
+                    if (onPreparedBounceSupport(player, from, to, lastMove, tick, data)) {
+                        checkNf = false;
+                    }
                 }
             }
         }
@@ -1427,6 +1445,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Prevent NoFall violations for ender-pearls.
                 data.noFallSkipAirCheck = true;
             }
+        }
+
+        // Cross world teleportation issues with the end.
+        final Location from = event.getFrom();
+        if (from != null 
+                && event.getCause() == TeleportCause.END_PORTAL // Currently only related to this.
+                &&!from.getWorld().getName().equals(to.getWorld().getName())) { // Less java, though.
+            // Remember the position teleported from.
+            data.crossWorldFrom = new SimplePositionWithLook(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch());
+        }
+        else {
+            // Reset last cross world position.
+            data.crossWorldFrom = null;
         }
 
         // Log.

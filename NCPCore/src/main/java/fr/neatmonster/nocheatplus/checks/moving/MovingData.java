@@ -47,6 +47,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEn
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
+import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
@@ -192,6 +193,12 @@ public class MovingData extends ACheckData {
      * morepackets set-back.
      */
     private int morePacketsSetBackResetTime = 0;
+
+    /**
+     * Position teleported from into another world. Only used for certain
+     * contexts for workarounds.
+     */
+    public IPositionWithLook crossWorldFrom = null;
 
     /** Keep track of currently processed (if) and past moves for player moving. */
     public final MoveTrace <PlayerMoveData> playerMoves = new MoveTrace<PlayerMoveData>(new Callable<PlayerMoveData>() {
