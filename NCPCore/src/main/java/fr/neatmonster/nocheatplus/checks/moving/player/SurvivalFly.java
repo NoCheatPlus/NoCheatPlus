@@ -1978,7 +1978,13 @@ public class SurvivalFly extends Check {
         //		}
         data.addHorizontalVelocity(builder);
         if (!resetFrom && !resetTo) {
-            if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + " vacc=" + data.vDistAcc.toInformalString());
+            if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) {
+                builder.append("\n" + " vacc: " + data.vDistAcc.toInformalString());
+            }
+        }
+        if (data.combinedMediumHCount > 0) {
+            // TODO: if hacc activated:
+            builder.append("\n hacc: " + StringUtil.fdec3.format(data.combinedMediumHValue / (double) data.combinedMediumHCount) + "(" + data.combinedMediumHCount + ")");
         }
         if (player.isSleeping()) {
             tags.add("sleeping");
