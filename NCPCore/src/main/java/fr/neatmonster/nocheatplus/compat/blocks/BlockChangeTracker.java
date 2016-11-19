@@ -44,7 +44,21 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
-
+/**
+ * Keep track of block changes, to allow mitigation of false positives. Think of
+ * pistons, falling blocks, digging, block placing, explosions, vegetables
+ * growing, all sorts of doors, plugins changing blocks and so on. This is
+ * needed not only for elevator and parkour designs, but also to prevent piston
+ * based trap designs, which could lead to players violating moving checks.
+ * <hr>
+ * In general we assume that at the time of adding a block change entry, the
+ * block has not yet been changed, so we access the "old state" at that point of
+ * time. If needed, a method allowing to specify the old state explicitly will
+ * be added.
+ * 
+ * @author asofold
+ *
+ */
 public class BlockChangeTracker {
     /** These blocks certainly can't be pushed nor pulled. */
     public static long F_MOVABLE_IGNORE = BlockProperties.F_LIQUID;
@@ -88,8 +102,19 @@ public class BlockChangeTracker {
     }
 
     public static class WorldNode {
+        // TODO: private + access methods.
+        /*
+         * TODO: A coarse rectangle or cuboid based approach, Allowing fast
+         * exclusion check for moves (needs access methods for everything then).
+         * Could merge with the per-block map, similar to WorldGuard.
+         */
+        /*
+         * TODO: Consider a filter mechanism for player activity by chunks or
+         * chunk sections (some margin, only add if activity, let expire by
+         * tick). Only add blocks if players could reach the location.
+         */
+
         public final LinkedCoordHashMap<LinkedList<BlockChangeEntry>> blocks = new LinkedCoordHashMap<LinkedList<BlockChangeEntry>>();
-        // TODO: Filter mechanism for player activity by chunks or chunk sections (some margin, only add if activity, let expire by tick).
         /** Tick of last change. */
         public int lastChangeTick = 0;
 
@@ -106,6 +131,7 @@ public class BlockChangeTracker {
             blocks.clear();
             size = 0;
         }
+
     }
 
     /**
@@ -216,7 +242,8 @@ public class BlockChangeTracker {
             if (ReflectionUtil.getMethodNoArgs(BlockPistonRetractEvent.class, "getBlocks") == null) {
                 retractHasBlocks = false;
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Assume legacy piston behavior.");
-            } else {
+            }
+            else {
                 retractHasBlocks = true;
             }
         }
@@ -284,13 +311,15 @@ public class BlockChangeTracker {
                 final Location retLoc = event.getRetractLocation();
                 if (retLoc == null) {
                     blocks = null;
-                } else {
+                }
+                else {
                     final Block retBlock = retLoc.getBlock();
                     final long flags = BlockProperties.getBlockFlags(retBlock.getType());
                     if ((flags & F_MOVABLE_IGNORE) == 0L && (flags & F_MOVABLE) != 0L) {
                         blocks = new ArrayList<Block>(1);
                         blocks.add(retBlock);
-                    } else {
+                    }
+                    else {
                         blocks = null;
                     }
                 }
@@ -320,7 +349,10 @@ public class BlockChangeTracker {
     /** Use to avoid duplicate entries with pistons. Always empty after processing. */
     private final Set<Block> processBlocks = new HashSet<Block>();
 
-    // TODO: Consider tracking regions of player activity (chunk sections, with a margin around the player) and filter.
+    /*
+     * TODO: Consider tracking regions of player activity (chunk sections, with
+     * a margin around the player) and filter.
+     */
 
     /**
      * Process the data, as given by a BlockPistonExtendEvent or
@@ -334,6 +366,11 @@ public class BlockChangeTracker {
      *            direction (!) are added.
      */
     public void addPistonBlocks(final Block pistonBlock, final BlockFace blockFace, final List<Block> movedBlocks) {
+        /*
+         * TODO: Might need a configuration for if to also add block
+         * state/properties right here (or if to wait for a multi block change
+         * event or what not).
+         */
         final int tick = TickTask.getTick();
         final UUID worldId = pistonBlock.getWorld().getUID();
         WorldNode worldNode = worldMap.get(worldId);
@@ -394,7 +431,8 @@ public class BlockChangeTracker {
         if (entries == null) {
             entries = new LinkedList<BlockChangeTracker.BlockChangeEntry>();
             worldNode.blocks.put(x, y, z, entries, MoveOrder.END); // Add to end.
-        } else {
+        }
+        else {
             // Lazy expiration check for this block.
             if (!entries.isEmpty() && entries.getFirst().tick < tick - expirationAgeTicks) {
                 worldNode.size -= expireEntries(tick - expirationAgeTicks, entries);
@@ -413,7 +451,8 @@ public class BlockChangeTracker {
             if (it.next().tick < olderThanTick) {
                 it.remove();
                 removed ++;
-            } else {
+            }
+            else {
                 return removed;
             }
         }
@@ -433,7 +472,8 @@ public class BlockChangeTracker {
             if (worldNode.lastChangeTick < olderThanTick) {
                 worldNode.clear();
                 it.remove();
-            } else {
+            }
+            else {
                 // Check for expiration of individual blocks.
                 if (worldNode.size < worldNodeSkipSize) {
                     continue;
@@ -527,7 +567,8 @@ public class BlockChangeTracker {
             if (entry.tick < olderThanTick) {
                 //DebugUtil.debug("Lazy expire: " + x + "," + y + "," + z + " " + entry.id);
                 it.remove();
-            } else {
+            }
+            else {
                 if (ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
                     return entry;
                 }
