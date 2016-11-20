@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 
 /**
- * Access to type-ids and data using caching techniques.
+ * Access to block properties using caching technique (id, data, bounds).
  * 
  * @author asofold
  *
@@ -39,12 +39,12 @@ public abstract class BlockCache {
 
         public static final short FETCHED_ID = 0x01;
         public static final short FETCHED_DATA = 0x02;
-        public static final short FETCHED_SHAPE = 0x04;
+        public static final short FETCHED_BOUNDS = 0x04;
 
         private short fetched = 0;
         private int id = 0;
         private int data = 0;
-        private double[] shape = null;
+        private double[] bounds = null;
 
         public boolean isIdFetched() {
             return (fetched & FETCHED_ID) != 0;
@@ -54,8 +54,8 @@ public abstract class BlockCache {
             return (fetched & FETCHED_DATA) != 0;
         }
 
-        public boolean isShapeFetched() {
-            return (fetched & FETCHED_SHAPE) != 0;
+        public boolean isBoundsFetched() {
+            return (fetched & FETCHED_BOUNDS) != 0;
         }
 
         public int getId() {
@@ -66,8 +66,8 @@ public abstract class BlockCache {
             return data;
         }
 
-        public double[] getShape() {
-            return shape;
+        public double[] getBounds() {
+            return bounds;
         }
 
         public void setId(int id) {
@@ -80,36 +80,30 @@ public abstract class BlockCache {
             fetched |= FETCHED_DATA;
         }
 
-        public void setShape(double[] shape) {
-            this.shape = shape;
-            fetched |= FETCHED_SHAPE;
+        public void setBounds(double[] bounds) {
+            this.bounds = bounds;
+            fetched |= FETCHED_BOUNDS;
         }
 
-        public void set(int id, int data, double[] shape) {
+        public void set(int id, int data, double[] bounds) {
             setId(id);
             setData(data);
-            setShape(shape);
+            setBounds(bounds);
         }
 
         void reset() {
             fetched = 0;
             id = 0;
             data  = 0;
-            shape = null;
+            bounds = null;
         }
 
     }
 
     // Instance
 
-    /** Cached type-ids. */
-    private final CoordMap<Integer> idMap = new CoordHashMap<Integer>(23);
-
-    /** Cached data values. */
-    private final CoordMap<Integer> dataMap = new CoordHashMap<Integer>(23);
-
-    /** Cached shape values. */
-    private final CoordMap<double[]> boundsMap = new CoordHashMap<double[]>(23);
+    /** Nodes for cached block properties. */
+    private final CoordMap<BlockCacheNode> nodeMap = new CoordHashMap<BlockCacheNode>(23);
 
     /** The max block y. */
     protected int maxBlockY =  255;
@@ -210,9 +204,33 @@ public abstract class BlockCache {
      * NOTE: You must delete world references with this one.
      */
     public void cleanup() {
-        idMap.clear();
-        dataMap.clear();
-        boundsMap.clear();
+        nodeMap.clear();
+    }
+
+    /**
+     * If there is no node stored, create a new node only with the type id set.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    private BlockCacheNode getOrCreateNode(final int x, final int y, final int z) {
+        BlockCacheNode node = nodeMap.get(x, y, z);
+        if (node != null) {
+            return node;
+        }
+        final int id = (y < 0 || y > maxBlockY) ? ID_AIR : fetchTypeId(x, y, z);
+        // (Later: Static id-node map from config.)
+        if (id == ID_AIR) {
+            return airNode;
+        }
+        else {
+            node = new BlockCacheNode();
+            node.id = id; // The id is always needed.
+            nodeMap.put(x, y, z, node);
+            return node;
+        }
     }
 
     /**
@@ -253,13 +271,7 @@ public abstract class BlockCache {
      * @return the type id
      */
     public int getTypeId(final int x, final int y, final int z) {
-        final Integer pId = idMap.get(x, y, z);
-        if (pId != null) {
-            return pId;
-        }
-        final Integer nId = (y < 0 || y > maxBlockY) ? ID_AIR : fetchTypeId(x, y, z);
-        idMap.put(x, y, z, nId);
-        return nId;
+        return getOrCreateNode(x, y, z).getId();
     }
 
     /**
@@ -274,12 +286,12 @@ public abstract class BlockCache {
      * @return the data
      */
     public int getData(final int x, final int y, final int z) {
-        final Integer pData = dataMap.get(x, y, z);
-        if (pData != null) {
-            return pData;
+        final BlockCacheNode node = getOrCreateNode(x, y, z);
+        if (node.isDataFetched()) {
+            return node.getData();
         }
-        final Integer nData = (y < 0 || y > maxBlockY) ? 0 : fetchData(x, y, z);
-        dataMap.put(x, y, z, nData);
+        final int nData = fetchData(x, y, z);
+        node.setData(nData);
         return nData;
     }
 
@@ -298,18 +310,27 @@ public abstract class BlockCache {
      *         get cached.
      */
     public double[] getBounds(final int x, final int y, final int z) {
-        final double[] pBounds = boundsMap.get(x, y, z);
-        if (pBounds != null) {
-            return pBounds;
+        final BlockCacheNode node = getOrCreateNode(x, y, z);
+        if (node.isBoundsFetched()) {
+            return node.getBounds();
         }
+        final double[] nBounds = fetchBounds(x, y, z);
         // TODO: Convention for null bounds -> full ?
-        // TODO: fetchBounds(x, y, z, node)
-        final double[] nBounds = (y < 0 || y > maxBlockY) ? null : fetchBounds(x, y, z);
-        boundsMap.put(x, y, z, nBounds);
+        node.setBounds(nBounds);
         return nBounds;
     }
 
-    // TODO: public BlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll)
+    // TODO: Interface / Override annotation.
+    public BlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
+        final BlockCacheNode node = getOrCreateNode(x, y, z);
+        if (!node.isDataFetched()) {
+            node.setData(fetchData(x, y, z));
+        }
+        if (!node.isBoundsFetched()) {
+            node.setBounds(fetchBounds(x, y, z));
+        }
+        return node;
+    }
 
     /**
      * Convenience method to check if the bounds for a block cover the full
