@@ -35,6 +35,73 @@ public abstract class BlockCache {
     /** The Constant ID_AIR. */
     private static final int ID_AIR = 0;
 
+    public static class BlockCacheNode {
+
+        public static final short FETCHED_ID = 0x01;
+        public static final short FETCHED_DATA = 0x02;
+        public static final short FETCHED_SHAPE = 0x04;
+
+        private short fetched = 0;
+        private int id = 0;
+        private int data = 0;
+        private double[] shape = null;
+
+        public boolean isIdFetched() {
+            return (fetched & FETCHED_ID) != 0;
+        }
+
+        public boolean isDataFetched() {
+            return (fetched & FETCHED_DATA) != 0;
+        }
+
+        public boolean isShapeFetched() {
+            return (fetched & FETCHED_SHAPE) != 0;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public int getData() {
+            return data;
+        }
+
+        public double[] getShape() {
+            return shape;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+            fetched |= FETCHED_ID;
+        }
+
+        public void setData(int data) {
+            this.data = data;
+            fetched |= FETCHED_DATA;
+        }
+
+        public void setShape(double[] shape) {
+            this.shape = shape;
+            fetched |= FETCHED_SHAPE;
+        }
+
+        public void set(int id, int data, double[] shape) {
+            setId(id);
+            setData(data);
+            setShape(shape);
+        }
+
+        void reset() {
+            fetched = 0;
+            id = 0;
+            data  = 0;
+            shape = null;
+        }
+
+    }
+
+    // Instance
+
     /** Cached type-ids. */
     private final CoordMap<Integer> idMap = new CoordHashMap<Integer>(23);
 
@@ -47,12 +114,14 @@ public abstract class BlockCache {
     /** The max block y. */
     protected int maxBlockY =  255;
 
-    // TODO: Switch to nodes with all details on?
+    private final BlockCacheNode airNode = new BlockCacheNode();
+    // TODO: setBlockCacheConfig -> set static nodes (rather only by id).
 
     /**
      * Instantiates a new block cache.
      */
     public BlockCache() {
+        airNode.set(0, 0, null);
     }
 
     /**
@@ -234,10 +303,13 @@ public abstract class BlockCache {
             return pBounds;
         }
         // TODO: Convention for null bounds -> full ?
+        // TODO: fetchBounds(x, y, z, node)
         final double[] nBounds = (y < 0 || y > maxBlockY) ? null : fetchBounds(x, y, z);
         boundsMap.put(x, y, z, nBounds);
         return nBounds;
     }
+
+    // TODO: public BlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll)
 
     /**
      * Convenience method to check if the bounds for a block cover the full
