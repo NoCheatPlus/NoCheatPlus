@@ -47,6 +47,7 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
         if (BlockProperties.isPassableBox(blockCache, blockX, blockY, blockZ, minX, minY, minZ, maxX, maxY, maxZ)) {
             return true;
         }
+        // TODO: if (blockChangeTracker != null && -- check with BlockChangeTracker and BlockChangeReference --
         else {
             collides = true;
             return false;

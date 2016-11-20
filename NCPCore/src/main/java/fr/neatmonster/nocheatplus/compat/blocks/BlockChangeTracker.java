@@ -190,8 +190,14 @@ public class BlockChangeTracker {
      */
     public static class BlockChangeReference {
 
-        /** Last used block change id.*/
-        public BlockChangeEntry entry = null;
+        /*
+         * TODO: public BlockChangeEntry firstUsedEntry = null; // Would the
+         * span suffice? Consider using span + timing or just the span during
+         * one check covering multiple blocks.
+         */
+
+        /** Last used block change entry, highest id.*/
+        public BlockChangeEntry lastUsedEntry = null;
 
         /** Indicate if the set id can still be used.*/
         public boolean valid = false;
@@ -207,7 +213,7 @@ public class BlockChangeTracker {
          * @return
          */
         public boolean canUpdateWith(final BlockChangeEntry entry) {
-            return this.entry == null || entry.id > this.entry.id || entry.id == this.entry.id && valid;
+            return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
         }
 
         /**
@@ -217,7 +223,7 @@ public class BlockChangeTracker {
          */
         public BlockChangeReference copy() {
             final BlockChangeReference copy = new BlockChangeReference();
-            copy.entry = this.entry;
+            copy.lastUsedEntry = this.lastUsedEntry;
             copy.valid = this.valid;
             return copy;
         }
@@ -228,7 +234,7 @@ public class BlockChangeTracker {
                 return false;
             }
             final BlockChangeReference other = (BlockChangeReference) obj;
-            return valid == other.valid && (entry != null && entry.equals(other.entry) || entry == null && other.entry == null);
+            return valid == other.valid && (lastUsedEntry != null && lastUsedEntry.equals(other.lastUsedEntry) || lastUsedEntry == null && other.lastUsedEntry == null);
         }
 
     }
@@ -415,8 +421,7 @@ public class BlockChangeTracker {
     }
 
     /**
-     * Add a block change. Simplistic version (no actual block states/shapes are
-     * stored).
+     * Add a block change.
      * 
      * @param x
      * @param y
@@ -426,6 +431,7 @@ public class BlockChangeTracker {
      */
     private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, final int x, final int y, final int z, final Direction direction) {
         worldNode.lastChangeTick = tick;
+        // TODO: Efficient way of using a block cache for shapes here (possibly better create the entry in addPistonBlocks).
         final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction);
         LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z, MoveOrder.END);
         if (entries == null) {

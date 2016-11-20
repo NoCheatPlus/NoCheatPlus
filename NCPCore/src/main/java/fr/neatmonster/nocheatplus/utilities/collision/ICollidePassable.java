@@ -28,6 +28,8 @@ public interface ICollidePassable extends ICollideBlocks, ISetMargins {
     public void setBlockCache(BlockCache blockCache);
     public BlockCache getBlockCache();
 
+    // TODO: public void (bool?) setBlockChangeReference(tracker, reference).
+
     /**
      * Convenience: Call set and setBlockCache with the data from the
      * PlayerLocation instances. Should use from.getBlockCache() as BlockCache
