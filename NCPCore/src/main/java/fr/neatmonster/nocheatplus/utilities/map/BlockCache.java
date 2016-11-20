@@ -320,16 +320,32 @@ public abstract class BlockCache {
         return nBounds;
     }
 
-    // TODO: Interface / Override annotation.
+    /**
+     * Get the internally stored BlockCacheNode instance for the given
+     * coordinates. Creation/updating is controlled with forceSetAll.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param forceSetAll
+     * @return If forceSetAll is true, a node will always be returned with all
+     *         properties set. If forceSetAll is false, null might be returned,
+     *         if no node is present for the given coordinates.
+     */
     public BlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
-        final BlockCacheNode node = getOrCreateNode(x, y, z);
-        if (!node.isDataFetched()) {
-            node.setData(fetchData(x, y, z));
+        if (forceSetAll) {
+            final BlockCacheNode node = getOrCreateNode(x, y, z);
+            if (!node.isDataFetched()) {
+                node.setData(fetchData(x, y, z));
+            }
+            if (!node.isBoundsFetched()) {
+                node.setBounds(fetchBounds(x, y, z));
+            }
+            return node;
         }
-        if (!node.isBoundsFetched()) {
-            node.setBounds(fetchBounds(x, y, z));
+        else {
+            return nodeMap.get(x, y, z);
         }
-        return node;
     }
 
     /**
