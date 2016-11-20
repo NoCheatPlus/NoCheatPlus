@@ -126,6 +126,7 @@ import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -1212,12 +1213,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
         final MCAccessConfig mcaC = new MCAccessConfig(config);
         final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
+        // Set in registry.
+        genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
+        // Register a BlockCache instance for temporary use (enables using handle thing).
+        genericInstanceRegistry.registerGenericInstance(BlockCache.class, mcAccess.getBlockCache());
+        // Spin-off.
         new AttributeAccessFactory().setupAttributeAccess(mcAccess, mcaC);
         new EntityAccessFactory().setupEntityAccess(mcAccess, mcaC);
-
-        // Set in registry.
-        // TODO: Perhaps make MCAccess an aggregate thing for the more fine grained parts.
-        genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
 
         // TODO: Summary event or listener call-back (possibly in another place.).
 
