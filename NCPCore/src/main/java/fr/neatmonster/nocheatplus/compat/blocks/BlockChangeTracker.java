@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -37,11 +38,14 @@ import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache.BlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -147,6 +151,7 @@ public class BlockChangeTracker {
         public final long id;
         public final int tick, x, y, z;
         public final Direction direction;
+        public final BlockCacheNode previousState;
 
         /**
          * A push entry.
@@ -157,13 +162,15 @@ public class BlockChangeTracker {
          * @param z
          * @param direction
          */
-        public BlockChangeEntry(long id,  int tick, int x, int y, int z, Direction direction) {
+        public BlockChangeEntry(long id,  int tick, int x, int y, int z, 
+                Direction direction, BlockCacheNode previousState) {
             this.id = id;
             this.tick = tick;
             this.x = x;
             this.y = y;
             this.z = z;
             this.direction = direction;
+            this.previousState = previousState;
         }
 
         @Override
@@ -172,7 +179,9 @@ public class BlockChangeTracker {
                 return false;
             }
             final BlockChangeEntry other = (BlockChangeEntry) obj;
-            return id == other.id && tick == other.tick && x == other.x && z == other.z && y == other.y && direction == other.direction;
+            return id == other.id && tick == other.tick 
+                    && x == other.x && z == other.z && y == other.y 
+                    && direction == other.direction;
         }
 
         // Might follow: Id, data, block shape. Convenience methods for testing.
@@ -355,6 +364,9 @@ public class BlockChangeTracker {
     /** Use to avoid duplicate entries with pistons. Always empty after processing. */
     private final Set<Block> processBlocks = new HashSet<Block>();
 
+    /** Ensure to set from extern. */
+    private IGenericInstanceHandle<BlockCache> blockCacheHandle = null;
+
     /*
      * TODO: Consider tracking regions of player activity (chunk sections, with
      * a margin around the player) and filter.
@@ -378,7 +390,8 @@ public class BlockChangeTracker {
          * event or what not).
          */
         final int tick = TickTask.getTick();
-        final UUID worldId = pistonBlock.getWorld().getUID();
+        final World world = pistonBlock.getWorld();
+        final UUID worldId = world.getUID();
         WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
             // TODO: With activity tracking this should be a return.
@@ -398,9 +411,13 @@ public class BlockChangeTracker {
             }
         }
         // Process queued blocks.
+        final BlockCache blockCache = blockCacheHandle.getHandle();
+        blockCache.setAccess(world); // Assume all users always clean up after use :).
         for (final Block block : processBlocks) {
-            addPistonBlock(changeId, tick, worldNode, block, blockFace);
+            addPistonBlock(changeId, tick, worldNode, block.getX(), block.getY(), block.getZ(), 
+                    blockFace, blockCache);
         }
+        blockCache.cleanup();
         processBlocks.clear();
     }
 
@@ -409,15 +426,21 @@ public class BlockChangeTracker {
      * 
      * @param changeId
      * @param tick
-     * @param worldId
-     * @param block
+     * @param worldNode
+     * @param x
+     * @param y
+     * @param z
      * @param blockFace
+     * @param blockCache
+     *            For retrieving the current block state.
      */
-    private void addPistonBlock(final long changeId, final int tick, final WorldNode worldNode, final Block targetBlock, final BlockFace blockFace) {
+    private void addPistonBlock(final long changeId, final int tick, final WorldNode worldNode, 
+            final int x, final int y, final int z, final BlockFace blockFace, final BlockCache blockCache) {
         // TODO: A filter for regions of player activity.
         // TODO: Test which ones can actually push a player (and what type of push).
         // Add this block.
-        addBlockChange(changeId, tick, worldNode, targetBlock.getX(), targetBlock.getY(), targetBlock.getZ(), Direction.getDirection(blockFace));
+        addBlockChange(changeId, tick, worldNode, x, y, z, Direction.getDirection(blockFace), 
+                blockCache.getBlockCacheNode(x, y, z, true));
     }
 
     /**
@@ -429,10 +452,10 @@ public class BlockChangeTracker {
      * @param direction
      *            If not NONE, pushing into that direction is assumed.
      */
-    private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, final int x, final int y, final int z, final Direction direction) {
+    private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, 
+            final int x, final int y, final int z, final Direction direction, final BlockCacheNode previousState) {
         worldNode.lastChangeTick = tick;
-        // TODO: Efficient way of using a block cache for shapes here (possibly better create the entry in addPistonBlocks).
-        final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction);
+        final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction, previousState);
         LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z, MoveOrder.END);
         if (entries == null) {
             entries = new LinkedList<BlockChangeTracker.BlockChangeEntry>();
@@ -619,6 +642,13 @@ public class BlockChangeTracker {
 
     public void setWorldNodeSkipSize(int worldNodeSkipSize) {
         this.worldNodeSkipSize = worldNodeSkipSize;
+    }
+
+    public void updateBlockCacheHandle() {
+        if (this.blockCacheHandle != null) {
+            this.blockCacheHandle.disableHandle();
+        }
+        this.blockCacheHandle = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(BlockCache.class);
     }
 
 }

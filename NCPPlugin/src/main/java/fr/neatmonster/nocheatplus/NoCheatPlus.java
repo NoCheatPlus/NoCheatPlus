@@ -1194,6 +1194,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Configuration.
         blockChangeTracker.setExpirationAgeTicks(config.getInt(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS));
         blockChangeTracker.setWorldNodeSkipSize(config.getInt(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD_MAXENTRIES));
+        blockChangeTracker.updateBlockCacheHandle();
     }
 
     @Override
