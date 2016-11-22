@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
@@ -35,6 +36,7 @@ public class ReflectBlock implements IReflectBlock {
     private final ReflectBlockPosition reflectBlockPosition;
     private final ReflectAxisAlignedBB reflectAxisAlignedBB;
     private final ReflectIBlockData reflectIBlockData;
+    private final ReflectIBlockAccess reflectIBlockAccess;
     private final ReflectWorld reflectWorld;
 
     // Static.
@@ -65,7 +67,7 @@ public class ReflectBlock implements IReflectBlock {
         if (reflectWorld.nmsClass == null || reflectWorld.nmsGetType == null) {
             fail();
         }
-        ReflectIBlockAccess reflectIBlockAccess = new ReflectIBlockAccess(base);
+        this.reflectIBlockAccess = new ReflectIBlockAccess(base);
         // Block.
         nmsClass = Class.forName(base.nmsPackageName + ".Block");
         // byID (static)
@@ -78,16 +80,46 @@ public class ReflectBlock implements IReflectBlock {
         if (this.nmsGetBlockData == null) {
             fail();
         }
-        // TODO: a(IBlockData, IBlockAccess, BlockPosition) is deprecated (why / what else?).
-        this.nmsFetchAABB = ReflectionUtil.getMethod(nmsClass, "a", 
-                reflectIBlockData.nmsClass, reflectIBlockAccess.nmsClass, reflectBlockPosition.nmsClass);
-        if (nmsFetchAABB == null || nmsFetchAABB.getReturnType() != reflectAxisAlignedBB.nmsClass) {
+        this.nmsFetchAABB = determine_fetchAABB();
+        if (this.nmsFetchAABB == null) {
             fail();
         }
-        if (!nmsFetchAABB.isAnnotationPresent(Deprecated.class)) {
-            // The final frontier.
-            fail();
+    }
+
+    /**
+     * Fail-safe (return null if not available).
+     * 
+     * @return
+     */
+    private Method determine_fetchAABB() {
+        Method nmsFetchAABB = null;
+
+        // At least since 1.11.
+        if (ServerVersion.compareMinecraftVersion("1.11") >= 0) {
+            nmsFetchAABB = ReflectionUtil.getMethod(nmsClass, "b", 
+                    reflectIBlockData.nmsClass, reflectIBlockAccess.nmsClass, reflectBlockPosition.nmsClass);
+            if (nmsFetchAABB != null 
+                    && nmsFetchAABB.getReturnType() == reflectAxisAlignedBB.nmsClass
+                    && nmsFetchAABB.isAnnotationPresent(Deprecated.class) // TODO: Why deprecated?
+                    ) {
+                return nmsFetchAABB;
+            }
         }
+
+        // Legacy (pre 1.11, possibly even before.)
+        if (nmsFetchAABB == null) {
+            nmsFetchAABB = ReflectionUtil.getMethod(nmsClass, "a", 
+                    reflectIBlockData.nmsClass, reflectIBlockAccess.nmsClass, reflectBlockPosition.nmsClass);
+            if (nmsFetchAABB != null 
+                    && nmsFetchAABB.getReturnType() == reflectAxisAlignedBB.nmsClass
+                    && nmsFetchAABB.isAnnotationPresent(Deprecated.class) // TODO: Why deprecated?
+                    ) {
+                return nmsFetchAABB;
+            }
+        }
+
+        // Nothing found.
+        return null;
     }
 
     /**
@@ -141,7 +173,6 @@ public class ReflectBlock implements IReflectBlock {
             final int x, final int y, final int z) {
         final Object pos = nmsBlockPosition(x, y, z);
         final Object blockData = reflectWorld.nms_getType(nmsWorld, pos);
-        // TODO: a(IBlockData, IBlockAccess, BlockPosition) is deprecated (why / what else?).
         final Object bb = nms_fetchAABB(nmsBlock, blockData, nmsWorld, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.
