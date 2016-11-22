@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.MagicVehicle;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -94,8 +95,12 @@ public class VehicleEnvelope extends Check {
     /** Details for re-use. */
     private final CheckDetails checkDetails = new CheckDetails();
 
+    private final Class<?> bestHorse; 
+
     public VehicleEnvelope() {
         super(CheckType.MOVING_VEHICLE_ENVELOPE);
+        Class<?> clazz = ReflectionUtil.getClass("org.bukkit.entity.AbstractHorse");
+        bestHorse = clazz == null ? Horse.class : clazz;
     }
 
     public SetBackEntry check(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
@@ -326,9 +331,9 @@ public class VehicleEnvelope extends Check {
             }
             checkDetails.gravityTargetSpeed = 0.79;
         }
-        else if (vehicle instanceof Horse) {
+        else if (bestHorse.isAssignableFrom(vehicle.getClass())) {
             // TODO: Climbable? -> seems not.
-            checkDetails.simplifiedType = EntityType.HORSE;
+            checkDetails.simplifiedType = EntityType.HORSE; // TODO: 1.11 - Use AbstractHorse?
             checkDetails.canJump = checkDetails.canStepUpBlock = true;
         }
         else if (vehicle instanceof Pig) {

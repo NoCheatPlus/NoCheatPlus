@@ -876,6 +876,7 @@ public class VehicleChecks extends CheckListener {
         builder.append(LocUtil.simpleFormat(thisMove.from));
         builder.append("\nTo: ");
         builder.append(LocUtil.simpleFormat(thisMove.to));
+        builder.append("\n" + (thisMove.from.resetCond ? "resetcond" : (thisMove.from.onGround ? "ground" : "---")) + " -> " + (thisMove.to.resetCond ? "resetcond" : (thisMove.to.onGround ? "ground" : "---")));
         builder.append("\n Vehicle: ");
         builder.append(LocUtil.simpleFormat(vLoc));
         builder.append("\n Player: ");
