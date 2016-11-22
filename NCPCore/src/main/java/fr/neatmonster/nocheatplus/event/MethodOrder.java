@@ -14,11 +14,20 @@
  */
 package fr.neatmonster.nocheatplus.event;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Annotation to allow per-method method-order. Empty strings are regarded as "not set".
  * @author mc_dev
  *
  */
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface MethodOrder {
 	public String tag() default "";
 	public String beforeTag() default "";
