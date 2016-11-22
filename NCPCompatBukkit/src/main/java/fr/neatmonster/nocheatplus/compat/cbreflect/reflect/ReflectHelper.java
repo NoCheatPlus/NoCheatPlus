@@ -157,7 +157,8 @@ public class ReflectHelper {
     }
 
     /**
-     * Quick fail with exception.
+     * Quick fail with exception. Used both for setup and runtime.
+     * @throws ReflectFailureException Always.
      */
     private void fail() {
         throw new ReflectFailureException();
@@ -357,14 +358,15 @@ public class ReflectHelper {
 
     public double getWidth(final Entity entity) {
         float width = -16f;
-        if (reflectEntity.nmsWidth != null) {
-            final Object handle = reflectEntity.getHandle(entity);
-            if (handle != null) {
-                width = ReflectionUtil.getFloat(reflectEntity.nmsWidth, handle, width);
-            }
+        if (reflectEntity.nmsWidth == null) {
+            fail();
+        }
+        final Object handle = reflectEntity.getHandle(entity);
+        if (handle != null) {
+            width = ReflectionUtil.getFloat(reflectEntity.nmsWidth, handle, width);
         }
         if (width < 0f) {
-            throw new ReflectFailureException();
+            fail();
         }
         return (double) width;
     }
@@ -372,15 +374,17 @@ public class ReflectHelper {
     public double getHeight(final Entity entity) {
         float floatHeight = -16f;
         final Object handle = reflectEntity.getHandle(entity); // TODO: Distinguish classes (living vs not)?
-        if (handle != null) {
-            if (reflectEntity.nmsLength != null) {
-                floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsLength, handle, floatHeight), floatHeight);
-            }
-            if (reflectEntity.nmsHeight != null) {
-                floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsHeight, handle, floatHeight), floatHeight);
-            }
+        double height;
+        if (handle == null) {
+            fail();
         }
-        double height = (double) floatHeight;
+        if (reflectEntity.nmsLength != null) {
+            floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsLength, handle, floatHeight), floatHeight);
+        }
+        if (reflectEntity.nmsHeight != null) {
+            floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsHeight, handle, floatHeight), floatHeight);
+        }
+        height = (double) floatHeight;
         // TODO: Consider dropping the box for performance?
         if (reflectAxisAlignedBB != null && reflectEntity.nmsGetBoundingBox != null) {
             final Object box = ReflectionUtil.invokeMethodNoArgs(reflectEntity.nmsGetBoundingBox, handle);
@@ -394,7 +398,7 @@ public class ReflectHelper {
             }
         }
         if (height < 0.0) {
-            throw new ReflectFailureException();
+            fail();
         }
         // On success only: Check eye height (MCAccessBukkit is better than just eye height.).
         if (entity instanceof LivingEntity) {
