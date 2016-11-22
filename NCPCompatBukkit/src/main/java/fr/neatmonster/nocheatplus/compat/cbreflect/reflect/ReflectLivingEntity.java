@@ -18,16 +18,16 @@ import java.lang.reflect.Method;
 
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-public class ReflectLivingEntity extends ReflectEntityDamage {
+public class ReflectLivingEntity extends ReflectEntity {
 
     public final Method nmsGetHealth;
 
-    public ReflectLivingEntity(ReflectBase base, ReflectDamageSource damageSource) throws ClassNotFoundException {
-        this(base, damageSource, Class.forName(base.obcPackageName + ".entity.CraftLivingEntity"), Class.forName(base.nmsPackageName + ".EntityLiving"));
+    public ReflectLivingEntity(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource) throws ClassNotFoundException {
+        this(base, reflectAxisAlignedBB, damageSource, Class.forName(base.obcPackageName + ".entity.CraftLivingEntity"), Class.forName(base.nmsPackageName + ".EntityLiving"));
     }
 
-    public ReflectLivingEntity(ReflectBase base, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
-        super(base, damageSource, obcClass, nmsClass);
+    public ReflectLivingEntity(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
+        super(base, reflectAxisAlignedBB, damageSource, obcClass, nmsClass);
         this.nmsGetHealth = ReflectionUtil.getMethodNoArgs(nmsClass, "getHealth"); 
     }
 

@@ -129,10 +129,15 @@ public class ReflectAttributeAccess implements IAttributeAccess {
     public ReflectAttributeAccess() {
         try {
             this.reflectBase = new ReflectBase();
+            ReflectAxisAlignedBB reflectAxisAlignedBB = null;
+            try {
+                reflectAxisAlignedBB = new ReflectAxisAlignedBB(reflectBase);
+            }
+            catch (NullPointerException e) {}
             reflectGenericAttributes = new ReflectGenericAttributes(this.reflectBase);
             reflectAttributeInstance = new ReflectAttributeInstance(this.reflectBase);
             reflectAttributeModifier = new ReflectAttributeModifier(this.reflectBase);
-            reflectPlayer = new ReflectPlayer(reflectBase, new ReflectDamageSource(reflectBase));
+            reflectPlayer = new ReflectPlayer(reflectBase, reflectAxisAlignedBB, new ReflectDamageSource(reflectBase));
         } catch (ClassNotFoundException ex) {
             throw new RuntimeException("Not available.");
         }

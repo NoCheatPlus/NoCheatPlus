@@ -379,6 +379,24 @@ public class ReflectionUtil {
         return defaultValue;
     }
 
+    public static float getFloat(Field field, Object object, float defaultValue) {
+        try {
+            return field.getFloat(object);
+        }
+        catch (IllegalArgumentException e) {}
+        catch (IllegalAccessException e) {}
+        return defaultValue;
+    }
+
+    public static double getDouble(Field field, Object object, double defaultValue) {
+        try {
+            return field.getDouble(object);
+        }
+        catch (IllegalArgumentException e) {}
+        catch (IllegalAccessException e) {}
+        return defaultValue;
+    }
+
     public static Object get(Field field, Object object, Object defaultValue) {
         try {
             return field.get(object);

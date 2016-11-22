@@ -19,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -61,19 +63,28 @@ public class ReflectHelper {
 
     protected final ReflectBase reflectBase;
 
+    protected final ReflectAxisAlignedBB reflectAxisAlignedBB;
     protected final ReflectBlockPosition reflectBlockPosition;
     protected final IReflectBlock reflectBlock;
     protected final ReflectMaterial reflectMaterial;
     protected final ReflectWorld reflectWorld;
 
     protected final ReflectDamageSource reflectDamageSource;
-    protected final ReflectEntityDamage reflectEntity;
+    protected final ReflectEntity reflectEntity;
+    protected final ReflectEntity reflectLivingEntity;
     protected final ReflectPlayer reflectPlayer;
 
     public ReflectHelper() throws ReflectFailureException {
-        // TODO: Allow some to not work?
+        // TODO: Store one instance of ReflectFailureException?
+        // TODO: Allow some more to not work?
         try {
             this.reflectBase = new ReflectBase();
+            ReflectAxisAlignedBB reflectAxisAlignedBB = null;
+            try {
+                reflectAxisAlignedBB = new ReflectAxisAlignedBB(reflectBase);
+            }
+            catch (NullPointerException ex1) {}
+            this.reflectAxisAlignedBB = reflectAxisAlignedBB;
             ReflectBlockPosition reflectBlockPosition = null;
             try {
                 reflectBlockPosition = new ReflectBlockPosition(this.reflectBase);
@@ -86,7 +97,8 @@ public class ReflectHelper {
             try {
                 reflectBlockLatest = new ReflectBlock(this.reflectBase, this.reflectBlockPosition,
                         reflectMaterial, reflectWorld);
-            } catch (Throwable t) {}
+            }
+            catch (Throwable t) {}
             if (reflectBlockLatest == null) {
                 // More lenient constructor.
                 this.reflectBlock = new ReflectBlockSix(this.reflectBase, this.reflectBlockPosition);
@@ -96,8 +108,9 @@ public class ReflectHelper {
             }
 
             this.reflectDamageSource = new ReflectDamageSource(this.reflectBase);
-            this.reflectEntity = new ReflectEntityDamage(this.reflectBase, this.reflectDamageSource);
-            this.reflectPlayer = new ReflectPlayer(this.reflectBase, this.reflectDamageSource);
+            this.reflectEntity = new ReflectEntity(this.reflectBase, this.reflectAxisAlignedBB, this.reflectDamageSource);
+            this.reflectLivingEntity = new ReflectLivingEntity(this.reflectBase, this.reflectAxisAlignedBB, this.reflectDamageSource);
+            this.reflectPlayer = new ReflectPlayer(this.reflectBase, this.reflectAxisAlignedBB, this.reflectDamageSource);
         }
         catch (ClassNotFoundException ex) {
             throw new ReflectFailureException(ex);
@@ -105,6 +118,9 @@ public class ReflectHelper {
         if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
             List<String> parts = new LinkedList<String>();
             for (Field rootField : this.getClass().getDeclaredFields()) {
+                if (rootField.isAnnotationPresent(MostlyHarmless.class)) {
+                    continue;
+                }
                 boolean accessible = rootField.isAccessible();
                 if (!accessible) {
                     rootField.setAccessible(true);
@@ -118,6 +134,9 @@ public class ReflectHelper {
                     Class<?> clazz = obj.getClass();
                     // TODO: Skip attributes silently before 1.6.1 (and not unknown version).
                     for (Field field : clazz.getFields()) {
+                        if (field.isAnnotationPresent(MostlyHarmless.class)) {
+                            continue;
+                        }
                         if (ReflectionUtil.get(field, obj, null) == null) {
                             parts.add(clazz.getName() + "." + field.getName());
                         }
@@ -334,6 +353,54 @@ public class ReflectHelper {
             return null;
         }
         return reflectBlock.nms_fetchBounds(nmsWorld, nmsBlock, x, y, z);
+    }
+
+    public double getWidth(final Entity entity) {
+        float width = -16f;
+        if (reflectEntity.nmsWidth != null) {
+            final Object handle = reflectEntity.getHandle(entity);
+            if (handle != null) {
+                width = ReflectionUtil.getFloat(reflectEntity.nmsWidth, handle, width);
+            }
+        }
+        if (width < 0f) {
+            throw new ReflectFailureException();
+        }
+        return (double) width;
+    }
+
+    public double getHeight(final Entity entity) {
+        float floatHeight = -16f;
+        final Object handle = reflectEntity.getHandle(entity); // TODO: Distinguish classes (living vs not)?
+        if (handle != null) {
+            if (reflectEntity.nmsLength != null) {
+                floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsLength, handle, floatHeight), floatHeight);
+            }
+            if (reflectEntity.nmsHeight != null) {
+                floatHeight = Math.max(ReflectionUtil.getFloat(reflectEntity.nmsHeight, handle, floatHeight), floatHeight);
+            }
+        }
+        double height = (double) floatHeight;
+        // TODO: Consider dropping the box for performance?
+        if (reflectAxisAlignedBB != null && reflectEntity.nmsGetBoundingBox != null) {
+            final Object box = ReflectionUtil.invokeMethodNoArgs(reflectEntity.nmsGetBoundingBox, handle);
+            if (box != null) {
+                // mcEntity.boundingBox.e - mcEntity.boundingBox.b
+                final double y2 = ReflectionUtil.getDouble(reflectAxisAlignedBB.nms_maxY, box, Double.MAX_VALUE);
+                final double y1 = ReflectionUtil.getDouble(reflectAxisAlignedBB.nms_minY, box, Double.MAX_VALUE);
+                if (y1 != Double.MAX_VALUE && y2 != Double.MAX_VALUE) {
+                    height = Math.max(y2 - y1, height);
+                }
+            }
+        }
+        if (height < 0.0) {
+            throw new ReflectFailureException();
+        }
+        // On success only: Check eye height (MCAccessBukkit is better than just eye height.).
+        if (entity instanceof LivingEntity) {
+            height = Math.max(height, ((LivingEntity) entity).getEyeHeight());
+        }
+        return height;
     }
 
 }

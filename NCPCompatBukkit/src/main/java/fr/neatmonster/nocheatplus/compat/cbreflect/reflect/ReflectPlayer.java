@@ -27,12 +27,12 @@ public class ReflectPlayer extends ReflectLivingEntity {
 
     public final Method nmsGetAttributeInstance; // TODO: LivingEntity
 
-    public ReflectPlayer(ReflectBase base, ReflectDamageSource damageSource) throws ClassNotFoundException {
-        this(base, damageSource, Class.forName(base.obcPackageName + ".entity.CraftPlayer"), Class.forName(base.nmsPackageName + ".EntityPlayer"));
+    public ReflectPlayer(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource) throws ClassNotFoundException {
+        this(base, reflectAxisAlignedBB, damageSource, Class.forName(base.obcPackageName + ".entity.CraftPlayer"), Class.forName(base.nmsPackageName + ".EntityPlayer"));
     }
 
-    public ReflectPlayer(ReflectBase base, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
-        super(base, damageSource, obcClass, nmsClass);
+    public ReflectPlayer(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
+        super(base, reflectAxisAlignedBB, damageSource, obcClass, nmsClass);
         // TODO: invulnerable etc.
         // deathTicks
         nmsDeathTicks = ReflectionUtil.getField(nmsClass, "deathTicks", int.class);

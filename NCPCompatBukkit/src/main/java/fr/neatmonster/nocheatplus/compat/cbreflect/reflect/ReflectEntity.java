@@ -26,7 +26,14 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  * @author asofold
  *
  */
-public class ReflectEntityDamage extends ReflectGetHandleBase<Entity> {
+public class ReflectEntity extends ReflectGetHandleBase<Entity> {
+
+    public final Field nmsWidth;
+    public final Field nmsLength; // Something like height.
+    @MostlyHarmless()
+    public final Field nmsHeight; // Not anymore in 1.11.
+
+    public final Method nmsGetBoundingBox;
 
     public final Field nmsDead;
 
@@ -34,13 +41,18 @@ public class ReflectEntityDamage extends ReflectGetHandleBase<Entity> {
 
     public final boolean nmsDamageEntityInt;
 
-    public ReflectEntityDamage(ReflectBase base, ReflectDamageSource damageSource) throws ClassNotFoundException {
-        this(base, damageSource, Class.forName(base.obcPackageName + ".entity.CraftEntity"), Class.forName(base.nmsPackageName + ".Entity"));
+    public ReflectEntity(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource) throws ClassNotFoundException {
+        this(base, reflectAxisAlignedBB, damageSource, Class.forName(base.obcPackageName + ".entity.CraftEntity"), Class.forName(base.nmsPackageName + ".Entity"));
     }
 
-    public ReflectEntityDamage(ReflectBase base, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
+    public ReflectEntity(ReflectBase base, ReflectAxisAlignedBB reflectAxisAlignedBB, ReflectDamageSource damageSource, Class<?> obcClass, Class<?> nmsClass) throws ClassNotFoundException {
         // base
         super(base, obcClass, nmsClass);
+
+        // width, length (height)
+        nmsWidth = ReflectionUtil.getField(nmsClass, "width", float.class);
+        nmsLength = ReflectionUtil.getField(nmsClass, "length", float.class);
+        nmsHeight = ReflectionUtil.getField(nmsClass, "height", float.class); // Rather old CB around 1.6.
 
         // dead
         nmsDead = ReflectionUtil.getField(nmsClass, "dead", boolean.class);
@@ -52,6 +64,14 @@ public class ReflectEntityDamage extends ReflectGetHandleBase<Entity> {
             nmsDamageEntityInt = nmsDamageEntity.getParameterTypes()[1] == int.class;
         } else {
             nmsDamageEntityInt = true; // Uncertain.
+        }
+
+        // getBoundingBox
+        if (reflectAxisAlignedBB == null) {
+            this.nmsGetBoundingBox = null;
+        }
+        else {
+            this.nmsGetBoundingBox = ReflectionUtil.getMethodNoArgs(nmsClass, "getBoundingBox", reflectAxisAlignedBB.nmsClass);
         }
     }
 

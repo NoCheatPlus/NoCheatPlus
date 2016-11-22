@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.compat.cbreflect;
 
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -50,7 +51,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be older than what Compat-CB-Reflect can support.");
             this.knownSupportedVersion = false;
         }
-        else if (GenericVersion.compareVersions(mcVersion, "1.10") > 0) {
+        else if (GenericVersion.compareVersions(mcVersion, "1.11") > 0) {
             this.knownSupportedVersion = false;
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.INIT, "The Minecraft version seems to be more recent than the one Compat-CB-Reflect has been built with - this might work, but there could be incompatibilities.");
         } else {
@@ -68,7 +69,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     @Override
     public String getMCVersion() {
         // Potentially all :p.
-        return "1.4.5-1.10|?";
+        return "1.4.5-1.11|?";
     }
 
     @Override
@@ -169,23 +170,27 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
         }
     }
 
+    @Override
+    public double getHeight(Entity entity) {
+        try {
+            return helper.getHeight(entity);
+        }
+        catch (ReflectFailureException ex) {
+            return super.getHeight(entity);
+        }
+    }
+
+    @Override
+    public double getWidth(Entity entity) {
+        try {
+            return helper.getWidth(entity);
+        }
+        catch (ReflectFailureException ex) {
+            return super.getWidth(entity);
+        }
+    }
 
     // TODO: ---- Missing (better to implement these) ----
-
-    //    @Override
-    //    public double getHeight(final Entity entity) {
-    //        final net.minecraft.server.v1_8_R3.Entity mcEntity = ((CraftEntity) entity).getHandle();
-    //        AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
-    //        final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
-    //        if (entity instanceof LivingEntity) {
-    //            return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
-    //        } else return entityHeight;
-    //    }
-
-    //    @Override
-    //    public double getWidth(final Entity entity) {
-    //        return ((CraftEntity) entity).getHandle().width;
-    //    }
 
     //    @Override
     //    public AlmostBoolean isIllegalBounds(final Player player) {
