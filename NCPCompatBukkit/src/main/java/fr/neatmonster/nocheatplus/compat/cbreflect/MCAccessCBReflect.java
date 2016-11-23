@@ -216,33 +216,10 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
 
     // ---- Missing (probably ok with Bukkit only) ----
 
-    //    @Override
-    //    public double getJumpAmplifier(final Player player) {
-    //        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-    //        if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
-    //            return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-    //        }
-    //        else {
-    //            return Double.NEGATIVE_INFINITY;
-    //        }
-    //    }
-
-    //    @Override
-    //    public double getFasterMovementAmplifier(final Player player) {
-    //        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-    //        if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
-    //            return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
-    //        }
-    //        else {
-    //            return Double.NEGATIVE_INFINITY;
-    //        }
-    //    }
-
-    //    @Override
-    //    public boolean isComplexPart(final Entity entity) {
-    //        return ((CraftEntity) entity).getHandle() instanceof EntityComplexPart;
-    //    }
-
     // (getCommandMap already uses reflection, but could be more speedy.).
+    // getJumpAmplifier(final Player player)
+    // getFasterMovementAmplifier(final Player player)
+    // isComplexPart(final Entity entity) // Fails for very old builds, likely irrelevant.
+    // hasGravity(Material)
 
 }
