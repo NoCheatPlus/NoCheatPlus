@@ -1214,6 +1214,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
         final MCAccessConfig mcaC = new MCAccessConfig(config);
         final MCAccess mcAccess = new MCAccessFactory().getMCAccess(mcaC);
+        /*
+         * NOTE: previously registration was done last, to allow fetching the
+         * previous registration. That has been discarded, due to the number of
+         * related objects registering anyway.
+         */
         // Set in registry.
         genericInstanceRegistry.registerGenericInstance(MCAccess.class, mcAccess);
         // Register a BlockCache instance for temporary use (enables using handle thing).
