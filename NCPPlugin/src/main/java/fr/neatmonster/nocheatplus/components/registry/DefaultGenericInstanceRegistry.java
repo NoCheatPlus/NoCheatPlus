@@ -120,7 +120,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
         }
 
         public IGenericInstanceHandle<T> getHandle() {
-            if (uniqueHandle == null) {
+            if (uniqueHandle == null || uniqueHandle.isDisabled()) {
                 uniqueHandle = new ReferenceCountHandle<T>(registeredFor, registry, unregister);
                 this.listeners.add(uniqueHandle);
             }
