@@ -45,7 +45,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.map.BlockCache.BlockCacheNode;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -151,7 +151,7 @@ public class BlockChangeTracker {
         public final long id;
         public final int tick, x, y, z;
         public final Direction direction;
-        public final BlockCacheNode previousState;
+        public final IBlockCacheNode previousState;
 
         /**
          * A push entry.
@@ -163,7 +163,7 @@ public class BlockChangeTracker {
          * @param direction
          */
         public BlockChangeEntry(long id,  int tick, int x, int y, int z, 
-                Direction direction, BlockCacheNode previousState) {
+                Direction direction, IBlockCacheNode previousState) {
             this.id = id;
             this.tick = tick;
             this.x = x;
@@ -453,7 +453,7 @@ public class BlockChangeTracker {
      *            If not NONE, pushing into that direction is assumed.
      */
     private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, 
-            final int x, final int y, final int z, final Direction direction, final BlockCacheNode previousState) {
+            final int x, final int y, final int z, final Direction direction, final IBlockCacheNode previousState) {
         worldNode.lastChangeTick = tick;
         final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction, previousState);
         LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z, MoveOrder.END);

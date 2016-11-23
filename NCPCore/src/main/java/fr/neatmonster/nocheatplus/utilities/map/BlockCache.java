@@ -35,37 +35,64 @@ public abstract class BlockCache {
     /** The Constant ID_AIR. */
     private static final int ID_AIR = 0;
 
-    public static class BlockCacheNode {
+    /**
+     * Read access to a BlockCacheNode.
+     * @author asofold
+     *
+     */
+    public static interface IBlockCacheNode {
 
-        public static final short FETCHED_ID = 0x01;
-        public static final short FETCHED_DATA = 0x02;
-        public static final short FETCHED_BOUNDS = 0x04;
+        public boolean isIdFetched();
+
+        public boolean isDataFetched();
+
+        public boolean isBoundsFetched();
+
+        public int getId();
+
+        public int getData();
+
+        public double[] getBounds();
+
+    }
+
+    public static class BlockCacheNode implements IBlockCacheNode {
+
+        private static final short FETCHED_ID = 0x01;
+        private static final short FETCHED_DATA = 0x02;
+        private static final short FETCHED_BOUNDS = 0x04;
 
         private short fetched = 0;
         private int id = 0;
         private int data = 0;
         private double[] bounds = null;
 
+        @Override
         public boolean isIdFetched() {
             return (fetched & FETCHED_ID) != 0;
         }
 
+        @Override
         public boolean isDataFetched() {
             return (fetched & FETCHED_DATA) != 0;
         }
 
+        @Override
         public boolean isBoundsFetched() {
             return (fetched & FETCHED_BOUNDS) != 0;
         }
 
+        @Override
         public int getId() {
             return id;
         }
 
+        @Override
         public int getData() {
             return data;
         }
 
+        @Override
         public double[] getBounds() {
             return bounds;
         }
@@ -332,7 +359,7 @@ public abstract class BlockCache {
      *         properties set. If forceSetAll is false, null might be returned,
      *         if no node is present for the given coordinates.
      */
-    public BlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
+    public IBlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
         if (forceSetAll) {
             final BlockCacheNode node = getOrCreateNode(x, y, z);
             if (!node.isDataFetched()) {
