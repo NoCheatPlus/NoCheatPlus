@@ -95,6 +95,7 @@ public class NetData extends ACheckData {
      * Keep track of current world name, to be used for asynchronous world
      * config getting. Set on join and world change, reset on leave.
      */
+    // TODO: Remove? (Despite future use cases where this is nice to have.) 
     public String currentWorldName = null;
 
     public NetData(final NetConfig config) {
