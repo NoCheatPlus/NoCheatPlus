@@ -45,6 +45,12 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
             final double maxX, final double maxY, final double maxZ, 
             final Axis axis, final int increment) {
         if (BlockProperties.isPassableBox(blockCache, blockX, blockY, blockZ, minX, minY, minZ, maxX, maxY, maxZ)) {
+            /*
+             * TODO: HEIGHT150 -> if not passable... how/where to test for block
+             * change tracker? E.g.: y-offset from block < 0.5 -> check the
+             * block underneath. (one method check box normal + opportunistic
+             * past state handling in one?)
+             */
             return true;
         }
         // TODO: if (blockChangeTracker != null && -- check with BlockChangeTracker and BlockChangeReference --

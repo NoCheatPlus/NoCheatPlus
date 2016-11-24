@@ -4092,6 +4092,10 @@ public class BlockProperties {
                 }
             }
         }
+        /*
+         * Consider doing an xz iteration here for HEIGHT150, iff y-offset <=
+         * 0.5 (and possibly a flag is set).
+         */
         return added;
     }
 
