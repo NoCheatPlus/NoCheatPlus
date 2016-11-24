@@ -194,11 +194,11 @@ public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
         }
     }
 
-    private boolean shouldCheckForIgnoredBlocks() {
+    protected boolean shouldCheckForIgnoredBlocks() {
         return ignoreInitiallyColliding && !ignoredBlocks.isEmpty();
     }
 
-    private boolean isBlockIgnored(final int x, final int y, final int z) {
+    protected boolean isBlockIgnored(final int x, final int y, final int z) {
         return ignoredBlocks.containsBlockPosition(x, y, z);
     }
 
