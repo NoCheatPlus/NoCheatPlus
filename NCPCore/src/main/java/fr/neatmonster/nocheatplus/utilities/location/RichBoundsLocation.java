@@ -1012,7 +1012,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Check for push using the full bounding box (pistons). The given
+     * Check for tracked block changes, having moved a block into a certain
+     * direction, using the full bounding box (pistons). The given
      * BlockChangeReference is not changed, it has to be updated externally.
      *
      * @param blockChangeTracker
@@ -1026,7 +1027,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return A matching BlockChangeEntry with the minimal id. If no entry was
      *         found, null is returned.
      */
-    public BlockChangeEntry getBlockChangeIdPush(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
+    public BlockChangeEntry matchBlockChange(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
         final int tick = TickTask.getTick();
         final UUID worldId = world.getUID();
         final int iMinX = Location.locToBlock(minX);
@@ -1070,7 +1071,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Test if a block fully pushed into that direction can push the player by
+     * Test if a block fully moved into that direction can move the player by
      * coverDistance.
      *
      * @param x

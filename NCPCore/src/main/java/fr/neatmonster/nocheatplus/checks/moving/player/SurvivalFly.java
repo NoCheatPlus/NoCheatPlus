@@ -423,13 +423,13 @@ public class SurvivalFly extends Check {
         }
 
         // Post-check recovery.
-        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015 && cc.blockChangeTrackerPush) {
-            // TODO: Better place for checking for push [redesign for intermediate result objects?].
+        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015 && cc.trackBlockMove) {
+            // TODO: Better place for checking for moved blocks [redesign for intermediate result objects?].
             // Vertical push/pull.
-            double[] pushResult = getPushResultVertical(yDistance, from, to, data);
-            if (pushResult != null) {
-                vAllowedDistance = pushResult[0];
-                vDistanceAboveLimit = pushResult[1];
+            double[] blockMoveResult = getBlockMoveResult(yDistance, from, to, data);
+            if (blockMoveResult != null) {
+                vAllowedDistance = blockMoveResult[0];
+                vDistanceAboveLimit = blockMoveResult[1];
             }
         }
         // Push/pull sideways.
@@ -639,7 +639,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return
      */
-    private double[] getPushResultVertical(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
+    private double[] getBlockMoveResult(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
         /*
          * TODO: Once horizontal push is allowed too, a maxIdEntry has to be
          * passed as argument and data.updateBlockChangeReference has to be
@@ -655,10 +655,10 @@ public class SurvivalFly extends Check {
                 // Extreme case: 1.51 blocks up (details pending).
                 || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
             // TODO: Other conditions? [some will be in passable later].
-            final BlockChangeEntry entryYPos = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0));
+            final BlockChangeEntry entryYPos = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0));
             if (entryYPos != null) {
                 data.updateBlockChangeReference(entryYPos, to);
-                tags.add("push_y_pos");
+                tags.add("blkmv_y_pos");
                 final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                 return new double[]{maxDistYPos, 0.0};
             }
@@ -666,10 +666,10 @@ public class SurvivalFly extends Check {
         // Push (/pull) down.
         else if (yDistance < 0.0 && yDistance >= -1.0) {
             // TODO: Other conditions? [some will be in passable later].
-            final BlockChangeEntry entryYNeg = from.getBlockChangeIdPush(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
+            final BlockChangeEntry entryYNeg = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
             if (entryYNeg != null) {
                 data.updateBlockChangeReference(entryYNeg, to);
-                tags.add("push_y_neg");
+                tags.add("blkmv_y_neg");
                 final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?
                 return new double[]{maxDistYNeg, 0.0};
             }

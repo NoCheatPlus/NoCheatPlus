@@ -196,7 +196,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean assumeSprint;
     public final int speedGrace;
     public final boolean enforceLocation;
-    public final boolean blockChangeTrackerPush;
+    public final boolean trackBlockMove;
 
     // Vehicles
     public final boolean vehicleEnforceLocation;
@@ -331,7 +331,7 @@ public class MovingConfig extends ACheckConfig {
         } else {
             enforceLocation = ref.decide();
         }
-        blockChangeTrackerPush = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
+        trackBlockMove = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
 
         traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
         traceMaxSize = config.getInt(ConfPaths.MOVING_TRACE_MAXSIZE, 200);
