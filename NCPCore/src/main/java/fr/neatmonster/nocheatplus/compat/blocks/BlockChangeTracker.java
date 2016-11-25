@@ -212,7 +212,15 @@ public class BlockChangeTracker {
          * one check covering multiple blocks.
          */
 
-        /** Last used block change entry, highest id.*/
+        /** First used (oldest) entry during checking. */
+        public BlockChangeEntry firstSpanEntry = null;
+        /** Last used (newest) entry during checking. */
+        public BlockChangeEntry lastSpanEntry = null;
+
+        /**
+         * Last used block change entry, set after a complete iteration of
+         * checking, update with updateFinal.
+         */
         public BlockChangeEntry lastUsedEntry = null;
 
         /**
@@ -246,26 +254,43 @@ public class BlockChangeTracker {
         }
 
         /**
-         * Update lastUsedEntry by the given entry, assuming <i>to</i> to be the
+         * Update the span during checking. Ensure to test canUpdateWith(entry)
+         * before calling this.
+         * 
+         * @param entry
+         */
+        public void updateSpan(final BlockChangeEntry entry) {
+            if (firstSpanEntry == null || entry.id < firstSpanEntry.id) {
+                firstSpanEntry = entry;
+            }
+            if (lastSpanEntry == null || entry.id > lastSpanEntry.id) {
+                lastSpanEntry = entry;
+            }
+        }
+
+        /**
+         * Update lastUsedEntry by the set span, assuming <i>to</i> to be the
          * move end-point to continue from next time. This is meant to finalize
          * prepared changes/span for use with the next move.
          * 
-         * @param entry
          * @param to
          *            If not null, allows keeping the latest entry valid, if
          *            intersecting with the bounding box of <i>to</i>.
          */
-        public void updateFinal(final BlockChangeEntry entry, final RichBoundsLocation to) {
-            // TODO: updateBlockChangeReference ... Span(entry, to !?)|Final()
-            if (lastUsedEntry == null || lastUsedEntry.id < entry.id) { // Here use the id for fastest comparison.
-                lastUsedEntry = entry; // Unchecked.
-                if (to != null && to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
+        public void updateFinal(final RichBoundsLocation to) {
+            if (firstSpanEntry == null) {
+                return;
+            }
+            if (lastSpanEntry != null && (lastUsedEntry == null || lastSpanEntry.id > lastUsedEntry.id)) {
+                lastUsedEntry = lastSpanEntry;
+                if (to != null && to.isBlockIntersecting(lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z)) {
                     valid = true;
                 }
                 else {
                     valid = false;
                 }
             }
+            firstSpanEntry = lastSpanEntry = null;
         }
 
         /**
@@ -275,9 +300,16 @@ public class BlockChangeTracker {
          */
         public BlockChangeReference copy() {
             final BlockChangeReference copy = new BlockChangeReference();
+            copy.firstSpanEntry = this.firstSpanEntry;
+            copy.lastSpanEntry = this.lastSpanEntry;
             copy.lastUsedEntry = this.lastUsedEntry;
             copy.valid = this.valid;
             return copy;
+        }
+
+        public void clear() {
+            firstSpanEntry = lastSpanEntry = lastUsedEntry = null;
+            valid = false;
         }
 
         @Override
@@ -286,7 +318,14 @@ public class BlockChangeTracker {
                 return false;
             }
             final BlockChangeReference other = (BlockChangeReference) obj;
-            return valid == other.valid && (lastUsedEntry != null && lastUsedEntry.equals(other.lastUsedEntry) || lastUsedEntry == null && other.lastUsedEntry == null);
+            return valid == other.valid && 
+                    (lastUsedEntry != null && lastUsedEntry.equals(other.lastUsedEntry) 
+                    || lastUsedEntry == null && other.lastUsedEntry == null)
+                    && (firstSpanEntry != null && firstSpanEntry.equals(other.firstSpanEntry) 
+                    || firstSpanEntry == null && other.firstSpanEntry == null)
+                    && (lastSpanEntry != null && lastSpanEntry.equals(other.lastSpanEntry) 
+                    || lastSpanEntry == null && other.lastSpanEntry == null)
+                    ;
         }
 
     }
@@ -576,7 +615,7 @@ public class BlockChangeTracker {
      * @param ref
      *            Reference for checking the validity of BlockChangeEntry
      *            instances. No changes are made to the passed instance,
-     *            canUpdateWith is called.
+     *            canUpdateWith is called. Pass null to skip further validation.
      * @param tick
      *            The current tick. Used for lazy expiration.
      * @param worldId
@@ -604,7 +643,7 @@ public class BlockChangeTracker {
      * @param ref
      *            Reference for checking the validity of BlockChangeEntry
      *            instances. No changes are made to the passed instance,
-     *            canUpdateWith is called.
+     *            canUpdateWith is called. Pass null to skip further validation.
      * @param tick
      *            The current tick. Used for lazy expiration.
      * @param worldNode
@@ -643,7 +682,7 @@ public class BlockChangeTracker {
                 it.remove();
             }
             else {
-                if (ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
+                if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
                     return entry;
                 }
             }

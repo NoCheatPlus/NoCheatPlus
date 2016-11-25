@@ -19,6 +19,7 @@ import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -26,6 +27,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
@@ -60,26 +62,28 @@ public class Passable extends Check {
     // TODO: Store both and select on check (with config then).
     private final ICollidePassable rayTracingLegacy = new PassableRayTracing();
     private final ICollidePassable rayTracingActual = new PassableAxisTracing();
+    private final BlockChangeTracker blockTracker;
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
         // TODO: Configurable maxSteps?
         rayTracingLegacy.setMaxSteps(60);
         rayTracingActual.setMaxSteps(60);
+        blockTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc) {
+            final MovingData data, final MovingConfig cc, final int tick) {
         if (rt_legacy) {
             return checkLegacy(player, from, to, data, cc);
         }
         else {
-            return checkActual(player, from, to, data, cc);
+            return checkActual(player, from, to, data, cc, tick);
         }
     }
 
     private Location checkActual(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc) {
+            final MovingData data, final MovingConfig cc, final int tick) {
         // TODO: Distinguish feet vs. box.
 
         // Block distances (sum, max) for from-to (not for loc!).
@@ -87,7 +91,7 @@ public class Passable extends Check {
 
         // General condition check for using ray-tracing.
         if (cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            final String newTag = checkRayTracing(player, from, to, manhattan, data, cc);
+            final String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick);
             if (newTag != null) {
                 // Direct return.
                 return potentialViolation(player, from, to, manhattan, newTag, data, cc);
@@ -107,11 +111,14 @@ public class Passable extends Check {
     }
 
     private String checkRayTracing(final Player player, final PlayerLocation from, final PlayerLocation to,
-            final int manhattan, final MovingData data, final MovingConfig cc) {
+            final int manhattan, final MovingData data, final MovingConfig cc, final int tick) {
         String tags = null;
         setNormalMargins(rayTracingActual, from);
         rayTracingActual.set(from, to);
         rayTracingActual.setIgnoreInitiallyColliding(true);
+        if (cc.trackBlockMove) { // TODO: Extra flag for 'any' block changes.
+            rayTracingActual.setBlockChangeTracker(blockTracker, data.blockChangeRef, tick, from.getWorld().getUID());
+        }
         //rayTracing.setCutOppositeDirectionMargin(true);
         rayTracingActual.loop();
         rayTracingActual.setIgnoreInitiallyColliding(false);

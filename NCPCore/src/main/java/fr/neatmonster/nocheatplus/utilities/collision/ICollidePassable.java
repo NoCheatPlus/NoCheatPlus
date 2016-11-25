@@ -14,6 +14,10 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.UUID;
+
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
@@ -24,11 +28,26 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
  *
  */
 public interface ICollidePassable extends ICollideBlocks, ISetMargins {
+    // TODO: Add a super interface (+ asbtract impl.) for BlockCache based stuff including BlockChangeTracker.
 
     public void setBlockCache(BlockCache blockCache);
     public BlockCache getBlockCache();
 
-    // TODO: public void (bool?) setBlockChangeReference(tracker, reference).
+    /**
+     * Allows testing for past states. Should be reset in cleanup. Will do
+     * nothing, if not supported.
+     * <hr>
+     * <b>Method signature subject to change (tick).</b>
+     * 
+     * @param blockChangeTracker
+     * @param blockChangeReference
+     * @param tick
+     *            The tick right now (timing info).
+     * @param worldId
+     *            the UUID of the world this takes place in.
+     */
+    public void setBlockChangeTracker(BlockChangeTracker blockChangeTracker, 
+            BlockChangeReference blockChangeReference, int tick, UUID worldId);
 
     /**
      * Convenience: Call set and setBlockCache with the data from the
@@ -52,8 +71,8 @@ public interface ICollidePassable extends ICollideBlocks, ISetMargins {
     public boolean mightNeedSplitAxisHandling();
 
     /**
-     * Remove reference to objects passed from outside (BlockCache, but not
-     * calling their cleanup methods).
+     * Remove reference to objects passed from outside (BlockCache,
+     * BlockChangeTracker and similar, but not calling their cleanup methods).
      */
     public void cleanup();
 

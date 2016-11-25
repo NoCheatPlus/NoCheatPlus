@@ -14,6 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.UUID;
+
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -21,6 +26,10 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 public class PassableAxisTracing extends AxisTracing implements ICollidePassable {
 
     private BlockCache blockCache;
+    private BlockChangeTracker blockChangeTracker = null;
+    private BlockChangeReference blockChangeRef = null;
+    private int tick;
+    private UUID worldId;
 
     // TODO: Might need another option for margins (option to skip margin for the axis-start point, or alter ignoreFirst behavior).
     // TODO: Consider an iteration margin as well (0.5 below for fences).
@@ -31,6 +40,15 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
 
     public void setBlockCache(BlockCache blockCache) {
         this.blockCache = blockCache;
+    }
+
+    @Override
+    public void setBlockChangeTracker(BlockChangeTracker blockChangeTracker, 
+            BlockChangeReference blockChangeReference, int tick, UUID worldId) {
+        this.blockChangeTracker = blockChangeTracker;
+        this.blockChangeRef = blockChangeReference;
+        this.tick = tick;
+        this.worldId = worldId;
     }
 
     @Override
@@ -56,16 +74,18 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
              */
             return true;
         }
-        // TODO: if (blockChangeTracker != null && -- check with BlockChangeTracker and BlockChangeReference --
-        else {
-            collides = true;
-            return false;
+        // Recovery attempt via the BlockChangeTracker.
+        if (blockChangeTracker != null) {
+            // Opportunistic (FCFS, no consistency).
+            final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntry(blockChangeRef, tick, worldId, blockX, blockY, blockZ, null);
+            if (entry != null) {
+                blockChangeRef.updateSpan(entry);
+                return true;
+            }
         }
-    }
-
-    @Override
-    public void set(double x0, double y0, double z0, double x1, double y1, double z1) {
-        super.set(x0, y0, z0, x1, y1, z1);
+        // No condition for passing through found.
+        collides = true;
+        return false;
     }
 
     @Override
@@ -82,6 +102,9 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
     @Override
     public void cleanup() {
         blockCache = null;
+        blockChangeTracker = null;
+        blockChangeRef = null;
+        worldId = null;
     }
 
 }

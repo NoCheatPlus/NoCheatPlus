@@ -674,7 +674,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set-back locations from the other checks, if needed. 
-            newTo = passable.check(player, pFrom, pTo, data, cc);
+            newTo = passable.check(player, pFrom, pTo, data, cc, tick);
             if (newTo != null) {
                 // Check if to skip the nofall check.
                 mightSkipNoFall = true;
@@ -697,7 +697,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, tick, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {

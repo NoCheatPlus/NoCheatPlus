@@ -1013,8 +1013,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check for tracked block changes, having moved a block into a certain
-     * direction, using the full bounding box (pistons). The given
-     * BlockChangeReference is not changed, it has to be updated externally.
+     * direction, using the full bounding box (pistons).
+     * BlockChangeReference.updateSpan is called with the earliest entry found
+     * (updateFinal has to be called extra). This is an opportunistic version
+     * without any consistency checking done, just updating the span by the
+     * earliest entry found.
      *
      * @param blockChangeTracker
      *            the block change tracker
@@ -1024,10 +1027,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            the direction
      * @param coverDistance
      *            The (always positive) distance to cover.
-     * @return A matching BlockChangeEntry with the minimal id. If no entry was
-     *         found, null is returned.
+     * @return Returns true, iff an entry was found.
      */
-    public BlockChangeEntry matchBlockChange(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
+    public boolean matchBlockChange(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
+        // TODO: update span instead !
         final int tick = TickTask.getTick();
         final UUID worldId = world.getUID();
         final int iMinX = Location.locToBlock(minX);
@@ -1050,7 +1053,13 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
                 }
             }
         }
-        return minEntry;
+        if (minEntry == null) {
+            return false;
+        }
+        else {
+            ref.updateSpan(minEntry);
+            return true;
+        }
     }
 
     /**

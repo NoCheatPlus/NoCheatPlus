@@ -14,6 +14,10 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.UUID;
+
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -30,6 +34,12 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
     @Override
     public void setBlockCache(BlockCache blockCache) {
         this.blockCache = blockCache;
+    }
+
+    @Override
+    public void setBlockChangeTracker(BlockChangeTracker blockChangeTracker,
+            BlockChangeReference blockChangeReference, int tick, UUID worldId) {
+        // (Not supported.)
     }
 
     @Override

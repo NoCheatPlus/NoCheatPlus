@@ -43,7 +43,6 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
@@ -51,7 +50,6 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -115,7 +113,9 @@ public class SurvivalFly extends Check {
      * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, 
+            final int tick, final long now) {
         tags.clear();
         if (data.debug) {
             justUsedWorkarounds.clear();
@@ -610,7 +610,7 @@ public class SurvivalFly extends Check {
         // TODO: Pull down tick / timing data (perhaps add an API object for millis + source + tick + sequence count (+ source of sequence count).
         if (data.debug) {
             // TODO: Only update, if velocity is queued at all.
-            data.getVerticalVelocityTracker().updateBlockedState(TickTask.getTick(), 
+            data.getVerticalVelocityTracker().updateBlockedState(tick, 
                     // Assume blocked with being in web/water, despite not entirely correct.
                     thisMove.headObstructed || thisMove.from.resetCond,
                     // (Similar here.)
@@ -655,9 +655,8 @@ public class SurvivalFly extends Check {
                 // Extreme case: 1.51 blocks up (details pending).
                 || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
             // TODO: Other conditions? [some will be in passable later].
-            final BlockChangeEntry entryYPos = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0));
-            if (entryYPos != null) {
-                data.blockChangeRef.updateFinal(entryYPos, to);
+            if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0))) {
+                data.blockChangeRef.updateFinal(to); // TODO: -> MovingListener (!).
                 tags.add("blkmv_y_pos");
                 final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                 return new double[]{maxDistYPos, 0.0};
@@ -666,9 +665,8 @@ public class SurvivalFly extends Check {
         // Push (/pull) down.
         else if (yDistance < 0.0 && yDistance >= -1.0) {
             // TODO: Other conditions? [some will be in passable later].
-            final BlockChangeEntry entryYNeg = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
-            if (entryYNeg != null) {
-                data.blockChangeRef.updateFinal(entryYNeg, to);
+            if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance)) {
+                data.blockChangeRef.updateFinal(to); // TODO: -> MovingListener (!).
                 tags.add("blkmv_y_neg");
                 final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?
                 return new double[]{maxDistYNeg, 0.0};
