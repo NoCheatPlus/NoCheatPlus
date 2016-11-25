@@ -98,16 +98,16 @@ public class Passable extends Check {
             }
             // TODO: Return already here, if not colliding?
         }
-        if (to.isPassable()) {
-            // Quick return.
-            // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
-            data.passableVL *= 0.99;
-            return null;
-        } else {
+        else if (!to.isPassable()) {
+            // TODO: Only do ray tracing and remove this anyway?
             // TODO: Do make use of isPassableBox. 
             // TODO: Some cases seem not to be covered here (same block !?).
             return potentialViolationLegacy(player, from, to, manhattan, "", data, cc);
         }
+        // No early return on violation happened.
+        // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
+        data.passableVL *= 0.99;
+        return null;
     }
 
     private String checkRayTracing(final Player player, final PlayerLocation from, final PlayerLocation to,
