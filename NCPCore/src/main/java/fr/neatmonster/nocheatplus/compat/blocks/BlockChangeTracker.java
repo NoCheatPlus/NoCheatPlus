@@ -198,7 +198,7 @@ public class BlockChangeTracker {
      * Simple class for helping with query functionality. Reference a
      * BlockChangeEntry and contain more information, such as validity for
      * further use/effects. This is meant for storing the state of last-consumed
-     * ids for a context within some data.
+     * block change entries for a context within some data.
      * 
      * @author asofold
      *
@@ -214,7 +214,13 @@ public class BlockChangeTracker {
         /** Last used block change entry, highest id.*/
         public BlockChangeEntry lastUsedEntry = null;
 
-        /** Indicate if the set id can still be used.*/
+        /**
+         * Indicate if the timing of the last entry is still regarded as valid.
+         */
+        /*
+         * TODO: Subject to change, switching to tick rather than id (ids can be
+         * inverted, thus lock out paths).
+         */
         public boolean valid = false;
 
         /**
@@ -228,7 +234,9 @@ public class BlockChangeTracker {
          * @return
          */
         public boolean canUpdateWith(final BlockChangeEntry entry) {
-            return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
+            // Love access methods: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
+            // TODO: There'll be a span perhaps.
+            return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
         }
 
         /**

@@ -1199,12 +1199,16 @@ public class MovingData extends ACheckData {
      * @param to
      */
     public void updateBlockChangeReference(final BlockChangeEntry entry, final RichBoundsLocation to) {
-        blockChangeRef.lastUsedEntry = entry; // Unchecked.
-        if (to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
-            blockChangeRef.valid = true;
-        }
-        else {
-            blockChangeRef.valid = false;
+        // TODO: Move method to BlockChangeReference to keep things easy to overview for now.
+        // TODO: updateBlockChangeReference ... Span(entry, to !?)|Final()
+        if (blockChangeRef.lastUsedEntry == null || blockChangeRef.lastUsedEntry.id < entry.id) {
+            blockChangeRef.lastUsedEntry = entry; // Unchecked.
+            if (to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
+                blockChangeRef.valid = true;
+            }
+            else {
+                blockChangeRef.valid = false;
+            }
         }
     }
 
