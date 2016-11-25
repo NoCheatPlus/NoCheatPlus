@@ -227,7 +227,8 @@ public class BlockProperties {
          * Instantiates a new block props.
          *
          * @param tool
-         *            the tool
+         *            The tool type that allows access to breaking times other
+         *            than MaterialBase.NONE.
          * @param hardness
          *            the hardness
          */
@@ -239,7 +240,8 @@ public class BlockProperties {
          * Instantiates a new block props.
          *
          * @param tool
-         *            the tool
+         *            The tool type that allows access to breaking times other
+         *            than MaterialBase.NONE.
          * @param hardness
          *            the hardness
          * @param efficiencyMod
@@ -269,11 +271,13 @@ public class BlockProperties {
          * Instantiates a new block props.
          *
          * @param tool
-         *            the tool
+         *            The tool type that allows access to breaking times other
+         *            than MaterialBase.NONE.
          * @param hardness
          *            the hardness
          * @param breakingTimes
-         *            the breaking times
+         *            The breaking times (NONE, WOOD, STONE, IRON, DIAMOND,
+         *            GOLD)
          */
         public BlockProps(ToolProps tool, float hardness, long[] breakingTimes) {
             this(tool, hardness, breakingTimes, 1f);
@@ -283,11 +287,13 @@ public class BlockProperties {
          * Instantiates a new block props.
          *
          * @param tool
-         *            the tool
+         *            The tool type that allows access to breaking times other
+         *            than MaterialBase.NONE.
          * @param hardness
          *            the hardness
          * @param breakingTimes
-         *            the breaking times
+         *            The breaking times (NONE, WOOD, STONE, IRON, DIAMOND,
+         *            GOLD)
          * @param efficiencyMod
          *            the efficiency mod
          */
@@ -3190,7 +3196,7 @@ public class BlockProperties {
      * passable.
      *
      * @param access
-     *            the access
+     *            the access <- we all love the access!
      * @param minX
      *            the min x
      * @param minY
@@ -4069,7 +4075,7 @@ public class BlockProperties {
      *            the max z
      * @param results
      *            the results
-     * @return the int
+     * @return The number of added blocks.
      */
     public static final int collectInitiallyCollidingBlocks(final BlockCache access, 
             final double minX, final double minY, final double minZ,
@@ -4087,14 +4093,18 @@ public class BlockProperties {
                 for (int y = iMinY; y <= iMaxY; y++) {
                     if (!isPassableBox(access, x, y, z, minX, minY, minZ, maxX, maxY, maxZ)) {
                         results.addBlockPosition(x, y, z);
-                        ++added;
+                        added ++;
                     }
                 }
             }
         }
         /*
-         * Consider doing an xz iteration here for HEIGHT150, iff y-offset <=
-         * 0.5 (and possibly a flag is set).
+         * Consider doing an xz iteration here for HEIGHT150, if y-offset <= 0.5
+         * (and possibly a flag is set). Note that collision behavior of fences
+         * can be peculiar, with barriers at 1.5 and 1.0 height (1.5 height only
+         * applies with non solid blocks above, thus ignore air/liquid/certain
+         * blocks if initially colliding with fence underneath (!)), for a
+         * convention.
          */
         return added;
     }

@@ -92,6 +92,7 @@ public class Passable extends Check {
                 // Direct return.
                 return potentialViolation(player, from, to, manhattan, newTag, data, cc);
             }
+            // TODO: Return already here, if not colliding?
         }
         if (to.isPassable()) {
             // Quick return.
@@ -99,6 +100,8 @@ public class Passable extends Check {
             data.passableVL *= 0.99;
             return null;
         } else {
+            // TODO: Do make use of isPassableBox. 
+            // TODO: Some cases seem not to be covered here (same block !?).
             return potentialViolationLegacy(player, from, to, manhattan, "", data, cc);
         }
     }
@@ -162,7 +165,7 @@ public class Passable extends Check {
 
         // Prefer the set-back location from the data.
         if (data.hasSetBack()) {
-            setBackLoc = data.getSetBack(to);;
+            setBackLoc = data.getSetBack(to);
             if (data.debug) {
                 debug(player, "Using set-back location for passable.");
             }

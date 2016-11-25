@@ -404,7 +404,8 @@ public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
      * @param increment
      *            Direction of the move concerning the given axis (1 means from
      *            min to max, -1 means from max to min).
-     * @return
+     * @return Return true to continue tracing. Return false to stop and trigger
+     *         a collision.
      */
     protected abstract boolean step(int blockX, int blockY, int blockZ, 
             double minX, double minY, double minZ, double maxX, double maxY, double maxZ,

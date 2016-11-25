@@ -49,7 +49,10 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
              * TODO: HEIGHT150 -> if not passable... how/where to test for block
              * change tracker? E.g.: y-offset from block < 0.5 -> check the
              * block underneath. (one method check box normal + opportunistic
-             * past state handling in one?)
+             * past state handling in one?) Prefer to set the
+             * air/liquid/whichever block above the fence as ignored, in order
+             * to allow collision with the 1.0 height border of the fence (TODO:
+             * legacy only?).
              */
             return true;
         }

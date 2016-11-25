@@ -53,7 +53,8 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  * pistons, falling blocks, digging, block placing, explosions, vegetables
  * growing, all sorts of doors, plugins changing blocks and so on. This is
  * needed not only for elevator and parkour designs, but also to prevent piston
- * based trap designs, which could lead to players violating moving checks.
+ * based trap designs, which could lead to victims continuously violating moving
+ * checks.
  * <hr>
  * In general we assume that at the time of adding a block change entry, the
  * block has not yet been changed, so we access the "old state" at that point of
@@ -154,13 +155,18 @@ public class BlockChangeTracker {
         public final IBlockCacheNode previousState;
 
         /**
-         * A push entry.
+         * A block change entry.
+         * 
          * @param id
          * @param tick
          * @param x
          * @param y
          * @param z
          * @param direction
+         *            Moving direction, NONE for none.
+         * @param previousState
+         *            State of the block before changes may have happened. Pass
+         *            null to ignore.
          */
         public BlockChangeEntry(long id,  int tick, int x, int y, int z, 
                 Direction direction, IBlockCacheNode previousState) {
@@ -437,7 +443,7 @@ public class BlockChangeTracker {
     private void addPistonBlock(final long changeId, final int tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final BlockFace blockFace, final BlockCache blockCache) {
         // TODO: A filter for regions of player activity.
-        // TODO: Test which ones can actually push a player (and what type of push).
+        // TODO: Test which ones can actually move a player (/how).
         // Add this block.
         addBlockChange(changeId, tick, worldNode, x, y, z, Direction.getDirection(blockFace), 
                 blockCache.getBlockCacheNode(x, y, z, true));
@@ -450,7 +456,7 @@ public class BlockChangeTracker {
      * @param y
      * @param z
      * @param direction
-     *            If not NONE, pushing into that direction is assumed.
+     *            If not NONE, moving the block into that direction is assumed.
      */
     private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final Direction direction, final IBlockCacheNode previousState) {
@@ -528,7 +534,7 @@ public class BlockChangeTracker {
     }
 
     /**
-     * Query if there is a push available into the indicated direction.
+     * Query past block states and moved blocks, including direction of moving.
      * 
      * @param ref
      *            Reference for checking the validity of BlockChangeEntry
@@ -538,11 +544,12 @@ public class BlockChangeTracker {
      *            The current tick. Used for lazy expiration.
      * @param worldId
      * @param x
-     *            Block Coordinates where a push might have happened.
+     *            Block Coordinates.
      * @param y
      * @param z
      * @param direction
-     *            Desired direction of the push.
+     *            Desired direction of a moved block. Pass null to ignore
+     *            direction.
      * @return The matching entry, or null if there is no matching entry.
      */
     public BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final UUID worldId, 
@@ -555,7 +562,7 @@ public class BlockChangeTracker {
     }
 
     /**
-     * Query if there is a push available into the indicated direction.
+     * Query past block states and moved blocks, including direction of moving.
      * 
      * @param ref
      *            Reference for checking the validity of BlockChangeEntry
@@ -565,11 +572,12 @@ public class BlockChangeTracker {
      *            The current tick. Used for lazy expiration.
      * @param worldNode
      * @param x
-     *            Block Coordinates where a push might have happened.
+     *            Block Coordinates.
      * @param y
      * @param z
      * @param direction
-     *            Desired direction of the push. Pass null to ignore direction.
+     *            Desired direction of a moved block. Pass null to ignore
+     *            direction.
      * @return The oldest matching entry, or null if there is no matching entry.
      */
     private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final WorldNode worldNode, 
