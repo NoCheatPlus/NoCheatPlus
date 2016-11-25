@@ -44,6 +44,7 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
+import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -237,6 +238,29 @@ public class BlockChangeTracker {
             // Love access methods: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
             // TODO: There'll be a span perhaps.
             return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
+        }
+
+        /**
+         * Update lastUsedEntry by the given entry, assuming <i>to</i> to be the
+         * move end-point to continue from next time. This is meant to finalize
+         * prepared changes/span for use with the next move.
+         * 
+         * @param entry
+         * @param to
+         *            If not null, allows keeping the latest entry valid, if
+         *            intersecting with the bounding box of <i>to</i>.
+         */
+        public void updateFinal(final BlockChangeEntry entry, final RichBoundsLocation to) {
+            // TODO: updateBlockChangeReference ... Span(entry, to !?)|Final()
+            if (lastUsedEntry == null || lastUsedEntry.id < entry.id) {
+                lastUsedEntry = entry; // Unchecked.
+                if (to != null && to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
+                    valid = true;
+                }
+                else {
+                    valid = false;
+                }
+            }
         }
 
         /**

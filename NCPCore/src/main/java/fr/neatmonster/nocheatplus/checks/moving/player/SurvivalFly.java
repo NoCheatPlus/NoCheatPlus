@@ -245,7 +245,7 @@ public class SurvivalFly extends Check {
                 //                    || to.isHeadObstructed() // Best not have this one.
                 ;
         //}
-        
+
         // HACK: Force sfNoLowJump by a flag.
         // TODO: Might remove that flag, as the issue for trying this has been resolved differently (F_HEIGHT8_1).
         // TODO: Consider setting on ground_height always?
@@ -301,7 +301,7 @@ public class SurvivalFly extends Check {
                     data.bunnyhopDelay = 0;
                 }
             }
-            
+
             // hacc (if enabled, always update)
             final double fcmhv = Math.max(1.0, thisMove.hDistance / thisMove.hAllowedDistanceBase);
             data.combinedMediumHCount ++;
@@ -657,7 +657,7 @@ public class SurvivalFly extends Check {
             // TODO: Other conditions? [some will be in passable later].
             final BlockChangeEntry entryYPos = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0));
             if (entryYPos != null) {
-                data.updateBlockChangeReference(entryYPos, to);
+                data.blockChangeRef.updateFinal(entryYPos, to);
                 tags.add("blkmv_y_pos");
                 final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                 return new double[]{maxDistYPos, 0.0};
@@ -668,7 +668,7 @@ public class SurvivalFly extends Check {
             // TODO: Other conditions? [some will be in passable later].
             final BlockChangeEntry entryYNeg = from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance);
             if (entryYNeg != null) {
-                data.updateBlockChangeReference(entryYNeg, to);
+                data.blockChangeRef.updateFinal(entryYNeg, to);
                 tags.add("blkmv_y_neg");
                 final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?
                 return new double[]{maxDistYNeg, 0.0};

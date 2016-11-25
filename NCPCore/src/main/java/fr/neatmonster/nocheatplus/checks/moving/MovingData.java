@@ -43,7 +43,6 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
@@ -53,7 +52,6 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichEntityLocation;
 import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 
@@ -1189,27 +1187,6 @@ public class MovingData extends ACheckData {
         clearAccounting(); // Not sure: adding up might not be nice.
         removeAllVelocity(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
-    }
-
-    /**
-     * Update the block change tracking reference by the given entry, assuming
-     * to to be the move end-point to continue from next time.
-     * 
-     * @param entry
-     * @param to
-     */
-    public void updateBlockChangeReference(final BlockChangeEntry entry, final RichBoundsLocation to) {
-        // TODO: Move method to BlockChangeReference to keep things easy to overview for now.
-        // TODO: updateBlockChangeReference ... Span(entry, to !?)|Final()
-        if (blockChangeRef.lastUsedEntry == null || blockChangeRef.lastUsedEntry.id < entry.id) {
-            blockChangeRef.lastUsedEntry = entry; // Unchecked.
-            if (to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
-                blockChangeRef.valid = true;
-            }
-            else {
-                blockChangeRef.valid = false;
-            }
-        }
     }
 
     /**
