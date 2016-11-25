@@ -226,17 +226,22 @@ public class BlockChangeTracker {
 
         /**
          * Check if this reference can be updated with the given entry,
-         * considering set validity information. By default, the given id either
-         * must be greater than the stored one, or the ids are the same and
-         * valid is set to true. The internal state is not changed by calling
-         * this.
+         * considering set validity information. By default, the given tick
+         * either must be greater than the stored one, or the tick are the same
+         * and valid is set to true. The internal state is not changed by
+         * calling this.
          * 
-         * @param id
+         * @param entry
          * @return
          */
         public boolean canUpdateWith(final BlockChangeEntry entry) {
             // Love access methods: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
             // TODO: There'll be a span perhaps.
+            /*
+             * Using ticks seems more appropriate, as ids are not necessarily
+             * ordered in a relevant way, if they reference the same tick. Even
+             * one tick may be too narrow.
+             */
             return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
         }
 
@@ -252,7 +257,7 @@ public class BlockChangeTracker {
          */
         public void updateFinal(final BlockChangeEntry entry, final RichBoundsLocation to) {
             // TODO: updateBlockChangeReference ... Span(entry, to !?)|Final()
-            if (lastUsedEntry == null || lastUsedEntry.id < entry.id) {
+            if (lastUsedEntry == null || lastUsedEntry.id < entry.id) { // Here use the id for fastest comparison.
                 lastUsedEntry = entry; // Unchecked.
                 if (to != null && to.isBlockIntersecting(entry.x, entry.y, entry.z)) {
                     valid = true;
