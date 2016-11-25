@@ -26,6 +26,13 @@ import fr.neatmonster.nocheatplus.logging.details.IGetStreamId;
 import fr.neatmonster.nocheatplus.logging.details.ILogString;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
+/**
+ * Default/simple implementation. Handles are kept forever once fetched, for
+ * simplicity and to avoid unnecessary onReload implementations.
+ * 
+ * @author asofold
+ *
+ */
 public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, IUnregisterGenericInstanceRegistryListener {
 
     // TODO: Test cases.
@@ -126,6 +133,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
             if (uniqueHandle == null) {
                 uniqueHandle = new ReferenceCountHandle<T>(registeredFor, registry, unregister);
                 this.listeners.add(uniqueHandle);
+                uniqueHandle.getHandle(); // Keep the count up, so this never unregisters automatically.
             }
             return uniqueHandle.getNewHandle();
         }
