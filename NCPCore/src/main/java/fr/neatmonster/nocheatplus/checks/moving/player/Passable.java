@@ -73,17 +73,17 @@ public class Passable extends Check {
     }
 
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final int tick) {
+            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
         if (rt_legacy) {
             return checkLegacy(player, from, to, data, cc);
         }
         else {
-            return checkActual(player, from, to, data, cc, tick);
+            return checkActual(player, from, to, data, cc, tick, useBlockChangeTracker);
         }
     }
 
     private Location checkActual(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final int tick) {
+            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
         // TODO: Distinguish feet vs. box.
 
         // Block distances (sum, max) for from-to (not for loc!).
@@ -91,7 +91,7 @@ public class Passable extends Check {
 
         // General condition check for using ray-tracing.
         if (cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            final String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick);
+            final String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
             if (newTag != null) {
                 // Direct return.
                 return potentialViolation(player, from, to, manhattan, newTag, data, cc);
@@ -111,12 +111,12 @@ public class Passable extends Check {
     }
 
     private String checkRayTracing(final Player player, final PlayerLocation from, final PlayerLocation to,
-            final int manhattan, final MovingData data, final MovingConfig cc, final int tick) {
+            final int manhattan, final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
         String tags = null;
         setNormalMargins(rayTracingActual, from);
         rayTracingActual.set(from, to);
         rayTracingActual.setIgnoreInitiallyColliding(true);
-        if (cc.trackBlockMove) { // TODO: Extra flag for 'any' block changes.
+        if (useBlockChangeTracker) { // TODO: Extra flag for 'any' block changes.
             rayTracingActual.setBlockChangeTracker(blockTracker, data.blockChangeRef, tick, from.getWorld().getUID());
         }
         //rayTracing.setCutOppositeDirectionMargin(true);

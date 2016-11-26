@@ -115,7 +115,7 @@ public class SurvivalFly extends Check {
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
             final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, 
-            final int tick, final long now) {
+            final int tick, final long now, final boolean useBlockChangeTracker) {
         tags.clear();
         if (data.debug) {
             justUsedWorkarounds.clear();
@@ -423,7 +423,7 @@ public class SurvivalFly extends Check {
         }
 
         // Post-check recovery.
-        if (vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015 && cc.trackBlockMove) {
+        if (useBlockChangeTracker && vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015) {
             // TODO: Better place for checking for moved blocks [redesign for intermediate result objects?].
             // Vertical push/pull.
             double[] blockMoveResult = getBlockMoveResult(yDistance, from, to, data);

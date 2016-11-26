@@ -82,6 +82,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
@@ -159,6 +160,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private IGenericInstanceHandle<IAttributeAccess> attributeAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IAttributeAccess.class);
 
+    private final BlockChangeTracker blockChangeTracker;
+
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idMoveHandled = counters.registerKey("event.player.move.handled");
@@ -171,6 +174,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         super(CheckType.MOVING);
         // Register vehicleChecks.
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(vehicleChecks);
+        blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
     /**
@@ -505,7 +509,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return true;
         }
 
-        {
+        { // TODO: Consider to remove ?
             // Debugging statistics, rather light weight.
             final boolean hasPos = !moveInfo.from.isSamePos(moveInfo.to);
             final boolean hasLook = from.getYaw() != to.getYaw() || from.getPitch() != to.getPitch();
@@ -668,13 +672,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }
         }
+        
+        // TODO: More adaptive margin / method (bouunding boxes).
+        final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || cc.survivalFlyCheck)
+                && blockChangeTracker.hasActivity(from.getWorld().getUID(), pFrom, pTo, 3.0);
 
         // Check passable first to prevent set-back override.
         // TODO: Redesign to set set-backs later (queue + invalidate).
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set-back locations from the other checks, if needed. 
-            newTo = passable.check(player, pFrom, pTo, data, cc, tick);
+            newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
             if (newTo != null) {
                 // Check if to skip the nofall check.
                 mightSkipNoFall = true;
@@ -697,7 +705,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, tick, time);
+                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, tick, time, useBlockChangeTracker);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
