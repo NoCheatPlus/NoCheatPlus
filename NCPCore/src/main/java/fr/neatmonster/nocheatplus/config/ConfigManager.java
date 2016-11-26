@@ -87,6 +87,7 @@ public class ConfigManager {
      *  with the NoCheatPlusAPI using the annotation SetupOrder with a higher negative value (-1000, see INotifyReload javadoc).
      * @param factory
      */
+    // TODO: Register at GenericInstanceRegistry instead, store a handle at best (get rid of 'the other' static registries).
     public static void setActionFactoryFactory(ActionFactoryFactory factory){
         if (factory != null){
             actionFactoryFactory = factory;
@@ -203,9 +204,10 @@ public class ConfigManager {
         LinkedHashMap<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>();
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
+        final ConfigFile defaultConfig = new DefaultConfig();
         PathUtils.processPaths(globalFile, "global config", false);
         final ConfigFile globalConfig = new ConfigFile();
-        globalConfig.setDefaults(new DefaultConfig());
+        globalConfig.setDefaults(defaultConfig);
         globalConfig.options().copyDefaults(true);
         if (globalFile.exists()){
             try {
@@ -225,7 +227,7 @@ public class ConfigManager {
                     StaticLog.logSevere(e);
                 }
             } catch (final Exception e) {
-                StaticLog.logSevere("Could not load config.yml (see exception below).  Continue with default settings...");
+                StaticLog.logSevere("Could not load config.yml (see exception below). Continue with default settings...");
                 StaticLog.logSevere(e);
             }
         }

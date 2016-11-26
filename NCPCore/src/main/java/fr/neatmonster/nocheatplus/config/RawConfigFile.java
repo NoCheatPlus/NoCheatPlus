@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.config;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 
-public class RawConfigFile  extends YamlConfiguration{
+public class RawConfigFile  extends YamlConfiguration {
 
     private static String prepareMatchMaterial(String content) {
         return content.replace(' ', '_').replace('-', '_').replace('.', '_');
@@ -46,11 +47,11 @@ public class RawConfigFile  extends YamlConfiguration{
     @SuppressWarnings("deprecation")
     public static Integer parseTypeId(String content) {
         content = content.trim().toUpperCase();
-        try{
+        try {
             return Integer.parseInt(content);
         }
-        catch(NumberFormatException e){}
-        try{
+        catch (NumberFormatException e){}
+        try {
             Material mat = Material.matchMaterial(prepareMatchMaterial(content));
             if (mat != null) {
                 return mat.getId();
@@ -69,12 +70,12 @@ public class RawConfigFile  extends YamlConfiguration{
     @SuppressWarnings("deprecation")
     public static Material parseMaterial(String content) {
         content = content.trim().toUpperCase();
-        try{
+        try {
             Integer id = Integer.parseInt(content);
             return Material.getMaterial(id);
         }
-        catch(NumberFormatException e){}
-        try{
+        catch (NumberFormatException e){}
+        try {
             return Material.matchMaterial(prepareMatchMaterial(content));
         }
         catch (Exception e) {}
@@ -84,6 +85,9 @@ public class RawConfigFile  extends YamlConfiguration{
     ////////////////
     // Not static.
     ////////////////
+
+    /** Meta data: The build number of the last significant change of a value. */
+    protected final Map<String, Integer> lastChangedBuildNumbers = new HashMap<String, Integer>();
 
     /**
      * Set a value depending on the detected Minecraft version.
@@ -319,6 +323,44 @@ public class RawConfigFile  extends YamlConfiguration{
         } catch (final Exception e) {}
 
         return super.saveToString();
+    }
+
+    /**
+     * Short cut to set a value and the last changed build number.
+     * <hr>
+     * Performs set(path, value) and setLastChangedBuildNumber(path,
+     * lastChangedBuildNumber).
+     * 
+     * @param path
+     * @param value
+     * @param lastChangedBuildNumber
+     */
+    public void set(String path, Object value, int lastChangedBuildNumber) {
+        set(path, value);
+        setLastChangedBuildNumber(path, lastChangedBuildNumber);
+    }
+
+    /**
+     * Set the build number at which a fundamental change of a value has
+     * happened (thus keeping an old value could be a problem).
+     * 
+     * @param path
+     * @param value
+     */
+    public void setLastChangedBuildNumber(String path, int value) {
+        lastChangedBuildNumbers.put(path, value);
+    }
+
+    /**
+     * Get the entire map of path -> last changed build number.
+     * <hr>
+     * Note that querying individual paths is not yet supported, as there may be
+     * different ways of handling parent/child node relations with this.
+     * 
+     * @return
+     */
+    public Map<String, Integer> getLastChangedBuildNumbers() {
+        return lastChangedBuildNumbers;
     }
 
 }

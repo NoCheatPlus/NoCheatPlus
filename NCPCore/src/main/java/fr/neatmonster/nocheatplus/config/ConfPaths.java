@@ -62,7 +62,11 @@ public abstract class ConfPaths {
     public static final String SAVEBACKCONFIG                            = "savebackconfig";
 
     // Configuration version.
-    @GlobalConfig // TODO: Per file versions should also be supported. Better with per-path comparison?
+    /*
+     * NOTE: The configuration allows setLastChangeBuildNumber(path), however
+     * some of these settings are still needed for that.
+     */
+    @GlobalConfig // TODO: Per file versions should also be supported.
     public static final String CONFIGVERSION                             = "configversion.";
     public static final String CONFIGVERSION_NOTIFY                      = CONFIGVERSION + "notify";
     /** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with first save. */

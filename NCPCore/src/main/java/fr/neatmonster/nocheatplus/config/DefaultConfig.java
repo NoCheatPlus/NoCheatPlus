@@ -30,9 +30,8 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 public class DefaultConfig extends ConfigFile {
 
     /**
-     * NCP build number, for which an existing entry has been changed. (Should
-     * only increment, if the user is advised to change to that value instead of
-     * the former default one.)
+     * NCP build number, for which fundamental changes have been made. With
+     * setLastChangeBuildNumber, it's possible to do this on a per-value basis.
      */
     public static final int buildNumber = 785;
 
@@ -510,7 +509,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_PACKETFREQUENCY_PPS, 200);
         set(ConfPaths.NET_PACKETFREQUENCY_SECONDS, 4);
         set(ConfPaths.NET_PACKETFREQUENCY_ACTIONS, "cancel cmd:kickpacketfrequency");
-        
+
         // SoundDistance
         set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true);
         set(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE, 320);
@@ -612,7 +611,7 @@ public class DefaultConfig extends ConfigFile {
                 )) {
             set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + mat.name().toLowerCase(), "default+ign_passable+ground_height");
         }
-        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, false); // TODO: Activate once it really works?
+        set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, true, 1036); // With lastChangedBuildNumber.
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true);
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS, 80);
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PERWORLD_MAXENTRIES, 1000);
