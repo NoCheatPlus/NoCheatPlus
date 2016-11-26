@@ -426,7 +426,7 @@ public class SurvivalFly extends Check {
         if (useBlockChangeTracker && vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015) {
             // TODO: Better place for checking for moved blocks [redesign for intermediate result objects?].
             // Vertical push/pull.
-            double[] blockMoveResult = getBlockMoveResult(yDistance, from, to, data);
+            double[] blockMoveResult = getVerticalBlockMoveResult(yDistance, from, to, data);
             if (blockMoveResult != null) {
                 vAllowedDistance = blockMoveResult[0];
                 vDistanceAboveLimit = blockMoveResult[1];
@@ -639,7 +639,7 @@ public class SurvivalFly extends Check {
      * @param data
      * @return
      */
-    private double[] getBlockMoveResult(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
+    private double[] getVerticalBlockMoveResult(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
         /*
          * TODO: Once horizontal push is allowed too, a maxIdEntry has to be
          * passed as argument and data.updateBlockChangeReference has to be
