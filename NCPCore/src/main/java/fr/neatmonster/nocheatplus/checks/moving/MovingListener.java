@@ -782,6 +782,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
 
+        // Update BlockChangeTracker
+        /*
+         * TODO: Set an activation flag earlier on, based on query for
+         * regions/chunks before running checks (and pass the activation flag to
+         * those).
+         */
+        if (cc.trackBlockMove && data.blockChangeRef.firstSpanEntry != null) {
+            data.blockChangeRef.updateFinal(pTo);
+        }
+
         if (newTo == null) {
             // Allowed move.
             // Bounce effects.

@@ -656,7 +656,6 @@ public class SurvivalFly extends Check {
                 || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
             // TODO: Other conditions? [some will be in passable later].
             if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0))) {
-                data.blockChangeRef.updateFinal(to); // TODO: -> MovingListener (!).
                 tags.add("blkmv_y_pos");
                 final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                 return new double[]{maxDistYPos, 0.0};
@@ -666,7 +665,6 @@ public class SurvivalFly extends Check {
         else if (yDistance < 0.0 && yDistance >= -1.0) {
             // TODO: Other conditions? [some will be in passable later].
             if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance)) {
-                data.blockChangeRef.updateFinal(to); // TODO: -> MovingListener (!).
                 tags.add("blkmv_y_neg");
                 final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?
                 return new double[]{maxDistYNeg, 0.0};

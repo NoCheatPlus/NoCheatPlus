@@ -227,6 +227,7 @@ public class Passable extends Check {
         else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
             debug(player, "Raytracing max steps exceeded (" + tag + "): "+ rayTracing.getCollidingAxis());
         }
+        // TODO: Detect having used past block changes and log or set a tag.
     }
 
     private Location checkLegacy(final Player player, final PlayerLocation from, final PlayerLocation to, 

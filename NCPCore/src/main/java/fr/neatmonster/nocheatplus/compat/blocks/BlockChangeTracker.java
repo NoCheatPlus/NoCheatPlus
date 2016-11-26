@@ -281,6 +281,13 @@ public class BlockChangeTracker {
             if (firstSpanEntry == null) {
                 return;
             }
+            // TODO: Consider a span margin, for which we set last used to first span.
+            /*
+             * TODO: What with latest entries, that stay valid until half round
+             * trip time? Should perhaps keep validity also if entries are the
+             * latest ones, needs updating in span already - can/should do
+             * without bounds?
+             */
             if (lastSpanEntry != null && (lastUsedEntry == null || lastSpanEntry.id > lastUsedEntry.id)) {
                 lastUsedEntry = lastSpanEntry;
                 if (to != null && to.isBlockIntersecting(lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z)) {
