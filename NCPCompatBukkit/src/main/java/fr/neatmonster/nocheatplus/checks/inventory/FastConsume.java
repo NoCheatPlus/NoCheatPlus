@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -42,7 +43,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * @author mc_dev
  *
  */
-public class FastConsume extends Check implements Listener{
+public class FastConsume extends Check implements Listener, INotifyReload {
 
 
 
@@ -58,6 +59,11 @@ public class FastConsume extends Check implements Listener{
     public FastConsume() {
         super(CheckType.INVENTORY_FASTCONSUME);
         // Overrides the instant-eat check.
+        disableInstantEat();
+    }
+
+    private void disableInstantEat() {
+        // TODO: Do this kind of thing via registries later on.
         ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
         StaticLog.logInfo("Inventory checks: FastConsume is available, disabled InstantEat.");
     }
@@ -145,6 +151,11 @@ public class FastConsume extends Check implements Listener{
         }
         data.instantEatInteract = time;
         return cancel;
+    }
+
+    @Override
+    public void onReload() {
+        disableInstantEat();
     }
 
 }
