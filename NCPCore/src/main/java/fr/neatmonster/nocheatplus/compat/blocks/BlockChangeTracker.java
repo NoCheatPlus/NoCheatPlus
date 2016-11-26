@@ -38,10 +38,13 @@ import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
+import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
@@ -107,6 +110,16 @@ public class BlockChangeTracker {
 
     }
 
+    /**
+     * Count active block changes per chunk/thing.
+     * 
+     * @author asofold
+     *
+     */
+    public static class ActivityNode {
+        public int count = 0;
+    }
+
     public static class WorldNode {
         // TODO: private + access methods.
         /*
@@ -120,6 +133,12 @@ public class BlockChangeTracker {
          * tick). Only add blocks if players could reach the location.
          */
 
+        /**
+         * Count active block change entries per chunk (chunk size and access
+         * are handled elsewhere, except for clear).
+         */
+        public final CoordMap<ActivityNode> activityMap = new CoordHashMap<ActivityNode>();
+        /** Directly map to individual blocks. */
         public final LinkedCoordHashMap<LinkedList<BlockChangeEntry>> blocks = new LinkedCoordHashMap<LinkedList<BlockChangeEntry>>();
         /** Tick of last change. */
         public int lastChangeTick = 0;
@@ -134,8 +153,35 @@ public class BlockChangeTracker {
         }
 
         public void clear() {
+            activityMap.clear();
             blocks.clear();
             size = 0;
+        }
+
+        /**
+         * Get an activity node for the given block coordinates at the given
+         * resolution. If no node is there, a new one will be created.
+         * 
+         * @param x
+         * @param y
+         * @param z
+         * @param activityResolution
+         * @return
+         */
+        public ActivityNode getActivityNode(int x, int y, int z, final int activityResolution) {
+            x /= activityResolution;
+            y /= activityResolution;
+            z /= activityResolution;
+            ActivityNode node = activityMap.get(x, y, z);
+            if (node == null) {
+                node = new ActivityNode();
+                activityMap.put(x, y, z, node);
+            }
+            return node;
+        }
+
+        public void removeActivityNode(final int x, final int y, final int z, final int activityResolution) {
+            activityMap.remove(x / activityResolution, y / activityResolution, z / activityResolution);
         }
 
     }
@@ -449,6 +495,8 @@ public class BlockChangeTracker {
     /** Size at which entries get skipped, per world node. */
     private int worldNodeSkipSize = 500;
 
+    private int activityResolution = 32; // TODO: getter/setter/config.
+
     /**
      * Store the WorldNode instances by UUID, containing the block change
      * entries (and filters). Latest entries must be sorted to the end.
@@ -551,6 +599,7 @@ public class BlockChangeTracker {
         worldNode.lastChangeTick = tick;
         final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction, previousState);
         LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z, MoveOrder.END);
+        ActivityNode activityNode = worldNode.getActivityNode(x, y, z, activityResolution);
         if (entries == null) {
             entries = new LinkedList<BlockChangeTracker.BlockChangeEntry>();
             worldNode.blocks.put(x, y, z, entries, MoveOrder.END); // Add to end.
@@ -559,7 +608,9 @@ public class BlockChangeTracker {
             // Lazy expiration check for this block.
             if (!entries.isEmpty()) { 
                 if (entries.getFirst().tick < tick - expirationAgeTicks) {
-                    worldNode.size -= expireEntries(tick - expirationAgeTicks, entries);
+                    final int expired = expireEntries(tick - expirationAgeTicks, entries);
+                    worldNode.size -= expired;
+                    activityNode.count -= expired;
                 }
                 // Re-check in case of invalidation.
                 if (!entries.isEmpty()) {
@@ -568,8 +619,8 @@ public class BlockChangeTracker {
                 }
             }
         }
-        // With tracking actual block states/shapes, an entry for the previous state must be present (update last time or replace last or create first).
         entries.add(entry); // Add latest to the end always.
+        activityNode.count ++;
         worldNode.size ++;
         //DebugUtil.debug("Add block change: " + x + "," + y + "," + z + " " + direction + " " + changeId); // TODO: REMOVE
     }
@@ -610,17 +661,24 @@ public class BlockChangeTracker {
                 }
                 final Iterator<fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry<LinkedList<BlockChangeEntry>>> blockIt = worldNode.blocks.iterator();
                 while (blockIt.hasNext()) {
-                    final LinkedList<BlockChangeEntry> entries = blockIt.next().getValue();
+                    final fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry<LinkedList<BlockChangeEntry>> entry = blockIt.next();
+                    final LinkedList<BlockChangeEntry> entries = entry.getValue();
+                    final ActivityNode activityNode = worldNode.getActivityNode(entry.getX(), entry.getY(), entry.getZ(), activityResolution);
                     if (!entries.isEmpty()) {
                         if (entries.getFirst().tick < olderThanTick) {
-                            worldNode.size -= expireEntries(olderThanTick, entries);
+                            final int expired = expireEntries(olderThanTick, entries);
+                            worldNode.size -= expired;
+                            activityNode.count -= expired;
                         }
                     }
                     if (entries.isEmpty()) {
                         blockIt.remove();
+                        if (activityNode.count <= 0) { // Safety first.
+                            worldNode.removeActivityNode(entry.getX(), entry.getY(), entry.getZ(), activityResolution);
+                        }
                     }
                 }
-                if (worldNode.size == 0) {
+                if (worldNode.size <= 0) {
                     // TODO: With activity tracking, nodes get removed based on last activity only.
                     it.remove();
                 }
@@ -678,9 +736,9 @@ public class BlockChangeTracker {
     private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final Direction direction) {
         // TODO: Might add some policy (start at age, oldest first, newest first).
-        final long olderThanTick = tick - expirationAgeTicks;
+        final long expireOlderThanTick = tick - expirationAgeTicks;
         // Lazy expiration of entire world nodes.
-        if (worldNode.lastChangeTick < olderThanTick) {
+        if (worldNode.lastChangeTick < expireOlderThanTick) {
             worldNode.clear();
             worldMap.remove(worldNode.worldId);
             //DebugUtil.debug("EXPIRE WORLD"); // TODO: REMOVE
@@ -692,13 +750,15 @@ public class BlockChangeTracker {
             //DebugUtil.debug("NO ENTRIES: " + x + "," + y + "," + z);
             return null;
         }
+        final ActivityNode activityNode = worldNode.getActivityNode(x, y, z, activityResolution);
         //DebugUtil.debug("Entries at: " + x + "," + y + "," + z);
         final Iterator<BlockChangeEntry> it = entries.iterator();
         while (it.hasNext()) {
             final BlockChangeEntry entry = it.next();
-            if (entry.tick < olderThanTick) {
+            if (entry.tick < expireOlderThanTick) {
                 //DebugUtil.debug("Lazy expire: " + x + "," + y + "," + z + " " + entry.id);
                 it.remove();
+                activityNode.count --;
             }
             else {
                 if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
@@ -712,8 +772,88 @@ public class BlockChangeTracker {
             if (worldNode.size == 0) {
                 worldMap.remove(worldNode.worldId);
             }
+            else if (activityNode.count <= 0) { // Safety.
+                worldNode.removeActivityNode(x, y, z, activityResolution);
+            }
         }
         return null;
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates need not be ordered.
+     * 
+     * @param worldId
+     * @param pos1
+     * @param pos2
+     * @param margin
+     * @return
+     */
+    public boolean hasActivity(final UUID worldId,
+            final IGetPosition pos1, final IGetPosition pos2, final double margin) {
+        return hasActivity(worldId, pos1.getX(), pos1.getY(), pos1.getZ(), pos2.getX(), pos2.getY(), pos2.getZ());
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates need not be ordered.
+     * 
+     * @param worldId
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @return
+     */
+    public boolean hasActivity(final UUID worldId, final double x1, final double y1, final double z1,
+            final double x2, final double y2, final double z2) {
+        return hasActivity(worldId, Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1),
+                Location.locToBlock(x2), Location.locToBlock(y2), Location.locToBlock(z2));
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates need not be ordered.
+     * 
+     * @param worldId
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @return
+     */
+    public boolean hasActivity(final UUID worldId, final int x1, final int y1, final int z1,
+            final int x2, final int y2, final int z2) {
+        final WorldNode worldNode = worldMap.get(worldId);
+        if (worldNode == null) {
+            return false;
+        }
+        /*
+         *  TODO: After all a better data structure would allow an almost direct return (despite most of the time iterating one chunk).
+         */
+        final int minX = Math.min(x1, x2) / activityResolution;
+        final int minY = Math.min(y1, y2) / activityResolution;
+        final int minZ = Math.min(z1, z2) / activityResolution;
+        final int maxX = Math.max(x1, x2) / activityResolution;
+        final int maxY = Math.max(y1, y2) / activityResolution;
+        final int maxZ = Math.max(z1, z2) / activityResolution;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                for (int y = minY; y <= maxY; y++) {
+                    if (worldNode.activityMap.contains(x, y, z)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void clear() {
