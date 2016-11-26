@@ -154,6 +154,11 @@ public class BlockChangeTracker {
         public final int tick, x, y, z;
         public final Direction direction;
         public final IBlockCacheNode previousState;
+        /**
+         * The tick value of the next entry, allowing to determine an interval
+         * of validity for this state.
+         */
+        public int nextEntryTick = -1;
 
         /**
          * A block change entry.
@@ -552,8 +557,15 @@ public class BlockChangeTracker {
         }
         else {
             // Lazy expiration check for this block.
-            if (!entries.isEmpty() && entries.getFirst().tick < tick - expirationAgeTicks) {
-                worldNode.size -= expireEntries(tick - expirationAgeTicks, entries);
+            if (!entries.isEmpty()) { 
+                if (entries.getFirst().tick < tick - expirationAgeTicks) {
+                    worldNode.size -= expireEntries(tick - expirationAgeTicks, entries);
+                }
+                // Re-check in case of invalidation.
+                if (!entries.isEmpty()) {
+                    // Update the nextEntryTick for the last entry in the list.
+                    entries.getLast().nextEntryTick = tick;
+                }
             }
         }
         // With tracking actual block states/shapes, an entry for the previous state must be present (update last time or replace last or create first).
