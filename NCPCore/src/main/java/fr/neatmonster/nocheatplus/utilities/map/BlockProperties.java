@@ -39,8 +39,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
@@ -57,6 +60,7 @@ import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -3510,7 +3514,10 @@ public class BlockProperties {
      *            Blocks with these flags are not counted as ground.
      * @return true, if is on ground
      */
-    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long ignoreFlags) {
+    public static final boolean isOnGround(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final long ignoreFlags) {
         final int maxBlockY = access.getMaxBlockY();
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
@@ -3522,154 +3529,215 @@ public class BlockProperties {
         final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
+        IBlockCacheNode node, nodeAbove;
         //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** isOnGround check size: " + ((iMaxX - iMinX + 1) * (iMaxY - iMinY + 1) * (iMaxZ - iMinZ + 1)));
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
 
                 // TODO: Might move above block check right here.
                 // TODO: Given workaround fixes, could go for the much-simplified-top-down-loop once more.
-
+                nodeAbove = null; // (Lazy fetch/update only.)
                 for (int y = iMaxY; y >= iMinY; y --) {
-
-                    // TODO: Remember the state of the last block below instead of checking the block above.
-                    // TODO: Alternatively optimize: block-above-check: use loop up to iMaxY...
-
-                    final int id = access.getTypeId(x, y, z);
-                    final long flags = blockFlags[id];
-
-
-                    // TODO: LIQUID could be a quick return as well.
-                    // (IGN_PASSABLE might still allow standing on.)
-                    if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0) {
-                        continue;
+                    node = access.getOrCreateBlockCacheNode(x, y, z, false);
+                    switch(isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 
+                            ignoreFlags, x, y, z, iMaxY, node, nodeAbove)) {
+                                case YES:
+                                    return true;
+                                case MAYBE:
+                                    nodeAbove = node;
+                                    continue;
+                                case NO:
+                                    break;
                     }
-
-                    // Might collide.
-                    final double[] bounds = access.getBounds(x, y, z);
-                    if (bounds == null) {
-                        // TODO: Safety check, uncertain.
-                        return true;
-                    }
-                    if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)) {
-                        continue;
-                    }
-
-                    // TODO: Make this one work (passable workaround).
-                    // Check if the block can be passed through with the bounding box (disregard the ignore flag).
-                    if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
-                        // Spider !
-                        // Not nice but...
-                        // TODO: GROUND_HEIGHT: would have to check passable workaround again ?
-                        // TODO: height >= ?
-                        // TODO: Another concept is needed for the stand-on-passable !
-                        // TODO: Add getMinGroundHeight, getMaxGroundHeight.
-                        if ((flags & F_GROUND_HEIGHT) == 0 ||  getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
-                            // Don't break, though could for some cases (?), since a block below still can be ground.
-                            continue;
-                        }
-                    }
-
-                    // Don't count as ground if a block contains the foot.
-                    // height >= ?
-                    if (getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
-                        // Within block, this x and z is no candidate for ground.
-                        if (isFullBounds(bounds)) {
-                            break;
-                        }
-                        else {
-                            continue; 
-                        }
-                    }
-
-                    if (maxY - y < 1.0) {
-                        // No need to check the block above (half slabs, stairs).
-                        return true;
-                    }
-
-                    // Check if the block above allows this to be ground. 
-
-                    if (y >= maxBlockY) {
-                        // Only air above.
-                        return true;
-                    }
-
-                    boolean variable = (flags & F_VARIABLE) != 0;
-
-                    // TODO: Keep an eye on this one for exploits.
-                    if (y != iMaxY && !variable) {
-                        // Ground found and the block above is passable, no need to check above.
-                        return true;
-                    }
-                    // TODO: Else if variable : continue ?
-                    // TODO: Highest block is always the foot position, even if just below 1.0, a return true would be ok?
-
-                    final int aboveId = access.getTypeId(x, y + 1, z);
-                    final long aboveFlags = blockFlags[aboveId];
-                    if ((aboveFlags & F_IGN_PASSABLE) != 0) {
-                        // Ignore these (Note for above block check before ground property).
-                        // TODO: Should this always apply ?
-                        return true;
-                    }
-
-                    if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & F_LIQUID) != 0 || (aboveFlags & ignoreFlags) != 0) {
-                        return true;
-                    }
-
-                    variable |= (aboveFlags & F_VARIABLE) != 0;
-                    // Check if it is the same id (walls!) and similar.
-                    if (!variable && id == aboveId) {
-                        // Exclude stone walls "quickly", can not stand on.
-                        if (isFullBounds(bounds)) {
-                            break;
-                        }
-                        else {
-                            continue;
-                        }
-                    }
-
-                    // Check against spider type hacks.
-                    final double[] aboveBounds = access.getBounds(x, y + 1, z);
-                    if (aboveBounds == null) {
-                        return true;
-                    }
-
-                    // TODO: 1.49 might be obsolete !
-                    if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)) {
-                        return true;
-                    }
-
-                    // Check passable workaround without checking ignore flag.
-                    if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
-                        return true;
-                    }
-
-                    if (isFullBounds(aboveBounds)) {
-                        // Can not be ground at this x - z position.
-                        break;
-                    }
-
-                    // TODO: Is this variable workaround still necessary ? Has this not been tested above already (passable workaround!)
-                    // TODO: This might be seen as a violation for many block types.
-                    // TODO: More distinction necessary here.
-                    if (variable) {
-                        // Simplistic hot fix attempt for same type + same shape.
-                        // TODO: Needs passable workaround check.
-                        if (isSameShape(bounds, aboveBounds)) {
-                            // Can not stand on (rough heuristics).
-                            // TODO: Test with cactus.
-                            break;
-                            // continue;
-                        }
-                        else {
-                            return true;
-                        }
-                    }
-
-                    // Not regarded as ground, 
-                    continue;
+                    break; // case NO
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * Check for ground at a certain block position, assuming checking order is
+     * top down within an x-z loop.
+     * 
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param ignoreFlags
+     * @param x
+     * @param y
+     * @param z
+     * @param iMaxY
+     *            Math.min(iteration max block y, world max block y)
+     * @param node
+     * @param nodeAbove
+     *            May be null.
+     * @return YES if certainly on ground, MAYBE if not on ground with the
+     *         possibility of being on ground underneath, NO if not on ground
+     *         without the possibility to be on ground with checking lower
+     *         y-coordinates.
+     */
+    private static final AlmostBoolean isOnGround(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final long ignoreFlags, 
+            final int x, final int y, final int z, final int iMaxY,
+            final IBlockCacheNode node, final IBlockCacheNode nodeAbove) {
+        // TODO: Consider public visibility.
+        // TODO: Relevant methods called here should be changed to use IBlockCacheNode (node, nodeAbove). 
+
+        final int id = node.getId(); // TODO: Pass on the node (signatures...).
+        final long flags = blockFlags[id];
+
+
+        // TODO: LIQUID could be a quick return as well.
+        // (IGN_PASSABLE might still allow standing on.)
+        if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0) {
+            return AlmostBoolean.MAYBE;
+        }
+
+        // Might collide.
+        final double[] bounds = node.isBoundsFetched() ? node.getBounds() : access.getBounds(x, y, z);
+        if (bounds == null) {
+            // TODO: Safety check, uncertain.
+            return AlmostBoolean.YES;
+        }
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)) {
+            return AlmostBoolean.MAYBE;
+        }
+
+        // TODO: Make this one work (passable workaround).
+        // Check if the block can be passed through with the bounding box (disregard the ignore flag).
+        if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+            // Spider !
+            // Not nice but...
+            // TODO: GROUND_HEIGHT: would have to check passable workaround again ?
+            // TODO: height >= ?
+            // TODO: Another concept is needed for the stand-on-passable !
+            // TODO: Add getMinGroundHeight, getMaxGroundHeight.
+            if ((flags & F_GROUND_HEIGHT) == 0 ||  getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
+                // Don't break, though could for some cases (?), since a block below still can be ground.
+                return AlmostBoolean.MAYBE;
+            }
+        }
+
+        // Don't count as ground if a block contains the foot.
+        // height >= ?
+        if (getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
+            // Within block, this x and z is no candidate for ground.
+            if (isFullBounds(bounds)) {
+                return AlmostBoolean.NO;
+            }
+            else {
+                return AlmostBoolean.MAYBE; 
+            }
+        }
+
+        if (maxY - y < 1.0) {
+            // No need to check the block above (half slabs, stairs).
+            return AlmostBoolean.YES;
+        }
+
+        // Check if the block above allows this to be ground. 
+
+        if (y >= access.getMaxBlockY()) {
+            // Only air above.
+            return AlmostBoolean.YES;
+        }
+
+        boolean variable = (flags & F_VARIABLE) != 0;
+
+        // TODO: Keep an eye on this one for exploits.
+        if (y != iMaxY && !variable) {
+            // Ground found and the block above is passable, no need to check above.
+            return AlmostBoolean.YES;
+        }
+        // TODO: Else if variable : continue ?
+        // TODO: Highest block is always the foot position, even if just below 1.0, a return true would be ok?
+
+        final int aboveId = nodeAbove != null ? nodeAbove.getId() : access.getTypeId(x, y + 1, z);
+        final long aboveFlags = blockFlags[aboveId];
+        if ((aboveFlags & F_IGN_PASSABLE) != 0) {
+            // Ignore these (Note for above block check before ground property).
+            // TODO: Should this always apply ?
+            return AlmostBoolean.YES;
+        }
+
+        if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & F_LIQUID) != 0 || (aboveFlags & ignoreFlags) != 0) {
+            return AlmostBoolean.YES;
+        }
+
+        variable |= (aboveFlags & F_VARIABLE) != 0;
+        // Check if it is the same id (walls!) and similar.
+        if (!variable && id == aboveId) {
+            // Exclude stone walls "quickly", can not stand on.
+            if (isFullBounds(bounds)) {
+                return AlmostBoolean.NO;
+            }
+            else {
+                return AlmostBoolean.MAYBE;
+            }
+        }
+
+        // Check against spider type hacks.
+        final double[] aboveBounds = nodeAbove != null && nodeAbove.isBoundsFetched() ? nodeAbove.getBounds() : access.getBounds(x, y + 1, z);
+        if (aboveBounds == null) {
+            return AlmostBoolean.YES;
+        }
+
+        // TODO: 1.49 might be obsolete !
+        if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)) {
+            return AlmostBoolean.YES;
+        }
+
+        // Check passable workaround without checking ignore flag.
+        if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+            return AlmostBoolean.YES;
+        }
+
+        if (isFullBounds(aboveBounds)) {
+            // Can not be ground at this x - z position.
+            return AlmostBoolean.NO;
+        }
+
+        // TODO: Is this variable workaround still necessary ? Has this not been tested above already (passable workaround!)
+        // TODO: This might be seen as a violation for many block types.
+        // TODO: More distinction necessary here.
+        if (variable) {
+            // Simplistic hot fix attempt for same type + same shape.
+            // TODO: Needs passable workaround check.
+            if (isSameShape(bounds, aboveBounds)) {
+                // Can not stand on (rough heuristics).
+                // TODO: Test with cactus.
+                return AlmostBoolean.NO;
+                // continue;
+            }
+            else {
+                return AlmostBoolean.YES;
+            }
+        }
+
+        // Not regarded as ground, 
+        return AlmostBoolean.MAYBE;
+    }
+
+    /**
+     * Check on-ground in a very opportunistic way, in terms of fcfs+no-consistency+no-actual-side-condition-checks.
+     * @param loc
+     * @param yShift
+     * @param blockChangetracker
+     * @param blockChangeRef
+     * @return
+     */
+    public static final boolean isOnGroundInAnOverlyOpportunisticWay(final PlayerLocation loc, final double yShift, 
+            final BlockChangeTracker blockChangetracker, final BlockChangeReference blockChangeRef) {
+        // TODO: Implement in an overly opportunistic way.
+        // TODO: collidesBlock( BlockCacheNode(s) , isPassableWorkaround(...)
+
         return false;
     }
 
