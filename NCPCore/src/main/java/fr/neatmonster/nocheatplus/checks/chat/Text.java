@@ -155,6 +155,7 @@ public class Text extends Check implements INotifyReload {
 
         // Upper case.
         if (letterCounts.fullCount.upperCase > msgLen / 3) {
+            // TODO: Regard chunks of 48 or so letters of the message for this?
             final float wUpperCase = 0.6f * letterCounts.fullCount.getUpperCaseRatio();
             score += wUpperCase  * cc.textMessageUpperCase;
         }
@@ -163,7 +164,11 @@ public class Text extends Check implements INotifyReload {
         if (msgLen > 4) {
             final float fullRep = letterCounts.fullCount.getLetterCountRatio();
             // Long messages: very small and very big are bad !
-            final float wRepetition = (float) msgLen / 15.0f * Math.abs(0.5f - fullRep);
+            /*
+             * TODO: 128 is a quick attempt to make one long message possible on
+             * 1.11.
+             */
+            final float wRepetition = (float) Math.min(msgLen, 128) / 15.0f * Math.abs(0.5f - fullRep);
             score += wRepetition * cc.textMessageLetterCount;
 
             // Number of words vs. length of message
@@ -233,7 +238,9 @@ public class Text extends Check implements INotifyReload {
         wWords /= (float) letterCounts.words.length;
         score += wWords;
 
-        if (debug && score > 0f) debugParts.add("Simple score: " + StringUtil.fdec3.format(score));
+        if (debug && score > 0f) {
+            debugParts.add("Simple score: " + StringUtil.fdec3.format(score));
+        }
 
         // Engine:
         // TODO: more fine grained sync !
@@ -244,8 +251,12 @@ public class Text extends Check implements INotifyReload {
             // TODO: more fine grained sync !s
             // TODO: different methods (add or max or add+max or something else).
             for (final  Float res : engMap.values()) {
-                if (cc.textEngineMaximum) wEngine = Math.max(wEngine, res.floatValue());
-                else wEngine += res.floatValue();
+                if (cc.textEngineMaximum) {
+                    wEngine = Math.max(wEngine, res.floatValue());
+                }
+                else {
+                    wEngine += res.floatValue();
+                }
             }
         }
         score += wEngine;
