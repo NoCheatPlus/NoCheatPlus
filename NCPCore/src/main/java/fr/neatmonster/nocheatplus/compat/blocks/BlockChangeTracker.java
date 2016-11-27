@@ -582,7 +582,7 @@ public class BlockChangeTracker {
         // TODO: Test which ones can actually move a player (/how).
         // Add this block.
         addBlockChange(changeId, tick, worldNode, x, y, z, Direction.getDirection(blockFace), 
-                blockCache.getBlockCacheNode(x, y, z, true));
+                blockCache.getOrCreateBlockCacheNode(x, y, z, true));
     }
 
     /**

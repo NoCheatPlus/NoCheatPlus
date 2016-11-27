@@ -348,31 +348,42 @@ public abstract class BlockCache {
     }
 
     /**
-     * Get the internally stored BlockCacheNode instance for the given
-     * coordinates. Creation/updating is controlled with forceSetAll.
+     * Get an IBlockCacheNode instance for the given coordinates. With
+     * forceSetAll set to true, it will be ensured that all properties are set
+     * for the returned node.
      * 
      * @param x
      * @param y
      * @param z
      * @param forceSetAll
      * @return If forceSetAll is true, a node will always be returned with all
-     *         properties set. If forceSetAll is false, null might be returned,
-     *         if no node is present for the given coordinates.
+     *         properties set. If forceSetAll is false, a node with at least the
+     *         id set will be returned.
      */
-    public IBlockCacheNode getBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
+    public IBlockCacheNode getOrCreateBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
+        final BlockCacheNode node = getOrCreateNode(x, y, z);
         if (forceSetAll) {
-            final BlockCacheNode node = getOrCreateNode(x, y, z);
             if (!node.isDataFetched()) {
                 node.setData(fetchData(x, y, z));
             }
             if (!node.isBoundsFetched()) {
                 node.setBounds(fetchBounds(x, y, z));
             }
-            return node;
         }
-        else {
-            return nodeMap.get(x, y, z);
-        }
+        return node;
+    }
+
+    /**
+     * Just return the internally stored node for these coordinates, or null if
+     * none is there.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public IBlockCacheNode getBlockCacheNode(int x, int y, int z) {
+        return nodeMap.get(x, y, z);
     }
 
     /**
