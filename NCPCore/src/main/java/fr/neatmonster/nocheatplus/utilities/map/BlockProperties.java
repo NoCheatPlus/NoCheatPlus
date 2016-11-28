@@ -62,7 +62,7 @@ import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * Properties of blocks.
  * 
@@ -1212,7 +1212,8 @@ public class BlockProperties {
      *            the s6
      * @return the long[]
      */
-    public static long[] secToMs(final double s1, final double s2, final double s3, final double s4, final double s5, final double s6) {
+    public static long[] secToMs(final double s1, final double s2, final double s3, 
+            final double s4, final double s5, final double s6) {
         return new long[] { (long) (s1 * 1000d), (long) (s2 * 1000d), (long) (s3 * 1000d), (long) (s4 * 1000d), (long) (s5 * 1000d), (long) (s6 * 1000d) };
     }
 
@@ -1648,7 +1649,8 @@ public class BlockProperties {
      *            the efficiency
      * @return true, if is valid tool
      */
-    public static boolean isValidTool(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final int efficiency) {
+    public static boolean isValidTool(final int blockId, final BlockProps blockProps, 
+            final ToolProps toolProps, final int efficiency) {
         boolean isValidTool = blockProps.tool.toolType == toolProps.toolType;
 
         if (!isValidTool && efficiency > 0) {
@@ -1843,7 +1845,8 @@ public class BlockProperties {
      *            the y on ground
      * @return true, if is on ground or reset cond
      */
-    public static boolean isOnGroundOrResetCond(final Player player, final Location location, final double yOnGround) {
+    public static boolean isOnGroundOrResetCond(final Player player, final Location location, 
+            final double yOnGround) {
         final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
@@ -2211,7 +2214,8 @@ public class BlockProperties {
      *            the z
      * @return true, if is trap door above ladder special case
      */
-    public static final boolean isTrapDoorAboveLadderSpecialCase(final BlockCache access, final int x, final int y, final int z) {
+    public static final boolean isTrapDoorAboveLadderSpecialCase(final BlockCache access, 
+            final int x, final int y, final int z) {
         // Special case activation.
         if (!isSpecialCaseTrapDoorAboveLadder()) {
             return false;
@@ -2418,7 +2422,8 @@ public class BlockProperties {
      *            the id
      * @return true, if is passable exact
      */
-    public static final boolean isPassableExact(final BlockCache access, final double x, final double y, final double z) {
+    public static final boolean isPassableExact(final BlockCache access, 
+            final double x, final double y, final double z) {
         return isPassable(access, x, y, z, access.getOrCreateBlockCacheNode(x, y, z, false), null) && isPassableH150(access, x, y, z);
     }
 
@@ -2469,9 +2474,11 @@ public class BlockProperties {
      * @return true, if is passable workaround
      */
     public static final boolean isPassableWorkaround(final BlockCache access, 
-            final int bx, final int by, final int bz, final double fx, final double fy, final double fz, 
+            final int bx, final int by, final int bz, 
+            final double fx, final double fy, final double fz, 
             final IBlockCacheNode node, 
-            final double dX, final double dY, final double dZ, final double dT) {
+            final double dX, final double dY, final double dZ, 
+            final double dT) {
         // Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
         // TODO: Add a flag if a workaround exists (!), might store the type of workaround extra (generic!), or extra flags.
         final int id = node.getId();
@@ -2558,7 +2565,8 @@ public class BlockProperties {
      *            isPassableworkaround for reference).
      * @return true, if successful
      */
-    public static boolean collidesFence(final double fx, final double fz, final double dX, final double dZ, final double dT, final double d) {
+    public static boolean collidesFence(final double fx, final double fz, 
+            final double dX, final double dZ, final double dT, final double d) {
         final double dFx = 0.5 - fx;
         final double dFz = 0.5 - fz;
         if (Math.abs(dFx) > d && Math.abs(dFz) > d) {
@@ -2592,7 +2600,8 @@ public class BlockProperties {
      *            the inset
      * @return False if no collision with the center bounds.
      */
-    public static final boolean collidesCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset) {
+    public static final boolean collidesCenter(final double fx, final double fz, 
+            final double dX, final double dZ, final double dT, final double inset) {
         final double low = inset;
         final double high = 1.0 - inset;
         final double xEnd = fx + dX * dT;
@@ -2630,7 +2639,8 @@ public class BlockProperties {
      *            the inset
      * @return True if the box is really inside of the center bounds.
      */
-    public static final boolean isInsideCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset) {
+    public static final boolean isInsideCenter(final double fx, final double fz, 
+            final double dX, final double dZ, final double dT, final double inset) {
         final double low = inset;
         final double high = 1.0 - inset;
         final double xEnd = fx + dX * dT;
@@ -2953,7 +2963,10 @@ public class BlockProperties {
      *            fr.neatmonster.nocheatplus.utilities.BlockProperties).
      * @return If any block has the flags.
      */
-    public static final boolean hasAnyFlags(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags) {
+    public static final boolean hasAnyFlags(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final long flags) {
         return hasAnyFlags(access, Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ), Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ), flags);
     }
 
@@ -2981,7 +2994,10 @@ public class BlockProperties {
      *            fr.neatmonster.nocheatplus.utilities.BlockProperties).
      * @return If any block has the flags.
      */
-    public static final boolean hasAnyFlags(final BlockCache access,final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags) {
+    public static final boolean hasAnyFlags(final BlockCache access,
+            final int minX, final int minY, final int minZ, 
+            final int maxX, final int maxY, final int maxZ, 
+            final long flags) {
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = minY; y <= maxY; y++) {
@@ -3032,7 +3048,10 @@ public class BlockProperties {
      *            The flags to match.
      * @return true, if successful
      */
-    public static final boolean collides(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags) {
+    public static final boolean collides(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final long flags) {
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
         // At least find fences etc. if searched for.
@@ -3083,7 +3102,10 @@ public class BlockProperties {
      *            the mat
      * @return true, if successful
      */
-    public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final Material mat) {
+    public static final boolean collidesId(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final Material mat) {
         return collidesId(access, minX, minY, minZ, maxX, maxY, maxZ, mat.getId());
     }
 
@@ -3110,7 +3132,10 @@ public class BlockProperties {
      *            the id
      * @return true, if successful
      */
-    public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id) {
+    public static final boolean collidesId(final BlockCache access, 
+            final double minX, double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final int id) {
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
         final int iMinY = Location.locToBlock(minY - ((blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0));
@@ -3151,7 +3176,10 @@ public class BlockProperties {
      *            the id
      * @return true, if successful
      */
-    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id) {
+    public static final boolean collidesBlock(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final int id) {
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
         final int iMinY = Location.locToBlock(minY - ((blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0));
@@ -3413,7 +3441,7 @@ public class BlockProperties {
         if (!isSolid(id)) {
             return false;
         }
-        final double[] bounds = getCorrectedBounds(x, y, z, id, node.isBoundsFetched() ? node.getBounds() : access.getBounds(x, y, z));
+        final double[] bounds = getCorrectedBounds(access, x, y, z, node);
         // TODO: Implement corrected bounds.
         // TODO: Fences ~ test.
         return bounds == null ? true : (bounds[1] == 0.0);
@@ -3436,27 +3464,30 @@ public class BlockProperties {
      * @deprecated Not yet for real (only used in certain checks/contexts).
      */
     public static double[] getCorrectedBounds(final BlockCache access, final int x, final int y, final int z) {
-        return getCorrectedBounds(x, y, z, access.getTypeId(x, y, z), access.getBounds(x, y, z));
+        return getCorrectedBounds(access, x, y, z, access.getOrCreateBlockCacheNode(x, y, z, false));
     }
 
     /**
      * Attempt to return the exact outside bounds, corrected by flags and other.
      *
+     * @param access
      * @param x
      *            the x
      * @param y
      *            the y
      * @param z
      *            the z
-     * @param id
-     *            the id
+     * @param node
+     *            Not null.
      * @param bounds
      *            the bounds
      * @return If changed, a copy is returned, otherwise the original array as
      *         given.
      * @deprecated Not yet for real (only used in certain checks/contexts).
      */
-    public static double[] getCorrectedBounds(final int x, final int y, final int z, final int id, final double[] bounds) {
+    public static double[] getCorrectedBounds(final BlockCache access, final int x, final int y, final int z, 
+            final IBlockCacheNode node) {
+        final double[] bounds = node.getBounds(access, x, y, z);
         if (bounds == null) {
             return null;
         }
@@ -3492,7 +3523,10 @@ public class BlockProperties {
      *            Added to the maximum of y.
      * @return true, if is on ground shuffled
      */
-    public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove) {
+    public static final boolean isOnGroundShuffled(final BlockCache access, 
+            final double x1, final double y1, final double z1, 
+            final double x2, final double y2, final double z2, 
+            final double xzMargin, final double yBelow, final double yAbove) {
         return isOnGroundShuffled(access, x1, y1, z1, x2, y2, z2, xzMargin, yBelow, yAbove, 0L);
     }
 
@@ -3518,7 +3552,9 @@ public class BlockProperties {
      *            the max z
      * @return true, if is on ground
      */
-    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
+    public static final boolean isOnGround(final BlockCache access, 
+            final double minX, double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ) {
         return isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 0L);
     }
 
@@ -3550,7 +3586,11 @@ public class BlockProperties {
      *            the ignore flags
      * @return true, if is on ground shuffled
      */
-    public static final boolean isOnGroundShuffled(final BlockCache access, final double x1, double y1, final double z1, final double x2, final double y2, final double z2, final double xzMargin, final double yBelow, final double yAbove, final long ignoreFlags) {
+    public static final boolean isOnGroundShuffled(final BlockCache access, 
+            final double x1, double y1, final double z1, 
+            final double x2, final double y2, final double z2, 
+            final double xzMargin, final double yBelow, final double yAbove, 
+            final long ignoreFlags) {
         return isOnGround(access, Math.min(x1, x2) - xzMargin, Math.min(y1, y2) - yBelow, Math.min(z1, z2) - xzMargin, Math.max(x1, x2) + xzMargin, Math.max(y1, y2) + yAbove, Math.max(z1, z2) + xzMargin, ignoreFlags);
     }
 
@@ -3861,7 +3901,9 @@ public class BlockProperties {
      * @return true, if is down stream
      */
     public static final boolean isDownStream(final PlayerLocation from, final PlayerLocation to) {
-        return isDownStream(from.getBlockCache(), from.getBlockX(), from.getBlockY(), from.getBlockZ(), from.getData(), to.getX() - from.getX(), to.getZ() - from.getZ());
+        return isDownStream(from.getBlockCache(), 
+                from.getBlockX(), from.getBlockY(), from.getBlockZ(), 
+                from.getData(), to.getX() - from.getX(), to.getZ() - from.getZ());
     }
 
     /**
@@ -3884,7 +3926,8 @@ public class BlockProperties {
      *            the d z
      * @return true, if is down stream
      */
-    public static final boolean isDownStream(final BlockCache access, final int x, final int y, final int z, final int data, 
+    public static final boolean isDownStream(final BlockCache access, 
+            final int x, final int y, final int z, final int data, 
             final double dX, final double dZ) {
         // x > 0 -> south, z > 0 -> west
         if ((data & 0x8) == 0) {
@@ -3948,7 +3991,9 @@ public class BlockProperties {
      *            the max z
      * @return the long
      */
-    public static final long collectFlagsSimple(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
+    public static final long collectFlagsSimple(final BlockCache access, 
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ) {
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
         final int iMinY = Location.locToBlock(minY);
@@ -4043,7 +4088,11 @@ public class BlockProperties {
      *            the d t
      * @return true, if is passable ray
      */
-    public static final boolean isPassableRay(final BlockCache access, final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dX, final double dY, final double dZ, final double dT) {
+    public static final boolean isPassableRay(final BlockCache access, 
+            final int blockX, final int blockY, final int blockZ, 
+            final double oX, final double oY, final double oZ, 
+            final double dX, final double dY, final double dZ, 
+            final double dT) {
         // TODO: Method signature with node, nodeAbove.
         final IBlockCacheNode node = access.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
         if (BlockProperties.isPassable(node.getId())) {
