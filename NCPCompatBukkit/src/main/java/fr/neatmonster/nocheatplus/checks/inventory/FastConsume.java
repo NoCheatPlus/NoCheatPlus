@@ -147,6 +147,9 @@ public class FastConsume extends Check implements Listener, INotifyReload {
             data.instantEatFood = actualStack == null ? null : actualStack.getType();
             // TODO: Allows some abuse: 1. try instantly eat (cancelled) 2. consume item directly when needed.
         } else  {
+            if (data.debug) {
+                debug(player, "PlayerItemConsumeEvent, reset fastconsume: " + data.instantEatFood);
+            }
             data.instantEatFood = null;
         }
         data.instantEatInteract = time;

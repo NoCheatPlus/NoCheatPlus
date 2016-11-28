@@ -351,6 +351,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
         if (resetAll) {
             // Nothing that we are interested in, reset data.
+            if (data.debug && data.instantEatFood != null) {
+                debug(player, "PlayerInteractEvent, reset fastconsume (legacy: instanteat).");
+            }
             data.instantBowInteract = 0;
             data.instantEatInteract = 0;
             data.instantEatFood = null;
@@ -385,6 +388,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     public void onItemHeldChange(final PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
         final InventoryData data = InventoryData.getData(player);
+        if (data.debug && data.instantEatFood != null) {
+            debug(player, "PlayerItemHeldEvent, reset fastconsume (legacy: instanteat).");
+        }
         data.instantBowInteract = 0;
         data.instantEatInteract = 0;
         data.instantEatFood = null;
