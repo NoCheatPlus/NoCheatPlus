@@ -200,11 +200,11 @@ public class Direction extends Check {
         }
         else if (off > 0.1) {
             // Add the overall violation level of the check.
-            data.directionVL += context.minViolation;
+            data.directionVL += off;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, context.minViolation, cc.directionActions).willCancel();
+            cancel = executeActions(player, data.directionVL, off, cc.directionActions).willCancel();
 
             if (cancel) {
                 // Deal an attack penalty time.
