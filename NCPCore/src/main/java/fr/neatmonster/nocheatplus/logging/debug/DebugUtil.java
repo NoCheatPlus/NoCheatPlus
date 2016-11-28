@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -149,13 +150,14 @@ public class DebugUtil {
             builder.append(messagePrefix);
         }
         builder.append(" id=");
-        final int id = blockCache.getTypeId(x, y, z);
+        final IBlockCacheNode node = blockCache.getOrCreateBlockCacheNode(x, y, z, true);
+        final int id = node.getId();
         builder.append(id);
         builder.append(" data=");
-        builder.append(blockCache.getData(x, y, z));
-        final double[] bounds = blockCache.getBounds(x, y, z);
+        builder.append(node.getData());
+        final double[] bounds = node.getBounds();
         if (bounds != null) {
-            final double minHeight = BlockProperties.getGroundMinHeight(blockCache, x, y, z, id, bounds, BlockProperties.getBlockFlags(id));
+            final double minHeight = BlockProperties.getGroundMinHeight(blockCache, x, y, z, node, BlockProperties.getBlockFlags(id));
             builder.append(" shape=[");
             builder.append(bounds[0]);
             builder.append(", ");

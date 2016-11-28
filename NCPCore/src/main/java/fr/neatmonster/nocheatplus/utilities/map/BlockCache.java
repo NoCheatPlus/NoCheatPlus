@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 
@@ -42,17 +43,66 @@ public abstract class BlockCache {
      */
     public static interface IBlockCacheNode {
 
-        public boolean isIdFetched();
-
         public boolean isDataFetched();
 
         public boolean isBoundsFetched();
 
+        /**
+         * Test for (useful) bounds being there, i.e. fetched and bounds being
+         * null.
+         * 
+         * @return YES, if bounds have been fetched and are not null. NO if
+         *         bounds have been fetched and are null. MAYBE, if bounds have
+         *         not been fetched.
+         */
+        public AlmostBoolean hasNonNullBounds();
+
+        /**
+         * Always set.
+         * @return
+         */
         public int getId();
 
+        /**
+         * Ensure to test with isDataSet().
+         * @return
+         */
         public int getData();
 
+        /**
+         * Ensure to test with isBoundsSet().
+         * @return
+         */
         public double[] getBounds();
+
+        /**
+         * Convenience method to return either the set data, or return data
+         * fetched from the given BlockCache instance. The internal state of
+         * this node is not updated by this call, unless the BlockCache instance
+         * does so.
+         * 
+         * @param blockCache
+         * @param x
+         * @param y
+         * @param z
+         * @return
+         */
+        public int getData(BlockCache blockCache, int x, int y, int z);
+
+        /**
+         * Convenience method to return either the set bounds, or return bounds
+         * fetched from the given BlockCache instance. The internal state of
+         * this node is not updated by this call, unless the BlockCache instance
+         * does so.
+         * 
+         * @param blockCache
+         * @param x
+         * @param y
+         * @param z
+         * @return
+         */
+        public double[] getBounds(BlockCache blockCache, int x, int y, int z);
+
 
     }
 
@@ -62,14 +112,14 @@ public abstract class BlockCache {
         private static final short FETCHED_DATA = 0x02;
         private static final short FETCHED_BOUNDS = 0x04;
 
-        private short fetched = 0;
-        private int id = 0;
+        private short fetched;
+        private final int id;
         private int data = 0;
         private double[] bounds = null;
 
-        @Override
-        public boolean isIdFetched() {
-            return (fetched & FETCHED_ID) != 0;
+        public BlockCacheNode(int id) {
+            this.id = id;
+            fetched = FETCHED_ID;
         }
 
         @Override
@@ -80,6 +130,11 @@ public abstract class BlockCache {
         @Override
         public boolean isBoundsFetched() {
             return (fetched & FETCHED_BOUNDS) != 0;
+        }
+
+        @Override
+        public AlmostBoolean hasNonNullBounds() {
+            return isBoundsFetched() ? (bounds == null ? AlmostBoolean.NO : AlmostBoolean.YES) : AlmostBoolean.MAYBE;
         }
 
         @Override
@@ -97,9 +152,14 @@ public abstract class BlockCache {
             return bounds;
         }
 
-        public void setId(int id) {
-            this.id = id;
-            fetched |= FETCHED_ID;
+        @Override
+        public int getData(BlockCache blockCache, int x, int y, int z) {
+            return isDataFetched() ? data : blockCache.getData(x, y, z);
+        }
+
+        @Override
+        public double[] getBounds(BlockCache blockCache, int x, int y, int z) {
+            return isBoundsFetched() ? bounds : blockCache.getBounds(x, y, z);
         }
 
         public void setData(int data) {
@@ -112,19 +172,6 @@ public abstract class BlockCache {
             fetched |= FETCHED_BOUNDS;
         }
 
-        public void set(int id, int data, double[] bounds) {
-            setId(id);
-            setData(data);
-            setBounds(bounds);
-        }
-
-        void reset() {
-            fetched = 0;
-            id = 0;
-            data  = 0;
-            bounds = null;
-        }
-
     }
 
     // Instance
@@ -135,14 +182,15 @@ public abstract class BlockCache {
     /** The max block y. */
     protected int maxBlockY =  255;
 
-    private final BlockCacheNode airNode = new BlockCacheNode();
+    private final BlockCacheNode airNode = new BlockCacheNode(ID_AIR);
     // TODO: setBlockCacheConfig -> set static nodes (rather only by id).
 
     /**
      * Instantiates a new block cache.
      */
     public BlockCache() {
-        airNode.set(0, 0, null);
+        airNode.setData(0);
+        airNode.setBounds(null);
     }
 
     /**
@@ -253,15 +301,14 @@ public abstract class BlockCache {
             return airNode;
         }
         else {
-            node = new BlockCacheNode();
-            node.id = id; // The id is always needed.
+            node = new BlockCacheNode(id);
             nodeMap.put(x, y, z, node);
             return node;
         }
     }
 
     /**
-     * (convenience method, uses cache).
+     * (Convenience method, uses cache).
      *
      * @param x
      *            the x
@@ -273,6 +320,18 @@ public abstract class BlockCache {
      */
     public int getTypeId(double x, double y, double z) {
         return getTypeId(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
+    }
+
+    /**
+     * (Convenience method, uses cache).
+     * @param x
+     * @param y
+     * @param z
+     * @param forceSetAll
+     * @return
+     */
+    public IBlockCacheNode getOrCreateBlockCacheNode(double x, double y, double z, boolean forceSetAll) {
+        return getOrCreateBlockCacheNode(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z), forceSetAll);
     }
 
     /**
@@ -363,6 +422,7 @@ public abstract class BlockCache {
     public IBlockCacheNode getOrCreateBlockCacheNode(int x, int y, int z, boolean forceSetAll) {
         final BlockCacheNode node = getOrCreateNode(x, y, z);
         if (forceSetAll) {
+            // TODO: Consider a half-lazy variant (only force fetch bounds, which may or may not fetch data).
             if (!node.isDataFetched()) {
                 node.setData(fetchData(x, y, z));
             }

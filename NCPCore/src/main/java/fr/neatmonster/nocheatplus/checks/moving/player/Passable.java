@@ -331,7 +331,11 @@ public class Passable extends Check {
             // Put one workaround for 1.5 high blocks here:
             if (from.isBlockAbove(to) && (BlockProperties.getBlockFlags(to.getTypeId()) & BlockProperties.F_HEIGHT150) != 0) {
                 // Check if the move went from inside of the block.
-                if (BlockProperties.collidesBlock(to.getBlockCache(), from.getX(), from.getY(), from.getZ(), from.getX(), from.getY(), from.getZ(), to.getBlockX(), to.getBlockY(), to.getBlockZ(), to.getTypeId())) {
+                if (BlockProperties.collidesBlock(to.getBlockCache(), 
+                        from.getX(), from.getY(), from.getZ(), 
+                        from.getX(), from.getY(), from.getZ(), 
+                        to.getBlockX(), to.getBlockY(), to.getBlockZ(), to.getOrCreateBlockCacheNode(), null,
+                        BlockProperties.getBlockFlags(to.getTypeId()))) {
                     // Allow moving inside of 1.5 high blocks.
                     return null;
                 }
@@ -345,7 +349,7 @@ public class Passable extends Check {
         // Keep loc as set-back.
         //				}
         else if (manhattan == 1 && to.isBlockAbove(from) 
-                && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ()))) {
+                && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getBlockCache().getOrCreateBlockCacheNode(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ(), false), null)) {
             //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ()))) {
             // Allow the move up if the head is free.
             return null;

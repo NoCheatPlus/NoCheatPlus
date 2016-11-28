@@ -30,8 +30,6 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  */
 public class PlayerLocation extends RichEntityLocation {
 
-    // TODO: Rather RichLivingEntityLocation, the rest: compile/JIT.
-
     // "Heavy" object members that need to be set to null on cleanup. //
 
     /** The player. */

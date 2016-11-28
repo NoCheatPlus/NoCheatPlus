@@ -65,7 +65,10 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
     @Override
     protected boolean step(final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dT, final boolean isPrimary) {
         // Check if initially colliding blocks are meant to be skipped.
-        if (isPrimary && step == 1 && ignoreInitiallyColliding && !BlockProperties.isPassable(blockCache, oX + blockX, oY + blockY, oZ + blockZ, blockCache.getTypeId(blockX, blockY, blockZ))){
+        if (isPrimary && step == 1 && ignoreInitiallyColliding 
+                && !BlockProperties.isPassable(blockCache, 
+                        oX + blockX, oY + blockY, oZ + blockZ, 
+                        blockCache.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false), null)){
             return true;
         }
         // Actual collision check for this block vs. the move.

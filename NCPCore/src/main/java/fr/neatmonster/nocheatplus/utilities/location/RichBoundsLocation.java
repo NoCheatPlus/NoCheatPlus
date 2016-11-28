@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
@@ -45,6 +46,7 @@ import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
  */
 public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition {
 
+    // TODO: Store IBlockCacheNode (s) ?
     // TODO: Consider switching back from default to private visibility (use getters for other places).
 
     // Simple members // 
@@ -82,14 +84,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     // TODO: The following should be changed to primitive types, add one long for "checked"-flags. Booleans can be compressed into a long.
     // TODO: All properties that can be set should have a "checked" flag, thus resetting the flag suffices.
 
-    /** Type id of the block at the position. */
-    Integer typeId = null;
+    /** Type node for the block at the position. */
+    IBlockCacheNode node = null;
 
-    /** Type id of the block below. */
-    Integer typeIdBelow = null;
-
-    /** Data value of the block this position is on. */
-    Integer data = null;
+    /** Type node of the block below. */
+    IBlockCacheNode nodeBelow = null;
 
     /** All block flags collected for maximum used bounds. */
     Long blockFlags = null;
@@ -433,13 +432,37 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
+     * Get existing or create.
+     * @return
+     */
+    public IBlockCacheNode getOrCreateBlockCacheNode() {
+        if (node == null) {
+            node = blockCache.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
+        }
+        return node;
+    }
+
+    /**
+     * Get existing or create.
+     * @return
+     */
+    public IBlockCacheNode getOrCreateBlockCacheNodeBelow() {
+        if (nodeBelow == null) {
+            nodeBelow = blockCache.getOrCreateBlockCacheNode(blockX, blockY - 1, blockZ, false);
+        }
+        return nodeBelow;
+    }
+
+    /**
      * Gets the type id.
      *
      * @return the type id
      */
     public Integer getTypeId() {
-        if (typeId == null) typeId = getTypeId(blockX, blockY, blockZ);
-        return typeId;
+        if (node == null) {
+            getOrCreateBlockCacheNode();
+        }
+        return node.getId();
     }
 
     /**
@@ -448,8 +471,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return the type id below
      */
     public Integer getTypeIdBelow() {
-        if (typeIdBelow == null) typeIdBelow = getTypeId(blockX, blockY - 1, blockZ);
-        return typeIdBelow;
+        if (nodeBelow == null) {
+            getOrCreateBlockCacheNodeBelow();
+        }
+        return nodeBelow.getId();
     }
 
     /**
@@ -458,8 +483,11 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return the data
      */
     public Integer getData() {
-        if (data == null) data = getData(blockX, blockY, blockZ);
-        return data;
+        if (node == null) {
+            node = blockCache.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
+            return node.getData(blockCache, blockX, blockY, blockZ);
+        }
+        return node.getData();
     }
 
     /**
@@ -741,17 +769,18 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
             if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0) {
                 // TODO: Consider dropping this shortcut.
                 final int bY = Location.locToBlock(y - yOnGround);
-                final int id = bY == blockY ? getTypeId() : (bY == blockY -1 ? getTypeIdBelow() : blockCache.getTypeId(blockX,  bY, blockZ));
+                final IBlockCacheNode useNode = bY == blockY ? getOrCreateBlockCacheNode() : (bY == blockY -1 ? getOrCreateBlockCacheNodeBelow() : blockCache.getOrCreateBlockCacheNode(blockX,  bY, blockZ, false));
+                final int id = useNode.getId();
                 final long flags = BlockProperties.getBlockFlags(id);
                 // TODO: Might remove check for variable ?
                 if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0) {
-                    final double[] bounds = blockCache.getBounds(blockX, bY, blockZ);
+                    final double[] bounds = useNode.getBounds(blockCache, blockX, bY, blockZ);
                     // Check collision if not inside of the block. [Might be a problem for cauldron or similar + something solid above.]
                     // TODO: Might need more refinement.
-                    if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)) {
+                    if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, useNode, null, flags)) {
                         // TODO: BlockHeight is needed for fences, use right away (above)?
-                        if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
-                                || (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) <= y - bY) {
+                        if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, useNode, maxX - minX, yOnGround, maxZ - minZ,  1.0)
+                                || (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, useNode, flags) <= y - bY) {
                             //                          NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** onground SHORTCUT");
                             onGround = true;
                         }
@@ -924,7 +953,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
                 passable = true;
             }
             else {
-                passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
+                if (node == null) {
+                    node = blockCache.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
+                }
+                passable = BlockProperties.isPassable(blockCache, x, y, z, node, null);
                 //passable = BlockProperties.isPassableExact(blockCache, x, y, z, getTypeId());
             }
         }
@@ -955,7 +987,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
-     * Checks if is block flags passable.
+     * Checks if block flags are set and are (entirely) passable.
      *
      * @return true, if is block flags passable
      */
@@ -1138,8 +1170,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         this.passable = other.passable;
         this.passableBox = other.passableBox;
         // Access methods.
-        this.typeId = other.getTypeId();
-        this.typeIdBelow = other.getTypeIdBelow();
+        this.node = other.node;
+        this.nodeBelow = other.nodeBelow;
         this.onGround = other.isOnGround();
         this.inWater = other.isInWater();
         this.inLava = other.isInLava();
@@ -1212,7 +1244,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         }
 
         // Reset cached values.
-        typeId = typeIdBelow = data = null;
+        node = nodeBelow = null;
         aboveStairs = inLava = inWater = inWeb = onIce = onGround = onClimbable = passable = passableBox = null;
         onGroundMinY = Double.MAX_VALUE;
         notOnGroundMaxY = Double.MIN_VALUE;
@@ -1232,8 +1264,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-    public int hashCode() {
+    @Override    public int hashCode() {
         return LocUtil.hashCode(this);
     }
 

@@ -2323,21 +2323,29 @@ public class BlockProperties {
      *            the y
      * @param z
      *            the z
-     * @param id
-     *            the id
+     * @param node
+     *            The IBlockCacheNode instance for the given block coordinates.
+     *            Not null.
+     * @param nodeAbove
+     *            The IBlockCacheNode instance above the given block
+     *            coordinates. May be null.
      * @return true, if is passable
      */
-    public static final boolean isPassable(final BlockCache access, final double x, final double y, final double z, final int id) {
+    public static final boolean isPassable(final BlockCache access, 
+            final double x, final double y, final double z, 
+            final IBlockCacheNode node, final IBlockCacheNode nodeAbove) {
+        final int id = node.getId();
         // Simple exclusion check first.
         if (isPassable(id)) {
             return true;
         }
         // Check if the position is inside of a bounding box.
+        // TODO: Consider to pass these as arguments too.
         final int bx = Location.locToBlock(x);
         final int by = Location.locToBlock(y);
         final int bz = Location.locToBlock(z);
-        final double[] bounds = access.getBounds(bx, by, bz);
-        if (bounds == null || !collidesBlock(access, x, y, z, x, y, z, bx, by, bz, id, bounds, blockFlags[id])) {
+        if (node.hasNonNullBounds() == AlmostBoolean.NO
+                || !collidesBlock(access, x, y, z, x, y, z, bx, by, bz, node, nodeAbove, blockFlags[id])) {
             return true;
         }
 
@@ -2346,7 +2354,7 @@ public class BlockProperties {
         final double fz = z - bz;
         // TODO: Check f_itchy if/once exists.
         // Check workarounds (blocks with bigger collision box but passable on some spots).
-        if (!isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0)) {
+        if (!isPassableWorkaround(access, bx, by, bz, fx, fy, fz, node, 0, 0, 0, 0)) {
             // Not passable.
             return false;
         }
@@ -2367,7 +2375,8 @@ public class BlockProperties {
      *            the z
      * @return true, if is passable h150
      */
-    public static final boolean isPassableH150(final BlockCache access, final double x, final double y, final double z) {
+    public static final boolean isPassableH150(final BlockCache access, 
+            final double x, final double y, final double z) {
         // Check for fences.
         final int by = Location.locToBlock(y) - 1;
         final double fy = y - by;
@@ -2376,21 +2385,22 @@ public class BlockProperties {
         }
         final int bx = Location.locToBlock(x);
         final int bz = Location.locToBlock(z);
-        final int belowId = access.getTypeId(bx, by, bz);
+        final IBlockCacheNode nodeBelow = access.getOrCreateBlockCacheNode(x, y, z, false);
+        final int belowId = nodeBelow.getId();
         final long belowFlags = blockFlags[belowId]; 
         if ((belowFlags & F_HEIGHT150) == 0 || isPassable(belowId)) {
             return true;
         }
-        final double[] belowBounds = access.getBounds(bx, by, bz);
+        final double[] belowBounds = nodeBelow.getBounds(access, bx, by, bz);
         if (belowBounds == null) {
             return true;
         }
-        if (!collidesBlock(access, x, y, z, x, y, z, bx, by, bz, belowId, belowBounds, belowFlags)) {
+        if (!collidesBlock(access, x, y, z, x, y, z, bx, by, bz, nodeBelow, null, belowFlags)) {
             return true;
         }
         final double fx = x - bx;
         final double fz = z - bz;
-        return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, belowId, 0, 0, 0, 0);
+        return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, nodeBelow, 0, 0, 0, 0);
     }
 
     /**
@@ -2408,8 +2418,8 @@ public class BlockProperties {
      *            the id
      * @return true, if is passable exact
      */
-    public static final boolean isPassableExact(final BlockCache access, final double x, final double y, final double z, final int id) {
-        return isPassable(access, x, y, z, id) && isPassableH150(access, x, y, z);
+    public static final boolean isPassableExact(final BlockCache access, final double x, final double y, final double z) {
+        return isPassable(access, x, y, z, access.getOrCreateBlockCacheNode(x, y, z, false), null) && isPassableH150(access, x, y, z);
     }
 
     /**
@@ -2422,7 +2432,7 @@ public class BlockProperties {
      * @return true, if is passable exact
      */
     public static final boolean isPassableExact(final BlockCache access, final Location loc) {
-        return isPassableExact(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        return isPassableExact(access, loc.getX(), loc.getY(), loc.getZ());
     }
 
 
@@ -2445,8 +2455,8 @@ public class BlockProperties {
      *            the fy
      * @param fz
      *            the fz
-     * @param id
-     *            Type-id of the block.
+     * @param node
+     *            The IBlockCacheNode instance for the given block coordinates.
      * @param dX
      *            Total ray distance for coordinated (see dT).
      * @param dY
@@ -2458,9 +2468,13 @@ public class BlockProperties {
      *            dY, dZ.
      * @return true, if is passable workaround
      */
-    public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT) {
+    public static final boolean isPassableWorkaround(final BlockCache access, 
+            final int bx, final int by, final int bz, final double fx, final double fy, final double fz, 
+            final IBlockCacheNode node, 
+            final double dX, final double dY, final double dZ, final double dT) {
         // Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
         // TODO: Add a flag if a workaround exists (!), might store the type of workaround extra (generic!), or extra flags.
+        final int id = node.getId();
         final long flags = blockFlags[id];
         if ((flags & F_STAIRS) != 0) {
             if ((access.getData(bx, by, bz) & 0x4) != 0) {
@@ -2518,7 +2532,7 @@ public class BlockProperties {
             }
         }
         else if ((flags & F_GROUND_HEIGHT) != 0 
-                && getGroundMinHeight(access, bx, by, bz, id, access.getBounds(bx, by, bz), flags) <= Math.min(fy, fy + dY * dT)) {
+                && getGroundMinHeight(access, bx, by, bz, node, flags) <= Math.min(fy, fy + dY * dT)) {
             return true;
         }
         // Nothing found.
@@ -2654,18 +2668,20 @@ public class BlockProperties {
      *            the y
      * @param z
      *            the z
-     * @param id
-     *            the id
-     * @param bounds
-     *            the bounds
+     * @param node
+     *            The node at the given block coordinates.
      * @param flags
      *            Flags for this block.
      * @return the ground min height
      */
-    public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
+    public static double getGroundMinHeight(final BlockCache access, 
+            final int x, final int y, final int z, 
+            final IBlockCacheNode node, final long flags) {
+        final int id = node.getId();
+        final double[] bounds = node.getBounds(access, x, y, z);
         // TODO: Check which ones are really needed !
         if ((flags & F_HEIGHT_8SIM_INC) != 0) {
-            final int data = (access.getData(x, y, z) & 0xF) % 8;
+            final int data = (node.getData(access, x, y, z) & 0xF) % 8;
             if (data < 3) {
                 return 0;
             }
@@ -2674,7 +2690,7 @@ public class BlockProperties {
             }
         }
         else if ((flags & F_HEIGHT_8_INC) != 0) {
-            final int data = (access.getData(x, y, z) & 0xF) % 8;
+            final int data = (node.getData(access, x, y, z) & 0xF) % 8;
             return 0.125 * (double) data;
         }
         // Height 100 is ignored (!).
@@ -2682,7 +2698,7 @@ public class BlockProperties {
             return 1.5;
         }
         else if ((flags & F_STAIRS) != 0) {
-            if ((access.getData(x, y, z) & 0x4) != 0) {
+            if ((node.getData(access, x, y, z) & 0x4) != 0) {
                 return 1.0;
             }
             else {
@@ -2713,13 +2729,16 @@ public class BlockProperties {
             // Allow moving as if no eye was inserted.
             return 0.8125;
         }
+        else if (bounds == null) {
+            return 0.0;
+        }
         else if ((flags & F_GROUND_HEIGHT) != 0) {
             // Default height is used.
             if (id == Material.SOIL.getId()) {
                 return bounds[4];
             }
             // Assume open gates/trapdoors/things to only allow standing on to, if at all.
-            if ((flags & F_PASSABLE_X4) != 0 && (access.getData(x, y, z) & 0x04) != 0) {
+            if ((flags & F_PASSABLE_X4) != 0 && (node.getData(access, x, y, z) & 0x04) != 0) {
                 return bounds[4];
             }
             // All blocks that are not treated individually are ground all through.
@@ -2740,7 +2759,7 @@ public class BlockProperties {
      * @return true, if is passable
      */
     public static final boolean isPassable(final PlayerLocation loc) {
-        return isPassable(loc.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), loc.getTypeId());
+        return isPassable(loc.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), loc.getOrCreateBlockCacheNode(), null);
     }
 
     /**
@@ -2770,7 +2789,7 @@ public class BlockProperties {
     public static final boolean isPassable(final World world, final double x, final double y, final double z) {
         final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(world);
-        boolean res = isPassable(blockCache, x, y, z, blockCache.getTypeId(x, y, z));
+        boolean res = isPassable(blockCache, x, y, z, blockCache.getOrCreateBlockCacheNode(x, y, z, false), null);
         blockCache.cleanup();
         return res;
     }
@@ -2837,7 +2856,7 @@ public class BlockProperties {
      */
     public static final boolean isPassable(final BlockCache  access, final Location loc)
     {
-        return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getOrCreateBlockCacheNode(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), false), null);
     }
 
     /**
@@ -3019,23 +3038,24 @@ public class BlockProperties {
         // At least find fences etc. if searched for.
         // TODO: F_HEIGHT150 could also be ground etc., more consequent might be to always use or flag it.
         final int iMinY = Location.locToBlock(minY - ((flags & F_HEIGHT150) != 0 ? 0.5625 : 0));
-        final int iMaxY = Location.locToBlock(maxY);
+        final int iMaxY = Math.min(Location.locToBlock(maxY), access.getMaxBlockY());
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
-                for (int y = iMinY; y <= iMaxY; y++) {
-                    final int id = access.getTypeId(x, y, z);
+                IBlockCacheNode nodeAbove = null;
+                for (int y = iMaxY; y >= iMinY; y--) {
+                    final IBlockCacheNode node = access.getOrCreateBlockCacheNode(x, y, z, false);
+                    final int id = node.getId();
                     final long cFlags = blockFlags[id];
                     if ((cFlags & flags) != 0) {
                         // Might collide.
-                        final double[] bounds = access.getBounds(x, y, z);
-                        if (bounds != null) {
-                            if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, cFlags)) {
-                                return true;
-                            }
+                        if (node.hasNonNullBounds().decideOptimistically() 
+                                && collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, node, nodeAbove, cFlags)) {
+                            return true;
                         }
                     }
+                    nodeAbove = node;
                 }
             }
         }
@@ -3135,16 +3155,18 @@ public class BlockProperties {
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
         final int iMinY = Location.locToBlock(minY - ((blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0));
-        final int iMaxY = Location.locToBlock(maxY);
+        final int iMaxY = Math.min(Location.locToBlock(maxY), access.getMaxBlockY());
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
+        final long flags = blockFlags[id];
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
-                for (int y = iMinY; y <= iMaxY; y++) {
-                    if (id == access.getTypeId(x, y, z)) {
-                        final double[] bounds = access.getBounds(x, y, z);
-                        if (bounds != null) {
-                            if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, blockFlags[id])) {
+                IBlockCacheNode nodeAbove = null;
+                for (int y = iMaxY; y >= iMinY; y--) {
+                    final IBlockCacheNode node = access.getOrCreateBlockCacheNode(x, y, z, false);
+                    if (id == node.getId()) {
+                        if (node.hasNonNullBounds().decideOptimistically()) {
+                            if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, node, nodeAbove, flags)) {
                                 return true;
                             }
                         }
@@ -3155,44 +3177,44 @@ public class BlockProperties {
         return false;
     }
 
-    /**
-     * Check if the bounds collide with the block that has the given type id at
-     * the given position. <br>
-     * Delegates: This method signature is not used internally anymore.
-     *
-     * @param access
-     *            the access
-     * @param minX
-     *            the min x
-     * @param minY
-     *            the min y
-     * @param minZ
-     *            the min z
-     * @param maxX
-     *            the max x
-     * @param maxY
-     *            the max y
-     * @param maxZ
-     *            the max z
-     * @param x
-     *            the x
-     * @param y
-     *            the y
-     * @param z
-     *            the z
-     * @param id
-     *            the id
-     * @return true, if successful
-     */
-    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id) {
-        // TODO: use internal block data unless delegation wanted?
-        final double[] bounds = access.getBounds(x,y,z);
-        if (bounds == null) {
-            return false; // TODO: policy ?
-        }
-        final long flags = blockFlags[id];
-        return collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags);
-    }
+    //    /**
+    //     * Check if the bounds collide with the block that has the given type id at
+    //     * the given position. <br>
+    //     * Delegates: This method signature is not used internally anymore.
+    //     *
+    //     * @param access
+    //     *            the access
+    //     * @param minX
+    //     *            the min x
+    //     * @param minY
+    //     *            the min y
+    //     * @param minZ
+    //     *            the min z
+    //     * @param maxX
+    //     *            the max x
+    //     * @param maxY
+    //     *            the max y
+    //     * @param maxZ
+    //     *            the max z
+    //     * @param x
+    //     *            the x
+    //     * @param y
+    //     *            the y
+    //     * @param z
+    //     *            the z
+    //     * @param id
+    //     *            the id
+    //     * @return true, if successful
+    //     */
+    //    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id) {
+    //        // TODO: use internal block data unless delegation wanted?
+    //        final double[] bounds = access.getBounds(x,y,z);
+    //        if (bounds == null) {
+    //            return false; // TODO: policy ?
+    //        }
+    //        final long flags = blockFlags[id];
+    //        return collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags);
+    //    }
 
     /**
      * Check if the bounds collide with the block for the given type id at the
@@ -3219,16 +3241,34 @@ public class BlockProperties {
      *            the y
      * @param z
      *            the z
-     * @param id
-     *            the id
-     * @param bounds
-     *            Not null: bounds of the block at x, y, z.
+     * @param node
+     *            The node at the given block coordinates (not null, bounds need
+     *            not be fetched).
+     * @param nodeAbove
+     *            The node above the given block coordinates (may be null). Pass
+     *            for efficiency, if it should already have been fetched for
+     *            some reason.
      * @param flags
      *            Block flags for the block at x, y, z. Mix in F_COLLIDE_EDGES
      *            to disallow the "high edges" of blocks.
      * @return true, if successful
      */
-    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
+    public static final boolean collidesBlock(final BlockCache access, 
+            final double minX, double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final int x, final int y, final int z, 
+            final IBlockCacheNode node, final IBlockCacheNode nodeAbove, 
+            final long flags) {
+        /*
+         * TODO: Not sure with the flags parameter, these days. Often a
+         * pre-check using flags is done ... array access vs. passing an
+         * argument (+ JIT) - would be better to have a 100+ player server to
+         * take profiling data just for testing such differences.
+         */
+        final double[] bounds = node.getBounds(access, x, y, z);
+        if (bounds == null) {
+            return false;
+        }
         final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
         // TODO: Consider a quick shortcut checks flags == F_NORMAL_GROUND
@@ -3254,13 +3294,13 @@ public class BlockProperties {
             if ((flags & F_HEIGHT_8SIM_INC) != 0) {
                 // TODO: remove / solve differently ?
                 bminY = 0;
-                final int data = (access.getData(x, y, z) & 0xF) % 8;
+                final int data = (node.getData(access, x, y, z) & 0xF) % 8;
                 //        		bmaxY = (double) (1 +  data) / 8.0;
                 bmaxY = data < 3 ? 0 : 0.5;
             }
             else if ((flags & F_HEIGHT_8_INC) != 0) {
                 bminY = 0;
-                final int data = (access.getData(x, y, z) & 0xF) % 8;
+                final int data = (node.getData(access, x, y, z) & 0xF) % 8;
                 bmaxY = 0.125 * data;
             }
             else if ((flags & F_HEIGHT150) != 0) {
@@ -3273,7 +3313,7 @@ public class BlockProperties {
             }
             else if ((flags & F_HEIGHT_8SIM_DEC) != 0) {
                 bminY = 0;
-                final int data = access.getData(x, y, z);
+                final int data = node.getData(access, x, y, z);
                 if ((data & 0x8) == 0) {
                     // This box works for jumping over flowing water.
                     //            		bmaxY = (0.8 - (double) ((data & 0xF) % 8) / 9.8);
@@ -3284,23 +3324,23 @@ public class BlockProperties {
                     }
                     else {
                         //bmaxY = 1.0; // - (double) data8 / 9.0;
-                        bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : LIQUID_HEIGHT_LOWERED;
+                        bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z, nodeAbove) ? 1.0 : LIQUID_HEIGHT_LOWERED;
                     }
                 }
                 else {
                     //bmaxY = 1.0;
-                    bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z) ? 1.0 : LIQUID_HEIGHT_LOWERED;
+                    bmaxY = shouldLiquidBelowBeFullHeight(access, x, y + 1, z, nodeAbove) ? 1.0 : LIQUID_HEIGHT_LOWERED;
                 }
             }
             else if ((flags & F_HEIGHT8_1) != 0) {
                 bminY = 0.0;
                 bmaxY = 0.125;
             }
-            else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
+            else if (node.getId() == Material.ENDER_PORTAL_FRAME.getId()) {
                 // TODO: Test
                 // TODO: Other concepts ...
                 bminY = 0;
-                if ((access.getData(x, y, z) & 0x04) != 0) {
+                if ((node.getData(access, x, y, z) & 0x04) != 0) {
                     bmaxY = 1.0;
                 } else {
                     bmaxY = 0.8125;
@@ -3328,33 +3368,57 @@ public class BlockProperties {
         return true;
     }
 
+    // TODO: Consider for convenience ?
+    //    /**
+    //     * Determine if the liquid block below has full height or not (provided it
+    //     * is max. level).
+    //     *
+    //     * @param access
+    //     *            the access
+    //     * @param x
+    //     *            Coordinates of the block above the liquid block in question.
+    //     * @param y
+    //     *            the y
+    //     * @param z
+    //     *            the z
+    //     * @return true, if successful
+    //     */
+    //    public static boolean shouldLiquidBelowBeFullHeight(final BlockCache access, final int x, final int y, final int z) {
+    //        return shouldLiquidBelowBeFullHeight(access, x, y, z, null);
+    //    }
+
     /**
      * Determine if the liquid block below has full height or not (provided it
      * is max. level).
-     *
+     * 
      * @param access
-     *            the access
      * @param x
      *            Coordinates of the block above the liquid block in question.
      * @param y
-     *            the y
      * @param z
-     *            the z
-     * @return true, if successful
+     * @param node
+     *            The IBlockCacheNode instance for the given coordinates, may be null.
+     * @return
      */
-    public static boolean shouldLiquidBelowBeFullHeight(final BlockCache access, final int x, final int y, final int z) {
-        final int id = access.getTypeId(x, y, z);
+    public static boolean shouldLiquidBelowBeFullHeight(final BlockCache access, 
+            final int x, final int y, final int z,
+            IBlockCacheNode node) {
+        if (node == null) {
+            node = access.getOrCreateBlockCacheNode(x, y, z, false);
+        }
+        final int id = node.getId();
         if (isLiquid(id)) {
             return true;
         }
         if (!isSolid(id)) {
             return false;
         }
-        final double[] bounds = getCorrectedBounds(x, y, z, id, access.getBounds(x, y, z));
+        final double[] bounds = getCorrectedBounds(x, y, z, id, node.isBoundsFetched() ? node.getBounds() : access.getBounds(x, y, z));
         // TODO: Implement corrected bounds.
         // TODO: Fences ~ test.
         return bounds == null ? true : (bounds[1] == 0.0);
     }
+
 
     /**
      * Attempt to return the exact outside bounds, corrected by flags and other.
@@ -3586,7 +3650,7 @@ public class BlockProperties {
             final double maxX, final double maxY, final double maxZ, 
             final long ignoreFlags, 
             final int x, final int y, final int z, final int iMaxY,
-            final IBlockCacheNode node, final IBlockCacheNode nodeAbove) {
+            final IBlockCacheNode node, IBlockCacheNode nodeAbove) {
         // TODO: Consider public visibility.
         // TODO: Relevant methods called here should be changed to use IBlockCacheNode (node, nodeAbove). 
 
@@ -3601,25 +3665,25 @@ public class BlockProperties {
         }
 
         // Might collide.
-        final double[] bounds = node.isBoundsFetched() ? node.getBounds() : access.getBounds(x, y, z);
+        final double[] bounds = node.getBounds(access, x, y, z);
         if (bounds == null) {
             // TODO: Safety check, uncertain.
             return AlmostBoolean.YES;
         }
-        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)) {
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, node, nodeAbove, flags)) {
             return AlmostBoolean.MAYBE;
         }
 
         // TODO: Make this one work (passable workaround).
         // Check if the block can be passed through with the bounding box (disregard the ignore flag).
-        if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+        if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, node, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
             // Spider !
             // Not nice but...
             // TODO: GROUND_HEIGHT: would have to check passable workaround again ?
             // TODO: height >= ?
             // TODO: Another concept is needed for the stand-on-passable !
             // TODO: Add getMinGroundHeight, getMaxGroundHeight.
-            if ((flags & F_GROUND_HEIGHT) == 0 ||  getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
+            if ((flags & F_GROUND_HEIGHT) == 0 ||  getGroundMinHeight(access, x, y, z, node, flags) > maxY - y) {
                 // Don't break, though could for some cases (?), since a block below still can be ground.
                 return AlmostBoolean.MAYBE;
             }
@@ -3627,7 +3691,7 @@ public class BlockProperties {
 
         // Don't count as ground if a block contains the foot.
         // height >= ?
-        if (getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y) {
+        if (getGroundMinHeight(access, x, y, z, node, flags) > maxY - y) {
             // Within block, this x and z is no candidate for ground.
             if (isFullBounds(bounds)) {
                 return AlmostBoolean.NO;
@@ -3659,7 +3723,11 @@ public class BlockProperties {
         // TODO: Else if variable : continue ?
         // TODO: Highest block is always the foot position, even if just below 1.0, a return true would be ok?
 
-        final int aboveId = nodeAbove != null ? nodeAbove.getId() : access.getTypeId(x, y + 1, z);
+        // Check above, ensure nodeAbove is set.
+        if (nodeAbove == null) {
+            nodeAbove = access.getOrCreateBlockCacheNode(x, y + 1, z, false);
+        }
+        final int aboveId = nodeAbove.getId();
         final long aboveFlags = blockFlags[aboveId];
         if ((aboveFlags & F_IGN_PASSABLE) != 0) {
             // Ignore these (Note for above block check before ground property).
@@ -3684,18 +3752,19 @@ public class BlockProperties {
         }
 
         // Check against spider type hacks.
-        final double[] aboveBounds = nodeAbove != null && nodeAbove.isBoundsFetched() ? nodeAbove.getBounds() : access.getBounds(x, y + 1, z);
+        final double[] aboveBounds = nodeAbove.getBounds(access, x, y + 1, z);
         if (aboveBounds == null) {
             return AlmostBoolean.YES;
         }
 
+        // TODO: nodeAbove + nodeAboveAbove ?? [don't want to implement a block cache for entire past state handling yet ...]
         // TODO: 1.49 might be obsolete !
-        if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)) {
+        if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, nodeAbove, null, aboveFlags)) {
             return AlmostBoolean.YES;
         }
 
         // Check passable workaround without checking ignore flag.
-        if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+        if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, nodeAbove, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
             return AlmostBoolean.YES;
         }
 
@@ -3975,8 +4044,9 @@ public class BlockProperties {
      * @return true, if is passable ray
      */
     public static final boolean isPassableRay(final BlockCache access, final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dX, final double dY, final double dZ, final double dT) {
-        final int id = access.getTypeId(blockX, blockY, blockZ);
-        if (BlockProperties.isPassable(id)) {
+        // TODO: Method signature with node, nodeAbove.
+        final IBlockCacheNode node = access.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
+        if (BlockProperties.isPassable(node.getId())) {
             return true;
         }
         double[] bounds = access.getBounds(blockX, blockY, blockZ);
@@ -4012,7 +4082,7 @@ public class BlockProperties {
             maxZ = dZ * dT + oZ + blockZ;
             minZ = oZ + blockZ;
         }
-        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id] | F_COLLIDE_EDGES)) {
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, node, null, blockFlags[node.getId()] | F_COLLIDE_EDGES)) {
             // TODO: Might check for fence too, here.
             return true;
         }
@@ -4021,7 +4091,7 @@ public class BlockProperties {
 
         // Check for workarounds.
         // TODO: check f_itchy once exists.
-        if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, oX, oY, oZ, id, dX, dY, dZ, dT)) {
+        if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, oX, oY, oZ, node, dX, dY, dZ, dT)) {
             return true;
         }
         // Does collide (most likely).
@@ -4059,7 +4129,8 @@ public class BlockProperties {
             final double minX, final double minY, final double minZ,
             final double maxX, final double maxY, final double maxZ) {
         // TODO: This mostly is copy and paste from isPassableRay.
-        final int id = access.getTypeId(blockX, blockY, blockZ);
+        final IBlockCacheNode node = access.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
+        final int id = node.getId();
         if (BlockProperties.isPassable(id)) {
             return true;
         }
@@ -4068,14 +4139,14 @@ public class BlockProperties {
             return true;
         }
         // (Coordinates are already passed in an ordered form.)
-        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id] | F_COLLIDE_EDGES)) {
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, node, null, blockFlags[id] | F_COLLIDE_EDGES)) {
             return true;
         }
 
         // Check for workarounds.
         // TODO: Adapted to use the version initially intended for ray-tracing. Should have an explicit thing for the box, and let the current ray-tracing variant use that, until THEY implement something real.
         // TODO: check f_itchy once exists.
-        if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, minX - blockX, minY - blockY, minZ - blockZ, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
+        if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, minX - blockX, minY - blockY, minZ - blockZ, node, maxX - minX, maxY - minY, maxZ - minZ, 1.0)) {
             return true;
         }
         // Does collide (most likely).
