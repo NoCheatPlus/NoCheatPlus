@@ -797,6 +797,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
          * those).
          */
         if (cc.trackBlockMove && data.blockChangeRef.firstSpanEntry != null) {
+            if (data.debug) {
+                debug(player, "BlockChangeReference: " + data.blockChangeRef.firstSpanEntry.tick + " .. " + data.blockChangeRef.lastSpanEntry.tick + " / " + tick);
+            }
             data.blockChangeRef.updateFinal(pTo);
         }
 

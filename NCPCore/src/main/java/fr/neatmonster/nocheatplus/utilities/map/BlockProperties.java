@@ -3835,7 +3835,11 @@ public class BlockProperties {
     }
 
     /**
-     * Check on-ground in a very opportunistic way, in terms of fcfs+no-consistency+no-actual-side-condition-checks.
+     * Check on-ground in a very opportunistic way, in terms of
+     * fcfs+no-consistency+no-actual-side-condition-checks.
+     * <hr>
+     * Assume this gets called after the ordinary isOnGround has returned false.
+     * 
      * @param loc
      * @param yShift
      * @param blockChangetracker
@@ -3845,8 +3849,7 @@ public class BlockProperties {
     public static final boolean isOnGroundInAnOverlyOpportunisticWay(final PlayerLocation loc, final double yShift, 
             final BlockChangeTracker blockChangetracker, final BlockChangeReference blockChangeRef) {
         // TODO: Implement in an overly opportunistic way.
-        // TODO: collidesBlock( BlockCacheNode(s) , isPassableWorkaround(...)
-
+        // TODO: Optimized queries (and query on with later states) for node + nodeAbove.
         return false;
     }
 
