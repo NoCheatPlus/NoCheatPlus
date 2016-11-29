@@ -15,9 +15,11 @@
 package fr.neatmonster.nocheatplus.compat.blocks;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -485,6 +487,7 @@ public class BlockChangeTracker {
             //DebugUtil.debug("RETRACT event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()) + " decide=" + getRetractDirection(event.getBlock(),  event.getDirection()));
             tracker.addPistonBlocks(pistonBlock.getRelative(direction.getOppositeFace()), direction, blocks);
         }
+
     }
 
     /** Change id/count, increasing with each entry added internally. */
@@ -504,7 +507,7 @@ public class BlockChangeTracker {
     private final Map<UUID, WorldNode> worldMap = new LinkedHashMap<UUID, BlockChangeTracker.WorldNode>();
 
     /** Use to avoid duplicate entries with pistons. Always empty after processing. */
-    private final Set<Block> processBlocks = new HashSet<Block>();
+    private final Set<Block> processBlocks = new LinkedHashSet<Block>();
 
     /** Ensure to set from extern. */
     private IGenericInstanceHandle<BlockCache> blockCacheHandle = null;
@@ -526,21 +529,10 @@ public class BlockChangeTracker {
      *            direction (!) are added.
      */
     public void addPistonBlocks(final Block pistonBlock, final BlockFace blockFace, final List<Block> movedBlocks) {
-        /*
-         * TODO: Might need a configuration for if to also add block
-         * state/properties right here (or if to wait for a multi block change
-         * event or what not).
-         */
+        checkProcessBlocks(); // TODO: Remove, once sure, that processing never ever generates an exception.
         final int tick = TickTask.getTick();
         final World world = pistonBlock.getWorld();
-        final UUID worldId = world.getUID();
-        WorldNode worldNode = worldMap.get(worldId);
-        if (worldNode == null) {
-            // TODO: With activity tracking this should be a return.
-            worldNode = new WorldNode(worldId);
-            worldMap.put(worldId, worldNode);
-        }
-        // TODO: (else) With activity tracking still check if lastActivityTick is too old (lazily expire entire worlds).
+        final WorldNode worldNode = getOrCreateWorldNode(world, tick);
         final long changeId = ++maxChangeId;
         // Avoid duplicates by adding to a set.
         if (pistonBlock != null) {
@@ -583,6 +575,91 @@ public class BlockChangeTracker {
         // Add this block.
         addBlockChange(changeId, tick, worldNode, x, y, z, Direction.getDirection(blockFace), 
                 blockCache.getOrCreateBlockCacheNode(x, y, z, true));
+    }
+
+    /**
+     * Add blocks as neutral past states (no moving direction). All blocks are
+     * to be in the same world (no consistency checks!), the world of the first
+     * block is used.
+     * 
+     * @param blocks
+     *            Could be/have empty / null / null entries, duplicate blocks
+     *            will be ignored.
+     */
+    public void addBlocks(final Block... blocks) {
+        if (blocks == null || blocks.length == 0) {
+            return;
+        }
+        addBlocks(Arrays.asList(blocks));
+    }
+
+    /**
+     * Add blocks as neutral past states (no moving direction). All blocks are
+     * to be in the same world (no consistency checks!), the world of the first
+     * block is used.
+     * 
+     * @param blocks
+     *            Could be/have empty / null / null entries, duplicate blocks
+     *            will be ignored.
+     */
+    public void addBlocks(final Collection<Block> blocks) {
+        if (blocks == null || blocks.isEmpty()) {
+            return;
+        }
+        checkProcessBlocks(); // TODO: Remove, once sure, that processing never ever generates an exception.
+        // Collect non null blocks first, set world.
+        World world = null;
+        for (final Block block : blocks) {
+            if (block != null) {
+                if (world == null) {
+                    world = block.getWorld();
+                }
+                processBlocks.add(block);
+            }
+        }
+        if (world == null || !processBlocks.isEmpty()) {
+            processBlocks.clear(); // In case the world is null (unlikely).
+            return;
+        }
+        // Add blocks.
+        final int tick = TickTask.getTick();
+        final WorldNode worldNode = getOrCreateWorldNode(world, tick);
+        final long changeId = ++maxChangeId;
+        // Process queued blocks.
+        final BlockCache blockCache = blockCacheHandle.getHandle();
+        blockCache.setAccess(world); // Assume all users always clean up after use :).
+        for (final Block block : processBlocks) {
+            addBlock(changeId, tick, worldNode, block.getX(), block.getY(), block.getZ(), blockCache);
+        }
+        blockCache.cleanup();
+        processBlocks.clear();
+    }
+
+    /**
+     * Neutral (no direction) adding of a block state.
+     * 
+     * @param changeId
+     * @param tick
+     * @param world
+     * @param block
+     * @param blockCache
+     */
+    private final void addBlock(final long changeId, final int tick, final WorldNode worldNode, 
+            final int x, final int y, final int z, final BlockCache blockCache) {
+        addBlockChange(changeId, tick, worldNode, x, y, z, Direction.NONE, 
+                blockCache.getOrCreateBlockCacheNode(x, y, z, true));
+    }
+
+    private final WorldNode getOrCreateWorldNode(final World world, final int tick) {
+        final UUID worldId = world.getUID();
+        WorldNode worldNode = worldMap.get(worldId);
+        if (worldNode == null) {
+            // TODO: With activity tracking this should be a return.
+            worldNode = new WorldNode(worldId);
+            worldMap.put(worldId, worldNode);
+        }
+        // TODO: (else) With activity tracking still check if lastActivityTick is too old (lazily expire entire worlds).
+        return worldNode;
     }
 
     /**
@@ -892,6 +969,16 @@ public class BlockChangeTracker {
             this.blockCacheHandle.disableHandle();
         }
         this.blockCacheHandle = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(BlockCache.class);
+    }
+
+    /**
+     * On starting to adding blocks: processBlocks has to be empty. If not empty, warn and clear. 
+     */
+    private void checkProcessBlocks() {
+        if (!processBlocks.isEmpty()) {
+            processBlocks.clear();
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "BlockChangeTracker: processBlocks is not empty on starting to add blocks.");
+        }
     }
 
 }
