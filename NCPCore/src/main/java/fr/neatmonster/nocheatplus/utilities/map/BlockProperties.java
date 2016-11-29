@@ -3644,7 +3644,7 @@ public class BlockProperties {
                 for (int y = iMaxY; y >= iMinY; y --) {
                     node = access.getOrCreateBlockCacheNode(x, y, z, false);
                     switch(isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 
-                            ignoreFlags, x, y, z, iMaxY, node, nodeAbove)) {
+                            ignoreFlags, x, y, z, node, nodeAbove)) {
                                 case YES:
                                     return true;
                                 case MAYBE:
@@ -3689,9 +3689,8 @@ public class BlockProperties {
             final double minX, final double minY, final double minZ, 
             final double maxX, final double maxY, final double maxZ, 
             final long ignoreFlags, 
-            final int x, final int y, final int z, final int iMaxY,
+            final int x, final int y, final int z, 
             final IBlockCacheNode node, IBlockCacheNode nodeAbove) {
-        // TODO: Consider public visibility.
         // TODO: Relevant methods called here should be changed to use IBlockCacheNode (node, nodeAbove). 
 
         final int id = node.getId(); // TODO: Pass on the node (signatures...).
@@ -3753,13 +3752,12 @@ public class BlockProperties {
             return AlmostBoolean.YES;
         }
 
-        boolean variable = (flags & F_VARIABLE) != 0;
-
-        // TODO: Keep an eye on this one for exploits.
-        if (y != iMaxY && !variable) {
-            // Ground found and the block above is passable, no need to check above.
-            return AlmostBoolean.YES;
-        }
+        // The commented out part below looks wrong.
+        //        // TODO: Keep an eye on this one for exploits.
+        //        if (y != iMaxY && !variable) {
+        //            // Ground found and the block above is passable, no need to check above.
+        //            return AlmostBoolean.YES;
+        //        }
         // TODO: Else if variable : continue ?
         // TODO: Highest block is always the foot position, even if just below 1.0, a return true would be ok?
 
@@ -3779,6 +3777,7 @@ public class BlockProperties {
             return AlmostBoolean.YES;
         }
 
+        boolean variable = (flags & F_VARIABLE) != 0;
         variable |= (aboveFlags & F_VARIABLE) != 0;
         // Check if it is the same id (walls!) and similar.
         if (!variable && id == aboveId) {
@@ -3822,7 +3821,7 @@ public class BlockProperties {
             if (isSameShape(bounds, aboveBounds)) {
                 // Can not stand on (rough heuristics).
                 // TODO: Test with cactus.
-                return AlmostBoolean.NO;
+                return AlmostBoolean.MAYBE; // There could be ground underneath (block vs. fence).
                 // continue;
             }
             else {
