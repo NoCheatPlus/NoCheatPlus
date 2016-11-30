@@ -519,7 +519,7 @@ public class BlockChangeTracker {
         //        }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onBlockRedstone (final BlockRedstoneEvent event) {
+        public void onBlockRedstone(final BlockRedstoneEvent event) {
 
             if (!enabled) {
                 return;
@@ -848,7 +848,7 @@ public class BlockChangeTracker {
      *            direction.
      * @return The matching entry, or null if there is no matching entry.
      */
-    public BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final UUID worldId, 
+    public BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final int tick, final UUID worldId, 
             final int x, final int y, final int z, final Direction direction) {
         final WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
@@ -876,10 +876,10 @@ public class BlockChangeTracker {
      *            direction.
      * @return The oldest matching entry, or null if there is no matching entry.
      */
-    private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final long tick, final WorldNode worldNode, 
+    private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final int tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final Direction direction) {
         // TODO: Might add some policy (start at age, oldest first, newest first).
-        final long expireOlderThanTick = tick - expirationAgeTicks;
+        final int expireOlderThanTick = tick - expirationAgeTicks;
         // Lazy expiration of entire world nodes.
         if (worldNode.lastChangeTick < expireOlderThanTick) {
             worldNode.clear();
