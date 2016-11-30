@@ -856,9 +856,11 @@ public class BlockChangeTracker {
         }
         // TODO: Might add some policy (start at age, oldest first, newest first).
         final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
-        for (final BlockChangeEntry entry : entries) {
-            if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
-                return entry;
+        if (entries != null) {
+            for (final BlockChangeEntry entry : entries) {
+                if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
+                    return entry;
+                }
             }
         }
         return null;
