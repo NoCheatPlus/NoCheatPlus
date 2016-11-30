@@ -850,43 +850,62 @@ public class BlockChangeTracker {
      */
     public BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final int tick, final UUID worldId, 
             final int x, final int y, final int z, final Direction direction) {
+        final WorldNode worldNode = getValidWorldNode(tick, worldId);
+        if (worldNode == null) {
+            return null;
+        }
+        // TODO: Might add some policy (start at age, oldest first, newest first).
+        final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
+        for (final BlockChangeEntry entry : entries) {
+            if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a WorldNode instance, after lazy expiration. If no node is there, or
+     * the node expired, null is returned.
+     * 
+     * @param tick
+     * @param worldId
+     * @return
+     */
+    private WorldNode getValidWorldNode(final int tick, final UUID worldId) {
         final WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
             return null;
         }
-        return getBlockChangeEntry(ref, tick, worldNode, x, y, z, direction);
+        else {
+            // Lazy expiration of entire world nodes.
+            if (worldNode.lastChangeTick < tick - expirationAgeTicks) {
+                worldNode.clear();
+                worldMap.remove(worldNode.worldId);
+                //DebugUtil.debug("EXPIRE WORLD"); // TODO: REMOVE
+                return null;
+            }
+            else {
+                return worldNode;
+            }
+        }
     }
 
     /**
-     * Query past block states and moved blocks, including direction of moving.
+     * Get the entries for the given coordinates, after lazy expiration. If no
+     * entries are there, null is returned.
      * 
-     * @param ref
-     *            Reference for checking the validity of BlockChangeEntry
-     *            instances. No changes are made to the passed instance,
-     *            canUpdateWith is called. Pass null to skip further validation.
-     * @param tick
-     *            The current tick. Used for lazy expiration.
      * @param worldNode
      * @param x
-     *            Block Coordinates.
      * @param y
      * @param z
-     * @param direction
-     *            Desired direction of a moved block. Pass null to ignore
-     *            direction.
-     * @return The oldest matching entry, or null if there is no matching entry.
+     * @param tick
+     * @return
      */
-    private BlockChangeEntry getBlockChangeEntry(final BlockChangeReference ref, final int tick, final WorldNode worldNode, 
-            final int x, final int y, final int z, final Direction direction) {
-        // TODO: Might add some policy (start at age, oldest first, newest first).
+    private LinkedList<BlockChangeEntry> getValidBlockChangeEntries(final int tick, final WorldNode worldNode, 
+            final int x, final int y, final int z) {
+        // TODO: Consider return ListIterator (wind 1 backwards with an entry fetched).
         final int expireOlderThanTick = tick - expirationAgeTicks;
-        // Lazy expiration of entire world nodes.
-        if (worldNode.lastChangeTick < expireOlderThanTick) {
-            worldNode.clear();
-            worldMap.remove(worldNode.worldId);
-            //DebugUtil.debug("EXPIRE WORLD"); // TODO: REMOVE
-            return null;
-        }
         // Check individual entries.
         final LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z);
         if (entries == null) {
@@ -904,9 +923,7 @@ public class BlockChangeTracker {
                 activityNode.count --;
             }
             else {
-                if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
-                    return entry;
-                }
+                return entries;
             }
         }
         // Remove entries from map + remove world if empty.
@@ -918,8 +935,12 @@ public class BlockChangeTracker {
             else if (activityNode.count <= 0) { // Safety.
                 worldNode.removeActivityNode(x, y, z, activityResolution);
             }
+            return null;
         }
-        return null;
+        else {
+            // TODO: ERROR
+            return entries;
+        }
     }
 
     /**
