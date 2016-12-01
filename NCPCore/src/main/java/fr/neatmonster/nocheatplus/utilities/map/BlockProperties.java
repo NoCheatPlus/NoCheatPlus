@@ -3627,22 +3627,16 @@ public class BlockProperties {
         final int iMaxX = Location.locToBlock(maxX);
         final int iMinY = Location.locToBlock(minY - 0.5626);
         if (iMinY > maxBlockY) {
-            // TODO: This can be wrong for high yOnGround (0.0626 and higher).
             return false;
         }
         final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
-        IBlockCacheNode node, nodeAbove;
-        //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** isOnGround check size: " + ((iMaxX - iMinX + 1) * (iMaxY - iMinY + 1) * (iMaxZ - iMinZ + 1)));
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
-
-                // TODO: Might move above block check right here.
-                // TODO: Given workaround fixes, could go for the much-simplified-top-down-loop once more.
-                nodeAbove = null; // (Lazy fetch/update only.)
+                IBlockCacheNode nodeAbove = null; // (Lazy fetch/update only.)
                 for (int y = iMaxY; y >= iMinY; y --) {
-                    node = access.getOrCreateBlockCacheNode(x, y, z, false);
+                    final IBlockCacheNode node = access.getOrCreateBlockCacheNode(x, y, z, false);
                     switch(isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 
                             ignoreFlags, x, y, z, node, nodeAbove)) {
                                 case YES:
@@ -3685,7 +3679,7 @@ public class BlockProperties {
      *         without the possibility to be on ground with checking lower
      *         y-coordinates.
      */
-    private static final AlmostBoolean isOnGround(final BlockCache access, 
+    public static final AlmostBoolean isOnGround(final BlockCache access, 
             final double minX, final double minY, final double minZ, 
             final double maxX, final double maxY, final double maxZ, 
             final long ignoreFlags, 
@@ -3845,10 +3839,10 @@ public class BlockProperties {
      * @param blockChangeRef
      * @return
      */
-    public static final boolean isOnGroundInAnOverlyOpportunisticWay(final PlayerLocation loc, final double yShift, 
+    public static final boolean isOnGroundInAnOverlyOpportunisticWay(
+            final PlayerLocation loc, final double yShift, final long ignoreFlags,
             final BlockChangeTracker blockChangetracker, final BlockChangeReference blockChangeRef) {
-        // TODO: Implement in an overly opportunistic way.
-        // TODO: Optimized queries (and query on with later states) for node + nodeAbove.
+        // TODO: Implement in an overly opportunistic way (relay to BlockChangeTracker.isOnGround).
         return false;
     }
 
