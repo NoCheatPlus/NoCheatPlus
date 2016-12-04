@@ -42,7 +42,7 @@
 	</dependencies>
 
 	<description>Features using the plugin ProtocolLib:
-http://dev.bukkit.org/bukkit-plugins/protocollib/</description>
+https://dev.bukkit.org/bukkit-plugins/protocollib/</description>
 
 	<build>
 		<plugins>
