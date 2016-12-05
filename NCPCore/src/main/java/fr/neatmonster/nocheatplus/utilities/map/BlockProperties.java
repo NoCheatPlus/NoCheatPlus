@@ -43,8 +43,6 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
-import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
-import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -3837,25 +3835,6 @@ public class BlockProperties {
 
         // Not regarded as ground, 
         return AlmostBoolean.MAYBE;
-    }
-
-    /**
-     * Check on-ground in a very opportunistic way, in terms of
-     * fcfs+no-consistency+no-actual-side-condition-checks.
-     * <hr>
-     * Assume this gets called after the ordinary isOnGround has returned false.
-     * 
-     * @param loc
-     * @param yShift
-     * @param blockChangetracker
-     * @param blockChangeRef
-     * @return
-     */
-    public static final boolean isOnGroundInAnOverlyOpportunisticWay(
-            final PlayerLocation loc, final double yShift, final long ignoreFlags,
-            final BlockChangeTracker blockChangetracker, final BlockChangeReference blockChangeRef) {
-        // TODO: Implement in an overly opportunistic way (relay to BlockChangeTracker.isOnGround).
-        return false;
     }
 
     /**

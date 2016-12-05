@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -37,6 +38,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -48,12 +50,14 @@ import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 public class CreativeFly extends Check {
 
     private final List<String> tags = new LinkedList<String>();
+    private final BlockChangeTracker blockChangeTracker;
 
     /**
      * Instantiates a new creative fly check.
      */
     public CreativeFly() {
         super(CheckType.MOVING_CREATIVEFLY);
+        blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
     /**
@@ -66,7 +70,8 @@ public class CreativeFly extends Check {
      * @param time Milliseconds.
      * @return
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc, final long time, final boolean useBlockChangeTracker) {
 
         // Reset tags, just in case.
         tags.clear();
@@ -99,7 +104,8 @@ public class CreativeFly extends Check {
                         // Nothing to do.
                     }
                 }
-                else if (LostGround.lostGround(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags)) {
+                else if (LostGround.lostGround(player, from, to, hDistance, yDistance, sprinting, lastMove, 
+                        data, cc, useBlockChangeTracker ? blockChangeTracker : null, tags)) {
                     // Nothing to do.
                 }
             }

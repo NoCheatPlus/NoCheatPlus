@@ -27,6 +27,8 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.player.Passable;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -49,9 +51,13 @@ public class LostGround {
      * @param sprinting
      * @param data
      * @param cc
+     * @param useBlockChangeTracker 
      * @return If touching the ground was lost.
      */
-    public static boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
+    public static boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final double hDistance, final double yDistance, final boolean sprinting, 
+            final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, 
+            final BlockChangeTracker blockChangeTracker, final Collection<String> tags) {
         // TODO: Regroup with appropriate conditions (toOnGround first?).
         // TODO: Some workarounds allow step height (0.6 on MC 1.8).
         // TODO: yDistance limit does not seem to be appropriate.
@@ -78,6 +84,23 @@ public class LostGround {
                     return true;
                 }
             }
+        }
+        // Block change tracker (kept extra for now).
+        if (blockChangeTracker != null && lostGroundPastState(player, from, to, data, cc, blockChangeTracker, tags)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean lostGroundPastState(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc, final BlockChangeTracker blockChangeTracker, final Collection<String> tags) {
+        // TODO: Heuristics.
+        // TODO: full y-move at from-xz (!).
+        final int tick = TickTask.getTick();
+        if (from.isOnGroundOpportune(cc.yOnGround, 0L, blockChangeTracker, data.blockChangeRef, tick)) {
+            // TODO: Not sure with setBackSafe here (could set back a hundred blocks on parkour).
+            return applyLostGround(player, from, false, data.playerMoves.getCurrentMove(), data, "past", tags);
         }
         return false;
     }
@@ -297,6 +320,7 @@ public class LostGround {
             // TODO: Full bounds check (!).
             final Location ref = from.getLocation();
             ref.setY(to.getY());
+            // TODO: passable test is obsolete with PassableAxisTracing.
             if (Passable.isPassable(from.getLocation(), ref)) {
                 // TODO: Needs new model (store detailed on-ground properties).
                 return applyLostGround(player, from, false, thisMove, data, "vcollide", tags);

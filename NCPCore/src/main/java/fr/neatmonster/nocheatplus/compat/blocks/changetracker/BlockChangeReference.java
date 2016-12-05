@@ -29,6 +29,7 @@ public class BlockChangeReference {
      * checking, update with updateFinal.
      */
     public BlockChangeEntry lastUsedEntry = null;
+    // TODO: Consider to store the tick of when lastUsedEntry had been used, to allow invalidation.
 
     /**
      * Indicate if the timing of the last entry is still regarded as valid.

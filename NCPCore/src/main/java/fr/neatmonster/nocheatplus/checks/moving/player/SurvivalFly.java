@@ -153,7 +153,8 @@ public class SurvivalFly extends Check {
         // Set some flags.
         final boolean fromOnGround = thisMove.from.onGround;
         final boolean toOnGround = thisMove.to.onGround;
-        final boolean resetTo = toOnGround || to.isResetCond();
+        final boolean resetTo = toOnGround || to.isResetCond() 
+                || useBlockChangeTracker && toOnGroundPastStates(from, to, thisMove, tick, data, cc);
 
         // Determine if the player is actually sprinting.
         final boolean sprinting;
@@ -211,7 +212,13 @@ public class SurvivalFly extends Check {
         // TODO: Extra workarounds for toOnGround (step-up is a case with to on ground)?
         else if (isSamePos) {
             // TODO: This isn't correct, needs redesign.
-            if (lastMove.toIsValid && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3) {
+            if (useBlockChangeTracker && from.isOnGroundOpportune(cc.yOnGround, 0L, blockChangeTracker, 
+                    data.blockChangeRef, tick)) {
+                // TODO: Quick addition. Reconsider entry points etc.
+                resetFrom = true;
+                tags.add("pastground_from");
+            }
+            else if (lastMove.toIsValid && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3) {
                 // Note that to is not on ground either.
                 resetFrom = LostGround.lostGroundStill(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags);
             } else {
@@ -223,7 +230,8 @@ public class SurvivalFly extends Check {
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
             // Check lost-ground workarounds.
-            resetFrom = LostGround.lostGround(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags);
+            resetFrom = LostGround.lostGround(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, 
+                    useBlockChangeTracker ? blockChangeTracker : null, tags);
             // Note: if not setting resetFrom, other places have to check assumeGround...
         }
 
@@ -628,6 +636,18 @@ public class SurvivalFly extends Check {
             logPostViolationTags(player);
         }
         return null;
+    }
+
+    private boolean toOnGroundPastStates(final PlayerLocation from, final PlayerLocation to, 
+            final PlayerMoveData thisMove, int tick, final MovingData data, final MovingConfig cc) {
+        // TODO: Heuristics / more / which? (too short move, typical step up moves, typical levels, ...)
+        if (to.isOnGroundOpportune(cc.yOnGround, 0L, blockChangeTracker, data.blockChangeRef, tick)) {
+            tags.add("pastground_to");
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**

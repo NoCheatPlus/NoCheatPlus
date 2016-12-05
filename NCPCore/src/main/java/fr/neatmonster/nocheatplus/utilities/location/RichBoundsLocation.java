@@ -898,6 +898,27 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     }
 
     /**
+     * Check on-ground in a very opportunistic way, in terms of
+     * fcfs+no-consistency+no-actual-side-condition-checks.
+     * <hr>
+     * Assume this gets called after the ordinary isOnGround has returned false.
+     * 
+     * @param loc
+     * @param yShift
+     * @param blockChangetracker
+     * @param blockChangeRef
+     * @return
+     */
+    public final boolean isOnGroundOpportune(
+            final double yOnGround, final long ignoreFlags,
+            final BlockChangeTracker blockChangeTracker, final BlockChangeReference blockChangeRef,
+            final int tick) {
+        // TODO: Consider updating onGround+dist cache.
+        return blockChangeTracker.isOnGround(blockCache, blockChangeRef, tick, world.getUID(), 
+                minX, minY - yOnGround, minZ, maxX, maxY, maxZ, ignoreFlags);
+    }
+
+    /**
      * Check if solid blocks hit the box.
      *
      * @param xzMargin

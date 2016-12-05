@@ -42,6 +42,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Keep track of block changes, to allow mitigation of false positives. Think of
@@ -265,6 +266,8 @@ public class BlockChangeTracker {
 
     /** Ensure to set from extern. */
     private IGenericInstanceHandle<BlockCache> blockCacheHandle = null;
+
+    private final OnGroundReference onGroundReference = new OnGroundReference();
 
     /*
      * TODO: Consider tracking regions of player activity (chunk sections, with
@@ -567,6 +570,88 @@ public class BlockChangeTracker {
             }
         }
         return null;
+    }
+
+    /**
+     * Determine if a past state can be found where the given bounds would have
+     * been on ground. The span of the given BlockChangeReference instance is
+     * only updated on success (pass a copy or store span/data otherwise for
+     * checking multiple blocks). This method will only check a position, if at
+     * least one stored node can be found. If no stored node exist for the
+     * world+coordinates, false will be returned (assumes that you have already
+     * checked with BlockProperties.isOnGround or similar).
+     * 
+     * @param blockCache
+     * @param ref
+     * @param tick
+     * @param worldId
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param ignoreFlags
+     * @return
+     */
+    public boolean isOnGround(final BlockCache blockCache, 
+            final BlockChangeReference ref, final int tick, final UUID worldId,
+            final double minX, final double minY, final double minZ, 
+            final double maxX, final double maxY, final double maxZ, 
+            final long ignoreFlags) {
+        // (The method has been put here for efficiency. Alternative: put specific stuff into OnGroundReference.)
+        // TODO: Keep the outer iteration code in line with BlockProperties.isOnGround.
+        final WorldNode worldNode = getValidWorldNode(tick, worldId);
+        if (worldNode == null) {
+            return false;
+        }
+        final int maxBlockY = blockCache.getMaxBlockY();
+        final int iMinX = Location.locToBlock(minX);
+        final int iMaxX = Location.locToBlock(maxX);
+        final int iMinY = Location.locToBlock(minY - 0.5626);
+        if (iMinY > maxBlockY) {
+            return false;
+        }
+        final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
+        final int iMinZ = Location.locToBlock(minZ);
+        final int iMaxZ = Location.locToBlock(maxZ);
+        onGroundReference.init(blockCache, ref, ignoreFlags);
+        for (int x = iMinX; x <= iMaxX; x++) {
+            for (int z = iMinZ; z <= iMaxZ; z++) {
+                onGroundReference.setEntriesAbove(getValidBlockChangeEntries(tick, worldNode, x, iMaxY + 1, z));
+                for (int y = iMaxY; y >= iMinY; y --) {
+                    onGroundReference.setEntries(getValidBlockChangeEntries(tick, worldNode, x, y, z));
+                    if (!onGroundReference.hasAnyEntries() || !onGroundReference.initEntries(x, y, z)) {
+                        // Don't break here.
+                        continue;
+                    }
+                    boolean shouldBreak = true; // Indicate no better than abort-y-iteration found.
+                    do {
+                        switch(BlockProperties.isOnGround(blockCache, minX, minY, minZ, maxX, maxY, maxZ, 
+                                ignoreFlags, x, y, z, 
+                                onGroundReference.getNode(), onGroundReference.getNodeAbove())) {
+                                    case YES:
+                                        onGroundReference.updateSpan();
+                                        onGroundReference.clear();
+                                        return true;
+                                    case MAYBE:
+                                        shouldBreak = false;
+                                    case NO:
+                                        break;
+                        }
+                    } while (onGroundReference.advance());
+                    // (End of y-loop.)
+                    if (shouldBreak) {
+                        break; // case NO for all, end y-iteration.
+                    }
+                    else {
+                        onGroundReference.moveDown();
+                    }
+                }
+            }
+        }
+        onGroundReference.clear();
+        return false;
     }
 
     /**
