@@ -12,12 +12,10 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.compat.blocks;
+package fr.neatmonster.nocheatplus.compat.blocks.changetracker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -29,34 +27,21 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.material.Directional;
-import org.bukkit.material.Door;
-import org.bukkit.material.MaterialData;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
-import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
-import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Keep track of block changes, to allow mitigation of false positives. Think of
@@ -75,10 +60,6 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  *
  */
 public class BlockChangeTracker {
-    /** These blocks certainly can't be pushed nor pulled. */
-    public static long F_MOVABLE_IGNORE = BlockProperties.F_LIQUID;
-    /** These blocks might be pushed or pulled. */
-    public static long F_MOVABLE = BlockProperties.F_GROUND | BlockProperties.F_SOLID;
 
     public static enum Direction {
         NONE,
@@ -248,310 +229,18 @@ public class BlockChangeTracker {
                     && direction == other.direction;
         }
 
-        // Might follow: Id, data, block shape. Convenience methods for testing.
-
-    }
-
-    /**
-     * Simple class for helping with query functionality. Reference a
-     * BlockChangeEntry and contain more information, such as validity for
-     * further use/effects. This is meant for storing the state of last-consumed
-     * block change entries for a context within some data.
-     * 
-     * @author asofold
-     *
-     */
-    public static class BlockChangeReference {
-
-        /*
-         * TODO: public BlockChangeEntry firstUsedEntry = null; // Would the
-         * span suffice? Consider using span + timing or just the span during
-         * one check covering multiple blocks.
-         */
-
-        /** First used (oldest) entry during checking. */
-        public BlockChangeEntry firstSpanEntry = null;
-        /** Last used (newest) entry during checking. */
-        public BlockChangeEntry lastSpanEntry = null;
-
         /**
-         * Last used block change entry, set after a complete iteration of
-         * checking, update with updateFinal.
-         */
-        public BlockChangeEntry lastUsedEntry = null;
-
-        /**
-         * Indicate if the timing of the last entry is still regarded as valid.
-         */
-        /*
-         * TODO: Subject to change, switching to tick rather than id (ids can be
-         * inverted, thus lock out paths).
-         */
-        public boolean valid = false;
-
-        /**
-         * Check if this reference can be updated with the given entry,
-         * considering set validity information. By default, the given tick
-         * either must be greater than the stored one, or the tick are the same
-         * and valid is set to true. The internal state is not changed by
-         * calling this.
+         * Test if two entries have overlapping intervals of validity (tick).
          * 
-         * @param entry
+         * @param other
          * @return
          */
-        public boolean canUpdateWith(final BlockChangeEntry entry) {
-            // Love access methods: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
-            // TODO: There'll be a span perhaps.
-            /*
-             * Using ticks seems more appropriate, as ids are not necessarily
-             * ordered in a relevant way, if they reference the same tick. Even
-             * one tick may be too narrow.
-             */
-            return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
+        public boolean overlapsIntervalOfValidity(final BlockChangeEntry other) {
+            return nextEntryTick < 0 && other.nextEntryTick < 0
+                    || nextEntryTick < 0 && tick <= other.nextEntryTick
+                    || other.nextEntryTick < 0 && other.tick <= nextEntryTick
+                    || tick <= other.nextEntryTick && other.tick <= nextEntryTick;
         }
-
-        /**
-         * Update the span during checking. Ensure to test canUpdateWith(entry)
-         * before calling this.
-         * 
-         * @param entry
-         */
-        public void updateSpan(final BlockChangeEntry entry) {
-            if (firstSpanEntry == null || entry.id < firstSpanEntry.id) {
-                firstSpanEntry = entry;
-            }
-            if (lastSpanEntry == null || entry.id > lastSpanEntry.id) {
-                lastSpanEntry = entry;
-            }
-        }
-
-        /**
-         * Update lastUsedEntry by the set span, assuming <i>to</i> to be the
-         * move end-point to continue from next time. This is meant to finalize
-         * prepared changes/span for use with the next move.
-         * 
-         * @param to
-         *            If not null, allows keeping the latest entry valid, if
-         *            intersecting with the bounding box of <i>to</i>.
-         */
-        public void updateFinal(final RichBoundsLocation to) {
-            if (firstSpanEntry == null) {
-                return;
-            }
-            // TODO: Consider a span margin, for which we set last used to first span.
-            /*
-             * TODO: What with latest entries, that stay valid until half round
-             * trip time? Should perhaps keep validity also if entries are the
-             * latest ones, needs updating in span already - can/should do
-             * without bounds?
-             */
-            if (lastSpanEntry != null && (lastUsedEntry == null || lastSpanEntry.id > lastUsedEntry.id)) {
-                lastUsedEntry = lastSpanEntry;
-                if (to != null && to.isBlockIntersecting(lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z)) {
-                    valid = true;
-                }
-                else {
-                    valid = false;
-                }
-            }
-            firstSpanEntry = lastSpanEntry = null;
-        }
-
-        /**
-         * Retrieve a shallow copy of this object.
-         * 
-         * @return
-         */
-        public BlockChangeReference copy() {
-            final BlockChangeReference copy = new BlockChangeReference();
-            copy.firstSpanEntry = this.firstSpanEntry;
-            copy.lastSpanEntry = this.lastSpanEntry;
-            copy.lastUsedEntry = this.lastUsedEntry;
-            copy.valid = this.valid;
-            return copy;
-        }
-
-        public void clear() {
-            firstSpanEntry = lastSpanEntry = lastUsedEntry = null;
-            valid = false;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj == null || !(obj instanceof BlockChangeReference)) {
-                return false;
-            }
-            final BlockChangeReference other = (BlockChangeReference) obj;
-            return valid == other.valid && 
-                    (lastUsedEntry != null && lastUsedEntry.equals(other.lastUsedEntry) 
-                    || lastUsedEntry == null && other.lastUsedEntry == null)
-                    && (firstSpanEntry != null && firstSpanEntry.equals(other.firstSpanEntry) 
-                    || firstSpanEntry == null && other.firstSpanEntry == null)
-                    && (lastSpanEntry != null && lastSpanEntry.equals(other.lastSpanEntry) 
-                    || lastSpanEntry == null && other.lastSpanEntry == null)
-                    ;
-        }
-
-    }
-
-    public static class BlockChangeListener implements Listener {
-        private final BlockChangeTracker tracker;
-        private final boolean retractHasBlocks;
-        private boolean enabled = true;
-        private final Set<Material> redstoneMaterials = new HashSet<Material>();
-
-        public BlockChangeListener(final BlockChangeTracker tracker) {
-            this.tracker = tracker;
-            if (ReflectionUtil.getMethodNoArgs(BlockPistonRetractEvent.class, "getBlocks") == null) {
-                retractHasBlocks = false;
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Assume legacy piston behavior.");
-            }
-            else {
-                retractHasBlocks = true;
-            }
-            // TODO: Make an access method to test this/such in BlockProperties!
-            for (Material material : Material.values()) {
-                if (material.isBlock()) {
-                    final String name = material.name().toLowerCase();
-                    if (name.indexOf("door") >= 0 || name.indexOf("gate") >= 0) {
-                        redstoneMaterials.add(material);
-                    }
-                }
-            }
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        private BlockFace getDirection(final Block pistonBlock) {
-            final MaterialData data = pistonBlock.getState().getData();
-            if (data instanceof Directional) {
-                Directional directional = (Directional) data;
-                return directional.getFacing();
-            }
-            return null;
-        }
-
-        /**
-         * Get the direction, in which blocks are or would be moved (towards the piston).
-         * 
-         * @param pistonBlock
-         * @param eventDirection
-         * @return
-         */
-        private BlockFace getRetractDirection(final Block pistonBlock, final BlockFace eventDirection) {
-            // Tested for pistons directed upwards.
-            // TODO: Test for pistons directed downwards, N, W, S, E.
-            // TODO: distinguish sticky vs. not sticky.
-            final BlockFace pistonDirection = getDirection(pistonBlock);
-            if (pistonDirection == null) {
-                return eventDirection;
-            }
-            else {
-                return eventDirection.getOppositeFace();
-            }
-        }
-
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onPistonExtend(final BlockPistonExtendEvent event) {
-            if (!enabled) {
-                return;
-            }
-            final BlockFace direction = event.getDirection();
-            //DebugUtil.debug("EXTEND event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()));
-            tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
-        }
-
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onPistonRetract(final BlockPistonRetractEvent event) {
-            if (!enabled) {
-                return;
-            }
-            final List<Block> blocks;
-            if (retractHasBlocks) {
-                // TODO: Legacy: Set flag in constructor (getRetractLocation).
-                blocks = event.getBlocks();
-            }
-            else {
-                // TODO: Use getRetractLocation.
-                @SuppressWarnings("deprecation")
-                final Location retLoc = event.getRetractLocation();
-                if (retLoc == null) {
-                    blocks = null;
-                }
-                else {
-                    final Block retBlock = retLoc.getBlock();
-                    final long flags = BlockProperties.getBlockFlags(retBlock.getType());
-                    if ((flags & F_MOVABLE_IGNORE) == 0L && (flags & F_MOVABLE) != 0L) {
-                        blocks = new ArrayList<Block>(1);
-                        blocks.add(retBlock);
-                    }
-                    else {
-                        blocks = null;
-                    }
-                }
-            }
-            // TODO: Special cases (don't push upwards on retract, with the resulting location being a solid block).
-            final Block pistonBlock = event.getBlock();
-            final BlockFace direction = getRetractDirection(pistonBlock, event.getDirection());
-            //DebugUtil.debug("RETRACT event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()) + " decide=" + getRetractDirection(event.getBlock(),  event.getDirection()));
-            tracker.addPistonBlocks(pistonBlock.getRelative(direction.getOppositeFace()), direction, blocks);
-        }
-
-        //        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        //        public void onBlockPhysics (final BlockPhysicsEvent event) {
-        //            if (!enabled) {
-        //                return;
-        //            }
-        //            // TODO: Fine grained enabling state (pistons, doors, other).
-        //            final Block block = event.getBlock();
-        //            if (block == null || !physicsMaterials.contains(block.getType())) {
-        //                return;
-        //            }
-        //            // TODO: MaterialData -> Door, upper/lower half needed ?
-        //            tracker.addBlocks(block); // TODO: Skip too fast changing states?
-        //            DebugUtil.debug("BlockPhysics: " + block); // TODO: REMOVE
-        //        }
-
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onBlockRedstone(final BlockRedstoneEvent event) {
-
-            if (!enabled) {
-                return;
-            }
-            // TODO: Fine grained enabling state (pistons, doors, other).
-            final Block block = event.getBlock();
-            // TODO: Abstract method for a block and a set of materials (redstone, interact, ...).
-            if (block == null || !redstoneMaterials.contains(block.getType())) {
-                return;
-            }
-            // TODO: MaterialData -> Door, upper/lower half.
-            final MaterialData materialData = block.getState().getData();
-            if (materialData instanceof Door) {
-                final Door door = (Door) materialData;
-                final Block otherBlock = block.getRelative(door.isTopHalf() ? BlockFace.DOWN : BlockFace.UP);
-                /*
-                 * TODO: Double doors... detect those too? Is it still more
-                 * efficient than using BlockPhysics with lazy delayed updating
-                 * (TickListener...).
-                 */
-                if (redstoneMaterials.contains(otherBlock.getType())) {
-                    tracker.addBlocks(block, otherBlock);
-                    // DebugUtil.debug("BlockRedstone door: " + block + " / " + otherBlock); // TODO: REMOVE
-                    return;
-                }
-            }
-            // Only the single block remains.
-            tracker.addBlocks(block);
-            // DebugUtil.debug("BlockRedstone: " + block); // TODO: REMOVE
-        }
-
-        // TODO: Falling blocks (physics?). 
 
     }
 
@@ -761,7 +450,21 @@ public class BlockChangeTracker {
                 }
             }
         }
-        // TODO: Skip too fast changing states?
+        /*
+         * TODO: Prevent too fast changing states (of similar nature) to cause
+         * slowed down checking (isOnGround). Means could be to search for past
+         * states that exactly match the current state, within some timing
+         * margin, and then increase the duration of validity for that past
+         * entry instead of adding a new entry. Needs some care, to not have
+         * that entry invalidated by tick, but could be interesting for the case
+         * of tick-clock-driven piston/door setups, such as survivalfly-traps
+         * and derp-o-matic machines (those could be detected by other means,
+         * however NCP shouldn't impose such restrictions on servers by
+         * default). Thinking of having to use often redundant physics events
+         * (falling blocks?), this will probably be necessary to add, and this
+         * kind of compressing mechanism could still be controlled by further
+         * parameters (both configuration + always for physics).
+         */
         entries.add(entry); // Add latest to the end always.
         activityNode.count ++;
         worldNode.size ++;

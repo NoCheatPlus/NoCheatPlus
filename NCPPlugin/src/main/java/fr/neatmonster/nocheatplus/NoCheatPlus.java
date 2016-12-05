@@ -67,8 +67,8 @@ import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeListener;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeListener;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.meta.BridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.compat.registry.AttributeAccessFactory;
 import fr.neatmonster.nocheatplus.compat.registry.DefaultComponentFactory;
@@ -768,11 +768,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Feature tags.
         featureTags.clear();
         // BlockChangeTracker.
-        blockChangeTracker.clear();
         if (blockChangeListener != null) {
             blockChangeListener.setEnabled(false);
             blockChangeListener = null; // Only on disable.
         }
+        blockChangeTracker.clear();
 
         // Restore changed commands.
         //		if (verbose) LogUtil.logInfo("Undo command changes...");

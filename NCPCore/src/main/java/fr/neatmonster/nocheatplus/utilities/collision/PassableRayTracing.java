@@ -16,8 +16,8 @@ package fr.neatmonster.nocheatplus.utilities.collision;
 
 import java.util.UUID;
 
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;

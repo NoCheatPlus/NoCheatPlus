@@ -27,7 +27,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;

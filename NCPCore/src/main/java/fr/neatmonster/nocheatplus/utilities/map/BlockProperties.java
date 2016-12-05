@@ -42,9 +42,9 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -2111,7 +2111,7 @@ public class BlockProperties {
     }
 
     /**
-     * Might hold true for liquids too.
+     * Might hold true for liquids too. TODO: ENSURE IT DOESN'T.
      *
      * @param blockType
      *            the block type
@@ -2122,7 +2122,7 @@ public class BlockProperties {
     }
 
     /**
-     * Might hold true for liquids too.
+     * Might hold true for liquids too. TODO: ENSURE IT DOESN'T.
      *
      * @param id
      *            the id
@@ -2130,6 +2130,18 @@ public class BlockProperties {
      */
     public static final boolean isGround(final int id) {
         return (blockFlags[id] & F_GROUND) != 0;
+    }
+
+    /**
+     * Might hold true for liquids too. TODO: ENSURE IT DOESN'T.
+     *
+     * @param id
+     *            the id
+     * @return true, if is ground
+     */
+    public static final boolean isGround(final int id, final long ignoreFlags) {
+        final long flags = blockFlags[id];
+        return (flags & F_GROUND) != 0 && (flags & ignoreFlags) == 0;
     }
 
     /**

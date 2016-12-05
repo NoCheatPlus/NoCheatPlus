@@ -16,9 +16,9 @@ package fr.neatmonster.nocheatplus.utilities.collision;
 
 import java.util.UUID;
 
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeEntry;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -77,6 +77,7 @@ public class PassableAxisTracing extends AxisTracing implements ICollidePassable
         // Recovery attempt via the BlockChangeTracker.
         if (blockChangeTracker != null) {
             // Opportunistic (FCFS, no consistency).
+            // TODO: Replace by BlockChangeTracker.isPassableBox(...) - iteration is necessary / better.
             final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntry(blockChangeRef, tick, worldId, blockX, blockY, blockZ, null);
             if (entry != null) {
                 blockChangeRef.updateSpan(entry);

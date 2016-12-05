@@ -43,7 +43,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;

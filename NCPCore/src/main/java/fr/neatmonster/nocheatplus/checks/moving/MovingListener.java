@@ -82,7 +82,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;

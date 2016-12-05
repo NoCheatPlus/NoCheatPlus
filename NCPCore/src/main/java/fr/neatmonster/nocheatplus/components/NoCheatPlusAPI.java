@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
 import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;

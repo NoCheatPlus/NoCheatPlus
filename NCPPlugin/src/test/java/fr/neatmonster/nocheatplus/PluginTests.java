@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.blocks.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
