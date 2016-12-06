@@ -746,7 +746,34 @@ public class BlockChangeTracker {
      */
     public boolean hasActivity(final UUID worldId,
             final IGetPosition pos1, final IGetPosition pos2, final double margin) {
-        return hasActivity(worldId, pos1.getX(), pos1.getY(), pos1.getZ(), pos2.getX(), pos2.getY(), pos2.getZ());
+        return hasActivityShuffled(worldId, pos1.getX(), pos1.getY(), pos1.getZ(), 
+                pos2.getX(), pos2.getY(), pos2.getZ(), margin);
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates need not be ordered.
+     * 
+     * @param worldId
+     * @param x1
+     * @param y1
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @param margin Margin to add towards all sides.
+     * @return
+     */
+    public boolean hasActivityShuffled(final UUID worldId, final double x1, final double y1, final double z1,
+            final double x2, final double y2, final double z2, final double margin) {
+        final double minX = Math.min(x1, x2) - margin;
+        final double minY = Math.min(y1, y2) - margin;
+        final double minZ = Math.min(z1, z2) - margin;
+        final double maxX = Math.max(x1, x2) + margin;
+        final double maxY = Math.max(y1, y2) + margin;
+        final double maxZ = Math.max(z1, z2) + margin;
+        return hasActivity(worldId, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -763,15 +790,37 @@ public class BlockChangeTracker {
      * @param z2
      * @return
      */
-    public boolean hasActivity(final UUID worldId, final double x1, final double y1, final double z1,
+    public boolean hasActivityShuffled(final UUID worldId, final double x1, final double y1, final double z1,
             final double x2, final double y2, final double z2) {
-        return hasActivity(worldId, Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1),
+        return hasActivityShuffled(worldId, 
+                Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1),
                 Location.locToBlock(x2), Location.locToBlock(y2), Location.locToBlock(z2));
     }
 
     /**
      * Test if there has been block change activity within the specified cuboid.
      * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates have to be ordered.
+     * 
+     * @param worldId
+     * @param minX
+     * @param minY
+     * @param z1
+     * @param x2
+     * @param y2
+     * @param z2
+     * @return
+     */
+    public boolean hasActivity(final UUID worldId, final double minX, final double minY, final double minZ,
+            final double maxX, final double maxY, final double maxZ) {
+        return hasActivityShuffled(worldId, 
+                Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ),
+                Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ));
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
      * inefficient. The coordinates need not be ordered.
      * 
      * @param worldId
@@ -783,8 +832,33 @@ public class BlockChangeTracker {
      * @param z2
      * @return
      */
-    public boolean hasActivity(final UUID worldId, final int x1, final int y1, final int z1,
+    public boolean hasActivityShuffled(final UUID worldId, final int x1, final int y1, final int z1,
             final int x2, final int y2, final int z2) {
+        final int minX = Math.min(x1, x2);
+        final int minY = Math.min(y1, y2);
+        final int minZ = Math.min(z1, z2);
+        final int maxX = Math.max(x1, x2);
+        final int maxY = Math.max(y1, y2);
+        final int maxZ = Math.max(z1, z2);
+        return hasActivity(worldId, minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * Test if there has been block change activity within the specified cuboid.
+     * Mind that queries for larger regions than chunk size (default 32) may be
+     * inefficient. The coordinates have to be ordered by 3xmin+3xmax.
+     * 
+     * @param worldId
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public boolean hasActivity(final UUID worldId, final int minX, final int minY, final int minZ,
+            final int maxX, final int maxY, final int maxZ) {
         final WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
             return false;
@@ -792,15 +866,9 @@ public class BlockChangeTracker {
         /*
          *  TODO: After all a better data structure would allow an almost direct return (despite most of the time iterating one chunk).
          */
-        final int minX = Math.min(x1, x2) / activityResolution;
-        final int minY = Math.min(y1, y2) / activityResolution;
-        final int minZ = Math.min(z1, z2) / activityResolution;
-        final int maxX = Math.max(x1, x2) / activityResolution;
-        final int maxY = Math.max(y1, y2) / activityResolution;
-        final int maxZ = Math.max(z1, z2) / activityResolution;
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                for (int y = minY; y <= maxY; y++) {
+        for (int x = minX / activityResolution; x <= maxX / activityResolution; x++) {
+            for (int z = minZ / activityResolution; z <= maxZ / activityResolution; z++) {
+                for (int y = minY / activityResolution; y <= maxY / activityResolution; y++) {
                     if (worldNode.activityMap.contains(x, y, z)) {
                         return true;
                     }

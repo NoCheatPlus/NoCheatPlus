@@ -625,6 +625,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Pre-check checks (hum), either for cf or for sf.
         boolean checkNf = true;
         boolean verticalBounce = false;
+
+        // TODO: More adaptive margin / method (bounding boxes).
+        final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || checkSf || checkCf)
+                && blockChangeTracker.hasActivity(from.getWorld().getUID(), pFrom, pTo, 1.5625);
+
         if (checkSf || checkCf) {
             // Ensure we have a set-back set.
             MovingUtil.checkSetBack(player, pFrom, data, this);
@@ -672,10 +677,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }
         }
-        
-        // TODO: More adaptive margin / method (bouunding boxes).
-        final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || cc.survivalFlyCheck)
-                && blockChangeTracker.hasActivity(from.getWorld().getUID(), pFrom, pTo, 3.0);
 
         // Check passable first to prevent set-back override.
         // TODO: Redesign to set set-backs later (queue + invalidate).
