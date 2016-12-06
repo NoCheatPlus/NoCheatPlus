@@ -16,16 +16,15 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  */
 public class OnGroundReference {
 
-    /*
-     * TODO: Make this a reference for use within the BlockChangeTracker at
-     * first. isOnGround is moved back there, but the reference carries entry,
-     * entryAbove, and the overlap logic + split to methods + nice to use access
-     * methods. Essentially this is an iterator for somehow consistent
-     * dual-block states.
-     */
-
     // TODO: More simplified opportunistic variant?
-    // TODO: Can other edge cases be excluded?
+    // TODO: Include/exclude other edge cases :p.
+
+    /*
+     * TODO: Consider adding a super interface/abstract, to make the
+     * implementation interchangeable (aiming at a very simple implementation,
+     * configurable).
+     */
+    // TODO: (Ever detach this to be used from within BlockProperties?)
 
     private BlockCache blockCache = null;
     private BlockChangeReference ref = null;
