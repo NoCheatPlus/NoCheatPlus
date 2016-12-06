@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.material.Directional;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
@@ -25,6 +26,9 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 public class BlockChangeListener implements Listener {
+
+    // TODO: Fine grained configurability (also switch flag in MovingListener to a sub-config).
+    // TODO: Coarse player activity filter?
 
     /** These blocks certainly can't be pushed nor pulled. */
     public static long F_MOVABLE_IGNORE = BlockProperties.F_LIQUID;
@@ -156,7 +160,6 @@ public class BlockChangeListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockRedstone(final BlockRedstoneEvent event) {
-
         if (!enabled) {
             return;
         }
@@ -166,7 +169,10 @@ public class BlockChangeListener implements Listener {
         if (block == null || !redstoneMaterials.contains(block.getType())) {
             return;
         }
-        // TODO: MaterialData -> Door, upper/lower half.
+        addRedstoneBlock(block);
+    }
+
+    private void addRedstoneBlock(final Block block) {
         final MaterialData materialData = block.getState().getData();
         if (materialData instanceof Door) {
             final Door door = (Door) materialData;
@@ -174,7 +180,7 @@ public class BlockChangeListener implements Listener {
             /*
              * TODO: Double doors... detect those too? Is it still more
              * efficient than using BlockPhysics with lazy delayed updating
-             * (TickListener...).
+             * (TickListener...). Hinge corner... possibilities?
              */
             if (redstoneMaterials.contains(otherBlock.getType())) {
                 tracker.addBlocks(block, otherBlock);
@@ -187,6 +193,30 @@ public class BlockChangeListener implements Listener {
         // DebugUtil.debug("BlockRedstone: " + block); // TODO: REMOVE
     }
 
-    // TODO: Falling blocks (physics?). 
+    //    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    //    public void onEntityFormBlock(final EntityBlockFormEvent event) {
+    //        if (!enabled) {
+    //            return;
+    //        }
+    //        final Block block = event.getBlock();
+    //        if (block != null) {
+    //            // TODO: Filters?
+    //            tracker.addBlocks(block);
+    //            DebugUtil.debug("EntityFormBlock: " + block); // TODO: REMOVE
+    //        }
+    //    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onEntityChangeBlock(final EntityChangeBlockEvent event) {
+        if (!enabled) {
+            return;
+        }
+        final Block block = event.getBlock();
+        if (block != null) {
+            // TODO: Filters?
+            tracker.addBlocks(block); // E.g. falling blocks like sand.
+            //DebugUtil.debug("EntityChangeBlock: " + block); // TODO: REMOVE
+        }
+    }
 
 }
