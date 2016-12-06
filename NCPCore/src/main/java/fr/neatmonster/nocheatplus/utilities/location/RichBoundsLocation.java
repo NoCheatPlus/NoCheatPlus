@@ -1082,8 +1082,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            The (always positive) distance to cover.
      * @return Returns true, iff an entry was found.
      */
-    public boolean matchBlockChange(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, final Direction direction, final double coverDistance) {
-        // TODO: update span instead !
+    public boolean matchBlockChange(final BlockChangeTracker blockChangeTracker, final BlockChangeReference ref, 
+            final Direction direction, final double coverDistance) {
         final int tick = TickTask.getTick();
         final UUID worldId = world.getUID();
         final int iMinX = Location.locToBlock(minX);
@@ -1096,7 +1096,69 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
                 for (int y = iMinY; y <= iMaxY; y++) {
-                    final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntry(ref, tick, worldId, x, y, z, direction);
+                    final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntry(ref, tick, worldId, 
+                            x, y, z, direction);
+                    if (entry != null && (minEntry == null || entry.id < minEntry.id)) {
+                        // Check vs. coverDistance, exclude cases where the piston can't push that far.
+                        if (coverDistance > 0.0 && coversDistance(x, y, z, direction, coverDistance)) {
+                            minEntry = entry;
+                        }
+                    }
+                }
+            }
+        }
+        if (minEntry == null) {
+            return false;
+        }
+        else {
+            ref.updateSpan(minEntry);
+            return true;
+        }
+    }
+
+    /**
+     * Check for tracked block changes, having moved a block into a certain
+     * direction, using the full bounding box (pistons), only regarding blocks
+     * having flags in common with matchFlags. BlockChangeReference.updateSpan
+     * is called with the earliest entry found (updateFinal has to be called
+     * extra). This is an opportunistic version without any consistency checking
+     * done, just updating the span by the earliest entry found.
+     *
+     * @param blockChangeTracker
+     *            the block change tracker
+     * @param ref
+     *            the ref
+     * @param direction
+     *            the direction
+     * @param coverDistance
+     *            The (always positive) distance to cover.
+     * @param matchFlags
+     *            Only blocks with past states having any flags in common with
+     *            matchFlags. If matchFlags is smaller than zero, the parameter
+     *            is ignored.
+     * @return Returns true, iff an entry was found.
+     */
+    public boolean matchBlockChangeMatchFlags(final BlockChangeTracker blockChangeTracker, 
+            final BlockChangeReference ref, final Direction direction, final double coverDistance, 
+            final long matchFlags) {
+        /*
+         * TODO: Not sure with code duplication. Is it better to run
+         * BlockChangeTracker.getBlockChangeMatchFlags for the other method too?
+         */
+        final int tick = TickTask.getTick();
+        final UUID worldId = world.getUID();
+        final int iMinX = Location.locToBlock(minX);
+        final int iMaxX = Location.locToBlock(maxX);
+        final int iMinY = Location.locToBlock(minY);
+        final int iMaxY = Location.locToBlock(maxY);
+        final int iMinZ = Location.locToBlock(minZ);
+        final int iMaxZ = Location.locToBlock(maxZ);
+        BlockChangeEntry minEntry = null;
+        for (int x = iMinX; x <= iMaxX; x++) {
+            for (int z = iMinZ; z <= iMaxZ; z++) {
+                for (int y = iMinY; y <= iMaxY; y++) {
+                    final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntryMatchFlags(
+                            ref, tick, worldId, x, y, z, direction, matchFlags);
                     if (entry != null && (minEntry == null || entry.id < minEntry.id)) {
                         // Check vs. coverDistance, exclude cases where the piston can't push that far.
                         if (coverDistance > 0.0 && coversDistance(x, y, z, direction, coverDistance)) {

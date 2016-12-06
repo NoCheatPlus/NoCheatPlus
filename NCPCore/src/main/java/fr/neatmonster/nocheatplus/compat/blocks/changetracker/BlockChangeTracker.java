@@ -564,7 +564,52 @@ public class BlockChangeTracker {
         final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
         if (entries != null) {
             for (final BlockChangeEntry entry : entries) {
-                if (ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction)) {
+                if (ref == null 
+                        || ref.canUpdateWith(entry) 
+                        && (direction == null || entry.direction == direction)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Query past block states and moved blocks, including direction of moving.
+     * 
+     * @param ref
+     *            Reference for checking the validity of BlockChangeEntry
+     *            instances. No changes are made to the passed instance,
+     *            canUpdateWith is called. Pass null to skip further validation.
+     * @param tick
+     *            The current tick. Used for lazy expiration.
+     * @param worldId
+     * @param x
+     *            Block Coordinates.
+     * @param y
+     * @param z
+     * @param direction
+     *            Desired direction of a moved block. Pass null to ignore
+     *            direction.
+     * @param matchFlags
+     *            Only blocks having previous states that have any flags in
+     *            common with matchFlags are considered for output. If
+     *            matchFlags is smaller than zero, the parameter is ignored.
+     * @return The matching entry, or null if there is no matching entry.
+     */
+    public BlockChangeEntry getBlockChangeEntryMatchFlags(final BlockChangeReference ref, final int tick, 
+            final UUID worldId, final int x, final int y, final int z, final Direction direction, 
+            final long matchFlags) {
+        final WorldNode worldNode = getValidWorldNode(tick, worldId);
+        if (worldNode == null) {
+            return null;
+        }
+        // TODO: Might add some policy (start at age, oldest first, newest first).
+        final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
+        if (entries != null) {
+            for (final BlockChangeEntry entry : entries) {
+                if ((ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction))
+                        && (matchFlags < 0 || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getId())) != 0)) {
                     return entry;
                 }
             }
