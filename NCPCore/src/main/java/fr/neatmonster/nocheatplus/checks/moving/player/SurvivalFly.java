@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
@@ -431,10 +432,12 @@ public class SurvivalFly extends Check {
         }
 
         // Post-check recovery.
-        if (useBlockChangeTracker && vDistanceAboveLimit > 0.0 && Math.abs(yDistance) <= 1.015) {
+        if (useBlockChangeTracker && vDistanceAboveLimit > 0.0 
+                // Skip for now: && Math.abs(yDistance) <= 1.55
+                ) {
             // TODO: Better place for checking for moved blocks [redesign for intermediate result objects?].
             // Vertical push/pull.
-            double[] blockMoveResult = getVerticalBlockMoveResult(yDistance, from, to, data);
+            double[] blockMoveResult = getVerticalBlockMoveResult(yDistance, from, to, tick, data);
             if (blockMoveResult != null) {
                 vAllowedDistance = blockMoveResult[0];
                 vDistanceAboveLimit = blockMoveResult[1];
@@ -659,31 +662,45 @@ public class SurvivalFly extends Check {
      * @param data
      * @return
      */
-    private double[] getVerticalBlockMoveResult(final double yDistance, final PlayerLocation from, final PlayerLocation to, final MovingData data) {
-        /*
-         * TODO: Once horizontal push is allowed too, a maxIdEntry has to be
-         * passed as argument and data.updateBlockChangeReference has to be
-         * called after processing all pushing. Return the new maxEntry if
-         * updated, or the old one.
-         */
+    private double[] getVerticalBlockMoveResult(final double yDistance, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final int tick, final MovingData data) {
         // TODO: Allow push up to 1.0 (or 0.65 something) even beyond block borders, IF COVERED [adapt PlayerLocation].
-        // TODO: Might have to allow pushing up to a distance of 1.0 if covered.
-        // TODO: Cleanup todo.
+        // TODO: Other conditions/filters ... ?
         // Push (/pull) up.
-        if (yDistance > 0.0 && (yDistance <= 1.0 
-                // Extra condition for full blocks: slightly more possible.
-                // Extreme case: 1.51 blocks up (details pending).
-                || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
-            // TODO: Other conditions? [some will be in passable later].
-            if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, Math.min(yDistance, 1.0))) {
-                tags.add("blkmv_y_pos");
-                final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
-                return new double[]{maxDistYPos, 0.0};
+        if (yDistance > 0.0) {
+            if ((yDistance <= 1.0 
+                    // Extra condition for full blocks: slightly more possible.
+                    // Extreme case: 1.51 blocks up (details pending).
+                    || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
+                if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
+                        Math.min(yDistance, 1.0))) {
+                    tags.add("blkmv_y_pos");
+                    final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
+                    return new double[]{maxDistYPos, 0.0};
+                }
+            }
+            // (No else.)
+            if (yDistance <= 1.55) {
+                // TODO: Edges ca. 0.5 (or 2x 0.5).
+                // TODO: Center ca. 1.5. With falling height, values increase slightly.
+                // Simplified: Always allow 1.5 or less with being pushed up by slime.
+                // TODO: 
+                if (from.matchBlockChangeMatchResultingFlags(
+                        blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
+                        Math.min(yDistance, 0.42), // Special limit.
+                        BlockProperties.F_BOUNCE25)) {
+                    tags.add("blkmv_y_pos_bounce");
+                    final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
+                    // TODO: Set bounce effect or something !?
+                    // TODO: Bounce effect instead ?
+                    data.addVerticalVelocity(new SimpleEntry(tick, Math.max(0.515, yDistance - 0.5), 2));
+                    return new double[]{maxDistYPos, 0.0};
+                }
             }
         }
         // Push (/pull) down.
         else if (yDistance < 0.0 && yDistance >= -1.0) {
-            // TODO: Other conditions? [some will be in passable later].
             if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_NEG, -yDistance)) {
                 tags.add("blkmv_y_neg");
                 final double maxDistYNeg = yDistance; // from.getY() - from.getBlockY(); // TODO: Margin ?

@@ -5,14 +5,16 @@ import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 
 /**
  * Simple class for helping with query functionality. Reference a
- * BlockChangeEntry and contain more information, such as validity for
- * further use/effects. This is meant for storing the state of last-consumed
- * block change entries for a context within some data.
+ * BlockChangeEntry and contain more information, such as validity for further
+ * use/effects. This is meant for storing the state of last-consumed block
+ * change entries for a context within some data.
  * 
  * @author asofold
  *
  */
 public class BlockChangeReference {
+    // TODO: IBlockChangeReference ?
+
     /*
      * TODO: public BlockChangeEntry firstUsedEntry = null; // Would the
      * span suffice? Consider using span + timing or just the span during
@@ -34,25 +36,28 @@ public class BlockChangeReference {
     /**
      * Indicate if the timing of the last entry is still regarded as valid.
      */
-    /*
-     * TODO: Subject to change, switching to tick rather than id (ids can be
-     * inverted, thus lock out paths).
-     */
     public boolean valid = false;
 
     /**
-     * Check if this reference can be updated with the given entry,
-     * considering set validity information. By default, the given tick
-     * either must be greater than the stored one, or the tick are the same
-     * and valid is set to true. The internal state is not changed by
-     * calling this.
+     * Check if this reference can be updated with the given entry, considering
+     * set validity information. By default, the given tick either must be
+     * greater than the stored one, or the tick are the same and valid is set to
+     * true. The internal state is not changed by calling this.
      * 
      * @param entry
      * @return
      */
     public boolean canUpdateWith(final BlockChangeEntry entry) {
-        // Love access methods: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
-        // TODO: There'll be a span perhaps.
+        // Formerly: return this.lastUsedEntry == null || entry.id > this.lastUsedEntry.id || entry.id == this.lastUsedEntry.id && valid;
+        // TODO: Consider: Allow the same tick if id is higher. (order of ids doesn't really help too much though)
+        // TODO: Consider: A tick-tolerance value [needs storing the tick of setting/altering].
+        // TODO: Consider keeping a map/set of used entries + allow reuse depending on context.
+        /*
+         * TODO: Alternative context def.: Hard invalidation via lastUsedEntry
+         * and soft invalidation via TBA span. E.g. hard for on ground and
+         * passable, soft for push/pull.
+         */
+        // TODO: There'll be a span of validity, perhaps.
         /*
          * Using ticks seems more appropriate, as ids are not necessarily
          * ordered in a relevant way, if they reference the same tick. Even
@@ -98,7 +103,8 @@ public class BlockChangeReference {
          */
         if (lastSpanEntry != null && (lastUsedEntry == null || lastSpanEntry.id > lastUsedEntry.id)) {
             lastUsedEntry = lastSpanEntry;
-            if (to != null && to.isBlockIntersecting(lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z)) {
+            if (to != null && to.isBlockIntersecting(
+                            lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z, lastSpanEntry.direction.blockFace)) {
                 valid = true;
             }
             else {

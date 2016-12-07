@@ -35,6 +35,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
@@ -63,13 +64,13 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 public class BlockChangeTracker {
 
     public static enum Direction {
-        NONE,
-        X_POS,
-        X_NEG,
-        Y_POS,
-        Y_NEG,
-        Z_POS,
-        Z_NEG;
+        NONE(BlockFace.SELF),
+        X_POS(CheckUtils.matchBlockFace(1, 0, 0)),
+        X_NEG(CheckUtils.matchBlockFace(-1, 0, 0)),
+        Y_POS(CheckUtils.matchBlockFace(0, 1, 0)),
+        Y_NEG(CheckUtils.matchBlockFace(0, -1, 0)),
+        Z_POS(CheckUtils.matchBlockFace(0, 0, 1)),
+        Z_NEG(CheckUtils.matchBlockFace(0, 0, -1));
 
         public static Direction getDirection(final BlockFace blockFace) {
             final int x = blockFace.getModX();
@@ -94,6 +95,12 @@ public class BlockChangeTracker {
                 return Z_NEG;
             }
             return NONE;
+        }
+
+        public final BlockFace blockFace;
+
+        private Direction(BlockFace blockFace) {
+            this.blockFace = blockFace;
         }
 
     }
@@ -332,6 +339,7 @@ public class BlockChangeTracker {
         // Add this block.
         addBlockChange(changeId, tick, worldNode, x, y, z, Direction.getDirection(blockFace), 
                 blockCache.getOrCreateBlockCacheNode(x, y, z, true));
+        //DebugUtil.debug("Piston: " + Direction.getDirection(blockFace) + " " + x + "," + y +"," + z + " / " + blockCache.getTypeId(x, y, z)); // TODO: REMOVE
     }
 
     /**
@@ -594,7 +602,7 @@ public class BlockChangeTracker {
      * @param matchFlags
      *            Only blocks having previous states that have any flags in
      *            common with matchFlags are considered for output. If
-     *            matchFlags is smaller than zero, the parameter is ignored.
+     *            matchFlags is zero, the parameter is ignored.
      * @return The matching entry, or null if there is no matching entry.
      */
     public BlockChangeEntry getBlockChangeEntryMatchFlags(final BlockChangeReference ref, final int tick, 
@@ -608,8 +616,12 @@ public class BlockChangeTracker {
         final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
         if (entries != null) {
             for (final BlockChangeEntry entry : entries) {
-                if ((ref == null || ref.canUpdateWith(entry) && (direction == null || entry.direction == direction))
-                        && (matchFlags < 0 || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getId())) != 0)) {
+                if ((ref == null 
+                        || ref.canUpdateWith(entry) 
+                        && (direction == null || entry.direction == direction))
+                        //
+                        && (matchFlags == 0 
+                        || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getId())) != 0)) {
                     return entry;
                 }
             }

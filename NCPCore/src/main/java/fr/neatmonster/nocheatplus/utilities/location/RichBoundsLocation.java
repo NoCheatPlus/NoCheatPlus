@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
@@ -1118,11 +1119,14 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /**
      * Check for tracked block changes, having moved a block into a certain
-     * direction, using the full bounding box (pistons), only regarding blocks
-     * having flags in common with matchFlags. BlockChangeReference.updateSpan
-     * is called with the earliest entry found (updateFinal has to be called
-     * extra). This is an opportunistic version without any consistency checking
-     * done, just updating the span by the earliest entry found.
+     * direction, confined to certain blocks hitting the player, using the full
+     * bounding box (pistons), only regarding blocks having flags in common with
+     * matchFlags. Thus not the replaced state at a position is regarded, but
+     * the state that should result from a block having been pushed there.
+     * BlockChangeReference.updateSpan is called with the earliest entry found
+     * (updateFinal has to be called extra). This is an opportunistic version
+     * without any consistency checking done, just updating the span by the
+     * earliest entry found.
      *
      * @param blockChangeTracker
      *            the block change tracker
@@ -1134,25 +1138,28 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            The (always positive) distance to cover.
      * @param matchFlags
      *            Only blocks with past states having any flags in common with
-     *            matchFlags. If matchFlags is smaller than zero, the parameter
-     *            is ignored.
+     *            matchFlags. If matchFlags is zero, the parameter is ignored.
      * @return Returns true, iff an entry was found.
      */
-    public boolean matchBlockChangeMatchFlags(final BlockChangeTracker blockChangeTracker, 
+    public boolean matchBlockChangeMatchResultingFlags(final BlockChangeTracker blockChangeTracker, 
             final BlockChangeReference ref, final Direction direction, final double coverDistance, 
             final long matchFlags) {
+        // TODO: Remove this method (!). Use a specialized method (here or external) just for bounce.
         /*
          * TODO: Not sure with code duplication. Is it better to run
          * BlockChangeTracker.getBlockChangeMatchFlags for the other method too?
          */
+        // TODO: Intended use is bouncing off slime, thus need confine to foot level ?
         final int tick = TickTask.getTick();
         final UUID worldId = world.getUID();
-        final int iMinX = Location.locToBlock(minX);
-        final int iMaxX = Location.locToBlock(maxX);
-        final int iMinY = Location.locToBlock(minY);
-        final int iMaxY = Location.locToBlock(maxY);
-        final int iMinZ = Location.locToBlock(minZ);
-        final int iMaxZ = Location.locToBlock(maxZ);
+        // Shift the entire search box to the opposite direction (if direction is given).
+        final BlockFace blockFace = direction == null ? BlockFace.SELF : direction.blockFace;
+        final int iMinX = Location.locToBlock(minX) - blockFace.getModX();
+        final int iMaxX = Location.locToBlock(maxX) - blockFace.getModX();
+        final int iMinY = Location.locToBlock(minY) - blockFace.getModY();
+        final int iMaxY = Location.locToBlock(maxY) - blockFace.getModY();
+        final int iMinZ = Location.locToBlock(minZ) - blockFace.getModZ();
+        final int iMaxZ = Location.locToBlock(maxZ) - blockFace.getModZ();
         BlockChangeEntry minEntry = null;
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
@@ -1161,7 +1168,9 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
                             ref, tick, worldId, x, y, z, direction, matchFlags);
                     if (entry != null && (minEntry == null || entry.id < minEntry.id)) {
                         // Check vs. coverDistance, exclude cases where the piston can't push that far.
-                        if (coverDistance > 0.0 && coversDistance(x, y, z, direction, coverDistance)) {
+                        if (coverDistance > 0.0 && coversDistance(
+                                x + blockFace.getModX(), y + blockFace.getModY(), z + blockFace.getModZ(), 
+                                direction, coverDistance)) {
                             minEntry = entry;
                         }
                     }
@@ -1186,12 +1195,32 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            the y
      * @param z
      *            the z
-     * @return true, if is block intersecting
+     * @return true, if the block is intersecting
      */
     public boolean isBlockIntersecting(final int x, final int y, final int z) {
         return CollisionUtil.intersectsBlock(minX, maxX, x)
                 && CollisionUtil.intersectsBlock(minY, maxY, y)
                 && CollisionUtil.intersectsBlock(minZ, maxZ, z);
+    }
+
+    /**
+     * Test, if either of two blocks intersects the bounding box, if assuming
+     * full bounds.
+     *
+     * @param x
+     *            the x
+     * @param y
+     *            the y
+     * @param z
+     *            the z
+     * @param blockFace
+     *            An additional block to check from the coordinates into that
+     *            direction.
+     * @return true, if either block is intersecting
+     */
+    public boolean isBlockIntersecting(final int x, final int y, final int z, final BlockFace blockFace) {
+        return isBlockIntersecting(x, y, z) 
+                || isBlockIntersecting(x + blockFace.getModX(), y + blockFace.getModY(), z + blockFace.getModZ());
     }
 
     /**
