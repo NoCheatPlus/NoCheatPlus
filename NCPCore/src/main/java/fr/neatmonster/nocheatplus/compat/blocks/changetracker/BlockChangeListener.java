@@ -114,11 +114,9 @@ public class BlockChangeListener implements Listener {
         }
         final List<Block> blocks;
         if (retractHasBlocks) {
-            // TODO: Legacy: Set flag in constructor (getRetractLocation).
             blocks = event.getBlocks();
         }
         else {
-            // TODO: Use getRetractLocation.
             @SuppressWarnings("deprecation")
             final Location retLoc = event.getRetractLocation();
             if (retLoc == null) {
@@ -161,6 +159,11 @@ public class BlockChangeListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockRedstone(final BlockRedstoneEvent event) {
         if (!enabled) {
+            return;
+        }
+        final int oldCurrent = event.getOldCurrent();
+        final int newCurrent = event.getNewCurrent();
+        if (oldCurrent == newCurrent || oldCurrent > 0 && newCurrent > 0) {
             return;
         }
         // TODO: Fine grained enabling state (pistons, doors, other).
