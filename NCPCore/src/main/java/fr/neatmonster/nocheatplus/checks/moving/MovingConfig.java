@@ -331,7 +331,11 @@ public class MovingConfig extends ACheckConfig {
         } else {
             enforceLocation = ref.decide();
         }
-        trackBlockMove = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS);
+        // TODO: Rename overall flag to trackBlockChanges. Create a sub-config rather.
+        trackBlockMove = config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE) 
+                && (config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS
+                        // TODO: || other activation flags.
+                        ));
 
         traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
         traceMaxSize = config.getInt(ConfPaths.MOVING_TRACE_MAXSIZE, 200);
