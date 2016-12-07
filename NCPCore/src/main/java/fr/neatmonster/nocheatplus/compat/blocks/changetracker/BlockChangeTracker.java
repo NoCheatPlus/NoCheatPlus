@@ -250,6 +250,24 @@ public class BlockChangeTracker {
                     || tick <= other.nextEntryTick && other.tick <= nextEntryTick;
         }
 
+        /**
+         * Test for redundancy between this entry and the given data
+         * (coordinates are not regarded, assuming handling the queue for the
+         * same coordinates).
+         * 
+         * @param tick
+         * @param direction
+         * @param previousState
+         * @return
+         */
+        public boolean isRedundant(final int tick, final Direction direction, 
+                final IBlockCacheNode previousState) {
+            return tick == this.tick && direction == this.direction && (
+                    previousState == null && this.previousState == null
+                    || previousState.equals(this.previousState)
+                    );
+        }
+
     }
 
     /** Change id/count, increasing with each entry added internally. */
@@ -438,47 +456,37 @@ public class BlockChangeTracker {
      */
     private void addBlockChange(final long changeId, final int tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final Direction direction, final IBlockCacheNode previousState) {
-        worldNode.lastChangeTick = tick;
-        final BlockChangeEntry entry = new BlockChangeEntry(changeId, tick, x, y, z, direction, previousState);
         LinkedList<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z, MoveOrder.END);
-        ActivityNode activityNode = worldNode.getActivityNode(x, y, z, activityResolution);
+        final ActivityNode activityNode = worldNode.getActivityNode(x, y, z, activityResolution);
+        if (entries != null && !entries.isEmpty()) {
+            // Lazy expiration check for this block.
+            if (entries.getFirst().tick < tick - expirationAgeTicks) {
+                final int expired = expireEntries(tick - expirationAgeTicks, entries);
+                worldNode.size -= expired;
+                activityNode.count -= expired;
+            }
+            // Re-check in case of invalidation.
+            if (!entries.isEmpty()) {
+                // Update the nextEntryTick for the last entry in the list.
+                final BlockChangeEntry lastEntry = entries.getLast();
+                if (lastEntry.isRedundant(tick, direction, previousState)) {
+                    // Do not add.
+                    return;
+                }
+                else {
+                    lastEntry.nextEntryTick = tick;
+                }
+            }
+            // TODO: Other redundancy checks / simplifications for often changing states?
+        }
         if (entries == null) {
             entries = new LinkedList<BlockChangeTracker.BlockChangeEntry>();
             worldNode.blocks.put(x, y, z, entries, MoveOrder.END); // Add to end.
         }
-        else {
-            // Lazy expiration check for this block.
-            if (!entries.isEmpty()) { 
-                if (entries.getFirst().tick < tick - expirationAgeTicks) {
-                    final int expired = expireEntries(tick - expirationAgeTicks, entries);
-                    worldNode.size -= expired;
-                    activityNode.count -= expired;
-                }
-                // Re-check in case of invalidation.
-                if (!entries.isEmpty()) {
-                    // Update the nextEntryTick for the last entry in the list.
-                    entries.getLast().nextEntryTick = tick;
-                }
-            }
-        }
-        /*
-         * TODO: Prevent too fast changing states (of similar nature) to cause
-         * slowed down checking (isOnGround). Means could be to search for past
-         * states that exactly match the current state, within some timing
-         * margin, and then increase the duration of validity for that past
-         * entry instead of adding a new entry. Needs some care, to not have
-         * that entry invalidated by tick, but could be interesting for the case
-         * of tick-clock-driven piston/door setups, such as survivalfly-traps
-         * and derp-o-matic machines (those could be detected by other means,
-         * however NCP shouldn't impose such restrictions on servers by
-         * default). Thinking of having to use often redundant physics events
-         * (falling blocks?), this will probably be necessary to add, and this
-         * kind of compressing mechanism could still be controlled by further
-         * parameters (both configuration + always for physics).
-         */
-        entries.add(entry); // Add latest to the end always.
+        entries.add(new BlockChangeEntry(changeId, tick, x, y, z, direction, previousState)); // Add to end.
         activityNode.count ++;
         worldNode.size ++;
+        worldNode.lastChangeTick = tick;
         //DebugUtil.debug("Add block change: " + x + "," + y + "," + z + " " + direction + " " + changeId); // TODO: REMOVE
     }
 

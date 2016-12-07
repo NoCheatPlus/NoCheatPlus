@@ -172,6 +172,21 @@ public abstract class BlockCache {
             fetched |= FETCHED_BOUNDS;
         }
 
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof IBlockCacheNode) {
+                final IBlockCacheNode other = (IBlockCacheNode) obj;
+                return id == other.getId() 
+                        && (!isDataFetched() && !other.isDataFetched() 
+                                || isDataFetched() && other.isDataFetched() && data == other.getData())
+                        && (!isBoundsFetched() && !other.isBoundsFetched()
+                                || isBoundsFetched() && other.isBoundsFetched() 
+                                && BlockProperties.isSameShape(bounds, other.getBounds())
+                                );
+            }
+            return false;
+        }
+
     }
 
     // Instance

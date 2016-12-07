@@ -3854,7 +3854,7 @@ public class BlockProperties {
     }
 
     /**
-     * Check if the bounds are the same. No null checks.
+     * Check if the bounds are the same. With null checks.
      *
      * @param bounds1
      *            the bounds1
@@ -3865,6 +3865,11 @@ public class BlockProperties {
     public static final boolean isSameShape(final double[] bounds1, final double[] bounds2) {
         // TODO: further exclude simple full shape blocks, or confine to itchy block types
         // TODO: make flags for it.
+        if (bounds1 == null || bounds2 == null) {
+            if (bounds1 != null || bounds2 != null) {
+                return false;
+            }
+        }
         // Allow as ground for differing shapes.
         for (int i = 0; i <  6; i++) {
             if (bounds1[i] != bounds2[i]) {
