@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -83,6 +84,8 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
@@ -118,6 +121,28 @@ import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
  * @see MovingEvent
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
+
+    /**
+     * Bounce preparation state.
+     * @author asofold
+     *
+     */
+    public static enum BounceType {
+        /** No bounce happened. */
+        NO_BOUNCE,
+        /** Ordinary bounce off a static block underneath. */
+        STATIC,
+        /**
+         * Ordinary bounce, due to a slime block having been underneath in the
+         * past. Rather for logging.
+         */
+        STATIC_PAST,
+        /**
+         * A slime block has been underneath, pushing up into the player.
+         */
+        STATIC_PAST_AND_PUSH,
+        // WEAK_PUSH <- TBD: with edge on slime, or with falling inside of the new slime block position?
+    }
 
     /** The no fall check. **/
     public final NoFall                 noFall              = addCheck(new NoFall());
@@ -624,7 +649,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Pre-check checks (hum), either for cf or for sf.
         boolean checkNf = true;
-        boolean verticalBounce = false;
+        BounceType verticalBounce = BounceType.NO_BOUNCE;
 
         // TODO: More adaptive margin / method (bounding boxes).
         final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || checkSf || checkCf)
@@ -656,22 +681,46 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
 
             // Check jumping on things like slime blocks.
-            // Detect potential bounce.
+            // Detect bounce type / use prepared bounce.
             if (newTo == null) {
+                // TODO: With past states: What does jump effects do here?
                 if (to.getY() < from.getY()) {
-                    if ((BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
-                            && !survivalFly.isReallySneaking(player) && checkBounceEnvelope(player, pFrom, pTo, data, cc)
-                            ) {
-                        // Prepare bounce: The center of the player must be above the block.
+                    // Prepare bounce: The center of the player must be above the block.
+                    // Common pre-conditions.
+                    // TODO: Check if really leads to calling the method for pistons (checkBounceEnvelope vs. push).
+                    if (!survivalFly.isReallySneaking(player) 
+                            && checkBounceEnvelope(player, pFrom, pTo, data, cc)) {
                         // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
-                        verticalBounce = true;
-                        // Skip NoFall.
-                        checkNf = false;
+                        // Classic static bounce.
+                        if ((BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) 
+                                & BlockProperties.F_BOUNCE25) != 0L) {
+                            /*
+                             * TODO: May need to adapt within this method, if
+                             * "push up" happened and the trigger had been
+                             * ordinary.
+                             */
+                            verticalBounce = BounceType.STATIC;
+                            checkNf = false; // Skip NoFall.
+                        }
+                        if (verticalBounce == BounceType.NO_BOUNCE && useBlockChangeTracker) { 
+                            verticalBounce = checkPastStateBounceDescend(player, pFrom, pTo, thisMove, lastMove, 
+                                    tick, data, cc);
+                            if (verticalBounce != BounceType.NO_BOUNCE) {
+                                checkNf = false; // Skip NoFall.
+                            }
+                        }
                     }
                 }
-                else if (data.verticalBounce != null) {
-                    // Prepared bounce support.
-                    if (onPreparedBounceSupport(player, from, to, lastMove, tick, data)) {
+                else {
+                    if (
+                            // Prepared bounce support.
+                            data.verticalBounce != null 
+                            && onPreparedBounceSupport(player, from, to, thisMove, lastMove, tick, data)
+                            // Past state bounce (includes prepending velocity / special calls).
+                            || useBlockChangeTracker 
+                            && thisMove.yDistance >= 0.415 && thisMove.yDistance <= 1.515 // TODO: MAGIC
+                            && checkPastStateBounceAscend(player, pFrom, pTo, thisMove, lastMove, tick, data, cc)
+                            ) {
                         checkNf = false;
                     }
                 }
@@ -681,7 +730,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Check passable first to prevent set-back override.
         // TODO: Redesign to set set-backs later (queue + invalidate).
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
-        if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+        if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) 
+                && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set-back locations from the other checks, if needed. 
             newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
             if (newTo != null) {
@@ -802,8 +853,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (newTo == null) {
             // Allowed move.
             // Bounce effects.
-            if (verticalBounce) {
-                processBounce(player, pFrom.getY(), pTo.getY(), data, cc);
+            if (verticalBounce != BounceType.NO_BOUNCE) {
+                processBounce(player, pFrom.getY(), pTo.getY(), verticalBounce, data, cc);
             }
             // Finished move processing.
             if (processingEvents.containsKey(playerName)) {
@@ -820,6 +871,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return false;
         }
         else {
+            if (data.debug) { // TODO: Remove, if not relevant (doesn't look like it was :p).
+                if (verticalBounce != BounceType.NO_BOUNCE) {
+                    debug(player, "Bounce effect not processed: " + verticalBounce);
+                }
+                if (data.verticalBounce != null) {
+                    debug(player, "Bounce effect not used: " + data.verticalBounce);
+                }
+            }
             // Set-back handling.
             onSetBack(player, event, newTo, data, cc);
             return true;
@@ -827,7 +886,116 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * A slime block is underneath, the player isn't really sneaking.
+     * Only for yDistance < 0 + some bounce envelope checked.
+     * @param player
+     * @param from
+     * @param to
+     * @param lastMove
+     * @param lastMove2 
+     * @param tick
+     * @param data
+     * @param cc
+     * @return
+     */
+    private BounceType checkPastStateBounceDescend(
+            final Player player, final PlayerLocation from, final PlayerLocation to,
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, 
+            final MovingData data, final MovingConfig cc) {
+        // TODO: Find more preconditions.
+        final UUID worldId = from.getWorld().getUID();
+        // Prepare (normal/extra) bounce.
+        // TODO: Might later need to override/adapt just the bounce effect set by the ordinary method.
+        // Typical: a slime block has been there.
+        final BlockChangeEntry entryBelowAny = blockChangeTracker.getBlockChangeEntryMatchFlags(
+                data.blockChangeRef, tick, worldId, to.getBlockX(), to.getBlockY() - 1, to.getBlockZ(), 
+                null, BlockProperties.F_BOUNCE25);
+        if (entryBelowAny != null) {
+            // TODO: Check preconditions for bouncing here at all (!).
+
+            // Check if the/a block below the feet of the player got pushed into the feet of the player.
+            // TODO: Not sure if this can/should be done on ascending.
+            final BlockChangeEntry entryBelowY_POS = entryBelowAny.direction == Direction.Y_POS ? entryBelowAny 
+                    : blockChangeTracker.getBlockChangeEntryMatchFlags(data.blockChangeRef, tick, worldId, 
+                            to.getBlockX(), to.getBlockY() - 1, to.getBlockZ(), Direction.Y_POS, 
+                            BlockProperties.F_BOUNCE25);
+            if (entryBelowY_POS != null) {
+                // TODO: Can't know if used... data.blockChangeRef.updateSpan(entryBelowY_POS);
+                // TODO: So far, doesn't seem to be followed by violations.
+                return BounceType.STATIC_PAST_AND_PUSH;
+            }
+            else {
+                // TODO: Can't know if used... data.blockChangeRef.updateSpan(entryBelowAny);
+                return BounceType.STATIC_PAST;
+            }
+        }
+
+        // TODO: ADDITIONAL: A slime block has been pushed up [a) block below counts ? b) into the feet of the player].
+        /*
+         * TODO: Can't update span here. If at all, it can be added as side
+         * condition for using the bounce effect. Probably not worth it.
+         */
+        return BounceType.NO_BOUNCE; // Nothing found, return no bounce.
+    }
+
+    private boolean checkPastStateBounceAscend(
+            final Player player, final PlayerLocation from, final PlayerLocation to,
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, 
+            final MovingData data, final MovingConfig cc) {
+        // TODO: find more preconditions.
+        final UUID worldId = from.getWorld().getUID();
+        // Possibly a "lost use of slime".
+        // TODO: Might need to cover push up, after ordinary slime bounce.
+        // TODO: Cover push by slime block (center/feet on block).
+        // TODO: Might need to cover push by slime block (center/feet off block).
+        // TODO: Low fall distance cases and where no slime block was underneath at descend have to be included here.
+        // TODO: Note that onPreparedBounceSupport etc. has to be called in here, if needed.
+        final BlockChangeEntry entryBelowY_POS = blockChangeTracker.getBlockChangeEntryMatchFlags(
+                data.blockChangeRef, tick, worldId, from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(), 
+                Direction.Y_POS, BlockProperties.F_BOUNCE25);
+        if (
+                // Center push.
+                entryBelowY_POS != null
+                // Off center push (2x 0.5(015) only, (sum below 1.015 ?)).
+                || thisMove.yDistance < 0.5015 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
+                        data.blockChangeRef, Direction.Y_POS, Math.min(.415, thisMove.yDistance), 
+                        BlockProperties.F_BOUNCE25)
+                ) {
+            // Always allow the double 0.505 move.
+            /*
+             * TODO: May detect the first 0.505 move to match preconditions
+             * better (roughly 2x 0.5, 0.0 -> 1.5, -0.few -> 1.389). One might
+             * also nail down to past y-position further. Also consider
+             * confining to horizontal speed envelope (is that even possible)?
+             */
+            if (data.debug) {
+                debug(player, "checkPastStateBounceAscend: " + (entryBelowY_POS == null ? "off_center" : "center"));
+            }
+            final double amount = Math.max(0.505, thisMove.yDistance);
+            if (data.peekVerticalVelocity(amount, 2) == null) {
+                // (Could skip peek for low distances around 0.5.)
+                if (amount > 1.38) {
+                    // TODO: HACK - More decrease than expected.
+                    // TODO: Consider to detect used velocity with vdistrel exceptions using past move tracking.
+                    data.prependVerticalVelocity(new SimpleEntry(tick, 0.925, 3));
+                }
+                data.prependVerticalVelocity(new SimpleEntry(tick, amount, 2));
+                /*
+                 * TODO: Update span or not ... [could use a class that extends
+                 * SimpleEntry but which also contains a block change id to update
+                 * span with, upon using that entry?]
+                 */
+                if (entryBelowY_POS != null) {
+                    data.blockChangeRef.updateSpan(entryBelowY_POS);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Pre conditions: A slime block is underneath and the player isn't really
+     * sneaking.<br>
      * 
      * @param player
      * @param from
@@ -836,13 +1004,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      * @return
      */
-    private boolean checkBounceEnvelope(Player player, PlayerLocation from, PlayerLocation to, MovingData data, MovingConfig cc) {
+    private boolean checkBounceEnvelope(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc) {
+        /*
+         * TODO: Likely not conform with getting pushed up, while outside of the
+         * strict envelope. The advantage of detecting that here could be the
+         * invalidation mechanics (also consider passable etc.), otherwise the
+         * move up might miss the already invalidated push up.
+         */
         return 
                 // 0: Normal envelope (forestall NoFall).
                 (
                         // 1: Ordinary.
                         to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) 
-                        // 1: With carpet. TODO: Magic block id.
+                        // 1: With carpet. TODO: Magic block id. Use isCarpet(id) instead.
                         || to.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9
                         )
                 && MovingUtil.getRealisticFallDistance(player, from.getY(), to.getY(), data) > 1.0
@@ -860,11 +1035,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param from
      * @param to
      * @param lastMove
+     * @param lastMove2 
      * @param tick
      * @param data
      * @return True, if bounce has been used, i.e. to do without fall damage.
      */
-    private boolean onPreparedBounceSupport(Player player, Location from, Location to, PlayerMoveData lastMove, int tick, MovingData data) {
+    private boolean onPreparedBounceSupport(final Player player, final Location from, final Location to, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, final MovingData data) {
         if (to.getY() > from.getY() || to.getY() == from.getY() && data.verticalBounce.value < 0.13) {
             // Apply bounce.
             if (to.getY() == from.getY()) {
@@ -900,7 +1077,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @return
      */
     @SuppressWarnings("unused")
-    private Location checkExtremeMove(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    private Location checkExtremeMove(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc) {
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         // TODO: Latency effects.
@@ -1003,7 +1181,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
     }
 
-    private static double guessFlyNoFlyVelocity(final Player player, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
+    private static double guessFlyNoFlyVelocity(final Player player, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // Default margin: Allow slightly less than the previous speed.
         final double defaultAmount = lastMove.hDistance * (1.0 + Magic.FRICTION_MEDIUM_AIR) / 2.0;
         // Test for exceptions.
@@ -1024,18 +1203,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * on ground. This might be a micro-move onto ground.
      * 
      * @param player
+     * @param verticalBounce 
      * @param from
      * @param to
      * @param data
      * @param cc
      */
-    private void processBounce(final Player player,final double fromY, final double toY, final MovingData data, final MovingConfig cc) {
+    private void processBounce(final Player player,final double fromY, final double toY, 
+            final BounceType bounceType, final MovingData data, final MovingConfig cc) {
         // Prepare velocity.
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
-        double effect = Math.min(3.5, base + Math.min(base / 10.0, Magic.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
+        double effect = Math.min(Magic.BOUNCE_VERTICAL_MAX_DIST, base + Math.min(base / 10.0, Magic.GRAVITY_MAX)); // Ancient Greek technology with gravity added.
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
-        if (effect > 0.42 && lastMove.toIsValid) {
+        if (effect > 0.415 && lastMove.toIsValid) {
             // Extra cap by last y distance(s).
             final double max_gain = Math.abs(lastMove.yDistance < 0.0 ? Math.min(lastMove.yDistance, toY - fromY) : (toY - fromY)) - Magic.GRAVITY_SPAN;
             if (max_gain < effect) {
@@ -1045,9 +1226,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }
         }
+        if (bounceType == BounceType.STATIC_PAST_AND_PUSH) {
+            /*
+             * TODO: Find out if relevant and handle here (still use maximum
+             * cap, but not by y-distance.). Could be the push part is only
+             * necessary if the player is pushed upwards without prepared
+             * bounce.
+             */
+        }
         // (Actually observed max. is near 3.5.) TODO: Why 3.14 then?
         if (data.debug) {
-            debug(player, "Bounce effect (dY=" + fallDistance + "): " + effect); 
+            debug(player, "Set bounce effect (dY=" + fallDistance + " / " + bounceType + "): " + effect); 
         }
         data.noFallSkipAirCheck = true;
         data.verticalBounce =  new SimpleEntry(effect, 1);
@@ -1998,7 +2187,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param to
      * @param mcAccess
      */
-    private void outputMoveDebug(final Player player, final PlayerLocation from, final PlayerLocation to, final double maxYOnGround, final MCAccess mcAccess) {
+    private void outputMoveDebug(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final double maxYOnGround, final MCAccess mcAccess) {
         final StringBuilder builder = new StringBuilder(250);
         final Location loc = player.getLocation();
         builder.append(CheckUtils.getLogMessagePrefix(player, checkType));

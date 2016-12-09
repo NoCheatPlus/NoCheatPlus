@@ -1078,7 +1078,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @param ref
      *            the ref
      * @param direction
-     *            the direction
+     *            Pass null to ignore the direction.
      * @param coverDistance
      *            The (always positive) distance to cover.
      * @return Returns true, iff an entry was found.
@@ -1133,7 +1133,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @param ref
      *            the ref
      * @param direction
-     *            the direction
+     *            Pass null to ignore the direction.
      * @param coverDistance
      *            The (always positive) distance to cover.
      * @param matchFlags
@@ -1144,7 +1144,6 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     public boolean matchBlockChangeMatchResultingFlags(final BlockChangeTracker blockChangeTracker, 
             final BlockChangeReference ref, final Direction direction, final double coverDistance, 
             final long matchFlags) {
-        // TODO: Remove this method (!). Use a specialized method (here or external) just for bounce.
         /*
          * TODO: Not sure with code duplication. Is it better to run
          * BlockChangeTracker.getBlockChangeMatchFlags for the other method too?

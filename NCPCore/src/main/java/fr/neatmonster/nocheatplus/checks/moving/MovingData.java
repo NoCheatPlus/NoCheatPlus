@@ -822,6 +822,15 @@ public class MovingData extends ACheckData {
         verVel.addToFront(entry);
     }
 
+    /**
+     * Get the first element without using it.
+     * 
+     * @return
+     */
+    public SimpleEntry peekVerticalVelocity(final double amount, final int maxActCount) {
+        return verVel.peek(amount, maxActCount, TOL_VVEL);
+    }
+
     public void addVerticalVelocity(final SimpleEntry entry) {
         verVel.add(entry);
     }

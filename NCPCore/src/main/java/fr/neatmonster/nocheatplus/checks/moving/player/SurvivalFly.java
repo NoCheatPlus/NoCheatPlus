@@ -44,6 +44,7 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
@@ -133,14 +134,16 @@ public class SurvivalFly extends Check {
             // TODO: Could run a completely different check here (roughly none :p).
             xDistance = yDistance = zDistance = hDistance = 0.0;
             hasHdist = false;
-        } else {
+        }
+        else {
             xDistance = to.getX() - from.getX();
             yDistance = thisMove.yDistance;
             zDistance = to.getZ() - from.getZ();
             if (xDistance == 0.0 && zDistance == 0.0) {
                 hDistance = 0.0;
                 hasHdist = false;
-            } else {
+            }
+            else {
                 hasHdist = true;
                 hDistance = thisMove.hDistance;
             }
@@ -168,7 +171,8 @@ public class SurvivalFly extends Check {
                 tags.add("invalidate_lostsprint");
                 if (now <= data.timeSprinting + cc.sprintingGrace) {
                     sprinting = true;
-                } else {
+                }
+                else {
                     sprinting = false;
                 }
             }
@@ -222,7 +226,8 @@ public class SurvivalFly extends Check {
             else if (lastMove.toIsValid && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3) {
                 // Note that to is not on ground either.
                 resetFrom = LostGround.lostGroundStill(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags);
-            } else {
+            }
+            else {
                 resetFrom = false;
             }
         }
@@ -372,7 +377,8 @@ public class SurvivalFly extends Check {
                     tags.add("sprintback"); // Might add it anyway.
                 }
             }
-        } else {
+        }
+        else {
             /*
              * TODO: Consider to log and/or remember when this was last time
              * cleared [add time distance to tags/log on violations].
@@ -454,7 +460,8 @@ public class SurvivalFly extends Check {
             outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
             tagsLength = tags.size();
             data.ws.setJustUsedIds(null);
-        } else {
+        }
+        else {
             tagsLength = 0; // JIT vs. IDE.
         }
 
@@ -547,7 +554,8 @@ public class SurvivalFly extends Check {
         }
         else if (!resetFrom || !resetTo) {
             data.insideMediumCount = 0;
-        } else {
+        }
+        else {
             data.insideMediumCount ++;
         }
 
@@ -599,7 +607,8 @@ public class SurvivalFly extends Check {
             // Adjust in-air counters.
             if (yDistance == 0.0) {
                 data.sfZeroVdistRepeat ++;
-            } else {
+            }
+            else {
                 data.sfZeroVdistRepeat = 0;
             }
         }
@@ -675,29 +684,39 @@ public class SurvivalFly extends Check {
                     || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
                 if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
                         Math.min(yDistance, 1.0))) {
+                    if (yDistance > 1.0) {
+                        final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntryMatchFlags(data.blockChangeRef, 
+                                tick, from.getWorld().getUID(), from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(),
+                                Direction.Y_POS, BlockProperties.F_BOUNCE25);
+                        if (entry != null) {
+                            data.blockChangeRef.updateSpan(entry);
+                            data.prependVerticalVelocity(new SimpleEntry(tick, 0.5015, 3)); // TODO: HACK
+                            tags.add("past_bounce");
+                        }
+                    }
                     tags.add("blkmv_y_pos");
                     final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
                     return new double[]{maxDistYPos, 0.0};
                 }
             }
             // (No else.)
-            if (yDistance <= 1.55) {
-                // TODO: Edges ca. 0.5 (or 2x 0.5).
-                // TODO: Center ca. 1.5. With falling height, values increase slightly.
-                // Simplified: Always allow 1.5 or less with being pushed up by slime.
-                // TODO: 
-                if (from.matchBlockChangeMatchResultingFlags(
-                        blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
-                        Math.min(yDistance, 0.42), // Special limit.
-                        BlockProperties.F_BOUNCE25)) {
-                    tags.add("blkmv_y_pos_bounce");
-                    final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
-                    // TODO: Set bounce effect or something !?
-                    // TODO: Bounce effect instead ?
-                    data.addVerticalVelocity(new SimpleEntry(tick, Math.max(0.515, yDistance - 0.5), 2));
-                    return new double[]{maxDistYPos, 0.0};
-                }
-            }
+            //            if (yDistance <= 1.55) {
+            //                // TODO: Edges ca. 0.5 (or 2x 0.5).
+            //                // TODO: Center ca. 1.5. With falling height, values increase slightly.
+            //                // Simplified: Always allow 1.5 or less with being pushed up by slime.
+            //                // TODO: 
+            //                if (from.matchBlockChangeMatchResultingFlags(
+            //                        blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
+            //                        Math.min(yDistance, 0.415), // Special limit.
+            //                        BlockProperties.F_BOUNCE25)) {
+            //                    tags.add("blkmv_y_pos_bounce");
+            //                    final double maxDistYPos = yDistance; //1.0 - (from.getY() - from.getBlockY()); // TODO: Margin ?
+            //                    // TODO: Set bounce effect or something !?
+            //                    // TODO: Bounce effect instead ?
+            //                    data.addVerticalVelocity(new SimpleEntry(tick, Math.max(0.515, yDistance - 0.5), 2));
+            //                    return new double[]{maxDistYPos, 0.0};
+            //                }
+            //            }
         }
         // Push (/pull) down.
         else if (yDistance < 0.0 && yDistance >= -1.0) {
@@ -969,7 +988,8 @@ public class SurvivalFly extends Check {
                 // Hack for boats (coarse: allows minecarts too).
                 if (yDistance > cc.sfStepHeight && yDistance - cc.sfStepHeight < 0.00000003 && to.isOnGroundDueToStandingOnAnEntity()) {
                     vAllowedDistance = yDistance;
-                } else  {
+                }
+                else  {
                     vAllowedDistance = Math.max(cc.sfStepHeight, maxJumpGain + jumpGainMargin);
                 }
             }
@@ -1088,7 +1108,8 @@ public class SurvivalFly extends Check {
                 vDistRelVL = true;
             }
             // else: Allow moving up less. Note: possibility of low jump.
-        } else { // if (yDistance < 0.0) // Rather too fast falling.
+        }
+        else { // if (yDistance < 0.0) // Rather too fast falling.
             if (yDistance < -3.0 && lastMove.yDistance < -3.0 && Math.abs(yDistDiffEx) < 5.0 * Magic.GRAVITY_MAX) {
                 // Disregard not falling faster at some point (our constants don't match 100%).
             }
@@ -1333,7 +1354,8 @@ public class SurvivalFly extends Check {
                 final float sc0;
                 if (count0 == cap) {
                     sc0 = acc.bucketScore(0);
-                } else {
+                }
+                else {
                     // Catch extreme changes quick.
                     sc0 = acc.bucketScore(0) * (float) cap / (float) count0 - Magic.GRAVITY_VACC * (float) (cap - count0);
                 }
@@ -1729,7 +1751,8 @@ public class SurvivalFly extends Check {
         final double vl2 = Math.abs(yDistAbs - frictDist - (yDistance < 0.0 ? Magic.GRAVITY_MAX + Magic.GRAVITY_SPAN : Magic.GRAVITY_MIN));
         if (vl1 <= vl2) {
             return new double[]{yDistance < 0.0 ? -baseSpeed : baseSpeed, vl1};
-        } else {
+        }
+        else {
             return new double[]{yDistance < 0.0 ? -frictDist - Magic.GRAVITY_MAX - Magic.GRAVITY_SPAN : frictDist - Magic.GRAVITY_MIN, vl2};
         }
     }
@@ -1772,7 +1795,8 @@ public class SurvivalFly extends Check {
                     tags.add("climbstep");
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - maxSpeed);
                 }
-            } else {
+            }
+            else {
                 tags.add("climbspeed");
                 vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - maxSpeed);
             }
@@ -1942,7 +1966,8 @@ public class SurvivalFly extends Check {
         if (now - data.sfCobwebTime > 3000) {
             data.sfCobwebTime = now;
             data.sfCobwebVL = vDistanceAboveLimit * 100D;
-        } else {
+        }
+        else {
             data.sfCobwebVL += vDistanceAboveLimit * 100D;
         }
         if (data.sfCobwebVL < 550) { // Totally random !
@@ -1953,7 +1978,8 @@ public class SurvivalFly extends Check {
             }
             data.sfJumpPhase = 0;
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }

@@ -106,6 +106,27 @@ public class SimpleAxisVelocity {
     }
 
     /**
+     * Without checking for invalidation, test if there is a matching entry with
+     * same or less the activation count.
+     * 
+     * @param amount
+     * @param maxActCount
+     * @param tolerance
+     * @return
+     */
+    public SimpleEntry peek(final double amount, final int maxActCount, final double tolerance) {
+        final Iterator<SimpleEntry> it = queued.iterator();
+        while (it.hasNext()) {
+            final SimpleEntry entry = it.next();
+            if (entry.actCount < maxActCount && matchesEntry(entry, amount, tolerance)) {
+                return entry;
+            }
+        }
+        // None found.
+        return null;
+    }
+
+    /**
      * Check if the demanded amount can be covered by this velocity entry. Might
      * return an entry with a small value with a different sign, if amount is
      * set to 0.0. Needed also for testing stored entries.
@@ -128,15 +149,16 @@ public class SimpleAxisVelocity {
      * Remove all entries that have been added before the given tick, or for
      * which the activation count has reached 0.
      * 
-     * @param tick
+     * @param invalidateBeforeTick
+     *            Entries with a smaller tick value get removed.
      */
-    public void removeInvalid(final int tick) {
+    public void removeInvalid(final int invalidateBeforeTick) {
         // Note: clear invalidated here, append unused to invalidated.
         final Iterator<SimpleEntry> it = queued.iterator();
         while (it.hasNext()) {
             final SimpleEntry entry = it.next();
             entry.actCount --; // Let others optimize this.
-            if (entry.actCount <= 0 || entry.tick < tick) {
+            if (entry.actCount <= 0 || entry.tick < invalidateBeforeTick) {
                 it.remove();
                 // Track unused velocity.
                 if (unusedActive) {
