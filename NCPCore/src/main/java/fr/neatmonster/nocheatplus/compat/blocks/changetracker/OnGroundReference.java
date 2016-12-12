@@ -284,22 +284,27 @@ public class OnGroundReference {
             while (itEntriesAbove.hasNext()) {
                 entryAbove = itEntriesAbove.next();
                 nodeAbove = entryAbove.previousState;
-                if (entry.nextEntryTick >= 0 && entryAbove.tick > entry.nextEntryTick) {
-                    entryAbove = null;
-                    nodeAbove = null;
-                    break;
-                }
-                else if (entry.overlapsIntervalOfValidity(entryAbove)) {
-                    // Good to use.
+                if (entry == null) {
+                    // Iterate to end. (Then stop, rewind shouldn't happen.)
                     return true;
                 }
                 else {
-                    entryAbove = null;
-                    nodeAbove = null;
-                    // Check the next one (not out of range yet).
+                    if (entry.nextEntryTick >= 0 && entryAbove.tick > entry.nextEntryTick) {
+                        entryAbove = null;
+                        nodeAbove = null;
+                        break;
+                    }
+                    else if (entry.overlapsIntervalOfValidity(entryAbove)) {
+                        // Good to use.
+                        return true;
+                    }
+                    else {
+                        entryAbove = null;
+                        nodeAbove = null;
+                        // Check the next one (not out of range yet).
+                    }
                 }
             }
-            // (entryAbove == null)
 
             // Rewind entryAbove, advance entry.
             entry = null;
