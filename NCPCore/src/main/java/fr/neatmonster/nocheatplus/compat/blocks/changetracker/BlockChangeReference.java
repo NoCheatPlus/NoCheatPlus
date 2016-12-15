@@ -63,7 +63,11 @@ public class BlockChangeReference {
          * ordered in a relevant way, if they reference the same tick. Even
          * one tick may be too narrow.
          */
-        return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
+
+        // TODO: ONCE STUFF WORKS: reinstate invalidation and boil it down to something useful.
+
+        //return this.lastUsedEntry == null || entry.tick > this.lastUsedEntry.tick || entry.tick == this.lastUsedEntry.tick && valid;
+        return true; // TODO: TEST
     }
 
     /**
@@ -104,7 +108,7 @@ public class BlockChangeReference {
         if (lastSpanEntry != null && (lastUsedEntry == null || lastSpanEntry.id > lastUsedEntry.id)) {
             lastUsedEntry = lastSpanEntry;
             if (to != null && to.isBlockIntersecting(
-                            lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z, lastSpanEntry.direction.blockFace)) {
+                    lastSpanEntry.x, lastSpanEntry.y, lastSpanEntry.z, lastSpanEntry.direction.blockFace)) {
                 valid = true;
             }
             else {

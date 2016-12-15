@@ -2295,6 +2295,7 @@ public class BlockProperties {
             return true;
         }
         else {
+            // TODO: F_GROUND ?
             return (flags & F_SOLID) == 0;
         }
     }

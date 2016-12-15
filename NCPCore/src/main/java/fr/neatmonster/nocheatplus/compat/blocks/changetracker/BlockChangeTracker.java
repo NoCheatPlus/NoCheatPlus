@@ -268,6 +268,18 @@ public class BlockChangeTracker {
                     );
         }
 
+        /**
+         * Test if ref can be updated with this entry, taking the given
+         * direction into account, allowing arguments to be null.
+         * 
+         * @param ref
+         * @param direction
+         * @return
+         */
+        public boolean canUpdate(final BlockChangeReference ref, final Direction direction) {
+            return (direction == null || direction == this.direction) && (ref == null || ref.canUpdateWith(this));
+        }
+
     }
 
     /** Change id/count, increasing with each entry added internally. */
@@ -580,9 +592,7 @@ public class BlockChangeTracker {
         final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
         if (entries != null) {
             for (final BlockChangeEntry entry : entries) {
-                if (ref == null 
-                        || ref.canUpdateWith(entry) 
-                        && (direction == null || entry.direction == direction)) {
+                if (entry.canUpdate(ref, direction)) {
                     return entry;
                 }
             }
@@ -624,10 +634,7 @@ public class BlockChangeTracker {
         final LinkedList<BlockChangeEntry> entries = getValidBlockChangeEntries(tick, worldNode, x, y, z);
         if (entries != null) {
             for (final BlockChangeEntry entry : entries) {
-                if ((ref == null 
-                        || ref.canUpdateWith(entry) 
-                        && (direction == null || entry.direction == direction))
-                        //
+                if (entry.canUpdate(ref, direction)
                         && (matchFlags == 0 
                         || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getId())) != 0)) {
                     return entry;

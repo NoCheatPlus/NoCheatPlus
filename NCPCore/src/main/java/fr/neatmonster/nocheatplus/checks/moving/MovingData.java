@@ -776,6 +776,7 @@ public class MovingData extends ACheckData {
 
     /**
      * Add velocity to internal book-keeping.
+     * 
      * @param player
      * @param data
      * @param cc
@@ -783,7 +784,25 @@ public class MovingData extends ACheckData {
      * @param vy
      * @param vz
      */
-    public void addVelocity(final Player player, final MovingConfig cc, final double vx, final double vy, final double vz) {
+    public void addVelocity(final Player player, final MovingConfig cc, 
+            final double vx, final double vy, final double vz) {
+        addVelocity(player, cc, vx, vy, vz, 0L);
+    }
+
+    /**
+     * Add velocity to internal book-keeping.
+     * 
+     * @param player
+     * @param data
+     * @param cc
+     * @param vx
+     * @param vy
+     * @param vz
+     * @param flags
+     *            Flags to use with velocity entries.
+     */
+    public void addVelocity(final Player player, final MovingConfig cc, 
+            final double vx, final double vy, final double vz, final long flags) {
 
         final int tick = TickTask.getTick();
         // TODO: Slightly odd to call this each time, might switch to a counter-strategy (move - remove). 
@@ -794,7 +813,7 @@ public class MovingData extends ACheckData {
         }
 
         // Always add vertical velocity.
-        verVel.add(new SimpleEntry(tick, vy, cc.velocityActivationCounter));
+        verVel.add(new SimpleEntry(tick, vy, flags, cc.velocityActivationCounter));
 
         // TODO: Should also switch to adding always.
         if (vx != 0.0 || vz != 0.0) {
@@ -824,11 +843,13 @@ public class MovingData extends ACheckData {
 
     /**
      * Get the first element without using it.
-     * 
+     * @param amount
+     * @param minActCount
+     * @param maxActCount
      * @return
      */
-    public SimpleEntry peekVerticalVelocity(final double amount, final int maxActCount) {
-        return verVel.peek(amount, maxActCount, TOL_VVEL);
+    public SimpleEntry peekVerticalVelocity(final double amount, final int minActCount, final int maxActCount) {
+        return verVel.peek(amount, minActCount, maxActCount, TOL_VVEL);
     }
 
     public void addVerticalVelocity(final SimpleEntry entry) {

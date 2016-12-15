@@ -76,6 +76,7 @@ import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.vehicle.VehicleChecks;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -143,6 +144,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         STATIC_PAST_AND_PUSH,
         // WEAK_PUSH <- TBD: with edge on slime, or with falling inside of the new slime block position?
     }
+
+    /**
+     * 
+     */
+    private static final long FLAGS_VELOCITY_BOUNCE_BLOCK = VelocityFlags.ORIGIN_BLOCK_BOUNCE;
+    
+    private static final long FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND = FLAGS_VELOCITY_BOUNCE_BLOCK
+            | VelocityFlags.SPLIT_ABOVE_0_42 | VelocityFlags.SPLIT_RETAIN_ACTCOUNT | VelocityFlags.ORIGIN_BLOCK_MOVE;
 
     /** The no fall check. **/
     public final NoFall                 noFall              = addCheck(new NoFall());
@@ -718,7 +727,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             && onPreparedBounceSupport(player, from, to, thisMove, lastMove, tick, data)
                             // Past state bounce (includes prepending velocity / special calls).
                             || useBlockChangeTracker 
-                            && thisMove.yDistance >= 0.415 && thisMove.yDistance <= 1.515 // TODO: MAGIC
+                            // 0-dist moves count in: && thisMove.yDistance >= 0.415 
+                            && thisMove.yDistance <= 1.515 // TODO: MAGIC
                             && checkPastStateBounceAscend(player, pFrom, pTo, thisMove, lastMove, tick, data, cc)
                             ) {
                         checkNf = false;
@@ -854,7 +864,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Allowed move.
             // Bounce effects.
             if (verticalBounce != BounceType.NO_BOUNCE) {
-                processBounce(player, pFrom.getY(), pTo.getY(), verticalBounce, data, cc);
+                processBounce(player, pFrom.getY(), pTo.getY(), verticalBounce, tick, data, cc);
             }
             // Finished move processing.
             if (processingEvents.containsKey(playerName)) {
@@ -949,6 +959,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Might need to cover push by slime block (center/feet off block).
         // TODO: Low fall distance cases and where no slime block was underneath at descend have to be included here.
         // TODO: Note that onPreparedBounceSupport etc. has to be called in here, if needed.
+
+
+
+        // TODO: Work around 0-dist?
+        // TODO: set data.verticalBounce and call data.useVerticalBounce right away (!) -> fall damage !?
+        // TODO: typically up to 1.5 above max level of pushed block ! (typically 2.0 total with 0.0 between).
+        /*
+         * TODO: Other concepts? a) maxCoordinate for SimpleEntry? (alters
+         * method calls to SimpleAxisVelocity) b) use past move tracking and
+         * store more moves (!) and store more context (e.g. bounce entry for
+         * center). c) combine both approaches, possibly use an interface to be
+         * set within SimpleEntry.
+         */
+
         final BlockChangeEntry entryBelowY_POS = blockChangeTracker.getBlockChangeEntryMatchFlags(
                 data.blockChangeRef, tick, worldId, from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(), 
                 Direction.Y_POS, BlockProperties.F_BOUNCE25);
@@ -956,7 +980,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Center push.
                 entryBelowY_POS != null
                 // Off center push (2x 0.5(015) only, (sum below 1.015 ?)).
-                || thisMove.yDistance < 0.5015 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
+                || thisMove.yDistance < 1.015 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
                         data.blockChangeRef, Direction.Y_POS, Math.min(.415, thisMove.yDistance), 
                         BlockProperties.F_BOUNCE25)
                 ) {
@@ -970,15 +994,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (data.debug) {
                 debug(player, "checkPastStateBounceAscend: " + (entryBelowY_POS == null ? "off_center" : "center"));
             }
-            final double amount = Math.max(0.505, thisMove.yDistance);
-            if (data.peekVerticalVelocity(amount, 2) == null) {
+            // TODO: Nail down to more precise side conditions for larger jumps, if possible.
+            // TODO: Adjust amount based on side conditions (center push or off center, distance to block top).
+            // TODO: Center push, without being hit by the block (2 below!) -> 0.5 off ground + 1.5 roughly !
+            // TODO: Push up, without being inside the pushed block (0.5 + 0.9x).
+            // TODO: Add two entries, split based on current yDistance?
+            /*
+             * TODO: USE EXISTING velocity with bounce flag set first, then peek
+             * / add. (might while peek -> has bounce flag: remove velocity)
+             */
+            final double amount = Math.min(Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515), 
+                    2.525); // TODO: EXACT MAGIC.
+            if (lastMove.toIsValid && lastMove.yDistance < 0.42 ||
+                    data.peekVerticalVelocity(amount, 2, 3) == null) {
                 // (Could skip peek for low distances around 0.5.)
-                if (amount > 1.38) {
-                    // TODO: HACK - More decrease than expected.
-                    // TODO: Consider to detect used velocity with vdistrel exceptions using past move tracking.
-                    data.prependVerticalVelocity(new SimpleEntry(tick, 0.925, 3));
-                }
-                data.prependVerticalVelocity(new SimpleEntry(tick, amount, 2));
+                /*
+                 * TODO: Concepts for limiting... max amount based on side
+                 * conditions such as block height+1.5, max coordinate, max
+                 * amount per use, ALLOW_ZERO flag/boolean and set in
+                 * constructor, demand max. 1 zero dist during validity. Bind
+                 * use to initial xz coordinates... Too precise = better with
+                 * past move tracking, or a sub-class of SimpleEntry with better
+                 * access signatures including thisMove.
+                 */
+                final SimpleEntry vel = new SimpleEntry(tick, amount, FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND, 4);
+                data.verticalBounce = vel;
+                data.useVerticalBounce(player);
                 /*
                  * TODO: Update span or not ... [could use a class that extends
                  * SimpleEntry but which also contains a block change id to update
@@ -987,7 +1028,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 if (entryBelowY_POS != null) {
                     data.blockChangeRef.updateSpan(entryBelowY_POS);
                 }
+                if (data.debug) {
+                    debug(player, "checkPastStateBounceAscend: add velocity: " + vel);
+                }
                 return true;
+            }
+            else if (data.debug) {
+                debug(player, "checkPastStateBounceAscend: Don't add velocity.");
             }
         }
         return false;
@@ -1210,7 +1257,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void processBounce(final Player player,final double fromY, final double toY, 
-            final BounceType bounceType, final MovingData data, final MovingConfig cc) {
+            final BounceType bounceType, final int tick, final MovingData data, final MovingConfig cc) {
         // Prepare velocity.
         final double fallDistance = MovingUtil.getRealisticFallDistance(player, fromY, toY, data);
         final double base =  Math.sqrt(fallDistance) / 3.3;
@@ -1239,7 +1286,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             debug(player, "Set bounce effect (dY=" + fallDistance + " / " + bounceType + "): " + effect); 
         }
         data.noFallSkipAirCheck = true;
-        data.verticalBounce =  new SimpleEntry(effect, 1);
+        data.verticalBounce =  new SimpleEntry(tick, effect, FLAGS_VELOCITY_BOUNCE_BLOCK, 1); // Just bounce for now.
     }
 
     /**

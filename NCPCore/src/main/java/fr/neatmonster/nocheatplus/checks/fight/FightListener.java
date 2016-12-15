@@ -51,6 +51,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.player.UnusedVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -646,7 +647,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (damagedData.debug || mdata.debug) {
             debug(damagedPlayer, "Received knockback level: " + level);
         }
-        mdata.addVelocity(damagedPlayer, mcc,  vx, vy, vz);
+        mdata.addVelocity(damagedPlayer, mcc,  vx, vy, vz, VelocityFlags.ORIGIN_PVP);
     }
 
     /**

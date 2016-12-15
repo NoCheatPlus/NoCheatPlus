@@ -32,24 +32,35 @@ public class SimpleEntry {
     /** Initial value for the actCount. */
     public final int initialActCount;
 
+    /**
+     * Flags to indicate special cases, such as splitting a used entry, if not
+     * all gets used.
+     */
+    public final long flags;
+
     /** Count down for invalidation. */
     public int actCount;
 
     // TODO: Add more conditions (max tick, real time ?)
 
-    public SimpleEntry(double value, int actCount){
+    public SimpleEntry(double value, int actCount) {
         this(TickTask.getTick(), value, actCount);
     }
 
-    public SimpleEntry(int tick, double value, int actCount){
+    public SimpleEntry(int tick, double value, int actCount) {
+        this(tick, value, 0L, actCount);
+    }
+
+    public SimpleEntry(int tick, double value, long flags, int actCount) {
         this.tick = tick;
         this.value = value;
         this.actCount = actCount;
         this.initialActCount = actCount;
+        this.flags = flags;
     }
 
-    public String toString(){
-        return "SimpleEntry(tick=" + tick + " value=" + value + " activate=" + actCount + "/" + initialActCount + ")";
+    public String toString() {
+        return "SimpleEntry(tick=" + tick + " value=" + value + " flags=" + flags + " activate=" + actCount + "/" + initialActCount + ")";
     }
 
 }

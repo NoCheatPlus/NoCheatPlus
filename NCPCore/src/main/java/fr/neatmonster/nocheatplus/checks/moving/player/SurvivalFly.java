@@ -39,12 +39,10 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
-import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
-import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
@@ -156,9 +154,10 @@ public class SurvivalFly extends Check {
 
         // Set some flags.
         final boolean fromOnGround = thisMove.from.onGround;
-        final boolean toOnGround = thisMove.to.onGround;
-        final boolean resetTo = toOnGround || to.isResetCond() 
+        // TODO: Work in the past ground stuff differently (thisMove, touchedGround?, from/to ...)
+        final boolean toOnGround = thisMove.to.onGround 
                 || useBlockChangeTracker && toOnGroundPastStates(from, to, thisMove, tick, data, cc);
+        final boolean resetTo = toOnGround || to.isResetCond();
 
         // Determine if the player is actually sprinting.
         final boolean sprinting;
@@ -678,20 +677,28 @@ public class SurvivalFly extends Check {
         // TODO: Other conditions/filters ... ?
         // Push (/pull) up.
         if (yDistance > 0.0) {
-            if ((yDistance <= 1.0 
-                    // Extra condition for full blocks: slightly more possible.
-                    // Extreme case: 1.51 blocks up (details pending).
-                    || yDistance <= 1.015 && to.getY() - to.getBlockY() < 0.015)) {
+            if (yDistance <= 1.015) {
+                /*
+                 * (Full blocks: slightly more possible, ending up just above
+                 * the block. Bounce allows other end positions.)
+                 */
+                // TODO: Is the air block wich the slime block is pushed onto really in? 
                 if (from.matchBlockChange(blockChangeTracker, data.blockChangeRef, Direction.Y_POS, 
                         Math.min(yDistance, 1.0))) {
                     if (yDistance > 1.0) {
-                        final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntryMatchFlags(data.blockChangeRef, 
-                                tick, from.getWorld().getUID(), from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(),
-                                Direction.Y_POS, BlockProperties.F_BOUNCE25);
-                        if (entry != null) {
-                            data.blockChangeRef.updateSpan(entry);
-                            data.prependVerticalVelocity(new SimpleEntry(tick, 0.5015, 3)); // TODO: HACK
-                            tags.add("past_bounce");
+                        //                        // TODO: Push of box off-center has the same effect.
+                        //                        final BlockChangeEntry entry = blockChangeTracker.getBlockChangeEntryMatchFlags(data.blockChangeRef, 
+                        //                                tick, from.getWorld().getUID(), from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(),
+                        //                                Direction.Y_POS, BlockProperties.F_BOUNCE25);
+                        //                        if (entry != null) {
+                        //                            data.blockChangeRef.updateSpan(entry);
+                        //                            data.prependVerticalVelocity(new SimpleEntry(tick, 0.5015, 3)); // TODO: HACK
+                        //                            tags.add("past_bounce");
+                        //                        }
+                        //                        else 
+                        if (to.getY() - to.getBlockY() >= 0.015) {
+                            // Exclude ordinary cases for this condition.
+                            return null;
                         }
                     }
                     tags.add("blkmv_y_pos");

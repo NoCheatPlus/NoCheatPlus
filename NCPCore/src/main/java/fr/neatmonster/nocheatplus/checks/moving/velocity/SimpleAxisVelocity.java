@@ -30,6 +30,11 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class SimpleAxisVelocity {
 
+    private static final long FILTER_SPLIT = VelocityFlags.SPLIT_ABOVE_THIRD | VelocityFlags.SPLIT_ABOVE_0_42;
+
+    /** Flags for fast exclusion check in the end of the use(double, double) method. */
+    private static final long FILTER_POST_USE = FILTER_SPLIT;
+
     /** Margin for accepting a demanded 0.0 amount, regardless sign. */
     private static final double marginAcceptZero = 0.005;
 
@@ -87,22 +92,55 @@ public class SimpleAxisVelocity {
      */
     public SimpleEntry use(final double amount, final double tolerance) {
         final Iterator<SimpleEntry> it = queued.iterator();
+        SimpleEntry entry = null;
         while (it.hasNext()) {
-            final SimpleEntry entry = it.next();
+            entry = it.next();
             it.remove();
             if (matchesEntry(entry, amount, tolerance)) {
                 // Success.
-                return entry;
+                break;
             }
             else {
                 // Track unused velocity.
                 if (unusedActive) {
                     addUnused(entry);
                 }
+                entry = null;
             }
         }
-        // None found.
-        return null;
+        if (entry == null) {
+            // None found.
+            return null;
+        }
+        else {
+            if ((entry.flags & FILTER_POST_USE) != 0L) {
+                return processFlagsPostUse(entry, amount);
+            }
+            else {
+                return entry;
+            }
+        }
+    }
+
+    private SimpleEntry processFlagsPostUse(SimpleEntry entry, double amount) {
+        // Check flags for splitting entries.
+        if (allowsSplit(entry, amount)) {
+            addToFront(new SimpleEntry(entry.tick, entry.value - amount, entry.flags, 
+                    (entry.flags & VelocityFlags.SPLIT_RETAIN_ACTCOUNT) == 0 
+                    ? entry.actCount : Math.max(entry.actCount, 2))
+                    );
+            // TODO: For performance reasons we don't return the used amount.
+        }
+        return entry;
+    }
+
+    private final boolean allowsSplit(final SimpleEntry entry, final double amount) {
+        if ((entry.flags & FILTER_SPLIT) == 0L) {
+            return false;
+        }
+        final double remain = entry.value - amount;
+        return (entry.flags & VelocityFlags.SPLIT_ABOVE_THIRD) != 0L && remain > entry.value / 3.0
+                || (entry.flags & VelocityFlags.SPLIT_ABOVE_0_42) != 0L && remain > 0.42;
     }
 
     /**
@@ -114,11 +152,13 @@ public class SimpleAxisVelocity {
      * @param tolerance
      * @return
      */
-    public SimpleEntry peek(final double amount, final int maxActCount, final double tolerance) {
+    public SimpleEntry peek(final double amount, final int minActCount, final int maxActCount, 
+            final double tolerance) {
         final Iterator<SimpleEntry> it = queued.iterator();
         while (it.hasNext()) {
             final SimpleEntry entry = it.next();
-            if (entry.actCount < maxActCount && matchesEntry(entry, amount, tolerance)) {
+            if (entry.actCount >= minActCount && entry.actCount <= maxActCount 
+                    && matchesEntry(entry, amount, tolerance)) {
                 return entry;
             }
         }
@@ -138,7 +178,7 @@ public class SimpleAxisVelocity {
      *            Must be equal or greater than 0.0.
      * @return
      */
-    public boolean matchesEntry(final SimpleEntry entry, final double amount, final double tolerance) {
+    public boolean matchesEntry(final SimpleEntry entry, final double amount, double tolerance) {
         return Math.abs(amount) <= Math.abs(entry.value) + tolerance && 
                 (amount > 0.0 && entry.value > 0.0 && amount <= entry.value + tolerance 
                 || amount < 0.0 && entry.value < 0.0 && entry.value - tolerance <= amount 
