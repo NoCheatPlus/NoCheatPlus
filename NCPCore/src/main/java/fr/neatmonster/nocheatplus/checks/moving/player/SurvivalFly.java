@@ -1493,6 +1493,27 @@ public class SurvivalFly extends Check {
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks");
         }
+        
+        // Check being moved by blocks.
+        if (cc.trackBlockMove && hDistanceAboveLimit > 0.0 
+                && hDistanceAboveLimit < 0.515 // MAGIC
+                ) {
+            // Push by 0.49-0.51 in one direction.
+            final double xDistance = to.getX() - from.getX();
+            final double zDistance = to.getZ() - from.getZ();
+            if (Math.abs(xDistance) > 0.485 && Math.abs(xDistance) < 1.025
+                    && from.matchBlockChange(blockChangeTracker, data.blockChangeRef, 
+                    xDistance < 0 ? Direction.X_NEG : Direction.X_POS, 0.05)) {
+                hAllowedDistance = thisMove.hDistance; // MAGIC
+                hDistanceAboveLimit = 0.0;
+            }
+            else if (Math.abs(zDistance) > 0.485 && Math.abs(zDistance) < 1.025
+                    && from.matchBlockChange(blockChangeTracker, data.blockChangeRef, 
+                            zDistance < 0 ? Direction.Z_NEG : Direction.Z_POS, 0.05)) {
+                hAllowedDistance = thisMove.hDistance; // MAGIC
+                hDistanceAboveLimit = 0.0;
+            }
+        }
 
         // Check velocity.
         double hFreedom = 0.0; // Horizontal velocity used.

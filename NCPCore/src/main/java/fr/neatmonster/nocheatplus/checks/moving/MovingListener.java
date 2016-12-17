@@ -1032,6 +1032,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 debug(player, "checkPastStateBounceAscend: Don't add velocity.");
             }
         }
+        // TODO: There is a special case with 1.0 up on pistons pushing horizontal only (!).
         return false;
     }
 
