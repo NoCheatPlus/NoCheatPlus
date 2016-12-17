@@ -167,8 +167,6 @@ public class MovingData extends ACheckData {
     /** Last time the player was actually sprinting. */
     public long           timeSprinting = 0;
     public double         multSprinting = 1.30000002; // Multiplier at the last time sprinting.
-    /** Just used velocity, during processing of moving checks. */
-    public SimpleEntry  verVelUsed = null;
     /** Compatibility entry for bouncing of slime blocks and the like. */
     public SimpleEntry verticalBounce = null;
     /** Last used block change id (BlockChangeTracker). */
@@ -401,7 +399,6 @@ public class MovingData extends ACheckData {
         insideMediumCount = 0;
         vehicleConsistency = MoveConsistency.INCONSISTENT;
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
-        verVelUsed = null;
         verticalBounce = null;
         blockChangeRef.valid = false;
     }
@@ -940,9 +937,6 @@ public class MovingData extends ACheckData {
         if (!sfDirty && (horVel.hasActive() || horVel.hasQueued())) {
             sfDirty = true;
         }
-
-        // Reset the "just used" velocity.
-        verVelUsed = null;
     }
 
     /**
@@ -994,7 +988,7 @@ public class MovingData extends ACheckData {
     public SimpleEntry useVerticalVelocity(final double amount) {
         final SimpleEntry available = verVel.use(amount, TOL_VVEL);
         if (available != null) {
-            verVelUsed = available;
+            playerMoves.getCurrentMove().verVelUsed = available;
             sfDirty = true;
             // TODO: Consider sfNoLowJump = true;
         }
@@ -1009,6 +1003,7 @@ public class MovingData extends ACheckData {
      * @return
      */
     public SimpleEntry getOrUseVerticalVelocity(final double amount) {
+        final SimpleEntry verVelUsed = playerMoves.getCurrentMove().verVelUsed;
         if (verVelUsed != null) {
             if (verVel.matchesEntry(verVelUsed, amount, TOL_VVEL)) {
                 return verVelUsed;

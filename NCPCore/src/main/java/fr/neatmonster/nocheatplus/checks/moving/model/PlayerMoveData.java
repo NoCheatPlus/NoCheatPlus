@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.checks.moving.model;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 
 /**
  * Include player specific data for a move.
@@ -77,6 +78,12 @@ public class PlayerMoveData extends MoveData {
      */
     public boolean mightBeMultipleMoves;
 
+    /**
+     * Just the used vertical velocity. Could be overridden multiple times
+     * during processing of moving checks.
+     */
+    public SimpleEntry  verVelUsed = null;
+
     @Override
     protected void resetBase() {
         // Properties of the player.
@@ -90,6 +97,7 @@ public class PlayerMoveData extends MoveData {
         flyCheck = CheckType.UNKNOWN;
         modelFlying = null;
         mightBeMultipleMoves = false;
+        verVelUsed = null;
         // Super class last, because it'll set valid to true in the end.
         super.resetBase();
     }

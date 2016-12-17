@@ -149,7 +149,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * 
      */
     private static final long FLAGS_VELOCITY_BOUNCE_BLOCK = VelocityFlags.ORIGIN_BLOCK_BOUNCE;
-    
+
     private static final long FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND = FLAGS_VELOCITY_BOUNCE_BLOCK
             | VelocityFlags.SPLIT_ABOVE_0_42 | VelocityFlags.SPLIT_RETAIN_ACTCOUNT | VelocityFlags.ORIGIN_BLOCK_MOVE;
 
@@ -912,9 +912,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, 
             final MovingData data, final MovingConfig cc) {
         // TODO: Find more preconditions.
+        // TODO: Might later need to override/adapt just the bounce effect set by the ordinary method.
         final UUID worldId = from.getWorld().getUID();
         // Prepare (normal/extra) bounce.
-        // TODO: Might later need to override/adapt just the bounce effect set by the ordinary method.
         // Typical: a slime block has been there.
         final BlockChangeEntry entryBelowAny = blockChangeTracker.getBlockChangeEntryMatchFlags(
                 data.blockChangeRef, tick, worldId, to.getBlockX(), to.getBlockY() - 1, to.getBlockZ(), 
@@ -923,7 +923,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Check preconditions for bouncing here at all (!).
 
             // Check if the/a block below the feet of the player got pushed into the feet of the player.
-            // TODO: Not sure if this can/should be done on ascending.
             final BlockChangeEntry entryBelowY_POS = entryBelowAny.direction == Direction.Y_POS ? entryBelowAny 
                     : blockChangeTracker.getBlockChangeEntryMatchFlags(data.blockChangeRef, tick, worldId, 
                             to.getBlockX(), to.getBlockY() - 1, to.getBlockZ(), Direction.Y_POS, 
@@ -938,8 +937,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 return BounceType.STATIC_PAST;
             }
         }
-
-        // TODO: ADDITIONAL: A slime block has been pushed up [a) block below counts ? b) into the feet of the player].
         /*
          * TODO: Can't update span here. If at all, it can be added as side
          * condition for using the bounce effect. Probably not worth it.
@@ -951,63 +948,65 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Player player, final PlayerLocation from, final PlayerLocation to,
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, 
             final MovingData data, final MovingConfig cc) {
-        // TODO: find more preconditions.
+        // TODO: More preconditions.
+        // TODO: Nail down to more precise side conditions for larger jumps, if possible.
         final UUID worldId = from.getWorld().getUID();
         // Possibly a "lost use of slime".
         // TODO: Might need to cover push up, after ordinary slime bounce.
-        // TODO: Cover push by slime block (center/feet on block).
-        // TODO: Might need to cover push by slime block (center/feet off block).
-        // TODO: Low fall distance cases and where no slime block was underneath at descend have to be included here.
-        // TODO: Note that onPreparedBounceSupport etc. has to be called in here, if needed.
-
-
-
         // TODO: Work around 0-dist?
-        // TODO: set data.verticalBounce and call data.useVerticalBounce right away (!) -> fall damage !?
-        // TODO: typically up to 1.5 above max level of pushed block ! (typically 2.0 total with 0.0 between).
-        /*
-         * TODO: Other concepts? a) maxCoordinate for SimpleEntry? (alters
-         * method calls to SimpleAxisVelocity) b) use past move tracking and
-         * store more moves (!) and store more context (e.g. bounce entry for
-         * center). c) combine both approaches, possibly use an interface to be
-         * set within SimpleEntry.
-         */
-
+        // TODO: Adjust amount based on side conditions (center push or off center, distance to block top).
+        double amount = -1.0;
         final BlockChangeEntry entryBelowY_POS = blockChangeTracker.getBlockChangeEntryMatchFlags(
                 data.blockChangeRef, tick, worldId, from.getBlockX(), from.getBlockY() - 1, from.getBlockZ(), 
                 Direction.Y_POS, BlockProperties.F_BOUNCE25);
         if (
                 // Center push.
                 entryBelowY_POS != null
-                // Off center push (2x 0.5(015) only, (sum below 1.015 ?)).
+                // Off center push.
                 || thisMove.yDistance < 1.015 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
                         data.blockChangeRef, Direction.Y_POS, Math.min(.415, thisMove.yDistance), 
                         BlockProperties.F_BOUNCE25)
                 ) {
-            // Always allow the double 0.505 move.
-            /*
-             * TODO: May detect the first 0.505 move to match preconditions
-             * better (roughly 2x 0.5, 0.0 -> 1.5, -0.few -> 1.389). One might
-             * also nail down to past y-position further. Also consider
-             * confining to horizontal speed envelope (is that even possible)?
-             */
             if (data.debug) {
-                debug(player, "checkPastStateBounceAscend: " + (entryBelowY_POS == null ? "off_center" : "center"));
+                debug(player, "Direct block push with bounce (" + (entryBelowY_POS == null ? "off_center)." : "center)."));
             }
-            // TODO: Nail down to more precise side conditions for larger jumps, if possible.
-            // TODO: Adjust amount based on side conditions (center push or off center, distance to block top).
-            // TODO: Center push, without being hit by the block (2 below!) -> 0.5 off ground + 1.5 roughly !
-            // TODO: Push up, without being inside the pushed block (0.5 + 0.9x).
-            // TODO: Add two entries, split based on current yDistance?
+            amount = Math.min(Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515), 
+                    2.525); // TODO: EXACT MAGIC.
+            if (entryBelowY_POS != null) {
+                data.blockChangeRef.updateSpan(entryBelowY_POS);
+            }
+        }
+        // Center push while being on the top height of the pushed block already (or 0.5 above (!)).
+        if (
+                amount < 0.0
+                // TODO: Not sure about y-Distance.
+                // TODO: MAGIC EVERYWHERE
+                && lastMove.toIsValid && lastMove.yDistance >= 0.0 && lastMove.yDistance <= 0.505
+                && from.getY() - (double) from.getBlockY() == lastMove.yDistance // TODO: Margin?
+                ) {
+            final BlockChangeEntry entry2BelowY_POS = blockChangeTracker.getBlockChangeEntryMatchFlags(
+                    data.blockChangeRef, tick, worldId, from.getBlockX(), from.getBlockY() - 2, from.getBlockZ(), 
+                    Direction.Y_POS, BlockProperties.F_BOUNCE25);
+            if (entry2BelowY_POS != null
+                    // TODO: Does off center push exist with this very case?
+                    ) {
+                if (data.debug) {
+                    debug(player, "Foot position block push with bounce (" + (entry2BelowY_POS == null ? "off_center)." : "center)."));
+                }
+                amount = Math.min(Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515), 
+                        2.015 - lastMove.yDistance); // TODO: EXACT MAGIC.
+                if (entryBelowY_POS != null) {
+                    data.blockChangeRef.updateSpan(entry2BelowY_POS);
+                }
+            }
+        }
+        // Finally add velocity if set.
+        if (amount >= 0.0) {
             /*
              * TODO: USE EXISTING velocity with bounce flag set first, then peek
              * / add. (might while peek -> has bounce flag: remove velocity)
              */
-            final double amount = Math.min(Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515), 
-                    2.525); // TODO: EXACT MAGIC.
-            if (lastMove.toIsValid && lastMove.yDistance < 0.42 ||
-                    data.peekVerticalVelocity(amount, 2, 3) == null) {
-                // (Could skip peek for low distances around 0.5.)
+            if (data.peekVerticalVelocity(amount, 2, 3) == null) {
                 /*
                  * TODO: Concepts for limiting... max amount based on side
                  * conditions such as block height+1.5, max coordinate, max
@@ -1017,17 +1016,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                  * past move tracking, or a sub-class of SimpleEntry with better
                  * access signatures including thisMove.
                  */
+                /*
+                 * TODO: Also account for current yDistance here? E.g. Add two
+                 * entries, split based on current yDistance?
+                 */
                 final SimpleEntry vel = new SimpleEntry(tick, amount, FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND, 4);
                 data.verticalBounce = vel;
                 data.useVerticalBounce(player);
-                /*
-                 * TODO: Update span or not ... [could use a class that extends
-                 * SimpleEntry but which also contains a block change id to update
-                 * span with, upon using that entry?]
-                 */
-                if (entryBelowY_POS != null) {
-                    data.blockChangeRef.updateSpan(entryBelowY_POS);
-                }
                 if (data.debug) {
                     debug(player, "checkPastStateBounceAscend: add velocity: " + vel);
                 }
@@ -1053,12 +1048,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private boolean checkBounceEnvelope(final Player player, final PlayerLocation from, final PlayerLocation to, 
             final MovingData data, final MovingConfig cc) {
-        /*
-         * TODO: Likely not conform with getting pushed up, while outside of the
-         * strict envelope. The advantage of detecting that here could be the
-         * invalidation mechanics (also consider passable etc.), otherwise the
-         * move up might miss the already invalidated push up.
-         */
         return 
                 // 0: Normal envelope (forestall NoFall).
                 (

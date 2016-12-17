@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
@@ -410,7 +411,8 @@ public class SurvivalFly extends Check {
                 // Silent set-back.
                 if (data.debug) {
                     tags.add("silentsbcobweb");
-                    outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+                    outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, 
+                            yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo, thisMove);
                     data.ws.setJustUsedIds(null);
                 }
                 return data.getSetBack(to);
@@ -456,7 +458,8 @@ public class SurvivalFly extends Check {
         // Debug output.
         final int tagsLength;
         if (data.debug) {
-            outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+            outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, 
+                    yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo, thisMove);
             tagsLength = tags.size();
             data.ws.setJustUsedIds(null);
         }
@@ -578,7 +581,7 @@ public class SurvivalFly extends Check {
                 // Prevent reset if coming from air (purpose of the flag).
                 data.sfLowJump = false;
             }
-            if (hFreedom <= 0.0 && data.verVelUsed == null) {
+            if (hFreedom <= 0.0 && thisMove.verVelUsed == null) {
                 data.resetVelocityJumpPhase();
             }
         }
@@ -1111,6 +1114,13 @@ public class SurvivalFly extends Check {
             else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data, cc)) {
                 // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
+            else if (thisMove.yDistance < 1.0 && thisMove.yDistance > 0.9 
+                    && lastMove.yDistance >= 1.5 && data.sfJumpPhase <= 2
+                    && lastMove.verVelUsed != null 
+                    && (lastMove.verVelUsed.flags & (VelocityFlags.ORIGIN_BLOCK_MOVE | VelocityFlags.ORIGIN_BLOCK_BOUNCE)) != 0) {
+                // Allow too strong decrease.
+                // TODO: Another magic check here? Route most checks through methods anyway?
+            }
             else {
                 vDistRelVL = true;
             }
@@ -1199,7 +1209,8 @@ public class SurvivalFly extends Check {
         // TODO: move into the in air checking above !?
         if (!envelopeHack && !resetFrom && !resetTo) {
             // "On-air" checks (vertical, already use velocity if needed).
-            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, inAirChecks(now, from, to, hDistance, yDistance, lastMove, data, cc));
+            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, 
+                    inAirChecks(now, from, to, hDistance, yDistance, thisMove, lastMove, data, cc));
         }
 
         // Block 'step' with yDistance between step height and minJumpGain (vdistrel and vdistsb should catch the rest).
@@ -1298,7 +1309,10 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double inAirChecks(final long now, final PlayerLocation from, final PlayerLocation to, 
+            final double hDistance, final double yDistance, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
+            final MovingData data, final MovingConfig cc) {
         double vDistanceAboveLimit = 0;
 
         // y direction change detection.
@@ -1319,7 +1333,7 @@ public class SurvivalFly extends Check {
                 // Allow adding 0.
                 data.vDistAcc.add((float) yDistance);
             }
-            else if (data.verVelUsed == null) { // Only skip if just used.
+            else if (thisMove.verVelUsed == null) { // Only skip if just used.
                 // Here yDistance can be negative and positive.
                 //                if (yDistance != 0.0) {
                 data.vDistAcc.add((float) yDistance);
@@ -2017,11 +2031,13 @@ public class SurvivalFly extends Check {
      * @param toOnGround
      * @param resetTo
      */
-    private void outputDebug(final Player player, final PlayerLocation to, final MovingData data, final MovingConfig cc, 
-            final double hDistance, final double hAllowedDistance, final double hFreedom, final double yDistance, final double vAllowedDistance,
-            final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
+    private void outputDebug(final Player player, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc, 
+            final double hDistance, final double hAllowedDistance, final double hFreedom, 
+            final double yDistance, final double vAllowedDistance,
+            final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo,
+            final PlayerMoveData thisMove) {
         // TODO: Show player name once (!)
-        final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         final StringBuilder builder = new StringBuilder(500);
         builder.append(CheckUtils.getLogMessagePrefix(player, type));
@@ -2035,8 +2051,8 @@ public class SurvivalFly extends Check {
         if (lastMove.toIsValid) {
             builder.append(" , fdsq: " + StringUtil.fdec3.format(thisMove.distanceSquared / lastMove.distanceSquared));
         }
-        if (data.verVelUsed != null) {
-            builder.append(" , vVelUsed: " + data.verVelUsed + " ");
+        if (thisMove.verVelUsed != null) {
+            builder.append(" , vVelUsed: " + thisMove.verVelUsed + " ");
         }
         data.addVerticalVelocity(builder);
         //		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001) {

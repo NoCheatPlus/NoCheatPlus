@@ -512,7 +512,9 @@ public class CreativeFly extends Check {
         return Math.max(maximumHeight - 10.0, world.getMaxHeight());
     }
 
-    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, final MovingData data) {
+    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, 
+            final double yDistance, final double limitV, final ModelFlying model, final List<String> tags, 
+            final MovingData data) {
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         StringBuilder builder = new StringBuilder(350);
         final String dHDist = lastMove.toIsValid ? " (" + StringUtil.formatDiff(hDistance, lastMove.hDistance) + ")" : "";
@@ -522,8 +524,8 @@ public class CreativeFly extends Check {
         if (lastMove.toIsValid) {
             builder.append(" , fdsq: " + StringUtil.fdec3.format(thisMove.distanceSquared / lastMove.distanceSquared));
         }
-        if (data.verVelUsed != null) {
-            builder.append(" , vVelUsed: " + data.verVelUsed);
+        if (thisMove.verVelUsed != null) {
+            builder.append(" , vVelUsed: " + thisMove.verVelUsed);
         }
         builder.append(" , model: " + model.id);
         if (!tags.isEmpty()) {
