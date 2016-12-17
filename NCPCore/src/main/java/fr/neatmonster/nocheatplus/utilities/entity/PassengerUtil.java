@@ -53,7 +53,23 @@ public class PassengerUtil {
      * @return the last non player vehicle
      */
     public static Entity getLastNonPlayerVehicle(final Entity passenger) {
-        Entity vehicle = passenger.getVehicle();
+        return getLastNonPlayerVehicle(passenger, false);
+    }
+
+    /**
+     * Check recursively for vehicles, returns null if players are vehicles,
+     * otherwise the lowest vehicle (that has no vehicle).
+     *
+     * @param passenger
+     *            The passenger of vehicles. Typically the player.
+     * @param includePassenger
+     *            If set to true, the passenger is counted as a vehicle as well
+     *            (meaning: vehicle enter, ther player is not in a vehicle, test
+     *            with this set to true and the vehicle returned by the event).
+     * @return the last non player vehicle
+     */
+    public static Entity getLastNonPlayerVehicle(final Entity passenger, final boolean includePassenger) {
+        Entity vehicle = includePassenger ? passenger : passenger.getVehicle();
         while (vehicle != null){
             if (vehicle instanceof Player){
                 return null;

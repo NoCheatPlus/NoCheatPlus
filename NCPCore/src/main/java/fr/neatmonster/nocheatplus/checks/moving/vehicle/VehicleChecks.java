@@ -15,6 +15,8 @@
 package fr.neatmonster.nocheatplus.checks.moving.vehicle;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -56,6 +58,7 @@ import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHand
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
@@ -229,6 +232,8 @@ public class VehicleChecks extends CheckListener {
                 final MovingConfig cc = MovingConfig.getConfig(player);
                 if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
                     if (cc.vehicleEnforceLocation) {
+                        // checks.moving.vehicle.enforcelocation
+                        // TODO: Permission + bypass check(s) !
                         return vLoc;
                     } else {
                         return null;
@@ -335,6 +340,7 @@ public class VehicleChecks extends CheckListener {
         final World world = vehicle.getWorld();
         final MovingConfig cc = MovingConfig.getConfig(player);
         final VehicleMoveInfo moveInfo = aux.useVehicleMoveInfo();
+        // vehicleLocation: Track when it could become null! -> checkIllegal  -> no setback or null location.
         final Location vehicleLocation = vehicle.getLocation(moveInfo.useLoc);
         final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
         // Ensure firstPastMove is valid.
@@ -652,11 +658,11 @@ public class VehicleChecks extends CheckListener {
             debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
         }
         // Check for nested vehicles.
-        final Entity lastVehicle = PassengerUtil.getLastNonPlayerVehicle(player);
+        final Entity lastVehicle = PassengerUtil.getLastNonPlayerVehicle(vehicle, true);
         if (lastVehicle == null) {
             data.clearVehicleData();
             if (data.debug) {
-                debug(player, "Vehicle enter: Skip on nested vehicles, possibly with multiple players involved, who would do that?");
+                debugNestedVehicleEnter(player);
             }
             return;
         }
@@ -673,6 +679,19 @@ public class VehicleChecks extends CheckListener {
             dataOnVehicleEnter(player, vehicle, data);
         }
 
+    }
+
+    private void debugNestedVehicleEnter(Player player) {
+        debug(player, "Vehicle enter: Skip on nested vehicles, possibly with multiple players involved, who would do that?");
+        List<String> vehicles = new LinkedList<String>();
+        Entity tempVehicle = player.getVehicle();
+        while (tempVehicle != null) {
+            vehicles.add(tempVehicle.getType().toString());
+            tempVehicle = tempVehicle.getVehicle();
+        }
+        if (!vehicles.isEmpty()) {
+            debug(player, "Vehicle enter: Nested vehicles: " + StringUtil.join(vehicles, ", "));
+        }
     }
 
     /**
