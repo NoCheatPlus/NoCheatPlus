@@ -692,6 +692,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Check jumping on things like slime blocks.
             // Detect bounce type / use prepared bounce.
             if (newTo == null) {
+                // TODO: Mixed ground (e.g. slime blocks + slabs), specifically on pushing.
+                // TODO: More on fall damage. What with sneaking + past states?
                 // TODO: With past states: What does jump effects do here?
                 if (to.getY() < from.getY()) {
                     // Prepare bounce: The center of the player must be above the block.

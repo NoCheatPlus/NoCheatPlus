@@ -676,6 +676,11 @@ public class SurvivalFly extends Check {
     private double[] getVerticalBlockMoveResult(final double yDistance, 
             final PlayerLocation from, final PlayerLocation to, 
             final int tick, final MovingData data) {
+        /*
+         * TODO: Pistons pushing horizontally allow similar/same upwards
+         * (downwards?) moves (possibly all except downwards, which is hard to
+         * test :p).
+         */
         // TODO: Allow push up to 1.0 (or 0.65 something) even beyond block borders, IF COVERED [adapt PlayerLocation].
         // TODO: Other conditions/filters ... ?
         // Push (/pull) up.
@@ -1493,17 +1498,19 @@ public class SurvivalFly extends Check {
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks");
         }
-        
+
         // Check being moved by blocks.
         if (cc.trackBlockMove && hDistanceAboveLimit > 0.0 
-                && hDistanceAboveLimit < 0.515 // MAGIC
+                && hDistanceAboveLimit < 1.025 // MAGIC
                 ) {
-            // Push by 0.49-0.51 in one direction.
+            // Push by 0.49-0.51 in one direction. Also observed 1.02.
+            // TODO: Better also test if the per axis distance is equal to or exceeds hDistanceAboveLimit?
+            // TODO: The minimum push value can be misleading (blocked by a block?)
             final double xDistance = to.getX() - from.getX();
             final double zDistance = to.getZ() - from.getZ();
             if (Math.abs(xDistance) > 0.485 && Math.abs(xDistance) < 1.025
                     && from.matchBlockChange(blockChangeTracker, data.blockChangeRef, 
-                    xDistance < 0 ? Direction.X_NEG : Direction.X_POS, 0.05)) {
+                            xDistance < 0 ? Direction.X_NEG : Direction.X_POS, 0.05)) {
                 hAllowedDistance = thisMove.hDistance; // MAGIC
                 hDistanceAboveLimit = 0.0;
             }
