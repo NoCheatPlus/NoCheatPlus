@@ -176,7 +176,11 @@ public class NetStatic {
      * @return
      */
     public static NetConfig getWorldConfig(Player player, NetConfigCache configCache, NetDataFactory dataFactory) {
-        final World world = player.getWorld();
+        World world = null;
+        try {
+            world = player.getWorld();
+        }
+        catch (UnsupportedOperationException e) {}
         return configCache.getConfig(world == null ? dataFactory.getData(player).currentWorldName : world.getName()); 
     }
 
