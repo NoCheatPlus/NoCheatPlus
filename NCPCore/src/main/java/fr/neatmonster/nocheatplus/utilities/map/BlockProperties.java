@@ -4047,10 +4047,15 @@ public class BlockProperties {
      * Cleanup. Call init() to re-initialize.
      */
     public static void cleanup() {
-        pLoc.cleanup();
-        pLoc = null;
-        wrapBlockCache.cleanup();
-        wrapBlockCache = null;
+        // (Null checks are error cases, to be intercepted elsewhere.)
+        if (pLoc != null) {
+            pLoc.cleanup();
+            pLoc = null;
+        }
+        if (wrapBlockCache != null) {
+            wrapBlockCache.cleanup();
+            wrapBlockCache = null;
+        }
         // TODO: might empty mappings...
     }
 
