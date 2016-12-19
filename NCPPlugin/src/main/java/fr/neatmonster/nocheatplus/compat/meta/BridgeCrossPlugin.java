@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectBase;
+import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
 import fr.neatmonster.nocheatplus.components.registry.feature.IPostRegisterRunnable;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -38,9 +39,20 @@ public class BridgeCrossPlugin implements IBridgeCrossPlugin, IPostRegisterRunna
     private final Class<?> entityClass;
 
     public BridgeCrossPlugin() {
-        ReflectBase reflectBase = new ReflectBase();
-        this.playerClass = getEntityClass(reflectBase, "Player");
-        this.entityClass = getEntityClass(reflectBase, "Entity", "");
+        ReflectBase reflectBase = null;
+        try {
+            reflectBase = new ReflectBase();
+        }
+        catch (NullPointerException e1) {}
+        catch (ReflectFailureException e2) {}
+        if (reflectBase != null) {
+            this.playerClass = getEntityClass(reflectBase, "Player");
+            this.entityClass = getEntityClass(reflectBase, "Entity", "");
+        }
+        else {
+            this.playerClass = null;
+            this.entityClass = null;
+        }
     }
 
     private Class<?> getEntityClass(ReflectBase reflectBase, String entityName) {
