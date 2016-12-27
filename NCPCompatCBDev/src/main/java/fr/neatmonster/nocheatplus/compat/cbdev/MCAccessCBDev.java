@@ -99,7 +99,7 @@ public class MCAccessCBDev implements MCAccess {
     @Override
     public String getMCVersion() {
         // 1.10 (1_10_R1)
-        return "1.10";
+        return "1.10-1.10.2";
     }
 
     @Override
