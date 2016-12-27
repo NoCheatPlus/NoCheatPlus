@@ -21,7 +21,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -234,22 +233,6 @@ public class CheckUtils {
      */
     public static Random getRandom() {
         return NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Random.class);
-    }
-
-    /**
-     * Find the appropriate BlockFace.
-     * @param x Exact increments.
-     * @param y
-     * @param z
-     * @return
-     */
-    public static BlockFace matchBlockFace(int x, int y, int z) {
-        for (BlockFace blockFace : BlockFace.values()) {
-            if (blockFace.getModX() == x && blockFace.getModY() == y && blockFace.getModZ() == z) {
-                return blockFace;
-            }
-        }
-        return null;
     }
 
 }

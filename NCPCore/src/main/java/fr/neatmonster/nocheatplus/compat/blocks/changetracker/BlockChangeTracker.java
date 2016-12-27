@@ -35,7 +35,6 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHashMap;
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
@@ -44,6 +43,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.LinkedCoordHashMap.MoveOrder;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache.IBlockCacheNode;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
 /**
  * Keep track of block changes, to allow mitigation of false positives. Think of
@@ -65,12 +65,12 @@ public class BlockChangeTracker {
 
     public static enum Direction {
         NONE(BlockFace.SELF),
-        X_POS(CheckUtils.matchBlockFace(1, 0, 0)),
-        X_NEG(CheckUtils.matchBlockFace(-1, 0, 0)),
-        Y_POS(CheckUtils.matchBlockFace(0, 1, 0)),
-        Y_NEG(CheckUtils.matchBlockFace(0, -1, 0)),
-        Z_POS(CheckUtils.matchBlockFace(0, 0, 1)),
-        Z_NEG(CheckUtils.matchBlockFace(0, 0, -1));
+        X_POS(MapUtil.matchBlockFace(1, 0, 0)),
+        X_NEG(MapUtil.matchBlockFace(-1, 0, 0)),
+        Y_POS(MapUtil.matchBlockFace(0, 1, 0)),
+        Y_NEG(MapUtil.matchBlockFace(0, -1, 0)),
+        Z_POS(MapUtil.matchBlockFace(0, 0, 1)),
+        Z_NEG(MapUtil.matchBlockFace(0, 0, -1));
 
         public static Direction getDirection(final BlockFace blockFace) {
             final int x = blockFace.getModX();

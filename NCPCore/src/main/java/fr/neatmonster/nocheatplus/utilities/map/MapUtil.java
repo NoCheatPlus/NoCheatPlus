@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.utilities.map;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -28,6 +29,22 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 public class MapUtil {
+
+    /**
+     * Find the appropriate BlockFace.
+     * @param x Exact increments.
+     * @param y
+     * @param z
+     * @return
+     */
+    public static BlockFace matchBlockFace(int x, int y, int z) {
+        for (BlockFace blockFace : BlockFace.values()) {
+            if (blockFace.getModX() == x && blockFace.getModY() == y && blockFace.getModZ() == z) {
+                return blockFace;
+            }
+        }
+        return null;
+    }
 
     /**
      * Convenience method to check if the bounds as returned by getBounds cover
