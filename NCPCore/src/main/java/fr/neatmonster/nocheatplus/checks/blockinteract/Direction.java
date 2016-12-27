@@ -21,9 +21,9 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.collision.CollideRayVsAABB;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollideRayVsAABB;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
  * The Direction check will find out if a player tried to interact with something that's not in their field of view.

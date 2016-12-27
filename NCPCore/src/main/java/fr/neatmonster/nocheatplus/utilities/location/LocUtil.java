@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.moving.location;
+package fr.neatmonster.nocheatplus.utilities.location;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,7 +23,6 @@ import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
-import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 
 /**
  * Auxiliary methods for Location handling, mainly intended for use with

@@ -17,9 +17,9 @@ package fr.neatmonster.nocheatplus.checks.moving.location.setback;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.ISetLocationWithLook;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
  * Mutable location with timing and validity information. Not complex objects

@@ -14,8 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.checks.net.model;
 
-import fr.neatmonster.nocheatplus.checks.moving.location.LocUtil;
 import fr.neatmonster.nocheatplus.components.location.IGetPositionWithLook;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
  * An immutable location data object with coordinates and pitch and yaw.
