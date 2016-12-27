@@ -274,7 +274,7 @@ public class CreativeFly extends Check {
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
         if (model.applyModifiers) {
             final double speedModifier = mcAccess.getHandle().getFasterMovementAmplifier(player);
-            if (speedModifier == Double.NEGATIVE_INFINITY) {
+            if (Double.isInfinite(speedModifier)) {
                 fSpeed = 1.0;
             }
             else {

@@ -73,7 +73,7 @@ public class MovingUtil {
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
-                && (Bridge1_9.getLevitationAmplifier(player) == Double.NEGATIVE_INFINITY || fromLocation.isInLiquid())
+                && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) || fromLocation.isInLiquid())
                 && (!Bridge1_9.isGlidingWithElytra(player) || fromLocation.isOnGroundOrResetCond())
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
     }
@@ -262,7 +262,7 @@ public class MovingUtil {
 
     public static double getJumpAmplifier(final Player player, final MCAccess mcAccess) {
         final double amplifier = mcAccess.getJumpAmplifier(player);
-        if (amplifier == Double.NEGATIVE_INFINITY) {
+        if (Double.isInfinite(amplifier)) {
             return 0.0;
         }
         else {

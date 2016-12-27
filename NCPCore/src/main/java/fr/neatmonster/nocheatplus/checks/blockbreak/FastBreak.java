@@ -129,7 +129,7 @@ public class FastBreak extends Check {
             final ItemStack stack = Bridge1_9.getItemInMainHand(player);
             final boolean isValidTool = BlockProperties.isValidTool(blockType, stack);
             final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
-            String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockType + "] "+ elapsedTime + "u / " + expectedBreakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
+            String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockType + "] "+ elapsedTime + "u / " + expectedBreakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (Double.isInfinite(haste) ? "" : " haste=" + ((int) haste + 1));
             player.sendMessage(msg);
             //        	net.minecraft.server.Item mcItem = net.minecraft.server.Item.byId[stack.getTypeId()];
             //        	if (mcItem != null) {

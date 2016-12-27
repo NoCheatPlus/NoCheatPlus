@@ -252,7 +252,7 @@ public class LocUtil {
      * @return
      */
     public static final boolean needsYawCorrection(final float yaw) {
-        return yaw == Float.NaN || yaw < 0f || yaw >= 360f;
+        return Float.isNaN(yaw) || yaw < 0f || yaw >= 360f;
     }
 
     /**
@@ -262,7 +262,7 @@ public class LocUtil {
      * @return
      */
     public static final boolean needsPitchCorrection(final float pitch) {
-        return pitch == Float.NaN || pitch < -90f || pitch > 90f;
+        return Float.isNaN(pitch) || pitch < -90f || pitch > 90f;
     }
 
     /**
@@ -283,7 +283,7 @@ public class LocUtil {
      * @return
      */
     public static final float correctYaw(float yaw) {
-        if (yaw == Float.NaN) {
+        if (Float.isNaN(yaw)) {
             return 0f;
         }
         if (yaw >= 360f) {
@@ -314,7 +314,7 @@ public class LocUtil {
      * @return
      */
     public static final float correctPitch(float pitch) {
-        if (pitch == Float.NaN) {
+        if (Float.isNaN(pitch)) {
             return 0f;
         } else if (pitch < -90f) {
             return -90f;

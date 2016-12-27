@@ -400,7 +400,7 @@ public class MovingConfig extends ACheckConfig {
             // TODO: INCONSISTENT.
             return modelGameMode;
         }
-        if (Bridge1_9.getLevitationAmplifier(player) != Double.NEGATIVE_INFINITY) {
+        if (!Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))) {
             return flyingModelLevitation;
         }
         if (fromLocation.isOnGroundOrResetCond()) {

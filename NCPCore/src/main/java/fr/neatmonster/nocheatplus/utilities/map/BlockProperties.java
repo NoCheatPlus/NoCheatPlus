@@ -1405,7 +1405,7 @@ public class BlockProperties {
         // Haste (faster digging).
         final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
         // TODO: haste: int / double !?
-        return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste == Double.NEGATIVE_INFINITY ? 0 : 1 + (int) haste);
+        return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), Double.isInfinite(haste) ? 0 : 1 + (int) haste);
     }
 
     /**

@@ -312,7 +312,9 @@ public class TrigUtil {
      */
     public static float angle(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ) {
         double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-        if (dirLength == 0.0) dirLength = 1.0; // ...
+        if (dirLength == 0.0) {
+            dirLength = 1.0; // ...
+        }
 
         final double dX = targetX - sourceX;
         final double dY = targetY - sourceY;
@@ -338,15 +340,29 @@ public class TrigUtil {
      */
     public static final double angle(final double x, final double z){
         final double a;
-        if (x > 0.0) a = Math.atan(z / x);
-        else if  (x < 0.0) a = Math.atan(z / x) + Math.PI;
-        else{
-            if (z < 0.0) a=3.0 * Math.PI / 2.0;
-            else if (z > 0.0) a = Math.PI / 2.0;
-            else return Double.NaN;
+        if (x > 0.0) {
+            a = Math.atan(z / x);
         }
-        if (a < 0.0) return a + 2.0 * Math.PI;
-        else return a;
+        else if  (x < 0.0) {
+            a = Math.atan(z / x) + Math.PI;
+        }
+        else{
+            if (z < 0.0) {
+                a = 3.0 * Math.PI / 2.0;
+            }
+            else if (z > 0.0) {
+                a = Math.PI / 2.0;
+            }
+            else {
+                return Double.NaN;
+            }
+        }
+        if (a < 0.0) {
+            return a + 2.0 * Math.PI;
+        }
+        else {
+            return a;
+        }
     }
 
     /**
@@ -360,11 +376,20 @@ public class TrigUtil {
      * @return Difference of angle from -pi to pi
      */
     public static final double angleDiff(final double a1, final double a2){
-        if (Double.isNaN(a1) || Double.isNaN(a1)) return Double.NaN;
+        if (Double.isNaN(a1) || Double.isNaN(a2)) {
+            return Double.NaN;
+        }
         final double diff = a2 - a1;
-        if (diff < -Math.PI) return diff + 2.0 * Math.PI;
-        else if (diff > Math.PI) return diff - 2.0 * Math.PI;
-        else return diff;
+        // TODO: What with resulting special values here?
+        if (diff < -Math.PI) {
+            return diff + 2.0 * Math.PI;
+        }
+        else if (diff > Math.PI) {
+            return diff - 2.0 * Math.PI;
+        }
+        else {
+            return diff;
+        }
     }
 
     /**
@@ -379,13 +404,25 @@ public class TrigUtil {
      *         [-180, 180].
      */
     public static final float yawDiff(float fromYaw, float toYaw){
-        if (fromYaw <= -360f) fromYaw = -((-fromYaw) % 360f);
-        else if (fromYaw >= 360f) fromYaw = fromYaw % 360f;
-        if (toYaw <= -360f) toYaw = -((-toYaw) % 360f);
-        else if (toYaw >= 360f) toYaw = toYaw % 360f;
+        if (fromYaw <= -360f) {
+            fromYaw = -((-fromYaw) % 360f);
+        }
+        else if (fromYaw >= 360f) {
+            fromYaw = fromYaw % 360f;
+        }
+        if (toYaw <= -360f) {
+            toYaw = -((-toYaw) % 360f);
+        }
+        else if (toYaw >= 360f) {
+            toYaw = toYaw % 360f;
+        }
         float yawDiff = toYaw - fromYaw;
-        if (yawDiff < -180f) yawDiff += 360f;
-        else if (yawDiff > 180f) yawDiff -= 360f;
+        if (yawDiff < -180f) {
+            yawDiff += 360f;
+        }
+        else if (yawDiff > 180f) {
+            yawDiff -= 360f;
+        }
         return yawDiff;
     }
 

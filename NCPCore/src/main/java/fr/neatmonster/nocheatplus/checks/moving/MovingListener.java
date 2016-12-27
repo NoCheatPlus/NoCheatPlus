@@ -2255,14 +2255,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
             }
         }
-        if (speed != Double.NEGATIVE_INFINITY) {
+        if (!Double.isInfinite(speed)) {
             builder.append("(e_speed=" + (speed + 1) + ")");
         }
         final double slow = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SLOW);
-        if (slow != Double.NEGATIVE_INFINITY) {
+        if (Double.isInfinite(slow)) {
             builder.append("(e_slow=" + (slow + 1) + ")");
         }
-        if (jump != Double.NEGATIVE_INFINITY) {
+        if (Double.isInfinite(jump)) {
             builder.append("(e_jump=" + (jump + 1) + ")");
         }
         if (strider != 0) {

@@ -117,7 +117,7 @@ public class CheckUtils {
     }
 
     /**
-     * Check for NaN, infinity.
+     * Check for NaN, infinity, some random maximum coordinate.
      *
      * @param doubles
      *            the doubles

@@ -371,7 +371,7 @@ public class CollisionUtil {
      */
     public static double getMaxTimeIncludeEdges(final double pos, final double dir, 
             final double minPos, final double maxPos, final double minTime) {
-        if (minTime == Double.POSITIVE_INFINITY) {
+        if (Double.isInfinite(minTime)) {
             return Double.NaN;
         }
         else if (dir == 0.0) {

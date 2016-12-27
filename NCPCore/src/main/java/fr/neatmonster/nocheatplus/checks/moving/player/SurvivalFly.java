@@ -865,7 +865,7 @@ public class SurvivalFly extends Check {
                 // TODO: Slowness potion.
                 // Count in speed potions.
                 final double speedAmplifier = mcAccess.getHandle().getFasterMovementAmplifier(player);
-                if (speedAmplifier != Double.NEGATIVE_INFINITY) {
+                if (!Double.isInfinite(speedAmplifier)) {
                     hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
                 }
             }
