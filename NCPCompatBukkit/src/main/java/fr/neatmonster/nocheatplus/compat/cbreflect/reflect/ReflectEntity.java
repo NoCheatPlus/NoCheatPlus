@@ -33,6 +33,7 @@ public class ReflectEntity extends ReflectGetHandleBase<Entity> {
     @MostlyHarmless()
     public final Field nmsHeight; // Not anymore in 1.11.
 
+    // TODO: Pre 1.7.10 would be a field: nmsBoundingBox
     public final Method nmsGetBoundingBox;
 
     public final Field nmsDead;
