@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import net.minecraft.server.v1_8_R2.AxisAlignedBB;
 import net.minecraft.server.v1_8_R2.Block;
@@ -121,6 +122,9 @@ public class MCAccessSpigotCB1_8_R2 implements MCAccess{
         }
         // TODO: Does this need a method call for the "real" box? Might be no problem during moving events, though.
         final AxisAlignedBB box = entityPlayer.getBoundingBox();
+        if (LocUtil.isBadCoordinate(box.a, box.b, box.c, box.d, box.e, box.f)) {
+            return AlmostBoolean.YES;
+        }
         if (!entityPlayer.isSleeping()) {
             // This can not really test stance but height of bounding box.
             final double dY = Math.abs(box.e - box.b);
