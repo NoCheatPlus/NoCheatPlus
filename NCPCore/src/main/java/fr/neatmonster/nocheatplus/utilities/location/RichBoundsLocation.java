@@ -29,7 +29,6 @@ import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker
 import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
@@ -384,7 +383,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return true, if successful
      */
     public boolean hasIllegalCoords() {
-        return CheckUtils.isBadCoordinate(minX, maxX, minY, maxY, minZ, maxZ);
+        return LocUtil.isBadCoordinate(minX, maxX, minY, maxY, minZ, maxZ);
     }
 
     /**

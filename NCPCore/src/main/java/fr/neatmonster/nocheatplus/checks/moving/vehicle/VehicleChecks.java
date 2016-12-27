@@ -412,7 +412,7 @@ public class VehicleChecks extends CheckListener {
         if (moveInfo.from.hasIllegalCoords()) {
             // (from is from the past moves usually.)
             // Attempt to use the current location.
-            if (CheckUtils.isBadCoordinate(vehicleLocation.getX(), vehicleLocation.getY(), vehicleLocation.getZ())) {
+            if (LocUtil.isBadCoordinate(vehicleLocation.getX(), vehicleLocation.getY(), vehicleLocation.getZ())) {
                 // Can't recover vehicle coordinates.
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Could not recover vehicle coordinates. Player will be kicked.");
                 // Just kick.

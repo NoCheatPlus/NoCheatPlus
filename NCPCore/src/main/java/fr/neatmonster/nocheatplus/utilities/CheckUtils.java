@@ -101,39 +101,6 @@ public class CheckUtils {
     }
 
     /**
-     * Check for NaN, infinity.
-     *
-     * @param floats
-     *            the floats
-     * @return true, if is bad coordinate
-     */
-    public static boolean isBadCoordinate(float ... floats) {
-        for (int i = 0; i < floats.length; i++) {
-            if (Float.isNaN(floats[i]) || Float.isInfinite(floats[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check for NaN, infinity, some random maximum coordinate.
-     *
-     * @param doubles
-     *            the doubles
-     * @return true, if is bad coordinate
-     */
-    public static boolean isBadCoordinate(double ... doubles) {
-        for (int i = 0; i < doubles.length; i++) {
-            final double x = doubles[i];
-            if (Double.isNaN(x) || Double.isInfinite(x) || Math.abs(x) > 3.2E7D) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Check for config flag and exemption (hasBypass). Meant thread-safe.
      *
      * @param checkType

@@ -33,7 +33,7 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
  * Run checks related to moving (pos/look/flying). Skip packets that shouldn't
@@ -169,10 +169,10 @@ public class MovingFlying extends BaseAdapter {
     }
 
     private boolean isInvalidContent(final DataPacketFlying packetData) {
-        if (packetData.hasPos && CheckUtils.isBadCoordinate(packetData.getX(), packetData.getY(), packetData.getZ())) {
+        if (packetData.hasPos && LocUtil.isBadCoordinate(packetData.getX(), packetData.getY(), packetData.getZ())) {
             return true;
         }
-        if (packetData.hasLook && CheckUtils.isBadCoordinate(packetData.getYaw(), packetData.getPitch())) {
+        if (packetData.hasLook && LocUtil.isBadCoordinate(packetData.getYaw(), packetData.getPitch())) {
             return true;
         }
         return false;
