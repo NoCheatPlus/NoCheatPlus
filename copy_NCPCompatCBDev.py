@@ -27,7 +27,7 @@ import sys
 import os
 import shutil
 import traceback
-from mimify import repl
+
 
 def is_ok_dir(path):
     """
