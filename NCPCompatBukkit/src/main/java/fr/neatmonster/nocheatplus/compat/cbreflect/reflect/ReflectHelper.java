@@ -74,6 +74,8 @@ public class ReflectHelper {
     protected final ReflectEntity reflectLivingEntity;
     protected final ReflectPlayer reflectPlayer;
 
+    private final double[] tempBounds = new double[6];
+
     public ReflectHelper() throws ReflectFailureException {
         // TODO: Store one instance of ReflectFailureException?
         // TODO: Allow some more to not work?
@@ -405,6 +407,56 @@ public class ReflectHelper {
             height = Math.max(height, ((LivingEntity) entity).getEyeHeight());
         }
         return height;
+    }
+
+    /**
+     * Fetch the bounding box.
+     * 
+     * @param entity
+     * @return A new double array {minX, minY, minZ, maxX, maxY, maxZ}. Not to
+     *         be stored etc.
+     * @throws ReflectFailureException
+     *             On failure to fetch bounds.
+     */
+    public double[] getBounds(final Entity entity) {
+        return getBounds(entity, new double[6]);
+    }
+
+    /**
+     * Fetch the bounding box.
+     * 
+     * @param entity
+     * @return The internally stored double array for bounds {minX, minY, minZ,
+     *         maxX, maxY, maxZ}. Not to be stored etc.
+     * @throws ReflectFailureException
+     *             On failure to fetch bounds.
+     */
+    public double[] getBoundsTemp(final Entity entity) {
+        return getBounds(entity, tempBounds);
+    }
+
+    /**
+     * Fetch the bounding box.
+     * 
+     * @param entity
+     * @param bounds
+     *            The double[6+] array, which to fill values in to.
+     * @return The passed bounds array filled with {minX, minY, minZ, maxX,
+     *         maxY, maxZ}.
+     * @throws ReflectFailureException
+     *             On failure to fetch bounds.
+     */
+    public double[] getBounds(final Entity entity, final double[] bounds) {
+        // TODO: Also fetch for legacy versions?
+        if (reflectAxisAlignedBB == null || reflectEntity == null) {
+            fail();
+        }
+        final Object aabb = ReflectionUtil.invokeMethodNoArgs(reflectEntity.nmsGetBoundingBox, reflectEntity.getHandle(entity));
+        if (aabb == null) {
+            fail();
+        }
+        reflectAxisAlignedBB.fillInValues(aabb, bounds);
+        return bounds;
     }
 
 }

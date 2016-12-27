@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.Reflect
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 public class MCAccessCBReflect extends MCAccessBukkitBase {
@@ -190,29 +191,34 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
         }
     }
 
-    // TODO: ---- Missing (better to implement these) ----
-
-    //    @Override
-    //    public AlmostBoolean isIllegalBounds(final Player player) {
-    //        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-    //        if (entityPlayer.dead) {
-    //            return AlmostBoolean.NO;
-    //        }
-    //        // TODO: Does this need a method call for the "real" box? Might be no problem during moving events, though.
-    //        final AxisAlignedBB box = entityPlayer.getBoundingBox();
-    //        if (!entityPlayer.isSleeping()) {
-    //            // This can not really test stance but height of bounding box.
-    //            final double dY = Math.abs(box.e - box.b);
-    //            if (dY > 1.8) {
-    //                return AlmostBoolean.YES; // dY > 1.65D || 
-    //            }
-    //            if (dY < 0.1D && entityPlayer.length >= 0.1) {
-    //                return AlmostBoolean.YES;
-    //            }
-    //        }
-    //        return AlmostBoolean.MAYBE;
-    //    }
-
+    @Override
+    public AlmostBoolean isIllegalBounds(final Player player) {
+        if (player.isDead()) {
+            return AlmostBoolean.NO;
+        }
+        try {
+            final double[] bounds = helper.getBoundsTemp(player);
+            if (LocUtil.isBadCoordinate(bounds)) {
+                return AlmostBoolean.YES;
+            }
+            if (!player.isSleeping()) {
+                final double dY = Math.abs(bounds[4] - bounds[1]);
+                if (dY > 1.8) {
+                    return AlmostBoolean.YES; // dY > 1.65D || 
+                }
+                if (dY < 0.1D && getHeight(player) >= 0.1) { // TODO: Not strictly the height parameter.
+                    return AlmostBoolean.YES;
+                }
+            }
+        }
+        catch (ReflectFailureException e) {
+            // Ignore.
+        }
+        catch (NullPointerException ne) {
+            // Ignore.
+        }
+        return AlmostBoolean.MAYBE;
+    }
 
     // ---- Missing (probably ok with Bukkit only) ----
 
