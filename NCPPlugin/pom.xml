@@ -134,6 +134,24 @@
 				<!-- Non minimal below. -->
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatspigotcb1_10_r1</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<!-- Non minimal above. -->
+			</dependencies>
+		</profile>
+		<profile>
+			<id>spigot1_11_r1</id>
+			<activation>
+				<property>
+					<name>spigot1_11_r1</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<!-- Non minimal below. -->
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatcbdev</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
@@ -256,6 +274,11 @@
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatspigotcb1_10_r1</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
 				<dependency>

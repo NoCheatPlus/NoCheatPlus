@@ -15,6 +15,12 @@ This program is free software: you can redistribute it and/or modify
   
 CONTENT:
     * Rude script to create a new dedicated compatibility module using NCPCompatCBDev.
+    * Currently missing:
+        * MCAccessFactory entry.
+        * EntityAccessFactory entry.
+        * AttributeAccessFactory entry.
+        * Update root+NCPPlugin pom (module/dependency with profile all 
+            + point an existing profile for this version to the new module).
 '''
 
 import sys
@@ -36,8 +42,8 @@ def replace(item, repl_def):
 
 def copy_and_replace_content(full_src, full_dst, repl_content):
     # Read.
-    f = open(full_src, "r")
-    content = f.read()
+    f = open(full_src, "rb")
+    content = f.read() # .decode("utf-8")
     f.close()
     # TODO: Above leaks on errors (suggested use is command line).
     content = replace(content, repl_content)
@@ -46,17 +52,23 @@ def copy_and_replace_content(full_src, full_dst, repl_content):
     f.close()
     # TODO: Above leaks on errors (suggested use is command line).
 
-def copy_and_replace(src_dir, dst_dir, repl_filename, repl_content):
+def copy_and_replace(src_dir, dst_dir, repl_filename, repl_content, 
+                     filter_filename = ("target", ), filter_ext = (".class",)):
     """
     All exact case replacements.
     @param src_dir: 
     @param dst_dir:
     @param repl_filename: Also includes directories.
     @param repl_content: 
+    @param filter_filename: Filter for file names and directories (exact match).
+    @param filter_extension: filter for extensions (exact match).
     """
     names = os.listdir(src_dir)
     for name in names:
         full_src = os.path.join(src_dir, name)
+        if name in filter_filename or os.path.splitext(name)[1] in filter_ext:
+            print("Skip filter: " + full_src)
+            continue
         if os.path.islink(full_src):
             print("[WARNING] Skip link: " + full_src)
             continue
@@ -106,13 +118,15 @@ def main_interactive(path):
     # Create replacement definitions.
     repl_filename = [(src_name, dst_name_with_rev), (src_name.lower(), dst_name.lower() + (("_" + dst_rev) if dst_rev else ""))]
     repl_content = [
+        # TODO: DOESNT FUCKING WORK artifactId
         ("the development version (latest of the supported Minecraft versions)", dst_name_with_rev),
-                    ] + repl_filename
+        ] + repl_filename + [
+        ("<artifactId>ncpcompat" + dst_name.lower() + (("_" + dst_rev) if dst_rev else "") + "</artifactId>", "<artifactId>ncpcompat" + dst_name_with_rev.lower() + "</artifactId>"),
+        ]
     # Run.
     """
-    TODO:
-    - Factory entries.
-    - Fix for artifactId tag in pom.xml (force all lower case).
+    TODO: Factory entries. Adapt build profiles. 
+    Perhaps just create a text file with all typical entries for copy and paste.
     """
     try:
         # TODO: May leak file descriptors :p.
@@ -132,7 +146,7 @@ def main():
     Parse command line parameter(s).
     """
     if len(sys.argv) > 1:
-        path = u"".join(sys.argv[1:])
+        path = "".join(sys.argv[1:])
         if path and path[0] == path[-1] == "\"":
             path = path[1:-1]
     else:

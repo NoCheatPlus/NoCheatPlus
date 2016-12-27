@@ -101,6 +101,20 @@
 			</activation>
 			<modules>
 				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_10_R1</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_11_r1</id>
+			<activation>
+				<property>
+					<name>spigot1_11_r1</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<!-- Non minimal below. -->
 				<module>NCPCompatCBDev</module>
 				<!-- Non minimal above. -->
 			</modules>
@@ -147,6 +161,7 @@
 				<module>NCPCompatSpigotCB1_8_R3</module>
 				<module>NCPCompatSpigotCB1_9_R1</module>
 				<module>NCPCompatSpigotCB1_9_R2</module>
+				<module>NCPCompatSpigotCB1_10_R1</module>
 				<module>NCPCompatCBDev</module>
 				<!-- Non minimal above. -->
 			</modules>

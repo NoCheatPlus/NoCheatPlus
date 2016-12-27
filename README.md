@@ -43,7 +43,8 @@ _For some building environments you might need to both set the profiles and set 
 | `-P spigot1_8_r3 -P ncp_base` | `spigot1_8_r3` and `ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
 | `-P spigot1_9_r1 -P ncp_base` | `spigot1_9_r1` and `ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
 | `-P spigot1_9_r2 -P ncp_base` | `spigot1_9_r2` and `ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
-| `-P spigot1_10_r1 -P ncp_base` | `spigot1_10_r1` and `ncp_base` | Just Spigot 1.10 R1 (MC 1.10). |
+| `-P spigot1_10_r1 -P ncp_base` | `spigot1_10_r1` and `ncp_base` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
+| `-P spigot1_11_r1 -P ncp_base` | `spigot1_11_r1` and `ncp_base` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
 | `-P cbdev -P ncp_base` | `cbdev` and `ncp_base` | The latest version in development. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
