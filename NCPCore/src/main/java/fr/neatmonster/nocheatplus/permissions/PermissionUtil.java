@@ -231,7 +231,7 @@ public class PermissionUtil {
      * @param permissionDefault
      *            Default for child permissions.
      * @throws NullPointerException
-     *             If the no permission is registered for permissionName.
+     *             If no permission is registered for permissionName.
      */
     public static void addChildPermissionBySuffix(final String permissionName, final String childPermissionSuffix, 
             final PermissionDefault permissionDefault) {
