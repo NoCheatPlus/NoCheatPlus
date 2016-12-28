@@ -99,14 +99,25 @@ public class NoFall extends Check {
      * @return
      */
     public double estimateDamage(final Player player, final double y, final MovingData data) {
-        return getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
+        //return getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
+        return getDamage(Math.max((float) (data.noFallMaxY - y), data.noFallFallDistance));
     }
 
+    /**
+     * 
+     * @param player
+     * @param minY
+     * @param reallyOnGround
+     * @param data
+     * @param cc
+     */
     private void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         final float noFallFallDistance = Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY));
         if (noFallFallDistance >= 3.0) {
             final float fallDistance = player.getFallDistance();
-            if (noFallFallDistance - fallDistance >= 0.5f || noFallFallDistance >= 3.5f && noFallFallDistance < 3.5f) {
+            if (noFallFallDistance - fallDistance >= 0.5f // TODO: Why not always adjust, if greater?
+                    || noFallFallDistance >= 3.5f && fallDistance < 3.5f // Ensure damage.
+                    ) {
                 player.setFallDistance(noFallFallDistance);
             }
         }
@@ -230,7 +241,7 @@ public class NoFall extends Check {
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?
         final float mcFallDistance = player.getFallDistance(); // Note: it has to be fetched here.
-        data.noFallFallDistance = Math.max(mcFallDistance, data.noFallFallDistance);
+        // SKIP: data.noFallFallDistance = Math.max(mcFallDistance, data.noFallFallDistance);
 
         // Add y distance.
         if (!toReset && !toOnGround && yDiff < 0) {
@@ -279,7 +290,8 @@ public class NoFall extends Check {
     public void onLeave(final Player player) {
         final MovingData data = MovingData.getData(player);
         final float fallDistance = player.getFallDistance();
-        if (data.noFallFallDistance - fallDistance > 0.0) {
+        // TODO: Might also detect too high mc fall dist.
+        if (data.noFallFallDistance > fallDistance) {
             final double playerY = player.getLocation(useLoc).getY();
             useLoc.setWorld(null);
             if (player.isFlying() || player.getGameMode() == GameMode.CREATIVE
@@ -292,7 +304,7 @@ public class NoFall extends Check {
                 // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
                 // Might consider triggering violations here as well.
                 final float yDiff = (float) (data.noFallMaxY - playerY);
-                final float maxDist = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
+                final float maxDist = Math.max(yDiff, data.noFallFallDistance);
                 player.setFallDistance(maxDist);
             }
         }

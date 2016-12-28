@@ -1742,7 +1742,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (!(entity instanceof Player)) {
             return;
         }
-        final Player player = (Player) entity;
+        checkFallDamageEvent((Player) entity, event);
+    }
+
+    private void checkFallDamageEvent(final Player player, final EntityDamageEvent event) {
         final MovingData data = MovingData.getData(player);
         if (player.isInsideVehicle()) {
             // Ignore vehicles (noFallFallDistance will be inaccurate anyway).
@@ -1763,12 +1766,48 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         boolean allowReset = true;
+        float fallDistance = player.getFallDistance();
+        final float yDiff = (float) (data.noFallMaxY - loc.getY());
+        final double damage = BridgeHealth.getDamage(event);
+        // NoFall bypass checks.
         if (!data.noFallSkipAirCheck) {
+         // Cheat: let Minecraft gather and deal fall damage.
+            /*
+             * TODO: data.noFallSkipAirCheck is used to skip checking in
+             * general, thus move into that block or not?
+             */
+            // TODO: Could consider skipping accumulated fall distance for NoFall in general as well.
+            final float dataDist = Math.max(yDiff, data.noFallFallDistance);
+            final double dataDamage = NoFall.getDamage(dataDist);
+            if (damage > dataDamage + 0.5 || dataDamage <= 0.0) {
+                data.noFallVL += 1.0;
+                if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel()) {
+                    // NOTE: Double violations are possible with the in-air check below.
+                    // TODO: Differing sub checks, once cancel action...
+                    player.setFallDistance(dataDist);
+                    if (dataDamage <= 0.0) {
+                        // Cancel the event.
+                        event.setCancelled(true);
+                        useLoc.setWorld(null);
+                        aux.returnPlayerMoveInfo(moveInfo);
+                        return;
+                    }
+                    else {
+                        // Adjust and continue.
+                        if (data.debug) {
+                            debug(player, "NoFall/Damage: override player fall distance and damage (" + fallDistance + " -> " + dataDist + ").");
+                        }
+                        fallDistance = dataDist;
+                        BridgeHealth.setDamage(event, dataDamage);
+                    }
+                }
+            }
+            // Cheat: set ground to true in-air.
             // Be sure not to lose that block.
-            data.noFallFallDistance += 1.0;
-            // TODO: Accound for liquid too?
+            data.noFallFallDistance += 1.0; // TODO: What is this and why is it right here?
+            // TODO: Account for liquid too?
             if (!pLoc.isOnGround(1.0, 0.3, 0.1) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()) {
-                // Likely a new style no-fall bypass (damage in mid-air).
+                // Likely: force damage in mid-air by setting on-ground to true.
                 data.noFallVL += 1.0;
                 if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel() && data.hasSetBack()) {
                     // Cancel the event and restore fall distance.
@@ -1779,14 +1818,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             else {
                 // Legitimate damage: clear accounting data.
                 data.vDistAcc.clear();
+                // TODO: Why only reset in case of !data.noFallSkipAirCheck?
                 // TODO: Also reset other properties.
                 // TODO: Also reset in other cases (moved too quickly)?
             }
         }
         aux.returnPlayerMoveInfo(moveInfo);
-        final float fallDistance = player.getFallDistance();
-        final double damage = BridgeHealth.getDamage(event);
-        final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (data.debug) {
             debug(player, "Damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
