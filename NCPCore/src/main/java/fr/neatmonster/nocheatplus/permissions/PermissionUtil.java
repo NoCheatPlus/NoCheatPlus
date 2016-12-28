@@ -33,6 +33,8 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class PermissionUtil {
 
+    private static final String AUTO_GENERATED = "Auto-generated permission (NoCheatPlus).";
+
     /**
      * Entry for what the old state of a command was.
      * @author mc_dev
@@ -190,21 +192,28 @@ public class PermissionUtil {
     }
 
     /**
-     * Set a permission as child for all the other permissions given in a Collection.
-     * @param permissions Not expected to exist.
+     * Set a permission as child for all the other permissions given in a
+     * Collection.
+     * 
+     * @param permissions
+     *            Not expected to exist.
      * @param childPermissionName
+     * @param permissionDefault
+     *            Default for all generated permissions (child and parent
+     *            alike).
      */
-    public static void addChildPermission(final Collection<String> permissions, final String childPermissionName, final PermissionDefault permissionDefault) {
+    public static void addChildPermission(final Collection<String> permissions, 
+            final String childPermissionName, final PermissionDefault permissionDefault) {
         final PluginManager pm = Bukkit.getPluginManager();
         Permission childPermission = pm.getPermission(childPermissionName);
         if (childPermission == null) {
-            childPermission = new Permission(childPermissionName, "auto-generated child permission (NoCheatPlus)", permissionDefault);
+            childPermission = new Permission(childPermissionName, AUTO_GENERATED, permissionDefault);
             pm.addPermission(childPermission);
         }
         for (final String permissionName : permissions) {
             Permission permission = pm.getPermission(permissionName);
             if (permission == null) {
-                permission = new Permission(permissionName, "auto-generated permission (NoCheatPlus)", permissionDefault);
+                permission = new Permission(permissionName, AUTO_GENERATED, permissionDefault);
                 pm.addPermission(permission);
             }
             if (!permission.getChildren().containsKey(childPermissionName)) {
@@ -212,4 +221,34 @@ public class PermissionUtil {
             }
         }
     }
+
+    /**
+     * 
+     * @param permissionName
+     *            Name of an already existing permission. Must be registered!
+     * @param childPermissionSuffix
+     *            No leading dot, results in: permissionName.childPermissionSuffix
+     * @param permissionDefault
+     *            Default for child permissions.
+     * @throws NullPointerException
+     *             If the no permission is registered for permissionName.
+     */
+    public static void addChildPermissionBySuffix(final String permissionName, final String childPermissionSuffix, 
+            final PermissionDefault permissionDefault) {
+        final PluginManager pm = Bukkit.getPluginManager();
+        final Permission permission = pm.getPermission(permissionName);
+        if (permission == null) {
+            throw new NullPointerException("Permission is not registered: " + permissionName);
+        }
+        final String childPermissionName = permissionName + "." + childPermissionSuffix;
+        Permission childPermission = pm.getPermission(childPermissionName);
+        if (childPermission == null) {
+            childPermission = new Permission(childPermissionName, AUTO_GENERATED, permissionDefault);
+            pm.addPermission(childPermission);
+        }
+        if (!permission.getChildren().containsKey(childPermissionName)) {
+            childPermission.addParent(permission, true);
+        }
+    }
+
 }

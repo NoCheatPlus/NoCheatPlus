@@ -50,6 +50,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
@@ -1096,6 +1097,20 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         } catch (Throwable t) {
             logManager.severe(Streams.INIT, "Failed to complement permissions: " + t.getClass().getSimpleName());
             logManager.severe(Streams.INIT, t);
+        }
+        // Set .silent child permissions for all check permissions.
+        for (CheckType checkType : CheckType.values()) {
+            final String permissionName = checkType.getPermission();
+            if (permissionName == null) {
+                continue;
+            }
+            try {
+                // PermissionDefault.FALSE: Ensure it's not there by accident / non-typical.
+                PermissionUtil.addChildPermissionBySuffix(permissionName, "silent", PermissionDefault.FALSE);
+            } catch (Throwable t) {
+                logManager.severe(Streams.INIT, "Failed to add .silent child permission for " + permissionName + ": " + t.getClass().getSimpleName());
+                logManager.severe(Streams.INIT, t);
+            }
         }
         try {
             // Command protection feature.
