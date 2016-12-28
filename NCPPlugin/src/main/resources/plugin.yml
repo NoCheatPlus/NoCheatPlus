@@ -155,6 +155,8 @@ permissions:
                                 description: Allow the player to bypass the InstantEat check.
                             nocheatplus.checks.inventory.items:
                                 description: Allow the player to bypass the items check (illegal enchantments/dupes).
+                            nocheatplus.checks.inventory.open:
+                                description: Check for open inventories on special transitions, such as teleportation.
                     nocheatplus.checks.moving:
                         description: Allow the player to bypass all Moving checks.
                         children:
