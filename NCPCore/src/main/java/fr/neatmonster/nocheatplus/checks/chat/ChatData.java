@@ -103,6 +103,12 @@ public class ChatData extends AsyncCheckData {
     public int     relogWarnings;
     public long    relogWarningTime;
 
+    /**
+     * Keep track of current world name, to be used for asynchronous world
+     * config getting. Set on join and world change, reset on leave.
+     */
+    public String currentWorldName = null;
+
     public ChatData(final ChatConfig config) {
         super(config);
     }

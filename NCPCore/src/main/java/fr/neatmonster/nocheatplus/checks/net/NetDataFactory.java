@@ -44,11 +44,6 @@ public class NetDataFactory implements CheckDataFactory, ICanHandleTimeRunningBa
         if (data != null) {
             return data;
         } else {
-            /*
-             * TODO: Bootstrap problem with NetStatic and null worlds :) -> move
-             * world tracking to basic data (e.g. PlayerData), needs thread
-             * safety.
-             */
             data = new NetData((NetConfig) CheckType.NET.getConfigFactory().getConfig(player));
             dataMap.put(player.getName(), data);
             return data;

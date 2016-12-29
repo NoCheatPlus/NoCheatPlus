@@ -91,13 +91,6 @@ public class NetData extends ACheckData {
     /** Overall packet frequency. */
     public final ActionFrequency packetFrequency;
 
-    /**
-     * Keep track of current world name, to be used for asynchronous world
-     * config getting. Set on join and world change, reset on leave.
-     */
-    // TODO: Remove? (Despite future use cases where this is nice to have.) 
-    public String currentWorldName = null;
-
     public NetData(final NetConfig config) {
         super(config);
         flyingFrequencyAll = new ActionFrequency(config.flyingFrequencySeconds, 1000L);
@@ -113,17 +106,11 @@ public class NetData extends ACheckData {
     public void onJoin(final Player player) {
         teleportQueue.clear();
         clearFlyingQueue();
-        currentWorldName = player.getWorld().getName();
     }
 
     public void onLeave(Player player) {
         teleportQueue.clear();
         clearFlyingQueue();
-        currentWorldName = null;
-    }
-
-    public void onWorldChange(Player player) {
-        currentWorldName = player.getWorld().getName();
     }
 
     /**

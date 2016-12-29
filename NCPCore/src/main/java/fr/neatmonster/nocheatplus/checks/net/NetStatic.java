@@ -19,6 +19,7 @@ import java.util.List;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.chat.ChatData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
@@ -181,7 +182,8 @@ public class NetStatic {
             world = player.getWorld();
         }
         catch (UnsupportedOperationException e) {}
-        return configCache.getConfig(world == null ? dataFactory.getData(player).currentWorldName : world.getName()); 
+        // TODO: Abusing ChatData for tracking world names. Should be in PlayerData or some generic data.
+        return configCache.getConfig(world == null ? ChatData.getData(player).currentWorldName : world.getName()); 
     }
 
 }

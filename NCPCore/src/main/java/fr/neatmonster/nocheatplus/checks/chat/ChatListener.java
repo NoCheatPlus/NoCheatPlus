@@ -101,8 +101,10 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 
     @EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
+        final Player player = event.getPlayer();
+        ChatData.getData(player).currentWorldName = player.getWorld().getName();
         // Tell TickTask to update cached permissions.
-        TickTask.requestPermissionUpdate(event.getPlayer().getName(), CheckType.CHAT);
+        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
     }
 
     /**
@@ -212,7 +214,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         }
 
     }
-    
+
     private boolean checkUntrackedLocation(final Player player, final String message, final MovingConfig mcc) {
         final Location loc = player.getLocation(useLoc);
         boolean cancel = false;
@@ -282,6 +284,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     public void playerJoins(final Player player) { 
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
+        data.currentWorldName = player.getWorld().getName();
         synchronized (data) {
             if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)) {
                 // shouldCheckCaptcha: only if really enabled.
@@ -294,6 +297,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 
     @Override
     public void playerLeaves(final Player player) {
+        ChatData.getData(player).currentWorldName = null;
     }
 
 }
