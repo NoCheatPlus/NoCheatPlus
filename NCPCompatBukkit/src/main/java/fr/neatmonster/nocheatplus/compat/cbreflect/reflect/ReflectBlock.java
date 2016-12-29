@@ -105,9 +105,8 @@ public class ReflectBlock implements IReflectBlock {
                 return nmsFetchAABB;
             }
         }
-
         // Legacy (pre 1.11, possibly even before.)
-        if (nmsFetchAABB == null) {
+        else if (nmsFetchAABB == null) {
             nmsFetchAABB = ReflectionUtil.getMethod(nmsClass, "a", 
                     reflectIBlockData.nmsClass, reflectIBlockAccess.nmsClass, reflectBlockPosition.nmsClass);
             if (nmsFetchAABB != null 
