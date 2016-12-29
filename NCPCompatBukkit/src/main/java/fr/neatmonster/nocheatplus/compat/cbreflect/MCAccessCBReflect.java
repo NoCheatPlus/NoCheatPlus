@@ -206,7 +206,8 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
                 if (dY > 1.8) {
                     return AlmostBoolean.YES; // dY > 1.65D || 
                 }
-                if (dY < 0.1D && getHeight(player) >= 0.1) { // TODO: Not strictly the height parameter.
+                // TODO: Get height/length from ReflectEntity.
+                if (dY < 0.1D && getHeight(player) >= 0.1) {
                     return AlmostBoolean.YES;
                 }
             }
