@@ -14,20 +14,20 @@
  */
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.AttribUtil;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
-import net.minecraft.server.v1_10_R1.AttributeInstance;
-import net.minecraft.server.v1_10_R1.AttributeModifier;
-import net.minecraft.server.v1_10_R1.GenericAttributes;
+import net.minecraft.server.v1_11_R1.AttributeInstance;
+import net.minecraft.server.v1_11_R1.AttributeModifier;
+import net.minecraft.server.v1_11_R1.GenericAttributes;
 
 public class AttributeAccess implements IAttributeAccess {
 
     public AttributeAccess() {
-        if (ReflectionUtil.getClass("net.minecraft.server.v1_10_R1.AttributeInstance") == null) {
+        if (ReflectionUtil.getClass("net.minecraft.server.v1_11_R1.AttributeInstance") == null) {
             throw new RuntimeException("Service not available.");
         }
     }

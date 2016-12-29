@@ -18,23 +18,23 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
-import net.minecraft.server.v1_10_R1.AxisAlignedBB;
-import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.EntityBoat;
-import net.minecraft.server.v1_10_R1.EntityShulker;
-import net.minecraft.server.v1_10_R1.EnumDirection;
-import net.minecraft.server.v1_10_R1.IBlockAccess;
-import net.minecraft.server.v1_10_R1.IBlockData;
-import net.minecraft.server.v1_10_R1.TileEntity;
+import net.minecraft.server.v1_11_R1.AxisAlignedBB;
+import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.EntityBoat;
+import net.minecraft.server.v1_11_R1.EntityShulker;
+import net.minecraft.server.v1_11_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.IBlockAccess;
+import net.minecraft.server.v1_11_R1.IBlockData;
+import net.minecraft.server.v1_11_R1.TileEntity;
 
 public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
 
-    protected net.minecraft.server.v1_10_R1.World world;
+    protected net.minecraft.server.v1_11_R1.World world;
     protected World bukkitWorld;
 
     public BlockCacheCBDev(World world) {
@@ -69,7 +69,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
         final int id = getTypeId(x, y, z);		
-        final net.minecraft.server.v1_10_R1.Block block = net.minecraft.server.v1_10_R1.Block.getById(id);
+        final net.minecraft.server.v1_11_R1.Block block = net.minecraft.server.v1_11_R1.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null blocks -> full ?
             return null;
@@ -77,7 +77,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
         final BlockPosition pos = new BlockPosition(x, y, z);
         // TODO: Deprecation warning below (reason / substitute?).
         @SuppressWarnings("deprecation")
-        final AxisAlignedBB bb = block.a(getType(pos), this, pos);
+        final AxisAlignedBB bb = block.b(getType(pos), this, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.
             //return null;
@@ -91,7 +91,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
         try{
             // TODO: Find some simplification!
 
-            final net.minecraft.server.v1_10_R1.Entity mcEntity  = ((CraftEntity) entity).getHandle();
+            final net.minecraft.server.v1_11_R1.Entity mcEntity  = ((CraftEntity) entity).getHandle();
 
             final AxisAlignedBB box = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
             @SuppressWarnings("rawtypes")
@@ -99,7 +99,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess {
             @SuppressWarnings("rawtypes")
             final Iterator iterator = list.iterator();
             while (iterator.hasNext()) {
-                final net.minecraft.server.v1_10_R1.Entity other = (net.minecraft.server.v1_10_R1.Entity) iterator.next();
+                final net.minecraft.server.v1_11_R1.Entity other = (net.minecraft.server.v1_11_R1.Entity) iterator.next();
                 if (mcEntity == other || !(other instanceof EntityBoat) && !(other instanceof EntityShulker)) { // && !(other instanceof EntityMinecart)) continue;
                     continue;
                 }
