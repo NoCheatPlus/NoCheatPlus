@@ -3861,15 +3861,15 @@ public class BlockProperties {
      *            the bounds1
      * @param bounds2
      *            the bounds2
-     * @return Block bounds: minX, minY, minZ, maxX, maxY, maxZ
+     * @return True, if the shapes have the exact same bounds, same if both are
+     *         null. In case of one parameter being null, false is returned,
+     *         even if the other is a full block.
      */
     public static final boolean isSameShape(final double[] bounds1, final double[] bounds2) {
         // TODO: further exclude simple full shape blocks, or confine to itchy block types
         // TODO: make flags for it.
         if (bounds1 == null || bounds2 == null) {
-            if (bounds1 != null || bounds2 != null) {
-                return false;
-            }
+            return bounds1 == bounds2;
         }
         // Allow as ground for differing shapes.
         for (int i = 0; i <  6; i++) {
