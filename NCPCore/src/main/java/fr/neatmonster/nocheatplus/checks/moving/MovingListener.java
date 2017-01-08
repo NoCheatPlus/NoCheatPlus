@@ -662,7 +662,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // TODO: More adaptive margin / method (bounding boxes).
         final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || checkSf || checkCf)
-                && blockChangeTracker.hasActivity(from.getWorld().getUID(), pFrom, pTo, 1.5625);
+                && blockChangeTracker.hasActivityShuffled(from.getWorld().getUID(), pFrom, pTo, 1.5625);
 
         if (checkSf || checkCf) {
             // Ensure we have a set-back set.

@@ -816,7 +816,7 @@ public class BlockChangeTracker {
      * @param margin
      * @return
      */
-    public boolean hasActivity(final UUID worldId,
+    public boolean hasActivityShuffled(final UUID worldId,
             final IGetPosition pos1, final IGetPosition pos2, final double margin) {
         return hasActivityShuffled(worldId, pos1.getX(), pos1.getY(), pos1.getZ(), 
                 pos2.getX(), pos2.getY(), pos2.getZ(), margin);
@@ -885,7 +885,7 @@ public class BlockChangeTracker {
      */
     public boolean hasActivity(final UUID worldId, final double minX, final double minY, final double minZ,
             final double maxX, final double maxY, final double maxZ) {
-        return hasActivityShuffled(worldId, 
+        return hasActivity(worldId, 
                 Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ),
                 Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ));
     }
