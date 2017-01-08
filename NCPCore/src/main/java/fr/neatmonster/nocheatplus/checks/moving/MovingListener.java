@@ -661,8 +661,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         BounceType verticalBounce = BounceType.NO_BOUNCE;
 
         // TODO: More adaptive margin / method (bounding boxes).
-        final boolean useBlockChangeTracker = cc.trackBlockMove && (cc.passableCheck || checkSf || checkCf)
-                && blockChangeTracker.hasActivityShuffled(from.getWorld().getUID(), pFrom, pTo, 1.5625);
+        final boolean useBlockChangeTracker;
 
         if (checkSf || checkCf) {
             // Ensure we have a set-back set.
@@ -688,6 +687,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Test for friction and velocity.
                 newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
             }
+
+            useBlockChangeTracker = newTo == null 
+                    && cc.trackBlockMove && (cc.passableCheck || checkSf || checkCf)
+                    && blockChangeTracker.hasActivityShuffled(from.getWorld().getUID(), pFrom, pTo, 1.5625);
 
             // Check jumping on things like slime blocks.
             // Detect bounce type / use prepared bounce.
@@ -737,6 +740,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
             }
+        }
+        else {
+            // TODO: Might still allow block change tracker with only passable enabled.
+            useBlockChangeTracker = false;
         }
 
         // Check passable first to prevent set-back override.
@@ -1771,7 +1778,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double damage = BridgeHealth.getDamage(event);
         // NoFall bypass checks.
         if (!data.noFallSkipAirCheck) {
-         // Cheat: let Minecraft gather and deal fall damage.
+            // Cheat: let Minecraft gather and deal fall damage.
             /*
              * TODO: data.noFallSkipAirCheck is used to skip checking in
              * general, thus move into that block or not?
