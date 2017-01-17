@@ -1106,7 +1106,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
             try {
                 // PermissionDefault.FALSE: Ensure it's not there by accident / non-typical.
-                PermissionUtil.addChildPermissionBySuffix(permissionName, "silent", PermissionDefault.FALSE);
+                PermissionUtil.addChildPermissionBySuffix(permissionName, "silent", PermissionDefault.FALSE, false);
             } catch (Throwable t) {
                 logManager.severe(Streams.INIT, "Failed to add .silent child permission for " + permissionName + ": " + t.getClass().getSimpleName());
                 logManager.severe(Streams.INIT, t);

@@ -234,7 +234,7 @@ public class PermissionUtil {
      *             If no permission is registered for permissionName.
      */
     public static void addChildPermissionBySuffix(final String permissionName, final String childPermissionSuffix, 
-            final PermissionDefault permissionDefault) {
+            final PermissionDefault permissionDefault, final boolean childValue) {
         final PluginManager pm = Bukkit.getPluginManager();
         final Permission permission = pm.getPermission(permissionName);
         if (permission == null) {
@@ -247,7 +247,7 @@ public class PermissionUtil {
             pm.addPermission(childPermission);
         }
         if (!permission.getChildren().containsKey(childPermissionName)) {
-            childPermission.addParent(permission, true);
+            childPermission.addParent(permission, childValue);
         }
     }
 
