@@ -581,7 +581,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".morepackets", start + "sent too many moves ([packets] [tags])" + end);
         set(ConfPaths.STRINGS + ".msgtempdenylogin", "You are temporarily denied to join this server.");
         set(ConfPaths.STRINGS + ".munchhausen", start + "almost made it off the pit" + end);
-        set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage" + end);
+        set(ConfPaths.STRINGS + ".nofall", start + "tried to alter fall damage ([tags])" + end, 1057);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid]) from [locationfrom] to [locationto] distance [distance] " + end);

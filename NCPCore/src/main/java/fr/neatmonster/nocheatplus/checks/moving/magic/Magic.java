@@ -90,6 +90,9 @@ public class Magic {
     public static final double Y_ON_GROUND_DEFAULT = 0.016; // Jump upwards, while placing blocks.
     //    public static final double Y_ON_GROUND_DEFAULT = 0.029; // Bounce off slime blocks.
 
+    /** The lower bound of fall distance for taking fall damage. */
+    public static final double FALL_DAMAGE_DIST = 3.0;
+
     /**
      * The maximum distance that can be achieved with bouncing back from slime
      * blocks.

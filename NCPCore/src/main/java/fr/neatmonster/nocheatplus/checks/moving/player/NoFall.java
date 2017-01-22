@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -53,7 +54,7 @@ public class NoFall extends Check {
      * @return
      */
     public static final double getDamage(final float fallDistance) {
-        return fallDistance - 3.0;
+        return fallDistance - Magic.FALL_DAMAGE_DIST;
     }
 
     /**
@@ -71,8 +72,8 @@ public class NoFall extends Check {
         if (maxD >= 1.0) {
             // Check skipping conditions.
             if (cc.noFallSkipAllowFlight && player.getAllowFlight()) {
-                data.noFallSkipAirCheck = true;
                 data.clearNoFallData();
+                data.noFallSkipAirCheck = true;
                 // Not resetting the fall distance here, let Minecraft or the issue tracker deal with that.
             }
             else {
@@ -81,6 +82,7 @@ public class NoFall extends Check {
                     debug(player, "NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
                 }
                 // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
+                // TODO: Detect fake fall distance accumulation here as well.
                 data.noFallSkipAirCheck = true;
                 dealFallDamage(player, maxD);
             }
@@ -113,10 +115,10 @@ public class NoFall extends Check {
      */
     private void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         final float noFallFallDistance = Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY));
-        if (noFallFallDistance >= 3.0) {
+        if (noFallFallDistance >= Magic.FALL_DAMAGE_DIST) {
             final float fallDistance = player.getFallDistance();
             if (noFallFallDistance - fallDistance >= 0.5f // TODO: Why not always adjust, if greater?
-                    || noFallFallDistance >= 3.5f && fallDistance < 3.5f // Ensure damage.
+                    || noFallFallDistance >= Magic.FALL_DAMAGE_DIST && fallDistance < Magic.FALL_DAMAGE_DIST // Ensure damage.
                     ) {
                 player.setFallDistance(noFallFallDistance);
             }
@@ -196,7 +198,7 @@ public class NoFall extends Check {
             // Just reset.
             data.clearNoFallData();
             // Ensure very big/strange moves don't yield violations.
-            if (toY - fromY <= -3.0) {
+            if (toY - fromY <= -Magic.FALL_DAMAGE_DIST) {
                 data.noFallSkipAirCheck = true;
             }
         }
@@ -209,7 +211,7 @@ public class NoFall extends Check {
                 adjustFallDistance(player, minY, true, data, cc);
             }
             // Ensure very big/strange moves don't yield violations.
-            if (toY - fromY <= -3.0) {
+            if (toY - fromY <= -Magic.FALL_DAMAGE_DIST) {
                 data.noFallSkipAirCheck = true;
             }
         }

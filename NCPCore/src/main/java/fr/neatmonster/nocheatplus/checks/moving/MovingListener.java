@@ -1689,7 +1689,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     // (Set fall distance if set to not reset.)
                     player.setFallDistance((float) fallDistance);
                 }
-                else if (fallDistance >= 3.0) {
+                else if (fallDistance >= Magic.FALL_DAMAGE_DIST) {
                     data.noFallSkipAirCheck = true;
                 }
             }
@@ -1776,6 +1776,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         float fallDistance = player.getFallDistance();
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         final double damage = BridgeHealth.getDamage(event);
+        if (data.debug) {
+            debug(player, "Damage(FALL/PRE): " + damage + " / mc=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
+        }
         // NoFall bypass checks.
         if (!data.noFallSkipAirCheck) {
             // Cheat: let Minecraft gather and deal fall damage.
@@ -1787,8 +1790,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final float dataDist = Math.max(yDiff, data.noFallFallDistance);
             final double dataDamage = NoFall.getDamage(dataDist);
             if (damage > dataDamage + 0.5 || dataDamage <= 0.0) {
-                data.noFallVL += 1.0;
-                if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel()) {
+                if (noFallVL(player, "fakefall", data, cc)) {
                     // NOTE: Double violations are possible with the in-air check below.
                     // TODO: Differing sub checks, once cancel action...
                     player.setFallDistance(dataDist);
@@ -1815,8 +1817,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Account for liquid too?
             if (!pLoc.isOnGround(1.0, 0.3, 0.1) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()) {
                 // Likely: force damage in mid-air by setting on-ground to true.
-                data.noFallVL += 1.0;
-                if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel() && data.hasSetBack()) {
+                if (noFallVL(player, "fakeground", data, cc) && data.hasSetBack()) {
                     // Cancel the event and restore fall distance.
                     // NoFall data will not be reset 
                     allowReset = false;
@@ -1831,11 +1832,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
         aux.returnPlayerMoveInfo(moveInfo);
-        if (data.debug) {
-            debug(player, "Damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
-        }
         // Fall-back check.
-        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : 3.0);
+        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : Magic.FALL_DAMAGE_DIST);
         if (maxD > damage) {
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);
@@ -1846,6 +1844,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (allowReset) {
             // Normal fall damage, reset data.
             data.clearNoFallData();
+            if (data.debug) {
+                debug(player, "Reset NoFall data on fall damage.");
+            }
         }
         else {
             // Minecraft/NCP bug or cheating.
@@ -1862,6 +1863,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Entity fall-distance should be reset elsewhere.
         // Cleanup.
         useLoc.setWorld(null);
+    }
+
+    private final boolean noFallVL(final Player player, final String tag, 
+            final MovingData data, final MovingConfig cc) {
+        data.noFallVL += 1.0;
+        //if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions).willCancel()
+        final ViolationData vd = new ViolationData(noFall, player, data.noFallVL, 1.0, cc.noFallActions);
+        if (tag != null) {
+            vd.setParameter(ParameterName.TAGS, tag);
+        }
+        return noFall.executeActions(vd).willCancel();
     }
 
     /**

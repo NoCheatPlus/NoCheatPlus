@@ -200,7 +200,7 @@ public class MCAccessCB3100 implements MCAccess{
 
     @Override
     public AlmostBoolean dealFallDamageFiresAnEvent() {
-        return AlmostBoolean.MAYBE;
+        return AlmostBoolean.YES;
     }
 
     //	@Override
