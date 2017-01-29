@@ -822,7 +822,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else if (checkCf) {
             // CreativeFly
             if (newTo == null) {
-                newTo = creativeFly.check(player, pFrom, pTo, data, cc, time, useBlockChangeTracker);
+                newTo = creativeFly.check(player, pFrom, pTo, data, cc, time, tick, useBlockChangeTracker);
             }
             data.sfHoverTicks = -1;
             data.sfLowJump = false;

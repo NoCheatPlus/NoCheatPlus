@@ -71,7 +71,8 @@ public class CreativeFly extends Check {
      * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final long time, final boolean useBlockChangeTracker) {
+            final MovingData data, final MovingConfig cc, final long time, final int tick,
+            final boolean useBlockChangeTracker) {
 
         // Reset tags, just in case.
         tags.clear();
@@ -86,6 +87,18 @@ public class CreativeFly extends Check {
         //        }
         thisMove.modelFlying = model;
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
+
+        // Proactive reset of elytraBoost (MC 1.11.2).
+        if (data.fireworksBoostDuration > 0) {
+            if (!lastMove.valid || lastMove.flyCheck != CheckType.MOVING_CREATIVEFLY 
+                    || lastMove.modelFlying != model
+                    || data.fireworksBoostTickExpire < tick ) {
+                data.fireworksBoostDuration = 0;
+            }
+            else {
+                data.fireworksBoostDuration --;
+            }
+        }
 
         // Calculate some distances.
         final double yDistance = thisMove.yDistance;
@@ -361,9 +374,9 @@ public class CreativeFly extends Check {
             }
         }
 
-        // TODO: Hack, move / config / something.
-        // TODO: Confine more. hdist change relates to ydist change
+        // Related to elytra.
         if (limitV == 0.0 && Bridge1_9.isGlidingWithElytra(from.getPlayer())) {
+            // TODO: Better detection of an elytra model (extra flags?).
             limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data);
         }
 
@@ -423,6 +436,8 @@ public class CreativeFly extends Check {
     }
 
     private double hackLytra(final double yDistance, final double limitV, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
+        // TODO: Hack, move / config / something.
+        // TODO: Confine more. hdist change relates to ydist change
         // TODO: Further: jumpphase vs. y-distance to set-back. Problem: velocity
         // TODO: Further: record max h and descend speeds and relate to those.
         // TODO: Demand total speed to decrease.
@@ -461,8 +476,33 @@ public class CreativeFly extends Check {
                     }
                 }
             }
-
         }
+
+        // Elytra boost with fireworks rockets.
+        if (yDistance > limitV && data.fireworksBoostDuration > 0 && lastMove.toIsValid 
+                && (
+                        yDistance >= lastMove.yDistance 
+                        || yDistance - lastMove.yDistance < Magic.GRAVITY_MAX
+                        // TODO: Head blocked -> friction does it?
+                        )
+                && (
+                        yDistance - lastMove.yDistance < 0.77 // TODO
+                        || lastMove.yDistance < 0.0 && yDistance < 1.54
+                        )
+                && yDistance < 1.67 // Last resort, check / TODO
+                ) {
+            /*
+             * TODO: Do cross check item consumption (do other events fire?).
+             * [?on tick: expectations framework, check before tick and before
+             * other inventory events, once set]
+             */
+            // TODO: Remove fumbling with magic constants.
+            // TODO: Relate horizontal to vertical + relate to looking direction.
+            // TODO: More invalidation conditions, like total age (checked elsewhere?).
+            tags.add("fw_boost_asc");
+            return yDistance;
+        }
+
         return limitV;
     }
 
@@ -526,6 +566,9 @@ public class CreativeFly extends Check {
         }
         if (thisMove.verVelUsed != null) {
             builder.append(" , vVelUsed: " + thisMove.verVelUsed);
+        }
+        if (data.fireworksBoostDuration > 0 && model.id.equals("jetpack.elytra")) {
+            builder.append(" , boost: " + data.fireworksBoostDuration);
         }
         builder.append(" , model: " + model.id);
         if (!tags.isEmpty()) {

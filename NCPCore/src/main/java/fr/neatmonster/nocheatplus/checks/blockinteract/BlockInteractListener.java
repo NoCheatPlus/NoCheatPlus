@@ -30,10 +30,14 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
@@ -72,8 +76,7 @@ public class BlockInteractListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = false, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         // Cancel interact events for dead players.
@@ -86,50 +89,50 @@ public class BlockInteractListener extends CheckListener {
             return;
         }
 
-        // TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
+        // TODO: Re-arrange for interact spamming.
         final Action action = event.getAction();
         final Block block = event.getClickedBlock();
-
-        if (block == null) {
-            return;
-        }
-
         final BlockInteractData data = BlockInteractData.getData(player);
         final int previousLastTick = data.lastTick;
-        data.setLastBlock(block, action);
+        // TODO: Last block setting: better on monitor !?.
+        if (block == null) {
+            data.resetLastBlock();
+        }
+        else {
+            data.setLastBlock(block, action);
+        }
         final BlockFace face = event.getBlockFace();
+        final ItemStack stack;
         switch(action) {
+            case RIGHT_CLICK_AIR:
+                // TODO: What else to adapt?
+            case LEFT_CLICK_AIR:
+                // TODO: What else to adapt?
             case LEFT_CLICK_BLOCK:
+                stack = null;
                 break;
             case RIGHT_CLICK_BLOCK:
-                final ItemStack stack = Bridge1_9.getUsedItem(player, event);
+                stack = Bridge1_9.getUsedItem(player, event);
                 if (stack != null && stack.getType() == Material.ENDER_PEARL) {
-                    if (!BlockProperties.isPassable(block.getType())) {
-                        final CombinedConfig ccc = CombinedConfig.getConfig(player);
-                        if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
-                            event.setUseItemInHand(Result.DENY);
-                            if (data.debug) {
-                                final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
-                                genericDebug(player, block, face, event, "click block: deny use ender pearl", previousLastTick, data, cc);
-                            }
-                        }
-                    }
+                    checkEnderPearlRightClickBlock(player, block, face, event, previousLastTick, data);
                 }
                 break;
             default:
                 return;
         }
 
+        boolean cancelled = false;
         if (event.isCancelled() && event.useInteractedBlock() != Result.ALLOW) {
             data.subsequentCancel ++;
             return;
         }
 
         final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
-        boolean cancelled = false;
         boolean preventUseItem = false;
 
         final Location loc = player.getLocation(useLoc);
+
+        // TODO: Always run all checks, also for !isBlock ?
 
         // Interaction speed.
         if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)) {
@@ -154,41 +157,93 @@ public class BlockInteractListener extends CheckListener {
 
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
-            if (event.isCancelled()) {
-                // Just prevent using the block.
-                event.setUseInteractedBlock(Result.DENY);
-                if (data.debug) {
-                    genericDebug(player, block, face, event, "already cancelled: deny use block", previousLastTick, data, cc);
-                }
-            } else {
-                final Result previousUseItem = event.useItemInHand();
-                event.setCancelled(true);
-                event.setUseInteractedBlock(Result.DENY);
-                if (
-                        previousUseItem == Result.DENY || preventUseItem
-                        // Allow consumption still.
-                        || !InventoryUtil.isConsumable(Bridge1_9.getUsedItem(player, event))
-                        ) {
-                    event.setUseItemInHand(Result.DENY);
-                    if (data.debug) {
-                        genericDebug(player, block, face, event, "deny item use", previousLastTick, data, cc);
-                    }
-                }
-                else {
-                    // Consumable and not prevented otherwise.
-                    // TODO: Ender pearl?
-                    event.setUseItemInHand(Result.ALLOW);
-                    if (data.debug) {
-                        genericDebug(player, block, face, event, "allow edible item use", previousLastTick, data, cc);
-                    }
-                }
-            }
-            data.subsequentCancel ++;
+            onCancelInteract(player, block, face, event, previousLastTick, preventUseItem, data, cc);
         }
         else {
             data.subsequentCancel = 0;
         }
         useLoc.setWorld(null);
+    }
+
+    private void onCancelInteract(final Player player, final Block block, final BlockFace face, 
+            final PlayerInteractEvent event, final int previousLastTick, final boolean preventUseItem, 
+            final BlockInteractData data, final BlockInteractConfig cc) {
+        if (event.isCancelled()) {
+            // Just prevent using the block.
+            event.setUseInteractedBlock(Result.DENY);
+            if (data.debug) {
+                genericDebug(player, block, face, event, "already cancelled: deny use block", previousLastTick, data, cc);
+            }
+        } else {
+            final Result previousUseItem = event.useItemInHand();
+            event.setCancelled(true);
+            event.setUseInteractedBlock(Result.DENY);
+            if (
+                    previousUseItem == Result.DENY || preventUseItem
+                    // Allow consumption still.
+                    || !InventoryUtil.isConsumable(Bridge1_9.getUsedItem(player, event))
+                    ) {
+                event.setUseItemInHand(Result.DENY);
+                if (data.debug) {
+                    genericDebug(player, block, face, event, "deny item use", previousLastTick, data, cc);
+                }
+            }
+            else {
+                // Consumable and not prevented otherwise.
+                // TODO: Ender pearl?
+                event.setUseItemInHand(Result.ALLOW);
+                if (data.debug) {
+                    genericDebug(player, block, face, event, "allow edible item use", previousLastTick, data, cc);
+                }
+            }
+        }
+        data.subsequentCancel ++;
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
+    public void onPlayerInteractMonitor(final PlayerInteractEvent event) {
+        // Elytra boost.
+        if (event.getAction() == Action.RIGHT_CLICK_AIR 
+                && event.isCancelled() && event.useItemInHand() != Result.DENY) {
+            final Player player = event.getPlayer();
+            final ItemStack stack = Bridge1_9.getUsedItem(player, event);
+            if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {
+                final BlockInteractData data = BlockInteractData.getData(player);
+                final int power = BridgeMisc.getFireworksPower(stack);
+                /*
+                 * The default Material.FIREWORK has power 0 and roughly does 10
+                 * blocks in one seconds. With power 127, the flight duration
+                 * roughly is 7 seconds, so we assume the effect duration to be
+                 * something like 20 + power. What does the wiki tell? However
+                 * the actual flight duration with elytra + fireworks seems to
+                 * be higher, or the friction behavior has changed.
+                 */
+                final MovingData mData = MovingData.getData(player);
+                mData.fireworksBoostDuration = power + Magic.FIREWORKS_BOOST_EXTRA_TICKS;
+                // Expiration tick: not general latency, rather a minimum margin for sudden congestion.
+                mData.fireworksBoostTickExpire = TickTask.getTick() + power + Magic.FIREWORKS_BOOST_EXTRA_TICKS;
+                // TODO: Invalidation mechanics: by tick/time well ?
+                // TODO: Implement using it in CreativeFly.
+                if (data.debug) {
+                    debug(player, "Elytra boost (power " + power + "): " + stack);
+                }
+            }
+        }
+    }
+
+    private void checkEnderPearlRightClickBlock(final Player player, final Block block, 
+            final BlockFace face, final PlayerInteractEvent event, 
+            final int previousLastTick, final BlockInteractData data) {
+        if (!BlockProperties.isPassable(block.getType())) {
+            final CombinedConfig ccc = CombinedConfig.getConfig(player);
+            if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
+                event.setUseItemInHand(Result.DENY);
+                if (data.debug) {
+                    final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+                    genericDebug(player, block, face, event, "click block: deny use ender pearl", previousLastTick, data, cc);
+                }
+            }
+        }
     }
 
     private void genericDebug(final Player player, final Block block, final BlockFace face, 

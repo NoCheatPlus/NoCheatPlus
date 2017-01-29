@@ -82,6 +82,7 @@ public class Magic {
      * moving direction).
      */
     public static final double GLIDE_DESCEND_GAIN_MAX_POS = GRAVITY_ODD / 1.95;
+    public static final int FIREWORKS_BOOST_EXTRA_TICKS = 50;
 
     // On-ground.
     public static final double Y_ON_GROUND_MIN = 0.00001;

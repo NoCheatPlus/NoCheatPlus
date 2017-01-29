@@ -20,9 +20,13 @@ import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -42,8 +46,10 @@ public class BridgeMisc {
     }
 
     public static final GameMode GAME_MODE_SPECTATOR = getSpectatorGameMode();
-    
+
     private static final Method Bukkit_getOnlinePlayers = ReflectionUtil.getMethodNoArgs(Bukkit.class, "getOnlinePlayers");
+
+    public static final Material FIREWORK = Material.getMaterial("FIREWORK");
 
     /**
      * Return a shooter of a projectile if we get an entity, null otherwise.
@@ -102,6 +108,41 @@ public class BridgeMisc {
             }
         }
         return new Player[0];
+    }
+
+    /**
+     * Test side conditions for fireworks boost with elytra on, for interaction
+     * with the item in hand. Added with Minecraft 1.11.2.
+     * 
+     * @param player
+     * @param materialInHand
+     *            The type of the item used with interaction.
+     * @return
+     */
+    public static boolean maybeElytraBoost(final Player player, final Material materialInHand) {
+        // TODO: Account for MC version (needs configuration override or auto adapt to protocol support).
+        // TODO: Non-static due to version checks (...).
+        return FIREWORK != null && materialInHand == FIREWORK && Bridge1_9.isGlidingWithElytra(player);
+    }
+
+    /**
+     * Get the power for a firework(s) item (stack).
+     * 
+     * @param item
+     * @return The power. Should be between 0 and 127 including edges, in case
+     *         of valid items, according to javadocs (Spigot MC 1.11.2). In case
+     *         the item is null or can't be judged, -1 is returned.
+     */
+    public static int getFireworksPower(final ItemStack item) {
+        if (item == null || item.getType() != FIREWORK) {
+            return 0;
+        }
+        final ItemMeta meta = item.getItemMeta();
+        if (!(meta instanceof FireworkMeta)) { // INDIRECT: With elytra, this already exists.
+            return 0;
+        }
+        final FireworkMeta fwMeta = (FireworkMeta) meta;
+        return fwMeta.getPower();
     }
 
 }

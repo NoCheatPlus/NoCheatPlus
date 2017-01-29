@@ -220,6 +220,13 @@ public class MovingData extends ACheckData {
     /** Horizontal velocity modeled as an axis (always positive) */
     private final FrictionAxisVelocity horVel = new FrictionAxisVelocity();
 
+    /** Duration of the boost effect in ticks. */
+    public int fireworksBoostDuration = 0;
+    /**
+     * Expire at this tick.
+     */
+    public int fireworksBoostTickExpire = 0;
+
     // Coordinates.
     /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves." */
     private final LocationTrace trace;
@@ -290,6 +297,7 @@ public class MovingData extends ACheckData {
     public long         sfCobwebTime = 0;
     public double       sfCobwebVL = 0;
     public long         sfVLTime = 0;
+
 
     // Accounting info.
     public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
@@ -389,8 +397,7 @@ public class MovingData extends ACheckData {
         sfZeroVdistRepeat = 0;
         clearAccounting();
         clearNoFallData();
-        removeAllVelocity();
-        sfHorizontalBuffer = 0.0;
+        removeAllPlayerSpeedModifiers();
         lostSprintCount = 0;
         sfHoverTicks = sfHoverLoginTicks = -1;
         sfDirty = false;
@@ -421,14 +428,13 @@ public class MovingData extends ACheckData {
         // Keep jump amplifier
         // Keep bunny-hop delay (?)
         // keep jump phase.
-        sfHorizontalBuffer = 0.0;
         lostSprintCount = 0;
         sfHoverTicks = -1; // 0 ?
         sfDirty = false;
         sfLowJump = false;
         liftOffEnvelope = defaultLiftOffEnvelope;
         insideMediumCount = 0;
-        removeAllVelocity();
+        removeAllPlayerSpeedModifiers();
         vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
         lastFrictionHorizontal = lastFrictionVertical = 0.0;
         verticalBounce = null;
@@ -496,7 +502,7 @@ public class MovingData extends ACheckData {
      * Called when a player leaves the server.
      */
     public void onPlayerLeave() {
-        removeAllVelocity();
+        removeAllPlayerSpeedModifiers();
         trace.reset();
         playerMoves.invalidate();
         vehicleMoves.invalidate();
@@ -864,7 +870,21 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Remove all vertical and horizontal velocity.
+     * Remove/reset all speed modifier tracking, like vertical and horizontal
+     * velocity, elytra boost, buffer.
+     */
+    private void removeAllPlayerSpeedModifiers() {
+        // Velocity
+        removeAllVelocity();
+        // Elytra boost best fits velocity / effects.
+        fireworksBoostDuration = 0; 
+        fireworksBoostTickExpire = 0;
+        // Horizontal buffer.
+        sfHorizontalBuffer = 0.0;
+    }
+
+    /**
+     * Reset velocity tracking (h+v).
      */
     public void removeAllVelocity() {
         horVel.clear();
@@ -1210,7 +1230,7 @@ public class MovingData extends ACheckData {
         sfCobwebTime = Math.min(sfCobwebTime, time);
         sfVLTime = Math.min(sfVLTime, time);
         clearAccounting(); // Not sure: adding up might not be nice.
-        removeAllVelocity(); // TODO: This likely leads to problems.
+        removeAllPlayerSpeedModifiers(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
     }
 
