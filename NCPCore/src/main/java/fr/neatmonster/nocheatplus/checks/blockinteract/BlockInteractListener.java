@@ -31,7 +31,6 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -210,18 +209,11 @@ public class BlockInteractListener extends CheckListener {
             if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {
                 final BlockInteractData data = BlockInteractData.getData(player);
                 final int power = BridgeMisc.getFireworksPower(stack);
-                /*
-                 * The default Material.FIREWORK has power 0 and roughly does 10
-                 * blocks in one seconds. With power 127, the flight duration
-                 * roughly is 7 seconds, so we assume the effect duration to be
-                 * something like 20 + power. What does the wiki tell? However
-                 * the actual flight duration with elytra + fireworks seems to
-                 * be higher, or the friction behavior has changed.
-                 */
                 final MovingData mData = MovingData.getData(player);
-                mData.fireworksBoostDuration = power + Magic.FIREWORKS_BOOST_EXTRA_TICKS;
+                final int ticks = Math.max((1 + power) * 20, 30);
+                mData.fireworksBoostDuration = ticks;
                 // Expiration tick: not general latency, rather a minimum margin for sudden congestion.
-                mData.fireworksBoostTickExpire = TickTask.getTick() + power + Magic.FIREWORKS_BOOST_EXTRA_TICKS;
+                mData.fireworksBoostTickExpire = TickTask.getTick() + ticks;
                 // TODO: Invalidation mechanics: by tick/time well ?
                 // TODO: Implement using it in CreativeFly.
                 if (data.debug) {
