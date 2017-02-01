@@ -412,7 +412,7 @@ public class BlockChangeTracker {
                 processBlocks.add(block);
             }
         }
-        if (world == null || !processBlocks.isEmpty()) {
+        if (world == null || processBlocks.isEmpty()) {
             processBlocks.clear(); // In case the world is null (unlikely).
             return;
         }
