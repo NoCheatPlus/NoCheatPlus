@@ -284,6 +284,8 @@ public class BlockChangeTracker {
 
     /** Change id/count, increasing with each entry added internally. */
     private long maxChangeId = 0;
+    /** Tick of the last time, when maxChangeId had been incremented. */
+    private int maxChangeIdTick = -1;
 
     /** Global maximum age for entries, in ticks. */
     private int expirationAgeTicks = 80;
@@ -327,7 +329,7 @@ public class BlockChangeTracker {
         final int tick = TickTask.getTick();
         final World world = pistonBlock.getWorld();
         final WorldNode worldNode = getOrCreateWorldNode(world, tick);
-        final long changeId = ++maxChangeId;
+        final long changeId = getNewChangeId(tick, false); // TODO: Could set preferKeep.
         // Avoid duplicates by adding to a set.
         if (pistonBlock != null) {
             processBlocks.add(pistonBlock);
@@ -419,7 +421,7 @@ public class BlockChangeTracker {
         // Add blocks.
         final int tick = TickTask.getTick();
         final WorldNode worldNode = getOrCreateWorldNode(world, tick);
-        final long changeId = ++maxChangeId;
+        final long changeId = getNewChangeId(tick, false); // TODO: Could set preferKeep.
         // Process queued blocks.
         final BlockCache blockCache = blockCacheHandle.getHandle();
         blockCache.setAccess(world); // Assume all users always clean up after use :).
@@ -431,13 +433,51 @@ public class BlockChangeTracker {
     }
 
     /**
-     * Retrieve a new valid change id, for use with adding multiple (fake)
-     * blocks.
+     * Retrieve a (new) valid change id, for use with adding blocks.
      * 
+     * @param tick
+     * @param preferKeep
+     *            If set to true and the tick is the same as was with the last
+     *            fetching, the current maxChangeId is returned, otherwise a new
+     *            one is used.
      * @return
      */
-    public long getNewChangeId() {
-        return ++maxChangeId;
+    public long getNewChangeId(final int tick, final boolean preferKeep) {
+        if (preferKeep && tick == maxChangeIdTick) {
+            return maxChangeId;
+        }
+        else {
+            maxChangeIdTick = tick;
+            return ++maxChangeId;
+        }
+    }
+
+    /**
+     * Add a custom (fake) block change entry. Simplified method: fetch tick,
+     * prefer to reuse the last change id.
+     * 
+     * @param worldId
+     *            Bukkit world UUID as returned by World.getUid().
+     * @param x
+     *            Block coordinates.
+     * @param y
+     * @param z
+     * @param previousState
+     *            The (legacy) block id and data plus the bounds. All should be
+     *            set appropriately, nodes can be used for multiple blocks, they
+     *            are not going to be changed nor "updated". Note that for typical
+     *            fake blocks, you'll set the state you want to be there instead
+     *            of (typically) air. This is reverse to the usage for Bukkit
+     *            events, where the passed state is what has been there
+     *            previously (e.g. air), while the state that a block is
+     *            replaced with will be on the actual map, which is not the case
+     *            with per-player fake blocks.
+     */
+    public void addBlockChange(final UUID worldId, final int x, final int y, final int z, 
+            final IBlockCacheNode previousState) {
+        final int tick = TickTask.getTick();
+        addBlockChange(getNewChangeId(tick, true), tick, getOrCreateWorldNode(worldId, tick), 
+                x, y, z, Direction.NONE, previousState);
     }
 
     /**
@@ -459,9 +499,9 @@ public class BlockChangeTracker {
      *            enter Direction.NONE here. This is kept accessible to allow
      *            sending fake piston pushing via packets.
      * @param previousState
-     *            The (legacy) block id and data, and the shape. All should be
+     *            The (legacy) block id and data plus the bounds. All should be
      *            set appropriately, nodes can be used for multiple blocks, they
-     *            are not going to be changed/"updated". Note that for typical
+     *            are not going to be changed nor "updated". Note that for typical
      *            fake blocks, you'll set the state you want to be there instead
      *            of (typically) air. This is reverse to the usage for Bukkit
      *            events, where the passed state is what has been there
