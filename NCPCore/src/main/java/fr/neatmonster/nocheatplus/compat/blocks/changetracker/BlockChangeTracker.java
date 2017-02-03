@@ -431,6 +431,51 @@ public class BlockChangeTracker {
     }
 
     /**
+     * Retrieve a new valid change id, for use with adding multiple (fake)
+     * blocks.
+     * 
+     * @return
+     */
+    public long getNewChangeId() {
+        return ++maxChangeId;
+    }
+
+    /**
+     * Add a custom (fake) block change entry.
+     * 
+     * @param changeId
+     *            A changeId to assign to one or multiple blocks, such as
+     *            returned by getNewChangeId().
+     * @param tick
+     *            Tick as returned by TickTask.getTick()
+     * @param worldId
+     *            Bukkit world UUID as returned by World.getUid().
+     * @param x
+     *            Block coordinates.
+     * @param y
+     * @param z
+     * @param direction
+     *            A pushing direction. For blocks to walk on or pass through,
+     *            enter Direction.NONE here. This is kept accessible to allow
+     *            sending fake piston pushing via packets.
+     * @param previousState
+     *            The (legacy) block id and data, and the shape. All should be
+     *            set appropriately, nodes can be used for multiple blocks, they
+     *            are not going to be changed/"updated". Note that for typical
+     *            fake blocks, you'll set the state you want to be there instead
+     *            of (typically) air. This is reverse to the usage for Bukkit
+     *            events, where the passed state is what has been there
+     *            previously (e.g. air), while the state that a block is
+     *            replaced with will be on the actual map, which is not the case
+     *            with per-player fake blocks.
+     */
+    public void addBlockChange(final long changeId, final int tick, final UUID worldId,
+            final int x, final int y, final int z, 
+            final Direction direction, final IBlockCacheNode previousState) {
+        addBlockChange(changeId, tick, getOrCreateWorldNode(worldId, tick), x, y, z, direction, previousState);
+    }
+
+    /**
      * Neutral (no direction) adding of a block state.
      * 
      * @param changeId
@@ -439,14 +484,17 @@ public class BlockChangeTracker {
      * @param block
      * @param blockCache
      */
-    private final void addBlock(final long changeId, final int tick, final WorldNode worldNode, 
+    private void addBlock(final long changeId, final int tick, final WorldNode worldNode, 
             final int x, final int y, final int z, final BlockCache blockCache) {
         addBlockChange(changeId, tick, worldNode, x, y, z, Direction.NONE, 
                 blockCache.getOrCreateBlockCacheNode(x, y, z, true));
     }
 
-    private final WorldNode getOrCreateWorldNode(final World world, final int tick) {
-        final UUID worldId = world.getUID();
+    private WorldNode getOrCreateWorldNode(final World world, final int tick) {
+        return getOrCreateWorldNode(world.getUID(), tick);
+    }
+
+    private WorldNode getOrCreateWorldNode(final UUID worldId, final int tick) {
         WorldNode worldNode = worldMap.get(worldId);
         if (worldNode == null) {
             // TODO: With activity tracking this should be a return.
