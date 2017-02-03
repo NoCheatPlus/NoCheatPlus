@@ -264,7 +264,7 @@ public class BlockChangeTracker {
                 final IBlockCacheNode previousState) {
             return tick == this.tick && direction == this.direction && (
                     previousState == null && this.previousState == null
-                    || previousState.equals(this.previousState)
+                    || previousState != null && previousState.equals(this.previousState)
                     );
         }
 
