@@ -550,11 +550,36 @@ public class BlockChangeTracker {
         //DebugUtil.debug("Add block change: " + x + "," + y + "," + z + " " + direction + " " + changeId); // TODO: REMOVE
     }
 
-    private int expireEntries(final int olderThanTick, final LinkedList<BlockChangeEntry> entries) {
+    /**
+     * Test for expiration, account for intervals of validity (if set) and for
+     * settings.
+     * 
+     * @param expireOlderThanTick
+     * @param entry
+     * @return
+     */
+    private boolean shouldExpireEntry(final int expireOlderThanTick, final BlockChangeEntry entry) {
+        if (entry.nextEntryTick < 0) {
+            return entry.tick < expireOlderThanTick;
+        }
+        else {
+            return entry.nextEntryTick < expireOlderThanTick;
+        }
+    }
+
+    /**
+     * Remove expired entries from the given list. Statistics have to be
+     * adjusted externally, based on the returned number of expired entries.
+     * 
+     * @param expireOlderThanTick
+     * @param entries
+     * @return
+     */
+    private int expireEntries(final int expireOlderThanTick, final LinkedList<BlockChangeEntry> entries) {
         int removed = 0;
         final Iterator<BlockChangeEntry> it = entries.iterator();
         while (it.hasNext()) {
-            if (it.next().tick < olderThanTick) {
+            if (shouldExpireEntry(expireOlderThanTick, it.next())) {
                 it.remove();
                 removed ++;
             }
@@ -571,11 +596,11 @@ public class BlockChangeTracker {
      * @param currentTick
      */
     public void checkExpiration(final int currentTick) {
-        final int olderThanTick = currentTick - expirationAgeTicks;
+        final int expireOlderThanTick = currentTick - expirationAgeTicks;
         final Iterator<Entry<UUID, WorldNode>> it = worldMap.entrySet().iterator();
         while (it.hasNext()) {
             final WorldNode worldNode = it.next().getValue();
-            if (worldNode.lastChangeTick < olderThanTick) {
+            if (worldNode.lastChangeTick < expireOlderThanTick) {
                 worldNode.clear();
                 it.remove();
             }
@@ -590,8 +615,8 @@ public class BlockChangeTracker {
                     final LinkedList<BlockChangeEntry> entries = entry.getValue();
                     final ActivityNode activityNode = worldNode.getActivityNode(entry.getX(), entry.getY(), entry.getZ(), activityResolution);
                     if (!entries.isEmpty()) {
-                        if (entries.getFirst().tick < olderThanTick) {
-                            final int expired = expireEntries(olderThanTick, entries);
+                        if (shouldExpireEntry(expireOlderThanTick, entries.getFirst())) {
+                            final int expired = expireEntries(expireOlderThanTick, entries);
                             worldNode.size -= expired;
                             activityNode.count -= expired;
                         }
@@ -827,7 +852,7 @@ public class BlockChangeTracker {
         final Iterator<BlockChangeEntry> it = entries.iterator();
         while (it.hasNext()) {
             final BlockChangeEntry entry = it.next();
-            if (entry.tick < expireOlderThanTick) {
+            if (shouldExpireEntry(expireOlderThanTick, entry)) {
                 //DebugUtil.debug("Lazy expire: " + x + "," + y + "," + z + " " + entry.id);
                 it.remove();
                 activityNode.count --;
