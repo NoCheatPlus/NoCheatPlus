@@ -317,7 +317,7 @@ public class SurvivalFly extends Check {
             }
 
             // hacc (if enabled, always update)
-            final double fcmhv = Math.max(1.0, thisMove.hDistance / thisMove.hAllowedDistanceBase);
+            final double fcmhv = Math.max(1.0, Math.min(10.0, thisMove.hDistance / thisMove.hAllowedDistanceBase));
             data.combinedMediumHCount ++;
             data.combinedMediumHValue += fcmhv;
             // TODO: Balance, where to check / use (...).
