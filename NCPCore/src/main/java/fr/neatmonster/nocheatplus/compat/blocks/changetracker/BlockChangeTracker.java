@@ -516,6 +516,43 @@ public class BlockChangeTracker {
     }
 
     /**
+     * Remove all block change entries for the given coordinates in that world.
+     * 
+     * @param worldId
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public int removeAllEntries(final UUID worldId, final int x, final int y, final int z) {
+        final WorldNode worldNode = worldMap.get(worldId);
+        if (worldNode == null) {
+            return 0;
+        }
+        final List<BlockChangeEntry> entries = worldNode.blocks.get(x, y, z);
+        if (entries == null
+                || entries.isEmpty() // TODO: debug/error.
+                ) {
+            return 0;
+        }
+        final int res = entries.size();
+        entries.clear();
+        worldNode.blocks.remove(x, y, z); // Could store lightly and do lazily?
+        // Might delegate the following to another method here.
+        final ActivityNode activity = worldNode.getActivityNode(x, y, z, activityResolution);
+        activity.count -= res;
+        if (activity.count <= 0) {
+            worldNode.removeActivityNode(x, y, z, activityResolution);
+        }
+        worldNode.size -= res;
+        if (worldNode.size <= 0) {
+            worldNode.clear();
+            worldMap.remove(worldId);
+        }
+        return res;
+    }
+
+    /**
      * Neutral (no direction) adding of a block state.
      * 
      * @param changeId
