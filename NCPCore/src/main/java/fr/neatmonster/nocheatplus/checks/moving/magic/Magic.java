@@ -25,6 +25,10 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
  */
 public class Magic {
 
+    // CraftBukkit/Minecraft constants.
+    public static final double DEFAULT_WALKSPEED = 0.2;
+    public static final double DEFAULT_FLYSPEED = 0.1;
+
     // Gravity.
     public static final double GRAVITY_MAX = 0.0834;
     public static final double GRAVITY_MIN = 0.0624; // TODO: Special cases go down to 0.05.

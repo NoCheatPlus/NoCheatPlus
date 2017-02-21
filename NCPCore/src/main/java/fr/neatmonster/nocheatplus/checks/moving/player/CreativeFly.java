@@ -295,7 +295,7 @@ public class CreativeFly extends Check {
             }
             if (flying) {
                 // TODO: Consider mechanics for flying backwards.
-                fSpeed *= data.flySpeed / 0.1;
+                fSpeed *= data.flySpeed / Magic.DEFAULT_FLYSPEED;
                 if (sprinting) {
                     // TODO: Prevent for pre-1.8?
                     fSpeed *= model.hModSprint;
@@ -305,7 +305,7 @@ public class CreativeFly extends Check {
             }
             else {
                 // (Ignore sprinting here).
-                fSpeed *= data.walkSpeed / 0.2;
+                fSpeed *= data.walkSpeed / Magic.DEFAULT_WALKSPEED;
             }
         }
         else {
@@ -361,7 +361,7 @@ public class CreativeFly extends Check {
         double resultV = 0.0;
         if (model.applyModifiers && flying && yDistance > 0.0) {
             // Let fly speed apply with moving upwards.
-            limitV *= data.flySpeed / 0.1;
+            limitV *= data.flySpeed / Magic.DEFAULT_FLYSPEED;
         }
         else if (model.isScaleLevitationEffect() && Bridge1_9.hasLevitation()) {
             // Exclude modifiers for now.

@@ -201,7 +201,7 @@ public class SurvivalFly extends Check {
         // Use the player-specific walk speed.
         // TODO: Might get from listener.
         // TODO: Use in lostground?
-        thisMove.walkSpeed = Magic.WALK_SPEED * ((double) data.walkSpeed / 0.2);
+        thisMove.walkSpeed = Magic.WALK_SPEED * ((double) data.walkSpeed / Magic.DEFAULT_WALKSPEED);
 
         setNextFriction(thisMove, data, cc);
 
@@ -321,7 +321,8 @@ public class SurvivalFly extends Check {
             data.combinedMediumHCount ++;
             data.combinedMediumHValue += fcmhv;
             // TODO: Balance, where to check / use (...).
-            if (data.combinedMediumHCount > 30) { // TODO: Adjust whatever way.
+            if (data.combinedMediumHCount > 30) {
+                // TODO: Early trigger (> 0,1,2,5?), for way too high values. [in that case don't reset]
                 final double fcmh = data.combinedMediumHValue / (double) data.combinedMediumHCount;
                 final double limitFCMH;
                 // TODO: with buffer use, might want to skip.
@@ -873,7 +874,14 @@ public class SurvivalFly extends Check {
                 hAllowedDistance *= attrMod;
                 // TODO: Consider getting modifiers from items, calculate with classic means (or iterate over all modifiers).
                 // Hack for allow sprint-jumping with slowness.
-                if (sprinting && hAllowedDistance < 0.29 && cc.sfSlownessSprintHack && player.hasPotionEffect(PotionEffectType.SLOW)) {
+                if (sprinting && hAllowedDistance < 0.29 && cc.sfSlownessSprintHack 
+                        && (
+                                // TODO: Test/balance thresholds (walkSpeed, attrMod).
+                                player.hasPotionEffect(PotionEffectType.SLOW)
+                                || data.walkSpeed < Magic.DEFAULT_WALKSPEED
+                                || attrMod < 1.0
+                                )
+                        ) {
                     // TODO: Should restrict further by yDistance, ground and other (jumping only).
                     // TODO: Restrict to not in water (depth strider)?
                     hAllowedDistance = slownessSprintHack(player, hAllowedDistance);
