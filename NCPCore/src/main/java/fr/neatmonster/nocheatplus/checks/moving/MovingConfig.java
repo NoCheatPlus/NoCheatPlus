@@ -395,7 +395,7 @@ public class MovingConfig extends ACheckConfig {
         // TODO: Short touch of water/vines (/ground?) is possible - use past moves or in-medium-count.
         final boolean isUsingElytra = Bridge1_9.isWearingElytra(player);
         if (player.isFlying() 
-                || !ignoreAllowFlight && player.getAllowFlight() && !isUsingElytra) {
+                || !isUsingElytra && !ignoreAllowFlight && player.getAllowFlight()) {
             return modelGameMode;
         }
         // TODO: ORDER IS RANDOM GUESSING. Is mixtures possible?
