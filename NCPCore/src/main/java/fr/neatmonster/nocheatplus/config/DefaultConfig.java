@@ -398,7 +398,10 @@ public class DefaultConfig extends ConfigFile {
             set(ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra." + ConfPaths.SUB_MODIFIERS, false);
         }
         set(ConfPaths.MOVING_CREATIVEFLY_ACTIONS,
-                "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
+                "log:flyfile:3:5:f cancel"
+                        + "vl>100 log:flyshort:0:5:i log:flyfile:0:5:f cancel"
+                        + "vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
+                        , 1067);
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
         set(ConfPaths.MOVING_MOREPACKETS_SECONDS, 6);
@@ -433,7 +436,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HBUFMAX, 1.0);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID, true);
-        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1500 log:flylong:0:5:cif cancel cmd:kickfly");
+        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, 
+                "log:flyfile:3:10:f cancel"
+                        + "vl>100 log:flyshort:0:10:i log:flyfile:0:10:f cancel"
+                        + "vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
+                        + "vl>1500 log:flylong:0:5:i log:flyfile:0:5:cf cancel cmd:kickfly"
+                        , 1067);
 
         // sf / hover check.
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true);
@@ -548,7 +556,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
         set(ConfPaths.STRINGS + ".flylong", start
-                + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
+                + "tried to move: [locationfrom] -> [locationto], d=[distance] ([tags])" + end, 1067);
+        set(ConfPaths.STRINGS + ".flyfile", start 
+                + "tried to move: [locationfrom] -> [locationto], d=[distance] ([tags])" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack with too high a frequency" + end);
