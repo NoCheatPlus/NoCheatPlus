@@ -2094,36 +2094,29 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     @Override
     public void onTick(final int tick, final long timeLast) {
-        final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
         // TODO: Change to per world checking (as long as configs are per world).
 
-        // Enforcing location check.
-        for (final String playerName : playersEnforce) {
-            final Player player = DataManager.getPlayerExact(playerName);
-            if (player == null || !player.isOnline()) {
-                rem.add(playerName);
-                continue;
-            }
-            else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
-                // Don't remove but also don't check [subject to change].
-                continue;
-            }
-            final MovingData data = MovingData.getData(player);
-            final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
-            if (newTo != null) {
-                data.prepareSetBack(newTo);
-                player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
-            }
+        // Legacy: enforcing location consistency.
+        if (!playersEnforce.isEmpty()) {
+            checkOnTickPlayersEnforce();
         }
-        if (!rem.isEmpty()) {
-            playersEnforce.removeAll(rem);
-        }
-        // Hover check (survivalfly).
-        rem.clear();
-        if (tick % hoverTicksStep != 0) {
+
+        // Hover check (SurvivalFly).
+        if (tick % hoverTicksStep == 0 && !hoverTicks.isEmpty()) {
             // Only check every so and so ticks.
-            return;
+            checkOnTickHover();
         }
+
+        // Cleanup.
+        useLoc.setWorld(null);
+    }
+
+    /**
+     * Check for hovering.<br>
+     * NOTE: Makes use of useLoc, without resetting it.
+     */
+    private void checkOnTickHover() {
+        final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
         final PlayerMoveInfo info = aux.usePlayerMoveInfo();
         for (final String playerName : hoverTicks) {
             // TODO: put players into the set (+- one tick would not matter ?)
@@ -2166,9 +2159,35 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
         hoverTicks.removeAll(rem);
-        rem.clear();
         aux.returnPlayerMoveInfo(info);
-        useLoc.setWorld(null);
+    }
+
+    /**
+     * Legacy check: Enforce location of players, in case of inconsistencies.
+     * First move exploit / possibly vehicle leave.<br>
+     * NOTE: Makes use of useLoc, without resetting it.
+     */
+    private void checkOnTickPlayersEnforce() {
+        final List<String> rem = new ArrayList<String>(playersEnforce.size()); // Pessimistic.
+        for (final String playerName : playersEnforce) {
+            final Player player = DataManager.getPlayerExact(playerName);
+            if (player == null || !player.isOnline()) {
+                rem.add(playerName);
+                continue;
+            } else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
+                // Don't remove but also don't check [subject to change].
+                continue;
+            }
+            final MovingData data = MovingData.getData(player);
+            final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
+            if (newTo != null) {
+                data.prepareSetBack(newTo);
+                player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
+            }
+        }
+        if (!rem.isEmpty()) {
+            playersEnforce.removeAll(rem);
+        }
     }
 
     private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
@@ -2233,7 +2252,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
                 aux.returnPlayerMoveInfo(moveInfo);
             }
-            else res = false;
+            else {
+                res = false;
+            }
         }
         info.cleanup();
         return res;
