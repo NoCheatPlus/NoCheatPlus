@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -50,6 +51,13 @@ public class BridgeMisc {
     private static final Method Bukkit_getOnlinePlayers = ReflectionUtil.getMethodNoArgs(Bukkit.class, "getOnlinePlayers");
 
     public static final Material FIREWORK = Material.getMaterial("FIREWORK");
+
+    /**
+     * Correction of position: Used for ordinary setting back. <br>
+     * NOTE: Currently it's not distinguished, if we do it as a proactive
+     * measure, or due to an actual check violation.
+     */
+    public static final TeleportCause TELEPORT_CAUSE_CORRECTION_OF_POSITION = TeleportCause.UNKNOWN;
 
     /**
      * Return a shooter of a projectile if we get an entity, null otherwise.

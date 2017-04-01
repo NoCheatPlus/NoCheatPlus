@@ -17,7 +17,6 @@ package fr.neatmonster.nocheatplus.utilities;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -26,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
@@ -69,7 +69,8 @@ public class TeleportUtil {
         else if (playerIsPassenger) { // && vehicle.equals(player.getVehicle).
             // Attempt to only teleport the entity first. On failure use eject.
             // TODO: Probably needs a guard depending on version.
-            //            if (vehicle.teleport(location, TeleportCause.PLUGIN)) {
+            //            if (vehicle.teleport(location, 
+            //                  BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
             //                // Check success.
             //                if (vehicle.getLocation(useLoc).equals(location) && player.equals(vehicle.getPassenger())) {
             //                    vehicleTeleported = true;
@@ -82,11 +83,13 @@ public class TeleportUtil {
             if (!playerTeleported){
                 vehicle.eject(); // NOTE: VehicleExit fires, unknown TP fires.
                 // TODO: Confirm eject worked, handle if not.
-                vehicleTeleported = vehicle.teleport(LocUtil.clone(location), TeleportCause.PLUGIN);
+                vehicleTeleported = vehicle.teleport(LocUtil.clone(location), 
+                        BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }
         }
         else if (passenger == null) {
-            vehicleTeleported = vehicle.teleport(location, TeleportCause.PLUGIN);
+            vehicleTeleported = vehicle.teleport(location, 
+                    BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
         }
         if (!playerTeleported && player.isOnline() && !player.isDead()) {
             // Mask player teleport as a set-back.

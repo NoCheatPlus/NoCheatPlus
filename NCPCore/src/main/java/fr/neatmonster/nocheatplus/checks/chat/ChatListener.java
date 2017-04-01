@@ -27,7 +27,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
@@ -35,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -221,7 +221,8 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         if (MovingUtil.shouldCheckUntrackedLocation(player, loc)) {
             final Location newTo = MovingUtil.checkUntrackedLocation(loc);
             if (newTo != null) {
-                if (mcc.passableUntrackedCommandTryTeleport && player.teleport(newTo, TeleportCause.PLUGIN)) {
+                if (mcc.passableUntrackedCommandTryTeleport 
+                        && player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.TRACE_FILE, player.getName() + " runs the command '" + message + "' at an untracked location: " + loc + " , teleport to: " + newTo);
                 } else {
                     // TODO: Allow disabling cancel?

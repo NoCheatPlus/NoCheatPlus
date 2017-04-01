@@ -322,7 +322,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             useLoc.setWorld(null);
             // Teleport.
             data.prepareSetBack(target); // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
-            player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
+            // TODO: schedule / other measures ?
+            player.teleport(target, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
         }
         else {
             // Reset bed ...
@@ -2111,7 +2112,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
             if (newTo != null) {
                 data.prepareSetBack(newTo);
-                player.teleport(newTo, TeleportCause.PLUGIN);
+                player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }
         }
         if (!rem.isEmpty()) {

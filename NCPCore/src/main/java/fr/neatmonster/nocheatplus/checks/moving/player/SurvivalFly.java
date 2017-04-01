@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -43,6 +42,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
@@ -1995,7 +1995,7 @@ public class SurvivalFly extends Check {
             if (data.hasSetBack()) {
                 final Location newTo = data.getSetBack(loc);
                 data.prepareSetBack(newTo);
-                player.teleport(newTo, TeleportCause.PLUGIN);
+                player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }
             else {
                 // Solve by extra actions ? Special case (probably never happens)?
