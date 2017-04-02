@@ -58,7 +58,6 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
@@ -624,7 +623,7 @@ public class VehicleChecks extends CheckListener {
                 if (data.debug) {
                     debug(player, "Attempt to set the player back directly.");
                 }
-                TeleportUtil.teleport(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug);
+                passengerUtil.teleportWithPassengers(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug);
             }
 
         }

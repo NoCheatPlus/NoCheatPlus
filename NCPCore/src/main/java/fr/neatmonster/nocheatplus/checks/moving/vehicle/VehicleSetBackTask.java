@@ -18,9 +18,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
+import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 
 /**
  * Task for scheduling a vehicle set back. Resets the vehicleSetBackTaskId in
@@ -47,7 +48,8 @@ public class VehicleSetBackTask implements Runnable{
         final MovingData data = MovingData.getData(player);
         data.vehicleSetBackTaskId = -1;
         try{
-            TeleportUtil.teleport(vehicle, player, location, debug);
+            NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(PassengerUtil.class).teleportWithPassengers(
+                    vehicle, player, location, debug);
         }
         catch(Throwable t){
             StaticLog.logSevere(t);
