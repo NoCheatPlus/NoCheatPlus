@@ -544,6 +544,11 @@ public class VehicleChecks extends CheckListener {
 
         // Schedule a set back?
         if (newTo == null) {
+            // Update vehicle data for passive player passengers.
+            final List<Entity> passengers = passengerUtil.handleVehicle.getHandle().getEntityPassengers(vehicle);
+            if (passengers.size() > 1) {
+                updateVehicleData(player, data, vehicle, moveInfo, passengers);
+            }
             // Increase time since set back.
             data.timeSinceSetBack ++;
             // Finally finish processing the current move and move it to past ones.
@@ -553,6 +558,22 @@ public class VehicleChecks extends CheckListener {
             setBack(player, vehicle, newTo, data, cc);
         }
         useLoc1.setWorld(null);
+    }
+
+    private void updateVehicleData(final Player player, final MovingData data, final Entity vehicle, 
+            final VehicleMoveInfo moveInfo, final List<Entity> passengers) {
+        for (final Entity passenger : passengers) {
+            if ((passenger instanceof Player) && !player.equals(passenger)) {
+                final Player otherPlayer = (Player) passenger;
+                final MovingData otherData = MovingData.getData(otherPlayer);
+                otherData.resetVehiclePositions(moveInfo.to);
+                // TODO: Reset all precisely to what there is or this or what not.
+                otherData.vehicleSetBacks.resetAllLazily(data.vehicleSetBacks.getOldestValidEntry());
+                otherData.wasInVehicle = true;
+                // TODO: VehicleMoves: should adjust fully ?
+                otherData.vehicleMoves.invalidate();
+            }
+        }
     }
 
     /**
