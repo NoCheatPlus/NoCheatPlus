@@ -237,19 +237,19 @@ public class CreativeFly extends Check {
 
         // Return setBack, if set.
         if (setBack != null) {
-            // Check for max height of the set-back.
+            // Check for max height of the set back.
             if (setBack.getY() > maximumHeight) {
                 // Correct the y position.
                 setBack.setY(getCorrectedHeight(maximumHeight, setBack.getWorld()));
                 if (data.debug) {
-                    debug(player, "Maximum height exceeded by set-back, correct to: " + setBack.getY());
+                    debug(player, "Maximum height exceeded by set back, correct to: " + setBack.getY());
                 }
             }
             data.sfJumpPhase = 0;
             return setBack;
         }
         else {
-            // Adjust the set-back and other last distances.
+            // Adjust the set back and other last distances.
             data.setSetBack(to);
             // Adjust jump phase.
             if (!thisMove.from.onGroundOrResetCond && !thisMove.to.onGroundOrResetCond) {
@@ -438,7 +438,7 @@ public class CreativeFly extends Check {
     private double hackLytra(final double yDistance, final double limitV, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Hack, move / config / something.
         // TODO: Confine more. hdist change relates to ydist change
-        // TODO: Further: jumpphase vs. y-distance to set-back. Problem: velocity
+        // TODO: Further: jumpphase vs. y-distance to set back. Problem: velocity
         // TODO: Further: record max h and descend speeds and relate to those.
         // TODO: Demand total speed to decrease.
         if (yDistance > Magic.GLIDE_DESCEND_PHASE_MIN && yDistance < 17.0 * Magic.GRAVITY_MAX

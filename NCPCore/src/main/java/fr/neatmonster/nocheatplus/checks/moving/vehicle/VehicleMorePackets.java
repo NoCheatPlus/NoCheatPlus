@@ -52,7 +52,7 @@ public class VehicleMorePackets extends Check {
      * @param player
      *            the player
      * @param thisMove
-     * @param setBack Already decided set-back, if not null.
+     * @param setBack Already decided set back, if not null.
      * @param cc 
      * @param data 
      * @return the location
@@ -111,11 +111,11 @@ public class VehicleMorePackets extends Check {
             // Set the new "last" time.
             data.vehicleMorePacketsLastTime = time;
 
-            // Set the new set-back location.
+            // Set the new set back location.
             if (allowSetSetBack && newTo == null) {
                 data.vehicleSetBacks.setMidTermEntry(thisMove.from);
                 if (data.debug) {
-                    debug(player, "Update vehicle morepackets set-back: " + thisMove.from);
+                    debug(player, "Update vehicle morepackets set back: " + thisMove.from);
                 }
             }
         } else if (data.vehicleMorePacketsLastTime > time) {

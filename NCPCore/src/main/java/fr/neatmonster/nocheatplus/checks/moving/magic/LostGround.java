@@ -410,7 +410,7 @@ public class LostGround {
      * Apply lost-ground workaround.
      * @param player
      * @param refLoc
-     * @param setBackSafe If to use the given location as set-back.
+     * @param setBackSafe If to use the given location as set back.
      * @param data
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
@@ -420,7 +420,7 @@ public class LostGround {
             data.setSetBack(refLoc);
         }
         else {
-            // Keep Set-back.
+            // Keep Set back.
         }
         return applyLostGround(player, thisMove, data, tag, tags, mcAccess);
     }
@@ -429,7 +429,7 @@ public class LostGround {
      * Apply lost-ground workaround.
      * @param player
      * @param refLoc
-     * @param setBackSafe If to use the given location as set-back.
+     * @param setBackSafe If to use the given location as set back.
      * @param data
      * @param tag Added to "lostground_" as tag.
      * @return Always true.
@@ -440,7 +440,7 @@ public class LostGround {
             data.setSetBack(refLoc);
         }
         else {
-            // Keep Set-back.
+            // Keep Set back.
         }
         return applyLostGround(player, thisMove, data, tag, tags, refLoc.getMCAccess());
     }
@@ -449,7 +449,7 @@ public class LostGround {
      * Apply lost-ground workaround (data adjustments and tag).
      * @param player
      * @param refLoc
-     * @param setBackSafe If to use the given location as set-back.
+     * @param setBackSafe If to use the given location as set back.
      * @param data
      * @param tag Added to "lostground_" as tag.
      * @return Always true.

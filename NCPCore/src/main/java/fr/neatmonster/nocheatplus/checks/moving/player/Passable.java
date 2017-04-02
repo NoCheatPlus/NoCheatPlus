@@ -170,11 +170,11 @@ public class Passable extends Check {
             final String tags, final MovingData data, final MovingConfig cc) {
         Location setBackLoc = null; // Alternative to from.getLocation().
 
-        // Prefer the set-back location from the data.
+        // Prefer the set back location from the data.
         if (data.hasSetBack()) {
             setBackLoc = data.getSetBack(to);
             if (data.debug) {
-                debug(player, "Using set-back location for passable.");
+                debug(player, "Using set back location for passable.");
             }
         }
 
@@ -340,13 +340,13 @@ public class Passable extends Check {
                     return null;
                 }
             }
-            // From should be the set-back.
+            // From should be the set back.
             tags += "into";
         }
 
         //				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
         // (Mind that this can be the case on the same block theoretically.)
-        // Keep loc as set-back.
+        // Keep loc as set back.
         //				}
         else if (manhattan == 1 && to.isBlockAbove(from) 
                 && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getBlockCache().getOrCreateBlockCacheNode(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ(), false), null)) {
@@ -355,7 +355,7 @@ public class Passable extends Check {
             return null;
         }
         else if (manhattan > 0) {
-            // Otherwise keep from as set-back.
+            // Otherwise keep from as set back.
             tags += "cross";
         }
         else {

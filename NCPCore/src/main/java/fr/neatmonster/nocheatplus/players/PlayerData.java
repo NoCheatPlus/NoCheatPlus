@@ -25,7 +25,7 @@ import fr.neatmonster.nocheatplus.components.data.IData;
  * On the medium run this is intended to carry all data for the player...
  * <li>Checks data objects.</li>
  * <li>Time stamps for logged out players</li>
- * <li>Data to be persisted, like set-backs, xray.</li>
+ * <li>Data to be persisted, like set backs, xray.</li>
  * <br>Might contain...
  * <li>References of configs.</li>
  * <li>Exemption entries.</li>

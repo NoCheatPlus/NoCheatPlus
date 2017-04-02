@@ -26,7 +26,7 @@ import fr.neatmonster.nocheatplus.components.location.ISetPositionWithLook;
 
 /**
  * Auxiliary methods for Location handling, mainly intended for use with
- * set-back locations.
+ * set back locations.
  * 
  * @author asofold
  *

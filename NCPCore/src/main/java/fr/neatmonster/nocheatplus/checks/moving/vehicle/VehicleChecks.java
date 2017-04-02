@@ -346,7 +346,7 @@ public class VehicleChecks extends CheckListener {
         // Ensure firstPastMove is valid.
         if (!firstPastMove.valid) {
             // Determine the best location to use as past move.
-            // TODO: Could also check the set-backs for plausible entries, however that would lead to a violation by default. Could use an indicator.
+            // TODO: Could also check the set backs for plausible entries, however that would lead to a violation by default. Could use an indicator.
             final Location refLoc = from == null ? vehicleLocation : from;
             MovingUtil.ensureChunksLoaded(player, refLoc, "vehicle move (no past move)", data, cc);
             aux.resetVehiclePositions(vehicle, refLoc, data, cc);
@@ -421,7 +421,7 @@ public class VehicleChecks extends CheckListener {
             else {
                 // Better than nothing.
                 data.vehicleSetBacks.setDefaultEntry(vehicleLocation);
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Using the current vehicle location for set-back, due to not having a past location to rely on. This could be a bug.");
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, checkType) + "Using the current vehicle location for set back, due to not having a past location to rely on. This could be a bug.");
             }
         }
         else {
@@ -498,21 +498,21 @@ public class VehicleChecks extends CheckListener {
 
         // TODO: Check activation of any check?
 
-        // Ensure a common set-back for now.
+        // Ensure a common set back for now.
         if (!data.vehicleSetBacks.isDefaultEntryValid()) {
             ensureSetBack(player, thisMove, data);
         }
 
         // Moving envelope check(s).
-        // TODO: Use set-back storage for testing if this is appropriate (use SetBackEntry instead, remove Location retrieval then?).
+        // TODO: Use set back storage for testing if this is appropriate (use SetBackEntry instead, remove Location retrieval then?).
         if ((newTo == null || data.vehicleSetBacks.getSafeMediumEntry().isValidAndOlderThan(newTo))
                 && vehicleEnvelope.isEnabled(player, data, cc)) {
-            // Skip if this is the first move after set-back, with to=set-back.
+            // Skip if this is the first move after set back, with to=set back.
             if (data.timeSinceSetBack == 0 || thisMove.to.hashCode() == data.lastSetBackHash) {
-                // TODO: This is a hot fix, to prevent a set-back loop. Depends on having only the morepackets set-back for vehicles.
+                // TODO: This is a hot fix, to prevent a set back loop. Depends on having only the morepackets set back for vehicles.
                 // TODO: Perhaps might want to add || !data.equalsAnyVehicleSetBack(to)
                 if (data.debug) {
-                    debug(player, "Skip envelope check on first move after set back acknowledging the set-back with an odd starting point (from).");
+                    debug(player, "Skip envelope check on first move after set back acknowledging the set back with an odd starting point (from).");
                 }
             }
             else {
@@ -526,7 +526,7 @@ public class VehicleChecks extends CheckListener {
             }
         }
 
-        // More packets: Sort this in last, to avoid setting the set-back early. Always check to adjust set-back, for now.
+        // More packets: Sort this in last, to avoid setting the set back early. Always check to adjust set back, for now.
         // TODO: Still always update the frequency part?
         if ((newTo == null || data.vehicleSetBacks.getMidTermEntry().isValidAndOlderThan(newTo))) {
             if (vehicleMorePackets.isEnabled(player, data, cc)) {
@@ -537,14 +537,14 @@ public class VehicleChecks extends CheckListener {
             }
             else {
                 // Otherwise we need to clear their data.
-                // TODO: Make mid-term set-back resetting independent of more packets.
+                // TODO: Make mid-term set back resetting independent of more packets.
                 data.clearVehicleMorePacketsData();
             }
         }
 
-        // Schedule a set-back?
+        // Schedule a set back?
         if (newTo == null) {
-            // Increase time since set-back.
+            // Increase time since set back.
             data.timeSinceSetBack ++;
             // Finally finish processing the current move and move it to past ones.
             data.vehicleMoves.finishCurrentMove();
@@ -556,7 +556,7 @@ public class VehicleChecks extends CheckListener {
     }
 
     /**
-     * Called if the default set-back entry isn't valid.
+     * Called if the default set back entry isn't valid.
      * 
      * @param player
      * @param thisMove
@@ -572,20 +572,20 @@ public class VehicleChecks extends CheckListener {
         }
         data.vehicleSetBacks.setDefaultEntry(ensureLoc);
         if (data.debug) {
-            debug(player, "Ensure vehicle set-back: " + ensureLoc);
+            debug(player, "Ensure vehicle set back: " + ensureLoc);
         }
         //        if (data.vehicleSetBackTaskId != -1) {
         //            // TODO: This is likely the wrong thing to do!
         //            Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
         //            data.vehicleSetBackTaskId = -1;
         //            if (data.debug) {
-        //                debug(player, "Cancel set-back task on ensureSetBack.");
+        //                debug(player, "Cancel set back task on ensureSetBack.");
         //            }
         //        }
     }
 
     private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data, final MovingConfig cc) {
-        // TODO: Generic set-back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
+        // TODO: Generic set back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
         if (data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
             // (Only schedule if not already scheduled.)
@@ -604,7 +604,7 @@ public class VehicleChecks extends CheckListener {
                 data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
 
                 if (data.vehicleSetBackTaskId == -1) {
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set-back: " + newTo);
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set back: " + newTo);
                     scheduleSetBack = false; // Force direct teleport as a fall-back measure.
                 }
                 else if (data.debug) {
@@ -617,7 +617,7 @@ public class VehicleChecks extends CheckListener {
                  * NOTE: This causes nested vehicle exit+enter and player
                  * teleport events, while the current event is still being
                  * processed (one of player move, vehicle update/move). Position
-                 * resetting and updating the set-back (if needed) is done there
+                 * resetting and updating the set back (if needed) is done there
                  * (hack, subject to current review).
                  */
                 if (data.debug) {
@@ -644,7 +644,7 @@ public class VehicleChecks extends CheckListener {
 
     /**
      * Assume entering a vehicle, event or join with being inside a vehicle.
-     * Set-back and past move overriding are done here, performing the necessary
+     * Set back and past move overriding are done here, performing the necessary
      * consistency checking. Because teleporting players with their vehicle
      * means exit + teleport + re-enter, vehicle data should not be reset on
      * player teleportation.
@@ -753,7 +753,7 @@ public class VehicleChecks extends CheckListener {
         if (!(entity instanceof Player)) {
             return;
         }
-        // TODO: Queued set-backs? Usually means they still get teleported, individually though.
+        // TODO: Queued set backs? Usually means they still get teleported, individually though.
         onPlayerVehicleLeave((Player) entity, event.getVehicle());
     }
 
@@ -794,20 +794,20 @@ public class VehicleChecks extends CheckListener {
         data.wasInVehicle = false;
         data.joinOrRespawn = false;
         //      if (data.vehicleSetBackTaskId != -1) {
-        //          // Await set-back.
-        //          // TODO: might still set ordinary set-backs ?
+        //          // Await set back.
+        //          // TODO: might still set ordinary set backs ?
         //          return;
         //      }
 
         final MovingConfig cc = MovingConfig.getConfig(player);
         // TODO: Loc can be inconsistent, determine which to use ! 
         final Location pLoc = player.getLocation(useLoc1);
-        Location loc = pLoc; // The location to use as set-back.
+        Location loc = pLoc; // The location to use as set back.
         //  TODO: Which vehicle to use ?
         // final Entity vehicle = player.getVehicle();
         if (vehicle != null) {
             final Location vLoc = vehicle.getLocation(useLoc2);
-            // (Don't override vehicle set-back and last position here.)
+            // (Don't override vehicle set back and last position here.)
             // Workaround for some entities/animals that don't fire VehicleMoveEventS.
             if (!normalVehicles.contains(vehicle.getType()) || cc.noFallVehicleReset) {
                 data.noFallSkipAirCheck = true; // Might allow one time cheat.

@@ -267,7 +267,7 @@ public class Magic {
     }
 
     /**
-     * First move after set-back / teleport. Originally has been found with
+     * First move after set back / teleport. Originally has been found with
      * PaperSpigot for MC 1.7.10, however it also does occur on Spigot for MC
      * 1.7.10.
      * 

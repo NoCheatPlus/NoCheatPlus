@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 
 /**
  * A default extension of SetBackStorage, featuring convenience methods for
- * set-back locations with standard naming, including a default set-back.
+ * set back locations with standard naming, including a default set back.
  * <ul>
  * <li>0: Default. Typically after teleport/join.</li>
  * <li>1: Mid-term. Typically used by more packets checks.</li>
@@ -62,7 +62,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
     }
 
     /**
-     * Get the 'mid-term' set-back entry, disregarding validity.
+     * Get the 'mid-term' set back entry, disregarding validity.
      * 
      * @return
      */
@@ -71,7 +71,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
     }
 
     /**
-     * Get the 'safe-medium' set-back entry, disregarding validity.
+     * Get the 'safe-medium' set back entry, disregarding validity.
      * 
      * @return
      */
@@ -80,7 +80,7 @@ public class DefaultSetBackStorage extends SetBackStorage {
     }
 
     /**
-     * Get the 'last-move' set-back entry, disregarding validity of the entry
+     * Get the 'last-move' set back entry, disregarding validity of the entry
      * itself.
      * 
      * @return

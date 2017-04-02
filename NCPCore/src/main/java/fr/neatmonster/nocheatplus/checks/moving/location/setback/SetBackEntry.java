@@ -169,7 +169,7 @@ public class SetBackEntry implements IGetLocationWithLook, ISetLocationWithLook 
      * @return A new Location object, containing the given world, ready to be
      *         used.
      * @throws IllegalStateException
-     *             In case the set-back entry is not valid.
+     *             In case the set back entry is not valid.
      * @throws IllegalArgumentException
      *             In case the name of the given world does not match the stored
      *             one.

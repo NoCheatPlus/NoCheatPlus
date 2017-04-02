@@ -22,8 +22,8 @@ import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
- * Represent a set-back location storage, allowing for more or less efficient
- * keeping track of multiple set-backs for use within one overall checking
+ * Represent a set back location storage, allowing for more or less efficient
+ * keeping track of multiple set backs for use within one overall checking
  * context (e.g. player moving, or vehicle moving). For timing values, a counter
  * is used as time and a monotonic clock for msTime (static primary thread
  * clock: Monotonic.millis()).
@@ -34,11 +34,11 @@ import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 public class SetBackStorage {
 
     // TODO: Support a hash for locations (LocUtil.hashCode).
-    // TODO: Support for last-used set-back (on retrieving a Location instance)?
+    // TODO: Support for last-used set back (on retrieving a Location instance)?
 
     final SetBackEntry[] entries;
     final int defaultIndex;
-    /** Count times setting a set-back. */
+    /** Count times setting a set back. */
     int time; // TODO: Switch to a counter/clock implementation, in order to allow the same provider for player + vehicle?
 
     /**
@@ -210,7 +210,7 @@ public class SetBackStorage {
     }
 
     /**
-     * Test if any of the stored set-back location is valid.
+     * Test if any of the stored set back location is valid.
      * 
      * @return
      */
@@ -238,7 +238,7 @@ public class SetBackStorage {
     }
 
     /**
-     * Get the default set-back entry, disregarding validity.
+     * Get the default set back entry, disregarding validity.
      * 
      * @return In case no default is set, null is returned. Otherwise the
      *         default entry is returned disregarding validity.
@@ -279,6 +279,6 @@ public class SetBackStorage {
         return entry.isValid() ? entry.getLocation(world) : null;
     }
 
-    // TODO: Method to reset only newer entries to a certain location [a) pass a set-back entry b) find it first, then compare age].
+    // TODO: Method to reset only newer entries to a certain location [a) pass a set back entry b) find it first, then compare age].
 
 }

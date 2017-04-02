@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
  * Carry data of a move, involving from- and to- locations. This is for
  * temporary storage and often resetting, also to encapsulate some data during
  * checking. The I/Location instead of I/Position is used in order to be
- * compatible with passing these to set-back handling and similar.
+ * compatible with passing these to set back handling and similar.
  * 
  * @author asofold
  *
@@ -120,7 +120,7 @@ public class MoveData {
     }
 
     /**
-     * Set with join / teleport / set-back.
+     * Set with join / teleport / set back.
      * @param x
      * @param y
      * @param z
@@ -162,7 +162,7 @@ public class MoveData {
     }
 
     /**
-     * Set with join / teleport / set-back. Does not set extra properties for
+     * Set with join / teleport / set back. Does not set extra properties for
      * locations.
      * 
      * @param loc
@@ -173,7 +173,7 @@ public class MoveData {
     }
 
     /**
-     * Set with join / teleport / set-back, also set extra properties.
+     * Set with join / teleport / set back, also set extra properties.
      * 
      * @param loc
      */

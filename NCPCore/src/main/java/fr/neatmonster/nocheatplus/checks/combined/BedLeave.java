@@ -30,7 +30,7 @@ public class BedLeave extends Check {
      * 
      * @param player
      *            the player
-     * @return If to prevent action (would be set back location of survivalfly).
+     * @return If to prevent action (use the set back location of survivalfly).
      */
     public boolean checkBed(final Player player) {
         final CombinedData data = CombinedData.getData(player);

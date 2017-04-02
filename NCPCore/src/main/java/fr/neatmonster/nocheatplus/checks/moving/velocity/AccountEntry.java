@@ -34,7 +34,7 @@ public class AccountEntry {
 
     /**
      * "Some sum" for general purpose. <li>For vertical entries this is used to
-     * alter the allowed y-distance to the set-back point.</li>
+     * alter the allowed y-distance to the set back point.</li>
      */
     public double sum = 0.0;
 

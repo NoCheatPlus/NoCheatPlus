@@ -80,11 +80,16 @@ public class MovingUtil {
 
     /**
      * Handle an illegal move by a player, attempt to restore a valid location.
+     * <br>
+     * NOTE: event.setTo is used to not leave a gap.
+     * 
      * @param event
      * @param player
      * @param data
+     * @param cc
      */
-    public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data, final MovingConfig cc)
+    public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, 
+            final MovingData data, final MovingConfig cc)
     {
         // This might get extended to a check-like thing.
         boolean restored = false;
@@ -125,7 +130,7 @@ public class MovingUtil {
     }
 
     /**
-     * Used for a workaround that resets the set-back for the case of jumping on just placed blocks.
+     * Used for a workaround that resets the set back for the case of jumping on just placed blocks.
      * @param id
      * @return
      */
@@ -235,7 +240,7 @@ public class MovingUtil {
     }
 
     /**
-     * Ensure we have a set-back location set, plus allow moving from upwards
+     * Ensure we have a set back location set, plus allow moving from upwards
      * with respawn/login. Intended for MovingListener (pre-checks).
      * 
      * @param player
@@ -253,7 +258,7 @@ public class MovingUtil {
             // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
             if (data.debug) {
                 // TODO: Should this be info?
-                idp.debug(player, "Adjust set-back after join/respawn: " + from.getLocation());
+                idp.debug(player, "Adjust set back after join/respawn: " + from.getLocation());
             }
             data.setSetBack(from);
             data.resetPlayerPositions(from);

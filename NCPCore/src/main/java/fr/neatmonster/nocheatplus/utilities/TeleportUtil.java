@@ -51,7 +51,8 @@ public class TeleportUtil {
      * @param debug
      *            the debug
      */
-    public static void teleport(final Entity vehicle, final Player player, final Location location, final boolean debug) {
+    public static void teleport(final Entity vehicle, final Player player, final Location location, 
+            final boolean debug) {
         // TODO: Rubber band issue needs synchronizing with packet level and ignore certain incoming ones?
         // TODO: This handling could conflict with WorldGuard region flags.
         // TODO: Account for nested passengers and inconsistencies.
@@ -92,29 +93,31 @@ public class TeleportUtil {
                     BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
         }
         if (!playerTeleported && player.isOnline() && !player.isDead()) {
-            // Mask player teleport as a set-back.
+            // Mask player teleport as a set back.
             data.prepareSetBack(location);
             playerTeleported = player.teleport(LocUtil.clone(location));
             data.resetTeleported(); // Just in case.
             // Workarounds.
             data.ws.resetConditions(WRPT.G_RESET_NOTINAIR); // Allow re-use of certain workarounds. Hack/shouldbedoneelsewhere?
             // TODO: Magic 1.0, plus is this valid with horse, dragon...
-            if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.5) {
+            if (playerIsPassenger && playerTeleported && vehicleTeleported 
+                    && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.5) {
                 // Somewhat check against tp showing something wrong (< 1.0).
                 vehicle.setPassenger(player); // NOTE: VehicleEnter fires, unknown TP fires.
                 // TODO: What on failure of setPassenger?
-                // Ensure a set-back.
-                // TODO: Set-backs get invalidated somewhere, likely on an extra unknown TP. Use data.isVehicleSetBack in MovingListener/teleport.
+                // Ensure a set back.
+                // TODO: Set backs get invalidated somewhere, likely on an extra unknown TP. Use data.isVehicleSetBack in MovingListener/teleport.
                 if (data.vehicleSetBacks.getFirstValidEntry(location) == null) {
                     // At least ensure one of the entries has to match the location we teleported the vehicle to.
                     if (data.debug) {
-                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No set-back is matching the vehicle location that it has just been set back to. Reset all lazily to: " + location);
+                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No set back is matching the vehicle location that it has just been set back to. Reset all lazily to: " + location);
                     }
                     data.vehicleSetBacks.resetAllLazily(location);
                 }
                 // Set this location as past move.
                 final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
-                if (!firstPastMove.valid || firstPastMove.toIsValid || !TrigUtil.isSamePos(firstPastMove.from, location)) {
+                if (!firstPastMove.valid || firstPastMove.toIsValid 
+                        || !TrigUtil.isSamePos(firstPastMove.from, location)) {
                     final MovingConfig cc = MovingConfig.getConfig(player);
                     NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class).resetVehiclePositions(vehicle, location, data, cc);
                 }

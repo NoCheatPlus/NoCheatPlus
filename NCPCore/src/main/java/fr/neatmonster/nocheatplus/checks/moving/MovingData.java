@@ -177,16 +177,16 @@ public class MovingData extends ACheckData {
     public float walkSpeed = 0.0f;
     public float flySpeed = 0.0f;
 
-    /** Count set-back (re-) setting. */
+    /** Count set back (re-) setting. */
     private int setBackResetCount = 0;
     /**
      * setBackResetCount (incremented) at the time of (re-) setting the ordinary
-     * set-back.
+     * set back.
      */
     private int setBackResetTime = 0;
     /**
      * setBackResetCount (incremented) at the time of (re-) setting the
-     * morepackets set-back.
+     * morepackets set back.
      */
     private int morePacketsSetBackResetTime = 0;
 
@@ -320,7 +320,7 @@ public class MovingData extends ACheckData {
 
     // HOT FIX / WORKAROUND
     /**
-     * Set to true after login/respawn, only if the set-back is reset there.
+     * Set to true after login/respawn, only if the set back is reset there.
      * Reset in MovingListener after handling PlayerMoveEvent
      */
     public boolean joinOrRespawn = false;
@@ -330,8 +330,8 @@ public class MovingData extends ACheckData {
      */
     public int timeSinceSetBack = 0;
     /**
-     * Location hash value of the last (player/vehicle) set-back, for checking
-     * independently of which set-back location had been used.
+     * Location hash value of the last (player/vehicle) set back, for checking
+     * independently of which set back location had been used.
      */
     public int lastSetBackHash = 0;
 
@@ -351,7 +351,7 @@ public class MovingData extends ACheckData {
     // Data of the more packets vehicle check.
     public int              vehicleMorePacketsBuffer = vehicleMorePacketsBufferDefault;
     public long             vehicleMorePacketsLastTime;
-    /** Task id of the vehicle set-back task. */ 
+    /** Task id of the vehicle set back task. */ 
     public int              vehicleSetBackTaskId = -1;
 
     public MovingData(final MovingConfig config) {
@@ -443,8 +443,8 @@ public class MovingData extends ACheckData {
         // Reset to setBack.
         resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
-        setSetBack(setBack); // Problematic with multiple set-back locations stored (currently the safe-medium one is preferred, but later...)
-        // vehicleSetBacks.resetAllLazily(setBack); // Not good: Overrides older set-back locations.
+        setSetBack(setBack); // Problematic with multiple set back locations stored (currently the safe-medium one is preferred, but later...)
+        // vehicleSetBacks.resetAllLazily(setBack); // Not good: Overrides older set back locations.
     }
 
     /**
@@ -614,7 +614,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Set the set-back location, this will also adjust the y-coordinate for some block types (at least air).
+     * Set the set back location, this will also adjust the y-coordinate for some block types (at least air).
      * @param loc
      */
     public void setSetBack(final PlayerLocation loc) {
@@ -624,7 +624,7 @@ public class MovingData extends ACheckData {
         else{
             LocUtil.set(setBack, loc);
         }
-        // TODO: Consider adjusting the set-back-y here. Problem: Need to take into account for bounding box (collect max-ground-height needed).
+        // TODO: Consider adjusting the set back-y here. Problem: Need to take into account for bounding box (collect max-ground-height needed).
         setBackResetTime = ++setBackResetCount;
     }
 
@@ -643,7 +643,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Get the set-back location with yaw and pitch set form ref.
+     * Get the set back location with yaw and pitch set form ref.
      * @param ref
      * @return
      */
@@ -652,7 +652,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Get the set-back location with yaw and pitch set from ref.
+     * Get the set back location with yaw and pitch set from ref.
      * @param ref
      * @return
      */
@@ -692,7 +692,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Test, if the 'teleported' location is set, e.g. on a scheduled set-back.
+     * Test, if the 'teleported' location is set, e.g. on a scheduled set back.
      * 
      * @return
      */
@@ -721,7 +721,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Set teleport-to location to recognize NCP set-backs. This copies the coordinates and world.
+     * Set teleport-to location to recognize NCP set backs. This copies the coordinates and world.
      * @param loc
      */
     public final void setTeleported(final Location loc) {
@@ -733,7 +733,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Test if the morepackets set-back is older than the ordinary set-back.
+     * Test if the morepackets set back is older than the ordinary set back.
      * Does not check for existence of either.
      * 
      * @return
@@ -771,7 +771,7 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Set set-back location to null.
+     * Set set back location to null.
      */
     public final void resetSetBack() {
         setBack = null;

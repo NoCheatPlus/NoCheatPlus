@@ -33,6 +33,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -53,16 +55,16 @@ public class TickTask implements Runnable {
      * The Class PermissionUpdateEntry.
      */
     protected static final class PermissionUpdateEntry{ 
-        
+
         /** The check type. */
         public final CheckType checkType;
-        
+
         /** The player name. */
         public final String playerName;
-        
+
         /** The hash code. */
         private final int hashCode;
-        
+
         /**
          * Instantiates a new permission update entry.
          *
@@ -76,7 +78,7 @@ public class TickTask implements Runnable {
             this.checkType = checkType;
             hashCode = playerName.hashCode() ^ checkType.hashCode();
         }
-        
+
         /* (non-Javadoc)
          * @see java.lang.Object#equals(java.lang.Object)
          */
@@ -88,7 +90,7 @@ public class TickTask implements Runnable {
             final PermissionUpdateEntry other = (PermissionUpdateEntry) obj;
             return playerName.equals(other.playerName) && checkType.equals(other.checkType);
         }
-        
+
         /* (non-Javadoc)
          * @see java.lang.Object#hashCode()
          */
@@ -102,10 +104,10 @@ public class TickTask implements Runnable {
      * The Class ImprobableUpdateEntry.
      */
     protected static final class ImprobableUpdateEntry {
-        
+
         /** The add level. */
         public float addLevel;
-        
+
         /**
          * Instantiates a new improbable update entry.
          *
@@ -126,7 +128,10 @@ public class TickTask implements Runnable {
     private static Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
     /** Improbable entries to update. */
     private static Map<UUID, ImprobableUpdateEntry> improbableUpdates = new LinkedHashMap<UUID, TickTask.ImprobableUpdateEntry>(50);
-    
+
+    /** UUIDs of players who are to be set back. Primary thread only, so far. */
+    private static final Set<UUID> playerSetBackIds = new LinkedHashSet<UUID>(); // Could use a list, though.
+
     /** The Constant improbableLock. */
     private static final ReentrantLock improbableLock = new ReentrantLock();
 
@@ -264,6 +269,29 @@ public class TickTask implements Runnable {
             }
             permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
         }
+    }
+
+    /**
+     * Using the getTeleported() Location instance in MovingData, in order to
+     * set back the player on tick. This is for PlayerMoveEvent-like handling,
+     * not for vehicles. Primary thread only, so far.
+     * 
+     * @param playerId
+     */
+    public static void requestPlayerSetBack(final UUID playerId) {
+        if (!locked) {
+            playerSetBackIds.add(playerId);
+        }
+    }
+
+    /**
+     * Test if a player set back is scheduled (MovingData).
+     * 
+     * @param playerId
+     * @return
+     */
+    public static boolean isPlayerGoingToBeSetBack(final UUID playerId) {
+        return playerSetBackIds.contains(playerId);
     }
 
     /**
@@ -599,6 +627,9 @@ public class TickTask implements Runnable {
         synchronized (tickListeners) {
             tickListeners.clear();
         }
+        if (Bukkit.isPrimaryThread()) {
+            playerSetBackIds.clear();
+        }
     }
 
     /** 
@@ -647,17 +678,47 @@ public class TickTask implements Runnable {
         }
     }
 
+    private void processPlayerSetBackIds() {
+        // TODO: Might design as a permanent tick listener (access API elsewhere) to minimize TickListener.
+        for (final UUID id : playerSetBackIds) {
+            final Player player = DataManager.getPlayer(id);
+            if (player == null) {
+                // (Should be intercepted elsewhere, e.g. on quit/kick.)
+                continue;
+            }
+            final MovingData data = MovingData.getData(player);
+            if (!data.hasTeleported()) {
+                if (data.debug) {
+                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: No stored location available.");
+                }
+                continue;
+            }
+            if (!player.teleport(data.getTeleported(), BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
+                if (data .debug) {
+                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Teleport failed.");
+                }
+            }
+            // (Data resetting is done during PlayerTeleportEvent handling.)
+        }
+        // (There could be ids kept on errors !?)
+        playerSetBackIds.clear();
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
     @Override
-    public void run() {		
-        // Actions.
-        executeActions();
-        // Permissions.
-        updatePermissions();
+    public void run() {
         // Improbable.
         updateImprobable();
+        // Actions.
+        executeActions();
+        // Set back (after actions, for now, because actions may contain a set back action later on).
+        if (!playerSetBackIds.isEmpty()) {
+            processPlayerSetBackIds();
+        }
+        // Permissions.
+        updatePermissions();
         // Listeners.
         notifyListeners();
 

@@ -67,9 +67,9 @@ public class VehicleEnvelope extends Check {
         public boolean checkAscendMuch;
         public boolean checkDescendMuch;
 
-        /** From could be a new set-back location. */
+        /** From could be a new set back location. */
         public boolean fromIsSafeMedium;
-        /** To could be a new set-back location. */
+        /** To could be a new set back location. */
         public boolean toIsSafeMedium;
 
         /** Interpreted differently depending on check. */
@@ -127,7 +127,7 @@ public class VehicleEnvelope extends Check {
         }
         else {
             data.vehicleEnvelopeVL *= 0.99; // Random cool down for now.
-            // Do not set a set-back here.
+            // Do not set a set back here.
         }
         return null;
     }
@@ -279,7 +279,7 @@ public class VehicleEnvelope extends Check {
                 data.sfJumpPhase ++;
             }
             else {
-                // Adjust set-back.
+                // Adjust set back.
                 if (checkDetails.toIsSafeMedium) {
                     data.vehicleSetBacks.setSafeMediumEntry(thisMove.to);
                     data.sfJumpPhase = 0;
@@ -380,7 +380,7 @@ public class VehicleEnvelope extends Check {
         }
 
         if (checkDetails.canJump) {
-            // TODO: Max. y-distance to set-back.
+            // TODO: Max. y-distance to set back.
             // TODO: Friction.
         }
         else {

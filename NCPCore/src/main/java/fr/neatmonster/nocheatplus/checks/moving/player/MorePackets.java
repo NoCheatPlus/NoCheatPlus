@@ -56,7 +56,7 @@ public class MorePackets extends Check {
      * @param from
      * @param to
      * @param allowSetSetBack
-     *            If to allow setting the set-back location.
+     *            If to allow setting the set back location.
      * @param data
      * @param cc
      * @return
@@ -72,9 +72,9 @@ public class MorePackets extends Check {
         //    		return null;
         //    	}
 
-        // Ensure we have a set-back location.
+        // Ensure we have a set back location.
         if (allowSetSetBack && !data.hasMorePacketsSetBack()){
-            // TODO: Check if other set-back is appropriate or if to set/reset on other events.
+            // TODO: Check if other set back is appropriate or if to set/reset on other events.
             if (data.hasSetBack()) {
                 data.setMorePacketsSetBack(data.getSetBack(to));
             }
@@ -104,12 +104,12 @@ public class MorePackets extends Check {
             }
         } 
         else if (allowSetSetBack) {
-            // Update the set-back location. (CHANGED to only update, if not a violation.)
+            // Update the set back location. (CHANGED to only update, if not a violation.)
             // (Might update whenever newTo == null)
             data.setMorePacketsSetBack(from);
         }
 
-        // No set-back.
+        // No set back.
         return null;
 
     }

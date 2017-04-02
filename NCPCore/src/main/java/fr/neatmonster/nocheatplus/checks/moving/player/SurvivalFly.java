@@ -409,7 +409,7 @@ public class SurvivalFly extends Check {
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
             if (res[0] == Double.MIN_VALUE && res[1] == Double.MIN_VALUE) {
-                // Silent set-back.
+                // Silent set back.
                 if (data.debug) {
                     tags.add("silentsbcobweb");
                     outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, 
@@ -992,7 +992,7 @@ public class SurvivalFly extends Check {
         // TODO: lostground_pyramid(yDist < 0.0) -> step up (yDist 0.5). Needs better last-move modeling.
         // TODO: lostground_edgedesc(yDist <0.0) -> Bunny (yDist > .72, e_jump). Needs better last-move modeling.
         // TODO: air->ground...small-range-tp...air-air+vDist==0.0 (might work around with fromWasReset?).
-        // TODO: bunny after vDist<0.0... vdistsb. Might need set-back detection. [solved with setFrictionJumpPhase?]
+        // TODO: bunny after vDist<0.0... vdistsb. Might need set back detection. [solved with setFrictionJumpPhase?]
         // TODO: Other edge cases?
         // TODO: Cleanup pending.
         final boolean strictVdistRel;
@@ -1075,7 +1075,7 @@ public class SurvivalFly extends Check {
                 if (yDistance < 0.0 && lastMove.yDistance < 0.0 && yDistChange > -Magic.GRAVITY_MAX
                         && (from.isOnGround(Math.abs(yDistance) + 0.001) || BlockProperties.isLiquid(to.getTypeId(to.getBlockX(), Location.locToBlock(to.getY() - 0.5), to.getBlockZ())))) {
                     // Pretty coarse workaround, should instead do a proper modeling for from.getDistanceToGround.
-                    // (OR loc... needs different model, distanceToGround, proper set-back, moveHitGround)
+                    // (OR loc... needs different model, distanceToGround, proper set back, moveHitGround)
                     // TODO: Slightly too short move onto the same level as snow (0.75), but into air (yDistance > -0.5).
                     // TODO: Better on-ground model (adapt to actual client code).
                 }
@@ -1960,7 +1960,7 @@ public class SurvivalFly extends Check {
         }
         // Some resetting is done in MovingListener.
         if (executeActions(vd).willCancel()) {
-            // Set-back + view direction of to (more smooth).
+            // Set back + view direction of to (more smooth).
             return data.getSetBack(to);
         }
         else {
@@ -1981,7 +1981,7 @@ public class SurvivalFly extends Check {
     public final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
         data.survivalFlyVL += cc.sfHoverViolation;
 
-        // TODO: Extra options for set-back / kick, like vl?
+        // TODO: Extra options for set back / kick, like vl?
         data.sfVLTime = System.currentTimeMillis();
         final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, cc.sfHoverViolation, cc.survivalFlyActions);
         if (vd.needsParameters()) {
@@ -1991,7 +1991,7 @@ public class SurvivalFly extends Check {
             vd.setParameter(ParameterName.TAGS, "hover");
         }
         if (executeActions(vd).willCancel()) {
-            // Set-back or kick.
+            // Set back or kick.
             if (data.hasSetBack()) {
                 final Location newTo = data.getSetBack(loc);
                 data.prepareSetBack(newTo);
