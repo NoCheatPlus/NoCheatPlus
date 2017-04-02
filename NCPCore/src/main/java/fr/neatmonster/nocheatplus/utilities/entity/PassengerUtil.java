@@ -47,6 +47,8 @@ public class PassengerUtil {
 
     /** Temp use. LocUtil.clone on passing. setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
+    /** Temp use. LocUtil.clone on passing. setWorld(null) after use. */
+    private final Location useLoc2 = new Location(null, 0, 0, 0);
 
     /**
      * Test if the given entity is a passenger of the given vehicle.
@@ -148,75 +150,191 @@ public class PassengerUtil {
     //    }
 
     /**
-     * Teleport the player with vehicle, temporarily eject the passenger and set
-     * teleported in MovingData.
+     * Teleport the player with vehicle, might temporarily eject the passengers
+     * and set teleported in MovingData. The passengers are fetched from the
+     * vehicle with this method.
      *
      * @param vehicle
-     *            the vehicle
+     *            The vehicle to teleport.
      * @param player
-     *            the player
+     *            The (original) player in charge, who'd also trigger
+     *            violations. Should be originalPassengers[0].
      * @param location
-     *            the location
+     *            Location to teleport the vehicle to.
      * @param debug
      *            the debug
      */
     public void teleportWithPassengers(final Entity vehicle, final Player player, final Location location, 
             final boolean debug) {
+        final List<Entity> originalPassengers = handleVehicle.getHandle().getEntityPassengers(vehicle);
+        teleportWithPassengers(vehicle, player, location, debug, 
+                originalPassengers.toArray(new Entity[originalPassengers.size()]), false);
+    }
+
+    /**
+     * Teleport the player with vehicle, might temporarily eject the passengers and set
+     * teleported in MovingData.
+     *
+     * @param vehicle
+     *            The vehicle to teleport.
+     * @param player
+     *            The (original) player in charge, who'd also trigger
+     *            violations. Should be originalPassengers[0].
+     * @param location
+     *            Location to teleport the vehicle to.
+     * @param debug
+     *            the debug
+     * @param originalPassengers
+     *            The passengers at the time, that is to be restored. Must not be null.
+     * @param CheckPassengers Set to true to compare current with original passengers.
+     */
+    public void teleportWithPassengers(final Entity vehicle, final Player player, final Location location, 
+            final boolean debug, final Entity[] originalPassengers, final boolean checkPassengers) {
         // TODO: Rubber band issue needs synchronizing with packet level and ignore certain incoming ones?
         // TODO: This handling could conflict with WorldGuard region flags.
         // TODO: Account for nested passengers and inconsistencies.
+        // TODO: Conception: Restore the passengers at the time of setting the vehicle set back?
+
         final MovingData data = MovingData.getData(player);
         data.isVehicleSetBack = true;
-
-        final List<Entity> passengers = handleVehicle.getHandle().getEntityPassengers(vehicle);
-        final boolean playerIsPassenger = passengers.contains(player);
-        // TODO: Multi-passenger teleport, playerIsCaptain? Similar...
+        int otherPlayers = 0;
+        boolean playerIsOriginalPassenger = false;
+        for (int i = 0; i < originalPassengers.length; i++) { 
+            if (originalPassengers[i].equals(player)) {
+                playerIsOriginalPassenger = true;
+                break;
+            }
+            else if (originalPassengers[i] instanceof Player) {
+                MovingData.getData((Player) originalPassengers[i]).isVehicleSetBack = true;
+                otherPlayers ++;
+            }
+        }
+        boolean redoPassengers = true; // false; // Some time in the future a teleport might work directly.
+        //        if (checkPassengers) {
+        //            final List<Entity> passengers = handleVehicle.getHandle().getEntityPassengers(vehicle);
+        //            if (passengers.size() != originalPassengers.length) {
+        //                redoPassengers = true;
+        //            }
+        //            else {
+        //                for (int i = 0; i < originalPassengers.length; i++) {
+        //                    if (originalPassengers[i] != passengers.get(i)) {
+        //                        redoPassengers = true;
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //        }
+        if (!playerIsOriginalPassenger) {
+            if (data.debug) {
+                CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Vehicle set back: This player is not an original passenger.");
+            }
+            //            redoPassengers = true;
+        }
 
         boolean vehicleTeleported = false;
         boolean playerTeleported = false;
+        int otherPlayersTeleported = 0;
 
         if (vehicle.isDead() || !vehicle.isValid()) {
             // TODO: Still consider teleporting the player.
             vehicleTeleported = false;
         }
-        else if (playerIsPassenger) { // && vehicle.equals(player.getVehicle).
+        else {
+            // TODO: if (!redoPassengers) { 
+            // Can the vehicle teleport with passengers directly, one day?
             // Attempt to only teleport the entity first. On failure use eject.
             // TODO: Probably needs a guard depending on version.
             //            if (vehicle.teleport(location, 
             //                  BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
             //                // Check success.
-            //                if (vehicle.getLocation(useLoc).equals(location) && player.equals(vehicle.getPassenger())) {
+            //                if (vehicle.getLocation(useLoc).equals(location) && isPassenger(player, vehicle)) { // TODO: Compare all passengers (...)
             //                    vehicleTeleported = true;
             //                    playerTeleported = true;
             //                    if (debug) {
             //                        CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Direct teleport of entity with passenger succeeded.");
             //                    }
             //                }
-            //            }
-            if (!playerTeleported){
+            //            } // TODO: other players flags reset etc.
+            if (redoPassengers){
+                // Teleport the vehicle independently.
                 vehicle.eject(); // NOTE: VehicleExit fires, unknown TP fires.
                 // TODO: Confirm eject worked, handle if not.
                 vehicleTeleported = vehicle.teleport(LocUtil.clone(location), 
                         BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }
         }
-        else if (passengers.isEmpty()) {
-            vehicleTeleported = vehicle.teleport(location, 
-                    BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
+
+        if (redoPassengers) {
+            // Add the player first,  if not an original passenger (special case, idk, replaced by squids perhaps).
+            if (!playerIsOriginalPassenger) {
+                // (Not sure: always add first, until another case is needed.)
+                teleportPlayerPassenger(player, vehicle, location, vehicleTeleported, data);
+            }
+            // Add all other original passengers in a generic way, distinguish players.
+            for (int i = 0; i < originalPassengers.length; i++) {
+                final Entity passenger = originalPassengers[i];
+                if (passenger.isValid() && !passenger.isDead()) {
+                    // Cross world cases?
+                    if (passenger instanceof Player) {
+                        if (teleportPlayerPassenger((Player) passenger, vehicle, location, vehicleTeleported, 
+                                MovingData.getData((Player) passenger))) {
+                            if (player.equals(passenger)) {
+                                playerTeleported = true;
+                            }
+                            else {
+                                otherPlayersTeleported ++;
+                            }
+                        }
+                    }
+                    else {
+                        if (passenger.teleport(location, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)
+                                && vehicleTeleported 
+                                && passenger.getLocation(useLoc2).distance(vehicle.getLocation(useLoc)) < 1.5) {
+                            if (!handleVehicle.getHandle().addPassenger(passenger, vehicle)) {
+                                // TODO: What?
+                            }
+                        }
+                    }
+                }
+                // Log skipped + failed non player entities.
+            }
         }
-        if (!playerTeleported && player.isOnline() && !player.isDead()) {
+        // TODO: else: reset flags for other players?
+
+        // Log resolution.
+        if (debug) { 
+            CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Vehicle set back resolution: " + location + " pt=" + playerTeleported + " vt=" + vehicleTeleported + (otherPlayers > 0 ? (" opt=" + otherPlayersTeleported + "/" + otherPlayers) : ""));
+        }
+        useLoc.setWorld(null);
+        useLoc2.setWorld(null);
+    }
+
+    /**
+     * Teleport and set as passenger.
+     * 
+     * @param player
+     * @param vehicle
+     * @param location
+     * @param vehicleTeleported
+     * @param data
+     * @return
+     */
+    private final boolean teleportPlayerPassenger(final Player player, final Entity vehicle, 
+            final Location location, final boolean vehicleTeleported, final MovingData data) {
+        final boolean playerTeleported;
+        if (player.isOnline() && !player.isDead()) {
             // Mask player teleport as a set back.
             data.prepareSetBack(location);
-            playerTeleported = player.teleport(LocUtil.clone(location));
+            playerTeleported = player.teleport(LocUtil.clone(location), 
+                    BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             data.resetTeleported(); // Just in case.
             // Workarounds.
-            data.ws.resetConditions(WRPT.G_RESET_NOTINAIR); // Allow re-use of certain workarounds. Hack/shouldbedoneelsewhere?
-            // TODO: Magic 1.0, plus is this valid with horse, dragon...
-            if (playerIsPassenger && playerTeleported && vehicleTeleported 
-                    && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.5) {
-                // Somewhat check against tp showing something wrong (< 1.0).
+            // Allow re-use of certain workarounds. Hack/shouldbedoneelsewhere?
+            data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
+            if (playerTeleported && vehicleTeleported 
+                    && player.getLocation(useLoc2).distance(vehicle.getLocation(useLoc)) < 1.5) {
+                // Still set as passenger.
                 // NOTE: VehicleEnter fires, unknown TP fires.
-                // TODO: Is teleporting the player superfluous?
                 if (!handleVehicle.getHandle().addPassenger(player, vehicle)) {
                     // TODO: What?
                 }
@@ -238,11 +356,11 @@ public class PassengerUtil {
                 }
             }
         }
-        data.isVehicleSetBack = false;
-        if (debug) { 
-            CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Vehicle set back resolution: " + location + " pt=" + playerTeleported + " vt=" + vehicleTeleported);
+        else {
+            playerTeleported = false;
         }
-        useLoc.setWorld(null);
+        data.isVehicleSetBack = false;
+        return playerTeleported;
     }
 
 }

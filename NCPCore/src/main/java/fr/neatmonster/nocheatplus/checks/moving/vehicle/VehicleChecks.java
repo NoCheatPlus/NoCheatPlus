@@ -593,6 +593,7 @@ public class VehicleChecks extends CheckListener {
             // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
             // TODO: Reset on world changes or not?
             // TODO: Prevent vehicle data resetting due to dismount/mount/teleport.
+            // TODO: Force fall type of set back?
             // (Future: Dismount penalty does not need extra handling, both are teleported anyway.)
             if (data.debug) {
                 debug(player, "Will set back to: " + newTo);

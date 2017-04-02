@@ -35,12 +35,24 @@ public class VehicleSetBackTask implements Runnable{
     private final Player player;
     private final Location location;
     private final boolean debug;
+    private final Entity[] passengers;
 
-    public VehicleSetBackTask(Entity vehicle, Player player, Location location, boolean debug) {
+    /**
+     * 
+     * @param vehicle
+     * @param player
+     *            The player because of whom this teleport is happening. This
+     *            should be the player in charge of steering, but that needn't
+     *            be the case in future.
+     * @param location
+     * @param debug
+     */
+    public VehicleSetBackTask(Entity vehicle, Player player, Location location, boolean debug, Entity... passengers) {
         this.vehicle = vehicle;
         this.player = player;
         this.location = location;
         this.debug = debug;
+        this.passengers = passengers;
     }
 
     @Override
@@ -49,7 +61,7 @@ public class VehicleSetBackTask implements Runnable{
         data.vehicleSetBackTaskId = -1;
         try{
             NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(PassengerUtil.class).teleportWithPassengers(
-                    vehicle, player, location, debug);
+                    vehicle, player, location, debug, passengers, true);
         }
         catch(Throwable t){
             StaticLog.logSevere(t);
