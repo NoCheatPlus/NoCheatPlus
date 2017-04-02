@@ -21,4 +21,10 @@ public class EntityAccessVehicleLegacy implements IEntityAccessVehicle {
         return Arrays.asList(entity.getPassenger());
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean addPassenger(final Entity entity, final Entity vehicle) {
+        return vehicle.setPassenger(entity);
+    }
+
 }

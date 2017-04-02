@@ -21,4 +21,9 @@ public class EntityAccessVehicleMultiPassenger implements IEntityAccessVehicle {
         return entity.getPassengers();
     }
 
+    @Override
+    public boolean addPassenger(final Entity entity, final Entity vehicle) {
+        return vehicle.addPassenger(entity);
+    }
+
 }

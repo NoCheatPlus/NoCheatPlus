@@ -167,12 +167,14 @@ public class PassengerUtil {
         // TODO: Account for nested passengers and inconsistencies.
         final MovingData data = MovingData.getData(player);
         data.isVehicleSetBack = true;
-        // TODO: Adjust to multiple passengers.
-        final Entity passenger = vehicle.getPassenger();
+
+        final List<Entity> passengers = handleVehicle.getHandle().getEntityPassengers(vehicle);
+        final boolean playerIsPassenger = passengers.contains(player);
+        // TODO: Multi-passenger teleport, playerIsCaptain? Similar...
+
         boolean vehicleTeleported = false;
-        final boolean playerIsPassenger = player.equals(passenger);
         boolean playerTeleported = false;
-        // TODO: TeleportCause needs some central configuration (plugin vs. unknown vs. future).
+
         if (vehicle.isDead() || !vehicle.isValid()) {
             // TODO: Still consider teleporting the player.
             vehicleTeleported = false;
@@ -198,7 +200,7 @@ public class PassengerUtil {
                         BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }
         }
-        else if (passenger == null) {
+        else if (passengers.isEmpty()) {
             vehicleTeleported = vehicle.teleport(location, 
                     BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
         }
@@ -213,8 +215,11 @@ public class PassengerUtil {
             if (playerIsPassenger && playerTeleported && vehicleTeleported 
                     && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.5) {
                 // Somewhat check against tp showing something wrong (< 1.0).
-                vehicle.setPassenger(player); // NOTE: VehicleEnter fires, unknown TP fires.
-                // TODO: What on failure of setPassenger?
+                // NOTE: VehicleEnter fires, unknown TP fires.
+                // TODO: Is teleporting the player superfluous?
+                if (!handleVehicle.getHandle().addPassenger(player, vehicle)) {
+                    // TODO: What?
+                }
                 // Ensure a set back.
                 // TODO: Set backs get invalidated somewhere, likely on an extra unknown TP. Use data.isVehicleSetBack in MovingListener/teleport.
                 if (data.vehicleSetBacks.getFirstValidEntry(location) == null) {

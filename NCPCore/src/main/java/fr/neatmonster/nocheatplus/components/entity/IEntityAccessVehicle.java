@@ -20,4 +20,13 @@ public interface IEntityAccessVehicle {
      */
     public List<Entity> getEntityPassengers(Entity entity);
 
+    /**
+     * Add a new passenger (entity) to the given vehicle.
+     * 
+     * @param entity
+     * @param vehicle
+     * @return
+     */
+    public boolean addPassenger(Entity entity, Entity vehicle);
+
 }
