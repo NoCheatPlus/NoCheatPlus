@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.compat.registry;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
 
 /**
  * Set up more fine grained entity access providers, registered as generic
@@ -39,6 +40,8 @@ public class EntityAccessFactory {
      * @param config
      */
     public void setupEntityAccess(final MCAccess mcAccess, final MCAccessConfig config) {
+
+        // IEntityAccessLastPositionAndLook
         RegistryHelper.setupGenericInstance(new String[] {
                 "fr.neatmonster.nocheatplus.compat.cbdev.EntityAccessLastPositionAndLook",
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_10_R1.EntityAccessLastPositionAndLook",
@@ -47,6 +50,12 @@ public class EntityAccessFactory {
         }, new String[] {
                 "fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectEntityLastPositionAndLook",
         }, IEntityAccessLastPositionAndLook.class, config, false);
+
+        // IEntityAccessVehicle
+        RegistryHelper.registerFirstAvailable(new String[] {
+                "fr.neatmonster.nocheatplus.compat.bukkit.EntityAccessVehicleMultiPassenger",
+                "fr.neatmonster.nocheatplus.compat.bukkit.EntityAccessVehicleLegacy",
+        }, IEntityAccessVehicle.class, false);
     }
 
 }

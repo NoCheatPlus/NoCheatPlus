@@ -84,4 +84,30 @@ public class PassengerUtil {
         return vehicle;
     }
 
+    //    /**
+    //     * Get a player from an entity. This will return the first player found
+    //     * amongst the entity itself and passengers checked recursively.
+    //     *
+    //     * @param entity
+    //     *            the entity
+    //     * @return the player passenger recursively
+    //     */
+    //    public static Player getFirstPlayerIncludingPassengersRecursively(Entity entity) {
+    //        while (entity != null) {
+    //            if (entity instanceof Player) {
+    //                // Scrap the case of players riding players for the moment.
+    //                return (Player) entity;
+    //            }
+    //            final Entity passenger = entity.getPassenger();
+    //            if (entity.equals(passenger)) {
+    //                // Just in case :9.
+    //                break;
+    //            }
+    //            else {
+    //                entity = passenger;
+    //            }
+    //        }
+    //        return null;
+    //    }
+
 }

@@ -58,6 +58,7 @@ public class TeleportUtil {
         // TODO: Account for nested passengers and inconsistencies.
         final MovingData data = MovingData.getData(player);
         data.isVehicleSetBack = true;
+        // TODO: Adjust to multiple passengers.
         final Entity passenger = vehicle.getPassenger();
         boolean vehicleTeleported = false;
         final boolean playerIsPassenger = player.equals(passenger);

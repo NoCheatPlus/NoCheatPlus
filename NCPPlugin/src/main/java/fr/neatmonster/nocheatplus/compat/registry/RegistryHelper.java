@@ -162,4 +162,17 @@ public class RegistryHelper {
         return result;
     }
 
+    /**
+     * Auxiliary method to register the first available class, using the default
+     * constructor, logging registration state (and debug if desired).
+     * 
+     * @param classNames
+     * @param registerFor
+     * @param logDebug
+     * @return
+     */
+    public static <T> T registerFirstAvailable(String[] classNames, Class<T> registerFor, boolean logDebug) {
+        return registerGenericInstance(registerFor, getFirstAvailable(classNames, registerFor, logDebug));
+    }
+
 }

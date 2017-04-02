@@ -50,6 +50,8 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
+import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
@@ -84,6 +86,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     private final int idCancelDead = counters.registerKey("canceldead");
     private final int idIllegalItem = counters.registerKey("illegalitem");
     private final int idEggOnEntity = counters.registerKey("eggonentity");
+
+    private final IGenericInstanceHandle<IEntityAccessVehicle> handleVehicles = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessVehicle.class);
 
     public InventoryListener() {
         super(CheckType.INVENTORY);
@@ -414,10 +418,18 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityPortal(final EntityPortalEnterEvent event) {
-        final Player player = InventoryUtil.getPlayerPassengerRecursively(event.getEntity());
-        if (player != null) {
-            // Note: ignore cancelother setting.
-            open.check(player);
+        // Check passengers flat for now.
+        final Entity entity = event.getEntity();
+        if (entity instanceof Player) {
+            open.check((Player) entity);
+        }
+        else {
+            for (final Entity passenger : handleVehicles.getHandle().getEntityPassengers(entity)) {
+                if (passenger instanceof Player) {
+                    // Note: ignore cancelother setting.
+                    open.check((Player) passenger);
+                }
+            }
         }
     }
 
