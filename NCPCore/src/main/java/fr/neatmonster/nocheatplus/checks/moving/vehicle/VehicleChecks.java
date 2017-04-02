@@ -53,7 +53,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
 import fr.neatmonster.nocheatplus.components.location.IGetLocationWithLook;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
-import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -100,10 +100,11 @@ public class VehicleChecks extends CheckListener {
 
     /** Auxiliary functionality. */
     private final AuxMoving aux = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
+    private final PassengerUtil passengerUtil = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(PassengerUtil.class);
 
     /** Access last position fields for an entity. Updated on setMCAccess. */
     // TODO: Useless.
-    private final IGenericInstanceHandle<IEntityAccessLastPositionAndLook> lastPosLook = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessLastPositionAndLook.class);
+    private final IHandle<IEntityAccessLastPositionAndLook> lastPosLook = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessLastPositionAndLook.class);
 
     /** The vehicle more packets check. */
     private final VehicleMorePackets vehicleMorePackets = addCheck(new VehicleMorePackets());
@@ -134,7 +135,7 @@ public class VehicleChecks extends CheckListener {
             // Do ignore events for vehicles inside of other vehicles.
             return;
         }
-        final Player player = PassengerUtil.getFirstPlayerPassenger(vehicle);
+        final Player player = passengerUtil.getFirstPlayerPassenger(vehicle);
         if (player == null) {
             return;
         }
@@ -203,7 +204,7 @@ public class VehicleChecks extends CheckListener {
         // Workaround for pigs and other (1.5.x and before)!
         // Note that with 1.6 not even PlayerMove fires for horses and pigs.
         // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
-        final Entity vehicle = PassengerUtil.getLastNonPlayerVehicle(player);
+        final Entity vehicle = passengerUtil.getLastNonPlayerVehicle(player);
         if (data.debug) {
             debug(player, "onPlayerMoveVehicle: vehicle: " + vehicle);
         }
@@ -271,7 +272,7 @@ public class VehicleChecks extends CheckListener {
             // Do ignore events for vehicles inside of other vehicles.
             return;
         }
-        final Player player = PassengerUtil.getFirstPlayerPassenger(vehicle);
+        final Player player = passengerUtil.getFirstPlayerPassenger(vehicle);
         if (player == null || player.isDead()) {
             return;
         }
@@ -658,7 +659,7 @@ public class VehicleChecks extends CheckListener {
             debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
         }
         // Check for nested vehicles.
-        final Entity lastVehicle = PassengerUtil.getLastNonPlayerVehicle(vehicle, true);
+        final Entity lastVehicle = passengerUtil.getLastNonPlayerVehicle(vehicle, true);
         if (lastVehicle == null) {
             data.clearVehicleData();
             if (data.debug) {
@@ -761,7 +762,7 @@ public class VehicleChecks extends CheckListener {
     public void onVehicleDestroyLowest(final VehicleDestroyEvent event) {
         // Prevent destroying ones own vehicle.
         final Entity attacker = event.getAttacker();
-        if (attacker instanceof Player && attacker.equals(event.getVehicle().getPassenger())) {
+        if (attacker instanceof Player && passengerUtil.isPassenger(attacker, event.getVehicle())) {
             final Player player = (Player) attacker;
             final MovingData data = MovingData.getData(player);
             final MovingConfig cc = MovingConfig.getConfig(player);
@@ -778,9 +779,10 @@ public class VehicleChecks extends CheckListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVehicleDestroy(final VehicleDestroyEvent event) {
-        final Entity entity = event.getVehicle().getPassenger();
-        if (entity instanceof Player) {
-            onPlayerVehicleLeave((Player) entity, event.getVehicle());
+        for (final Entity entity : passengerUtil.handleVehicle.getHandle().getEntityPassengers(event.getVehicle())) {
+            if (entity instanceof Player) {
+                onPlayerVehicleLeave((Player) entity, event.getVehicle());
+            }
         }
     }
 
