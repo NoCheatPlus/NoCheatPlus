@@ -1429,7 +1429,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     debug(player, "Schedule teleport (set back) to: " + ref);
                 }
             }
-            else if (data.debug) {
+            else if (mData.debug) {
                 debug(player, "Teleport (set back) already scheduled to: " + ref);
             }
             // TODO: Does this still play well with onSetBack etc (not having the teleport follow directly)?
