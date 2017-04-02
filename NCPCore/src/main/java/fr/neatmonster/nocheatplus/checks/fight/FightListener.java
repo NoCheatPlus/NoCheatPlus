@@ -229,28 +229,31 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
 
-        // 1.9: sweep attack.
-        // TODO: Account for charge/meter thing?
-        final int locHashCode = LocUtil.hashCode(loc);
-        if (originalDamage == 1.0) {
-            // Might be a sweep attack.
-            if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
-                // TODO: Might limit the amount of 'too far off' sweep hits, possibly silent cancel for low frequency.
-                // Could further guard by checking equality of loc to last location.
-                if (data.debug) {
-                    debug(player, "(Assume sweep attack follow up damage.)");
+        // LEGACY: 1.9: sweep attack.
+        if (BridgeHealth.DAMAGE_SWEEP == null) {
+            // TODO: Account for charge/meter thing?
+            final int locHashCode = LocUtil.hashCode(loc);
+            if (originalDamage == 1.0) {
+                // Might be a sweep attack.
+                if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
+                    // TODO: Might limit the amount of 'too far off' sweep hits, possibly silent cancel for low frequency.
+                    // Could further guard by checking equality of loc to last location.
+                    if (data.debug) {
+                        debug(player, "(Assume sweep attack follow up damage.)");
+                    }
+                    return cancelled;
                 }
-                return cancelled;
             }
-        }
-        else {
-            // TODO: More side conditions for a sweep attack.
-            data.sweepTick = tick;
-            data.sweepLocationHashCode = locHashCode;
+            else {
+                // TODO: More side conditions for a sweep attack.
+                data.sweepTick = tick;
+                data.sweepLocationHashCode = locHashCode;
+            }
         }
 
         // LEGACY: thorns.
-        if (BridgeHealth.DAMAGE_THORNS == null && originalDamage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()) {
+        if (BridgeHealth.DAMAGE_THORNS == null && originalDamage <= 4.0 && tick == data.damageTakenByEntityTick 
+                && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()) {
             // Don't handle further, but do respect selfhit/canceldead.
             // TODO: Remove soon, at least version-dependent.
             data.thornsId = Integer.MIN_VALUE;

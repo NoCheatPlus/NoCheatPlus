@@ -29,11 +29,15 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
- * Utility class with static access methods to bridge compatibility issues, such as arising from changes in Bukkit from MC 1.5.2 to 1.6.1.
- * <br>NOTES:
- * <li>To simplify code IncompatibleClassChangeError is caught instead of AbstractMethodError and NoSuchMethodError etc.</li>
- * <li>TODO: Since API dependency is now 1.6.1+, some things can be simplified to just call the "int-methods".</li>
- * @author mc_dev
+ * Health/Fight utility class with static access methods to bridge compatibility
+ * issues, such as arising from changes in Bukkit from MC 1.5.2 to 1.6.1. <br>
+ * NOTES:
+ * <li>To simplify code IncompatibleClassChangeError is caught instead of
+ * AbstractMethodError and NoSuchMethodError etc.</li>
+ * <li>TODO: Since API dependency is now 1.6.1+, some things can be simplified
+ * to just call the "int-methods".</li>
+ * 
+ * @author asofold
  *
  */
 public class BridgeHealth {
@@ -51,13 +55,20 @@ public class BridgeHealth {
     }
 
     public static final DamageCause DAMAGE_THORNS = getDamageCause("THORNS");
+    public static final DamageCause DAMAGE_SWEEP = getDamageCause("ENTITY_SWEEP_ATTACK");
 
     /**
-     * This method is meant to be called on API that changed from int to double.<br>
+     * This method is meant to be called on API that changed from int to
+     * double.<br>
      * NOTE: Might get changed to return a Number instance.
-     * @param obj Object to call the method on.
+     * 
+     * @param obj
+     *            Object to call the method on.
      * @param methodName
-     * @param RuntimeException with reason Will be thrown if no recovery from present methods is possible. If not null the first call gets logged as "API incompatibility".
+     * @param RuntimeException
+     *            with reason Will be thrown if no recovery from present methods
+     *            is possible. If not null the first call gets logged as "API
+     *            incompatibility".
      * @return
      */
     public static final double getDoubleOrInt(final Object obj, final String methodName, final Throwable reason){
@@ -85,9 +96,12 @@ public class BridgeHealth {
 
     /**
      * Get the amount of health added with the event.
+     * 
      * @param event
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static double getAmount(final EntityRegainHealthEvent event){
         try{
@@ -149,10 +163,13 @@ public class BridgeHealth {
 
     /**
      * Set the damage from an EntityDamageEvent.
+     * 
      * @param event
      * @param damage
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static void setDamage(final EntityDamageEvent event, final double damage){
         try{
@@ -165,9 +182,12 @@ public class BridgeHealth {
 
     /**
      * Get the health for an entity (LivingEntity).
+     * 
      * @param entity
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static double getHealth(final LivingEntity entity){
         try{
@@ -180,9 +200,12 @@ public class BridgeHealth {
 
     /**
      * Get the maximum health for an entity (LivingEntity).
+     * 
      * @param entity
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static double getMaxHealth(final LivingEntity entity){
         try{
@@ -195,9 +218,12 @@ public class BridgeHealth {
 
     /**
      * Get the last damage for an entity (LivingEntity).
+     * 
      * @param entity
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static double getLastDamage(final LivingEntity entity){
         try{
@@ -210,10 +236,13 @@ public class BridgeHealth {
 
     /**
      * Set the health for an entity (LivingEntity).
+     * 
      * @param entity
      * @param health
      * @return
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static void setHealth(final LivingEntity entity, final double health){
         try{
@@ -226,9 +255,12 @@ public class BridgeHealth {
 
     /**
      * Damage an entity (LivingEntity).
+     * 
      * @param entity
      * @param damage
-     * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
      */
     public static void damage(final LivingEntity entity, final double damage){
         try{
@@ -250,7 +282,9 @@ public class BridgeHealth {
     }
 
     /**
-     * Intended for faster compatibility methods for defined scenarios. Transforms any exception to a RuntimeException.
+     * Intended for faster compatibility methods for defined scenarios.
+     * Transforms any exception to a RuntimeException.
+     * 
      * @param obj
      * @param methodName
      * @param value
