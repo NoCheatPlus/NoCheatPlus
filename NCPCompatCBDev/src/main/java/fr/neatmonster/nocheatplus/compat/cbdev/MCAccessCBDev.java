@@ -172,7 +172,7 @@ public class MCAccessCBDev implements MCAccess {
 
     @Override
     public double getWidth(final Entity entity) {
-        return entity.getWidth();
+        return ((CraftEntity) entity).getHandle().width;
     }
 
     @Override
