@@ -1726,7 +1726,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Detect our own vehicle set backs (...).
         if (data.isVehicleSetBack) {
             // Uncertain if this is vehicle leave or vehicle enter.
-            if (event.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+            if (event.getCause() != BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION) {
                 // TODO: Unexpected, what now?
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Unexpected teleport cause on vehicle set back: " + event.getCause());
             }
@@ -2101,7 +2101,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                                 else {
                                     StaticLog.logInfo("Set back player " + player.getName() + ": " + LocUtil.simpleFormat(refLoc));
                                     data.prepareSetBack(refLoc);
-                                    if (!player.teleport(refLoc)) {
+                                    if (!player.teleport(refLoc, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
                                         StaticLog.logWarning("FAILED to set back player " + player.getName());
                                     }
                                 }
