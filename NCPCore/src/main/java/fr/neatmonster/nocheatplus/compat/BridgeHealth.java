@@ -42,6 +42,8 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  */
 public class BridgeHealth {
 
+    // TODO: Move to (smaller?) IGenericInstanceHandle instances.
+
     /** For debugging purposes. TODO: Reset on shutdown !? */
     private static Set<String> failures = new HashSet<String>();
 
@@ -162,7 +164,17 @@ public class BridgeHealth {
     }
 
     /**
-     * Set the damage from an EntityDamageEvent.
+     * Set the damage from an EntityDamageEvent.    @SuppressWarnings("deprecation")
+    public static double getMaxHealth(final LivingEntity entity){
+        try{
+            // TODO: Attribute.GENERIC_MAX_HEALTH for latest.
+            return entity.getMaxHealth();
+        }
+        catch(IncompatibleClassChangeError e){
+            return getDoubleOrInt(entity, "getMaxHealth", e);
+        }
+    }
+
      * 
      * @param event
      * @param damage
@@ -207,8 +219,10 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
+    @SuppressWarnings("deprecation")
     public static double getMaxHealth(final LivingEntity entity){
         try{
+            // TODO: Attribute.GENERIC_MAX_HEALTH for latest.
             return entity.getMaxHealth();
         }
         catch(IncompatibleClassChangeError e){
