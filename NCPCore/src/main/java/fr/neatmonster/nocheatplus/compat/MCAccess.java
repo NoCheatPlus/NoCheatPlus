@@ -42,7 +42,11 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 public interface MCAccess extends IGetBlockCache, IEntityAccessDimensions {
 
     /**
-     * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
+     * Simple/rough version information, separate several individual versions by
+     * '|' ranges with '-', potential future support with '?', e.g.
+     * "1.x.1|1.x.2|2.3.4-3.4.5|?". For large ranges, don't expect all versions
+     * between to be supported.
+     * 
      * @return
      */
     public String getMCVersion();

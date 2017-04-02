@@ -38,6 +38,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 public class MCAccessBukkitBase implements MCAccess {
 
     // private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
+    protected final boolean bukkitHasGetHeightAndGetWidth;
 
     /**
      * Constructor to let it fail.
@@ -48,13 +49,16 @@ public class MCAccessBukkitBase implements MCAccess {
         Material.AIR.isOccluding();
         Material.AIR.isTransparent();
         // TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
+        // TODO: Move getHeight and the like to EntityAccessXY.
+        bukkitHasGetHeightAndGetWidth = ReflectionUtil.getMethodNoArgs(Entity.class, "getHeight", double.class) != null
+                && ReflectionUtil.getMethodNoArgs(Entity.class, "getWidth", double.class) != null;
     }
 
     @Override
     public String getMCVersion() {
         // Bukkit API.
         // TODO: maybe output something else.
-        return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x|1.8.x|1.9.x|?"; // 1.8.x is bold!
+        return "1.4.6-1.11.2|?"; // uh oh
     }
 
     @Override
@@ -84,8 +88,13 @@ public class MCAccessBukkitBase implements MCAccess {
 
     @Override
     public double getHeight(final Entity entity) {
-        // TODO: Copy defaults like with widths.
-        final double entityHeight = 1.0;
+        double entityHeight;
+        if (bukkitHasGetHeightAndGetWidth) {
+            entityHeight = entity.getHeight();
+        }
+        else {
+            entityHeight = 1.0;
+        }
         if (entity instanceof LivingEntity) {
             return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
         } else {
@@ -105,8 +114,7 @@ public class MCAccessBukkitBase implements MCAccess {
         }
     }
 
-    @Override
-    public double getWidth(final Entity entity) {
+    private final double legacyGetWidth(final Entity entity) {
         // TODO: Make readable from file for defaults + register individual getters where appropriate.
         // TODO: For height too. [Automatize most by spawning + checking?]
         // Values taken from 1.7.10.
@@ -207,7 +215,16 @@ public class MCAccessBukkitBase implements MCAccess {
         } catch (Throwable t) {}
         // Default entity width.
         return 0.6f;
+    }
 
+    @Override
+    public double getWidth(final Entity entity) {
+        if (bukkitHasGetHeightAndGetWidth) {
+            return entity.getWidth();
+        }
+        else {
+            return legacyGetWidth(entity);
+        }
     }
 
     @Override

@@ -70,7 +70,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     @Override
     public String getMCVersion() {
         // Potentially all :p.
-        return "1.4.5-1.11|?";
+        return "1.4.5-1.11.2|?";
     }
 
     @Override
@@ -173,6 +173,9 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
 
     @Override
     public double getHeight(Entity entity) {
+        if (bukkitHasGetHeightAndGetWidth) {
+            return super.getHeight(entity);
+        }
         try {
             return helper.getHeight(entity);
         }
@@ -183,6 +186,9 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
 
     @Override
     public double getWidth(Entity entity) {
+        if (bukkitHasGetHeightAndGetWidth) {
+            return super.getWidth(entity);
+        }
         try {
             return helper.getWidth(entity);
         }

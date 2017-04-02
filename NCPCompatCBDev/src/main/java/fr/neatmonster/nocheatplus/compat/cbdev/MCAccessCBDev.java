@@ -128,8 +128,9 @@ public class MCAccessCBDev implements MCAccess {
 
     @Override
     public double getHeight(final Entity entity) {
+        // (entity.getHeight() returns the length field, but we access nms anyway.)
         final net.minecraft.server.v1_11_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
-        AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
+        final AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
         final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
         if (entity instanceof LivingEntity) {
             return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
@@ -171,7 +172,7 @@ public class MCAccessCBDev implements MCAccess {
 
     @Override
     public double getWidth(final Entity entity) {
-        return ((CraftEntity) entity).getHandle().width;
+        return entity.getWidth();
     }
 
     @Override
