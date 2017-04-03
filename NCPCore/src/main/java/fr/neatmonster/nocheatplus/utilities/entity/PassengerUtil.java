@@ -75,7 +75,10 @@ public class PassengerUtil {
         List<Entity> passengers = handleVehicle.getHandle().getEntityPassengers(entity);
         while (!passengers.isEmpty()){
             entity = passengers.get(0); // The one in charge.
-            if (entity instanceof Player){
+            if (entity == null) {
+                break;
+            }
+            else if (entity instanceof Player){
                 return (Player) entity;
             }
             passengers = handleVehicle.getHandle().getEntityPassengers(entity);
