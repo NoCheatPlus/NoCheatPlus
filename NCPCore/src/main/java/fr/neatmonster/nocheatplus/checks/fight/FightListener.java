@@ -413,6 +413,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             final Location damagedLoc, LocationTrace damagedTrace, 
             final long tick, final long now,  final boolean reachEnabled, final boolean directionEnabled) {
         // TODO: Order / splitting off generic stuff.
+        /*
+         * TODO: Abstract: interface with common setup/loop/post routine, only
+         * pass the ACTIVATED checks on to here (e.g. IFightLoopCheck...
+         * loopChecks). Support an arbitrary number of loop checks, special
+         * behavior -> interface and/or order within loopChecks.
+         */
         boolean cancelled = false;
 
         // (Might pass generic context to factories, for shared + heavy properties.)
