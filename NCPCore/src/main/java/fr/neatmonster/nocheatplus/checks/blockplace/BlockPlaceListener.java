@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -168,9 +169,14 @@ public class BlockPlaceListener extends CheckListener {
             // Always hash as sign post for improved compatibility with Lockette etc.
             data.autoSignPlacedHash = getBlockPlaceHash(block, Material.SIGN);
         }
+        
+        // Don't run checks, if a set back is scheduled.
+        if (!cancelled && MovingUtil.hasScheduledPlayerSetBack(player)) {
+            cancelled = true;
+        }
 
         // Fast place check.
-        if (fastPlace.isEnabled(player)) {
+        if (!cancelled && fastPlace.isEnabled(player)) {
             if (fastPlace.check(player, block, data, cc)) {
                 cancelled = true;
             }
@@ -327,6 +333,12 @@ public class BlockPlaceListener extends CheckListener {
         final Projectile projectile = event.getEntity();
         final Player player = BridgeMisc.getShooterPlayer(projectile);
         if (player == null) {
+            return;
+        }
+
+        if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+            // TODO: Should log.
+            event.setCancelled(true);
             return;
         }
 

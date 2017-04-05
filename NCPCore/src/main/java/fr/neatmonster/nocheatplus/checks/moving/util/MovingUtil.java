@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.util;
 
+import java.util.UUID;
+
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,6 +40,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -387,6 +390,29 @@ public class MovingUtil {
         if (loaded > 0 && data.debug) {
             StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
         }
+    }
+
+    /**
+     * Test if a set back is set in data and scheduled. <br>
+     * Primary thread only.
+     * 
+     * @param player
+     * @return
+     */
+    public static boolean hasScheduledPlayerSetBack(final Player player) {
+        return hasScheduledPlayerSetBack(player.getUniqueId(), MovingData.getData(player));
+    }
+
+    /**
+     * Test if a set back is set in data and scheduled. <br>
+     * Primary thread only.
+     * @param playerId
+     * @param data
+     * @return
+     */
+    public static boolean hasScheduledPlayerSetBack(final UUID playerId, final MovingData data) {
+        return TickTask.isPlayerGoingToBeSetBack(playerId) 
+                && data.hasTeleported();
     }
 
 }

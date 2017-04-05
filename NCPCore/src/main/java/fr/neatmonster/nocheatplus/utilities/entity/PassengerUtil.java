@@ -330,7 +330,7 @@ public class PassengerUtil {
             data.prepareSetBack(location);
             playerTeleported = player.teleport(LocUtil.clone(location), 
                     BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
-            data.resetTeleported(); // Just in case.
+            data.resetTeleported(); // Cleanup, just in case.
             // Workarounds.
             // Allow re-use of certain workarounds. Hack/shouldbedoneelsewhere?
             data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);

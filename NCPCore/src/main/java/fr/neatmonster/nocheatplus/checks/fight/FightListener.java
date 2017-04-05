@@ -600,6 +600,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     attackerData.lastExplosionDamageTick = -1;
                     attackerData.lastExplosionEntityId = Integer.MAX_VALUE;
                 }
+                // Prevent attacking if a set back is scheduled.
+                else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+                    if (attackerData.debug) {
+                        // Use fight data flag for efficiency.
+                        debug(attacker, "Prevent melee attack, due to a scheduled set back.");
+                    }
+                    event.setCancelled(true);
+                }
+                // Ordinary melee damage handling.
                 else if (handleNormalDamage(player, !crossPlugin.getHandle().isNativePlayer(player),
                         damaged, damagedIsFake,
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 

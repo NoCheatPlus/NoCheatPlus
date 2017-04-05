@@ -31,6 +31,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -48,6 +49,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
@@ -376,6 +378,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             counters.addPrimaryThread(idCancelDead, 1);
             return;
         }
+        else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+            event.setCancelled(true);
+            return;
+        }
         // TODO: Activate mob-egg check only for specific server versions.
         final ItemStack stack = Bridge1_9.getUsedItem(player, event);
         Entity entity = event.getRightClicked();
@@ -385,6 +391,17 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             event.setCancelled(true);
             counters.addPrimaryThread(idEggOnEntity, 1);
             return;
+        }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    public final void onPlayerInventoryOpen(final InventoryOpenEvent event) {
+        // Possibly already prevented by block + entity interaction.
+        final HumanEntity entity = event.getPlayer();
+        if (entity instanceof Player) {
+            if (MovingUtil.hasScheduledPlayerSetBack((Player) entity)) {
+                event.setCancelled(true);
+            }
         }
     }
 

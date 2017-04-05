@@ -31,6 +31,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -78,13 +79,30 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
-        // Cancel interact events for dead players.
-        if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+        // Early cancel for interact events with dead players and other.
+        final int cancelId;
+        if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) { // TODO: Should be dead !?.
             // Auto-soup after death.
+            /*
+             * TODO: Allow physical interact after death? Risks could be command
+             * blocks used etc.
+             */
+            cancelId = idCancelDead;
+        }
+        else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+            // Might log.
+            cancelId = -1; // No counters yet, but do prevent.
+        }
+        else {
+            cancelId = Integer.MIN_VALUE;
+        }
+        if (cancelId != Integer.MIN_VALUE) {
             event.setUseInteractedBlock(Result.DENY);
             event.setUseItemInHand(Result.DENY);
             event.setCancelled(true);
-            counters.addPrimaryThread(idCancelDead, 1);
+            if (cancelId >= 0) {
+                counters.addPrimaryThread(cancelId, 1);
+            }
             return;
         }
 

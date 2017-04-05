@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -91,6 +92,9 @@ public class BlockBreakListener extends CheckListener {
         if (Items.checkIllegalEnchantmentsAllHands(player)) {
             event.setCancelled(true);
             counters.addPrimaryThread(idCancelDIllegalItem, 1);
+        }
+        else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+            event.setCancelled(true);
         }
 
         // Cancelled events only leads to resetting insta break.
@@ -220,7 +224,10 @@ public class BlockBreakListener extends CheckListener {
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockDamageLowest(final BlockDamageEvent event) {
-        if (event.getInstaBreak()) {
+        if (MovingUtil.hasScheduledPlayerSetBack(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+        else if (event.getInstaBreak()) {
             // Indicate that this might have been set by CB/MC.
             isInstaBreak = AlmostBoolean.MAYBE;
         }

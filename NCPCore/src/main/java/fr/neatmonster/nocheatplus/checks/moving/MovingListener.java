@@ -1503,14 +1503,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
     }
 
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onPlayerPortalLowest(final PlayerPortalEvent event) {
+        final Player player = event.getPlayer();
+        if (MovingUtil.hasScheduledPlayerSetBack(player)) {
+            if (MovingData.getData(player).debug) {
+                debug(player, "[PORTAL] Prevent use, due to a scheduled set back.");
+            }
+            event.setCancelled(true);
+        }
+    }
+
     /**
      * When a player uses a portal, all information related to the moving checks becomes invalid.
      * 
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerPortal(final PlayerPortalEvent event) {
         final Location to = event.getTo();
         final MovingData data = MovingData.getData(event.getPlayer());
@@ -1566,17 +1576,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             default:
                 return;
         }
+        final MovingData data = MovingData.getData(player);
         final Location to = event.getTo();
         if (to == null) {
             // Better cancel this one.
-            //            if (!event.isCancelled()) {
-            event.setCancelled(true);
-            //            }
+            if (!event.isCancelled()) {
+                if (data.debug) {
+                    debugTeleportMessage(player, event, "Cancel event, that has no target location (to) set.");
+                }
+                event.setCancelled(true);
+            }
             return;
         }
-        final MovingData data = MovingData.getData(player);
-        if (data.isTeleported(to)) {
-            return;
+
+        if (data.hasTeleported()) {
+            // TODO: What if not scheduled.
+            if (data.isTeleported(to)) {
+                return;
+            }
+            else {
+                // TODO: Configurable ?
+                if (data.debug) {
+                    debugTeleportMessage(player, event, "Prevent teleport, due to a scheduled set back: ", to);
+                }
+                event.setCancelled(true);
+                return;
+            }
         }
 
         // Run checks.
@@ -1629,25 +1654,39 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         // Only check cancelled events.
-        if (!event.isCancelled()) {
-            return;
+        if (event.isCancelled()) {
+            checkUndoCancelledSetBack(event);
         }
+    }
+
+    /**
+     * Called for cancelled events only, before EventPriority.MONITOR.
+     * 
+     * @param event
+     */
+    private void checkUndoCancelledSetBack(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        Location to = event.getTo();
         // Revert cancel on set back.
-        if (data.isTeleported(to)) {
+        if (data.isTeleported(event.getTo())) {
             // Teleport by NCP.
-            final Location teleported = data.getTeleported();
-            // Prevent cheaters getting rid of flying data (morepackets, other).
-            // TODO: even more strict enforcing ?
-            event.setCancelled(false);
-            event.setTo(teleported); // ?
-            event.setFrom(teleported);
-            if (data.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() + " (revert cancel on set back): " + to);
-            }
-            return;
+            // TODO: What if not scheduled.
+            undoCancelledSetBack(player, event, data);
+        }
+    }
+
+    private final void undoCancelledSetBack(final Player player, final PlayerTeleportEvent event,
+            final MovingData data) {
+        final Location teleported = data.getTeleported();
+        // Prevent cheaters getting rid of flying data (morepackets, other).
+        // TODO: even more strict enforcing ?
+        event.setCancelled(false); // TODO: Does this make sense? Have it configurable rather?
+        event.setTo(teleported); // ?
+        event.setFrom(teleported);
+        if (data.debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(
+                    Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() 
+                    + " (revert cancel on set back): " + event.getTo());
         }
     }
 
@@ -1669,57 +1708,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Special cases.
         final Location to = event.getTo();
         if (event.isCancelled()) {
-            if (data.isTeleported(to)) {
-                // TODO: Schedule a teleport to set back with PlayerData (+ failure count)?
-                // TODO: Log once per player always?
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) +  " TP " + event.getCause() + " (set back was prevented): " + to);
-            }
-            else {
-                if (data.debug) {
-                    debug(player, "TP " + event.getCause() + " (cancelled): " + to);
-                }
-            }
-            data.resetTeleported();
+            onPlayerTeleportMonitorCancelled(player, event, to, data);
             return;
         }
         else if (to == null) {
             // Weird event.
-            // TODO: Log?
-            if (!event.isCancelled()) {
-                // TODO: Log!
-                // TODO: Reset yaw rate, such as to accept any yaw to start with (!).
-            }
-            data.resetTeleported();
+            onPlayerTeleportMonitorNullTarget(player, event, to, data);
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
         // Detect our own player set backs.
-        if (data.hasTeleported()) {
-            if (data.isTeleported(to)) {
-                // Set back.
-                final Location teleported = data.getTeleported();
-                final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
-                moveInfo.set(player, teleported, null, cc.yOnGround);
-                if (cc.loadChunksOnTeleport) {
-                    MovingUtil.ensureChunksLoaded(player, teleported, "teleport", data, cc);
-                }
-                data.onSetBack(moveInfo.from);
-                aux.returnPlayerMoveInfo(moveInfo);
-
-                // Reset stuff.
-                Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
-                data.resetTeleported();
-
-                // Log.
-                if (data.debug) {
-                    debug(player, "TP " + event.getCause() + " (set back): " + to);
-                }
-                return;
-            }
-            else {
-                // Another plugin overrides the set back location.
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) + " TP " + event.getCause() + " (set back was overridden): " + to);
-            }
+        if (data.hasTeleported() && onPlayerTeleportMonitorHasTeleported(player, event, to, data, cc)) {
+            return;
         }
 
         boolean skipExtras = false; // Skip extra data adjustments during special teleport, e.g. vehicle set back.
@@ -1728,7 +1728,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Uncertain if this is vehicle leave or vehicle enter.
             if (event.getCause() != BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION) {
                 // TODO: Unexpected, what now?
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Unexpected teleport cause on vehicle set back: " + event.getCause());
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, 
+                        CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) 
+                        + "Unexpected teleport cause on vehicle set back: " + event.getCause());
             }
             // TODO: Consider to verify, if this is somewhere near the vehicle as expected (might need storing more data for a set back).
             skipExtras = true;
@@ -1791,8 +1793,125 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Log.
         if (data.debug) {
-            debug(player, "TP " + event.getCause() + " (normal): " + to);
+            debugTeleportMessage(player, event, "(normal)", to);
         }
+    }
+
+    /**
+     * 
+     * @param player
+     * @param event
+     * @param to
+     * @param data
+     * @param cc
+     * @return True, if processing the teleport event should be aborted, false
+     *         otherwise.
+     */
+    private boolean onPlayerTeleportMonitorHasTeleported(final Player player, final PlayerTeleportEvent event, 
+            final Location to, final MovingData data, final MovingConfig cc) {
+        if (data.isTeleported(to)) {
+            // Set back.
+            final Location teleported = data.getTeleported();
+            final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
+            moveInfo.set(player, teleported, null, cc.yOnGround);
+            if (cc.loadChunksOnTeleport) {
+                MovingUtil.ensureChunksLoaded(player, teleported, "teleport", data, cc);
+            }
+            data.onSetBack(moveInfo.from);
+            aux.returnPlayerMoveInfo(moveInfo);
+
+            // Reset stuff.
+            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+            data.resetTeleported();
+
+            // Log.
+            if (data.debug) {
+                debugTeleportMessage(player, event, "(set back)", to);
+            }
+            return true;
+        }
+        else {
+            /*
+             * In this case another plugin has prevented NCP cancelling that
+             * teleport during before this EventPriority stage, or another
+             * plugin has altered the target location (to).
+             */
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(
+                    Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) 
+                    + " TP " + event.getCause() + " (set back was overridden): " + to);
+            return false;
+        }
+    }
+
+    private void onPlayerTeleportMonitorCancelled(final Player player, final PlayerTeleportEvent event, 
+            final Location to, final MovingData data) {
+        if (data.isTeleported(to)) {
+            // TODO: Schedule a teleport to set back with PlayerData (+ failure count)?
+            // TODO: Log once per player always?
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(
+                    Streams.TRACE_FILE, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) 
+                    +  " TP " + event.getCause() + " (set back was prevented): " + to);
+        }
+        else {
+            if (data.debug) {
+                debugTeleportMessage(player, event, to);
+            }
+        }
+        data.resetTeleported();
+    }
+
+    private void onPlayerTeleportMonitorNullTarget(final Player player, final PlayerTeleportEvent event, 
+            final Location to, final MovingData data) {
+        if (data.debug) {
+            debugTeleportMessage(player, event, "No target location (to) set.");
+        }
+        if (data.hasTeleported()) {
+            if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+                // Assume set back event following later.
+                event.setCancelled(true);
+                if (data.debug) {
+                    debugTeleportMessage(player, event, "Cancel, due to a scheduled set back.");
+                }
+            }
+            else {
+                data.resetTeleported();
+                if (data.debug) {
+                    debugTeleportMessage(player, event, "Skip set back, not being scheduled.");
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param player
+     * @param event
+     * @param message
+     * @param extra
+     *            Added in the end, with a leading space each.
+     */
+    private void debugTeleportMessage(final Player player, final PlayerTeleportEvent event, 
+            final Object... extra) {
+        final StringBuilder builder = new StringBuilder(128);
+        builder.append("TP ");
+        builder.append(event.getCause());
+        if (event.isCancelled()) {
+            builder.append(" (cancelled)");
+        }
+        if (extra != null && extra.length > 0) {
+            for (final Object obj : extra) {
+                if (obj != null) {
+                    builder.append(' ');
+                    if (obj instanceof String) {
+                        builder.append((String) obj);
+                    }
+                    else {
+                        builder.append(obj.toString());
+                    }
+                }
+            }
+        }
+        debug(player, builder.toString());
     }
 
     /**

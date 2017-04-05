@@ -659,23 +659,30 @@ public class VehicleChecks extends CheckListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVehicleEnter(final VehicleEnterEvent event) {
         final Entity entity = event.getEntered();
-        if ((entity instanceof Player)) {
-            onPlayerVehicleEnter((Player) entity, event.getVehicle());
+        if ((entity instanceof Player) && onPlayerVehicleEnter((Player) entity, event.getVehicle())) {
+            event.setCancelled(true);
         }
     }
 
     /**
-     * Assume entering a vehicle, event or join with being inside a vehicle.
-     * Set back and past move overriding are done here, performing the necessary
+     * Assume entering a vehicle, event or join with being inside a vehicle. Set
+     * back and past move overriding are done here, performing the necessary
      * consistency checking. Because teleporting players with their vehicle
      * means exit + teleport + re-enter, vehicle data should not be reset on
      * player teleportation.
      * 
      * @param player
      * @param vehicle
+     * @return True, if an event is to be cancelled.
      */
-    public void onPlayerVehicleEnter(final Player player,  final Entity vehicle) {
+    public boolean onPlayerVehicleEnter(final Player player,  final Entity vehicle) {
         final MovingData data = MovingData.getData(player);
+        if (!data.isVehicleSetBack && MovingUtil.hasScheduledPlayerSetBack(player.getUniqueId(), data)) {
+            if (data.debug) {
+                debug(player, "Vehicle enter: prevent, due to a scheduled set back.");
+            }
+            return true;
+        }
         if (data.debug) {
             debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
         }
@@ -686,7 +693,7 @@ public class VehicleChecks extends CheckListener {
             if (data.debug) {
                 debugNestedVehicleEnter(player);
             }
-            return;
+            return false;
         }
         else if (!lastVehicle.equals(vehicle)) {
             // Nested vehicles.
@@ -700,7 +707,7 @@ public class VehicleChecks extends CheckListener {
             // Proceed normally.
             dataOnVehicleEnter(player, vehicle, data);
         }
-
+        return false;
     }
 
     private void debugNestedVehicleEnter(Player player) {
