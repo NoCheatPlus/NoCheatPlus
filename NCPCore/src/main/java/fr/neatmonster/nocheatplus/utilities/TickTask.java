@@ -564,7 +564,7 @@ public class TickTask implements Runnable {
      * Check if new permission update requests and actions can be added.
      * @return True if locked.
      */
-    public boolean isLocked() {
+    public static boolean isLocked() {
         return locked;
     }
 
