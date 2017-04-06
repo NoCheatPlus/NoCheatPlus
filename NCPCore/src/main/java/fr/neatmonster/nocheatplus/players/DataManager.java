@@ -66,13 +66,18 @@ import fr.neatmonster.nocheatplus.utilities.IdUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
- * Central access point for a lot of functionality for managing data, especially removing data for cleanup.<br>
- * Originally intended as temporary or intermediate design, this might help reorganizing the API at some point.<br>
- * However i could not yet find a pleasing way for generic configuration access for a centralized data management (all in one),
- * so this might just be a workarounds class for coping with the current design, until somehow resolved in another way.
+ * Central access point for a lot of functionality for managing data, especially
+ * removing data for cleanup.<br>
+ * Originally intended as temporary or intermediate design, this might help
+ * reorganizing the API at some point.<br>
+ * However i could not yet find a pleasing way for generic configuration access
+ * for a centralized data management (all in one), so this might just be a
+ * workarounds class for coping with the current design, until somehow resolved
+ * in another way.
  * <hr>
  * ComponentRegistry:
  * <li>Supported: IRemoveData</li>
+ * 
  * @author mc_dev
  *
  */
@@ -88,13 +93,11 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     /** PlayerData storage. */
     private final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
 
-    /*
-     * 
-     */
     /**
      * Access order for playerName (exact) -> ms time of logout.
      * <hr>
-     * Later this might hold central player data objects instead of the long only.
+     * Later this might hold central player data objects instead of the long
+     * only.
      */
     private final Map<String, Long> lastLogout = new LinkedHashMap<String, Long>(50, 0.75f, true);
 
@@ -107,8 +110,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * IRemoveData instances.
-     * // TODO: might use a map for those later (extra or not).
      */
+    // TODO: might use a map for those later (extra or not).
     private final ArrayList<IRemoveData> iRemoveData = new ArrayList<IRemoveData>();
 
     /**
@@ -119,9 +122,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     /** Flag if data expiration is active at all. */
     private boolean doExpireData = false;
 
-    /** 
-     * Duration in milliseconds for expiration of logged off players data. 
-     * In the config minutes are used as unit.
+    /**
+     * Duration in milliseconds for expiration of logged off players data. In
+     * the config minutes are used as unit.
      */
     private long durExpireData = 0;
 
@@ -151,7 +154,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * Check the logged out players for if any data can be removed.<br>
-     * Currently only "dumb" full removal is performed. Later it is thinkable to remove "as much as reasonable".
+     * Currently only "dumb" full removal is performed. Later it is thinkable to
+     * remove "as much as reasonable".
      */
     public void checkExpiration() {
         if (!doExpireData || durExpireData <= 0) {
@@ -241,6 +245,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     /**
      * Used by checks to register the history for external access.<br>
      * NOTE: This method is not really meant ot be used from outside NCP.
+     * 
      * @param type
      * @param histories
      */
@@ -250,8 +255,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * Access method to the the execution history for check type for a player.
+     * 
      * @param type
-     * @param playerName Exact case for player name.
+     * @param playerName
+     *            Exact case for player name.
      * @return null if not present.
      */
     public static ExecutionHistory getExecutionHistory(final CheckType type, final String playerName) {
@@ -264,6 +271,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * Remove the execution history for a player for the given check type.
+     * 
      * @param type
      * @param playerName
      * @return
@@ -282,6 +290,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * Removes all data and history for a player.
+     * 
      * @deprecated Use clearData instead, this likely to be removed later.
      * @param checkType
      */
@@ -290,7 +299,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Remove data and history of all players for the given check type and sub checks.
+     * Remove data and history of all players for the given check type and sub
+     * checks.
+     * 
      * @param checkType
      */
     public static void clearData(final CheckType checkType) {
@@ -398,9 +409,13 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
-     * @param playerName Exact player name.
-     * @param checkType Check type to remove data for, null is regarded as ALL.
+     * Remove the player data for a given player and a given check type.
+     * CheckType.ALL and null will be interpreted as removing all data.<br>
+     * 
+     * @param playerName
+     *            Exact player name.
+     * @param checkType
+     *            Check type to remove data for, null is regarded as ALL.
      * @return If any data was present.
      */
     public static boolean removeData(final String playerName, CheckType checkType) {
@@ -437,8 +452,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Clear player related data, only for registered components (not execution history, violation history, normal check data).<br>
+     * Clear player related data, only for registered components (not execution
+     * history, violation history, normal check data).<br>
      * That should at least go for chat engine data.
+     * 
      * @param CheckType
      * @param PlayerName
      * @return If something was removed.
@@ -482,7 +499,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * This gets an online player by exact player name or lower-case player name only [subject to change].
+     * This gets an online player by exact player name or lower-case player name
+     * only [subject to change].
+     * 
      * @param playerName
      * @return
      */
@@ -509,6 +528,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     /**
      * Get an online player by UUID.
+     * 
      * @param id
      * @return
      */
@@ -517,7 +537,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * This gets the online player with the exact name, but transforms the input to lower case.
+     * This gets the online player with the exact name, but transforms the input
+     * to lower case.
+     * 
      * @param playerName
      * @return
      */
@@ -568,7 +590,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Cleanup method, removes all data and config, but does not call ConfigManager.cleanup.
+     * Cleanup method, removes all data and config, but does not call
+     * ConfigManager.cleanup.
      */
     @Override
     public void onDisable() {
@@ -637,7 +660,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
     }
 
     /**
-     * Convenience method, also hiding how player data is stored for a Player instance - always creates a PlayerData instance, if not already present.
+     * Convenience method, also hiding how player data is stored for a Player
+     * instance - always creates a PlayerData instance, if not already present.
+     * 
      * @param player
      * @return
      */
