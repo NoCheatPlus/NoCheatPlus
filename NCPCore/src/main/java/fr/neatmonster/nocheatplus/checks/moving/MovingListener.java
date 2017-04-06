@@ -438,7 +438,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             earlyReturn = true;
         }
         else if (data.hasTeleported()) {
-            earlyReturn = handleTeleportedOnMove(player, event, data);
+            earlyReturn = handleTeleportedOnMove(player, event, data, cc);
         }
         else {
             earlyReturn = false;
@@ -525,11 +525,25 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param player
      * @param event
      * @param data
+     * @param cc 
      * 
      * @return
      */
-    private boolean handleTeleportedOnMove(Player player, PlayerMoveEvent event, MovingData data) {
-        if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+    private boolean handleTeleportedOnMove(final Player player, final PlayerMoveEvent event, 
+            final MovingData data, final MovingConfig cc) {
+        // This could also happen with a packet based set back such as with cancelling move events.
+        if (data.isTeleported(event.getFrom())) {
+            // Treat as ACK (!).
+            // Adjust.
+            confirmSetBack(player, false, data, cc);
+            // Log.
+            if (data.debug) {
+                debug(player, "Implicitly confirm set back with the start point of a move.");
+            }
+            return false;
+        }
+        else if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+            // A set back has been scheduled, but the player is moving randomly.
             event.setCancelled(true);
             if (data.debug) {
                 debug(player, "Cancel move, due to a scheduled teleport (set back).");
@@ -1418,10 +1432,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      */
     private void onCancelledMove(final Player player, final Location from, final int tick, final long now, final MovingData mData, final MovingConfig mCc, final CombinedData data) {
-
         // Detect our own set back, choice of reference location.
         if (mData.hasSetBack()) {
             final Location ref = mData.getTeleported();
+            /*
+             * Attempt to control the immediate set back location, allowing to
+             * do without the PlayerTeleportEvent, if successful.
+             */
+            LocUtil.set(from, ref); // Hope the from location is used for teleport (fastest way).
+            // Schedule the teleport, because it might be faster than the next incoming packet.
             final UUID playerId = player.getUniqueId();
             if (!TickTask.isPlayerGoingToBeSetBack(playerId)) {
                 TickTask.requestPlayerSetBack(playerId);
@@ -1432,8 +1451,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             else if (mData.debug) {
                 debug(player, "Teleport (set back) already scheduled to: " + ref);
             }
-            // TODO: Does this still play well with onSetBack etc (not having the teleport follow directly)?
-            // (Position adaption will happen with the teleport on tick.)
+            // (Position adaption will happen with the teleport on tick, or with the next move.)
         }
 
         // Assume the implicit teleport to the from-location (no Bukkit event fires).
@@ -1811,19 +1829,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final Location to, final MovingData data, final MovingConfig cc) {
         if (data.isTeleported(to)) {
             // Set back.
-            final Location teleported = data.getTeleported();
-            final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
-            moveInfo.set(player, teleported, null, cc.yOnGround);
-            if (cc.loadChunksOnTeleport) {
-                MovingUtil.ensureChunksLoaded(player, teleported, "teleport", data, cc);
-            }
-            data.onSetBack(moveInfo.from);
-            aux.returnPlayerMoveInfo(moveInfo);
-
-            // Reset stuff.
-            Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
-            data.resetTeleported();
-
+            confirmSetBack(player, true, data, cc);
             // Log.
             if (data.debug) {
                 debugTeleportMessage(player, event, "(set back)", to);
@@ -1841,6 +1847,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     + " TP " + event.getCause() + " (set back was overridden): " + to);
             return false;
         }
+    }
+
+    /**
+     * A set back has been performed, or applying it got through to
+     * EventPriority.MONITOR.
+     * 
+     * @param player
+     * @param fakeNews
+     *            True, iff it's not really been applied yet (, but should get
+     *            applied, due to reaching EventPriority.MONITOR).
+     * @param data
+     * @param cc
+     */
+    private void confirmSetBack(final Player player, final boolean fakeNews, final MovingData data, 
+            final MovingConfig cc) {
+        final Location teleported = data.getTeleported();
+        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
+        moveInfo.set(player, teleported, null, cc.yOnGround);
+        if (cc.loadChunksOnTeleport) {
+            MovingUtil.ensureChunksLoaded(player, teleported, "teleport", data, cc);
+        }
+        data.onSetBack(moveInfo.from);
+        aux.returnPlayerMoveInfo(moveInfo);
+        // Reset stuff.
+        Combined.resetYawRate(player, teleported.getYaw(), System.currentTimeMillis(), true); // TODO: Not sure.
+        data.resetTeleported();
     }
 
     private void onPlayerTeleportMonitorCancelled(final Player player, final PlayerTeleportEvent event, 
