@@ -465,7 +465,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 if (data.debug) {
                     debug(player, "Early return on PlayerMoveEvent, set back to: " + newTo);
                 }
-                onSetBack(player, event, newTo, data, cc);
+                prepareSetBack(player, event, newTo, data, cc);
             }
             data.joinOrRespawn = false;
             return;
@@ -951,7 +951,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }
             // Set back handling.
-            onSetBack(player, event, newTo, data, cc);
+            prepareSetBack(player, event, newTo, data, cc);
             return true;
         }
     }
@@ -1341,8 +1341,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * Called during PlayerMoveEvent for adjusting to a to-be-scheduled set
-     * back.
+     * Called during PlayerMoveEvent for adjusting to a to-be-done/scheduled set
+     * back. <br>
+     * NOTE: Meaning differs from data.onSetBack (to be cleaned up).
      * 
      * @param player
      * @param event
@@ -1352,7 +1353,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param data
      * @param cc
      */
-    private void onSetBack(final Player player, final PlayerMoveEvent event, final Location newTo, final MovingData data, final MovingConfig cc) {
+    private void prepareSetBack(final Player player, final PlayerMoveEvent event, final Location newTo, final MovingData data, final MovingConfig cc) {
         // Illegal Yaw/Pitch.
         if (LocUtil.needsYawCorrection(newTo.getYaw())) {
             newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));

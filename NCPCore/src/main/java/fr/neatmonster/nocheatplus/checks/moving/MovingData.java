@@ -412,9 +412,10 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Teleport event: Mildly reset the flying data without losing any important
-     * information. The given setBack location is set internally, past move set
-     * to it.
+     * On confirming a set back (teleport monitor / move start point): Mildly
+     * reset the flying data without losing any important information. Past move
+     * is adjusted to the given setBack, internal setBack is only updated, if
+     * none is set.
      * 
      * @param setBack
      */
@@ -444,8 +445,10 @@ public class MovingData extends ACheckData {
         // Reset to setBack.
         resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
-        // TODO: Only setSetBack if no set back location is there? Policies?
-        setSetBack(setBack); // Problematic with multiple set back locations stored (currently the safe-medium one is preferred, but later...)
+        // Only setSetBack if no set back location is there.
+        if (setBack == null) {
+            setSetBack(setBack);
+        }
         // vehicleSetBacks.resetAllLazily(setBack); // Not good: Overrides older set back locations.
     }
 
