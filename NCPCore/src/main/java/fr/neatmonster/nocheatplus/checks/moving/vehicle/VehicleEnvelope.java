@@ -20,7 +20,6 @@ import java.util.List;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -100,7 +99,7 @@ public class VehicleEnvelope extends Check {
     public VehicleEnvelope() {
         super(CheckType.MOVING_VEHICLE_ENVELOPE);
         Class<?> clazz = ReflectionUtil.getClass("org.bukkit.entity.AbstractHorse");
-        bestHorse = clazz == null ? Horse.class : clazz;
+        bestHorse = clazz == null ? ReflectionUtil.getClass("org.bukkit.entity.Horse") : clazz;
     }
 
     public SetBackEntry check(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
@@ -331,7 +330,7 @@ public class VehicleEnvelope extends Check {
             }
             checkDetails.gravityTargetSpeed = 0.79;
         }
-        else if (bestHorse.isAssignableFrom(vehicle.getClass())) {
+        else if (bestHorse != null && bestHorse.isAssignableFrom(vehicle.getClass())) {
             // TODO: Climbable? -> seems not.
             checkDetails.simplifiedType = EntityType.HORSE; // TODO: 1.11 - Use AbstractHorse?
             checkDetails.canJump = checkDetails.canStepUpBlock = true;
