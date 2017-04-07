@@ -627,7 +627,7 @@ public class TrigUtil {
      *            the loc2
      * @return Returns false if either is null.
      */
-    public static boolean isSamePos(final IGetPositionWithLook loc1, final Location loc2) {
+    public static boolean isSamePos(final IGetPosition loc1, final Location loc2) {
         return loc1 != null && loc2 != null 
                 && loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
     }
@@ -655,7 +655,7 @@ public class TrigUtil {
      *            the loc2
      * @return Returns false if either is null.
      */
-    public static boolean isSamePos(final IGetPositionWithLook loc1, final IGetPositionWithLook loc2) {
+    public static boolean isSamePos(final IGetPosition loc1, final IGetPosition loc2) {
         return loc1 != null && loc2 != null 
                 && loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
     }
