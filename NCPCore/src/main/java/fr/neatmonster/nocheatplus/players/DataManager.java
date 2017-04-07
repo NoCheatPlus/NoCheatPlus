@@ -54,7 +54,6 @@ import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
-import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -82,7 +81,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 @SetupOrder(priority = -80)
-public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, IDisableListener{
+public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, IDisableListener{
 
     private static DataManager instance = null;
 
@@ -206,19 +205,19 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-        onLeave(event.getPlayer());
+        onPlayerLeave(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerKick(final PlayerKickEvent event) {
-        onLeave(event.getPlayer());
+        onPlayerLeave(event.getPlayer());
     }
 
     /**
      * Quit or kick.
      * @param player
      */
-    private final void onLeave(final Player player) {
+    private final void onPlayerLeave(final Player player) {
         final long now = System.currentTimeMillis();
         lastLogout.put(player.getName(), now);
         CombinedData.getData(player).lastLogoutTime = now;
