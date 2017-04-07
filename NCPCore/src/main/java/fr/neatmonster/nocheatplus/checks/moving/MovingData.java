@@ -53,6 +53,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichEntityLocation;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 
 /**
@@ -443,6 +444,7 @@ public class MovingData extends ACheckData {
         // Reset to setBack.
         resetPlayerPositions(setBack);
         adjustMediumProperties(setBack);
+        // TODO: Only setSetBack if no set back location is there? Policies?
         setSetBack(setBack); // Problematic with multiple set back locations stored (currently the safe-medium one is preferred, but later...)
         // vehicleSetBacks.resetAllLazily(setBack); // Not good: Overrides older set back locations.
     }
@@ -710,7 +712,8 @@ public class MovingData extends ACheckData {
     }
 
     /**
-     * Check if the given location is the teleported-to location.
+     * Check if the given location equals to the 'teleported' (set back)
+     * location.
      * 
      * @param loc
      * @return In case of either loc or teleported being null, false is
@@ -718,6 +721,20 @@ public class MovingData extends ACheckData {
      */
     public boolean isTeleported(final Location loc) {
         return loc != null && teleported != null && teleported.equals(loc);
+    }
+
+    /**
+     * Check if the given location has the same coordinates like the
+     * 'teleported' (set back) location. This is more light-weight and more
+     * lenient than isTeleported, because world and yaw and pitch are all
+     * ignored.
+     * 
+     * @param loc
+     * @return In case of either loc or teleported being null, false is
+     *         returned, otherwise TrigUtil.isSamePos(teleported, loc).
+     */
+    public boolean isTeleportedPosition(final Location loc) {
+        return loc != null && teleported != null && TrigUtil.isSamePos(teleported, loc);
     }
 
     /**

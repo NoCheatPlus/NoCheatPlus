@@ -532,7 +532,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private boolean handleTeleportedOnMove(final Player player, final PlayerMoveEvent event, 
             final MovingData data, final MovingConfig cc) {
         // This could also happen with a packet based set back such as with cancelling move events.
-        if (data.isTeleported(event.getFrom())) {
+        if (data.isTeleportedPosition(event.getFrom())) {
             // Treat as ACK (!).
             // Adjust.
             confirmSetBack(player, false, data, cc);
@@ -1608,8 +1608,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         if (data.hasTeleported()) {
-            // TODO: What if not scheduled.
-            if (data.isTeleported(to)) {
+            // More lenient: accept the position.
+            if (data.isTeleportedPosition(to)) {
                 return;
             }
             else {
@@ -1685,7 +1685,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void checkUndoCancelledSetBack(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        // Revert cancel on set back.
+        // Revert cancel on set back (only precise match).
         if (data.isTeleported(event.getTo())) {
             // Teleport by NCP.
             // TODO: What if not scheduled.
@@ -1827,7 +1827,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private boolean onPlayerTeleportMonitorHasTeleported(final Player player, final PlayerTeleportEvent event, 
             final Location to, final MovingData data, final MovingConfig cc) {
-        if (data.isTeleported(to)) {
+        if (data.isTeleportedPosition(to)) {
             // Set back.
             confirmSetBack(player, true, data, cc);
             // Log.
@@ -1878,6 +1878,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void onPlayerTeleportMonitorCancelled(final Player player, final PlayerTeleportEvent event, 
             final Location to, final MovingData data) {
         if (data.isTeleported(to)) {
+            // (Only precise match.)
             // TODO: Schedule a teleport to set back with PlayerData (+ failure count)?
             // TODO: Log once per player always?
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(
