@@ -1367,6 +1367,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         aux.resetPositionsAndMediumProperties(player, newTo, data, cc); // TODO: Might move into prepareSetBack, experimental here.
 
         // Set new to-location.
+        // TODO: Perhaps need to distinguish by version+settings?
         // event.setTo(newTo); // LEGACY: pre-2017-03-24
         event.setCancelled(true);
         // NOTE: A teleport is scheduled on MONITOR priority, if still relevant.
@@ -1432,15 +1433,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param mData
      * @param data
      */
-    private void onCancelledMove(final Player player, final Location from, final int tick, final long now, final MovingData mData, final MovingConfig mCc, final CombinedData data) {
+    private void onCancelledMove(final Player player, final Location from, final int tick, final long now, 
+            final MovingData mData, final MovingConfig mCc, final CombinedData data) {
         // Detect our own set back, choice of reference location.
         if (mData.hasSetBack()) {
             final Location ref = mData.getTeleported();
-            /*
-             * Attempt to control the immediate set back location, allowing to
-             * do without the PlayerTeleportEvent, if successful.
-             */
-            LocUtil.set(from, ref); // Hope the from location is used for teleport (fastest way).
+            // TODO: Initiate further action depending on version/capabilities (update getFrom()).
+            LocUtil.set(from, ref); // Attempt to do without a PlayerTeleportEvent as follow up.
             // Schedule the teleport, because it might be faster than the next incoming packet.
             final UUID playerId = player.getUniqueId();
             if (!TickTask.isPlayerGoingToBeSetBack(playerId)) {
@@ -1507,6 +1506,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             mData.updateTrace(player, to, tick, mcAccess.getHandle());
             if (mData.hasTeleported()) {
                 if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+                    // TODO: If legacy behavior with setTo is supported, adjust to it here as well.
                     // Skip.
                     if (mData.debug) {
                         debug(player, "Event not cancelled, despite a set back has been scheduled. Ignore set back.");
