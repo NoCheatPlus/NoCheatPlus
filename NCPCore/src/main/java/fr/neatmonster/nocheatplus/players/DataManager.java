@@ -288,16 +288,6 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     }
 
     /**
-     * Removes all data and history for a player.
-     * 
-     * @deprecated Use clearData instead, this likely to be removed later.
-     * @param checkType
-     */
-    public static void clear(final CheckType checkType) {
-        clearData(checkType);
-    }
-
-    /**
      * Remove data and history of all players for the given check type and sub
      * checks.
      * 
@@ -332,6 +322,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
         ViolationHistory.clear(checkType);
         if (checkType == CheckType.ALL) {
+            // TODO: Don't remove PlayerData for online players.
             instance.playerData.clear(); // TODO
         }
     }
@@ -444,6 +435,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
 
         if (checkType == CheckType.ALL) {
+            // TODO: Don't remove PlayerData for online players.
             instance.playerData.remove(playerName.toLowerCase());
         }
 
