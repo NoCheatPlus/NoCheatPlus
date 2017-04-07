@@ -14,8 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -205,6 +209,8 @@ public class MovingConfig extends ACheckConfig {
     public final boolean vehiclePreventDestroyOwn;
     public final boolean scheduleVehicleSetBacks;
 
+    public final Set<EntityType> ignoredVehicles = new HashSet<EntityType>();
+
     public final boolean    vehicleMorePacketsCheck;
     public final ActionList vehicleMorePacketsActions;
 
@@ -355,6 +361,21 @@ public class MovingConfig extends ACheckConfig {
         vehicleEnvelopeActive = ref == AlmostBoolean.MAYBE ? ServerVersion.compareMinecraftVersion("1.9") >= 0 : ref.decide();
         config.readDoubleValuesForEntityTypes(ConfPaths.MOVING_VEHICLE_ENVELOPE_HSPEEDCAP, vehicleEnvelopeHorizontalSpeedCap, 4.0, true);
         vehicleEnvelopeActions = config.getOptimizedActionList(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, Permissions.MOVING_VEHICLE_ENVELOPE);
+        // Ignored vehicle types (ignore mostly, no checks run).
+        List<String> types;
+        if (config.get(ConfPaths.MOVING_VEHICLE_IGNOREDVEHICLES) == null) { // Hidden setting for now.
+            // Use defaults.
+            types = Arrays.asList("arrow", "spectral_arrow", "tipped_arrow");
+        }
+        else {
+            types = config.getStringList(ConfPaths.MOVING_VEHICLE_IGNOREDVEHICLES);
+        }
+        for (String stype : types) {
+            EntityType type = EntityType.valueOf(stype.toUpperCase());
+            if (type != null) {
+                ignoredVehicles.add(type);
+            }
+        }
 
         // Messages.
         msgKickIllegalMove = ColorUtil.replaceColors(config.getString(ConfPaths.MOVING_MESSAGE_ILLEGALPLAYERMOVE));

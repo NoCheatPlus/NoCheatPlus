@@ -337,8 +337,14 @@ public class VehicleChecks extends CheckListener {
             final Location from, final Location to, final Player player, final boolean fake, 
             final MovingData data) {
         // TODO: Detect teleportation and similar.
-        final World world = vehicle.getWorld();
         final MovingConfig cc = MovingConfig.getConfig(player);
+        // Exclude certain vehicle types.
+        if (cc.ignoredVehicles.contains(vehicleType)) {
+            // 100% legit.
+            data.clearVehicleData();
+            return;
+        }
+        final World world = vehicle.getWorld();
         final VehicleMoveInfo moveInfo = aux.useVehicleMoveInfo();
         // vehicleLocation: Track when it could become null! -> checkIllegal  -> no setback or null location.
         final Location vehicleLocation = vehicle.getLocation(moveInfo.useLoc);
