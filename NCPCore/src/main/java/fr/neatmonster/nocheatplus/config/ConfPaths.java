@@ -662,6 +662,8 @@ public abstract class ConfPaths {
     public static final String  MOVING_ASSUMESPRINT                         = MOVING + "assumesprint";
     public static final String  MOVING_SPEEDGRACE                           = MOVING + "speedgrace";
     public static final String  MOVING_ENFORCELOCATION                      = MOVING + "enforcelocation";
+    private static final String MOVING_SETBACK                              = MOVING + "setback.";
+    public static final String  MOVING_SETBACK_METHOD                       = MOVING_SETBACK + "method";
 
     private static final String MOVING_TRACE                                = MOVING + "trace.";
     public static final String  MOVING_TRACE_MAXAGE                         = MOVING_TRACE + "maxage";

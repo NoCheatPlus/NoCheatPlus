@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
+import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -197,6 +198,7 @@ public class MovingConfig extends ACheckConfig {
     public final int speedGrace;
     public final boolean enforceLocation;
     public final boolean trackBlockMove;
+    public final PlayerSetBackMethod playerSetBackMethod;
 
     // Vehicles
     public final boolean vehicleEnforceLocation;
@@ -336,6 +338,9 @@ public class MovingConfig extends ACheckConfig {
                 && (config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS
                         // TODO: || other activation flags.
                         ));
+        final PlayerSetBackMethod playerSetBackMethod = PlayerSetBackMethod.fromString(
+                "extern.fromconfig", config.getString(ConfPaths.MOVING_SETBACK_METHOD));
+        this.playerSetBackMethod = playerSetBackMethod.doesThisMakeSense() ? playerSetBackMethod : PlayerSetBackMethod.CAUTIOUS;
 
         traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
         traceMaxSize = config.getInt(ConfPaths.MOVING_TRACE_MAXSIZE, 200);

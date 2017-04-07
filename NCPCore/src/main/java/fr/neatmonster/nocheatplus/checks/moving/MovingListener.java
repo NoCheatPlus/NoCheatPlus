@@ -69,6 +69,7 @@ import fr.neatmonster.nocheatplus.checks.moving.player.CreativeFly;
 import fr.neatmonster.nocheatplus.checks.moving.player.MorePackets;
 import fr.neatmonster.nocheatplus.checks.moving.player.NoFall;
 import fr.neatmonster.nocheatplus.checks.moving.player.Passable;
+import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
 import fr.neatmonster.nocheatplus.checks.moving.player.SurvivalFly;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
@@ -92,7 +93,6 @@ import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
-import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
@@ -121,7 +121,7 @@ import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
  * 
  * @see MovingEvent
  */
-public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
+public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INeedConfig, JoinLeaveListener{
 
     /**
      * Bounce preparation state.
@@ -460,12 +460,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
                 }
                 // Set.
-                // TODO: Reset positions? enforceLocation?
-                //event.setTo(newTo); // LEGACY: pre-2017-03-24
-                if (data.debug) {
-                    debug(player, "Early return on PlayerMoveEvent, set back to: " + newTo);
-                }
-                prepareSetBack(player, event, newTo, data, cc);
+                prepareSetBack(player, event, newTo, data, cc); // Logs set back details.
             }
             data.joinOrRespawn = false;
             return;
@@ -1367,15 +1362,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.prepareSetBack(newTo);
         aux.resetPositionsAndMediumProperties(player, newTo, data, cc); // TODO: Might move into prepareSetBack, experimental here.
 
-        // Set new to-location.
-        // TODO: Perhaps need to distinguish by version+settings?
-        // event.setTo(newTo); // LEGACY: pre-2017-03-24
-        event.setCancelled(true);
-        // NOTE: A teleport is scheduled on MONITOR priority, if still relevant.
+        // Set new to-location, distinguish method by settings.
+        final PlayerSetBackMethod method = cc.playerSetBackMethod;
+        if (method.shouldSetTo()) {
+            event.setTo(newTo); // LEGACY: pre-2017-03-24
+        }
+        if (method.shouldCancel()) {
+            event.setCancelled(true);
+        }
+        // NOTE: A teleport is scheduled on MONITOR priority, if set so.
+        // TODO: enforcelocation?
 
         // Debug.
         if (data.debug) {
-            debug(player, "Set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
+            debug(player, "Prepare set back to: " + newTo.getWorld().getName() + "/" 
+                    + LocUtil.simpleFormatPosition(newTo) + " (" + method.getId() + ")");
         }
     }
 
@@ -1439,18 +1440,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Detect our own set back, choice of reference location.
         if (mData.hasSetBack()) {
             final Location ref = mData.getTeleported();
-            // TODO: Initiate further action depending on version/capabilities (update getFrom()).
-            LocUtil.set(from, ref); // Attempt to do without a PlayerTeleportEvent as follow up.
-            // Schedule the teleport, because it might be faster than the next incoming packet.
-            final UUID playerId = player.getUniqueId();
-            if (!TickTask.isPlayerGoingToBeSetBack(playerId)) {
-                TickTask.requestPlayerSetBack(playerId);
-                if (mData.debug) {
-                    debug(player, "Schedule teleport (set back) to: " + ref);
-                }
+            // Initiate further action depending on settings.
+            final PlayerSetBackMethod method = mCc.playerSetBackMethod;
+            if (method.shouldUpdateFrom()) {
+                // Attempt to do without a PlayerTeleportEvent as follow up.
+                LocUtil.set(from, ref);
             }
-            else if (mData.debug) {
-                debug(player, "Teleport (set back) already scheduled to: " + ref);
+            if (method.shouldSchedule()) {
+                // Schedule the teleport, because it might be faster than the next incoming packet.
+                final UUID playerId = player.getUniqueId();
+                if (!TickTask.isPlayerGoingToBeSetBack(playerId)) {
+                    TickTask.requestPlayerSetBack(playerId);
+                    if (mData.debug) {
+                        debug(player, "Schedule teleport (set back) to: " + ref);
+                    }
+                }
+                else if (mData.debug) {
+                    debug(player, "Teleport (set back) already scheduled to: " + ref);
+                }
             }
             // (Position adaption will happen with the teleport on tick, or with the next move.)
         }

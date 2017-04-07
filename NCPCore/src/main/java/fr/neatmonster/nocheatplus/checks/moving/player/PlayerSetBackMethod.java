@@ -26,11 +26,14 @@ public class PlayerSetBackMethod {
 
     // DEFAULTS
 
-    public static final PlayerSetBackMethod LEGACY = new PlayerSetBackMethod(SET_TO);
-    public static final PlayerSetBackMethod CAUTIOUS = new PlayerSetBackMethod(CANCEL | UPDATE_FROM | SCHEDULE);
-    public static final PlayerSetBackMethod MODERN = new PlayerSetBackMethod(CANCEL | UPDATE_FROM);
+    public static final PlayerSetBackMethod LEGACY = new PlayerSetBackMethod("default.legacy", 
+            SET_TO);
+    public static final PlayerSetBackMethod CAUTIOUS = new PlayerSetBackMethod("default.cautious", 
+            CANCEL | UPDATE_FROM | SCHEDULE);
+    public static final PlayerSetBackMethod MODERN = new PlayerSetBackMethod("default.modern", 
+            CANCEL | UPDATE_FROM);
 
-    public static final PlayerSetBackMethod fromString(String input) {
+    public static final PlayerSetBackMethod fromString(String name, String input) {
         // TODO: Perhaps complain for incomplete/wrong content, much later.
         input = input.toLowerCase().replaceAll("_", "");
         int flags = 0;
@@ -46,16 +49,30 @@ public class PlayerSetBackMethod {
         if (input.contains("schedule")) {
             flags |= SCHEDULE;
         }
-        return new PlayerSetBackMethod(flags);
+        return new PlayerSetBackMethod(name, flags);
     }
 
 
     // INSTANCE
 
+    private final String id;
     private final int flags;
 
-    public PlayerSetBackMethod(int flags) {
+    public PlayerSetBackMethod(String id, int flags) {
+        this.id = id;
         this.flags = flags;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * ?
+     * @return
+     */
+    public boolean doesThisMakeSense() {
+        return (flags & (SET_TO | CANCEL | SCHEDULE)) != 0;
     }
 
     public boolean shouldSetTo() {

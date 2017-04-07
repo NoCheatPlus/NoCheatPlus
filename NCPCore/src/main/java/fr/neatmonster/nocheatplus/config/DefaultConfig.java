@@ -472,6 +472,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         set(ConfPaths.MOVING_ENFORCELOCATION, "default");
+        set(ConfPaths.MOVING_SETBACK_METHOD, "default");
 
         // Vehicles.
         set(ConfPaths.MOVING_VEHICLE_PREVENTDESTROYOWN, true);
