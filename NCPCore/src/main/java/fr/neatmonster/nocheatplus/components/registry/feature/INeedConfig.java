@@ -16,9 +16,12 @@ package fr.neatmonster.nocheatplus.components.registry.feature;
 
 
 /**
- * Indicate that a component needs config after time of creation but in onEnable.
- * @author mc_dev
+ * Indicate that a component needs to get notified on reloading the
+ * configuration, as well as to be configured during the registration process.
+ * This means onReload will be called during registration.
+ * 
+ * @author asofold
  *
  */
-public interface INeedConfig extends INotifyReload{
+public interface INeedConfig extends INotifyReload {
 }
