@@ -532,6 +532,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private boolean handleTeleportedOnMove(final Player player, final PlayerMoveEvent event, 
             final MovingData data, final MovingConfig cc) {
         // This could also happen with a packet based set back such as with cancelling move events.
+        // TODO: Alter the move from location and let it get through?
         if (data.isTeleportedPosition(event.getFrom())) {
             // Treat as ACK (!).
             // Adjust.
@@ -551,7 +552,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return true;
         }
         else {
-            // Left-over.
+            // Left-over (Demand: schedule or teleport before moving events arrive).
             if (data.debug) {
                 debug(player, "Invalidate left-over teleported (set back) location: " + data.getTeleported());
             }
@@ -1505,20 +1506,33 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             mData.updateTrace(player, to, tick, mcAccess.getHandle());
             if (mData.hasTeleported()) {
-                if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
-                    // TODO: If legacy behavior with setTo is supported, adjust to it here as well.
-                    // Skip.
-                    if (mData.debug) {
-                        debug(player, "Event not cancelled, despite a set back has been scheduled. Ignore set back.");
-                    }
-                }
-                else {
-                    if (mData.debug) {
-                        debug(player, "Inconsistent state (move MONITOR): teleported has been set, but no set back is scheduled. Ignore set back.");
-                    }
-                }
-                mData.resetTeleported(); // (TickTask will notice it's not set.)
+                onPlayerMoveMonitorNotCancelledHasTeleported(player, to, mData);
             }
+        }
+    }
+
+    private void onPlayerMoveMonitorNotCancelledHasTeleported(final Player player, final Location to, 
+            final MovingData mData) {
+        if (mData.isTeleportedPosition(to)) {
+            // Skip resetting, especially if legacy setTo is enabled.
+            // TODO: Might skip this condition, if legacy setTo is not enabled.
+            if (mData.debug) {
+                debug(player, "Event not cancelled, with teleported (set back) set, assume legacy behavior.");
+            }
+        }
+        else if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+            // Skip, because the scheduled teleport has been overridden.
+            // TODO: Only do this, if cancel is set, because it is not an un-cancel otherwise.
+            if (mData.debug) {
+                debug(player, "Event not cancelled, despite a set back has been scheduled. Ignore set back.");
+            }
+            mData.resetTeleported(); // (TickTask will notice it's not set.)
+        }
+        else {
+            if (mData.debug) {
+                debug(player, "Inconsistent state (move MONITOR): teleported has been set, but no set back is scheduled. Ignore set back.");
+            }
+            mData.resetTeleported();
         }
     }
 
