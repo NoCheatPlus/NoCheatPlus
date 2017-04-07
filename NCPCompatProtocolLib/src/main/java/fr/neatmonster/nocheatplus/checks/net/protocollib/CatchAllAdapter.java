@@ -72,7 +72,15 @@ public class CatchAllAdapter extends BaseAdapter {
             // TODO: Is this a problem, as the server has the player so it could break a block)?
             return;
         }
-        final NetConfig cc = NetStatic.getWorldConfig(player, configFactory, dataFactory);
+        final NetConfig cc;
+        try {
+            cc = NetStatic.getWorldConfig(player, configFactory, dataFactory);
+        }
+        catch (UnsupportedOperationException e) {
+            // Legacy +-.
+            // TODO: Get from PlayerData, once HashMapLOW is used.
+            return;
+        }
         if (cc.packetFrequencyActive) {
             final NetData data = dataFactory.getData(player);
             if (packetFrequency.isEnabled(player, data, cc) 
