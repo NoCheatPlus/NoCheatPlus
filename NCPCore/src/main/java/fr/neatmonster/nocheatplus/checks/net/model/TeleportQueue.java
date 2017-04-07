@@ -49,6 +49,7 @@ public class TeleportQueue {
     private long maxAge = 4000; // TODO: configurable
     private int maxQueueSize = 60; // TODO: configurable
 
+    private CountableLocation lastAck = null;
 
     /**
      * Maximum age in milliseconds, older entries expire.
@@ -57,6 +58,10 @@ public class TeleportQueue {
     public long getMaxAge() {
         return maxAge;
     }
+    
+    public CountableLocation getLastAck() {
+        return lastAck;
+    }
 
     /**
      * Call for Bukkit events (expect this packet to be sent).
@@ -64,6 +69,7 @@ public class TeleportQueue {
      */
     public void onTeleportEvent(final double x, final double y, final double z, final float yaw, final float pitch) {
         lock.lock();
+        lastAck = null;
         expectOutgoing = new DataLocation(x, y, z, yaw, pitch);
         lock.unlock();
     }
@@ -174,6 +180,7 @@ public class TeleportQueue {
                 if (--ref.count <= 0) { // (Lots of safety margin.)
                     expectIncoming.removeFirst(); // Do not use the iterator here.
                 }
+                lastAck = ref;
                 return AckResolution.ACK;
             }
             else {

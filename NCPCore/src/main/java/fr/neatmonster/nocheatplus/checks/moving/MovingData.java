@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
+import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -738,6 +739,20 @@ public class MovingData extends ACheckData {
      */
     public boolean isTeleportedPosition(final Location loc) {
         return loc != null && teleported != null && TrigUtil.isSamePos(teleported, loc);
+    }
+
+    /**
+     * Check if the given location has the same coordinates like the
+     * 'teleported' (set back) location. This is more light-weight and more
+     * lenient than isTeleported, because world and yaw and pitch are all
+     * ignored.
+     * 
+     * @param loc
+     * @return In case of either loc or teleported being null, false is
+     *         returned, otherwise TrigUtil.isSamePos(pos, teleported).
+     */
+    public boolean isTeleportedPosition(final IGetPosition pos) {
+        return pos != null && teleported != null && TrigUtil.isSamePos(pos, teleported);
     }
 
     /**

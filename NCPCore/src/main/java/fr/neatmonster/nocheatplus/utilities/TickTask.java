@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -33,7 +34,11 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -648,6 +653,10 @@ public class TickTask implements Runnable {
     }
 
     // Instance methods (meant private).
+
+    /** Temporary use only, beware of nesting. Cleanup with setWorld(null). */
+    private final Location useLoc = new Location(null, 0, 0, 0);
+
     /**
      * 
      * Notify all listeners. A copy of the listeners under lock, then processed without lock. Theoretically listeners can get processed though they have already been unregistered.
@@ -693,11 +702,43 @@ public class TickTask implements Runnable {
                 }
                 continue;
             }
-            if (!player.teleport(data.getTeleported(), BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
+            // (teleported is set.).
+            final Location loc = player.getLocation(useLoc);
+            if (data.isTeleportedPosition(loc)) {
+                // Skip redundant teleport.
+                if (data.debug) {
+                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Skip teleport, player is there, already.");
+                }
+                continue;
+            }
+            // (player is somewhere else.)
+            // TODO: Consider to skip packet level, if not available (plus optimize access to the information).
+            final PlayerSetBackMethod method = MovingConfig.getConfig(player).playerSetBackMethod;
+            if (method.shouldCancel() || method.shouldSetTo()) {
+                /*
+                 * Another leniency option: Skip, if we have already received an
+                 * ACK for this position on packet level.
+                 */
+                // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
+                final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
+                if (data.isTeleportedPosition(cl)) {
+                    if (data.debug) {
+                        CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Skip teleport, having received an ACK for the teleport on packet level.");
+                    }
+                    continue;
+                }
+            }
+
+            // (No ACK received yet.)
+            final Location teleported = data.getTeleported();
+            if (!player.teleport(teleported, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
                 if (data .debug) {
                     CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Teleport failed.");
                 }
             }
+            // Cleanup.
+            useLoc.setWorld(null);
+
             // (Data resetting is done during PlayerTeleportEvent handling.)
         }
         // (There could be ids kept on errors !?)
