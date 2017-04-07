@@ -371,10 +371,13 @@ public class MovingConfig extends ACheckConfig {
             types = config.getStringList(ConfPaths.MOVING_VEHICLE_IGNOREDVEHICLES);
         }
         for (String stype : types) {
-            EntityType type = EntityType.valueOf(stype.toUpperCase());
-            if (type != null) {
-                ignoredVehicles.add(type);
+            try {
+                EntityType type = EntityType.valueOf(stype.toUpperCase());
+                if (type != null) {
+                    ignoredVehicles.add(type);
+                }
             }
+            catch (IllegalArgumentException e) {}
         }
 
         // Messages.
