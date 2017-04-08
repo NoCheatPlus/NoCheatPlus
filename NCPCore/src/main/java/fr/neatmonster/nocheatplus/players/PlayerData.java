@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.players;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import fr.neatmonster.nocheatplus.components.data.IData;
 
@@ -43,6 +44,9 @@ import fr.neatmonster.nocheatplus.components.data.IData;
  */
 public class PlayerData implements IData {
 
+    // TODO: Prefer this data over an extra structure (PlayerMap)?
+    // TODO: Functionality of PlayerTask in here.
+
     public static final String TAG_NOTIFY_OFF = "notify_off";
 
     public final PlayerTask task;
@@ -50,6 +54,10 @@ public class PlayerData implements IData {
     /** Not sure this is the future of extra properties. */
     protected Set<String> tags = null;
 
+    /** Unique id of the player. */
+    final UUID playerId;
+    /** Exact case name of the player. */
+    final String playerName;
     /** Lower case name of the player. */
     final String lcName;
 
@@ -57,9 +65,11 @@ public class PlayerData implements IData {
      * 
      * @param playerName Accurate case not (yet) demanded.
      */
-    public PlayerData(final String playerName) {
+    public PlayerData(final UUID playerId, final String playerName) {
+        this.playerId = playerId;
+        this.playerName = playerName;
         this.lcName = playerName.toLowerCase();
-        this.task = new PlayerTask(this.lcName);
+        this.task = new PlayerTask(playerId, playerName);
     }
 
     /**

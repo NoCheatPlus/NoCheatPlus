@@ -651,23 +651,26 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     }
 
     /**
-     * Convenience method, also hiding how player data is stored for a Player
-     * instance - always creates a PlayerData instance, if not already present.
+     * Get a PlayerData instance in any case - always creates a PlayerData
+     * instance, if none is present. This method should be preferred, as it
+     * hides details.
      * 
      * @param player
      * @return
      */
     public static PlayerData getPlayerData(final Player player) {
-        return getPlayerData(player.getName(), true);
+        return getPlayerData(player.getUniqueId(), player.getName(), true);
     }
 
     /**
+     * Get PlayerData instances, controlling if data is created, in case it is
+     * not present.
      * 
      * @param playerName
      * @param create
      * @return
      */
-    public static PlayerData getPlayerData(final String playerName, final boolean create) {
+    public static PlayerData getPlayerData(final UUID playerId, final String playerName, final boolean create) {
         final String lcName = playerName.toLowerCase(); // TODO: Store by both lower case and exact case (also store the Player reference).
         final PlayerData data = instance.playerData.get(lcName);
         if (data != null) {
@@ -677,10 +680,19 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             return null;
         }
         else {
-            final PlayerData newData = new PlayerData(lcName);
+            final PlayerData newData = new PlayerData(playerId, playerName);
             instance.playerData.put(lcName, newData);
             return newData;
         }
+    }
+
+    /**
+     * Get the player data, if present.
+     * @param playerName
+     * @return The PlayerData instance if present, null otherwise.
+     */
+    public static PlayerData getPlayerData(final String playerName) {
+        return instance.playerData.get(playerName.toLowerCase());
     }
 
     /**

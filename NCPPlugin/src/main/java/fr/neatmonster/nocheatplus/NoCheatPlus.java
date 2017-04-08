@@ -354,7 +354,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     private boolean hasTurnedOffNotifications(final String playerName) {
-        final PlayerData data = DataManager.getPlayerData(playerName, false);
+        final PlayerData data = DataManager.getPlayerData(playerName);
         return data != null && data.getNotifyOff();
     }
 
@@ -424,6 +424,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     @Override
     public void sendMessageOnTick(final String playerName, final String message) {
+        // TODO: Move to PlayerData ?
         playerMessageSender.sendMessageThreadSafe(playerName, message);
     }
 
@@ -1356,7 +1357,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final String playerName = player.getName();
         if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)) {
             // Login notifications...
-            final PlayerData data = DataManager.getPlayerData(playerName, true);
+            final PlayerData data = DataManager.getPlayerData(player.getUniqueId(), playerName, true);
             //			// Update available.
             //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 

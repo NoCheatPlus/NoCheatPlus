@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.players;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
@@ -24,12 +26,15 @@ import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
  *
  */
 public class PlayerTask extends OnDemandTickListener {
+    
+    // TODO: Transform/remove (TickTask instead).
 
     // TODO: Merge with player-specific TickTask logic - (e.g. store playerId-> PlayerTask there).
-    // TODO: Also store the UUID here, prefer.
+    // TODO: Exact case name / rather !?
     // TODO: Consider overriding some logic, because it is used in the main thread only (context: isRegisterd + register).
 
-    public final String lcName;
+    public final String name;
+    public final UUID id;
 
     protected boolean updateInventory = false;
 
@@ -37,17 +42,19 @@ public class PlayerTask extends OnDemandTickListener {
 
     /**
      * 
-     * @param name Not demanded to be case sensitive.
+     * @param id The unique id of the player.
+     * @param name Preferable the original exact case name.
      */
-    public PlayerTask(final String name) {
-        this.lcName = name.toLowerCase();
+    public PlayerTask(final UUID id, final String name) {
+        this.name = name;
+        this.id = id;
     }
 
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean delegateTick(final int tick, final long timeLast) {
-        final Player player = DataManager.getPlayer(lcName);
+        final Player player = DataManager.getPlayer(id);
         if (player != null) {
             if (player.isOnline()) {
                 //				if (correctDirection) {
