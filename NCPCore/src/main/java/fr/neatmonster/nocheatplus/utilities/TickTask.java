@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -26,7 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -34,15 +34,10 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
-import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
-import fr.neatmonster.nocheatplus.checks.net.NetData;
-import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
-import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData.PlayerTickListener;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 // TODO: Auto-generated Javadoc
@@ -134,8 +129,9 @@ public class TickTask implements Runnable {
     /** Improbable entries to update. */
     private static Map<UUID, ImprobableUpdateEntry> improbableUpdates = new LinkedHashMap<UUID, TickTask.ImprobableUpdateEntry>(50);
 
-    /** UUIDs of players who are to be set back. Primary thread only, so far. */
-    private static final Set<UUID> playerSetBackIds = new LinkedHashSet<UUID>(); // Could use a list, though.
+    /** PlayerTickListener instances, run player specific tasks on tick. */
+    // TODO: For thread-safe adding : another set under synchronization update under lock.
+    private static final Set<PlayerTickListener> playerTickListeners = new LinkedHashSet<PlayerTickListener>();
 
     /** The Constant improbableLock. */
     private static final ReentrantLock improbableLock = new ReentrantLock();
@@ -277,26 +273,23 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Using the getTeleported() Location instance in MovingData, in order to
-     * set back the player on tick. This is for PlayerMoveEvent-like handling,
-     * not for vehicles. Primary thread only, so far.
-     * 
-     * @param playerId
+     * Run player specific tasks on tick.
+     * @param playerTickListener
      */
-    public static void requestPlayerSetBack(final UUID playerId) {
+    public static void addPlayerTickListener(final PlayerTickListener playerTickListener) {
         if (!locked) {
-            playerSetBackIds.add(playerId);
+            playerTickListeners.add(playerTickListener);
         }
     }
 
     /**
-     * Test if a player set back is scheduled (MovingData).
+     * Test if a player specific task is scheduled.
      * 
-     * @param playerId
+     * @param playerTickListener
      * @return
      */
-    public static boolean isPlayerGoingToBeSetBack(final UUID playerId) {
-        return playerSetBackIds.contains(playerId);
+    public static boolean isPlayerTiskListenerThere(final PlayerTickListener playerTickListener) {
+        return playerTickListeners.contains(playerTickListener);
     }
 
     /**
@@ -633,7 +626,7 @@ public class TickTask implements Runnable {
             tickListeners.clear();
         }
         if (Bukkit.isPrimaryThread()) {
-            playerSetBackIds.clear();
+            playerTickListeners.clear();
         }
     }
 
@@ -653,9 +646,6 @@ public class TickTask implements Runnable {
     }
 
     // Instance methods (meant private).
-
-    /** Temporary use only, beware of nesting. Cleanup with setWorld(null). */
-    private final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * 
@@ -687,62 +677,21 @@ public class TickTask implements Runnable {
         }
     }
 
-    private void processPlayerSetBackIds() {
-        // TODO: Might design as a permanent tick listener (access API elsewhere) to minimize TickListener.
-        for (final UUID id : playerSetBackIds) {
-            final Player player = DataManager.getPlayer(id);
-            if (player == null) {
-                // (Should be intercepted elsewhere, e.g. on quit/kick.)
-                continue;
-            }
-            final MovingData data = MovingData.getData(player);
-            if (!data.hasTeleported()) {
-                if (data.debug) {
-                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: No stored location available.");
-                }
-                continue;
-            }
-            // (teleported is set.).
-            final Location loc = player.getLocation(useLoc);
-            if (data.isTeleportedPosition(loc)) {
-                // Skip redundant teleport.
-                if (data.debug) {
-                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Skip teleport, player is there, already.");
-                }
-                continue;
-            }
-            // (player is somewhere else.)
-            // TODO: Consider to skip packet level, if not available (plus optimize access to the information).
-            final PlayerSetBackMethod method = MovingConfig.getConfig(player).playerSetBackMethod;
-            if (method.shouldCancel() || method.shouldSetTo()) {
-                /*
-                 * Another leniency option: Skip, if we have already received an
-                 * ACK for this position on packet level.
-                 */
-                // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
-                final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
-                if (data.isTeleportedPosition(cl)) {
-                    if (data.debug) {
-                        CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Skip teleport, having received an ACK for the teleport on packet level.");
-                    }
-                    continue;
+    private void processPlayerTickListeners(final int tick, final long timeLast) {
+        // TODO: Not sure: Make a copy list, clear original. Add to original if to stay. [Concurrent modification.]
+        final Iterator<PlayerTickListener> it = playerTickListeners.iterator();
+        while (it.hasNext()) {
+            final PlayerTickListener listener = it.next();
+            try {
+                if (listener.processOnTick(tick, timeLast)) {
+                    it.remove();
                 }
             }
-
-            // (No ACK received yet.)
-            final Location teleported = data.getTeleported();
-            if (!player.teleport(teleported, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
-                if (data .debug) {
-                    CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Teleport failed.");
-                }
+            catch (Throwable t) {
+                StaticLog.logSevere("(TickTask) PlayerTickListener generated an exception:");
+                StaticLog.logSevere(t);
             }
-            // Cleanup.
-            useLoc.setWorld(null);
-
-            // (Data resetting is done during PlayerTeleportEvent handling.)
         }
-        // (There could be ids kept on errors !?)
-        playerSetBackIds.clear();
     }
 
     /* (non-Javadoc)
@@ -755,8 +704,8 @@ public class TickTask implements Runnable {
         // Actions.
         executeActions();
         // Set back (after actions, for now, because actions may contain a set back action later on).
-        if (!playerSetBackIds.isEmpty()) {
-            processPlayerSetBackIds();
+        if (!playerTickListeners.isEmpty()) {
+            processPlayerTickListeners(tick, timeLast);
         }
         // Permissions.
         updatePermissions();

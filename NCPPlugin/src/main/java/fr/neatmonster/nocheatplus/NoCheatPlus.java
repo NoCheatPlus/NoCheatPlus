@@ -353,9 +353,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
+    @Deprecated
     private boolean hasTurnedOffNotifications(final String playerName) {
         final PlayerData data = DataManager.getPlayerData(playerName);
         return data != null && data.getNotifyOff();
+    }
+
+    private boolean hasTurnedOffNotifications(final Player player) {
+        return DataManager.getPlayerData(player).getNotifyOff();
     }
 
     /**
@@ -393,7 +398,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         for (final Permissible permissible : permissibles) {
             if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)) {
                 final CommandSender sender = (CommandSender) permissible;
-                if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())) {
+                if ((sender instanceof Player) && hasTurnedOffNotifications((Player) sender)) {
                     continue;
                 }
 
@@ -407,7 +412,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 if (!done.contains(name)) {
                     final Player player = DataManager.getPlayerExact(name);
                     if (player != null && player.hasPermission(Permissions.NOTIFY)) {
-                        if (hasTurnedOffNotifications(player.getName())) {
+                        if (hasTurnedOffNotifications(player)) {
                             continue;
                         }
                         player.sendMessage(message); 
@@ -1357,7 +1362,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final String playerName = player.getName();
         if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)) {
             // Login notifications...
-            final PlayerData data = DataManager.getPlayerData(player.getUniqueId(), playerName, true);
+            final PlayerData data = DataManager.getPlayerData(player);
             //			// Update available.
             //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 

@@ -104,6 +104,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -527,7 +528,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private boolean handleTeleportedOnMove(final Player player, final PlayerMoveEvent event, 
             final MovingData data, final MovingConfig cc) {
         // This could also happen with a packet based set back such as with cancelling move events.
-        // TODO: Alter the move from location and let it get through?
         if (data.isTeleportedPosition(event.getFrom())) {
             // Treat as ACK (!).
             // Adjust.
@@ -538,8 +538,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             return false;
         }
-        else if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+        else if (DataManager.getPlayerData(player).isPlayerSetBackScheduled()) {
             // A set back has been scheduled, but the player is moving randomly.
+            // TODO: Instead alter the move from location and let it get through? +- when
             event.setCancelled(true);
             if (data.debug) {
                 debug(player, "Cancel move, due to a scheduled teleport (set back).");
@@ -1448,15 +1449,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             if (method.shouldSchedule()) {
                 // Schedule the teleport, because it might be faster than the next incoming packet.
-                final UUID playerId = player.getUniqueId();
-                if (!TickTask.isPlayerGoingToBeSetBack(playerId)) {
-                    TickTask.requestPlayerSetBack(playerId);
+                final PlayerData pd = DataManager.getPlayerData(player);
+                if (pd.isPlayerSetBackScheduled()) {
+                    debug(player, "Teleport (set back) already scheduled to: " + ref);
+                }
+                else if (mData.debug) {
+                    pd.requestPlayerSetBack();
                     if (mData.debug) {
                         debug(player, "Schedule teleport (set back) to: " + ref);
                     }
-                }
-                else if (mData.debug) {
-                    debug(player, "Teleport (set back) already scheduled to: " + ref);
                 }
             }
             // (Position adaption will happen with the teleport on tick, or with the next move.)
@@ -1526,14 +1527,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (mData.debug) {
                 debug(player, "Event not cancelled, with teleported (set back) set, assume legacy behavior.");
             }
+            return;
         }
-        else if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+        else if (DataManager.getPlayerData(player).isPlayerSetBackScheduled()) {
             // Skip, because the scheduled teleport has been overridden.
             // TODO: Only do this, if cancel is set, because it is not an un-cancel otherwise.
             if (mData.debug) {
-                debug(player, "Event not cancelled, despite a set back has been scheduled. Ignore set back.");
+                debug(player, "Event not cancelled, despite a set back has been scheduled. Cancel set back.");
             }
-            mData.resetTeleported(); // (TickTask will notice it's not set.)
+            mData.resetTeleported(); // (PlayerTickListener will notice it's not set.)
         }
         else {
             if (mData.debug) {
@@ -1921,7 +1923,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             debugTeleportMessage(player, event, "No target location (to) set.");
         }
         if (data.hasTeleported()) {
-            if (TickTask.isPlayerGoingToBeSetBack(player.getUniqueId())) {
+            if (DataManager.getPlayerData(player).isPlayerSetBackScheduled()) {
                 // Assume set back event following later.
                 event.setCancelled(true);
                 if (data.debug) {

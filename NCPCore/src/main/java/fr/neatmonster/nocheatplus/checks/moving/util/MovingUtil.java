@@ -32,6 +32,9 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
+import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
+import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -39,8 +42,8 @@ import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -411,8 +414,65 @@ public class MovingUtil {
      * @return
      */
     public static boolean hasScheduledPlayerSetBack(final UUID playerId, final MovingData data) {
-        return TickTask.isPlayerGoingToBeSetBack(playerId) 
-                && data.hasTeleported();
+        return data.hasTeleported() && DataManager.getPlayerData(playerId).isPlayerSetBackScheduled();
+    }
+
+    /**
+     * 
+     * @param player
+     * @param debugMessagePrefix
+     * @return
+     */
+    public static boolean processStoredSetBack(final Player player, final String debugMessagePrefix) {
+        final MovingData data = MovingData.getData(player);
+        if (!data.hasTeleported()) {
+            if (data.debug) {
+                CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "No stored location available.");
+            }
+            return false;
+        }
+        // (teleported is set.).
+        final Location loc = player.getLocation(useLoc);
+        if (data.isTeleportedPosition(loc)) {
+            // Skip redundant teleport.
+            if (data.debug) {
+                CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, player is there, already.");
+            }
+            useLoc.setWorld(null);
+            return false;
+        }
+        useLoc.setWorld(null);
+        // (player is somewhere else.)
+        // TODO: Consider to skip checking for packet level, if not available (plus optimize access).
+        // TODO: Consider a config flag, so this can be turned off (set back method).
+        final PlayerSetBackMethod method = MovingConfig.getConfig(player).playerSetBackMethod;
+        if (method.shouldCancel() || method.shouldSetTo()) {
+            /*
+             * Another leniency option: Skip, if we have already received an
+             * ACK for this position on packet level.
+             */
+            // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
+            final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
+            if (data.isTeleportedPosition(cl)) {
+                if (data.debug) {
+                    CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, having received an ACK for the teleport on packet level.");
+                }
+                return false;
+            }
+        }
+
+        // (No ACK received yet.)
+        final Location teleported = data.getTeleported();
+        // (Data resetting is done during PlayerTeleportEvent handling.)
+        if (player.teleport(teleported, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {
+            return true;
+        }
+        else {
+            if (data .debug) {
+                CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Teleport failed.");
+            }
+            return false;
+        }
     }
 
 }

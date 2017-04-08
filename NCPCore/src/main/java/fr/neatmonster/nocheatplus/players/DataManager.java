@@ -90,7 +90,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
 
     // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting
     /** PlayerData storage. */
-    private final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
+    private final Map<UUID, PlayerData> playerData = new LinkedHashMap<UUID, PlayerData>(100);
 
     /**
      * Access order for playerName (exact) -> ms time of logout.
@@ -671,8 +671,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * @return
      */
     public static PlayerData getPlayerData(final UUID playerId, final String playerName, final boolean create) {
-        final String lcName = playerName.toLowerCase(); // TODO: Store by both lower case and exact case (also store the Player reference).
-        final PlayerData data = instance.playerData.get(lcName);
+        final PlayerData data = instance.playerData.get(playerId);
         if (data != null) {
             return data;
         }
@@ -681,18 +680,30 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
         else {
             final PlayerData newData = new PlayerData(playerId, playerName);
-            instance.playerData.put(lcName, newData);
+            instance.playerData.put(playerId, newData);
             return newData;
         }
     }
 
     /**
      * Get the player data, if present.
+     * 
      * @param playerName
      * @return The PlayerData instance if present, null otherwise.
      */
     public static PlayerData getPlayerData(final String playerName) {
-        return instance.playerData.get(playerName.toLowerCase());
+        final UUID playerId = getUUID(playerName);
+        return playerId == null ? null : instance.playerData.get(playerId);
+    }
+
+    /**
+     * Get the player data, if present.
+     * 
+     * @param playerID
+     * @return The PlayerData instance if present, null otherwise.
+     */
+    public static PlayerData getPlayerData(final UUID playerID) {
+        return instance.playerData.get(playerID);
     }
 
     /**

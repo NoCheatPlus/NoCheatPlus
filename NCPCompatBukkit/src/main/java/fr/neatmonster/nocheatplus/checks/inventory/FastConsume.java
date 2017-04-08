@@ -84,7 +84,7 @@ public class FastConsume extends Check implements Listener, INotifyReload {
         final long time = System.currentTimeMillis();
         if (check(player, event.getItem(), time, data)){
             event.setCancelled(true);
-            DataManager.getPlayerData(player).task.updateInventory();
+            DataManager.getPlayerData(player).requestUpdateInventory();
         }
     }
 
