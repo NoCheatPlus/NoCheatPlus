@@ -438,6 +438,7 @@ public class MovingUtil {
             if (data.debug) {
                 CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, player is there, already.");
             }
+            data.resetTeleported(); // Not necessary to keep.
             useLoc.setWorld(null);
             return false;
         }
@@ -457,6 +458,7 @@ public class MovingUtil {
                 if (data.debug) {
                     CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, having received an ACK for the teleport on packet level.");
                 }
+                // Keep teleported in data. Subject to debug logs and/or discussion.
                 return false;
             }
         }
