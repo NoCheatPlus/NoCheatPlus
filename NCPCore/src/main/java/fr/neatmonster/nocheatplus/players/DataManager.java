@@ -63,6 +63,7 @@ import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
  * Central access point for a lot of functionality for managing data, especially
@@ -90,7 +91,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
 
     // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting
     /** PlayerData storage. */
-    private final Map<UUID, PlayerData> playerData = new LinkedHashMap<UUID, PlayerData>(100);
+    private final HashMapLOW<UUID, PlayerData> playerData = new HashMapLOW<UUID, PlayerData>(100);
 
     /**
      * Access order for playerName (exact) -> ms time of logout.
@@ -164,12 +165,14 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         final Set<CheckDataFactory> factories = new LinkedHashSet<CheckDataFactory>();
         final Set<Entry<String, Long>> entries = lastLogout.entrySet();
         final Iterator<Entry<String, Long>> iterator = entries.iterator();
+        final List<UUID> removeIds = new LinkedList<UUID>();
         while (iterator.hasNext()) {
             final Entry<String, Long> entry = iterator.next();
             final long ts = entry.getValue();
             if (now - ts <= durExpireData) {
                 break;
             }
+            // TODO: LEGACY handling: switch to UUIDs here for sure.
             final String playerName = entry.getKey();
             if (deleteData) {
                 factories.clear();
@@ -183,7 +186,11 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
                     factory.removeData(playerName);
                 }
                 clearComponentData(CheckType.ALL, playerName);
-                playerData.remove(playerName.toLowerCase()); // TODO
+                // TODO: Fetch/use UUID early, and check validity of name.
+                final UUID playerId = getUUID(playerName);
+                if (playerId != null) {
+                    removeIds.add(playerId); // For bulk removal.
+                }
             }
             if (deleteData || deleteHistory) {
                 removeExecutionHistory(CheckType.ALL, playerName);
@@ -192,6 +199,10 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
                 ViolationHistory.removeHistory(playerName);
             }
             iterator.remove();
+        }
+        // Bulk removal of PlayerData.
+        if (!removeIds.isEmpty()) {
+            playerData.remove(removeIds);
         }
     }
 
@@ -436,7 +447,11 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
 
         if (checkType == CheckType.ALL) {
             // TODO: Don't remove PlayerData for online players.
-            instance.playerData.remove(playerName.toLowerCase());
+            // TODO: Fetch/use UUID early, and check validity of name.
+            final UUID playerId = getUUID(playerName);
+            if (playerId != null) {
+                instance.playerData.remove(playerId);
+            }
         }
 
         return had;
