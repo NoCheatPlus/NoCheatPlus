@@ -25,6 +25,8 @@ import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
  */
 public class PlayerTask extends OnDemandTickListener {
 
+    // TODO: Merge with player-specific TickTask logic - (e.g. store playerId-> PlayerTask there).
+    // TODO: Also store the UUID here, prefer.
     // TODO: Consider overriding some logic, because it is used in the main thread only (context: isRegisterd + register).
 
     public final String lcName;
