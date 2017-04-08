@@ -346,7 +346,16 @@ public class MovingConfig extends ACheckConfig {
                         ));
         final PlayerSetBackMethod playerSetBackMethod = PlayerSetBackMethod.fromString(
                 "extern.fromconfig", config.getString(ConfPaths.MOVING_SETBACK_METHOD));
-        this.playerSetBackMethod = playerSetBackMethod.doesThisMakeSense() ? playerSetBackMethod : PlayerSetBackMethod.CAUTIOUS;
+        if (playerSetBackMethod.doesThisMakeSense()) {
+            this.playerSetBackMethod = playerSetBackMethod;
+        }
+        else if (ServerVersion.compareMinecraftVersion("1.9") < 0) {
+            this.playerSetBackMethod = PlayerSetBackMethod.LEGACY;
+        }
+        else {
+            // Latest.
+            this.playerSetBackMethod = PlayerSetBackMethod.CAUTIOUS;
+        }
 
         traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
         traceMaxSize = config.getInt(ConfPaths.MOVING_TRACE_MAXSIZE, 200);
@@ -380,6 +389,7 @@ public class MovingConfig extends ACheckConfig {
             catch (IllegalArgumentException e) {}
         }
 
+        
         // Messages.
         msgKickIllegalMove = ColorUtil.replaceColors(config.getString(ConfPaths.MOVING_MESSAGE_ILLEGALPLAYERMOVE));
         msgKickIllegalVehicleMove = ColorUtil.replaceColors(config.getString(ConfPaths.MOVING_MESSAGE_ILLEGALVEHICLEMOVE));

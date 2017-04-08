@@ -447,7 +447,7 @@ public class MovingUtil {
         // TODO: Consider to skip checking for packet level, if not available (plus optimize access).
         // TODO: Consider a config flag, so this can be turned off (set back method).
         final PlayerSetBackMethod method = MovingConfig.getConfig(player).playerSetBackMethod;
-        if (method.shouldCancel() || method.shouldSetTo()) {
+        if ((method.shouldCancel() || method.shouldSetTo()) && method.shouldUpdateFrom()) {
             /*
              * Another leniency option: Skip, if we have already received an
              * ACK for this position on packet level.
