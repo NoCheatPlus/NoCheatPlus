@@ -1,11 +1,11 @@
 NoCheatPlus
 ---------
-NoCheatPlus is a fork of the famous anti-cheat plugin [NoCheat] (https://dev.bukkit.org/server-mods/nocheat/) created by [Evenprime] (https://github.com/Evenprime). NoCheatPlus attempts to enforce "vanilla Minecraft" mechanics, as well as preventing players from abusing weaknesses in Minecraft or its protocol, making your server more safe. Organized in different sections, various checks are performed to test players doing, covering a wide range including flying and speeding, fighting hacks, fast block breaking and nukers, inventory hacks, chat spam and other types of malicious behaviour. For a more complete list have a look at the always outdated [Features Page] (https://github.com/NoCheatPlus/Docs/wiki/Features).
+NoCheatPlus is a fork of the famous anti-cheat plugin [NoCheat](https://dev.bukkit.org/server-mods/nocheat/) created by [Evenprime](https://github.com/Evenprime). NoCheatPlus attempts to enforce "vanilla Minecraft" mechanics, as well as preventing players from abusing weaknesses in Minecraft or its protocol, making your server more safe. Organized in different sections, various checks are performed to test players doing, covering a wide range including flying and speeding, fighting hacks, fast block breaking and nukers, inventory hacks, chat spam and other types of malicious behaviour. For a more complete list have a look at the always outdated [Features Page](https://github.com/NoCheatPlus/Docs/wiki/Features).
 
 Installation
 ---------
-* Get [CraftBukkit] (http://wiki.bukkit.org/Setting_up_a_server) or [Spigot] (https://www.spigotmc.org/threads/buildtools-updates-information.42865/)
-* Download NoCheatPlus from either [BukkitDev (staff approved)] (https://dev.bukkit.org/server-mods/nocheatplus/files/) or [Jenkins (development versions)] (https://ci.md-5.net/job/NoCheatPlus/).
+* Get [CraftBukkit](http://wiki.bukkit.org/Setting_up_a_server) or [Spigot](https://www.spigotmc.org/threads/buildtools-updates-information.42865/)
+* Download NoCheatPlus from either [BukkitDev (staff approved)](https://dev.bukkit.org/server-mods/nocheatplus/files/) or [Jenkins (development versions)](https://ci.md-5.net/job/NoCheatPlus/).
 * Drop the NoCheatPlus.jar in to your plugins folder.
 * Start your Spigot/CraftBukkit server. (Using /reload can have unwanted side effects with players still online, but also with complex plugins and cross-plugin dependencies, so we don't recommend it. Usually it should work with NCP.)
 
@@ -13,13 +13,13 @@ Tips
 ---------
 * Be sure that your Spigot/CraftBukkit and NoCheatPlus versions match together.
 * Don't use tabs in the config.yml file.
-* Use [ProtocolLib] (https://dev.bukkit.org/bukkit-plugins/protocollib) for full efficiency of the fight checks and other. Using version of ProtocolLib that is supported by NCP is essential, as otherwise some checks will be disabled.
-* For compatibility with other plugins such as mcMMO, citizens and more check out [CompatNoCheatPlus] (https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/).
+* Use [ProtocolLib](https://dev.bukkit.org/bukkit-plugins/protocollib) for full efficiency of the fight checks and other. Using version of ProtocolLib that is supported by NCP is essential, as otherwise some checks will be disabled.
+* For compatibility with other plugins such as mcMMO, citizens and more check out [CompatNoCheatPlus](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/).
 
 Compiling NoCheatPlus
 ---------
 * NoCheatPlus used to be compiled with java 6 compliance (note OpenJDK, possibly we'll switch to 8 directly, once appropriate, e.g. with ProtocolLib dropping support for 7.).
-* We use [Maven] (http://maven.apache.org/download.cgi) 3 to handle the dependencies.
+* We use [Maven](http://maven.apache.org/download.cgi) 3 to handle the dependencies.
 * You can compile with this Maven goal: `mvn clean package`, if you don't want any dedicated CraftBukkit modules, or if you are lacking the jar files - **for best performance  and compatibility, choose the appropriate build profile(s) from below**. If you do have all the legacy dependencies, you can set the parameter `cbdedicated` to `true` and activate the profile `all` adding `-P all` to the maven goals. For more options, see the table below. If your specific needs are not met by the provided options, you can still build only using the compat module(s) that you need, e.g. by adjusting the build/dependency profiles or adding your own profile, which means changing/adding a profile both in the root pom.xml for modules to have and in NCPPlugin/pom.xml for the dependency inclusion. The preset profiles should be enough of a hint for that. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to add the source inclusion to the NoCheatPlus/pom.xml as well.
 * Jar files for the dedicated compat modules, which your local maven repository might be missing, can be installed manually.
 Example for Eclipse with embedded maven:
@@ -56,23 +56,23 @@ Project
 * [NoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/nocheatplus/)
 
 Download
-* [BukkitDev (staff approved)] (https://dev.bukkit.org/server-mods/nocheatplus/files/)
-* [Jenkins (development versions)] (https://ci.md-5.net/job/NoCheatPlus/)
+* [BukkitDev (staff approved)](https://dev.bukkit.org/server-mods/nocheatplus/files/)
+* [Jenkins (development versions)](https://ci.md-5.net/job/NoCheatPlus/)
 
 Support and Documentation
-* [Issues/Tickets] (https://github.com/NoCheatPlus/Issues/issues)
-* [Wiki] (https://github.com/NoCheatPlus/Docs/wiki)
-* [Configuration] (https://github.com/NoCheatPlus/Docs/wiki/Configuration)
-* [Permissions] (https://github.com/NoCheatPlus/Docs/wiki/Permissions)
-* [Commands] (https://github.com/NoCheatPlus/Docs/wiki/Commands)
+* [Issues/Tickets](https://github.com/NoCheatPlus/Issues/issues)
+* [Wiki](https://github.com/NoCheatPlus/Docs/wiki)
+* [Configuration](https://github.com/NoCheatPlus/Docs/wiki/Configuration)
+* [Permissions](https://github.com/NoCheatPlus/Docs/wiki/Permissions)
+* [Commands](https://github.com/NoCheatPlus/Docs/wiki/Commands)
 
 Developers
-* [License (GPLv3)] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
-* [API] (https://github.com/NoCheatPlus/Docs/wiki/API)
-* [Contribute] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
+* [License (GPLv3)](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
+* [API](https://github.com/NoCheatPlus/Docs/wiki/API)
+* [Contribute](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
 
 TODO: BLEEDING REPO
 
 Related
-* [ProtocolLib at BukkitDev] (https://dev.bukkit.org/bukkit-plugins/protocollib)
-* [CompatNoCheatPlus at BukkitDev] (https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
+* [ProtocolLib at BukkitDev](https://dev.bukkit.org/bukkit-plugins/protocollib)
+* [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
