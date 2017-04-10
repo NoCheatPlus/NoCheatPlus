@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.logging.details;
 import java.util.List;
 import java.util.logging.Level;
 
+import fr.neatmonster.nocheatplus.utilities.ds.corw.IQueueRORA;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.QueueRORA;
 
 /**
@@ -25,19 +26,19 @@ import fr.neatmonster.nocheatplus.utilities.ds.corw.QueueRORA;
  *
  */
 public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { // TODO: Name
-    
+
     // TODO: Queues might need a drop policy with thresholds.
     // TODO: Allow multiple tasks for logging, e.g. per file, also thinking of SQL logging. Could pool + round-robin.
-    
+
     /**
      * This queue has to be processed in a task within the primary thread with calling runLogsPrimary.
      */
-    protected final QueueRORA<LogRecord<?>> queuePrimary = new QueueRORA<LogRecord<?>>();
-    protected final QueueRORA<LogRecord<?>> queueAsynchronous = new QueueRORA<LogRecord<?>>();
-    
+    protected final IQueueRORA<LogRecord<?>> queuePrimary = new QueueRORA<LogRecord<?>>();
+    protected final IQueueRORA<LogRecord<?>> queueAsynchronous = new QueueRORA<LogRecord<?>>();
+
     /** Once a queue reaches this size, it will be reduced (loss of content). */
     protected int maxQueueSize = 5000;
-    
+
     /**
      * Task id, -1 means the asynchronous task is not running. Synchronize over
      * queueAsynchronous. Must be maintained.
@@ -48,7 +49,7 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
      * taskAsynchronousID, synchronized over queueAsynchronous.
      */
     protected final Runnable taskAsynchronous = new Runnable() {
-        
+
         @Override
         public void run() {
             // TODO: A more sophisticated System to allow "wake up on burst"?
@@ -86,9 +87,9 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
                 }
             }
         }
-        
+
     };
-    
+
     /**
      * Optional init logger to log errors. Should log to the init stream, no queuing.
      */
@@ -102,16 +103,16 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
             scheduleLog(node, level, content);
         }
     }
-    
+
     protected boolean runLogsPrimary() {
         return runLogs(queuePrimary);
     }
-    
+
     protected boolean runLogsAsynchronous() {
         return runLogs(queueAsynchronous);
     }
-    
-    private boolean runLogs(final QueueRORA<LogRecord<?>> queue) {
+
+    private boolean runLogs(final IQueueRORA<LogRecord<?>> queue) {
         // TODO: Consider allowYield + msYield, calling yield after 5 ms if async.
         final List<LogRecord<?>> records = queue.removeAll();
         if (records.isEmpty()) {
@@ -122,7 +123,7 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
         }
         return true;
     }
-    
+
     @Override
     public void flush(long ms) {
         if (!isPrimaryThread()) {
@@ -130,7 +131,7 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
             throw new IllegalStateException("Must only be called from within the primary thread.");
         }
         // TODO: Note that all streams should be emptied here, except the fallback logger.
-        
+
         // Cancel task.
         synchronized (queueAsynchronous) {
             if (taskAsynchronousID != -1) {
@@ -150,12 +151,12 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
                 // Ignore.
             }
         }
-        
+
         // Log the rest (from here logging should be done via the appropriate direct-only stream).
         runLogsPrimary();
         runLogsAsynchronous();
     }
-    
+
     protected <C> boolean isWithinContext(LogNode<C> node) {
         switch (node.options.callContext) {
             case PRIMARY_THREAD_DIRECT:
@@ -174,7 +175,7 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
                 return false; // Force scheduling.
         }
     }
-    
+
     protected <C> void scheduleLog(LogNode<C> node, Level level, C content) {
         final LogRecord<C> record = new LogRecord<C>(node, level, content); // TODO: parameters.
         switch (node.options.callContext) {
@@ -201,12 +202,12 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
                 throw new IllegalArgumentException("Bad CallContext: " + node.options.callContext);
         }
     }
-    
+
     /**
      * Hard reduce the queue (heavy locking!).
      * @param queue
      */
-    private void reduceQueue(final QueueRORA<LogRecord<?>> queue) {
+    private void reduceQueue(final IQueueRORA<LogRecord<?>> queue) {
         // TODO: Different dropping strategies (drop first, last, alternate).
         final int dropped;
         synchronized (queue) {
@@ -220,17 +221,17 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
         }
         logINIT(Level.WARNING, "Dropped " + dropped + " log entries from the " + (queue == queueAsynchronous ? "asynchronous" : "primary thread") + " queue.");
     }
-    
+
     @Override
     public void setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
     }
-    
+
     @Override
     public void setInitLogger(ContentLogger<String> logger) {
         this.initLogger = logger;
     }
-    
+
     protected void logINIT(final Level level, final String message) {
         if (initLogger != null) {
             initLogger.log(level, message);
@@ -238,9 +239,9 @@ public abstract class AbstractLogNodeDispatcher implements LogNodeDispatcher { /
     }
 
     protected abstract boolean isPrimaryThread();
-    
+
     protected abstract void scheduleAsynchronous();
-    
+
     protected abstract void cancelTask(int taskId);
-    
+
 }

@@ -19,23 +19,18 @@ import java.util.List;
 
 
 /**
- * A replace-on-read-all queue-thing, exchanging the internal list under lock by
- * a new empty one, for a small locking time, so it is not really a typical
- * copy-on-read. All methods use locking, the QueueRORA instance is used for
- * locking.
+ * IQueueRORA implementation using the synchronized keyword for locking, with a
+ * LinkedList inside.
  * 
- * @author dev1mc
+ * @author asofold
  *
+ * @param <E>
  */
-public class QueueRORA<E> {
-    
+public class QueueRORA<E> implements IQueueRORA<E> {
+
     private LinkedList<E> elements = new LinkedList<E>();
-    
-    /**
-     * Add to list (synchronized).
-     * @param element
-     * @return Size of queue after adding.
-     */
+
+    @Override
     public int add(final E element) {
         final int size;
         synchronized (this) {
@@ -44,11 +39,8 @@ public class QueueRORA<E> {
         }
         return size;
     }
-    
-    /**
-     * 
-     * @return An ordinary (linked) List containing all elements. 
-     */
+
+    @Override
     public List<E> removeAll() {
         final List<E> result;
         synchronized (this) {
@@ -57,12 +49,8 @@ public class QueueRORA<E> {
         }
         return result;
     }
-    
-    /**
-     * Remove oldest entries until maxSize is reached.
-     * @param maxSize
-     * @return
-     */
+
+    @Override
     public int reduce(final int maxSize) {
         int dropped = 0;
         synchronized (this) {
@@ -77,15 +65,13 @@ public class QueueRORA<E> {
         }
         return dropped;
     }
-    
+
+    @Override
     public void clear() {
         removeAll();
     }
-    
-    /**
-     * 
-     * @return
-     */
+
+    @Override
     public boolean isEmpty() {
         final boolean isEmpty;
         synchronized (this) {
@@ -93,11 +79,8 @@ public class QueueRORA<E> {
         }
         return isEmpty;
     }
-    
-    /**
-     * 
-     * @return
-     */
+
+    @Override
     public int size() {
         final int size;
         synchronized (this) {
@@ -105,5 +88,5 @@ public class QueueRORA<E> {
         }
         return size;
     }
-    
+
 }
