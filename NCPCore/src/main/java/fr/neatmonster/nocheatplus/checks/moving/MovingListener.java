@@ -1439,7 +1439,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void onCancelledMove(final Player player, final Location from, final int tick, final long now, 
             final MovingData mData, final MovingConfig mCc, final CombinedData data) {
         // Detect our own set back, choice of reference location.
-        if (mData.hasSetBack()) {
+        if (mData.hasTeleported()) {
             final Location ref = mData.getTeleported();
             // Initiate further action depending on settings.
             final PlayerSetBackMethod method = mCc.playerSetBackMethod;
