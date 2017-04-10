@@ -47,10 +47,16 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * Might contain individual settings such as debug flags, exemption,
  * notification settings, task references.
  * 
- * @author mc_dev
+ * @author asofold
  *
  */
 public class PlayerData implements IData {
+
+    /*
+     * TODO: Still consider interfaces, even if this is the only implementation.
+     * E.g. for requesting on-tick action, permission-related, (check-)
+     * data-related.
+     */
 
     /**
      * Interface for TickTask. Uses the UUID for hash and equals, equals accepts
@@ -99,9 +105,13 @@ public class PlayerData implements IData {
 
     }
 
-    // TODO: Prefer this data over an extra structure (PlayerMap)?
-
+    // Default tags.
     public static final String TAG_NOTIFY_OFF = "notify_off";
+
+
+    /////////////
+    // Instance
+    /////////////
 
     /** Not sure this is the future of extra properties. */
     private Set<String> tags = null;
