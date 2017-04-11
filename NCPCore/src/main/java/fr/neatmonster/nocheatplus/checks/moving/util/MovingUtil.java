@@ -63,7 +63,8 @@ public class MovingUtil {
     private static final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
-     * Check if the player is to be checked by the survivalfly check.
+     * Check if the player is to be checked by the survivalfly check.<br>
+     * Primary thread only.
      * 
      * @param player
      * @param fromLoc
@@ -78,7 +79,7 @@ public class MovingUtil {
         return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY, true)
                 && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) || fromLocation.isInLiquid())
                 && (!Bridge1_9.isGlidingWithElytra(player) || fromLocation.isOnGroundOrResetCond())
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);

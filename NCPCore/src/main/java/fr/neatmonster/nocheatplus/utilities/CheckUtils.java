@@ -129,6 +129,8 @@ public class CheckUtils {
     /**
      * Check for exemption by permissions, API access, possibly other. Meant
      * thread-safe.
+     * 
+     * @see #hasBypass(CheckType, Player, ICheckData, boolean)
      *
      * @param checkType
      *            the check type
@@ -141,12 +143,35 @@ public class CheckUtils {
      */
     public static boolean hasBypass(final CheckType checkType, final Player player, final ICheckData data) {
         // TODO: Checking for the thread might be a temporary measure.
+        return hasBypass(checkType, player, data, Bukkit.isPrimaryThread());
+    }
+
+    /**
+     * Check for exemption by permissions, API access, possibly other. Meant
+     * thread-safe.
+     *
+     * @param checkType
+     *            the check type
+     * @param player
+     *            the player
+     * @param data
+     *            If data is null, the data factory will be used for the given
+     *            check type.
+     * @param isPrimaryThread
+     *            If set to true, this must be the primary server thread as
+     *            returned by Bukkit.isPrimaryThread().
+     * @return true, if successful
+     */
+    public static boolean hasBypass(final CheckType checkType, final Player player, final ICheckData data,
+            final boolean isPrimaryThread) {
+        // TODO: Checking for the thread might be a temporary measure.
         final String permission =  checkType.getPermission();
-        if (Bukkit.isPrimaryThread()) {
+        if (isPrimaryThread) {
             if (permission != null && player.hasPermission(permission)) {
                 return true;
             }
-        } else if (permission != null) {
+        }
+        else if (permission != null) {
             if (data == null) {
                 if (checkType.hasCachedPermission(player, permission)) {
                     return true;
@@ -162,7 +187,7 @@ public class CheckUtils {
         }
         // TODO: ExemptionManager relies on the initial definition for which type can be checked off main thread.
         // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
-        return NCPExemptionManager.isExempted(player, checkType);
+        return NCPExemptionManager.isExempted(player, checkType, isPrimaryThread);
     }
 
     /**

@@ -693,7 +693,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
             thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
         }
-        else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
+        else if (cc.creativeFlyCheck 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY, true) 
+                && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
             checkCf = true;
             checkSf = false;
             data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
@@ -799,7 +801,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Redesign to set set backs later (queue + invalidate).
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR 
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE, true) 
                 && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set back locations from the other checks, if needed. 
             newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
@@ -883,7 +885,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Morepackets.
         if (cc.morePacketsCheck && (newTo == null || data.isMorePacketsSetBackOldest())
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS, true) 
                 && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
             /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
             to avoid packet speeding using micro-violations.) */
