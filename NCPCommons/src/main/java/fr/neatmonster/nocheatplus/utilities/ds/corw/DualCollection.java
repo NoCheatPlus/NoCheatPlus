@@ -175,8 +175,10 @@ public abstract class DualCollection<T, C extends Collection<T>> {
             return false;
         }
         else {
+            ;
             lock.lock();
-            final boolean res = asynchronousCollection.contains(element);
+            // (Could be set to null within the primary thread.)
+            final boolean res = asynchronousCollection == null ? false : asynchronousCollection.contains(element);
             lock.unlock();
             return res;
         }
@@ -195,15 +197,17 @@ public abstract class DualCollection<T, C extends Collection<T>> {
      * Primary thread only.
      */
     public void mergePrimaryThread() {
-        if (asynchronousCollection != null) { // Called from the primary thread anyway.
+        if (asynchronousCollection != null) { // Opportunistic.
             lock.lock();
+            // (Can only be set to null within the primary thread.)
             internalMergePrimaryThreadNoLock();
             lock.unlock();
         }
     }
 
     /**
-     * Demands asynchronousCollection to be not null. <br>
+     * Demands asynchronousCollection to be not null, and to be called under
+     * lock. <br>
      * Primary thread only.
      */
     private void internalMergePrimaryThreadNoLock() {
