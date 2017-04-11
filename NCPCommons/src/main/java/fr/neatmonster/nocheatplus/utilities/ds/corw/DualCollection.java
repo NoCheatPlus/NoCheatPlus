@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities.ds.collection;
+package fr.neatmonster.nocheatplus.utilities.ds.corw;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -156,6 +156,27 @@ public abstract class DualCollection<T, C extends Collection<T>> {
                 asynchronousCollection = newCollection();
             }
             final boolean res = asynchronousCollection.addAll(elements);
+            lock.unlock();
+            return res;
+        }
+    }
+
+    /**
+     * Test if the asynchronous collection contains an element, will use
+     * locking, unless the field is set to null. <br>
+     * Thread-safe.
+     * 
+     * @param element
+     * @return
+     */
+    public boolean containsAsynchronous(T element) {
+        if (asynchronousCollection == null) {
+            // Opportunistic.
+            return false;
+        }
+        else {
+            lock.lock();
+            final boolean res = asynchronousCollection.contains(element);
             lock.unlock();
             return res;
         }

@@ -12,32 +12,32 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.utilities.ds.collection;
+package fr.neatmonster.nocheatplus.utilities.ds.corw;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Use LinkedList internally.
+ * Use LinkedHashSet internally.
  * 
  * @author asofold
  *
  * @param <T>
  */
-public class DualList<T> extends DualCollection<T, List<T>> {
+public class DualSet<T> extends DualCollection<T, Set<T>>{
 
-    public DualList() {
+    public DualSet() {
         super();
     }
 
-    public DualList(Lock lock) {
+    public DualSet(Lock lock) {
         super(lock);
     }
 
     @Override
-    protected List<T> newCollection() {
-        return new LinkedList<T>();
+    protected Set<T> newCollection() {
+        return new LinkedHashSet<T>();
     }
 
 }
