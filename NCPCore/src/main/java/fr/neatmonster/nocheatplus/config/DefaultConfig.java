@@ -393,9 +393,9 @@ public class DefaultConfig extends ConfigFile {
         }
         set(ConfPaths.MOVING_CREATIVEFLY_ACTIONS,
                 "log:flyfile:3:5:f cancel"
-                        + "vl>100 log:flyshort:0:5:i log:flyfile:0:5:f cancel"
-                        + "vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
-                        , 1067);
+                        + " vl>100 log:flyshort:0:5:i log:flyfile:0:5:f cancel"
+                        + " vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
+                        , 1080);
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true, 785);
         set(ConfPaths.MOVING_MOREPACKETS_SECONDS, 6, 785);
@@ -432,10 +432,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID, true, 785);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, 
                 "log:flyfile:3:10:f cancel"
-                        + "vl>100 log:flyshort:0:10:i log:flyfile:0:10:f cancel"
-                        + "vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
-                        + "vl>1500 log:flylong:0:5:i log:flyfile:0:5:cf cancel cmd:kickfly"
-                        , 1067);
+                        + " vl>100 log:flyshort:0:10:i log:flyfile:0:10:f cancel"
+                        + " vl>400 log:flylong:0:5:i log:flyfile:0:5:cf cancel"
+                        + " vl>1500 log:flylong:0:5:i log:flyfile:0:5:cf cancel cmd:kickfly"
+                        , 1080);
 
         // sf / hover check.
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true, 785);
