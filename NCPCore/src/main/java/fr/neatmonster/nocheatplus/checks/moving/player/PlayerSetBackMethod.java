@@ -36,20 +36,44 @@ public class PlayerSetBackMethod {
     private static final int UPDATE_FROM = 0x04;
     /** An additional teleport is scheduled for safety. */
     private static final int SCHEDULE = 0x08;
+    /** Do not use workarounds that pose a risk. */
+    private static final int NO_RISK = 0x10;
 
 
     // DEFAULTS
 
+    /**
+     * Pre 1.9 PlayerMoveEvent handling.
+     */
     public static final PlayerSetBackMethod LEGACY = new PlayerSetBackMethod("default.legacy", 
-            SET_TO);
+            SET_TO | NO_RISK); // NO_RISK for future updates, just in case.
+    /**
+     * Option that should work on all supported versions, worse for game-play
+     * experience on pre-1.9, better for post-1.9, not taking additional risks.
+     */
     public static final PlayerSetBackMethod CAUTIOUS = new PlayerSetBackMethod("default.cautious", 
-            CANCEL | UPDATE_FROM | SCHEDULE);
+            CANCEL | UPDATE_FROM | SCHEDULE | NO_RISK);
+    /**
+     * Meant for the latest thing.
+     */
     public static final PlayerSetBackMethod MODERN = new PlayerSetBackMethod("default.modern", 
-            CANCEL | UPDATE_FROM);
+            CANCEL | UPDATE_FROM | SCHEDULE);
 
     public static final PlayerSetBackMethod fromString(String name, String input) {
+        input = input.toLowerCase();
+        // Check for presets.
+        if (input.equals(LEGACY.getId())) {
+            return LEGACY;
+        }
+        else if (input.equals(CAUTIOUS.getId())) {
+            return CAUTIOUS;
+        }
+        else if (input.equals(MODERN.getId())) {
+            return MODERN;
+        }
+        // Parse individual flags.
         // TODO: Perhaps complain for incomplete/wrong content, much later.
-        input = input.toLowerCase().replaceAll("_", "");
+        input = input.replaceAll("_", "");
         int flags = 0;
         if (input.contains("setto")) {
             flags |= SET_TO;
@@ -62,6 +86,9 @@ public class PlayerSetBackMethod {
         }
         if (input.contains("schedule")) {
             flags |= SCHEDULE;
+        }
+        if (input.contains("norisk")) {
+            flags |= NO_RISK;
         }
         return new PlayerSetBackMethod(name, flags);
     }
@@ -104,5 +131,9 @@ public class PlayerSetBackMethod {
     public boolean shouldSchedule() {
         return (flags & SCHEDULE) != 0;
     }
+
+    public boolean shouldNoRisk() {
+        return (flags & NO_RISK) != 0;
+    } 
 
 }

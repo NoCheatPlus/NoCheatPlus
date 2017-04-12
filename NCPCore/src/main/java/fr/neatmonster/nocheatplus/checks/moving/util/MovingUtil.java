@@ -44,6 +44,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -422,7 +423,7 @@ public class MovingUtil {
      * 
      * @param player
      * @param debugMessagePrefix
-     * @return
+     * @return True, if the teleport has been successful.
      */
     public static boolean processStoredSetBack(final Player player, final String debugMessagePrefix) {
         final MovingData data = MovingData.getData(player);
@@ -433,6 +434,7 @@ public class MovingUtil {
             return false;
         }
         // (teleported is set.).
+
         final Location loc = player.getLocation(useLoc);
         if (data.isTeleportedPosition(loc)) {
             // Skip redundant teleport.
@@ -445,26 +447,42 @@ public class MovingUtil {
         }
         useLoc.setWorld(null);
         // (player is somewhere else.)
+
+        // Post-1.9 packet level workaround.
+        final MovingConfig cc = MovingConfig.getConfig(player);
         // TODO: Consider to skip checking for packet level, if not available (plus optimize access).
         // TODO: Consider a config flag, so this can be turned off (set back method).
-        final PlayerSetBackMethod method = MovingConfig.getConfig(player).playerSetBackMethod;
-        if ((method.shouldCancel() || method.shouldSetTo()) && method.shouldUpdateFrom()) {
+        final PlayerSetBackMethod method = cc.playerSetBackMethod;
+        if (!method.shouldNoRisk() 
+                && (method.shouldCancel() || method.shouldSetTo()) && method.shouldUpdateFrom()) {
             /*
-             * Another leniency option: Skip, if we have already received an
-             * ACK for this position on packet level.
+             * Another leniency option: Skip, if we have already received an ACK
+             * for this position on packet level - typically the next move would
+             * confirm the set-back, but a redundant teleport would freeze the
+             * player for a slightly longer time. This could happen with the set
+             * back being at the coordinates the player had just been at, but
+             * between set back and on-tick there has been a micro move (not
+             * firing a PlayerMoveEvent) - similarly observed on a local test
+             * server once, HOWEVER there the micro move had been a look-only
+             * packet, not explaining why the position of the player wasn't
+             * reflecting the outgoing position. So here remains the uncertainty
+             * concerning the question if a (silent) Minecraft entity teleport
+             * always follows a cancelled PlayerMoveEvent (!), and a thinkable
+             * potential for abuse.
              */
             // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
             final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
             if (data.isTeleportedPosition(cl)) {
                 if (data.debug) {
-                    CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, having received an ACK for the teleport on packet level.");
+                    CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, having received an ACK for the teleport on packet level. Player is at: " + LocUtil.simpleFormat(loc));
                 }
                 // Keep teleported in data. Subject to debug logs and/or discussion.
                 return false;
             }
         }
-
         // (No ACK received yet.)
+
+        // Attempt to teleport.
         final Location teleported = data.getTeleported();
         // (Data resetting is done during PlayerTeleportEvent handling.)
         if (player.teleport(teleported, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION)) {

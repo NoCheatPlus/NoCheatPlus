@@ -64,7 +64,10 @@ public class TeleportQueue {
     }
 
     /**
-     * Call for Bukkit events (expect this packet to be sent).
+     * Call for Bukkit events (expect this packet to be sent).<br>
+     * TODO: The method name is misleading, as this also should be called with
+     * expected outgoing packet.
+     * 
      * @param packetData
      */
     public void onTeleportEvent(final double x, final double y, final double z, final float yaw, final float pitch) {

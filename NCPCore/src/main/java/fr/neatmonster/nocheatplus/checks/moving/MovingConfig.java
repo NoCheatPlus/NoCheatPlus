@@ -48,7 +48,8 @@ import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
 /**
- * Configurations specific for the moving checks. Every world gets one of these assigned to it.
+ * Configurations specific for the moving checks. Every world gets one of these
+ * assigned to it.
  */
 public class MovingConfig extends ACheckConfig {
 
@@ -76,8 +77,9 @@ public class MovingConfig extends ACheckConfig {
     }
 
     /**
-     * Gets the configuration for a specified player .
-     * <br>NOTE: Currently only per-world configs are implemented. This method might or might not get removed some day.
+     * Gets the configuration for a specified player . <br>
+     * NOTE: Currently only per-world configs are implemented. This method might
+     * or might not get removed some day.
      * 
      * @param player
      *            the player
@@ -89,7 +91,9 @@ public class MovingConfig extends ACheckConfig {
 
     /**
      * Get a per-world config.
-     * @param worldName Exact case world name.
+     * 
+     * @param worldName
+     *            Exact case world name.
      * @return
      */
     public static MovingConfig getConfig(final String worldName) {
@@ -123,10 +127,16 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList morePacketsActions;
 
     public final boolean    noFallCheck;
-    /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
+    /**
+     * Deal damage instead of Minecraft, whenever a player is judged to be on
+     * ground.
+     */
     public final boolean    noFallDealDamage;
     public final boolean    noFallSkipAllowFlight;
-    /** Reset data on violation, i.e. a player taking fall damage without being on ground. */
+    /**
+     * Reset data on violation, i.e. a player taking fall damage without being
+     * on ground.
+     */
     public final boolean    noFallViolationReset;
     /** Reset data on tp. */
     public final boolean 	noFallTpReset;
@@ -177,7 +187,10 @@ public class MovingConfig extends ACheckConfig {
     // Special tolerance values:
     /** Horizontal buffer (rather sf), after failure leniency. */
     public final double hBufMax;
-    /** Number of moving packets until which a velocity entry must be activated, in order to not be removed.*/
+    /**
+     * Number of moving packets until which a velocity entry must be activated,
+     * in order to not be removed.
+     */
     public final int		velocityActivationCounter;
     /** Server ticks until invalidating queues velocity. */
     public final int		velocityActivationTicks;
@@ -188,7 +201,7 @@ public class MovingConfig extends ACheckConfig {
     // General things.
     /**
      * If to allow splitting moves, due to player.getLocation reflecting
-     * soemthing else than from/to.
+     * something else than from/to.
      */
     public final boolean splitMoves;
     public final boolean ignoreStance;
@@ -347,6 +360,7 @@ public class MovingConfig extends ACheckConfig {
         final PlayerSetBackMethod playerSetBackMethod = PlayerSetBackMethod.fromString(
                 "extern.fromconfig", config.getString(ConfPaths.MOVING_SETBACK_METHOD));
         if (playerSetBackMethod.doesThisMakeSense()) {
+            // (Might info/warn if legacy is used without setTo and without SCHEDULE and similar?)
             this.playerSetBackMethod = playerSetBackMethod;
         }
         else if (ServerVersion.compareMinecraftVersion("1.9") < 0) {
@@ -354,7 +368,7 @@ public class MovingConfig extends ACheckConfig {
         }
         else {
             // Latest.
-            this.playerSetBackMethod = PlayerSetBackMethod.CAUTIOUS;
+            this.playerSetBackMethod = PlayerSetBackMethod.MODERN;
         }
 
         traceMaxAge = config.getInt(ConfPaths.MOVING_TRACE_MAXAGE, 200);
@@ -389,7 +403,7 @@ public class MovingConfig extends ACheckConfig {
             catch (IllegalArgumentException e) {}
         }
 
-        
+
         // Messages.
         msgKickIllegalMove = ColorUtil.replaceColors(config.getString(ConfPaths.MOVING_MESSAGE_ILLEGALPLAYERMOVE));
         msgKickIllegalVehicleMove = ColorUtil.replaceColors(config.getString(ConfPaths.MOVING_MESSAGE_ILLEGALVEHICLEMOVE));

@@ -1705,8 +1705,11 @@ public class SurvivalFly extends Check {
                             || thisMove.headObstructed || lastMove.toIsValid && lastMove.headObstructed && lastMove.yDistance <= 0.0
                             // 1: Hop without y distance increase at moderate h-speed.
                             // TODO: 2nd below: demand next move to jump. Relate to stored past moves. 
+                            // TODO: Ensure the gain can only be used once per so and so.
                             || (cc.sfGroundHop || yDistance == 0.0 && !lastMove.touchedGroundWorkaround && !lastMove.from.onGround)
-                            && hDistanceBaseRef > 0.0 && hDistance / hDistanceBaseRef < 1.35
+                            && hDistanceBaseRef > 0.0 && hDistance / hDistanceBaseRef < 1.5
+                            && (hDistance / lastMove.hDistance < 1.35 
+                                    || hDistance / hDistanceBaseRef < 1.35)
                             )
                     // 0: Ground + jump phase conditions.
                     && (
