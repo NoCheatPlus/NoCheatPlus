@@ -30,6 +30,7 @@ import org.bukkit.plugin.Plugin;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /**
  * Central location for everything that's described in the configuration file(s).<br>
@@ -209,8 +210,7 @@ public class ConfigManager {
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
         final ConfigFile defaultConfig = new DefaultConfig();
-        final int maxBuildContained = Math.max(DefaultConfig.buildNumber, 
-                defaultConfig.getMaxLastChangedBuildNumber());
+        final int maxBuildContained = defaultConfig.getMaxLastChangedBuildNumber();
         // TODO: Detect changes to the configuration (only save back if necessary.).
         PathUtils.processPaths(globalFile, "global config", false);
         final ConfigFile globalConfig = new ConfigFile();
@@ -322,14 +322,10 @@ public class ConfigManager {
         if (buildCreated < 0) {
             return null;
         }
-        final int maxBuildContained = Math.max(DefaultConfig.buildNumber, 
-                globalConfig.getMaxLastChangedBuildNumber());
+        final int maxBuildContained = globalConfig.getMaxLastChangedBuildNumber();
         // Legacy build number comparison.
-        if (buildCreated < DefaultConfig.buildNumber) {
-            // Potentially outdated Configuration.
-            return "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!";
-        }
-        else if (buildCreated > maxBuildContained) {
+        final int currentBuild = BuildParameters.buildNumber;
+        if (currentBuild != Integer.MIN_VALUE && buildCreated > Math.max(maxBuildContained, currentBuild)) {
             // Installed an older version of NCP.
             return "Your configuration seems to be created by a newer plugin version.\n" + "Some settings could have changed, you should regenerate it!";
         }
