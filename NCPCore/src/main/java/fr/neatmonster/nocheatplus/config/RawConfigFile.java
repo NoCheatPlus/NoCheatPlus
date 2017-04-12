@@ -346,8 +346,14 @@ public class RawConfigFile  extends YamlConfiguration {
      * 
      * @param path
      * @param value
+     *            Must be greater than zero.
+     * @throws IllegalArgumentException
+     *             If the value is equal to or smaller than zero.
      */
     public void setLastChangedBuildNumber(String path, int value) {
+        if (value <= 0) {
+            throw new IllegalArgumentException("Build number must be greater than zero. Got " + value + " for path: " + path);
+        }
         lastChangedBuildNumbers.put(path, value);
     }
 
@@ -361,6 +367,22 @@ public class RawConfigFile  extends YamlConfiguration {
      */
     public Map<String, Integer> getLastChangedBuildNumbers() {
         return lastChangedBuildNumbers;
+    }
+
+    /**
+     * Get the maximum of all last-changed-build-number values, stored for
+     * individual paths (default to 0).
+     * 
+     * @return
+     */
+    public int getMaxLastChangedBuildNumber() {
+        int max = 0;
+        for (Integer v : lastChangedBuildNumbers.values()) {
+            if (v != null) {
+                max = Math.max(max, v);
+            }
+        }
+        return max;
     }
 
 }
