@@ -694,9 +694,10 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             return null;
         }
         else {
+            // Creating this should be mostly harmless.
             final PlayerData newData = new PlayerData(playerId, playerName);
-            instance.playerData.put(playerId, newData);
-            return newData;
+            final PlayerData oldData = instance.playerData.putIfAbsent(playerId, newData);
+            return oldData == null ? newData : oldData;
         }
     }
 

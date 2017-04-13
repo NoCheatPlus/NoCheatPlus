@@ -25,8 +25,18 @@ import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
- * Central player data object.
+ * Central player-specific data object.
+ * <ul>
+ * <li>Access to on-tick request functionality.</li>
+ * <li>TBD: Permission cache.</li>
+ * <li>TBD: Check data.</li>
+ * <li>TBD: Exemptions</li>
+ * <li>...</li>
+ * </ul>
  * <hr>
+ * Creating PlayerData must always be thread-safe and fail-safe.
+ * <hr>
+ * OLD javadocs to be cleaned up (...):<br>
  * On the medium run this is intended to carry all data for the player...
  * <li>Checks data objects.</li>
  * <li>Time stamps for logged out players</li>

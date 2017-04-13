@@ -66,14 +66,17 @@ public class HashMapLOW <K, V> {
             this.value = value;
         }
 
+        @Override
         public K getKey() {
             return key;
         }
 
+        @Override
         public V getValue() {
             return value;
         }
 
+        @Override
         public V setValue(V value) {
             final V oldValue = this.value; 
             this.value = value; 
@@ -140,11 +143,15 @@ public class HashMapLOW <K, V> {
 
         /**
          * Called under lock.
+         * 
          * @param key
          * @param value
+         * @param ifAbsent
+         *            If true, an existing non-null (!) value will not be
+         *            overridden.
          * @return
          */
-        V put(final int hashCode, final K key, final V value) {
+        V put(final int hashCode, final K key, final V value, final boolean ifAbsent) {
             int emptyIndex;
             if (size == 0) {
                 emptyIndex = 0;
@@ -173,7 +180,9 @@ public class HashMapLOW <K, V> {
                 }
                 if (oldEntry != null) {
                     final V oldValue = oldEntry.getValue();
-                    oldEntry.setValue(value);
+                    if (oldValue == null || !ifAbsent) {
+                        oldEntry.setValue(value);
+                    }
                     return oldValue;
                 }
             }
@@ -405,7 +414,7 @@ public class HashMapLOW <K, V> {
     // Instance members
     ///////////////////////
 
-    private final Lock lock = new ReentrantLock();
+    private final Lock lock;
 
     /** Intended/expected size. */
     private final int targetSize;
@@ -420,11 +429,21 @@ public class HashMapLOW <K, V> {
     // TODO: Configurable: allow shrink.
 
     /**
-     * 
+     * Initialize with a ReentrantLock.
      * @param targetSize
      *            Expected (average) number of elements in the map.
      */
     public HashMapLOW(int targetSize) {
+        this(new ReentrantLock(), targetSize);
+    }
+
+    /**
+     * Initialize with a certain lock.
+     * @param lock
+     * @param targetSize
+     */
+    public HashMapLOW(Lock lock, int targetSize) {
+        this.lock = lock;
         this.targetSize = targetSize;
         buckets = newBuckets(targetSize);
     }
@@ -502,6 +521,31 @@ public class HashMapLOW <K, V> {
      * @return
      */
     public V put(final K key, final V value) {
+        return put(key, value, false);
+    }
+
+    /**
+     * Immediate put, only if there is no value or a null value set for the key,
+     * under lock.
+     * 
+     * @param key
+     * @param value
+     * @return
+     */
+    public V putIfAbsent(final K key, final V value) {
+        return put(key, value, true);
+    }
+
+    /**
+     * 
+     * @param key
+     * @param value
+     * @param ifAbsent
+     *            If true, an existing non-null (!) value will not be
+     *            overridden.
+     * @return
+     */
+    private final V put(final K key, final V value, final boolean ifAbsent) {
         final int hashCode = getHashCode(key);
         lock.lock();
         final int index = getBucketIndex(hashCode, buckets.length);
@@ -510,7 +554,7 @@ public class HashMapLOW <K, V> {
             bucket = new LHMBucket<K, V>();
             buckets[index] = bucket;
         }
-        final V oldValue = bucket.put(hashCode, key, value);
+        V oldValue = bucket.put(hashCode, key, value, ifAbsent);
         if (oldValue == null) {
             size ++;
             if (size > (int) (loadFactor * (float) buckets.length)) {
