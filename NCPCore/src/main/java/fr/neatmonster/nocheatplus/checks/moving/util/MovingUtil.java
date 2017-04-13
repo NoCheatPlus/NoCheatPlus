@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
@@ -416,7 +417,8 @@ public class MovingUtil {
      * @return
      */
     public static boolean hasScheduledPlayerSetBack(final UUID playerId, final MovingData data) {
-        return data.hasTeleported() && DataManager.getPlayerData(playerId).isPlayerSetBackScheduled();
+        final PlayerData pd = DataManager.getPlayerData(playerId);
+        return pd != null && data.hasTeleported() && pd.isPlayerSetBackScheduled();
     }
 
     /**
