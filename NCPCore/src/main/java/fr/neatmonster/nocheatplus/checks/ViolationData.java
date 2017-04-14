@@ -249,10 +249,30 @@ public class ViolationData implements IViolationInfo, ActionData {
         if (parameterName == null) {
             return "<???>";
         }
+        String value = null;
+        if (parameters != null) {
+            value = parameters.get(parameterName);
+        }
+        if (value == null) {
+            value = getImplicitValue(parameterName);
+        }
+        // If null, return what would have been parsed to get the parameter.
+        return (value == null) ? ("[" + parameterName.getText() + "]") : value;
+    }
+
+    /**
+     * Evaluate parameters that are supported to be fetched, even if no
+     * parameters have been set explicitly.
+     * 
+     * @param parameterName
+     * @return
+     */
+    private String getImplicitValue(final ParameterName parameterName) {
         switch (parameterName) {
             case CHECK:
                 return check.getClass().getSimpleName();
             case HEALTH: {
+                // Not optimal to get dynamically if the ViolationData is created off the primary thread. 
                 String health = getParameterValue(ParameterName.HEALTH);
                 return health == null ? (BridgeHealth.getHealth(player) + "/" + BridgeHealth.getMaxHealth(player)) : health;
             }
@@ -272,14 +292,8 @@ public class ViolationData implements IViolationInfo, ActionData {
                 return world == null ? player.getWorld().getName() : world;
             }
             default:
-                break;
+                return null;
         }
-        if (parameters == null) {
-            // Return what would have been parsed to get the parameter.
-            return "[" + parameterName.getText() + "]";
-        }
-        final String value = parameters.get(parameterName);
-        return(value == null) ? ("[" + parameterName.getText() + "]") : value;
     }
 
     private  String getParameterValue(ParameterName parameterName) {
