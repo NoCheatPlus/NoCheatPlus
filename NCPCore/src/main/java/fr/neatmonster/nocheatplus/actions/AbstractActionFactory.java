@@ -51,11 +51,12 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
      * @param definition
      *            the definition
      * @param permission
-     *            the permission
+     *            The ordinary check bypass permission, which will be extended
+     *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
     public L createActionList(final String definition, final String permission) {
-        final L list = listFactory.getNewActionList(permission);
+        final L list = listFactory.getNewActionList(permission == null ? null : permission + ".silent");
 
         // Do check for null, to allow removing default actions, for better robustness.
         if (definition == null) return list;

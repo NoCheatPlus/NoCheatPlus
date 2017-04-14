@@ -124,7 +124,8 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
     @Override
     public void execute(final ViolationData violationData) {
         // TODO: Consider permission caching or removing the feature? [Besides, check earlier?]
-        if (violationData.player.hasPermission(violationData.getPermissionSilent())) {
+        final String permissionSilent = violationData.getPermissionSilent();
+        if (permissionSilent != null && violationData.player.hasPermission(permissionSilent)) {
             return;
         }
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();

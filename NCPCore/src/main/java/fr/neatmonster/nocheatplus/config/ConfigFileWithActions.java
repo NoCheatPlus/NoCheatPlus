@@ -48,12 +48,14 @@ public abstract class ConfigFileWithActions<D extends ActionData, L extends Abst
     }
 
     /**
-     * A convenience method to get an optimized action list from the configuration.
+     * A convenience method to get an optimized action list from the
+     * configuration.
      * 
      * @param path
      *            the path
      * @param permission
-     *            the permission
+     *            The ordinary check bypass permission, which will be extended
+     *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
     public L getOptimizedActionList(final String path, final String permission)
@@ -62,13 +64,14 @@ public abstract class ConfigFileWithActions<D extends ActionData, L extends Abst
     }
 
     /**
-     * A convenience method to get default action lists from the configuration, without
-     * applying any optimization.
+     * A convenience method to get default action lists from the configuration,
+     * without applying any optimization.
      * 
      * @param path
      *            the path
      * @param permission
-     *            the permission
+     *            The ordinary check bypass permission, which will be extended
+     *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
     public L getDefaultActionList(final String path, final String permission)

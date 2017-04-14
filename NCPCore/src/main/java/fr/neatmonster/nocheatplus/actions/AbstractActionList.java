@@ -27,6 +27,12 @@ public abstract class AbstractActionList<D extends ActionData,  L extends Abstra
 
 
     public static interface ActionListFactory<D extends ActionData,  L extends AbstractActionList<D, L>>{
+        /**
+         * 
+         * @param permissionSilent
+         *            The permission to bypass log actions.
+         * @return
+         */
         public L getNewActionList(String permissionSilent);
     }
 
@@ -48,11 +54,11 @@ public abstract class AbstractActionList<D extends ActionData,  L extends Abstra
      * Instantiates a new action list.
      * 
      * @param permissionSilent
-     *            the permission
+     *            The permission to to bypass logging actions.
      */
     public AbstractActionList(final String permissionSilent, final ActionListFactory<D, L> listFactory) {
         this.listFactory = listFactory;
-        this.permissionSilent = permissionSilent + ".silent";
+        this.permissionSilent = permissionSilent;
     }
 
     /**
