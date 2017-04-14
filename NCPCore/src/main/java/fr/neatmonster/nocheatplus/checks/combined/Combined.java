@@ -16,6 +16,8 @@ package fr.neatmonster.nocheatplus.checks.combined;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 
@@ -55,16 +57,23 @@ public class Combined {
     }
 
     /**
-     * Update the yaw change data.
+     * Update the yaw change data. This will check for exemption and return
+     * true, if the player is exempted from this check.
+     * 
      * @param player
      * @param yaw
      * @param now
      * @param worldName
      * @param data
+     * @return True, if the player was exempted from yawrate. False otherwise.
      */
-    public static final void feedYawRate(final Player player, float yaw, final long now, 
+    public static final boolean feedYawRate(final Player player, float yaw, final long now, 
             final String worldName, final CombinedData data) {
-        // Reset on world change or timeout.
+        // Check for exemption (hack, sort of).
+        if (NCPExemptionManager.isExempted(player, CheckType.COMBINED_YAWRATE)) {
+            resetYawRate(player, yaw, now, true);
+            return true;
+        }
 
         // Ensure the yaw is within bounds.
         if (yaw <= -360f) {
@@ -106,7 +115,7 @@ public class Combined {
             if (Math.abs(data.sumYaw) < stationary) {
                 // Still stationary, keep sum, add nothing.
                 data.yawFreq.update(now);
-                return;
+                return false;
             }
             else {
                 // Reset.
@@ -121,20 +130,26 @@ public class Combined {
         final float dNorm = (float) dAbs / (float) (1 + elapsed);	
 
         data.yawFreq.add(now, dNorm);
+        return false;
     }
 
     /**
-     * This calls feedLastYaw and does nothing but set the freezing time to be used by whatever check.
+     * This calls feedLastYaw and does nothing but set the freezing time to be
+     * used by whatever check.
+     * 
      * @param player
      * @param yaw
      * @param now
      * @param worldName
-     * @return
+     * @return Classic 'cancel' state, i.e. true in case of a violation, false
+     *         otherwise.
      */
     public static final boolean checkYawRate(final Player player, final float yaw, final long now, 
             final String worldName, final CombinedData data) {
 
-        feedYawRate(player, yaw, now, worldName, data);
+        if (feedYawRate(player, yaw, now, worldName, data)) {
+            return false;
+        }
 
         final CombinedConfig cc = CombinedConfig.getConfig(player);
 

@@ -166,6 +166,9 @@ public class CombinedConfig extends ACheckConfig {
                 return bedLeaveCheck;
             case COMBINED_MUNCHHAUSEN:
                 return munchHausenCheck;
+            case COMBINED_YAWRATE:
+                // Always on, depends on other checks.
+                return true;
             default:
                 return false;
         }

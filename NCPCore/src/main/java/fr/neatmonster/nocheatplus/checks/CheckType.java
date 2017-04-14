@@ -82,6 +82,8 @@ public enum CheckType {
     COMBINED_BEDLEAVE(COMBINED, Permissions.COMBINED_BEDLEAVE),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
     COMBINED_MUNCHHAUSEN(COMBINED, Permissions.COMBINED_MUNCHHAUSEN),
+    /** Rather for data removal and exemption. */
+    COMBINED_YAWRATE(COMBINED),
 
     FIGHT(FightConfig.factory, FightData.factory, Permissions.FIGHT),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),
