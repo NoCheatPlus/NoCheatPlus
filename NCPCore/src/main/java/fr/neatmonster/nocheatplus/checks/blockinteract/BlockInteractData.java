@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -37,6 +38,11 @@ public class BlockInteractData extends ACheckData {
         @Override
         public final ICheckData getData(final Player player) {
             return BlockInteractData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return BlockInteractData.playersMap.get(playerName);
         }
 
         @Override

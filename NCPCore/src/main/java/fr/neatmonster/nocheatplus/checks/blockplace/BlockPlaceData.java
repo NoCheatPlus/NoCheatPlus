@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -34,6 +35,11 @@ public class BlockPlaceData extends ACheckData {
         @Override
         public final ICheckData getData(final Player player) {
             return BlockPlaceData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return BlockPlaceData.playersMap.get(playerName);
         }
 
         @Override

@@ -36,12 +36,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
@@ -61,6 +63,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
@@ -317,6 +320,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             }
         }
         for (final CheckDataFactory factory : factories) {
+            // TODO: Support precise removal ?
             factory.removeAllData();
         }
         for (final IRemoveData rmd : instance.iRemoveData) {
@@ -420,6 +424,12 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * @return If any data was present.
      */
     public static boolean removeData(final String playerName, CheckType checkType) {
+
+        final PlayerData pd = getPlayerData(playerName);
+        // TODO: Once working, use the most correct name from PlayerData.
+        final UUID playerId = pd == null ? getUUID(playerName) : pd.playerId;
+
+
         if (checkType == null) {
             checkType = CheckType.ALL;
         }
@@ -439,8 +449,8 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             }
         }
         // Remove data.
-        for (final CheckDataFactory otherFactory : factories) {
-            if (otherFactory.removeData(playerName) != null) {
+        for (final CheckDataFactory factory : factories) {
+            if (removeDataPrecisely(playerId, playerName, checkType, factory)) {
                 had = true;
             }
         }
@@ -448,13 +458,61 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         if (checkType == CheckType.ALL) {
             // TODO: Don't remove PlayerData for online players.
             // TODO: Fetch/use UUID early, and check validity of name.
-            final UUID playerId = getUUID(playerName);
             if (playerId != null) {
                 instance.playerData.remove(playerId);
             }
         }
 
         return had;
+    }
+
+    /**
+     * Attempt to only remove the data, relevant to the given CheckType.
+     * 
+     * @param playerId
+     * @param playerName
+     * @param checkType
+     * @param factory
+     * @return If any data has been removed.
+     */
+    private static boolean removeDataPrecisely(final UUID playerId, final String playerName, 
+            final CheckType checkType, final CheckDataFactory factory) {
+        final ICheckData data = factory.getDataIfPresent(playerId, playerName);
+        if (data == null) {
+            return false;
+        }
+        else {
+            // Attempt precise removal.
+            final boolean debug = data.getDebug();
+            String debugText = "[" + checkType + "] [" + playerName + "] Data removal: " ;
+            boolean res = false;
+            if (data instanceof IRemoveSubCheckData 
+                    && ((IRemoveSubCheckData) data).removeSubCheckData(checkType)) {
+                if (debug) {
+                    debugText += "Removed (sub) check data, keeping the data object.";
+                }
+                res = true;
+            }
+            else {
+                // Just remove.
+                if (factory.removeData(playerName) == null) {
+                    // Is this even possible?
+                    if (debug) {
+                        debugText += "Could not remove data, despite present!";
+                    }
+                }
+                else {
+                    if (debug) {
+                        debugText += "Removed the entire data object.";
+                    }
+                    res = true;
+                }
+            }
+            if (debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, debugText);
+            }
+            return res;
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -34,6 +35,11 @@ public class ChatData extends AsyncCheckData {
         @Override
         public final ICheckData getData(final Player player) {
             return ChatData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return ChatData.playersMap.get(playerName);
         }
 
         @Override

@@ -16,22 +16,30 @@ package fr.neatmonster.nocheatplus.checks.combined;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
-public class CombinedData extends ACheckData {
+public class CombinedData extends ACheckData implements IRemoveSubCheckData {
 
     /** The factory creating data. */
     public static final CheckDataFactory factory = new CheckDataFactory() {
         @Override
         public final ICheckData getData(final Player player) {
             return CombinedData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return CombinedData.playersMap.get(playerName);
         }
 
         @Override
@@ -97,6 +105,30 @@ public class CombinedData extends ACheckData {
 
     public CombinedData(final CombinedConfig config){
         super(config);
+    }
+
+    @Override
+    public boolean removeSubCheckData(final CheckType checkType) {
+        switch(checkType) {
+            // TODO: case COMBINED:
+            case COMBINED_IMPROBABLE:
+                improbableVL = 0;
+                improbableCount.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
+                return true;
+            case COMBINED_YAWRATE:
+                yawFreq.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
+                return true;
+            case COMBINED_BEDLEAVE:
+                bedLeaveVL = 0;
+                wasInBed = false; // wasInBed is probably better kept?
+                return true;
+            case COMBINED_MUNCHHAUSEN:
+                munchHausenVL = 0;
+                return true;
+
+            default:
+                return false;
+        }
     }
 
 }

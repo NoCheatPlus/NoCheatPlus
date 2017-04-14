@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.inventory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,6 +36,11 @@ public class InventoryData extends ACheckData {
         @Override
         public final ICheckData getData(final Player player) {
             return InventoryData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return InventoryData.playersMap.get(playerName);
         }
 
         @Override

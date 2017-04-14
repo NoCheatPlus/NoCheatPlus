@@ -15,12 +15,14 @@
 package fr.neatmonster.nocheatplus.checks.net;
 
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
@@ -48,6 +50,11 @@ public class NetDataFactory implements CheckDataFactory, ICanHandleTimeRunningBa
             dataMap.put(player.getName(), data);
             return data;
         }
+    }
+
+    @Override
+    public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+        return dataMap.get(playerName);
     }
 
     @Override

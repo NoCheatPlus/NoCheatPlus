@@ -14,27 +14,41 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
 
 /**
- * A factory for creating and accessing data.
+ * A factory for creating and accessing data. This design may be outdated, due
+ * to PlayerData soon holding the check data instances and factories becoming
+ * factories again.
  * 
  * @author asofold
  */
 public interface CheckDataFactory extends IRemoveData{
 
     /**
-     * Gets the data of the specified player.
+     * Gets the data of the specified player. Data might get created, if not
+     * present already.
      * 
      * @param player
      *            the player
      * @return the data
      */
-    public ICheckData getData(final Player player);
-    
+    public ICheckData getData(Player player);
+
+    /**
+     * Get data, but don't create if not present.
+     * 
+     * @param playerId
+     * @param playerName
+     * @return The data instance, if present. Null otherwise.
+     */
+    public ICheckData getDataIfPresent(UUID playerId, String playerName);
+
     @Override
-    public ICheckData removeData(final String playerName);
+    public ICheckData removeData(String playerName);
 
 }

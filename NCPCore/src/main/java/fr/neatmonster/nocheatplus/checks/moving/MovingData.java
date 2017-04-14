@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Location;
@@ -28,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.DefaultSetBackStorage;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
@@ -60,12 +62,17 @@ import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 /**
  * Player specific data for the moving checks.
  */
-public class MovingData extends ACheckData {
+public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     public static final class MovingDataFactory implements CheckDataFactory, ICanHandleTimeRunningBackwards {
         @Override
         public final ICheckData getData(final Player player) {
             return MovingData.getData(player);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return MovingData.playersMap.get(playerName);
         }
 
         @Override
@@ -367,6 +374,59 @@ public class MovingData extends ACheckData {
         // A new set of workaround conters.
         ws = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(WRPT.class).getWorkaroundSet(WRPT.WS_MOVING);
 
+    }
+
+    @Override
+    public boolean removeSubCheckData(final CheckType checkType) {
+        // TODO: LocationTrace stays (leniency for other players!).
+        // TODO: Likely more fields left to change.
+        switch (checkType) {
+            /*
+             * TODO: case MOVING: // Remove all in-place (future: data might
+             * stay as long as the player is online).
+             */
+            case MOVING_SURVIVALFLY:
+                survivalFlyVL = 0;
+                clearFlyData();
+                resetSetBack(); // TODO: Not sure this is really best for compatibility.
+                // TODO: other?
+                return true;
+            case MOVING_CREATIVEFLY:
+                creativeFlyVL = 0;
+                clearFlyData();
+                resetSetBack(); // TODO: Not sure this is really best for compatibility.
+                // TODO: other?
+                return true;
+            case MOVING_NOFALL:
+                noFallVL = 0;
+                clearNoFallData();
+                return true;
+            case MOVING_MOREPACKETS:
+                morePacketsVL = 0;
+                clearPlayerMorePacketsData();
+                morePacketsSetback = null;
+                morePacketsSetBackResetTime = 0;
+                return true;
+            case MOVING_PASSABLE:
+                passableVL = 0;
+                return true;
+            case MOVING_VEHICLE:
+                vehicleEnvelopeVL = 0;
+                vehicleMorePacketsVL = 0;
+                clearVehicleData();
+                return true;
+            case MOVING_VEHICLE_ENVELOPE:
+                vehicleEnvelopeVL = 0;
+                vehicleMoves.invalidate();
+                vehicleSetBacks.invalidateAll(); // Also invalidates morepackets set back.
+                return true;
+            case MOVING_VEHICLE_MOREPACKETS:
+                vehicleMorePacketsVL = 0;
+                clearVehicleMorePacketsData();
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**

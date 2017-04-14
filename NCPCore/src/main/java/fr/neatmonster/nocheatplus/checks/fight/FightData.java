@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -25,6 +26,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.access.SubCheckDataFactory;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
@@ -33,7 +35,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 /**
  * Player specific data for the fight checks.
  */
-public class FightData extends ACheckData {
+public class FightData extends ACheckData implements IRemoveSubCheckData {
 
     public static class FightDataFactory implements CheckDataFactory {
 
@@ -47,6 +49,11 @@ public class FightData extends ACheckData {
         }
 
         @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
+            return FightData.playersMap.get(playerName);
+        }
+
+        @Override
         public ICheckData removeData(final String playerName) {
             return FightData.removeData(playerName);
         }
@@ -55,6 +62,7 @@ public class FightData extends ACheckData {
         public void removeAllData() {
             clear();
         }
+
     }
 
 
@@ -66,6 +74,11 @@ public class FightData extends ACheckData {
 
         @Override
         protected FightData getData(String playerName) {
+            return playersMap.get(playerName);
+        }
+
+        @Override
+        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
             return playersMap.get(playerName);
         }
 
@@ -192,7 +205,7 @@ public class FightData extends ACheckData {
     public boolean                 noSwingArmSwung;
 
     // Data of the reach check.
-    public double                  reachMod = 1;
+    public double                  reachMod = 1.0;
 
     // Data of the SelfHit check.
     public ActionFrequency selfHitVL = new ActionFrequency(6, 5000);
@@ -215,6 +228,57 @@ public class FightData extends ACheckData {
         speedBuckets = new ActionFrequency(config.speedBuckets, config.speedBucketDur);
         // Start with full fast-heal buffer.
         fastHealBuffer = config.fastHealBuffer; 
+    }
+
+    @Override
+    public boolean removeSubCheckData(final CheckType checkType) {
+        switch(checkType) {
+            // TODO: case FIGHT: ...
+            case FIGHT_DIRECTION:
+                directionVL = 0;
+                return true;
+            case FIGHT_REACH:
+                reachVL = 0;
+                reachMod = 1.0;
+                return true;
+            case FIGHT_ANGLE:
+                angleVL = 0;
+                angleHits.clear();
+                return true;
+            case FIGHT_SPEED:
+                speedVL = 0;
+                speedBuckets.clear(System.currentTimeMillis());
+                speedShortTermCount = 0;
+                speedShortTermTick = 0;
+                return true;
+            case FIGHT_FASTHEAL:
+                fastHealVL = 0;
+                fastHealRefTime = 0;
+                fastHealBuffer = 0;
+                regainHealthTime = 0;
+                return true;
+            case FIGHT_GODMODE:
+                godModeVL = 0;
+                godModeBuffer = 0;
+                godModeAcc = 0;
+                godModeLastTime = 0;
+                godModeLastAge = 0;
+                lastNoDamageTicks = 0; // Not sure here, possibly a shared thing.
+                // godModeHealth / ...
+                return true;
+            case FIGHT_CRITICAL:
+                criticalVL = 0;
+                return true;
+            case FIGHT_NOSWING:
+                noSwingVL = 0;
+                // Not reset time, for leniency rather.
+                return true;
+            case FIGHT_SELFHIT:
+                selfHitVL.clear(System.currentTimeMillis());
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void onWorldChange() {
