@@ -157,19 +157,21 @@ public class BlockInteractListener extends CheckListener {
             preventUseItem = true;
         }
 
-        // First the reach check.
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)) {
-            cancelled = true;
-        }
+        if (block != null) {
+            // First the reach check.
+            if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)) {
+                cancelled = true;
+            }
 
-        // Second the direction check
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)) {
-            cancelled = true;
-        }
+            // Second the direction check
+            if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)) {
+                cancelled = true;
+            }
 
-        // Ray tracing for freecam use etc.
-        if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)) {
-            cancelled = true;
+            // Ray tracing for freecam use etc.
+            if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)) {
+                cancelled = true;
+            }
         }
 
         // If one of the checks requested to cancel the event, do so.
@@ -244,7 +246,7 @@ public class BlockInteractListener extends CheckListener {
     private void checkEnderPearlRightClickBlock(final Player player, final Block block, 
             final BlockFace face, final PlayerInteractEvent event, 
             final int previousLastTick, final BlockInteractData data) {
-        if (!BlockProperties.isPassable(block.getType())) {
+        if (block == null || !BlockProperties.isPassable(block.getType())) {
             final CombinedConfig ccc = CombinedConfig.getConfig(player);
             if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
                 event.setUseItemInHand(Result.DENY);
@@ -269,11 +271,17 @@ public class BlockInteractListener extends CheckListener {
         builder.append("Interact cancel: " + event.isCancelled());
         builder.append(" (");
         builder.append(tag);
-        builder.append(") block: ");
-        builder.append(block.getWorld().getName() + "/" + LocUtil.simpleFormat(block));
-        builder.append(" type: " + BlockProperties.getId(block.getType()));
-        builder.append(" data: " + BlockProperties.getData(block));
-        builder.append(" face: " + face);
+        if (block == null) {
+            builder.append(") block: null");
+        }
+        else {
+            builder.append(") block: ");
+            builder.append(block.getWorld().getName() + "/" + LocUtil.simpleFormat(block));
+            builder.append(" type: " + BlockProperties.getId(block.getType()));
+            builder.append(" data: " + BlockProperties.getData(block));
+            builder.append(" face: " + face);
+        }
+
         if (data.rateLimitSkip > 0) {
             builder.append(" skipped(rate-limit: " + data.rateLimitSkip);
             data.rateLimitSkip = 0;
