@@ -111,6 +111,8 @@ public class InventoryConfig extends ACheckConfig {
     public final boolean    instantBowCheck;
     public final boolean 	instantBowStrict;
     public final long       instantBowDelay;
+    public final boolean    instantBowImprobableFeedOnly;
+    public final float      instantBowImprobableWeight;
     public final ActionList instantBowActions;
 
     public final boolean    instantEatCheck;
@@ -157,6 +159,8 @@ public class InventoryConfig extends ACheckConfig {
         instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
         instantBowStrict = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_STRICT);
         instantBowDelay = data.getInt(ConfPaths.INVENTORY_INSTANTBOW_DELAY);
+        instantBowImprobableFeedOnly = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_IMPROBABLE_FEEDONLY);
+        instantBowImprobableWeight = (float) data.getDouble(ConfPaths.INVENTORY_INSTANTBOW_IMPROBABLE_WEIGHT);
         instantBowActions = data.getOptimizedActionList(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, Permissions.INVENTORY_INSTANTBOW);
 
         instantEatCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTEAT_CHECK);

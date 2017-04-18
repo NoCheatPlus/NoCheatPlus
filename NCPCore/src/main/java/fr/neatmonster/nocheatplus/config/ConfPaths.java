@@ -542,6 +542,10 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_INSTANTBOW_CHECK               = INVENTORY_INSTANTBOW + "active";
     public static final String  INVENTORY_INSTANTBOW_STRICT              = INVENTORY_INSTANTBOW + "strict";
     public static final String  INVENTORY_INSTANTBOW_DELAY               = INVENTORY_INSTANTBOW + "delay";
+    private static final String INVENTORY_INSTANTBOW_IMPROBABLE          = INVENTORY_INSTANTBOW + "improbable.";
+    public static final String  INVENTORY_INSTANTBOW_IMPROBABLE_FEEDONLY = INVENTORY_INSTANTBOW_IMPROBABLE + "feedonly";
+    public static final String  INVENTORY_INSTANTBOW_IMPROBABLE_WEIGHT   = INVENTORY_INSTANTBOW_IMPROBABLE + "weight";
+
     public static final String  INVENTORY_INSTANTBOW_ACTIONS             = INVENTORY_INSTANTBOW + "actions";
 
     private static final String INVENTORY_INSTANTEAT                     = INVENTORY + "instanteat.";

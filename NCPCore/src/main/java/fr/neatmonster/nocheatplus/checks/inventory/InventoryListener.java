@@ -114,14 +114,20 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                     // No else if with this, could be cancelled due to other checks feeding, does not have actions.
                     event.setCancelled(true);
                 }
+                final InventoryConfig cc = InventoryConfig.getConfig(player);
                 // Still check instantBow, whatever yawrate says.
                 if (instantBow.check(player, event.getForce(), now)) {
                     // The check requested the event to be cancelled.
                     event.setCancelled(true);
                 }
-                else if (Improbable.check(player, 0.6f, now, "inventory.instantbow")) {
-                    // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
-                    event.setCancelled(true);
+                else if (cc.instantBowImprobableWeight > 0.0f) {
+                    if (cc.instantBowImprobableFeedOnly) {
+                        Improbable.feed(player, cc.instantBowImprobableWeight, now);
+                    }
+                    else if (Improbable.check(player, cc.instantBowImprobableWeight, now, "inventory.instantbow")) {
+                        // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
+                        event.setCancelled(true);
+                    }
                 }
                 useLoc.setWorld(null);
             }  

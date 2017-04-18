@@ -339,6 +339,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true, 785);
         set(ConfPaths.INVENTORY_INSTANTBOW_STRICT, true, 785);
         set(ConfPaths.INVENTORY_INSTANTBOW_DELAY, 130, 785);
+        set(ConfPaths.INVENTORY_INSTANTBOW_IMPROBABLE_FEEDONLY, false, 1085);
+        set(ConfPaths.INVENTORY_INSTANTBOW_IMPROBABLE_WEIGHT, 0.6, 1085);
         set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "cancel vl>15 log:instantbow:2:5:if cancel", 785);
 
         set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true, 785);
