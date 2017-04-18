@@ -223,7 +223,7 @@ public class SurvivalFly extends Check {
                 resetFrom = true;
                 tags.add("pastground_from");
             }
-            else if (lastMove.toIsValid && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3) {
+            else if (lastMove.toIsValid) {
                 // Note that to is not on ground either.
                 resetFrom = LostGround.lostGroundStill(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags);
             }
@@ -241,10 +241,20 @@ public class SurvivalFly extends Check {
             // Note: if not setting resetFrom, other places have to check assumeGround...
         }
 
-        if (thisMove.touchedGround && !thisMove.from.onGround && !thisMove.to.onGround) {
-            // Lost ground workaround has just been applied, check resetting of the dirty flag.
-            // TODO: Always/never reset with any ground touched?
-            data.resetVelocityJumpPhase();
+        if (thisMove.touchedGround ) {
+            if (!thisMove.from.onGround && !thisMove.to.onGround) {
+                // Lost ground workaround has just been applied, check resetting of the dirty flag.
+                // TODO: Always/never reset with any ground touched?
+                data.resetVelocityJumpPhase();
+            }
+            else if (!mightBeMultipleMoves && thisMove.from.onGround && !lastMove.touchedGround
+                    && TrigUtil.isSamePosAndLook(thisMove.from, lastMove.to)) {
+                // Ground somehow appeared out of thin air (block place).
+                data.setSetBack(from);
+                if (data.debug) {
+                    debug(player, "Adjust set back on move: from is now on ground.");
+                }
+            }
         }
 
         // Renew the "dirty"-flag (in-air phase affected by velocity).
@@ -600,6 +610,7 @@ public class SurvivalFly extends Check {
         }
         else {
             data.sfJumpPhase ++;
+            // TODO: Void-to-void: Rather handle unified somewhere else (!).
             if (to.getY() < 0.0 && cc.sfSetBackPolicyVoid) {
                 data.setSetBack(to);
             }
@@ -1096,8 +1107,16 @@ public class SurvivalFly extends Check {
                         && yDistance < lastMove.yDistance - 0.001) {
                     // Odd decrease with water.
                 }
-                else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data, cc)) {
+                else if (MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data, cc)) {
                     // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
+                }
+                else if (yDistDiffEx < 0.025 
+                        && Magic.noobJumpsOffTower(yDistance, maxJumpGain, thisMove, lastMove, data)) {
+                    /*
+                     * On (noob) tower up, the second move has a higher distance
+                     * than expected, because the first had been starting
+                     * slightly above the top.
+                     */
                 }
                 else {
                     // Violation.

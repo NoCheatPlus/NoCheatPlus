@@ -132,7 +132,8 @@ public class Magic {
      * @param extraGravity Extra amount to fall faster.
      * @return
      */
-    public static boolean fallingEnvelope(final double yDistance, final double lastYDist, final double lastFrictionVertical, final double extraGravity) {
+    public static boolean fallingEnvelope(final double yDistance, final double lastYDist, 
+            final double lastFrictionVertical, final double extraGravity) {
         if (yDistance >= lastYDist) {
             return false;
         }
@@ -339,4 +340,28 @@ public class Magic {
                 ;
     }
 
+    /**
+     * Jump off the top off a block with the ordinary jumping envelope, however
+     * from a slightly higher position with the initial gain being lower than
+     * typical, but the following move having the y distance as if jumped off
+     * with typical gain.
+     * 
+     * @param yDistance
+     * @param maxJumpGain
+     * @param thisMove
+     * @param lastMove
+     * @param data
+     * @return
+     */
+    public static boolean noobJumpsOffTower(final double yDistance, final double maxJumpGain, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
+        final PlayerMoveData secondPastMove = data.playerMoves.getSecondPastMove();
+        return (data.sfJumpPhase == 1 && lastMove.touchedGroundWorkaround // TODO: Not observed though.
+                || data.sfJumpPhase == 2 && inAir(lastMove)
+                && secondPastMove.valid && secondPastMove.touchedGroundWorkaround
+                )
+                && inAir(thisMove)
+                && lastMove.yDistance < maxJumpGain && lastMove.yDistance > maxJumpGain * 0.67
+                && Magic.fallingEnvelope(yDistance, maxJumpGain, data.lastFrictionVertical, Magic.GRAVITY_SPAN);
+    }
 }

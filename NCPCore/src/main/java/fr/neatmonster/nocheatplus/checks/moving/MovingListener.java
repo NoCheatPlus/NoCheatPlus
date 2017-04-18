@@ -25,12 +25,10 @@ import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -210,65 +208,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Register vehicleChecks.
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(vehicleChecks);
         blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
-    }
-
-    /**
-     * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.
-     * 
-     * It essentially moves the "setbackpoint" to the top of the newly placed block, therefore tricking NoCheatPlus into
-     * thinking the player was already on top of that block and should be allowed to stay there.
-     * 
-     * It also prevent players from placing a block on a liquid (which is impossible without a modified version of
-     * Minecraft).
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onBlockPlace(final BlockPlaceEvent event) {
-        final Player player = event.getPlayer();
-
-        // Ignore players inside a vehicle.
-        if (player.isInsideVehicle())
-            return;
-
-        final org.bukkit.block.Block block = event.getBlock();
-        if (block == null) {
-            return;
-        }
-        final int blockY = block.getY();
-
-        final Material mat = block.getType();
-
-        final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
-        final Location loc = player.getLocation(useLoc);
-        moveInfo.set(player, loc, null, cc.yOnGround);
-        if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
-            aux.returnPlayerMoveInfo(moveInfo);
-            useLoc.setWorld(null);
-            return;
-        }
-        aux.returnPlayerMoveInfo(moveInfo);
-
-        if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) {
-            useLoc.setWorld(null);
-            return;
-        }
-
-
-        if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
-                && Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
-                && loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-                && (MovingUtil.canJumpOffTop(mat) || BlockProperties.isLiquid(mat))) {
-            // The creative fly and/or survival fly check is enabled, the
-            // block was placed below the player and is
-            // solid, so do what we have to do.
-            data.setSetBackY(blockY + 1D);
-            data.sfJumpPhase = 0;
-        }
-        useLoc.setWorld(null);
     }
 
     /**

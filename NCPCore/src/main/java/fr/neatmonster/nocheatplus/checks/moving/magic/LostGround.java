@@ -63,14 +63,14 @@ public class LostGround {
         // TODO: yDistance limit does not seem to be appropriate.
         if (yDistance >= -0.7 && yDistance <= Math.max(cc.sfStepHeight, LiftOffEnvelope.NORMAL.getMaxJumpGain(data.jumpAmplifier) + 0.174)) { // MovingUtil.estimateJumpLiftOff(player, data, 0.174))) {
             // "Mild" Ascending / descending.
-            //Ascending
-            if (yDistance >= 0) {
+            // Ascending
+            if (yDistance >= 0.0) {
                 if (lastMove.toIsValid && lostGroundAscend(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags)) {
                     return true;
                 }
             }
             // Descending.
-            if (yDistance <= 0) {
+            if (yDistance <= 0.0) {
                 if (lostGroundDescend(player, from, to, hDistance, yDistance, sprinting, lastMove, data, cc, tags)) {
                     return true;	
                 }
@@ -121,26 +121,44 @@ public class LostGround {
      */
     private static boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
-        final double setBackYDistance = to.getY() - data.getSetBackY();
+        final double setBackYDistance = from.getY() - data.getSetBackY();
         // Step height related.
         // TODO: Combine / refine preconditions for step height related.
         // TODO: || yDistance <= jump estimate?
         if (yDistance <= cc.sfStepHeight && hDistance <= 1.5) { // hDistance is arbitrary, just to confine.
-            if (setBackYDistance <= Math.max(0.0, 1.3 + 0.2 * data.jumpAmplifier)) {
+            final double setBackYMargin = data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier) - setBackYDistance;
+            if (setBackYMargin >= 0.0) {
                 // Half block step up (definitive).
                 // TODO: && hDistance < 0.5  ~  switch to about 2.2 * baseSpeed once available.
-                if (to.isOnGround()) {
+                if (to.isOnGround() && setBackYMargin >= yDistance) {
                     // TODO: hDistance > 0.0
                     if (lastMove.yDistance < 0.0 || yDistance <= cc.sfStepHeight && from.isOnGround(cc.sfStepHeight - yDistance)) {
                         return applyLostGround(player, from, true, thisMove, data, "step", tags);
                     }
                 }
                 // Noob tower (moving up placing blocks underneath). Rather since 1.9: player jumps off with 0.4 speed but ground within 0.42.
-                // TODO: Confine by actually having placed a block nearby, possibly rather low jumpphase (3, 4).
+                // TODO: Re-test with legacy.
+                // TODO: Confine by actually having placed a block nearby.
+                // TODO: Jump phase can be 6/7 - also confine by typical max jump phase (!)
                 final double maxJumpGain = data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier);
-                if (yDistance > 0.0 && yDistance < maxJumpGain && lastMove.yDistance < 0.0 && maxJumpGain > yDistance 
-                        && Math.abs(lastMove.yDistance) + Magic.GRAVITY_MAX > cc.yOnGround + maxJumpGain - yDistance
-                        && from.isOnGround(cc.yOnGround + maxJumpGain - yDistance)) {
+                if (
+                        maxJumpGain > yDistance 
+                        && (
+                                // Typical: distance to ground + yDistance roughly covers maxJumpGain.
+                                yDistance > 0.0
+                                && lastMove.yDistance < 0.0 // Rather -0.15 or so.
+                                && Math.abs(lastMove.yDistance) + Magic.GRAVITY_MAX + yDistance > cc.yOnGround + maxJumpGain 
+                                && from.isOnGround(0.025)
+                                /*
+                                 * Rather rare: Come to rest above the block.
+                                 * Multiple 0-dist moves with looking packets.
+                                 * Not sure this happens with hdist > 0 at all.
+                                 */
+                                || lastMove.yDistance == 0.0
+                                && noobTowerStillCommon(to, yDistance)
+                                )
+                        ) {
+                    // TODO: Ensure set back is slightly lower, if still on ground.
                     return applyLostGround(player, from, true, thisMove, data, "nbtwr", tags);
                 }
             }
@@ -192,6 +210,19 @@ public class LostGround {
     }
 
     /**
+     * Common conditions for noob tower without y distance taken (likely also no
+     * hdist).
+     * 
+     * @param to
+     * @param yDistance
+     * @return
+     */
+    private static boolean noobTowerStillCommon(final PlayerLocation to, final double yDistance) {
+        // TODO: Block recently placed underneath (xz box with 0.025 down, Direction.NONE).
+        return yDistance < 0.025 && to.getY() - to.getBlockY() < 0.025 && to.isOnGround(0.025);
+    }
+
+    /**
      * Preconditions move dist is 0, not on ground, last h dist > 0, last y dist
      * < 0. Needs last move data.
      * 
@@ -206,12 +237,25 @@ public class LostGround {
      * @param cc
      * @return
      */
-    public static boolean lostGroundStill(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final Collection<String> tags) {
-        if (lastMove.yDistance <= -0.23) {
+    public static boolean lostGroundStill(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final double hDistance, final double yDistance, final boolean sprinting, 
+            final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, 
+            final Collection<String> tags) {
+        if (lastMove.yDistance <= -0.23 && lastMove.hDistance > 0.0 && lastMove.yDistance < -0.3) {
             // TODO: Code duplication with edgeasc5 above.
             if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getBoxMarginHorizontal(), 0.3, data, "asc7", tags, from.getMCAccess())) {
                 return true;
             }
+        }
+        else if ((lastMove.yDistance == 0.0 && lastMove.touchedGround // TODO: && (lastMove.)hDistance == 0.0
+                || lastMove.yDistance < 0.0)
+                && data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier) > yDistance
+                && noobTowerStillCommon(to, yDistance)
+                ) {
+            // TODO: Ensure set back is slightly lower, if still on ground.
+            final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
+            return applyLostGround(player, from, true, thisMove, data, "nbtwr", tags);
         }
         return false;
     }
