@@ -167,7 +167,7 @@ public class Magic {
         // TODO: Elaborate... could have one method to test them all?
         final double frictDist = lastMove.yDistance * friction - minGravity;
         final double off = Math.abs(thisMove.yDistance - frictDist);
-        return off <= maxOff && thisMove.yDistance - lastMove.yDistance <= off * decreaseByOff;
+        return off <= maxOff && Math.abs(thisMove.yDistance - lastMove.yDistance) <= off * decreaseByOff;
     }
 
     /**
