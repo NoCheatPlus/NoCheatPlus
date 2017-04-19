@@ -14,10 +14,13 @@
  */
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Auxiliary methods for dealing with reflection.
@@ -487,6 +490,49 @@ public class ReflectionUtil {
             // Ignore.
         }
         return null;
+    }
+
+    /**
+     * Convenience for debugging: Print fields and methods with types separated
+     * by line breaks. Probably not safe for production use.
+     * 
+     * @param clazz
+     * @return
+     */
+    public static String getClassDescription(final Class<?> clazz) {
+        // TODO: Option to sort by names ?
+        final StringBuilder builder = new StringBuilder(512);
+        builder.append("Class: "); builder.append(clazz);
+        // TODO: superclass, interfaces, generics
+        for (final Field field : clazz.getFields()) {
+            builder.append("\n  ");
+            builder.append(getSimpleMemberModifierDescription(field));
+            builder.append(field.getType().getName());
+            builder.append(' ');
+            builder.append(field.getName());
+
+        }
+        for (final Method method : clazz.getMethods()) {
+            builder.append("\n  ");
+            builder.append(getSimpleMemberModifierDescription(method));
+            builder.append(method.getReturnType().getName());
+            builder.append(' ');
+            builder.append(method.getName());
+            builder.append("(");
+            for (Class<?> type : method.getParameterTypes()) {
+                builder.append(type.getName());
+                builder.append(", ");
+            }
+            builder.append(")");
+        }
+        return builder.toString();
+    }
+
+    private static String getSimpleMemberModifierDescription(final Member member) {
+        final boolean accessible = member instanceof AccessibleObject && ((AccessibleObject) member).isAccessible();
+        final int mod = member.getModifiers();
+        final String out = Modifier.isPublic(mod) ? "(public" : (accessible ? "(accessible" : "( -");
+        return out + (Modifier.isStatic(mod) ? " static) " : ") ");
     }
 
 }
