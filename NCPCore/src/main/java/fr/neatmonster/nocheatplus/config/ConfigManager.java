@@ -15,7 +15,9 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -228,7 +230,7 @@ public class ConfigManager {
                             overrideCreated = true;
                         }
                         if (!overrideCreated && globalConfig.getInt(ConfPaths.CONFIGVERSION_CREATED, 0) >= 0
-                                && ConfigManager.isConfigUpToDate(globalConfig) == null) {
+                                && ConfigManager.isConfigUpToDate(globalConfig, 0) == null) {
                             // Workaround: Update the created build number, to not warn on further changes.
                             overrideCreated = true;
                         }
@@ -307,12 +309,25 @@ public class ConfigManager {
         isInitialized = true;
     }
 
+    @Deprecated
+    public static String isConfigUpToDate(final ConfigFile globalConfig) {
+        return isConfigUpToDate(globalConfig, -1);
+    }
+
     /**
+     * Retrieve a warning string containing information about changed default
+     * configuration values.
      * 
      * @param globalConfig
-     * @return null if everything is fine, a string with a message stating problems otherwise.
+     * @param maxLines
+     *            Maximum number of configuration paths to include in the output
+     *            - note that extra lines will always be included, for
+     *            introduction and in the end some hints. A negative value means
+     *            no limit.
+     * @return null if everything is fine, a string with a message stating
+     *         problems otherwise.
      */
-    public static String isConfigUpToDate(ConfigFile globalConfig) {
+    public static String isConfigUpToDate(final ConfigFile globalConfig, final int maxPaths) {
         Object created_o = globalConfig.get(ConfPaths.CONFIGVERSION_CREATED);
         int buildCreated = -1;
         if (created_o != null && created_o instanceof Integer) {
@@ -322,7 +337,8 @@ public class ConfigManager {
         if (buildCreated < 0) {
             return null;
         }
-        final int maxBuildContained = globalConfig.getMaxLastChangedBuildNumber();
+        final ConfigFile defaultConfig = new DefaultConfig();
+        final int maxBuildContained = defaultConfig.getMaxLastChangedBuildNumber();
         // Legacy build number comparison.
         final int currentBuild = BuildParameters.buildNumber;
         if (currentBuild != Integer.MIN_VALUE && buildCreated > Math.max(maxBuildContained, currentBuild)) {
@@ -331,7 +347,6 @@ public class ConfigManager {
         }
         // So far so good... test individual paths.
         final List<String> problems = new LinkedList<String>();
-        final ConfigFile defaultConfig = new DefaultConfig();
         final Map<String, Integer> lastChangedBuildNumbers = defaultConfig.getLastChangedBuildNumbers();
         // TODO: Consider some behavior for entire nodes ?
         for (final Entry<String, Integer> entry : lastChangedBuildNumbers.entrySet()) {
@@ -343,7 +358,7 @@ public class ConfigManager {
             final String path = entry.getKey();
             final Object defaultValue = defaultConfig.get(path);
             if (defaultValue instanceof ConfigurationSection) {
-                problems.add("Changed with build " + defaultBuild + ", can not handle entire configuration sections yet: " + path);
+                problems.add(path + (maxPaths >= 0 ? "" : (" - Changed with build " + defaultBuild + ", can not handle entire configuration sections yet. ")));
                 continue;
             }
             final Object currentValue = globalConfig.get(path);
@@ -352,14 +367,27 @@ public class ConfigManager {
                 continue;
             }
             if (defaultBuild > buildCreated && !defaultValue.equals(currentValue)) {
-                problems.add("Changed with build " + defaultBuild + ": " + path);
+                problems.add(path + (maxPaths >= 0 ? "" : (" - Changed with build " + defaultBuild + ".")));
                 continue;
             }
         }
         if (!problems.isEmpty()) {
-            problems.add(0, "The following configuration default values have changed:");
-            problems.add("(Remove/update individual values or set configversion.created to " + maxBuildContained + " to ignore all, then reload the configuration with the 'ncp reload' command.)");
-            return StringUtil.join(problems, "\n");
+            Collections.sort(problems); // Sort by path.
+            final List<String> outList;
+            if (maxPaths >= 0 && problems.size() > maxPaths) {
+                outList = new ArrayList<String>(problems.subList(0, maxPaths));
+            }
+            else {
+                outList = problems;
+            }
+            outList.add(0, "The following configuration default values have changed:");
+            if (maxPaths >= 0) {
+                outList.add("-> " + problems.size() + " entries in total, check the log file(s) for a complete list.");
+            }
+            else {
+                outList.add("(Remove/update individual values or set configversion.created to " + maxBuildContained + " to ignore all, then reload the configuration with the 'ncp reload' command.)");
+            }
+            return StringUtil.join(outList, "\n");
         }
         // No errors could be determined (or versions coudl not be determined): ignore.
         return null;

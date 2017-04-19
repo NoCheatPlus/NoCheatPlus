@@ -69,6 +69,7 @@ public abstract class ConfPaths {
     @GlobalConfig // TODO: Per file versions should also be supported.
     public static final String CONFIGVERSION                             = "configversion.";
     public static final String CONFIGVERSION_NOTIFY                      = CONFIGVERSION + "notify";
+    public static final String CONFIGVERSION_NOTIFYMAXPATHS              = CONFIGVERSION + "notifymaxpaths";
     /** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with first save. */
     public static final String CONFIGVERSION_CREATED                     = CONFIGVERSION + "created";
     /** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with each save. */

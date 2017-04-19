@@ -159,8 +159,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Lower case player name to milliseconds point of time of release */
     private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
 
-    /** Configuration problems (likely put to ConfigManager later). */
-    protected String configProblems = null;
+    /** Configuration problems (send to chat). */
+    protected String configProblemsChat = null;
+    /** Configuration problems (send to log files). */
+    protected String configProblemsFile = null;
 
     //    /** Is a new update available? */
     //    private boolean              updateAvailable = false;
@@ -1057,9 +1059,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         logOtherNotes(config);
 
         // Is the version the configuration was created with consistent with the current one?
-        if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
+        if (configProblemsFile != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
             // Could use custom prefix from logging, however ncp should be mentioned then.
-            logManager.warning(Streams.INIT, "" + configProblems);
+            logManager.warning(Streams.INIT, "" + configProblemsFile);
         }
 
         // Care for already online players.
@@ -1193,7 +1195,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * @param config
      */
     private void setInstanceMembers(final ConfigFile config) {
-        configProblems = ConfigManager.isConfigUpToDate(config);
+        configProblemsChat = ConfigManager.isConfigUpToDate(config, config.getInt(ConfPaths.CONFIGVERSION_NOTIFYMAXPATHS));
+        configProblemsFile = configProblemsChat == null ? null : ConfigManager.isConfigUpToDate(config, -1);
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
         clearExemptionsOnJoin = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN);
         clearExemptionsOnLeave = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE);
@@ -1366,9 +1369,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 
             // Inconsistent config version.
-            if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
+            if (configProblemsChat != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
                 // Could use custom prefix from logging, however ncp should be mentioned then.
-                sendMessageOnTick(playerName, ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
+                sendMessageOnTick(playerName, ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblemsChat);
             }
             // Message if notify is turned off.
             if (data.getNotifyOff()) {

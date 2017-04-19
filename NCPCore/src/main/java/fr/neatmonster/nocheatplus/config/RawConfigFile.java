@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.config;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -358,15 +359,15 @@ public class RawConfigFile  extends YamlConfiguration {
     }
 
     /**
-     * Get the entire map of path -> last changed build number.
+     * Get the entire map of path -> last changed build number, unmodifiable.
      * <hr>
      * Note that querying individual paths is not yet supported, as there may be
      * different ways of handling parent/child node relations with this.
      * 
-     * @return
+     * @return An unmodifiable map is returned.
      */
     public Map<String, Integer> getLastChangedBuildNumbers() {
-        return lastChangedBuildNumbers;
+        return Collections.unmodifiableMap(lastChangedBuildNumbers);
     }
 
     /**
@@ -379,7 +380,7 @@ public class RawConfigFile  extends YamlConfiguration {
         int max = 0;
         for (Integer v : lastChangedBuildNumbers.values()) {
             if (v != null) {
-                max = Math.max(max, v);
+                max = Math.max(max, v.intValue());
             }
         }
         return max;

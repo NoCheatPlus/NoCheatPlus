@@ -43,6 +43,7 @@ public class DefaultConfig extends ConfigFile {
 
         // Config version.
         set(ConfPaths.CONFIGVERSION_NOTIFY, true, 785);
+        set(ConfPaths.CONFIGVERSION_NOTIFYMAXPATHS, 5, 1085);
         //        not set(ConfPaths.CONFIGVERSION_CREATED, -1);
         //        not set(ConfPaths.CONFIGVERSION_SAVED, -1);
         set(ConfPaths.LOGGING_ACTIVE, true, 785);
