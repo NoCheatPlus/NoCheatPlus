@@ -15,33 +15,32 @@
 package fr.neatmonster.nocheatplus.components.registry.exception;
 
 /**
- * A registry or a registration item has been locked against changes, but was
- * attempted to be changed.
+ * Registry related exception.
  * 
  * @author asofold
  *
  */
-public class RegistrationLockedException extends RegistryException {
+public class RegistryException extends RuntimeException {
 
-    private static final long serialVersionUID = 3562696047219049040L;
+    private static final long serialVersionUID = 5032539935257628503L;
 
-    public RegistrationLockedException() {
+    public RegistryException() {
         super();
     }
 
-    public RegistrationLockedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public RegistryException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public RegistrationLockedException(String message, Throwable cause) {
+    public RegistryException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RegistrationLockedException(String message) {
+    public RegistryException(String message) {
         super(message);
     }
 
-    public RegistrationLockedException(Throwable cause) {
+    public RegistryException(Throwable cause) {
         super(cause);
     }
 
