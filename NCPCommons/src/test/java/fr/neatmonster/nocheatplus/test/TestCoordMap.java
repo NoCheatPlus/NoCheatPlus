@@ -66,6 +66,9 @@ public class TestCoordMap {
         }
     }
 
+    private final boolean extraTesting = BuildParameters.testLevel > 0;
+    private final int suggestedSamples = extraTesting ? 40000 : 1250;
+
     public int[][] getRandomCoords(int n, int max, Random random) {
         final int [][] coords = new int[n][3];
         for (int i = 0; i < n; i++){
@@ -304,9 +307,7 @@ public class TestCoordMap {
 
         final Random random = new Random(System.nanoTime() - (System.currentTimeMillis() % 2 == 1 ? 37 : 137));
 
-        final boolean e = BuildParameters.testLevel > 0;
-
-        final int n = e ? 40000 : 6000; // Number of coordinates.
+        final int n = suggestedSamples; // Number of coordinates.
         final int max = 800; // Coordinate maximum.
 
         int [][] coords = getUniqueRandomCoords(n, max, random);
@@ -328,9 +329,7 @@ public class TestCoordMap {
 
         final Random random = new Random(System.nanoTime() - (System.currentTimeMillis() % 2 == 1 ? 37 : 137));
 
-        final boolean e = BuildParameters.testLevel > 0;
-
-        final int n = e ? 40000 : 6000; // Number of coordinates.
+        final int n = suggestedSamples; // Number of coordinates.
         final int max = 800; // Coordinate maximum.
 
         // Preparecoordinates.
