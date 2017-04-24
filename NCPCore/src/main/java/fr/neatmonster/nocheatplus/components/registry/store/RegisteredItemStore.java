@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.components.registry.store;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,6 +43,10 @@ public class RegisteredItemStore {
      */
     static class ItemNode <T> implements IGetRegistrationOrder, Comparable<ItemNode<T>> {
 
+        /*
+         * TODO: Looking ahead, should probably rather equal on base of the
+         * stored item (HashSet). Sorting by internalId may use a Comparator.
+         */
         // TODO: implement IGetItem
 
         final RegistrationOrder order;
@@ -78,6 +84,13 @@ public class RegisteredItemStore {
     };
 
     static final class ItemList <T> {
+
+        /*
+         * Looking ahead: Should probably rather use a LinkedHashSet for
+         * itemNodes, for faster removal and contains check. Sorting by
+         * internalId may use a Comparator.
+         */
+
         /** I bit heavy on the tip of the blade, java. */
         private final SortItemNode<T> typedSort = new SortItemNode<T>();
         // TODO: always fetch an array and store as sorted.
@@ -375,6 +388,23 @@ public class RegisteredItemStore {
     }
 
     /**
+     * Unregister each of all given items from all types it had been registered
+     * for.
+     * 
+     * @param items
+     * @return
+     * @throws NullPointerException
+     *             If items or any of the items within items is null.
+     */
+    public boolean unregister(final Collection<Object> items) {
+        boolean had = false;
+        for (final Object item : items) {
+            had |= unregister(item);
+        }
+        return had;
+    }
+
+    /**
      * Test if an item is registered for a given type.
      * 
      * @param type
@@ -427,6 +457,15 @@ public class RegisteredItemStore {
             throw new NullPointerException("Item must not be null.");
         }
         return items.containsKey(item);
+    }
+
+    /**
+     * Retrieve a copy of all registered items.
+     * 
+     * @return
+     */
+    public List<Object> getAllRegisteredItems() {
+        return new ArrayList<Object>(items.keySet());
     }
 
     /**
