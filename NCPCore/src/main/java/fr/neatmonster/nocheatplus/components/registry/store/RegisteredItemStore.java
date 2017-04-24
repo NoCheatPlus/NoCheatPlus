@@ -207,17 +207,17 @@ public class RegisteredItemStore {
             // Better support this to avoid confusion (?).
             order = ((IGetRegistrationOrder) item).getRegistrationOrder();
         }
-        // Check Annotations.
+        // 
         if (order == null) {
+            // Check Annotations.
             RegisterWithOrder annoOrder = item.getClass().getAnnotation(RegisterWithOrder.class);
             if (annoOrder != null) {
                 order = new RegistrationOrder(annoOrder);
             }
-        }
-        // 
-        if (order == null) {
-            // Default order.
-            order = RegistrationOrder.DEFAULT_ORDER;
+            else {
+                // Default order.
+                order = RegistrationOrder.DEFAULT_ORDER;
+            }
         }
         else {
             // Copy what has been found outside, huh.
