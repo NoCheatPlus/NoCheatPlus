@@ -135,6 +135,25 @@ public class RegisteredItemStore {
             return false;
         }
 
+        /**
+         * At your own risk :).
+         * @param item
+         * @return
+         */
+        @SuppressWarnings("unchecked")
+        boolean unregisterObject(final Object item) {
+            return unregister((T) item);
+        }
+
+        boolean isRegisteredObject(final Object item) {
+            for (ItemNode<?> node : itemNodes) {
+                if (item.equals(node.item)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 
     // TODO: Pre-register allowed types ?
@@ -246,14 +265,16 @@ public class RegisteredItemStore {
     }
 
     /**
+     * Unregister the item from the given type. It can still stay registered for
+     * other types.
      * 
      * @param type
      * @param item
-     * @return If something was registered.
+     * @return True, if the item has been removed for this type.
      * @throws NullPointerException
      *             If either of item or type is null.
      */
-    public <T, I extends T> boolean unregister(Class<T> type, I item) {
+    public <T, I extends T> boolean unregister(final Class<T> type, final I item) {
         if (item == null) {
             throw new NullPointerException("Item must not be null.");
         }
@@ -261,9 +282,9 @@ public class RegisteredItemStore {
             throw new NullPointerException("Type must not be null.");
         }
         int count = 0;
-        Set<Class<?>> registeredFor = items.get(item);
+        final Set<Class<?>> registeredFor = items.get(item);
         if (registeredFor != null) {
-            if (registeredFor.remove(item)) {
+            if (registeredFor.remove(type)) {
                 count ++;
                 if (registeredFor.isEmpty()) {
                     items.remove(item);
@@ -271,10 +292,13 @@ public class RegisteredItemStore {
             }
         }
         @SuppressWarnings("unchecked")
-        ItemList<T> itemList = (ItemList<T>) itemListMap.get(type);
+        final ItemList<T> itemList = (ItemList<T>) itemListMap.get(type);
         if (itemList != null) {
             if (itemList.unregister(item)) {
                 count ++;
+                if (itemList.itemNodes.isEmpty()) {
+                    itemListMap.remove(type);
+                }
             }
         }
         // TODO: If count is 1, throw some IllegalRegistryState (extends FatalRegistryException)?
@@ -283,6 +307,126 @@ public class RegisteredItemStore {
          * could make that configurable (constructor or otherwise).
          */
         return count > 0; // Was contained (consistently or not).
+    }
+
+    /**
+     * Unregister item from all types it is registered for.
+     * 
+     * @param type
+     * @param item
+     * @return True, if the item has been removed for this type.
+     * @throws NullPointerException
+     *             If either of item or type is null.
+     */
+    public boolean unregister(final Object item) {
+        if (item == null) {
+            throw new NullPointerException("Item must not be null.");
+        }
+        /*
+         * TODO: ItemNotRegisteredException ? Not certain this is intended -
+         * could make that configurable (constructor or otherwise).
+         */
+        final Set<Class<?>> registeredFor = items.remove(item);
+        if (registeredFor == null) {
+            return false;
+        }
+        // TODO: Track if consistent?
+        for (Class<?> type : registeredFor) {
+            final ItemList<?> itemList = itemListMap.get(type);
+            if (itemList != null) {
+                if (itemList.unregisterObject(item)) {
+                    if (itemList.itemNodes.isEmpty()) {
+                        itemListMap.remove(type);
+                    }
+                }
+            }
+            // TODO: What if null or not contained - throw / notice somehow?
+        }
+        return true; // Was contained (consistently or not).
+    }
+
+    /**
+     * Unregister all items just from this type.
+     * 
+     * @param type
+     * @return
+     * @throws NullPointerException
+     *             If type is null.
+     */
+    public boolean unregister(final Class<?> type) {
+        if (type == null) {
+            throw new NullPointerException("Type must not be null.");
+        }
+        final ItemList<?> itemList = itemListMap.remove(type);
+        if (itemList == null) {
+            return false;
+        }
+        for (ItemNode<?> node : itemList.itemNodes) {
+            final Object item = node.item;
+            final Set<Class<?>> registeredFor = items.get(item);
+            if (registeredFor != null) {
+                registeredFor.remove(type);
+                if (registeredFor.isEmpty()) {
+                    items.remove(item);
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Test if an item is registered for a given type.
+     * 
+     * @param type
+     * @param item
+     * @return
+     * @throws NullPointerException
+     *             If either of item or type is null.
+     */
+    public <T, I extends T> boolean isRegistered(Class<T> type, I item) {
+        if (item == null) {
+            throw new NullPointerException("Item must not be null.");
+        }
+        if (type == null) {
+            throw new NullPointerException("Type must not be null.");
+        }
+        if (items.containsKey(item)) {
+            final ItemList<?> itemList = itemListMap.get(type);
+            return itemList != null && itemList.isRegisteredObject(item);
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Test if anything is registered for this type.
+     * 
+     * @param type
+     * @return
+     * @throws NullPointerException
+     *             If type is null.
+     */
+    public boolean isRegistered(Class<?> type) {
+        if (type == null) {
+            throw new NullPointerException("Type must not be null.");
+        }
+        return itemListMap.containsKey(type);
+    }
+
+    /**
+     * Test if an item is registered at all.
+     * 
+     * @param item
+     * @return
+     * @throws NullPointerException
+     *             If item is null.
+     */
+    public boolean isRegistered(Object item) {
+        if (item == null) {
+            throw new NullPointerException("Item must not be null.");
+        }
+        return items.containsKey(item);
     }
 
     /**
@@ -311,6 +455,12 @@ public class RegisteredItemStore {
         return itemList == null ? new LinkedList<T>() : itemList.getSortedItemsCopyList();
     }
 
-    // TODO: IsRegistered + efficient ?
+    /**
+     * Remove everything.
+     */
+    public void clear() {
+        items.clear();
+        itemListMap.clear();
+    }
 
 }
