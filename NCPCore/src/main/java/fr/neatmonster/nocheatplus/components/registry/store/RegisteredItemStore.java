@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.components.registry.order.IRegisterWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegisterWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.AbstractRegistrationOrderSort;
+import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 
 /**
  * Keep sorted lists of registered (generic) items by type (support
@@ -198,7 +199,9 @@ public class RegisteredItemStore {
             throw new AlreadyRegisteredException("Already registered for type: " + type.getName());
         }
         // Ensure to have a RegistrationOrder instance, copy external ones.
+        // (No merging of information is done here.)
         // TODO: Try/Catch ?
+        // TODO: (Perhaps not ListenerOrder...)
         // Check the most specific interface.
         if (order == null && item instanceof IRegisterWithOrder) {
             order = ((IRegisterWithOrder) item).getRegistrationOrder(type);
@@ -211,8 +214,12 @@ public class RegisteredItemStore {
         if (order == null) {
             // Check Annotations.
             RegisterWithOrder annoOrder = item.getClass().getAnnotation(RegisterWithOrder.class);
+            SetupOrder setupOrder = item.getClass().getAnnotation(SetupOrder.class); // To be deprecated.
             if (annoOrder != null) {
                 order = new RegistrationOrder(annoOrder);
+            }
+            else if (setupOrder != null) {  // To be deprecated.
+                order = new RegistrationOrder(setupOrder);
             }
             else {
                 // Default order.

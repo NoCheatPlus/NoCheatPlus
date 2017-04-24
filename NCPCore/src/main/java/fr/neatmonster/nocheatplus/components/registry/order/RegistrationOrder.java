@@ -479,6 +479,14 @@ public class RegistrationOrder {
     private final String afterTag; // TODO: Set ?
 
     /**
+     * LEGACY support, to be deprecated.
+     * @param bluePrint
+     */
+    public RegistrationOrder(SetupOrder bluePrint) {
+        this(bluePrint.priority());
+    }
+
+    /**
      * 
      * @param bluePrint
      * @throws NumberFormatException, if basePriority can't be parsed.
