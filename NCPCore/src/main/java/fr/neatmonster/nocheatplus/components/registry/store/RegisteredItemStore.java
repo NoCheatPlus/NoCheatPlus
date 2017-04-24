@@ -199,9 +199,6 @@ public class RegisteredItemStore {
         }
         // Ensure to have a RegistrationOrder instance, copy external ones.
         // TODO: Try/Catch ?
-        if (order != null) {
-            order = new RegistrationOrder(order);
-        }
         // Check the most specific interface.
         if (order == null && item instanceof IRegisterWithOrder) {
             order = ((IRegisterWithOrder) item).getRegistrationOrder(type);
@@ -217,10 +214,16 @@ public class RegisteredItemStore {
                 order = new RegistrationOrder(annoOrder);
             }
         }
-        // Default order.
+        // 
         if (order == null) {
+            // Default order.
             order = RegistrationOrder.DEFAULT_ORDER;
         }
+        else {
+            // Copy what has been found outside, huh.
+            order = new RegistrationOrder(order);
+        }
+
         @SuppressWarnings("unchecked")
         ItemList<T> itemList = (ItemList<T>) itemListMap.get(type);
         if (itemList == null) {
