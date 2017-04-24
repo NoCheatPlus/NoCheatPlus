@@ -17,7 +17,9 @@ package fr.neatmonster.nocheatplus.components.registry.order;
 import java.util.Comparator;
 
 /**
- * Utilities for sorting out order.
+ * Utilities for sorting out order. <br>
+ * TODO: DEPRECATE and later remove.
+ * 
  * @author asofold
  *
  */

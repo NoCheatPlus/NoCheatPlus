@@ -21,13 +21,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Priority for order during setup/initialization of something.
- * @author mc_dev
+ * Priority for order during setup/initialization of something. <br>
+ * TODO: DEPRECATE, later remove.
+ * 
+ * @author asofold
  *
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SetupOrder {
-	public int priority() default 0;
+    public int priority() default 0;
 }
