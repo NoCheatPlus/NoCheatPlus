@@ -74,9 +74,10 @@ public class PlayerMoveData extends MoveData {
 
     /**
      * Due to the thresholds for moving events, there could have been other
-     * (micro-) moves by the player which could not be checked.
+     * (micro-) moves by the player which could not be checked. One moving event
+     * is split into two moves 1: from -> loc, 2: loc -> to.
      */
-    public boolean mightBeMultipleMoves;
+    public int multiMoveCount;
 
     /**
      * Just the used vertical velocity. Could be overridden multiple times
@@ -96,7 +97,7 @@ public class PlayerMoveData extends MoveData {
         // Meta stuff.
         flyCheck = CheckType.UNKNOWN;
         modelFlying = null;
-        mightBeMultipleMoves = false;
+        multiMoveCount = 0;
         verVelUsed = null;
         // Super class last, because it'll set valid to true in the end.
         super.resetBase();

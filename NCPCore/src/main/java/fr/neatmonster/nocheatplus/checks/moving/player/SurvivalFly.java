@@ -103,19 +103,21 @@ public class SurvivalFly extends Check {
     }
 
     /**
-     * Checks a player.
      * 
      * @param player
-     *            the player
      * @param from
-     *            the from
      * @param to
-     *            the to
-     * @param isSamePos 
-     * @return the location
+     * @param multiMoveCount
+     *            =: Ordinary, 1/2: first/second of a split move.
+     * @param data
+     * @param cc
+     * @param tick
+     * @param now
+     * @param useBlockChangeTracker
+     * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final boolean mightBeMultipleMoves, final MovingData data, final MovingConfig cc, 
+            final int multiMoveCount, final MovingData data, final MovingConfig cc, 
             final int tick, final long now, final boolean useBlockChangeTracker) {
         tags.clear();
         if (data.debug) {
@@ -247,7 +249,7 @@ public class SurvivalFly extends Check {
                 // TODO: Always/never reset with any ground touched?
                 data.resetVelocityJumpPhase();
             }
-            else if (!mightBeMultipleMoves && thisMove.from.onGround && !lastMove.touchedGround
+            else if (multiMoveCount == 0 && thisMove.from.onGround && !lastMove.touchedGround
                     && TrigUtil.isSamePosAndLook(thisMove.from, lastMove.to)) {
                 // Ground somehow appeared out of thin air (block place).
                 data.setSetBack(from);
@@ -348,7 +350,10 @@ public class SurvivalFly extends Check {
                 else {
                     limitFCMH = 1.0;
                 }
-                if (fcmh > limitFCMH && !data.isVelocityJumpPhase()) { // TODO: Configurable / adjust by medium type.
+                // TODO: Configurable / adjust by medium type.
+                // TODO: Instead of velocityJumpPhase account for friction directly?
+                // TODO: Fly-NoFly + bunny-water transitions pose issues.
+                if (fcmh > limitFCMH && !data.isVelocityJumpPhase()) {
                     hDistanceAboveLimit = hDistance * (fcmh - limitFCMH);
                     tags.add("hacc");
                     // Reset for now.
@@ -444,7 +449,7 @@ public class SurvivalFly extends Check {
             }
         }
         else {
-            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, mightBeMultipleMoves, lastMove, data, cc);
+            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, multiMoveCount, lastMove, data, cc);
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
         }
@@ -978,7 +983,10 @@ public class SurvivalFly extends Check {
      * Core y-distance checks for in-air movement (may include air -> other).
      * @return
      */
-    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, final boolean mightBeMultipleMoves, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double[] vDistAir(final long now, final Player player, final PlayerLocation from, 
+            final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, 
+            final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, 
+            final int multiMoveCount, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;

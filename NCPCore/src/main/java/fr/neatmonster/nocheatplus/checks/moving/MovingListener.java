@@ -428,7 +428,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Fire move from -> to
             // (Special case: Location has not been updated last moving event.)
             moveInfo.set(player, from, to, cc.yOnGround);
-            checkPlayerMove(player, from, to, false, moveInfo, data, cc, event);
+            checkPlayerMove(player, from, to, 0, moveInfo, data, cc, event);
         }
         else {
             // Split into two moves.
@@ -437,7 +437,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 debug(player, "Split move 1 (from -> loc):");
             }
             moveInfo.set(player, from, loc, cc.yOnGround);
-            if (!checkPlayerMove(player, from, loc, true, moveInfo, data, cc, event) && processingEvents.containsKey(player.getName())) {
+            if (!checkPlayerMove(player, from, loc, 1, moveInfo, data, cc, event) && processingEvents.containsKey(player.getName())) {
                 // Between -> set data accordingly (compare: onPlayerMoveMonitor).
                 onMoveMonitorNotCancelled(player, from, loc, System.currentTimeMillis(), TickTask.getTick(), CombinedData.getData(player), data, cc);
                 data.joinOrRespawn = false;
@@ -446,7 +446,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     debug(player, "Split move 2 (loc -> to):");
                 }
                 moveInfo.set(player, loc, to, cc.yOnGround);
-                checkPlayerMove(player, loc, to, false, moveInfo, data, cc, event);
+                checkPlayerMove(player, loc, to, 2, moveInfo, data, cc, event);
             }
         }
         // Cleanup.
@@ -502,7 +502,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param player
      * @param from
      * @param to
-     * @param mightBeMultipleMoves
+     * @param multiMoveCount
+     *            0: An ordinary move, not split. 1/2: first/second of a split
+     *            move.
      * @param moveInfo
      * @param data
      * @param cc
@@ -510,7 +512,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @return If cancelled/done, i.e. not to process further split moves.
      */
     private boolean checkPlayerMove(final Player player, final Location from, final Location to, 
-            final boolean mightBeMultipleMoves, final PlayerMoveInfo moveInfo, final MovingData data, final MovingConfig cc, 
+            final int multiMoveCount, final PlayerMoveInfo moveInfo, final MovingData data, final MovingConfig cc, 
             final PlayerMoveEvent event) {
 
         Location newTo = null;
@@ -606,8 +608,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Set some data for this move.
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         thisMove.set(pFrom, pTo);
-        if (mightBeMultipleMoves) {
-            thisMove.mightBeMultipleMoves = true;
+        if (multiMoveCount > 0) {
+            thisMove.multiMoveCount = multiMoveCount;
         }
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
 
@@ -766,7 +768,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, mightBeMultipleMoves, data, cc, tick, time, useBlockChangeTracker);
+                newTo = survivalFly.check(player, pFrom, pTo, multiMoveCount, data, cc, tick, time, useBlockChangeTracker);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
