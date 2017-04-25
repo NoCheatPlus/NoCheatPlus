@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHash;
 
@@ -79,10 +78,18 @@ public class RegistrationOrder {
             input.addAll(sorted);
         }
 
-        @SuppressWarnings("unchecked")
-        public F[] getSortedArray(Collection<F> input) {
-            // TODO: Make the default sorting thing use an array (!).
-            return (F[]) getSortedLinkedList(input).toArray();
+        /**
+         * Create a new linked list with elements of input in sorted order (from
+         * a sorted array).
+         * 
+         * @param input
+         * @return
+         */
+        public LinkedList<F> getSortedLinkedList(final Collection<F> input) {
+            final F[] arr = getSortedArray(input);
+            final LinkedList<F> out = new LinkedList<F>();
+            Collections.addAll(out, arr);
+            return out;
         }
 
         public final <O extends Collection<F>> O sort(final Collection<F> input, final O output) {
@@ -90,24 +97,33 @@ public class RegistrationOrder {
             return output;
         }
 
-        public LinkedList<F> getSortedLinkedList(final Collection<F> input) {
+        /**
+         * Core sorting method, return an array with all elements of input in
+         * sorted order.
+         * 
+         * @param input
+         * @return
+         */
+        public F[] getSortedArray(final Collection<F> input) {
             /*
              * (Due to the need for a ListIterator, you can't just use a given
              * type that merely extends Collection.)
              */
             // TODO: Implement using an array for output with insertionIndex (less iterators etc).
-            final LinkedList<F> output = new LinkedList<F>();
+            @SuppressWarnings("unchecked")
+            final F[] output = (F[]) new Object[input == null ? 0 : input.size()];
             if (input == null || input.isEmpty()) {
                 return output;
             }
             else if (input.size() == 1) {
-                output.addAll(input);
+                input.toArray(output);
                 return output;
             }
             // Sort into rough groups.
             final LinkedList<F> belowZeroPriority = new LinkedList<F>();
             final LinkedList<F> zeroPriority = new LinkedList<F>();
             final LinkedList<F> aboveZeroPriority = new LinkedList<F>();
+            int insertionIndex = output.length - 1; // Where to start sorting in elements to output.
             for (final F item : input) {
                 final RegistrationOrder order = fetchRegistrationOrder(item);
                 final Integer basePriority = order.getBasePriority();
@@ -122,7 +138,8 @@ public class RegistrationOrder {
                     }
                     else if (order.getAfterTag() != null) {
                         // These will be last in the end, thus add to tempOut directly.
-                        sortInFromStart(output, item);
+                        sortInFromStart(item, output, insertionIndex);
+                        insertionIndex --;
                     }
                     else {
                         /*
@@ -148,16 +165,19 @@ public class RegistrationOrder {
             // Combine lists into output.
             // TODO: Perhaps could use optimized methods for sorting in later on.
             if (!aboveZeroPriority.isEmpty()) {
-                addSortedSubList(aboveZeroPriority, output);
+                addSortedSubList(aboveZeroPriority, output, insertionIndex);
+                insertionIndex -= aboveZeroPriority.size();
             }
             if (!zeroPriority.isEmpty()) {
                 // Still need to sort the roughly pre-grouped items, to match tags.
                 for (final F item : zeroPriority) {
-                    sortInFromStart(output, item);
+                    sortInFromStart(item, output, insertionIndex);
+                    insertionIndex --;
                 }
             }
             if (!belowZeroPriority.isEmpty()) {
-                addSortedSubList(belowZeroPriority, output);
+                addSortedSubList(belowZeroPriority, output, insertionIndex);
+                //insertionIndex -= belowZeroPriority.size();
             }
             return output;
         }
@@ -169,43 +189,28 @@ public class RegistrationOrder {
          * @param subList
          * @param output
          */
-        private void addSortedSubList(final List<F> subList, final List<F> output) {
+        private void addSortedSubList(final List<F> subList, final F[] output, int insertionIndex) {
             Collections.sort(subList, cmp);
             Collections.reverse(subList);
             for (final F item : subList) {
-                sortInFromStart(output, item);
+                sortInFromStart(item, output, insertionIndex);
+                insertionIndex --;
             }
         }
 
-        private void sortInFromStart(final List<F> list, final F item) {
-            // Attempt to get the fast thing first.
-            if (list.isEmpty()) {
-                list.add(item);
-                return;
-            }
+        private void sortInFromStart(F item, final F[] output, final int insertionIndex) {
+            // (The place at insertionIndex should be free.)
             final RegistrationOrder order = fetchRegistrationOrder(item);
-            if (shouldSortBefore(order, fetchRegistrationOrder(list.get(0)))) {
-                list.add(0, item);
-                return;
-            }
-            else {
-                sortInFromSecond(list, item, order);
-            }
-        }
-
-        private void sortInFromSecond(final List<F> list, final F item, final RegistrationOrder order) {
-            final ListIterator<F> it = list.listIterator(1);
-            while (it.hasNext()) {
-                final F otherItem = it.next();
-                final RegistrationOrder other = fetchRegistrationOrder(otherItem);
-                if (shouldSortBefore(order, other)) {
-                    it.previous();
-                    it.add(item);
+            for (int i = insertionIndex; i < output.length; i++) {
+                if (i == output.length - 1 || shouldSortBefore(order, fetchRegistrationOrder(output[i + 1]))) {
+                    output[i] = item;
                     return;
                 }
+                else  {
+                    output[i] = output[i + 1];
+                }
             }
-            // To the end.
-            it.add(item);
+            output[output.length - 1] = item;
         }
 
         /**
