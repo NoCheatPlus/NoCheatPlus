@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.components.registry.store;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,11 +20,11 @@ import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.Ab
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 
 /**
- * Keep sorted lists of registered (generic) items by type (support
+ * Keep sorted arrays of registered (generic) items by type (support
  * RegistrationOrder, IRegisterWithOrder, RegisterWithOrder, possibly
  * other/deprecated). This is an internal registry object, not meant for direct
  * external manipulation. Registering the same instance for several class types
- * is possible. All registered items should differ by equals (!).
+ * is possible. All registered items must differ by equals (!).
  * 
  * @author asofold
  *
@@ -90,31 +91,53 @@ public class RegisteredItemStore {
          * itemNodes, for faster removal and contains check. Sorting by
          * internalId may use a Comparator.
          */
+        /*
+         * TODO: Consider only having sortedItems, doing without
+         * sortedItemNodes. Contra: future registry features, then stored
+         * meta-data.
+         */
 
         /** I bit heavy on the tip of the blade, java. */
         private final SortItemNode<T> typedSort = new SortItemNode<T>();
-        // TODO: always fetch an array and store as sorted.
+        /** Internal bookkeeping: all item nodes in order of registration. */
         private final List<ItemNode<T>> itemNodes = new LinkedList<ItemNode<T>>();
-        private List<ItemNode<T>> sortedItemNodes = null;
+        /** All elements of itemNodes in sorted order, or null - lazy init, keep consistent. */
+        private ItemNode<T>[] sortedItemNodes = null;
+        /** All elements of itemNodes in sorted order, or null - lazy init, keep consistent. */
+        private T[] sortedItems = null;
 
         /**
-         * For lazy sorting.
+         * Force sort, only should be called, if sortedItemNodes is null.
          */
+        @SuppressWarnings("unchecked")
         void sort() {
             // TODO: Might create the typed sort on the fly, instead of storing it ...
-            typedSort.sort(itemNodes);
-            // TODO: extra sorted list (better: array once available), preserves order of registration.
+            sortedItemNodes = typedSort.getSortedArray(itemNodes);
+            sortedItems = (T[]) new Object[sortedItemNodes.length];
+            for (int i = 0; i < sortedItemNodes.length; i++) {
+                sortedItems[i] = sortedItemNodes[i].item;
+            }
+        }
+
+        /**
+         * Invalidate sorted outputs.
+         */
+        void invalidateSorted() {
             sortedItemNodes = null;
+            sortedItems = null;
+        }
+
+        /**
+         * Must not be altered.
+         * @return
+         */
+        T[] getSortedItemsReferenceArray() {
+            return sortedItems;
         }
 
         List<T> getSortedItemsCopyList() {
-            if (sortedItemNodes == null) {
-                sort();
-            }
-            final List<T> out = new LinkedList<T>();
-            for (final ItemNode<T> node : sortedItemNodes) {
-                out.add(node.item);
-            }
+            final LinkedList<T> out = new LinkedList<T>();
+            Collections.addAll(out, sortedItems);
             return out;
         }
 
@@ -126,7 +149,7 @@ public class RegisteredItemStore {
          */
         void register(final RegistrationOrder order, final T item, final int internalCount) {
             itemNodes.add(new ItemNode<T>(order, item, internalCount));
-            sortedItemNodes = null;
+            invalidateSorted();
         }
 
         /**
@@ -140,7 +163,7 @@ public class RegisteredItemStore {
             while (it.hasNext()) {
                 // TODO: equals or ==
                 if (it.next().item.equals(item)) {
-                    sortedItemNodes = null;
+                    invalidateSorted();
                     it.remove();
                     return true;
                 }
@@ -480,7 +503,7 @@ public class RegisteredItemStore {
     }
 
     /**
-     * Get a new list with all registered items (ordered).
+     * Get a new (linked) list with all registered items (ordered).
      * 
      * @param type
      *            The type items are supposed to be registered for.
@@ -492,6 +515,22 @@ public class RegisteredItemStore {
     public <T> List<T> getSortedItemsCopyList(Class<T> type) {
         final ItemList<T> itemList = (ItemList<T>) itemListMap.get(type);
         return itemList == null ? new LinkedList<T>() : itemList.getSortedItemsCopyList();
+    }
+
+    /**
+     * Get the reference of an internally stored array with all items that have
+     * been registered for the given type in sorted order. This would sort the
+     * items first, if the array is not set. It's imperative not to alter the
+     * array, because that would lead to an inconsistent internal state of the
+     * array.
+     * 
+     * @param type
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T[] getSortedItemsReferenceArray(Class<T> type) {
+        final ItemList<T> itemList = (ItemList<T>) itemListMap.get(type);
+        return itemList == null ? null : itemList.getSortedItemsReferenceArray();
     }
 
     /**
