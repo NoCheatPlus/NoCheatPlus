@@ -861,7 +861,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.blockChangeRef.updateFinal(pTo);
         }
 
-        if (newTo == null) {
+        if (newTo == null && !data.hasTeleported()) {
             // Allowed move.
             // Bounce effects.
             if (verticalBounce != BounceType.NO_BOUNCE) {
@@ -882,6 +882,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return false;
         }
         else {
+            if (data.hasTeleported()) {
+                newTo = data.getTeleported();
+            }
             if (data.debug) { // TODO: Remove, if not relevant (doesn't look like it was :p).
                 if (verticalBounce != BounceType.NO_BOUNCE) {
                     debug(player, "Bounce effect not processed: " + verticalBounce);
