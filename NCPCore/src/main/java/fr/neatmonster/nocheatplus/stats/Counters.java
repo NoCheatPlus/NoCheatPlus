@@ -116,6 +116,23 @@ public class Counters {
     }
 
     /**
+     * Convenience: pass state via a boolean.
+     * 
+     * @param id
+     * @param count
+     * @param isPrimaryThread
+     *            Must be correct.
+     */
+    public void add(int id, int count, boolean isPrimaryThread) {
+        if (isPrimaryThread) {
+            ptCounts[id].count ++;
+        }
+        else {
+            addSynchronized(id, count);
+        }
+    }
+
+    /**
      * Only call from the primary thread.
      * 
      * @param id
