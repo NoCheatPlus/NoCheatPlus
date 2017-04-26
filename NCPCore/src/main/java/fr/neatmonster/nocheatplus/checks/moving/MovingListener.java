@@ -861,8 +861,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.blockChangeRef.updateFinal(pTo);
         }
 
-        if (newTo == null && !data.hasTeleported()) {
+        if (newTo == null) {
             // Allowed move.
+            if (data.hasTeleported()) {
+                data.resetTeleported();
+                if (data.debug) {
+                    debug(player, "Ignore hook-induced set-back: actions not set to cancel.");
+                }
+            }
             // Bounce effects.
             if (verticalBounce != BounceType.NO_BOUNCE) {
                 processBounce(player, pFrom.getY(), pTo.getY(), verticalBounce, tick, data, cc);
@@ -883,6 +889,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else {
             if (data.hasTeleported()) {
+                if (data.debug) {
+                    debug(player, "The set back has been overridden from (" + newTo + ") to: " + data.getTeleported());
+                }
                 newTo = data.getTeleported();
             }
             if (data.debug) { // TODO: Remove, if not relevant (doesn't look like it was :p).
