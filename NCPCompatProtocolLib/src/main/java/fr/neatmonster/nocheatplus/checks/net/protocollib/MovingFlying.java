@@ -15,6 +15,8 @@
 package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.bukkit.entity.Player;
@@ -30,11 +32,13 @@ import fr.neatmonster.nocheatplus.checks.net.FlyingFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying.PACKET_CONTENT;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
@@ -70,6 +74,8 @@ public class MovingFlying extends BaseAdapter {
      */
     private long packetMismatch = Long.MIN_VALUE;
     private long packetMismatchLogFrequency = 60000; // Every minute max, good for updating :).
+    
+    private final HashSet<PACKET_CONTENT> validContent = new LinkedHashSet<PACKET_CONTENT>();
 
     public MovingFlying(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
@@ -149,6 +155,8 @@ public class MovingFlying extends BaseAdapter {
                     data.addFlyingQueue(packetData); // TODO: Not the optimal position, perhaps.
                 }
             }
+            // Add as valid packet (exclude invalid coordinates etc. for now).
+            validContent.add(packetData.getSimplifiedContentType());
         }
 
         // TODO: Counters for hasPos, hasLook, both, none.
@@ -260,9 +268,16 @@ public class MovingFlying extends BaseAdapter {
         final long time = Monotonic.synchMillis();
         if (time - packetMismatchLogFrequency > packetMismatch) {
             packetMismatch = time;
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS,
-                    CheckUtils.getLogMessagePrefix(packetEvent.getPlayer(), checkType) 
-                    + "Incoming packet could not be interpreted. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every " + (packetMismatchLogFrequency / 1000) + " seconds, disregarding for which player this happens.");
+            StringBuilder builder = new StringBuilder(512);
+            builder.append(CheckUtils.getLogMessagePrefix(packetEvent.getPlayer(), checkType));
+            builder.append("Incoming packet could not be interpreted. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every ");
+            builder.append(Long.toString(packetMismatch / 1000));
+            builder.append(" seconds, disregarding for which player this happens.");
+            if (!validContent.isEmpty()) {
+                builder.append(" On other occasion, valid content was received for: ");
+                StringUtil.join(validContent, ", ", builder);
+            }
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, builder.toString());
         }
     }
 

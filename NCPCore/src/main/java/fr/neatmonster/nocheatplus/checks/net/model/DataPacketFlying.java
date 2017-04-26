@@ -16,6 +16,22 @@ package fr.neatmonster.nocheatplus.checks.net.model;
 
 public class DataPacketFlying extends DataLocation {
 
+    /**
+     * Simplified packet content type.
+     * @author asofold
+     *
+     */
+    public static enum PACKET_CONTENT {
+        /** Neither position nor look, only ground. */
+        GROUND_ONLY,
+        /** Position and ground. */
+        POS,
+        /** Look and ground. */
+        LOOK,
+        /** Position, look and ground. */
+        POS_LOOK;
+    }
+
     // TODO: Use MAX_VALUE for not set doubles/floats?
     // TODO: Consider private + access methods.
     // TODO: Consider AlmostBoolean for fault tolerance ?
@@ -130,6 +146,11 @@ public class DataPacketFlying extends DataLocation {
 
     public void setSequence(long sequence) {
         this.sequence = sequence;
+    }
+
+    public PACKET_CONTENT getSimplifiedContentType() {
+        return hasPos ? (hasLook ? PACKET_CONTENT.POS_LOOK : PACKET_CONTENT.POS) 
+                : (hasLook ? PACKET_CONTENT.LOOK : PACKET_CONTENT.GROUND_ONLY);
     }
 
 }
