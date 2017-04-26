@@ -72,7 +72,7 @@ public class StringUtil {
         return join(Arrays.asList(input), link);
     }
 
-    public static <O extends Object> String join(Iterator<O> iterator, String link) {
+    public static String join(Iterator<? extends Object> iterator, String link) {
         final StringBuilder builder = new StringBuilder(1024);
         boolean first = true;
         while (iterator.hasNext()) {
@@ -93,9 +93,21 @@ public class StringUtil {
      * @param link
      * @return
      */
-    public static <O extends Object> String join(final Collection<O> input, final String link)
+    public static String join(final Collection<? extends Object> input, final String link)
     {
-        final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
+        return join(input, link, new StringBuilder(Math.max(300, input.size() * 10))).toString();
+    }
+
+    /**
+     * Add joined parts with link.
+     * 
+     * @param input
+     * @param link
+     * @return The given StringBuilder for chaining.
+     */
+    public static StringBuilder join(final Collection<? extends Object> input, final String link,
+            final StringBuilder builder)
+    {
         boolean first = true;
         for (final Object obj : input) {
             if (!first) {
@@ -104,7 +116,7 @@ public class StringUtil {
             builder.append(obj.toString());
             first = false;
         }
-        return builder.toString();
+        return builder;
     }
 
     /**
