@@ -1400,6 +1400,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final PlayerSetBackMethod method = mCc.playerSetBackMethod;
             if (method.shouldUpdateFrom()) {
                 // Attempt to do without a PlayerTeleportEvent as follow up.
+                // TODO: Doing this on MONITOR priority is problematic, despite optimal.
                 LocUtil.set(from, ref);
             }
             if (method.shouldSchedule()) {

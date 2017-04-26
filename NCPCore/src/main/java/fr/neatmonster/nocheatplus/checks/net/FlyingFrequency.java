@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
- * Frequency of (pos/look/) flying packets checking.
+ * Check frequency of (pos/look/) flying packets, disregarding packet content.
  * 
  * @author asofold
  *

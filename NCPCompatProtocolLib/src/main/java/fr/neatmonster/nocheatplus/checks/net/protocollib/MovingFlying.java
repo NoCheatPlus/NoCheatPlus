@@ -58,7 +58,7 @@ public class MovingFlying extends BaseAdapter {
     public static final int indexYaw = 0;
     public static final int indexPitch = 1;
 
-    /** Dummy check for bypass checking and actions execution. */
+    /** Frequency check for flying packets. */
     private final FlyingFrequency flyingFrequency = new FlyingFrequency();
 
     private final int idHandled = counters.registerKey("packet.flying.handled");
@@ -127,7 +127,7 @@ public class MovingFlying extends BaseAdapter {
                 // TODO: extra actions: log and kick (cancel state is not evaluated)
                 event.setCancelled(true);
                 if (data.debug) {
-                    debug(player, "Flying packet with malicious content.");
+                    debug(player, "Incoming packet, cancel due to malicious content: " + packetData.toString());
                 }
                 return;
             }
@@ -155,19 +155,23 @@ public class MovingFlying extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
+        boolean cancel = false;
         if (!skipFlyingFrequency && flyingFrequency.check(player, packetData, time, data, cc)) {
-            event.setCancelled(true);
-            return;
+            cancel = true;
         }
 
         // TODO: Run other checks based on the packet content.
 
         // Cancel redundant packets, when frequency is high anyway.
         // TODO: Recode to detect cheating in a more reliable way, normally this is not the primary thread.
-        //        if (primaryThread && packetData != null && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, packetData, allScore, time, data, cc)) {
+        //        if (!cancel && primaryThread && packetData != null && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, packetData, allScore, time, data, cc)) {
         //            event.setCancelled(true);
         //        }
 
+        // Process cancel and debug log.
+        if (cancel) {
+            event.setCancelled(true);
+        }
         if (data.debug) {
             debug(player, (packetData == null ? "(Incompatible data)" : packetData.toString()) + (event.isCancelled() ? " CANCEL" : ""));
         }
@@ -258,7 +262,7 @@ public class MovingFlying extends BaseAdapter {
             packetMismatch = time;
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS,
                     CheckUtils.getLogMessagePrefix(packetEvent.getPlayer(), checkType) 
-                    + "Could not interpret moving a packet. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every " + (packetMismatchLogFrequency / 1000) + " seconds, disregarding for which player this happens.");
+                    + "Incoming packet could not be interpreted. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every " + (packetMismatchLogFrequency / 1000) + " seconds, disregarding for which player this happens.");
         }
     }
 
