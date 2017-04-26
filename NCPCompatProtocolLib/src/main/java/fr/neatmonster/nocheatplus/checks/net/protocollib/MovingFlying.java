@@ -65,7 +65,7 @@ public class MovingFlying extends BaseAdapter {
     /** Frequency check for flying packets. */
     private final FlyingFrequency flyingFrequency = new FlyingFrequency();
 
-    private final int idHandled = counters.registerKey("packet.flying.handled");
+    private final int idFlying = counters.registerKey("packet.flying");
     private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
 
     /**
@@ -95,6 +95,16 @@ public class MovingFlying extends BaseAdapter {
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
+        final boolean primaryThread = !event.isAsync();
+        if (primaryThread) {
+            counters.addPrimaryThread(idFlying, 1);
+        }
+        if (!primaryThread) {
+            counters.addSynchronized(idFlying, 1);
+            // Count all asynchronous events extra.
+            counters.addSynchronized(idAsyncFlying, 1);
+            // TODO: Detect game phase for the player?
+        }
         final long time =  System.currentTimeMillis();
         final Player player = event.getPlayer();
         if (player == null) {
@@ -111,15 +121,6 @@ public class MovingFlying extends BaseAdapter {
         // TODO: Leniency options too (packet order inversion).
         if (!cc.flyingFrequencyActive) {
             return;
-        }
-
-        counters.add(idHandled, 1);
-
-        final boolean primaryThread = !event.isAsync();
-        if (!primaryThread) {
-            // Count all asynchronous events.
-            counters.addSynchronized(idAsyncFlying, 1);
-            // TODO: Detect game phase for the player and warn if it is PLAY.
         }
 
         // Interpret the packet content.

@@ -197,10 +197,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idMoveHandled = counters.registerKey("event.player.move.handled");
-    private final int idMoveHandledPos = counters.registerKey("event.player.move.handled.pos");
-    private final int idMoveHandledLook = counters.registerKey("event.player.move.handled.look");
-    private final int idMoveHandledPosAndLook = counters.registerKey("event.player.move.handled.pos_look");
+    private final int idMoveEvent = counters.registerKey("event.player.move");
 
 
     public MovingListener() {
@@ -328,6 +325,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerMove(final PlayerMoveEvent event) {
+        counters.add(idMoveEvent, 1);
         final Player player = event.getPlayer();
 
         // Store the event for monitor level checks.
@@ -356,32 +354,39 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Early return checks (no full processing).
         final boolean earlyReturn;
+        final String token;
         if (player.isInsideVehicle()) {
             // No full processing for players in vehicles.
             newTo = vehicleChecks.onPlayerMoveVehicle(player, from, to, data);
             earlyReturn = true;
+            token = "vehicle";
         }
-        else if (player.isDead() || player.isSleeping()) {
+        else if (player.isDead()) {
             // Ignore dead players.
             data.sfHoverTicks = -1;
             earlyReturn = true;
+            token = "dead";
         }
         else if (player.isSleeping()) {
             // Ignore sleeping playerrs.
             // TODO: sleeping: (which cb!) debug(player, "isSleepingIgnored=" + player.isSleepingIgnored());
             data.sfHoverTicks = -1;
             earlyReturn = true;
+            token = "sleeping";
         }
         else if (!from.getWorld().equals(to.getWorld())) {
             // Keep hover ticks.
             // Ignore changing worlds.
             earlyReturn = true;
+            token = "worldchange";
         }
         else if (data.hasTeleported()) {
             earlyReturn = handleTeleportedOnMove(player, event, data, cc);
+            token = "awaitsetback";
         }
         else {
             earlyReturn = false;
+            token = null;
         }
 
         // TODO: Might log base parts here (+extras).
@@ -389,7 +394,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Remove player from enforceLocation ?
             // TODO: Log "early return: " + tags.
             if (data.debug) {
-                debug(player, "Early return on PlayerMoveEvent: from: " + from + " , to: " + to);
+                debug(player, "Early return" + (token == null ? "" : (" (" + token + ")")) +  " on PlayerMoveEvent: from: " + from + " , to: " + to);
             }
             if (newTo != null) {
                 // Illegal Yaw/Pitch.
@@ -531,29 +536,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 !cc.ignoreStance && (moveInfo.from.hasIllegalStance() || moveInfo.to.hasIllegalStance())) {
             MovingUtil.handleIllegalMove(event, player, data, cc);
             return true;
-        }
-
-        { // TODO: Consider to remove ?
-            // Debugging statistics, rather light weight.
-            final boolean hasPos = !moveInfo.from.isSamePos(moveInfo.to);
-            final boolean hasLook = from.getYaw() != to.getYaw() || from.getPitch() != to.getPitch();
-            counters.addPrimaryThread(idMoveHandled, 1);
-            final int counterId;
-            if (hasPos && hasLook) {
-                counterId = idMoveHandledPosAndLook;
-            }
-            else if (hasPos) {
-                counterId = idMoveHandledPos;
-            }
-            else if (hasLook) {
-                counterId = idMoveHandledLook;
-            }
-            else {
-                counterId = -1;
-            }
-            if (counterId != -1) {
-                counters.addPrimaryThread(counterId, 1);
-            }
         }
 
         final String playerName = player.getName(); // TODO: Could switch to UUID here (needs more changes).
