@@ -33,6 +33,8 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 
 /**
@@ -62,8 +64,12 @@ public class MovingFlying extends BaseAdapter {
     private final int idHandled = counters.registerKey("packet.flying.handled");
     private final int idAsyncFlying = counters.registerKey("packet.flying.asynchronous");
 
-    /** Set to true, if a packet can't be interpreted, assuming compatibility to be broken. */
-    private boolean packetMismatch = false;
+    /**
+     * If a packet can't be parsed, this time stamp is set for occasional
+     * logging.
+     */
+    private long packetMismatch = Long.MIN_VALUE;
+    private long packetMismatchLogFrequency = 60000; // Every minute max, good for updating :).
 
     public MovingFlying(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
@@ -111,14 +117,14 @@ public class MovingFlying extends BaseAdapter {
         }
 
         // Interpret the packet content.
-        final DataPacketFlying packetData = packetMismatch ? null : interpretPacket(event, time);
+        final DataPacketFlying packetData = interpretPacket(event, time);
 
         // Early return tests, if the packet can be interpreted.
         boolean skipFlyingFrequency = false;
         if (packetData != null) {
             // Prevent processing packets with obviously malicious content.
             if (isInvalidContent(packetData)) {
-                // TODO: More specific, log and kick or log once [/limited] ?
+                // TODO: extra actions: log and kick (cancel state is not evaluated)
                 event.setCancelled(true);
                 if (data.debug) {
                     debug(player, "Flying packet with malicious content.");
@@ -158,7 +164,7 @@ public class MovingFlying extends BaseAdapter {
 
         // Cancel redundant packets, when frequency is high anyway.
         // TODO: Recode to detect cheating in a more reliable way, normally this is not the primary thread.
-        //        if (primaryThread && !packetMismatch && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, packetData, allScore, time, data, cc)) {
+        //        if (primaryThread && packetData != null && cc.flyingFrequencyRedundantActive && checkRedundantPackets(player, packetData, allScore, time, data, cc)) {
         //            event.setCancelled(true);
         //        }
 
@@ -193,7 +199,7 @@ public class MovingFlying extends BaseAdapter {
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
         if (booleans.size() != 3) {
-            packetMismatch();
+            packetMismatch(event);
             return null;
         }
         final boolean onGround = booleans.get(MovingFlying.indexOnGround).booleanValue();
@@ -210,7 +216,7 @@ public class MovingFlying extends BaseAdapter {
             doubles = packet.getDoubles().getValues();
             if (doubles.size() != 3 && doubles.size() != 4) {
                 // 3: 1.8, 4: 1.7.10 and before (stance).
-                packetMismatch();
+                packetMismatch(event);
                 return null;
             }
             // TODO: before 1.8: stance (should make possible to reject in isInvalidContent).
@@ -222,7 +228,7 @@ public class MovingFlying extends BaseAdapter {
         if (hasLook) {
             floats = packet.getFloat().getValues();
             if (floats.size() != 2) {
-                packetMismatch();
+                packetMismatch(event);
                 return null;
             }
         }
@@ -246,9 +252,14 @@ public class MovingFlying extends BaseAdapter {
     /**
      * Log warning to console, stop interpreting packet content.
      */
-    private void packetMismatch() {
-        packetMismatch = true;
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Data mismatch: disable interpretation of flying packets.");
+    private void packetMismatch(final PacketEvent packetEvent) {
+        final long time = Monotonic.synchMillis();
+        if (time - packetMismatchLogFrequency > packetMismatch) {
+            packetMismatch = time;
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS,
+                    CheckUtils.getLogMessagePrefix(packetEvent.getPlayer(), checkType) 
+                    + "Could not interpret moving a packet. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every " + (packetMismatchLogFrequency / 1000) + " seconds, disregarding for which player this happens.");
+        }
     }
 
 }
