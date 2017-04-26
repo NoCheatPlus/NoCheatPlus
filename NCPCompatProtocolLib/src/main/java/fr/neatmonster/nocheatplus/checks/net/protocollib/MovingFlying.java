@@ -97,26 +97,20 @@ public class MovingFlying extends BaseAdapter {
     @Override
     public void onPacketReceiving(final PacketEvent event) {
         final boolean primaryThread = Bukkit.isPrimaryThread(); // TODO: Code review protocol plugin :p.
-        if (primaryThread) {
-            counters.addPrimaryThread(idFlying, 1);
-            if (event.isAsync()) {
-                counters.addPrimaryThread(ProtocolLibComponent.idInconsistentIsAsync, 1);
-            }
+        counters.add(idFlying, 1, primaryThread);
+        if (event.isAsync() == primaryThread) {
+            counters.add(ProtocolLibComponent.idInconsistentIsAsync, 1, primaryThread);
         }
-        else {
-            counters.addSynchronized(idFlying, 1);
+        if (!primaryThread) {
             // Count all asynchronous events extra.
             counters.addSynchronized(idAsyncFlying, 1);
-            if (!event.isAsync()) {
-                counters.addSynchronized(ProtocolLibComponent.idInconsistentIsAsync, 1);
-            }
             // TODO: Detect game phase for the player?
         }
         final long time =  System.currentTimeMillis();
         final Player player = event.getPlayer();
         if (player == null) {
             // TODO: Need config?
-            counters.add(ProtocolLibComponent.idNullPlayer, 1);
+            counters.add(ProtocolLibComponent.idNullPlayer, 1, primaryThread);
             event.setCancelled(true);
             return;
         }
