@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -74,7 +75,7 @@ public class MovingFlying extends BaseAdapter {
      */
     private long packetMismatch = Long.MIN_VALUE;
     private long packetMismatchLogFrequency = 60000; // Every minute max, good for updating :).
-    
+
     private final HashSet<PACKET_CONTENT> validContent = new LinkedHashSet<PACKET_CONTENT>();
 
     public MovingFlying(Plugin plugin) {
@@ -95,14 +96,20 @@ public class MovingFlying extends BaseAdapter {
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
-        final boolean primaryThread = !event.isAsync();
+        final boolean primaryThread = Bukkit.isPrimaryThread(); // TODO: Code review protocol plugin :p.
         if (primaryThread) {
             counters.addPrimaryThread(idFlying, 1);
+            if (event.isAsync()) {
+                counters.addPrimaryThread(ProtocolLibComponent.idInconsistentIsAsync, 1);
+            }
         }
-        if (!primaryThread) {
+        else {
             counters.addSynchronized(idFlying, 1);
             // Count all asynchronous events extra.
             counters.addSynchronized(idAsyncFlying, 1);
+            if (!event.isAsync()) {
+                counters.addSynchronized(ProtocolLibComponent.idInconsistentIsAsync, 1);
+            }
             // TODO: Detect game phase for the player?
         }
         final long time =  System.currentTimeMillis();

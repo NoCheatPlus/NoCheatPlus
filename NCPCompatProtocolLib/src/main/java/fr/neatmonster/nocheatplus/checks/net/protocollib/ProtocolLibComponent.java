@@ -59,7 +59,9 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class ProtocolLibComponent implements IDisableListener, INotifyReload, JoinLeaveListener, Listener {
 
     // TODO: Static reference is problematic (needs a static and accessible Counters instance?). 
-    public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.flying.nullplayer");
+    public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.nullplayer");
+    /** Likely does not happen, TODO: Code review protocol plugin. */
+    public static final int idInconsistentIsAsync = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.inconsistent.isasync");
 
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
