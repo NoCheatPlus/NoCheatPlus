@@ -271,7 +271,7 @@ public class MovingFlying extends BaseAdapter {
             StringBuilder builder = new StringBuilder(512);
             builder.append(CheckUtils.getLogMessagePrefix(packetEvent.getPlayer(), checkType));
             builder.append("Incoming packet could not be interpreted. Are server and plugins up to date (NCP/ProtocolLib...)? This message is logged every ");
-            builder.append(Long.toString(packetMismatch / 1000));
+            builder.append(Long.toString(packetMismatchLogFrequency / 1000));
             builder.append(" seconds, disregarding for which player this happens.");
             if (!validContent.isEmpty()) {
                 builder.append(" On other occasion, valid content was received for: ");
