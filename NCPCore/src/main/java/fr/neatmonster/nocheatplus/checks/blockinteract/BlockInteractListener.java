@@ -32,6 +32,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -106,7 +107,7 @@ public class BlockInteractListener extends CheckListener {
             return;
         }
 
-        // TODO: Re-arrange for interact spamming.
+        // TODO: Re-arrange for interact spamming. (With ProtocolLib something else is in place as well.)
         final Action action = event.getAction();
         final Block block = event.getClickedBlock();
         final BlockInteractData data = BlockInteractData.getData(player);
@@ -148,6 +149,7 @@ public class BlockInteractListener extends CheckListener {
         boolean preventUseItem = false;
 
         final Location loc = player.getLocation(useLoc);
+        final FlyingQueueHandle flyingHandle = new FlyingQueueHandle(player);
 
         // TODO: Always run all checks, also for !isBlock ?
 
@@ -159,17 +161,20 @@ public class BlockInteractListener extends CheckListener {
 
         if (block != null) {
             // First the reach check.
-            if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)) {
+            if (!cancelled && reach.isEnabled(player) 
+                    && reach.check(player, loc, block, flyingHandle, data, cc)) {
                 cancelled = true;
             }
 
             // Second the direction check
-            if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)) {
+            if (!cancelled && direction.isEnabled(player) 
+                    && direction.check(player, loc, block, flyingHandle, data, cc)) {
                 cancelled = true;
             }
 
             // Ray tracing for freecam use etc.
-            if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)) {
+            if (!cancelled && visible.isEnabled(player) 
+                    && visible.check(player, loc, block, face, action, flyingHandle, data, cc)) {
                 cancelled = true;
             }
         }

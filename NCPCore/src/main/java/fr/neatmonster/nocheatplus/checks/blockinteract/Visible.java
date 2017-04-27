@@ -27,7 +27,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.checks.net.NetData;
+import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
@@ -56,7 +56,9 @@ public class Visible extends Check {
         rayTracing.setMaxSteps(60); // TODO: Configurable ?
     }
 
-    public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
+    public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, 
+            final Action action, final FlyingQueueHandle flyingHandle, 
+            final BlockInteractData data, final BlockInteractConfig cc) {
         // TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
         // TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
         boolean collides;
@@ -87,7 +89,7 @@ public class Visible extends Check {
                     debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
                 }
                 // Re-check with flying packets.
-                final DataPacketFlying[] flyingQueue = ((NetData) CheckType.NET.getDataFactory().getData(player)).copyFlyingQueue();
+                final DataPacketFlying[] flyingQueue = flyingHandle.getHandle();
                 // TODO: Maybe just the latest one does (!).
                 LocUtil.set(useLoc, loc);
                 final float oldPitch = useLoc.getPitch();

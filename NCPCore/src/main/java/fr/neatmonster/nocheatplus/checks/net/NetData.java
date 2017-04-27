@@ -149,6 +149,11 @@ public class NetData extends ACheckData {
      */
     public DataPacketFlying[] copyFlyingQueue() {
         lock.lock();
+        /*
+         * TODO: Add a method to synchronize with the current position at the
+         * same time ? Packet inversion is acute on 1.11.2 (dig is processed
+         * before flying).
+         */
         final DataPacketFlying[] out = flyingQueue.toArray(new DataPacketFlying[flyingQueue.size()]);
         lock.unlock();
         return out;
