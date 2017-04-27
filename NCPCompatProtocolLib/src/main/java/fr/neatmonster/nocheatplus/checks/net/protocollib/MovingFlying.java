@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.checks.net.protocollib;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -24,9 +25,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.PacketType.Protocol;
+import com.comphenix.protocol.PacketType.Sender;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.FlyingFrequency;
@@ -34,8 +38,11 @@ import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying.PACKET_CONTENT;
+import fr.neatmonster.nocheatplus.checks.net.model.TeleportQueue.AckReference;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -63,6 +70,30 @@ public class MovingFlying extends BaseAdapter {
     public static final int indexYaw = 0;
     public static final int indexPitch = 1;
 
+    private static PacketType[] initPacketTypes() {
+        final List<PacketType> types = new LinkedList<PacketType>(Arrays.asList(
+                PacketType.Play.Client.FLYING,
+                PacketType.Play.Client.LOOK,
+                PacketType.Play.Client.POSITION,
+                PacketType.Play.Client.POSITION_LOOK
+                ));
+        // Add confirm teleport.
+        try {
+            PacketType confirmType;
+            // PacketPlayInTeleportAccept
+            confirmType = PacketType.findCurrent(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
+            if (confirmType != null) {
+                StaticLog.logInfo("Confirm teleport packet available (via name): " + confirmType);
+                types.add(confirmType);
+            }
+        }
+        catch (Throwable t) {
+            // uh
+        }
+        return types.toArray(new PacketType[types.size()]);
+    }
+
+
     /** Frequency check for flying packets. */
     private final FlyingFrequency flyingFrequency = new FlyingFrequency();
 
@@ -77,15 +108,12 @@ public class MovingFlying extends BaseAdapter {
     private long packetMismatchLogFrequency = 60000; // Every minute max, good for updating :).
 
     private final HashSet<PACKET_CONTENT> validContent = new LinkedHashSet<PACKET_CONTENT>();
+    private final PacketType confirmTeleportType = PacketType.findCurrent(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
+    private boolean acceptConfirmTeleportPackets = confirmTeleportType != null;
 
     public MovingFlying(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
-        super(plugin, ListenerPriority.LOW, new PacketType[] {
-                PacketType.Play.Client.FLYING,
-                PacketType.Play.Client.LOOK,
-                PacketType.Play.Client.POSITION,
-                PacketType.Play.Client.POSITION_LOOK
-        });
+        super(plugin, ListenerPriority.LOW, initPacketTypes());
 
         // Add feature tags for checks.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
@@ -96,6 +124,58 @@ public class MovingFlying extends BaseAdapter {
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
+
+        if (event.getPacketType().equals(confirmTeleportType)) {
+            if (acceptConfirmTeleportPackets) {
+                onConfirmTeleportPacket(event);
+            }
+        }
+        else {
+            onFlyingPacket(event);
+        }
+
+    }
+
+    private void onConfirmTeleportPacket(final PacketEvent event) {
+        try {
+            processConfirmTeleport(event);
+        }
+        catch (Throwable t) {
+            noConfirmTeleportPacket();
+        }
+    }
+
+    private void processConfirmTeleport(final PacketEvent event) {
+        final PacketContainer packet = event.getPacket();
+        final StructureModifier<Integer> integers = packet.getIntegers();
+        if (integers.size() != 1) {
+            noConfirmTeleportPacket();
+            return;
+        }
+        // TODO: Cross check legacy types (if they even had an integer).
+        Integer teleportId = integers.read(0);
+        if (teleportId == null) {
+            // TODO: Not sure ...
+            return;
+        }
+        final Player player = event.getPlayer();
+        final NetData data = dataFactory.getData(player);
+        final AlmostBoolean matched = data.teleportQueue.processAck(teleportId);
+        if (matched.decideOptimistically()) {
+            CheckUtils.subtract(System.currentTimeMillis(), 1, data.flyingFrequencyAll);
+        }
+        if (data.debug) {
+            debug(player, "Confirm teleport packet" + (matched.decideOptimistically() ? (" (matched=" + matched + ")") : "") + ": " + teleportId);
+        }
+    }
+
+    private void noConfirmTeleportPacket() {
+        acceptConfirmTeleportPackets = false;
+        // TODO: Attempt to unregister.
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Confirm teleport packet not available.");
+    }
+
+    private void onFlyingPacket(final PacketEvent event) {
         final boolean primaryThread = Bukkit.isPrimaryThread(); // TODO: Code review protocol plugin :p.
         counters.add(idFlying, 1, primaryThread);
         if (event.isAsync() == primaryThread) {
@@ -119,10 +199,11 @@ public class MovingFlying extends BaseAdapter {
         // Always update last received time.
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time; // Update without much of a contract.
-        // TODO: Leniency options too (packet order inversion).
+        // TODO: Leniency options too (packet order inversion). -> current: flyingQueue is fetched.
         if (!cc.flyingFrequencyActive) {
             return;
         }
+        boolean cancel = false;
 
         // Interpret the packet content.
         final DataPacketFlying packetData = interpretPacket(event, time);
@@ -144,6 +225,16 @@ public class MovingFlying extends BaseAdapter {
                     if (data.debug) {
                         debug(player, "Incoming packet, still waiting for ACK on outgoing position.");
                     }
+                    // Don't add to the flying queue for now (assumed invalid).
+                    final AckReference ackReference = data.teleportQueue.getLastAckReference();
+                    if (ackReference.lastOutgoingId != Integer.MIN_VALUE
+                            && ackReference.lastOutgoingId != ackReference.maxConfirmedId) {
+                        // Still waiting for a 'confirm teleport' packet. More or less safe to cancel this out.
+                        // TODO: Timeout -> either skip cancel or schedule a set back (to last valid pos or other).
+                        // TODO: Config?
+                        cancel = true;
+                    }
+                    break;
                 }
                 case ACK: {
                     // Skip processing ACK packets, no cancel.
@@ -165,8 +256,8 @@ public class MovingFlying extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
-        boolean cancel = false;
-        if (!skipFlyingFrequency && flyingFrequency.check(player, packetData, time, data, cc)) {
+        if (!cancel && !skipFlyingFrequency 
+                && flyingFrequency.check(player, packetData, time, data, cc)) {
             cancel = true;
         }
 
@@ -185,8 +276,9 @@ public class MovingFlying extends BaseAdapter {
         if (data.debug) {
             debug(player, (packetData == null ? "(Incompatible data)" : packetData.toString()) + (event.isCancelled() ? " CANCEL" : ""));
         }
-
     }
+
+
 
     private boolean isInvalidContent(final DataPacketFlying packetData) {
         if (packetData.hasPos && LocUtil.isBadCoordinate(packetData.getX(), packetData.getY(), packetData.getZ())) {

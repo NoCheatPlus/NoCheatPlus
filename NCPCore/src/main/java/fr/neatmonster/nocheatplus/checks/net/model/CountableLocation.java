@@ -25,11 +25,19 @@ public class CountableLocation extends DataLocation {
 
     public int count;
     public long time;
+    /** Confirm teleport id: INTEGER.MIN_VALUE means it's not been provided. */
+    public int teleportId;
 
     public CountableLocation(double x, double y, double z, float yaw, float pitch, int count, long time) {
+        this(x, y, z, yaw, pitch, count, time, Integer.MIN_VALUE);
+    }
+
+    public CountableLocation(double x, double y, double z, float yaw, float pitch, 
+            int count, long time, int teleportId) {
         super(x, y, z, yaw, pitch);
         this.time = time;
         this.count = count;
+        this.teleportId = teleportId;
     }
 
     @Override
@@ -48,6 +56,10 @@ public class CountableLocation extends DataLocation {
         builder.append(getYaw());
         builder.append(",count=");
         builder.append(count);
+        if (teleportId != Integer.MIN_VALUE) {
+            builder.append(",tpid=");
+            builder.append(teleportId);
+        }
         // Skip time for now.
         builder.append(")");
         return builder.toString();

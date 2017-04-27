@@ -473,6 +473,7 @@ public class MovingUtil {
              * potential for abuse.
              */
             // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
+            // TODO: Better method, full sync reference?
             final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
             if (data.isTeleportedPosition(cl)) {
                 if (data.debug) {

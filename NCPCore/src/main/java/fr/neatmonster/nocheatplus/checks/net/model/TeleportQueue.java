@@ -19,6 +19,8 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+
 /**
  * Queue outgoing teleport locations (DataPacketFlying), in order to cancel
  * other moving until the client acknowledges previous teleport locations. In
@@ -38,6 +40,19 @@ public class TeleportQueue {
         IDLE
     }
 
+    public static class AckReference {
+        public int lastOutgoingId = Integer.MIN_VALUE;
+        /**
+         * The maximum of confirmed ids. Once lastOutgoingId is reached, we
+         * assume all teleports are done. Until then this id may get adjusted if
+         * lower than lastOutgoingId. Note that the id will be circling within 0
+         * to Integer.MAX_VALUE - 1, systematically increasing until back to 0,
+         * thus this value can be greater than lastOutGoingId, which should be
+         * treated as 'bad luck', resetting this to Integer.MIN_VALUE.
+         */
+        public int maxConfirmedId = Integer.MIN_VALUE;
+    }
+
     // TODO: Consider passing a reentrant lock in the constructor (e.g. one lock per NetData).
     private final Lock lock = new ReentrantLock();
 
@@ -49,7 +64,13 @@ public class TeleportQueue {
     private long maxAge = 4000; // TODO: configurable
     private int maxQueueSize = 60; // TODO: configurable
 
+    /**
+     * Queried from the primary thread (read only), reset with outgoing
+     * teleport.
+     */
     private CountableLocation lastAck = null;
+
+    private AckReference lastAckReference = new AckReference();
 
     /**
      * Maximum age in milliseconds, older entries expire.
@@ -58,9 +79,27 @@ public class TeleportQueue {
     public long getMaxAge() {
         return maxAge;
     }
-    
+
+    /**
+     * The last confirmed teleport location (read-only by primary thread),
+     * resets with outgoing teleport.
+     * 
+     * @return
+     */
     public CountableLocation getLastAck() {
         return lastAck;
+    }
+
+    /**
+     * Get the reference of the last ack, not resetting, but updating with
+     * incoming acks. This always is the same object, it might only by updated
+     * on a successful ACK, depending on what's needed (current use is to cancel
+     * packets on processAck returning WAITING).
+     * 
+     * @return
+     */
+    public AckReference getLastAckReference() {
+        return lastAckReference;
     }
 
     /**
@@ -78,13 +117,27 @@ public class TeleportQueue {
     }
 
     /**
-     * Call for outgoing teleport packets. Lazily checks for expiration and max queue size. 
-     * @param packetData
+     * Call for outgoing teleport packets. Lazily checks for expiration and max
+     * queue size. Update teleportId (Integer.MIN_VALUE means that it isn't
+     * provided).
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param yaw
+     * @param pitch
+     * @param teleportId
+     * @return
      */
-    public CountableLocation onOutgoingTeleport(final double x, final double y, final double z, final float yaw, final float pitch) {
+    public CountableLocation onOutgoingTeleport(final double x, final double y, final double z, 
+            final float yaw, final float pitch, final int teleportId) {
         CountableLocation res = null;
         final long time = System.currentTimeMillis();
         lock.lock();
+        lastAckReference.lastOutgoingId = teleportId;
+        if (lastAckReference.maxConfirmedId > lastAckReference.lastOutgoingId) {
+            lastAckReference.maxConfirmedId = Integer.MIN_VALUE; // Some data loss accepted here.
+        }
         // Only register this location, if it matches the location from a Bukkit event.
         if (expectOutgoing != null) {
             if (expectOutgoing.isSameLocation(x, y, z, yaw, pitch)) {
@@ -109,13 +162,14 @@ public class TeleportQueue {
                         if (last.isSameLocation(x, y, z, yaw, pitch)) {
                             last.time = time;
                             last.count ++;
+                            last.teleportId = teleportId;
                             res = last;
                         }
                     }
                 }
                 // Add a new entry, if not merged with last.
                 if (res == null) {
-                    res = new CountableLocation(x, y, z, yaw, pitch, 1, time);
+                    res = new CountableLocation(x, y, z, yaw, pitch, 1, time, teleportId);
                     expectIncoming.addLast(res);
                     // Don't exceed maxQueueSize.
                     if (expectIncoming.size() > maxQueueSize) {
@@ -131,6 +185,67 @@ public class TeleportQueue {
     }
 
     /**
+     * Process ack on receiving a 'confirm teleport' packet.
+     * 
+     * @param teleportId
+     * @return YES, if this teleport id is explicitly matched (not necessarily
+     *         the latest one), MAYBE if it's a unique id smaller than than
+     *         maxConfirmedId. NO, if it's not a valid ack - it could be some
+     *         other special condition, like Integer overflow, or timeout.
+     */
+    public AlmostBoolean processAck(final int teleportId) {
+        /*
+         * Return values are subject to change, e.g.: (ACK_LATEST_POS),
+         * ACK_LATEST_ID, ACK_OUTDATED_POS, ACK_OUTDATED_ID, UNKNOWN
+         */
+        if (teleportId == Integer.MIN_VALUE) {
+            // Could consider to return MAYBE for not knowing, needs elaborating on context and use cases.
+            return AlmostBoolean.NO;
+        }
+        lock.lock();
+        if (teleportId == lastAckReference.lastOutgoingId) {
+            lastAckReference.maxConfirmedId = teleportId;
+            // Abort here for efficiency.
+            expectIncoming.clear();
+            lock.unlock();
+            return AlmostBoolean.YES;
+        }
+        AlmostBoolean ackState = AlmostBoolean.NO;
+        final Iterator<CountableLocation> it = expectIncoming.iterator();
+        while (it.hasNext()) {
+            final CountableLocation ref = it.next();
+            // No expiration checks here.
+            if (ref.teleportId == teleportId) {
+                // Match an outdated id.
+                // Remove all preceding older entries and this one.
+                while (ref != expectIncoming.getFirst()) {
+                    expectIncoming.removeFirst();
+                }
+                expectIncoming.removeFirst();
+                // The count doesn't count anymore.
+                ref.count = 0;
+                ackState = AlmostBoolean.YES;
+                break;
+            }
+        }
+        // Update lastAckReference only if within the safe area.
+        if (teleportId < lastAckReference.lastOutgoingId 
+                && teleportId > lastAckReference.maxConfirmedId) {
+            // Allow update.
+            lastAckReference.maxConfirmedId = teleportId;
+            if (ackState == AlmostBoolean.NO) {
+                // Adjust to maybe, as long as the id is increasing within unique range.
+                ackState = AlmostBoolean.MAYBE;
+            }
+        }
+        else {
+            lastAckReference.maxConfirmedId = Integer.MIN_VALUE;
+        }
+        lock.unlock();
+        return ackState;
+    }
+
+    /**
      * Test if the move is an ACK move (or no ACK is expected), adjust internals
      * if necessary.
      * 
@@ -142,6 +257,7 @@ public class TeleportQueue {
     public AckResolution processAck(final DataPacketFlying packetData) {
         // Check packet.
         if (!packetData.hasPos || !packetData.hasLook) {
+            // Applies, if we don't have a teleport-confirm event.
             return AckResolution.IDLE;
         }
         // Check queue.
@@ -160,7 +276,7 @@ public class TeleportQueue {
 
     /**
      * Check queue (lock is handled outside of this method). Does check for
-     * expiration of entries.
+     * expiration of entries. Must only be called under lock.
      * 
      * @param packetData
      * @return

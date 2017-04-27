@@ -23,8 +23,10 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
+import fr.neatmonster.nocheatplus.logging.Streams;
 
 public class OutgoingPosition extends BaseAdapter {
 
@@ -35,6 +37,8 @@ public class OutgoingPosition extends BaseAdapter {
     public static final int indexPitch = 1;
 
     private final Integer ID_OUTGOING_POSITION_UNTRACKED = counters.registerKey("packet.outgoing_position.untracked");
+    
+    private boolean hasTeleportId = true;
 
     public OutgoingPosition(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
@@ -73,8 +77,33 @@ public class OutgoingPosition extends BaseAdapter {
         final double z = doubles.read(indexZ);
         final float yaw = floats.read(indexYaw);
         final float pitch = floats.read(indexPitch);
+        Integer teleportId = Integer.MIN_VALUE;
+        
+        if (hasTeleportId) {
+            try {
+                final StructureModifier<Integer> integers = packet.getIntegers();
+                if (integers.size() == 1) {
+                    // Accept as id.
+                    teleportId = integers.read(0);
+                    if (teleportId == null) {
+                        teleportId = Integer.MIN_VALUE;
+                    }
+                    if (teleportId != Integer.MIN_VALUE && data.debug) {
+                        debug(player, "Outgoing confirm teleport id: " + teleportId);
+                    }
+                }
+                else {
+                    hasTeleportId = false;
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "PacketPlayOutPosition: Teleport confirm id not available, field mismatch: " + integers.size());
+                }
+            }
+            catch (Throwable t) {
+                hasTeleportId = false;
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "PacketPlayOutPosition: Teleport confirm id not available.");
+            }
+        }
 
-        final CountableLocation packetData = data.teleportQueue.onOutgoingTeleport(x, y, z, yaw, pitch);
+        final CountableLocation packetData = data.teleportQueue.onOutgoingTeleport(x, y, z, yaw, pitch, teleportId);
         if (packetData == null) {
             // Add counter for untracked (by Bukkit API) outgoing teleport.
             // TODO: There may be other cases which are indicated by Bukkit API events.
