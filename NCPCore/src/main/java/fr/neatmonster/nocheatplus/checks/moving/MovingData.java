@@ -660,7 +660,20 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     public void clearPlayerMorePacketsData() {
         morePacketsSetback = null;
+        final long now = System.currentTimeMillis();
+        morePacketsFreq.clear(now);
+        morePacketsBurstFreq.clear(now);
         // TODO: Also reset other data ?
+    }
+
+    /**
+     * Reduce the morepackets frequency counters by the given amount, capped at
+     * a minimum of 0.
+     * 
+     * @param amount
+     */
+    public void reducePlayerMorePacketsData(final float amount) {
+        CheckUtils.reduce(System.currentTimeMillis(), amount, morePacketsFreq, morePacketsBurstFreq);
     }
 
     public void clearVehicleMorePacketsData() {

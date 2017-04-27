@@ -1792,6 +1792,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (data.isTeleportedPosition(to)) {
             // Set back.
             confirmSetBack(player, true, data, cc);
+            // Reset some more data.
+            // TODO: Some more?
+            data.reducePlayerMorePacketsData(1);
             // Log.
             if (data.debug) {
                 debugTeleportMessage(player, event, "(set back)", to);
