@@ -90,14 +90,17 @@ public class Visible extends Check {
                 }
                 // Re-check with flying packets.
                 final DataPacketFlying[] flyingQueue = flyingHandle.getHandle();
-                // TODO: Maybe just the latest one does (!).
+                // TODO: Maybe just the latest one does (!).+
                 LocUtil.set(useLoc, loc);
                 final float oldPitch = useLoc.getPitch();
                 final float oldYaw = useLoc.getYaw();
                 // TODO: Specific max-recheck-count (likely doesn't equal packet count).
-                int count = 0;
                 for (int i = 0; i < flyingQueue.length; i++) {
                     final DataPacketFlying packetData = flyingQueue[i];
+                    if (packetData == null) {
+                        // Other checks have pre-selected.
+                        continue;
+                    }
                     // TODO: Allow if within threshold(s) of last move. 
                     // TODO: Confine by distance.
                     // Abort/skipping conditions.
@@ -105,19 +108,13 @@ public class Visible extends Check {
                     //                        break;
                     //                    }
                     if (!packetData.hasLook) {
+                        flyingQueue[i] = null;
                         continue;
                     }
                     // TODO: Might skip last pitch+yaw as well.
                     if (packetData.getPitch() == oldPitch && packetData.getYaw() == oldYaw) {
-                        if (count == 0) {
-                            count = 1;
-                        }
-                        else {
+                            flyingQueue[i] = null;
                             continue;
-                        }
-                    }
-                    else if (count < 4) {
-                        count ++;
                     }
                     // Run ray-tracing again with updated pitch and yaw.
                     useLoc.setPitch(packetData.getPitch());
@@ -129,6 +126,7 @@ public class Visible extends Check {
                     if (!collides) {
                         break;
                     }
+                    flyingQueue[i] = null;
                     // Debug output.
                     if (data.debug) {
                         debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
