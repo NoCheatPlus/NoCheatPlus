@@ -90,7 +90,7 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         BlockInit.setAs(212, Material.ICE);
 
         // 255(STRUCTURE_BLOCK / SOLID+GROUND) 
-        BlockInit.setAs(255, Material.BEDROCK);
+        BlockInit.setInstantAir(255);
 
         // Special case activation.
         // TODO: Is this the right place?
