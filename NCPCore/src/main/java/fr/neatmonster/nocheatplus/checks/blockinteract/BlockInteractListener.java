@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
@@ -185,8 +186,25 @@ public class BlockInteractListener extends CheckListener {
         }
         else {
             data.subsequentCancel = 0;
+            if (data.debug) {
+                if (flyingHandle.isFlyingQueueFetched()) {
+                    // Log which entry was used.
+                    logUsedFlyingPacket(player, flyingHandle);
+                }
+            }
         }
         useLoc.setWorld(null);
+    }
+
+    private void logUsedFlyingPacket(final Player player, final FlyingQueueHandle flyingHandle) {
+        final DataPacketFlying[] queue = flyingHandle.getHandle();
+        for (int i = 0; i < queue.length; i++) {
+            final DataPacketFlying packet = queue[i];
+            if (packet != null) {
+                debug(player, "Flying packet queue used at index " + i + ": pitch=" + packet.getPitch() + ",yaw=" + packet.getYaw());
+                return;
+            }
+        }
     }
 
     private void onCancelInteract(final Player player, final Block block, final BlockFace face, 

@@ -62,6 +62,7 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from their
         // target than allowed, the difference will be assigned to "distance".
+        // TODO: On failure loop through flying queue, and do set not working entries to null (!).
         final double distance = TrigUtil.distance(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), 0.5 + block.getX(), 0.5 + block.getY(), 0.5 + block.getZ()) - distanceLimit;
 
         if (distance > 0) {

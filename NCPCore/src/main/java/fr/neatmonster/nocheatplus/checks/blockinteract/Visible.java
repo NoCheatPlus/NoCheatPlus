@@ -28,15 +28,68 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
-import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
+import fr.neatmonster.nocheatplus.checks.net.FlyingQueueLookBlockChecker;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
-import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.WrapBlockCache;
 
 public class Visible extends Check {
+
+    private final class RayChecker extends FlyingQueueLookBlockChecker {
+
+        private BlockFace face;
+        private List<String> tags;
+        private boolean debug;
+        private Player player;
+
+        @Override
+        protected boolean check(final double x, final double y, final double z, 
+                final float yaw, final float pitch, 
+                final int blockX, final int blockY, final int blockZ) {
+            // Run ray-tracing again with updated pitch and yaw.
+            useLoc.setPitch(pitch);
+            useLoc.setYaw(yaw);
+            final Vector direction = useLoc.getDirection(); // TODO: Better.
+            tags.clear();
+            if (checkRayTracing(x, y, z, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, debug)) {
+                // Collision still.
+                if (debug) {
+                    debug(player, "pitch=" + pitch + ",yaw=" + yaw + " tags=" + StringUtil.join(tags, "+"));
+                }
+                return false;
+            }
+            else {
+                return true;
+            }
+
+        }
+
+        public boolean checkFlyingQueue(double x, double y, double z, float oldYaw, float oldPitch, int blockX,
+                int blockY, int blockZ, FlyingQueueHandle flyingHandle, 
+                BlockFace face, List<String> tags, boolean debug, Player player) {
+            this.face = face;
+            this.tags = tags;
+            this.debug = debug;
+            this.player = player;
+            return super.checkFlyingQueue(x, y, z, oldYaw, oldPitch, blockX, blockY, blockZ, flyingHandle);
+        }
+
+        @Override
+        public boolean checkFlyingQueue(double x, double y, double z, float oldYaw, float oldPitch, int blockX,
+                int blockY, int blockZ, FlyingQueueHandle flyingHandle) {
+            throw new UnsupportedOperationException("Use the other method.");
+        }
+
+        public void cleanup () {
+            this.player = null;
+            this.face = null;
+            this.debug = false;
+            this.tags = null;
+        }
+
+    }
 
     private final WrapBlockCache wrapBlockCache;
 
@@ -44,6 +97,8 @@ public class Visible extends Check {
      * Strict set to false, due to false positives.
      */
     private final InteractRayTracing rayTracing = new InteractRayTracing(false);
+
+    private final RayChecker checker = new RayChecker();
 
     private final List<String> tags = new ArrayList<String>();
 
@@ -86,52 +141,15 @@ public class Visible extends Check {
             if (collides) {
                 // Debug output.
                 if (data.debug) {
-                    debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
+                    debug(player, "pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
                 }
                 // Re-check with flying packets.
-                final DataPacketFlying[] flyingQueue = flyingHandle.getHandle();
-                // TODO: Maybe just the latest one does (!).+
-                LocUtil.set(useLoc, loc);
-                final float oldPitch = useLoc.getPitch();
-                final float oldYaw = useLoc.getYaw();
-                // TODO: Specific max-recheck-count (likely doesn't equal packet count).
-                for (int i = 0; i < flyingQueue.length; i++) {
-                    final DataPacketFlying packetData = flyingQueue[i];
-                    if (packetData == null) {
-                        // Other checks have pre-selected.
-                        continue;
-                    }
-                    // TODO: Allow if within threshold(s) of last move. 
-                    // TODO: Confine by distance.
-                    // Abort/skipping conditions.
-                    //                    if (packetData.hasPos) {
-                    //                        break;
-                    //                    }
-                    if (!packetData.hasLook) {
-                        flyingQueue[i] = null;
-                        continue;
-                    }
-                    // TODO: Might skip last pitch+yaw as well.
-                    if (packetData.getPitch() == oldPitch && packetData.getYaw() == oldYaw) {
-                            flyingQueue[i] = null;
-                            continue;
-                    }
-                    // Run ray-tracing again with updated pitch and yaw.
-                    useLoc.setPitch(packetData.getPitch());
-                    useLoc.setYaw(packetData.getYaw());
-                    direction = useLoc.getDirection(); // TODO: Better.
-                    tags.clear();
-                    tags.add("flying(" + i + ")"); // Interesting if this gets through.
-                    collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);
-                    if (!collides) {
-                        break;
-                    }
-                    flyingQueue[i] = null;
-                    // Debug output.
-                    if (data.debug) {
-                        debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
-                    }
+                if (checker.checkFlyingQueue(eyeX, eyeY, eyeZ, useLoc.getYaw(), useLoc.getPitch(), 
+                        blockX, blockY, blockZ, flyingHandle, face, tags, data.debug, player)) {
+                    // Check passed.
+                    collides = false;
                 }
+                checker.cleanup();
                 useLoc.setWorld(null);
             }
             // Cleanup.
@@ -155,7 +173,7 @@ public class Visible extends Check {
         else {
             data.visibleVL *= 0.99;
             if (data.debug) {
-                debug(player, "pitch=" + loc.getPitch() + " yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
+                debug(player, "pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
             }
         }
 

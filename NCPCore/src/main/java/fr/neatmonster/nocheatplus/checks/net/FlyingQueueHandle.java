@@ -31,4 +31,8 @@ public class FlyingQueueHandle implements IHandle<DataPacketFlying[]> {
         return queue;
     }
 
+    public boolean isFlyingQueueFetched() {
+        return queue != null;
+    }
+
 }
