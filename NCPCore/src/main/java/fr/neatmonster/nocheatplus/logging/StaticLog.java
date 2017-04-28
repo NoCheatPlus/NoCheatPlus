@@ -58,6 +58,10 @@ public class StaticLog {
         StaticLog.streamID = streamID;
     }
 
+    public static void logDebug(final String msg) {
+        log(Level.FINE, msg);
+    }
+
     public static void logInfo(final String msg) {
         log(Level.INFO, msg);
     }
@@ -68,6 +72,10 @@ public class StaticLog {
 
     public static void logSevere(final String msg) {
         log(Level.SEVERE, msg);
+    }
+
+    public static void logDebug(final Throwable t) {
+        log(Level.FINE, StringUtil.throwableToString(t));
     }
 
     public static void logInfo(final Throwable t) {
