@@ -15,10 +15,8 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -38,15 +36,25 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
+ * Random auxiliary gear, some might have general quality. Contents are likely
+ * to get moved to other classes. All that is in here should be set up with
+ * checks and not be related to early setup stages of the plugin.
  */
 public class CheckUtils {
 
-    /** The Constant logOnce. */
-    // TODO: Quick and dirty -> other methods elsewhere.
-    private static final Set<Integer> logOnce = Collections.synchronizedSet(new HashSet<Integer>());
+    /**
+     * Improper API access.
+     *
+     * @param checkType
+     *            the check type
+     */
+    private static void improperAPIAccess(final CheckType checkType) {
+        // TODO: Log once + examine stack (which plugins/things are involved).
+        final String trace = Arrays.toString(Thread.currentThread().getStackTrace());
+        StaticLog.logOnce(Streams.STATUS, Level.SEVERE, "Off primary thread call to hasByPass for " + checkType, trace);
+    }
 
     /**
      * Kick and log.
@@ -189,34 +197,6 @@ public class CheckUtils {
         // TODO: ExemptionManager relies on the initial definition for which type can be checked off main thread.
         // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
         return NCPExemptionManager.isExempted(player, checkType, isPrimaryThread);
-    }
-
-    /**
-     * Improper api access.
-     *
-     * @param checkType
-     *            the check type
-     */
-    private static void improperAPIAccess(final CheckType checkType) {
-        // TODO: Log once + examine stack (which plugins/things are involved).
-        final String trace = Arrays.toString(Thread.currentThread().getStackTrace());
-        final int ref = trace.hashCode() ^ new Integer(trace.length()).hashCode();
-        final String extra;
-        final boolean details = logOnce.add(ref);
-        if (details) {
-            // Not already contained.
-            extra = " (id=" + ref + ")";
-        } else {
-            extra = " (see earlier log with id=" + ref + ")";
-        }
-        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Off primary thread call to hasByPass for " + checkType + extra + ".");
-        if (details) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, trace);
-            if (logOnce.size() > 10000) {
-                logOnce.clear();
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Cleared log-once ids, due to exceeding the maximum number of stored ids.");
-            }
-        }
     }
 
     /**
