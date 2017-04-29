@@ -120,7 +120,8 @@ public class BlockBreakListener extends CheckListener {
         final GameMode gameMode = player.getGameMode();
 
         // Has the player broken a block that was not damaged before?
-        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data, isInstaBreak)) {
+        final boolean wrongBlockEnabled = wrongBlock.isEnabled(player);
+        if (wrongBlockEnabled && wrongBlock.check(player, block, cc, data, isInstaBreak)) {
             cancelled = true;
         }
 
@@ -145,6 +146,7 @@ public class BlockBreakListener extends CheckListener {
         }
 
         // Did the player look at the block at all?
+        // TODO: Skip if checks were run on this block (all sorts of hashes/conditions).
         if (!cancelled && direction.isEnabled(player) && direction.check(player, block, data)) {
             cancelled = true;
         }

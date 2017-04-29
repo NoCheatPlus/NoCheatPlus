@@ -760,4 +760,17 @@ public class TrigUtil {
         return x1 == Location.locToBlock(x2) && z1 == Location.locToBlock(z2) && y1 == Location.locToBlock(y2);
     }
 
+    /**
+     * Check if the block has the same coordinates.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param block
+     * @return
+     */
+    public static boolean isSameBlock(int x, int y, int z, Block block) {
+        return x == block.getX() && y == block.getY() && z == block.getZ();
+    }
+
 }

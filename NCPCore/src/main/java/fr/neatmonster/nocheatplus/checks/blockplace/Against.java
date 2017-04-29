@@ -26,7 +26,6 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
-import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 /**
  * Check if the placing is legitimate in terms of surrounding materials.
@@ -47,10 +46,10 @@ public class Against extends Check {
         if (BlockProperties.isAir(againstType)) {
             // Attempt to workaround blocks like cactus.
             final BlockInteractData bdata = BlockInteractData.getData(player);
-            if (bdata.lastType != null && bdata.lastX != Integer.MAX_VALUE && TickTask.getTick() == bdata.lastTick && TrigUtil.manhattan(bdata.lastX, bdata.lastY, bdata.lastZ, blockAgainst) == 0) {
-                // (Wide screen.)
+            if (bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
                 // Block was placed against something (e.g. cactus), allow it.
                 // TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
+                // TODO: Reset on leaving the listener rather - why could it conflict?
                 bdata.resetLastBlock(); 
                 return false;
             }

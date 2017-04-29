@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
  * Player specific data for the block interact checks.
@@ -88,8 +89,9 @@ public class BlockInteractData extends ACheckData {
 
     // General data
     // Last block interacted with
-    public int lastX = Integer.MAX_VALUE;
-    public int lastY, lastZ;
+    /** Set to Integer.MAX_VALUE for reset. */
+    private int lastX = Integer.MAX_VALUE;
+    private int lastY, lastZ;
     /** null for air */
     public Material lastType = null;
     public int lastTick;
@@ -120,7 +122,7 @@ public class BlockInteractData extends ACheckData {
      * Last interacted block.
      * @param block
      */
-    public void setLastBlock(Block block, Action action) {
+    public void setLastBlock(final Block block, final Action action) {
         lastX = block.getX();
         lastY = block.getY();
         lastZ = block.getZ();
@@ -132,11 +134,97 @@ public class BlockInteractData extends ACheckData {
         lastAction = action;
     }
 
+    /**
+     * Full state comparison.
+     * @param material
+     * @param action
+     * @param tick
+     * @param block
+     * @return
+     */
+    public boolean matchesLastBlock(final Material material, final Action action, final int tick, final Block block) {
+        return lastX != Integer.MAX_VALUE && material == lastType && matchesLastBlock(action, tick, block);
+    }
+
+    /**
+     * Compare action, tick and block.
+     * 
+     * @param action
+     * @param tick
+     * @param block
+     * @return
+     */
+    public boolean matchesLastBlock(final Action action, final int tick, final Block block) {
+        return lastX != Integer.MAX_VALUE && tick == lastTick && matchesLastBlock(action, block);
+    }
+
+    /**
+     * Compare only action and coordinates.
+     * 
+     * @param action
+     * @param block
+     * @return
+     */
+    public boolean matchesLastBlock(final Action action, final Block block) {
+        return lastX != Integer.MAX_VALUE && action == lastAction && matchesLastBlock(block);
+    }
+
+    /**
+     * Compare only tick and coordinates.
+     * 
+     * @param action
+     * @param block
+     * @return
+     */
+    public boolean matchesLastBlock(final int tick, final Block block) {
+        return lastX != Integer.MAX_VALUE && tick == lastTick && matchesLastBlock(block);
+    }
+
+
+    /**
+     * Compare the block coordinates.
+     * 
+     * @param block
+     * @return
+     */
+    public boolean matchesLastBlock(final Block block) {
+        // Skip the MAX_VALUE check.
+        return lastX == block.getX() && lastY == block.getY() && lastZ == block.getZ();
+    }
+
+    /**
+     * The Manhattan distance to the set last block, Integer.MAX_VALUE is
+     * returned if none is set.
+     * 
+     * @param block
+     * @return The Manhattan distance if appropriate - if no block is set,
+     *         Integer.MAX_VALUE is returned.
+     */
+    public int manhattanLastBlock(final Block block) {
+        return lastX == Integer.MAX_VALUE ? Integer.MAX_VALUE : TrigUtil.manhattan(lastX, lastY, lastZ,
+                block.getX(), block.getY(), block.getZ());
+    }
+
     public void resetLastBlock() {
         lastTick = 0;
         lastAction = null;
         lastX = Integer.MAX_VALUE;
         lastType = null;
+    }
+
+    /**
+     * Reset passed checks (concern the last block interacted with).
+     */
+    public void resetPassedChecks() {
+        // TODO
+    }
+
+    /**
+     * Adjustments, disregarding who/what cancelled the event.
+     */
+    public void onCancelledBlockInteractEvent() {
+        resetLastBlock();
+        resetPassedChecks();
     }
 
 }

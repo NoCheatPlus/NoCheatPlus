@@ -81,6 +81,8 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
+        final BlockInteractData data = BlockInteractData.getData(player);
+        data.resetPassedChecks();
         // Early cancel for interact events with dead players and other.
         final int cancelId;
         if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) { // TODO: Should be dead !?.
@@ -102,6 +104,7 @@ public class BlockInteractListener extends CheckListener {
             event.setUseInteractedBlock(Result.DENY);
             event.setUseItemInHand(Result.DENY);
             event.setCancelled(true);
+            data.onCancelledBlockInteractEvent();
             if (cancelId >= 0) {
                 counters.addPrimaryThread(cancelId, 1);
             }
@@ -111,7 +114,6 @@ public class BlockInteractListener extends CheckListener {
         // TODO: Re-arrange for interact spamming. (With ProtocolLib something else is in place as well.)
         final Action action = event.getAction();
         final Block block = event.getClickedBlock();
-        final BlockInteractData data = BlockInteractData.getData(player);
         final int previousLastTick = data.lastTick;
         // TODO: Last block setting: better on monitor !?.
         if (block == null) {
@@ -143,6 +145,7 @@ public class BlockInteractListener extends CheckListener {
         boolean cancelled = false;
         if (event.isCancelled() && event.useInteractedBlock() != Result.ALLOW) {
             data.subsequentCancel ++;
+            data.onCancelledBlockInteractEvent();
             return;
         }
 
@@ -216,7 +219,8 @@ public class BlockInteractListener extends CheckListener {
             if (data.debug) {
                 genericDebug(player, block, face, event, "already cancelled: deny use block", previousLastTick, data, cc);
             }
-        } else {
+        }
+        else {
             final Result previousUseItem = event.useItemInHand();
             event.setCancelled(true);
             event.setUseInteractedBlock(Result.DENY);
@@ -239,6 +243,7 @@ public class BlockInteractListener extends CheckListener {
                 }
             }
         }
+        data.onCancelledBlockInteractEvent();
         data.subsequentCancel ++;
     }
 
