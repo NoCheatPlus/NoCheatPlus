@@ -172,6 +172,7 @@ public class Visible extends Check {
         }
         else {
             data.visibleVL *= 0.99;
+            data.addPassedCheck(this.type);
             if (data.debug) {
                 debug(player, "pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
             }

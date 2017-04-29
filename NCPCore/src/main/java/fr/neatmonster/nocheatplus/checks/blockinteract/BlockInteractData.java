@@ -15,7 +15,9 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Material;
@@ -23,6 +25,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
@@ -113,6 +116,8 @@ public class BlockInteractData extends ACheckData {
      * with logging.
      */
     public int rateLimitSkip = 0;
+
+    private final Set<CheckType> passedChecks = new HashSet<CheckType>();
 
     public BlockInteractData(final BlockInteractConfig config) {
         super(config);
@@ -205,18 +210,36 @@ public class BlockInteractData extends ACheckData {
                 block.getX(), block.getY(), block.getZ());
     }
 
+    /**
+     * Resets the last block (and passed checks).
+     */
     public void resetLastBlock() {
         lastTick = 0;
         lastAction = null;
         lastX = Integer.MAX_VALUE;
         lastType = null;
+        resetPassedChecks();
     }
 
     /**
      * Reset passed checks (concern the last block interacted with).
      */
     public void resetPassedChecks() {
-        // TODO
+        passedChecks.clear();
+    }
+
+    public void addPassedCheck(final CheckType checkType) {
+        passedChecks.add(checkType);
+    }
+
+    /**
+     * Check if this check type was set as passed for the last block.
+     * 
+     * @param checkType
+     * @return
+     */
+    public boolean isPassedCheck(final CheckType checkType) {
+        return passedChecks.contains(checkType);
     }
 
     /**
@@ -224,7 +247,6 @@ public class BlockInteractData extends ACheckData {
      */
     public void onCancelledBlockInteractEvent() {
         resetLastBlock();
-        resetPassedChecks();
     }
 
 }

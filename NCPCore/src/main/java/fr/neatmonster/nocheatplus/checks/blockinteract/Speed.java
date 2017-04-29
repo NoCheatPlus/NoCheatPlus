@@ -49,10 +49,14 @@ public class Speed extends Check {
                     cancel = true;
                 }
             }
-            // else: keep vl.
+            else {
+                // keep vl. // Not sure either.
+                data.addPassedCheck(this.type); // Not sure.
+            }
         }
         else{
             data.speedVL *= 0.99;
+            data.addPassedCheck(this.type);
         }
 
         return cancel;

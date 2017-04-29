@@ -80,6 +80,7 @@ public class Reach extends Check {
         } else
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;
+        data.addPassedCheck(this.type);
 
         return cancel;
     }

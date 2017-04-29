@@ -126,6 +126,7 @@ public class Direction extends Check {
         } else {
             // Player did likely nothing wrong, reduce violation counter to reward them.
             data.directionVL *= 0.9D;
+            data.addPassedCheck(this.type);
         }
         return cancel;
     }
