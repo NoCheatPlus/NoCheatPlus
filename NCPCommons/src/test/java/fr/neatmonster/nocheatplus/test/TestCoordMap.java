@@ -225,6 +225,7 @@ public class TestCoordMap {
      * @param indexMap
      * @param initialSize
      */
+    @SuppressWarnings("unchecked")
     public  void series(int[][] coords, Map<Integer, int[]> indexMap, int initialSize, float loadFactor) {
 
         // Fill and check
