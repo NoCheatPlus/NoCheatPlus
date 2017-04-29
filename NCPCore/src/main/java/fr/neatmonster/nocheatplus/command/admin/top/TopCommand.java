@@ -173,6 +173,7 @@ public class TopCommand extends BaseCommand{
         this.usage = "Optional: Specify number of entries to show (once).\nObligatory: Specify check types (multiple possible).\nOptional: Specify what to sort by (multiple possible: -sumvl, -avgvl, -maxvl, -nvl, -name, -time).\nThis is a heavy operation, use with care."; // -check
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length < 2) {
