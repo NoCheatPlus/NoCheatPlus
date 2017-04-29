@@ -21,7 +21,6 @@ import java.util.List;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.IPatchBlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.special.MultiClientProtocolWaterLilyPatch;
-import fr.neatmonster.nocheatplus.components.registry.activation.IActivation;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
