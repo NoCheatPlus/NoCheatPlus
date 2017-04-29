@@ -225,14 +225,29 @@ public class MovingFlying extends BaseAdapter {
                     if (data.debug) {
                         debug(player, "Incoming packet, still waiting for ACK on outgoing position.");
                     }
-                    // Don't add to the flying queue for now (assumed invalid).
-                    final AckReference ackReference = data.teleportQueue.getLastAckReference();
-                    if (ackReference.lastOutgoingId != Integer.MIN_VALUE
-                            && ackReference.lastOutgoingId != ackReference.maxConfirmedId) {
-                        // Still waiting for a 'confirm teleport' packet. More or less safe to cancel this out.
-                        // TODO: Timeout -> either skip cancel or schedule a set back (to last valid pos or other).
-                        // TODO: Config?
-                        cancel = true;
+                    if (cc.supersededFlyingCancelWaiting) {
+                        // Don't add to the flying queue for now (assumed invalid).
+                        final AckReference ackReference = data.teleportQueue.getLastAckReference();
+                        if (ackReference.lastOutgoingId != Integer.MIN_VALUE
+                                && ackReference.lastOutgoingId != ackReference.maxConfirmedId) {
+                            // Still waiting for a 'confirm teleport' packet. More or less safe to cancel this out.
+                            /*
+                             * TODO: The actual issue with this, apart from
+                             * potential freezing, also concerns gameplay experience
+                             * in case of minor set backs, which also could be
+                             * caused by the server, e.g. with 'moved wrongly' or
+                             * setting players outside of blocks. In this case the
+                             * moves sent before teleport ack would still be valid
+                             * after the teleport, because distances are small. The
+                             * actual solution should still be to a) not have false
+                             * positives b) somehow get rid all the
+                             * position-correction teleporting the server does, for
+                             * the cases a plugin can handle.
+                             */
+                            // TODO: Timeout -> either skip cancel or schedule a set back (to last valid pos or other).
+                            // TODO: Config?
+                            cancel = true;
+                        }
                     }
                     break;
                 }

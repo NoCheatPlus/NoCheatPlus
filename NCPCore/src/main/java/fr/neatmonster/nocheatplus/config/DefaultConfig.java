@@ -520,6 +520,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true, 785);
         set(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE, 320, 785);
 
+        // Superseded
+        set(ConfPaths.NET_SUPERSEDED_FLYING_CANCELWAITING, true, 1090);
+
 
         // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";

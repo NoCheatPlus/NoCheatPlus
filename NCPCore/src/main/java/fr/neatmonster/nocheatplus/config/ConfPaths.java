@@ -732,6 +732,11 @@ public abstract class ConfPaths {
     public static final String  NET_SOUNDDISTANCE_ACTIVE                    = NET_SOUNDDISTANCE + "active";
     public static final String  NET_SOUNDDISTANCE_MAXDISTANCE               = NET_SOUNDDISTANCE + "maxdistance";
 
+    /** Somehow superseded packets, typically leniency options .*/
+    private static final String NET_SUPERSEDED                              = NET + "superseded.";
+    private static final String NET_SUPERSEDED_FLYING                       = NET_SUPERSEDED + "flying.";
+    public static final String  NET_SUPERSEDED_FLYING_CANCELWAITING         = NET_SUPERSEDED_FLYING + "cancelwaiting";
+
     public static final String  STRINGS                                     = "strings";
 
     // Compatibility section (possibly temporary).

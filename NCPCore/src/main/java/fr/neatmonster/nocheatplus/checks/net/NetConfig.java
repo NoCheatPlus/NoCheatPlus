@@ -58,6 +58,8 @@ public class NetConfig extends ACheckConfig {
     /** Maximum distance for lightning effects (squared). */
     public final double soundDistanceSq;
 
+    public final boolean supersededFlyingCancelWaiting;
+
     public NetConfig(final ConfigFile config) {
         super(config, ConfPaths.NET, new String[] {
                 Permissions.NET_ATTACKFREQUENCY,
@@ -96,6 +98,8 @@ public class NetConfig extends ACheckConfig {
         soundDistanceActive = config.getBoolean(ConfPaths.NET_SOUNDDISTANCE_ACTIVE);
         double dist = config.getDouble(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE);
         soundDistanceSq = dist * dist;
+
+        supersededFlyingCancelWaiting = config.getBoolean(ConfPaths.NET_SUPERSEDED_FLYING_CANCELWAITING);
 
     }
 
