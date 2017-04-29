@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.compat.versions;
+package fr.neatmonster.nocheatplus.components.registry.activation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +20,8 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.components.registry.activation.IActivation;
-import fr.neatmonster.nocheatplus.components.registry.activation.IDescriptiveActivation;
+import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**

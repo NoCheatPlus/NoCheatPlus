@@ -26,7 +26,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
 import fr.neatmonster.nocheatplus.checks.inventory.HotFixFallingBlockPortalEnter;
 import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
-import fr.neatmonster.nocheatplus.compat.versions.Activation;
+import fr.neatmonster.nocheatplus.components.registry.activation.Activation;
 import fr.neatmonster.nocheatplus.components.registry.activation.IActivation;
 import fr.neatmonster.nocheatplus.components.registry.activation.IDescriptiveActivation;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
