@@ -85,7 +85,8 @@ public class VersionCommand extends BaseCommand{
             lines.add("Hooks: " + StringUtil.join(fullNames, " | "));
         }
         final List<String> relatedPlugins = new LinkedList<String>();
-        for (final String name : new String[]{"CompatNoCheatPlus", "ProtocolLib"}) {
+        for (final String name : new String[]{
+                "CompatNoCheatPlus", "ProtocolLib", "ViaVersion", "ProtocolSupport", "PNCP", "NTAC"}) {
             Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
             if (plugin != null) {
                 relatedPlugins.add(alt(plugin.getDescription().getFullName()));
