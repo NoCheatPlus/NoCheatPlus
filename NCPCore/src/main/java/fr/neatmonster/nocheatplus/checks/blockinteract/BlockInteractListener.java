@@ -67,6 +67,9 @@ public class BlockInteractListener extends CheckListener {
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idInteractLookCurrent = counters.registerKey("block.interact.look.current");
+    private final int idInteractLookFlyingFirst = counters.registerKey("block.interact.look.flying.first");
+    private final int idInteractLookFlyingOther = counters.registerKey("block.interact.look.flying.other");
 
     public BlockInteractListener() {
         super(CheckType.BLOCKINTERACT);
@@ -189,24 +192,34 @@ public class BlockInteractListener extends CheckListener {
         }
         else {
             data.subsequentCancel = 0;
-            if (data.debug) {
-                if (flyingHandle.isFlyingQueueFetched()) {
-                    // Log which entry was used.
-                    logUsedFlyingPacket(player, flyingHandle);
+            if (flyingHandle.isFlyingQueueFetched()) {
+                final int flyingIndex = flyingHandle.getFirstIndexWithContentIfFetched();
+                final Integer cId;
+                if (flyingIndex == 0) {
+                    cId = idInteractLookFlyingFirst;
                 }
+                else {
+                    cId = idInteractLookFlyingOther;
+                }
+                counters.add(cId, 1);
+                if (data.debug) {
+                    // Log which entry was used.
+                    logUsedFlyingPacket(player, flyingHandle, flyingIndex);
+                }
+            }
+            else {
+                counters.addPrimaryThread(idInteractLookCurrent, 1);
             }
         }
         useLoc.setWorld(null);
     }
 
-    private void logUsedFlyingPacket(final Player player, final FlyingQueueHandle flyingHandle) {
-        final DataPacketFlying[] queue = flyingHandle.getHandle();
-        for (int i = 0; i < queue.length; i++) {
-            final DataPacketFlying packet = queue[i];
-            if (packet != null) {
-                debug(player, "Flying packet queue used at index " + i + ": pitch=" + packet.getPitch() + ",yaw=" + packet.getYaw());
-                return;
-            }
+    private void logUsedFlyingPacket(final Player player, final FlyingQueueHandle flyingHandle, 
+            final int flyingIndex) {
+        final DataPacketFlying packet = flyingHandle.getIfFetched(flyingIndex);
+        if (packet != null) {
+            debug(player, "Flying packet queue used at index " + flyingIndex + ": pitch=" + packet.getPitch() + ",yaw=" + packet.getYaw());
+            return;
         }
     }
 
