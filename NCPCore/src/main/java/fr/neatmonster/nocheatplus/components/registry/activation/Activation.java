@@ -87,19 +87,50 @@ public class Activation implements IDescriptiveActivation {
     }
 
     private final List<IActivation> conditions = new LinkedList<IActivation>();
+    private boolean conditionsAND = true;
 
     private String neutralDescription = null;
 
     private boolean advertise = false;
 
+    public Activation setConditionsAND() {
+        conditionsAND = true;
+        return this;
+    }
+
+    public boolean getConditionsAND() {
+        return conditionsAND;
+    }
+
+    public Activation setConditionsOR() {
+        conditionsAND = false;
+        return this;
+    }
+
+    public boolean getConditionsOR() {
+        return !conditionsAND;
+    }
+
     @Override
     public boolean isAvailable() {
-        for (IActivation condition : conditions) {
-            if (!condition.isAvailable()) {
-                return false;
+        if (conditionsAND) {
+            // AND
+            for (IActivation condition : conditions) {
+                if (!condition.isAvailable()) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+        else {
+            // OR
+            for (IActivation condition : conditions) {
+                if (condition.isAvailable()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public Activation neutralDescription(String neutralDescription) {
@@ -423,11 +454,24 @@ public class Activation implements IDescriptiveActivation {
         return this.advertise;
     }
 
-    // TODO: set operation ( AND / OR ( / ...) ) + addCondition(IActivation).
+    /**
+     * Add an IActivation instances as condition.
+     * 
+     * @param condition
+     * @return
+     */
+    public IActivation condition(IActivation condition) {
+        conditions.add(condition);
+        return this;
+    }
+
     // TODO: server version not contains (+ignore case).
     // TODO: Might use testing methods for parts: meetsServerVersionRequirements(), more complicated...
-
-    // (Well... specific member types, methods, :p...)
+    /*
+     * TODO: Consider a getter for filtered conditions, e.g. if configuration
+     * overrides something, alternatively provide an optional condition that is
+     * checking the configuration (?).
+     */
 
 }
 
