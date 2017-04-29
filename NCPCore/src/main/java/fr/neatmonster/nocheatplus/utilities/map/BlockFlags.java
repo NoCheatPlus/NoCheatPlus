@@ -25,7 +25,7 @@ import org.bukkit.Material;
  */
 public class BlockFlags {
 
-	/**
+    /**
      * Set flags of id same as already set with flags for the given material.
      * (Uses BlockProperties.)
      *
@@ -34,11 +34,11 @@ public class BlockFlags {
      * @param mat
      *            the mat
      */
-	public static void setFlagsAs(int id, Material mat) {
-		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(mat));
-	}
-	
-	/**
+    public static void setFlagsAs(int id, Material mat) {
+        BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(mat));
+    }
+
+    /**
      * Set flags of id same as already set with flags for the given material.
      * (Uses BlockProperties.)
      *
@@ -47,23 +47,35 @@ public class BlockFlags {
      * @param otherId
      *            the other id
      */
-	public static void setFlagsAs(int id, int otherId) {
-		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(otherId));
-	}
+    public static void setFlagsAs(int id, int otherId) {
+        BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(otherId));
+    }
 
-	/**
+    /**
      * Add flags to existent flags. (Uses BlockProperties.)
      *
      * @param id
-     *            the id
+     *            Id of the block.
      * @param flags
-     *            the flags
+     *            Block flags.
      */
-	public static void addFlags(int id, long flags) {
-		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
-	}
+    public static void addFlags(int id, long flags) {
+        BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+    }
 
-	/**
+    /**
+     * Add flags to existent flags. (Uses BlockProperties.)
+     *
+     * @param blockType
+     *            Bukkit Material type. Id of the block.
+     * @param flags
+     *            Block flags.
+     */
+    public static void addFlags(Material blockType, long flags) {
+        addFlags(BlockProperties.getId(blockType), flags);
+    }
+
+    /**
      * Remove the given flags from existent flags. (Uses BlockProperties.)
      *
      * @param id
@@ -71,8 +83,8 @@ public class BlockFlags {
      * @param flags
      *            the flags
      */
-	public static void removeFlags(int id, long flags) {
-		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
-	}
+    public static void removeFlags(int id, long flags) {
+        BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
+    }
 
 }
