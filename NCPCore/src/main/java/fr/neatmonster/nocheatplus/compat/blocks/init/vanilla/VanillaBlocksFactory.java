@@ -65,7 +65,7 @@ public class VanillaBlocksFactory {
                     if (description == null || description.isEmpty()) {
                         description = patch.getClass().getSimpleName();
                     }
-                    StaticLog.logInfo("BlockProperties patch applied: " + description);
+                    StaticLog.logInfo("Update block-info: " + description);
                 }
             }
             catch (Throwable t) {
