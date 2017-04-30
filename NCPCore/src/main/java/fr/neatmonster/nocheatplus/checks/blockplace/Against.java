@@ -40,27 +40,32 @@ public class Against extends Check {
 
     public boolean check(final Player player, final Block block, final Material placedMat, final Block blockAgainst, final BlockPlaceData data, final BlockPlaceConfig cc) {
         boolean violation = false;
-        // TODO: Make more precise (workarounds like WATER_LILY, general points).
+        // TODO: Make more precise (workarounds like WATER_LILY, general points, such as action?).
         // Workaround for signs on cactus and similar.
+        final BlockInteractData bdata = BlockInteractData.getData(player); // TODO: pass as argument.
         final Material againstType = blockAgainst.getType();
-        if (BlockProperties.isAir(againstType)) {
-            // Attempt to workaround blocks like cactus.
-            final BlockInteractData bdata = BlockInteractData.getData(player);
-            if (bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
-                // Block was placed against something (e.g. cactus), allow it.
-                // TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
-                // TODO: Reset on leaving the listener rather - why could it conflict?
-                bdata.resetLastBlock(); 
-                return false;
-            }
+        if (bdata.isConsumedCheck(this.type)) {
+            violation = true;
         }
-        if (BlockProperties.isLiquid(againstType)) {
-            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
+        bdata.addConsumedCheck(this.type);
+        if (!violation) {
+            if (BlockProperties.isAir(againstType)) {
+                // Attempt to workaround blocks like cactus.
+                if (!bdata.getLastisCancelled() && bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
+                    // Block was placed against something (e.g. cactus), allow it.
+                    // TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
+                    // TODO: Reset on leaving the listener rather - why could it conflict?
+                    return false;
+                }
+            }
+            if (BlockProperties.isLiquid(againstType)) {
+                if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
+                    violation = true;
+                }
+            }
+            else if (BlockProperties.isAir(againstType) && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
                 violation = true;
             }
-        }
-        else if (BlockProperties.isAir(againstType) && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
-            violation = true;
         }
         // Handle violation and return.
         if (violation) {

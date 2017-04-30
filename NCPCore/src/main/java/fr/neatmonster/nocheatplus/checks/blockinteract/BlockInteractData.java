@@ -23,7 +23,9 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
@@ -96,9 +98,12 @@ public class BlockInteractData extends ACheckData {
     private int lastX = Integer.MAX_VALUE;
     private int lastY, lastZ;
     /** null for air */
-    public Material lastType = null;
-    public int lastTick;
-    public Action lastAction = null;
+    private Material lastType = null;
+    private int lastTick;
+    private Action lastAction = null;
+    private boolean lastAllowUseBlock = false;
+    private boolean lastAllowUseItem = false;
+    private boolean lastIsCancelled = true;
 
     // Data of the reach check.
     public double reachDistance;
@@ -117,15 +122,28 @@ public class BlockInteractData extends ACheckData {
      */
     public int rateLimitSkip = 0;
 
+    /**
+     * Checks that have been run and passed for the block last interacted with
+     * (rather complete for block-interact checks, to skip subsequent
+     * block-break/place checks).
+     */
     private final Set<CheckType> passedChecks = new HashSet<CheckType>();
+    /**
+     * Checks that have been run and consume this event, i.e. can't be run again
+     * (not complete, may contain checks from other check groups).
+     */
+    private final Set<CheckType> consumedChecks = new HashSet<CheckType>();
 
     public BlockInteractData(final BlockInteractConfig config) {
         super(config);
     }
 
     /**
-     * Last interacted block.
+     * Set last interacted block (coordinates, type, tick). Also resets the
+     * passed checks.
+     * 
      * @param block
+     * @param action
      */
     public void setLastBlock(final Block block, final Action action) {
         lastX = block.getX();
@@ -137,6 +155,8 @@ public class BlockInteractData extends ACheckData {
         }
         lastTick = TickTask.getTick();
         lastAction = action;
+        resetPassedChecks();
+        resetConsumedChecks();
     }
 
     /**
@@ -210,6 +230,36 @@ public class BlockInteractData extends ACheckData {
                 block.getX(), block.getY(), block.getZ());
     }
 
+    public boolean getLastAllowUseItem() {
+        return lastAllowUseItem;
+    }
+
+    public boolean getLastAllowUseBlock() {
+        return lastAllowUseBlock;
+    }
+
+    public boolean getLastisCancelled() {
+        return lastIsCancelled;
+    }
+
+    /**
+     * Get the tick of the last interaction with a block.
+     * 
+     * @return
+     */
+    public int getLastTick() {
+        return lastTick;
+    }
+
+    /**
+     * Get the action of the last interaction with a block.
+     * 
+     * @return
+     */
+    public Action getLastAction() {
+        return lastAction;
+    }
+
     /**
      * Resets the last block (and passed checks).
      */
@@ -218,7 +268,11 @@ public class BlockInteractData extends ACheckData {
         lastAction = null;
         lastX = Integer.MAX_VALUE;
         lastType = null;
+        lastAllowUseBlock = false;
+        lastAllowUseItem = false;
+        lastIsCancelled = true;
         resetPassedChecks();
+        resetConsumedChecks();
     }
 
     /**
@@ -228,8 +282,39 @@ public class BlockInteractData extends ACheckData {
         passedChecks.clear();
     }
 
+    /**
+     * Set the check type to be passed for the last block.
+     * 
+     * @param checkType
+     */
     public void addPassedCheck(final CheckType checkType) {
         passedChecks.add(checkType);
+    }
+
+    /**
+     * Check if the last block was set to be consumed by this check type.
+     * 
+     * @param checkType
+     * @return
+     */
+    public boolean isConsumedCheck(final CheckType checkType) {
+        return consumedChecks.contains(checkType);
+    }
+
+    /**
+     * Reset consumed checks (concern the last block interacted with).
+     */
+    public void resetConsumedChecks() {
+        consumedChecks.clear();
+    }
+
+    /**
+     * Set last block to be consumed by the given check type.
+     * 
+     * @param checkType
+     */
+    public void addConsumedCheck(final CheckType checkType) {
+        consumedChecks.add(checkType);
     }
 
     /**
@@ -243,10 +328,44 @@ public class BlockInteractData extends ACheckData {
     }
 
     /**
-     * Adjustments, disregarding who/what cancelled the event.
+     * Adjust to the results of a BlockInteractEvent - only the results, the
+     * coordinates and action is not updated.
+     * 
+     * @param event
      */
-    public void onCancelledBlockInteractEvent() {
-        resetLastBlock();
+    public void setPlayerInteractEventResolution(final PlayerInteractEvent event) {
+        if (event.isCancelled()) {
+            lastIsCancelled = true;
+            lastAllowUseItem = event.useItemInHand() == Result.ALLOW;
+            lastAllowUseBlock = event.useInteractedBlock() == Result.ALLOW;
+            subsequentCancel ++;
+        }
+        else {
+            lastIsCancelled = false;
+            lastAllowUseItem = event.useItemInHand() != Result.DENY;
+            lastAllowUseBlock = event.useInteractedBlock() != Result.DENY;
+            subsequentCancel = 0;
+        }
+    }
+
+    /**
+     * Adjust to the results of a BlockInteractEvent.
+     * 
+     * @param isCancelled
+     * @param allowUseItem
+     * @param allowUseBlock
+     */
+    public void setPlayerInteractEventResolution(final boolean isCancelled,
+            final boolean allowUseItem, final boolean allowUseBlock) {
+        this.lastIsCancelled = isCancelled;
+        this.lastAllowUseBlock = allowUseBlock;
+        this.lastAllowUseItem = allowUseItem;
+        if (isCancelled) {
+            resetLastBlock();
+        }
+        else {
+
+        }
     }
 
 }

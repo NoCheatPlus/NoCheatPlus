@@ -107,7 +107,7 @@ public class BlockInteractListener extends CheckListener {
             event.setUseInteractedBlock(Result.DENY);
             event.setUseItemInHand(Result.DENY);
             event.setCancelled(true);
-            data.onCancelledBlockInteractEvent();
+            data.resetLastBlock();
             if (cancelId >= 0) {
                 counters.addPrimaryThread(cancelId, 1);
             }
@@ -117,10 +117,12 @@ public class BlockInteractListener extends CheckListener {
         // TODO: Re-arrange for interact spamming. (With ProtocolLib something else is in place as well.)
         final Action action = event.getAction();
         final Block block = event.getClickedBlock();
-        final int previousLastTick = data.lastTick;
+        final int previousLastTick = data.getLastTick();
         // TODO: Last block setting: better on monitor !?.
+        boolean blockChecks = true;
         if (block == null) {
             data.resetLastBlock();
+            blockChecks = false;
         }
         else {
             data.setLastBlock(block, action);
@@ -147,9 +149,14 @@ public class BlockInteractListener extends CheckListener {
 
         boolean cancelled = false;
         if (event.isCancelled() && event.useInteractedBlock() != Result.ALLOW) {
-            data.subsequentCancel ++;
-            data.onCancelledBlockInteractEvent();
-            return;
+            if (event.useItemInHand() == Result.ALLOW) {
+                blockChecks = false;
+                // TODO: Some potential for plugin features...
+            }
+            else {
+                // Can't do more than prevent all (could: set to prevent on highest, if desired).
+                return;
+            }
         }
 
         final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
@@ -161,12 +168,13 @@ public class BlockInteractListener extends CheckListener {
         // TODO: Always run all checks, also for !isBlock ?
 
         // Interaction speed.
-        if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)) {
+        if (!cancelled && speed.isEnabled(player) 
+                && speed.check(player, data, cc)) {
             cancelled = true;
             preventUseItem = true;
         }
 
-        if (block != null) {
+        if (blockChecks) {
             // First the reach check.
             if (!cancelled && reach.isEnabled(player) 
                     && reach.check(player, loc, block, flyingHandle, data, cc)) {
@@ -191,7 +199,6 @@ public class BlockInteractListener extends CheckListener {
             onCancelInteract(player, block, face, event, previousLastTick, preventUseItem, data, cc);
         }
         else {
-            data.subsequentCancel = 0;
             if (flyingHandle.isFlyingQueueFetched()) {
                 final int flyingIndex = flyingHandle.getFirstIndexWithContentIfFetched();
                 final Integer cId;
@@ -256,19 +263,19 @@ public class BlockInteractListener extends CheckListener {
                 }
             }
         }
-        data.onCancelledBlockInteractEvent();
-        data.subsequentCancel ++;
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onPlayerInteractMonitor(final PlayerInteractEvent event) {
+        // Set event resolution.
+        final Player player = event.getPlayer();
+        final BlockInteractData data = BlockInteractData.getData(player);
+        data.setPlayerInteractEventResolution(event);
         // Elytra boost.
         if (event.getAction() == Action.RIGHT_CLICK_AIR 
                 && event.isCancelled() && event.useItemInHand() != Result.DENY) {
-            final Player player = event.getPlayer();
             final ItemStack stack = Bridge1_9.getUsedItem(player, event);
             if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {
-                final BlockInteractData data = BlockInteractData.getData(player);
                 final int power = BridgeMisc.getFireworksPower(stack);
                 final MovingData mData = MovingData.getData(player);
                 final int ticks = Math.max((1 + power) * 20, 30);
@@ -304,7 +311,7 @@ public class BlockInteractListener extends CheckListener {
             final BlockInteractData data, final BlockInteractConfig cc) {
         final StringBuilder builder = new StringBuilder(512);
         // Rate limit.
-        if (data.lastTick == previousLastTick && data.subsequentCancel > 0) {
+        if (data.getLastTick() == previousLastTick && data.subsequentCancel > 0) {
             data.rateLimitSkip ++;
             return;
         }
