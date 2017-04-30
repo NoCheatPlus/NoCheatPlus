@@ -14,17 +14,25 @@
  */
 package fr.neatmonster.nocheatplus.actions.types;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandException;
 
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterHolder;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Execute a command by imitating an administrator typing the command directly into the console.
  */
 public class CommandAction<D extends ParameterHolder, L extends AbstractActionList<D, L>> extends ActionWithParameters<D, L> {
+
+    private final boolean logDebug;
 
     /**
      * Instantiates a new command action.
@@ -41,6 +49,7 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
     public CommandAction(final String name, final int delay, final int repeat, final String command) {
         // Log messages may have color codes now.
         super(name, delay, repeat, command);
+        logDebug = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_COMMANDS_ACTIONS);
     }
 
     /* (non-Javadoc)
@@ -51,12 +60,25 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
         final String command = super.getMessage(violationData);
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
-        } catch (final CommandException e) {
-            StaticLog.logWarning("Failed to execute the command '" + command + "': " + e.getMessage()
-                    + ", please check if everything is setup correct.");
+            if (logDebug) {
+                debug(violationData, command);
+            }
         } catch (final Exception e) {
-            // I don't care in this case, your problem if your command fails.
+            StaticLog.logOnce(Level.WARNING, "Failed to execute the command '" + command + "': " + e.getMessage()
+            + ", please check if everything is setup correct.", StringUtil.throwableToString(e));
         }
+    }
+
+    private void debug(final D violationData, String command) {
+        final String prefix;
+        if (violationData instanceof ViolationData) {
+            ViolationData vd = (ViolationData) violationData;
+            prefix = CheckUtils.getLogMessagePrefix(vd.player, vd.check.getType());
+        }
+        else {
+            prefix = "";
+        }
+        StaticLog.logDebug(prefix + "Execute command action: " + command);
     }
 
     /**

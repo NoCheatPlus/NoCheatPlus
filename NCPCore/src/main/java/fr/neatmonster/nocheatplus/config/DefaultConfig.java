@@ -49,6 +49,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_ACTIVE, true, 785);
         set(ConfPaths.LOGGING_MAXQUEUESIZE, 5000, 785);
         set(ConfPaths.LOGGING_EXTENDED_STATUS, false, 785);
+        set(ConfPaths.LOGGING_EXTENDED_COMMANDS_ACTIONS, false, 1090);
         set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_DEBUG, true, 785);
         set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_DEBUGONLY, false, 785);
         set(ConfPaths.LOGGING_EXTENDED_ALLVIOLATIONS_BACKEND_TRACE, false, 785);

@@ -95,6 +95,8 @@ public abstract class ConfPaths {
 
     private static final String LOGGING_EXTENDED                         = LOGGING + "extended.";
     public static final String  LOGGING_EXTENDED_STATUS                  = LOGGING_EXTENDED + "status";
+    private static final String LOGGING_EXTENDED_COMMANDS                = LOGGING_EXTENDED + "commands.";
+    public static final String  LOGGING_EXTENDED_COMMANDS_ACTIONS        = LOGGING_EXTENDED_COMMANDS + "actions";
     private static final String LOGGING_EXTENDED_ALLVIOLATIONS           = LOGGING_EXTENDED + "allviolations.";
     public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_DEBUG     = LOGGING_EXTENDED_ALLVIOLATIONS + "debug";
     public static final String  LOGGING_EXTENDED_ALLVIOLATIONS_DEBUGONLY = LOGGING_EXTENDED_ALLVIOLATIONS + "debugonly";
