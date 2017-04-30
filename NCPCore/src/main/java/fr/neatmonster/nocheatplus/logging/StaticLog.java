@@ -111,6 +111,19 @@ public class StaticLog {
     }
 
     /**
+     * Convenience method to use the set log stream (see:
+     * {@link #logOnce(StreamID, Level, String, String)}).
+     * 
+     * @param level
+     * @param header
+     * @param longMessage
+     */
+    public static void logOnce(final Level level, 
+            final String header, final String longMessage) {
+        logOnce(streamID, level, header, longMessage);
+    }
+
+    /**
      * Not really once: Always log the header with an id: create a hash of to be
      * logged parts and keep the hash in memory, log it with the header - only
      * log the longMessage once per hash. Once the id tracking storage has
