@@ -408,6 +408,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_MOREPACKETS_BURST_PACKETS, 40, 785);
         set(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT, 60, 785);
         set(ConfPaths.MOVING_MOREPACKETS_BURST_EPM, 180, 785);
+        set(ConfPaths.MOVING_MOREPACKETS_SETBACKAGE, 40, 1091);
         set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel vl>100 log:morepackets:0:2:if cancel cmd:kickpackets", 785);
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true, 785);

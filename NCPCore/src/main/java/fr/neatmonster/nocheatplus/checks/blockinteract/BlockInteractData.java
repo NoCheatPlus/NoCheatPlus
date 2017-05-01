@@ -146,6 +146,8 @@ public class BlockInteractData extends ACheckData {
      * @param action
      */
     public void setLastBlock(final Block block, final Action action) {
+        lastTick = TickTask.getTick();
+        lastAction = action;
         lastX = block.getX();
         lastY = block.getY();
         lastZ = block.getZ();
@@ -153,8 +155,6 @@ public class BlockInteractData extends ACheckData {
         if (lastType == Material.AIR) {
             lastType = null;
         }
-        lastTick = TickTask.getTick();
-        lastAction = action;
         resetPassedChecks();
         resetConsumedChecks();
     }
@@ -190,14 +190,17 @@ public class BlockInteractData extends ACheckData {
 
     /**
      * Full state comparison.
+     * 
      * @param material
+     *            null is treated as Material.AIR.
      * @param action
      * @param tick
      * @param block
      * @return
      */
     public boolean matchesLastBlock(final Material material, final Action action, final int tick, final Block block) {
-        return lastX != Integer.MAX_VALUE && material == lastType && matchesLastBlock(action, tick, block);
+        return lastX != Integer.MAX_VALUE && (material == lastType || material == null && lastType == Material.AIR) 
+                && matchesLastBlock(action, tick, block);
     }
 
     /**
@@ -233,7 +236,6 @@ public class BlockInteractData extends ACheckData {
     public boolean matchesLastBlock(final int tick, final Block block) {
         return lastX != Integer.MAX_VALUE && tick == lastTick && matchesLastBlock(block);
     }
-
 
     /**
      * Compare the block coordinates.

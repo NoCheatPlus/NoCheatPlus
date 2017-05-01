@@ -187,7 +187,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
     public float flySpeed = 0.0f;
 
     /** Count set back (re-) setting. */
-    private int setBackResetCount = 0;
+    private int playerMoveCount = 0;
     /**
      * setBackResetCount (incremented) at the time of (re-) setting the ordinary
      * set back.
@@ -704,7 +704,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
             LocUtil.set(setBack, loc);
         }
         // TODO: Consider adjusting the set back-y here. Problem: Need to take into account for bounding box (collect max-ground-height needed).
-        setBackResetTime = ++setBackResetCount;
+        setBackResetTime = playerMoveCount;
     }
 
     /**
@@ -718,7 +718,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         else{
             LocUtil.set(setBack, loc);
         }
-        setBackResetTime = ++setBackResetCount;
+        setBackResetTime = playerMoveCount;
     }
 
     /**
@@ -857,7 +857,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         else {
             LocUtil.set(morePacketsSetback, loc);
         }
-        morePacketsSetBackResetTime = ++setBackResetCount;
+        morePacketsSetBackResetTime = playerMoveCount;
     }
 
     public final void setMorePacketsSetBack(final Location loc) {
@@ -867,7 +867,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         else {
             LocUtil.set(morePacketsSetback, loc);
         }
-        morePacketsSetBackResetTime = ++setBackResetCount;
+        morePacketsSetBackResetTime = playerMoveCount;
     }
 
     public Location getMorePacketsSetBack() {
@@ -1349,6 +1349,35 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      */
     public SimpleAxisVelocity getVerticalVelocityTracker() {
         return verVel;
+    }
+
+    /**
+     * The number of move events received.
+     * 
+     * @return
+     */
+    public int getPlayerMoveCount() {
+        return playerMoveCount;
+    }
+
+    /**
+     * Called with player move events.
+     */
+    public void increasePlayerMoveCount() {
+        playerMoveCount++;
+        if (playerMoveCount == Integer.MAX_VALUE) {
+            playerMoveCount = 0;
+            morePacketsSetBackResetTime = 0;
+            setBackResetTime = 0;
+        }
+    }
+
+    /**
+     * Age in move events.
+     * @return
+     */
+    public int getMorePacketsSetBackAge() {
+        return playerMoveCount - morePacketsSetBackResetTime;
     }
 
 }

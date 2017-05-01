@@ -103,10 +103,13 @@ public class MorePackets extends Check {
                 return data.hasMorePacketsSetBack() ? data.getMorePacketsSetBack() : data.getSetBack(to);
             }
         } 
-        else if (allowSetSetBack) {
+        else if (allowSetSetBack && data.getMorePacketsSetBackAge() > cc.morePacketsSetBackAge) {
             // Update the set back location. (CHANGED to only update, if not a violation.)
             // (Might update whenever newTo == null)
             data.setMorePacketsSetBack(from);
+            if (data.debug) {
+                debug(player, "Update set back (morepackets) to from.");
+            }
         }
 
         // No set back.

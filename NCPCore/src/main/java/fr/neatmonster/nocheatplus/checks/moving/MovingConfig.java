@@ -124,6 +124,7 @@ public class MovingConfig extends ACheckConfig {
     public final float		morePacketsBurstPackets;
     public final double		morePacketsBurstDirect;
     public final double		morePacketsBurstEPM;
+    public final int        morePacketsSetBackAge;
     public final ActionList morePacketsActions;
 
     public final boolean    noFallCheck;
@@ -268,6 +269,7 @@ public class MovingConfig extends ACheckConfig {
         morePacketsBurstPackets = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsBurstDirect = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT);
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
+        morePacketsSetBackAge = config.getInt(ConfPaths.MOVING_MOREPACKETS_SETBACKAGE);
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);

@@ -333,6 +333,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
+        data.increasePlayerMoveCount();
 
         /*
          * TODO: Check if teleportation is set, verify if scheduled (tick task).
