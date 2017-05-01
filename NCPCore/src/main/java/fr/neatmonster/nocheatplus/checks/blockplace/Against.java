@@ -44,7 +44,8 @@ public class Against extends Check {
         // Workaround for signs on cactus and similar.
         final BlockInteractData bdata = BlockInteractData.getData(player); // TODO: pass as argument.
         final Material againstType = blockAgainst.getType();
-        if (bdata.isConsumedCheck(this.type)) {
+        if (bdata.isConsumedCheck(this.type) && !bdata.isPassedCheck(this.type)) {
+            // TODO: Awareness of repeated violation probably is to be implemented below somewhere.
             violation = true;
         }
         bdata.addConsumedCheck(this.type);
