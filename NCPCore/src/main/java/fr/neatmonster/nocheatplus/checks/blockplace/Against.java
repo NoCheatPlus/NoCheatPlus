@@ -51,7 +51,7 @@ public class Against extends Check {
         if (!violation) {
             if (BlockProperties.isAir(againstType)) {
                 // Attempt to workaround blocks like cactus.
-                if (!bdata.getLastisCancelled() && bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
+                if (!bdata.getLastIsCancelled() && bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
                     // Block was placed against something (e.g. cactus), allow it.
                     // TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
                     // TODO: Reset on leaving the listener rather - why could it conflict?

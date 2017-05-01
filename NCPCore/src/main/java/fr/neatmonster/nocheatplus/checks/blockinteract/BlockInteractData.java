@@ -238,7 +238,7 @@ public class BlockInteractData extends ACheckData {
         return lastAllowUseBlock;
     }
 
-    public boolean getLastisCancelled() {
+    public boolean getLastIsCancelled() {
         return lastIsCancelled;
     }
 
