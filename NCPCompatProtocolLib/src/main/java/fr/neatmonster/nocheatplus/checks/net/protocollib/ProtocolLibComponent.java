@@ -28,6 +28,9 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.PacketType.Protocol;
+import com.comphenix.protocol.PacketType.Sender;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -62,6 +65,27 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
     public static final int idNullPlayer = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.nullplayer");
     /** Likely does not happen, TODO: Code review protocol plugin. */
     public static final int idInconsistentIsAsync = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).registerKey("packet.inconsistent.isasync");
+
+    /**
+     * Auxiliary method for suppressing exceptions.
+     * 
+     * @param protocol
+     * @param sender
+     * @param name
+     *            PacketType if available, null otherwise.
+     * @return
+     */
+    public static PacketType findPacketTypeByName(Protocol protocol, Sender sender, String name) {
+        try {
+            return PacketType.findCurrent(protocol, sender, name);
+        }
+        catch (Throwable t) {
+            // uh
+            return null;
+        }
+    }
+
+    // INSTANCE ----
 
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
@@ -140,6 +164,9 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
         } catch (Throwable t) {
             StaticLog.logWarning("Could not register packet level hook: " + clazz.getSimpleName());
             StaticLog.logWarning(t);
+            if (t.getCause() != null) {
+                StaticLog.logWarning(t.getCause());
+            }
         }
     }
 

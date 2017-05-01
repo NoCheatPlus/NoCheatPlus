@@ -78,17 +78,11 @@ public class MovingFlying extends BaseAdapter {
                 PacketType.Play.Client.POSITION_LOOK
                 ));
         // Add confirm teleport.
-        try {
-            PacketType confirmType;
-            // PacketPlayInTeleportAccept
-            confirmType = PacketType.findCurrent(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
-            if (confirmType != null) {
-                StaticLog.logInfo("Confirm teleport packet available (via name): " + confirmType);
-                types.add(confirmType);
-            }
-        }
-        catch (Throwable t) {
-            // uh
+        // PacketPlayInTeleportAccept
+        PacketType confirmType = ProtocolLibComponent.findPacketTypeByName(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
+        if (confirmType != null) {
+            StaticLog.logInfo("Confirm teleport packet available (via name): " + confirmType);
+            types.add(confirmType);
         }
         return types.toArray(new PacketType[types.size()]);
     }
@@ -108,7 +102,7 @@ public class MovingFlying extends BaseAdapter {
     private long packetMismatchLogFrequency = 60000; // Every minute max, good for updating :).
 
     private final HashSet<PACKET_CONTENT> validContent = new LinkedHashSet<PACKET_CONTENT>();
-    private final PacketType confirmTeleportType = PacketType.findCurrent(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
+    private final PacketType confirmTeleportType = ProtocolLibComponent.findPacketTypeByName(Protocol.PLAY, Sender.CLIENT, "PacketPlayInTeleportAccept");
     private boolean acceptConfirmTeleportPackets = confirmTeleportType != null;
 
     public MovingFlying(Plugin plugin) {
@@ -225,7 +219,7 @@ public class MovingFlying extends BaseAdapter {
                     if (data.debug) {
                         debug(player, "Incoming packet, still waiting for ACK on outgoing position.");
                     }
-                    if (cc.supersededFlyingCancelWaiting) {
+                    if (confirmTeleportType != null && cc.supersededFlyingCancelWaiting) {
                         // Don't add to the flying queue for now (assumed invalid).
                         final AckReference ackReference = data.teleportQueue.getLastAckReference();
                         if (ackReference.lastOutgoingId != Integer.MIN_VALUE
