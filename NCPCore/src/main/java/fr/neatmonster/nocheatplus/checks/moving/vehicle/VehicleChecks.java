@@ -225,7 +225,8 @@ public class VehicleChecks extends CheckListener {
                 // Treat like VehicleUpdateEvent.
                 onVehicleUpdate(vehicle, vehicleType, player, true, data);
                 return null;
-            } else {
+            }
+            else {
                 final Location vLoc = vehicle.getLocation();
                 data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
                 // TODO: Consider TeleportUtil.forceMount or similar.
@@ -235,10 +236,12 @@ public class VehicleChecks extends CheckListener {
                         // checks.moving.vehicle.enforcelocation
                         // TODO: Permission + bypass check(s) !
                         return vLoc;
-                    } else {
+                    }
+                    else {
                         return null;
                     }
-                } else {
+                }
+                else {
                     // (Skip chunk loading here.)
                     aux.resetPositionsAndMediumProperties(player, vLoc, data, cc);
                     return null;
@@ -253,7 +256,7 @@ public class VehicleChecks extends CheckListener {
      * @param event
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onVehicleUpdate(final VehicleUpdateEvent event) {
+    public void b(final VehicleUpdateEvent event) {
         // TODO: VehicleUpdateEvent. How to track teleporting of the vehicle?
         // TODO: Track just left vehicle/entity positions otherwise (on tick + vehicle update)?
         // TODO: No problem: (?) update 'authorized state' if no player passenger.
@@ -517,6 +520,7 @@ public class VehicleChecks extends CheckListener {
             if (data.timeSinceSetBack == 0 || thisMove.to.hashCode() == data.lastSetBackHash) {
                 // TODO: This is a hot fix, to prevent a set back loop. Depends on having only the morepackets set back for vehicles.
                 // TODO: Perhaps might want to add || !data.equalsAnyVehicleSetBack(to)
+                thisMove.specialCondition = true;
                 if (data.debug) {
                     debug(player, "Skip envelope check on first move after set back acknowledging the set back with an odd starting point (from).");
                 }
@@ -889,25 +893,25 @@ public class VehicleChecks extends CheckListener {
         useLoc2.setWorld(null);
     }
 
-    //    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-    //    public void onEntityTeleport(final EntityTeleportEvent event) {
-    //        final Entity entity = event.getEntity();
-    //        if (entity == null) {
-    //            return;
-    //        }
-    //        final Player player = CheckUtils.getFirstPlayerPassenger(entity);
-    //        if (player != null && MovingData.getData(player).debug) {
-    //            debug(player, "Entity teleport with player as passenger: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
-    //        }
-    //        else {
-    //            // Log if the debug config flag is set.
-    //            final World world = LocUtil.getFirstWorld(event.getFrom(), event.getTo());
-    //            if (world != null && MovingConfig.getConfig(world.getName()).debug) {
-    //                // TODO: Keep (expiring) entity data, for recently mounted, possibly for fight checks too?
-    //                debug(null, "Entity teleport: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
+    //        @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+    //        public void onEntityTeleport(final EntityTeleportEvent event) {
+    //            final Entity entity = event.getEntity();
+    //            if (entity == null) {
+    //                return;
+    //            }
+    //            final Player player = passengerUtil.getFirstPlayerPassenger(entity);
+    //            if (player != null && MovingData.getData(player).debug) {
+    //                debug(player, "Entity teleport with player as passenger: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
+    //            }
+    //            else {
+    //                // Log if the debug config flag is set.
+    //                final World world = LocUtil.getFirstWorld(event.getFrom(), event.getTo());
+    //                if (world != null && MovingConfig.getConfig(world.getName()).debug) {
+    //                    // TODO: Keep (expiring) entity data, for recently mounted, possibly for fight checks too?
+    //                    debug(null, "Entity teleport: " + entity + " from=" + event.getFrom() + " to=" + event.getTo());
+    //                }
     //            }
     //        }
-    //    }
 
     /**
      * Intended for vehicle-move events.

@@ -39,12 +39,16 @@ public class VehicleMoveData extends PlayerMoveData {
     /** Lazily set for minecarts. */
     public boolean fromOnRails, toOnRails;
 
+    // Special properties added by checks.
+    /** Special condition, the move coordinates may be wrong. */
+    public boolean specialCondition = false;
+
     @Override
     protected void resetBase() {
         // Vehicle properties.
         vehicleId = null;
         vehicleType = null;
-        fromOnRails = toOnRails = false;
+        fromOnRails = toOnRails = specialCondition = false;
         // Super class last, because it'll set valid to true in the end.
         super.resetBase();
     }

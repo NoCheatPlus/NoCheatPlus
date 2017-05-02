@@ -32,6 +32,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.magic.MagicVehicle;
+import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
@@ -403,7 +404,7 @@ public class VehicleEnvelope extends Check {
         // Enforce falling speed (vdist) envelope by in-air phase count.
         // Slow falling (vdist), do not bind to descending in general.
         final double minDescend = -(thisMove.yDistance < -MagicVehicle.boatLowGravitySpeed ? MagicVehicle.boatGravityMinAtSpeed : MagicVehicle.boatGravityMin) * (checkDetails.canJump ? Math.max(data.sfJumpPhase - MagicVehicle.maxJumpPhaseAscend, 0) : data.sfJumpPhase);
-        final double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
+        final double maxDescend = getInAirMaxDescend(thisMove, data);
         if (data.sfJumpPhase > (checkDetails.canJump ? MagicVehicle.maxJumpPhaseAscend : 1)
                 && thisMove.yDistance > Math.max(minDescend, -checkDetails.gravityTargetSpeed)) {
             tags.add("slow_fall_vdist");
@@ -422,11 +423,28 @@ public class VehicleEnvelope extends Check {
                 checkDetails.checkDescendMuch = checkDetails.checkAscendMuch = false; // (Full envelope has been checked.)
             }
             if (data.debug) {
-                debugDetails.add("minDescend: " + minDescend);
                 debugDetails.add("maxDescend: " + maxDescend);
             }
         }
         return violation;
+    }
+
+    private double getInAirMaxDescend(final PlayerMoveData thisMove, final MovingData data) {
+        double maxDescend = -MagicVehicle.boatGravityMax * data.sfJumpPhase - 0.5;
+        final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
+        if (thisMove.yDistance < maxDescend && firstPastMove.toIsValid) {
+            if (firstPastMove.yDistance < maxDescend && firstPastMove.yDistance > maxDescend * 2.5) {
+                // Simply continue with friction.
+                maxDescend = Math.min(maxDescend, firstPastMove.yDistance - (MagicVehicle.boatGravityMax + MagicVehicle.boatGravityMin) / 2.0);
+                debugDetails.add("desc_frict");
+            }
+            else if (firstPastMove.specialCondition && thisMove.yDistance > -1.5) {
+                // After special set-back confirm move, observed ca. -1.1.
+                maxDescend = Math.min(maxDescend, -1.5);
+                debugDetails.add("desc_special");
+            }
+        }
+        return maxDescend;
     }
 
     private boolean maxDistHorizontal(final VehicleMoveData thisMove, final double maxDistanceHorizontal) {
