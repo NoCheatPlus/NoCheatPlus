@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
@@ -85,7 +86,7 @@ public class BlockBreakListener extends CheckListener {
      */
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
-
+        final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
 
         // Illegal enchantments hotfix check.
@@ -108,7 +109,6 @@ public class BlockBreakListener extends CheckListener {
 
 
         final Block block = event.getBlock();
-
         boolean cancelled = false;
 
         // Do the actual checks, if still needed. It's a good idea to make computationally cheap checks first, because
@@ -116,7 +116,14 @@ public class BlockBreakListener extends CheckListener {
 
         final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);
-        final long now = System.currentTimeMillis();
+        final BlockInteractData bdata = BlockInteractData.getData(player);
+        /*
+         * Re-check if this is a block interacted with before. With instantly
+         * broken blocks, this may be off by one orthogonally.
+         */
+        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(block);
+        int skippedRedundantChecks = 0;
+
 
         final GameMode gameMode = player.getGameMode();
 
@@ -132,7 +139,8 @@ public class BlockBreakListener extends CheckListener {
         }
 
         // Has the player broken blocks faster than possible?
-        if (!cancelled && gameMode != GameMode.CREATIVE && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data)) {
+        if (!cancelled && gameMode != GameMode.CREATIVE
+                && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data)) {
             cancelled = true;
         }
 
@@ -142,14 +150,25 @@ public class BlockBreakListener extends CheckListener {
         }
 
         // Is the block really in reach distance?
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data)) {
-            cancelled = true;
+        if (!cancelled) {
+            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
+                skippedRedundantChecks ++;
+            }
+            else if (reach.isEnabled(player) && reach.check(player, block, data)) {
+                cancelled = true;
+            }
         }
 
         // Did the player look at the block at all?
         // TODO: Skip if checks were run on this block (all sorts of hashes/conditions).
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, data)) {
-            cancelled = true;
+        if (!cancelled) {
+            if (isInteractBlock && (bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)
+                    || bdata.isPassedCheck(CheckType.BLOCKINTERACT_VISIBLE))) {
+                skippedRedundantChecks ++;
+            }
+            else if (direction.isEnabled(player) && direction.check(player, block, data)) {
+                cancelled = true;
+            }
         }
 
         // Destroying liquid blocks.
@@ -168,13 +187,12 @@ public class BlockBreakListener extends CheckListener {
             data.clickedY = block.getY();
             data.clickedZ = block.getZ();
         }
-        else{
+        else {
             // Invalidate last damage position:
             //        	data.clickedX = Integer.MAX_VALUE;
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
-                debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
-                debugBlockVSBlockInteract(player, block, "onBlockBreak");
+                debugBlockBreakResult(player, block, skippedRedundantChecks);
             }
         }
 
@@ -189,6 +207,15 @@ public class BlockBreakListener extends CheckListener {
         data.fastBreakBreakTime = now;
         //        data.fastBreakfirstDamage = now;
         isInstaBreak = AlmostBoolean.NO;
+    }
+
+    private void debugBlockBreakResult(final Player player, final Block block, final int skippedRedundantChecks) {
+        debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, block, "onBlockBreak", 
+                Action.LEFT_CLICK_BLOCK);
+        if (skippedRedundantChecks > 0) {
+            debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
+        }
     }
 
     /**
@@ -230,11 +257,16 @@ public class BlockBreakListener extends CheckListener {
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockDamageLowest(final BlockDamageEvent event) {
+        /*
+         * TODO: Add a check type BLOCKDAMAGE_CONFIRM (no permission):
+         * Cancel if the block doesn't match (MC 1.11.2, other ...)?
+         */
         if (MovingUtil.hasScheduledPlayerSetBack(event.getPlayer())) {
             event.setCancelled(true);
         }
         else if (event.getInstaBreak()) {
             // Indicate that this might have been set by CB/MC.
+            // TODO: Set in BlockInteractListener !!
             isInstaBreak = AlmostBoolean.MAYBE;
         }
     }
@@ -273,6 +305,7 @@ public class BlockBreakListener extends CheckListener {
         // Skip if already set to the same block without breaking within one tick difference.
         final ItemStack stack = Bridge1_9.getItemInMainHand(player);
         final Material tool = stack == null ? null: stack.getType();
+
         if (data.toolChanged(tool)) {
             // Update.
         } else if (tick < data.clickedTick || now < data.fastBreakfirstDamage || now < data.fastBreakBreakTime) {
@@ -289,28 +322,9 @@ public class BlockBreakListener extends CheckListener {
         data.setClickedBlock(block, tick, now, tool);
         // Compare with BlockInteract data (debug first).
         if (data.debug) {
-            debugBlockVSBlockInteract(player, block, "checkBlockDamage");
+            BlockInteractListener.debugBlockVSBlockInteract(player, this.checkType, block, "checkBlockDamage", 
+                    Action.LEFT_CLICK_BLOCK);
         }
-    }
-
-    private void debugBlockVSBlockInteract(final Player player, final Block block, final String prefix) {
-        final BlockInteractData bdata = BlockInteractData.getData(player);
-        final int manhattan = bdata.manhattanLastBlock(block);
-        String msg;
-        if (manhattan == Integer.MAX_VALUE) {
-            msg =  "no last block set!";
-        }
-        else {
-            msg = manhattan == 0 ? "same as last block." 
-                    : ("last block differs, Manhattan: " + manhattan);
-            if (bdata.getLastIsCancelled()) {
-                msg += " / cancelled";
-            }
-            if (bdata.getLastAction() != Action.LEFT_CLICK_BLOCK) {
-                msg += " / action=" + bdata.getLastAction();
-            }
-        }
-        debug(player, prefix + " BlockInteract: " + msg);
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)

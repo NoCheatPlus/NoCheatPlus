@@ -60,7 +60,11 @@ public class WrongBlock extends Check {
         }
         else if (dist == 1) {
             // One might to a concession in case of instant breaking.
+            // TODO: WHY ?
             if (now - data.wasInstaBreak < 60) {
+                if (data.debug) {
+                    debug(player, "Skip on Manhattan 1 and wasInstaBreak within 60 ms.");
+                }
                 wrongBlock = false;
             }
             else {

@@ -35,6 +35,8 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
@@ -146,6 +148,9 @@ public class BlockPlaceListener extends CheckListener {
 
         final BlockPlaceData data = BlockPlaceData.getData(player);
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+        final BlockInteractData bdata = BlockInteractData.getData(player);
+        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(blockAgainst);
+        int skippedRedundantChecks = 0;
 
         final boolean shouldSkipSome;
         if (blockMultiPlaceEvent != null && event.getClass() == blockMultiPlaceEvent) {
@@ -169,7 +174,7 @@ public class BlockPlaceListener extends CheckListener {
             // Always hash as sign post for improved compatibility with Lockette etc.
             data.autoSignPlacedHash = getBlockPlaceHash(block, Material.SIGN);
         }
-        
+
         // Don't run checks, if a set back is scheduled.
         if (!cancelled && MovingUtil.hasScheduledPlayerSetBack(player)) {
             cancelled = true;
@@ -193,13 +198,23 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Reach check (distance).
-        if (!cancelled && !shouldSkipSome && reach.isEnabled(player) && reach.check(player, block, data, cc)) {
-            cancelled = true;
+        if (!cancelled && !shouldSkipSome) {
+            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
+                skippedRedundantChecks ++;
+            }
+            else if (reach.isEnabled(player) && reach.check(player, block, data, cc)) {
+                cancelled = true;
+            }
         }
 
         // Direction check.
-        if (!cancelled && !shouldSkipSome && direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
-            cancelled = true;
+        if (!cancelled && !shouldSkipSome) {
+            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
+                skippedRedundantChecks ++;
+            }
+            else if (direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
+                cancelled = true;
+            }
         }
 
         // Surrounding material.
@@ -214,11 +229,22 @@ public class BlockPlaceListener extends CheckListener {
         else {
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
-                debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+                debugBlockPlace(player, placedMat, block, blockAgainst, skippedRedundantChecks);
             }
         }
         // Cleanup
         // Reminder(currently unused): useLoc.setWorld(null);
+    }
+
+    private void debugBlockPlace(final Player player, final Material placedMat, 
+            final Block block, final Block blockAgainst, 
+            final int skippedRedundantChecks) {
+        debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, blockAgainst, "onBlockInteract(blockAgainst)", 
+                Action.RIGHT_CLICK_BLOCK);
+        if (skippedRedundantChecks > 0) {
+            debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

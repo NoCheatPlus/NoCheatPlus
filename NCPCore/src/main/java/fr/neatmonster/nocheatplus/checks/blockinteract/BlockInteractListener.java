@@ -38,6 +38,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
@@ -49,6 +50,29 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  * @see BlockInteractEvent
  */
 public class BlockInteractListener extends CheckListener {
+
+    public static void debugBlockVSBlockInteract(final Player player, final CheckType checkType, 
+            final Block block, final String prefix, final Action expectedAction) {
+        final BlockInteractData bdata = BlockInteractData.getData(player);
+        final int manhattan = bdata.manhattanLastBlock(block);
+        String msg;
+        if (manhattan == Integer.MAX_VALUE) {
+            msg =  "no last block set!";
+        }
+        else {
+            msg = manhattan == 0 ? "same as last block." 
+                    : ("last block differs, Manhattan: " + manhattan);
+            if (bdata.getLastIsCancelled()) {
+                msg += " / cancelled";
+            }
+            if (bdata.getLastAction() != expectedAction) {
+                msg += " / action=" + bdata.getLastAction();
+            }
+        }
+        CheckUtils.debug(player, checkType, prefix + " BlockInteract: " + msg);
+    }
+
+    // INSTANCE ----
 
     /** The looking-direction check. */
     private final Direction direction = addCheck(new Direction());
@@ -82,10 +106,10 @@ public class BlockInteractListener extends CheckListener {
      *            the event
      */
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
-    protected void onPlayerInteract(final PlayerInteractEvent event) {
+    public void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final BlockInteractData data = BlockInteractData.getData(player);
-        data.resetPassedChecks();
+        data.resetLastBlock();
         // Early cancel for interact events with dead players and other.
         final int cancelId;
         if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) { // TODO: Should be dead !?.
@@ -107,7 +131,7 @@ public class BlockInteractListener extends CheckListener {
             event.setUseInteractedBlock(Result.DENY);
             event.setUseItemInHand(Result.DENY);
             event.setCancelled(true);
-            data.resetLastBlock();
+            data.setPlayerInteractEventResolution(event);
             if (cancelId >= 0) {
                 counters.addPrimaryThread(cancelId, 1);
             }
@@ -144,6 +168,7 @@ public class BlockInteractListener extends CheckListener {
                 }
                 break;
             default:
+                data.setPlayerInteractEventResolution(event);
                 return;
         }
 
@@ -155,6 +180,7 @@ public class BlockInteractListener extends CheckListener {
             }
             else {
                 // Can't do more than prevent all (could: set to prevent on highest, if desired).
+                data.setPlayerInteractEventResolution(event);
                 return;
             }
         }
@@ -218,6 +244,8 @@ public class BlockInteractListener extends CheckListener {
                 counters.addPrimaryThread(idInteractLookCurrent, 1);
             }
         }
+        // Set resolution here already:
+        data.setPlayerInteractEventResolution(event);
         useLoc.setWorld(null);
     }
 
@@ -271,6 +299,11 @@ public class BlockInteractListener extends CheckListener {
         final Player player = event.getPlayer();
         final BlockInteractData data = BlockInteractData.getData(player);
         data.setPlayerInteractEventResolution(event);
+        /*
+         * TODO: BlockDamageEvent fires before MONITOR level, BlockBreak after
+         * (!). Thus resolution is set on LOWEST already, probably should be
+         * HIGHEST to account for other plugins.
+         */
         // Elytra boost.
         if (event.getAction() == Action.RIGHT_CLICK_AIR 
                 && event.isCancelled() && event.useItemInHand() != Result.DENY) {

@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -311,6 +313,14 @@ public class BlockInteractData extends ACheckData {
     }
 
     /**
+     * 
+     * @return Unmodifiable collection.
+     */
+    public Collection<CheckType> getPassedChecks() {
+        return Collections.unmodifiableCollection(passedChecks);
+    }
+
+    /**
      * Check if the last block was set to be consumed by this check type.
      * 
      * @param checkType
@@ -337,6 +347,7 @@ public class BlockInteractData extends ACheckData {
      */
     public void setPlayerInteractEventResolution(final PlayerInteractEvent event) {
         if (event.isCancelled()) {
+            // TODO: resetPassedChecks() ?
             lastIsCancelled = true;
             lastAllowUseItem = event.useItemInHand() == Result.ALLOW;
             lastAllowUseBlock = event.useInteractedBlock() == Result.ALLOW;
