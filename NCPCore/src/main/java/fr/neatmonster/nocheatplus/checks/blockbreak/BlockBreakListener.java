@@ -32,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
@@ -173,6 +174,7 @@ public class BlockBreakListener extends CheckListener {
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
                 debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+                debugBlockVSBlockInteract(player, block, "onBlockBreak");
             }
         }
 
@@ -285,6 +287,30 @@ public class BlockBreakListener extends CheckListener {
         // (Always set, the interact event only fires once: the first time.)
         // Only record first damage:
         data.setClickedBlock(block, tick, now, tool);
+        // Compare with BlockInteract data (debug first).
+        if (data.debug) {
+            debugBlockVSBlockInteract(player, block, "checkBlockDamage");
+        }
+    }
+
+    private void debugBlockVSBlockInteract(final Player player, final Block block, final String prefix) {
+        final BlockInteractData bdata = BlockInteractData.getData(player);
+        final int manhattan = bdata.manhattanLastBlock(block);
+        String msg;
+        if (manhattan == Integer.MAX_VALUE) {
+            msg =  "no last block set!";
+        }
+        else {
+            msg = manhattan == 0 ? "same as last block." 
+                    : ("last block differs, Manhattan: " + manhattan);
+            if (bdata.getLastIsCancelled()) {
+                msg += " / cancelled";
+            }
+            if (bdata.getLastAction() != Action.LEFT_CLICK_BLOCK) {
+                msg += " / action=" + bdata.getLastAction();
+            }
+        }
+        debug(player, prefix + " BlockInteract: " + msg);
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
