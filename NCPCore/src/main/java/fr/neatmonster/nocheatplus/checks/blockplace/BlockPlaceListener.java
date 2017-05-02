@@ -42,6 +42,8 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -197,24 +199,33 @@ public class BlockPlaceListener extends CheckListener {
             cancelled = true;
         }
 
-        // Reach check (distance).
-        if (!cancelled && !shouldSkipSome) {
-            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
-                skippedRedundantChecks ++;
+        final FlyingQueueHandle flyingHandle;
+        if (cc.reachCheck || cc.directionCheck) {
+            flyingHandle = new FlyingQueueHandle(player);
+            final Location loc = player.getLocation(useLoc);
+            // Reach check (distance).
+            if (!cancelled && !shouldSkipSome) {
+                if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
+                    skippedRedundantChecks ++;
+                }
+                else if (reach.isEnabled(player) && reach.check(player, block, data, cc)) {
+                    cancelled = true;
+                }
             }
-            else if (reach.isEnabled(player) && reach.check(player, block, data, cc)) {
-                cancelled = true;
-            }
-        }
 
-        // Direction check.
-        if (!cancelled && !shouldSkipSome) {
-            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
-                skippedRedundantChecks ++;
+            // Direction check.
+            if (!cancelled && !shouldSkipSome) {
+                if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
+                    skippedRedundantChecks ++;
+                }
+                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, data, cc)) {
+                    cancelled = true;
+                }
             }
-            else if (direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
-                cancelled = true;
-            }
+            useLoc.setWorld(null);
+        }
+        else {
+            flyingHandle = null;
         }
 
         // Surrounding material.
@@ -229,7 +240,7 @@ public class BlockPlaceListener extends CheckListener {
         else {
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
-                debugBlockPlace(player, placedMat, block, blockAgainst, skippedRedundantChecks);
+                debugBlockPlace(player, placedMat, block, blockAgainst, skippedRedundantChecks, flyingHandle);
             }
         }
         // Cleanup
@@ -238,12 +249,20 @@ public class BlockPlaceListener extends CheckListener {
 
     private void debugBlockPlace(final Player player, final Material placedMat, 
             final Block block, final Block blockAgainst, 
-            final int skippedRedundantChecks) {
+            final int skippedRedundantChecks, final FlyingQueueHandle flyingHandle) {
         debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
         BlockInteractListener.debugBlockVSBlockInteract(player, checkType, blockAgainst, "onBlockInteract(blockAgainst)", 
                 Action.RIGHT_CLICK_BLOCK);
         if (skippedRedundantChecks > 0) {
             debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
+        }
+        if (flyingHandle != null && flyingHandle.isFlyingQueueFetched()) {
+            final int flyingIndex = flyingHandle.getFirstIndexWithContentIfFetched();
+            final DataPacketFlying packet = flyingHandle.getIfFetched(flyingIndex);
+            if (packet != null) {
+                debug(player, "Flying packet queue used at index " + flyingIndex + ": pitch=" + packet.getPitch() + ",yaw=" + packet.getYaw());
+                return;
+            }
         }
     }
 

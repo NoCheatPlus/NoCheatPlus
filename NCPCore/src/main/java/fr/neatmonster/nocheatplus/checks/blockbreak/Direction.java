@@ -14,23 +14,17 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.collision.CollisionUtil;
-import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.checks.generic.block.AbstractBlockDirectionCheck;
 
 /**
- * The Direction check will find out if a player tried to interact with something that's not in their field of view.
+ * The Direction check will find out if a player tried to interact with
+ * something that's not in their field of view.
  */
-public class Direction extends Check {
-
-    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
-    private final Location useLoc = new Location(null, 0, 0, 0);
+public class Direction extends AbstractBlockDirectionCheck<BlockBreakData, BlockBreakConfig> {
 
     /**
      * Instantiates a new direction check.
@@ -39,41 +33,20 @@ public class Direction extends Check {
         super(CheckType.BLOCKBREAK_DIRECTION);
     }
 
-    /**
-     * Checks a player.
-     * 
-     * @param player
-     *            the player
-     * @param location
-     *            the location
-     * @return true, if successful
-     */
-    public boolean check(final Player player, final Block block, final BlockBreakData data) {
-
-        boolean cancel = false;
-
-        // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
-        // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
-        final Location loc = player.getLocation(useLoc);
-        final Vector direction = loc.getDirection();
-        final double off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), direction, block, TrigUtil.DIRECTION_PRECISION);
-
-        if (off > 0.1D) {
-            // Player failed the check. Let's try to guess how far they were from looking directly to the block...
-            final Vector blockEyes = new Vector(0.5 + block.getX() - loc.getX(), 0.5 + block.getY() - loc.getY() - player.getEyeHeight(), 0.5 + block.getZ() - loc.getZ());
-            final double distance = blockEyes.crossProduct(direction).length() / direction.length();
-
-            // Add the overall violation level of the check.
-            data.directionVL += distance;
-
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event.
-            cancel = executeActions(player, data.directionVL, distance, BlockBreakConfig.getConfig(player).directionActions).willCancel();
-        } else {
-            // Player did likely nothing wrong, reduce violation counter to reward them.
-            data.directionVL *= 0.9D;
-        }
-        useLoc.setWorld(null);
-        return cancel;
+    @Override
+    protected double addVL(Player player, double distance, BlockBreakData data, BlockBreakConfig cc) {
+        data.directionVL += distance;
+        return data.directionVL;
     }
+
+    @Override
+    protected ActionList getActions(BlockBreakConfig cc) {
+        return cc.directionActions;
+    }
+
+    @Override
+    protected void cooldown(Player player, BlockBreakData data, BlockBreakConfig cc) {
+        data.directionVL *= 0.9D;
+    }
+
 }

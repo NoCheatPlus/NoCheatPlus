@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -36,6 +37,8 @@ import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
+import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -73,6 +76,9 @@ public class BlockBreakListener extends CheckListener {
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDIllegalItem = counters.registerKey("illegalitem");
+
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
     public BlockBreakListener(){
         super(CheckType.BLOCKBREAK);
@@ -149,26 +155,36 @@ public class BlockBreakListener extends CheckListener {
             cancelled = true;
         }
 
-        // Is the block really in reach distance?
-        if (!cancelled) {
-            if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
-                skippedRedundantChecks ++;
+        final FlyingQueueHandle flyingHandle;
+        if (cc.reachCheck || cc.directionCheck) {
+            flyingHandle = new FlyingQueueHandle(player);
+            final Location loc = player.getLocation(useLoc);
+            // Is the block really in reach distance?
+            if (!cancelled) {
+                if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
+                    skippedRedundantChecks ++;
+                }
+                else if (reach.isEnabled(player) && reach.check(player, block, data)) {
+                    cancelled = true;
+                }
             }
-            else if (reach.isEnabled(player) && reach.check(player, block, data)) {
-                cancelled = true;
-            }
-        }
 
-        // Did the player look at the block at all?
-        // TODO: Skip if checks were run on this block (all sorts of hashes/conditions).
-        if (!cancelled) {
-            if (isInteractBlock && (bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)
-                    || bdata.isPassedCheck(CheckType.BLOCKINTERACT_VISIBLE))) {
-                skippedRedundantChecks ++;
+            // Did the player look at the block at all?
+            // TODO: Skip if checks were run on this block (all sorts of hashes/conditions).
+            if (!cancelled) {
+                if (isInteractBlock && (bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)
+                        || bdata.isPassedCheck(CheckType.BLOCKINTERACT_VISIBLE))) {
+                    skippedRedundantChecks ++;
+                }
+                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, 
+                        data, cc)) {
+                    cancelled = true;
+                }
             }
-            else if (direction.isEnabled(player) && direction.check(player, block, data)) {
-                cancelled = true;
-            }
+            useLoc.setWorld(null);
+        }
+        else {
+            flyingHandle = null;
         }
 
         // Destroying liquid blocks.
@@ -192,7 +208,7 @@ public class BlockBreakListener extends CheckListener {
             //        	data.clickedX = Integer.MAX_VALUE;
             // Debug log (only if not cancelled, to avoid spam).
             if (data.debug) {
-                debugBlockBreakResult(player, block, skippedRedundantChecks);
+                debugBlockBreakResult(player, block, skippedRedundantChecks, flyingHandle);
             }
         }
 
@@ -209,12 +225,21 @@ public class BlockBreakListener extends CheckListener {
         isInstaBreak = AlmostBoolean.NO;
     }
 
-    private void debugBlockBreakResult(final Player player, final Block block, final int skippedRedundantChecks) {
+    private void debugBlockBreakResult(final Player player, final Block block, final int skippedRedundantChecks, 
+            final FlyingQueueHandle flyingHandle) {
         debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
         BlockInteractListener.debugBlockVSBlockInteract(player, checkType, block, "onBlockBreak", 
                 Action.LEFT_CLICK_BLOCK);
         if (skippedRedundantChecks > 0) {
             debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
+        }
+        if (flyingHandle != null && flyingHandle.isFlyingQueueFetched()) {
+            final int flyingIndex = flyingHandle.getFirstIndexWithContentIfFetched();
+            final DataPacketFlying packet = flyingHandle.getIfFetched(flyingIndex);
+            if (packet != null) {
+                debug(player, "Flying packet queue used at index " + flyingIndex + ": pitch=" + packet.getPitch() + ",yaw=" + packet.getYaw());
+                return;
+            }
         }
     }
 
