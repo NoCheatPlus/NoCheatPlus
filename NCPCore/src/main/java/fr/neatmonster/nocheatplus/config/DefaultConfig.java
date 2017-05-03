@@ -31,6 +31,9 @@ public class DefaultConfig extends ConfigFile {
 
     // TODO: Other version details ?
 
+    private static final String unifiedBlockDirectionActions = "cancel vl>10 log:bdirection:0:3:if cancel";
+    private static final String unifiedBlockReachActions = "cancel vl>5 log:breach:0:2:if cancel";
+
     /**
      * Instantiates a new default configuration.
      */
@@ -90,7 +93,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL, false, 785);
 
         set(ConfPaths.BLOCKBREAK_DIRECTION_CHECK, true, 785);
-        set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel", 785);
+        set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, unifiedBlockDirectionActions, 1097);
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true, 785);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_STRICT, true, 785);
@@ -110,17 +113,17 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel", 785);
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true, 785);
-        set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel", 785);
+        set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, unifiedBlockReachActions, 785);
 
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK, true, 785);
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_LEVEL, 10, 785);
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "cancel vl>10 log:bwrong:0:5:if cancel vl>30 log:bwrong:0:5:cif cancel cmd:kickwb", 785);
 
         set(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK, true, 785);
-        set(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel", 785);
+        set(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS, unifiedBlockDirectionActions, 785);
 
         set(ConfPaths.BLOCKINTERACT_REACH_CHECK, true, 785);
-        set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel", 785);
+        set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, unifiedBlockReachActions, 785);
 
         set(ConfPaths.BLOCKINTERACT_SPEED_CHECK, true, 785);
         set(ConfPaths.BLOCKINTERACT_SPEED_INTERVAL, 2000, 785);
@@ -139,7 +142,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, "cancel vl>10 log:bautosign:0:3:if cancel", 785);
 
         set(ConfPaths.BLOCKPLACE_DIRECTION_CHECK, true, 785);
-        set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel", 785);
+        set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, unifiedBlockDirectionActions, 785);
 
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true, 785);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_LIMIT, 22, 785);
@@ -148,7 +151,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel", 785);
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true, 785);
-        set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel", 785);
+        set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, unifiedBlockReachActions, 785);
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true, 785);
         set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList(Material.WATER_LILY.toString(), Material.FLINT_AND_STEEL.toString()), 785);
