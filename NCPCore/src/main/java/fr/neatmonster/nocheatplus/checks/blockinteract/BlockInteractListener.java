@@ -226,6 +226,7 @@ public class BlockInteractListener extends CheckListener {
         }
         else {
             if (flyingHandle.isFlyingQueueFetched()) {
+                // TODO: Update flying queue removing failed entries? At least store index for subsequent checks.
                 final int flyingIndex = flyingHandle.getFirstIndexWithContentIfFetched();
                 final Integer cId;
                 if (flyingIndex == 0) {

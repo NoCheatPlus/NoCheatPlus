@@ -127,7 +127,8 @@ public class BlockBreakListener extends CheckListener {
          * Re-check if this is a block interacted with before. With instantly
          * broken blocks, this may be off by one orthogonally.
          */
-        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(block);
+        final int tick = TickTask.getTick();
+        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(tick, block);
         int skippedRedundantChecks = 0;
 
 
@@ -140,7 +141,7 @@ public class BlockBreakListener extends CheckListener {
         }
 
         // Has the player broken more blocks per second than allowed?
-        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, cc, data)) {
+        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, tick, cc, data)) {
             cancelled = true;
         }
 

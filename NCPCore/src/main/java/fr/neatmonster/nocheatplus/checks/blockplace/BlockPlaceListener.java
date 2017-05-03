@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -151,12 +152,15 @@ public class BlockPlaceListener extends CheckListener {
         final BlockPlaceData data = BlockPlaceData.getData(player);
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final BlockInteractData bdata = BlockInteractData.getData(player);
-        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(blockAgainst);
+        final int tick = TickTask.getTick();
+        // isInteractBlock - the block placed against is the block last interacted with.
+        final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(tick, blockAgainst);
         int skippedRedundantChecks = 0;
 
         final boolean shouldSkipSome;
         if (blockMultiPlaceEvent != null && event.getClass() == blockMultiPlaceEvent) {
-            if (placedMat == Material.BEDROCK || Bridge1_9.hasEndCrystalItem() && placedMat == Bridge1_9.END_CRYSTAL_ITEM) {
+            if (placedMat == Material.BEDROCK 
+                    || Bridge1_9.hasEndCrystalItem() && placedMat == Bridge1_9.END_CRYSTAL_ITEM) {
                 shouldSkipSome = true;
             }
             else {
@@ -184,7 +188,7 @@ public class BlockPlaceListener extends CheckListener {
 
         // Fast place check.
         if (!cancelled && fastPlace.isEnabled(player)) {
-            if (fastPlace.check(player, block, data, cc)) {
+            if (fastPlace.check(player, block, tick, data, cc)) {
                 cancelled = true;
             }
             else {
@@ -194,7 +198,8 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // No swing check (player doesn't swing their arm when placing a lily pad).
-        if (!cancelled && !cc.noSwingExceptions.contains(placedMat) && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+        if (!cancelled && !cc.noSwingExceptions.contains(placedMat) 
+                && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
             // Consider skipping all insta placables or using simplified version (true or true within time frame).
             cancelled = true;
         }
@@ -218,7 +223,8 @@ public class BlockPlaceListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
                     skippedRedundantChecks ++;
                 }
-                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, data, cc)) {
+                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, 
+                        data, cc)) {
                     cancelled = true;
                 }
             }
@@ -229,7 +235,8 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Surrounding material.
-        if (!cancelled && against.isEnabled(player) && against.check(player, block, placedMat, blockAgainst, data, cc)) {
+        if (!cancelled && against.isEnabled(player) && against.check(player, block, placedMat, blockAgainst, 
+                isInteractBlock, data, cc)) {
             cancelled = true;
         }
 
@@ -251,7 +258,7 @@ public class BlockPlaceListener extends CheckListener {
             final Block block, final Block blockAgainst, 
             final int skippedRedundantChecks, final FlyingQueueHandle flyingHandle) {
         debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
-        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, blockAgainst, "onBlockInteract(blockAgainst)", 
+        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, blockAgainst, "onBlockPlace(blockAgainst)", 
                 Action.RIGHT_CLICK_BLOCK);
         if (skippedRedundantChecks > 0) {
             debug(player, "Skipped redundant checks: " + skippedRedundantChecks);

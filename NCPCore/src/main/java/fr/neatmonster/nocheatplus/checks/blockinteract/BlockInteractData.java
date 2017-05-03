@@ -231,7 +231,7 @@ public class BlockInteractData extends ACheckData {
     /**
      * Compare only tick and coordinates.
      * 
-     * @param action
+     * @param tick
      * @param block
      * @return
      */
@@ -273,6 +273,16 @@ public class BlockInteractData extends ACheckData {
 
     public boolean getLastIsCancelled() {
         return lastIsCancelled;
+    }
+
+    /**
+     * Return the type of the block last interacted with. This does not check
+     * for invalidation.
+     * 
+     * @return
+     */
+    public Material getLastType() {
+        return lastType;
     }
 
     /**

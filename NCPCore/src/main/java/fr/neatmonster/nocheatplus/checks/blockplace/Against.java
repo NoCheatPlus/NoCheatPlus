@@ -25,7 +25,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 /**
  * Check if the placing is legitimate in terms of surrounding materials.
@@ -38,7 +37,8 @@ public class Against extends Check {
         super(CheckType.BLOCKPLACE_AGAINST);
     }
 
-    public boolean check(final Player player, final Block block, final Material placedMat, final Block blockAgainst, final BlockPlaceData data, final BlockPlaceConfig cc) {
+    public boolean check(final Player player, final Block block, final Material placedMat, final Block blockAgainst, 
+            final boolean isInteractBlock, final BlockPlaceData data, final BlockPlaceConfig cc) {
         boolean violation = false;
         // TODO: Make more precise (workarounds like WATER_LILY, general points, such as action?).
         // Workaround for signs on cactus and similar.
@@ -47,36 +47,40 @@ public class Against extends Check {
         if (bdata.isConsumedCheck(this.type) && !bdata.isPassedCheck(this.type)) {
             // TODO: Awareness of repeated violation probably is to be implemented below somewhere.
             violation = true;
+            if (data.debug) {
+                debug(player, "Cancel due to block having been consumed by this check.");
+            }
         }
-        bdata.addConsumedCheck(this.type);
-        if (!violation) {
-            if (BlockProperties.isAir(againstType)) {
-                // Attempt to workaround blocks like cactus.
-                if (!bdata.getLastIsCancelled() && bdata.matchesLastBlock(TickTask.getTick(), blockAgainst)) {
-                    // Block was placed against something (e.g. cactus), allow it.
-                    // TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
-                    // TODO: Reset on leaving the listener rather - why could it conflict?
-                    return false;
-                }
+        else if (BlockProperties.isAir(againstType)) {
+            // Attempt to workaround blocks like cactus.
+            final Material matAgainst = bdata.getLastType();
+            if (isInteractBlock && !BlockProperties.isAir(matAgainst) && ! BlockProperties.isLiquid(matAgainst)) {
+                // Block was placed against something (e.g. cactus), allow it.
             }
-            if (BlockProperties.isLiquid(againstType)) {
-                if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
-                    violation = true;
-                }
+            else if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
+                violation = true;
             }
-            else if (BlockProperties.isAir(againstType) && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
+        }
+        else if (BlockProperties.isLiquid(againstType)) {
+            // TODO: F_PLACE_AGAINST_WATER|LIQUID...
+            if ((placedMat != Material.WATER_LILY 
+                    || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  
+                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
                 violation = true;
             }
         }
         // Handle violation and return.
+        bdata.addConsumedCheck(this.type);
         if (violation) {
             data.againstVL += 1.0;
             final ViolationData vd = new ViolationData(this, player, data.againstVL, 1, cc.againstActions);
             vd.setParameter(ParameterName.BLOCK_TYPE, placedMat.toString());
             vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(placedMat)));
             return executeActions(vd).willCancel();
-        } else {
+        }
+        else {
             data.againstVL *=  0.99; // Assume one false positive every 100 blocks.
+            bdata.addPassedCheck(this.type);
             return false;
         }
     }

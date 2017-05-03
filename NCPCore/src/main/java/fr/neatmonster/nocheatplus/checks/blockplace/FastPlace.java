@@ -43,7 +43,8 @@ public class FastPlace extends Check {
      * @param cc 
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final BlockPlaceData data, final BlockPlaceConfig cc) {
+    public boolean check(final Player player, final Block block, final int tick, 
+            final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         data.fastPlaceBuckets.add(System.currentTimeMillis(), 1f);
 
@@ -51,7 +52,6 @@ public class FastPlace extends Check {
         final float fullScore = data.fastPlaceBuckets.score(1f);
 
         // Short term arrivals.
-        final int tick = TickTask.getTick();
         if (tick < data.fastPlaceShortTermTick ) {
             // TickTask got reset.
             data.fastPlaceShortTermTick = tick;
