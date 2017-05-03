@@ -442,27 +442,27 @@ public class MovingConfig extends ACheckConfig {
         switch(gameMode) {
             case SURVIVAL:
             case ADVENTURE:
-                // Check for jetpack/potion first.
+            case CREATIVE:
+                // Specific checks.
                 break;
             default:
                 return modelGameMode;
         }
         // TODO: Short touch of water/vines (/ground?) is possible - use past moves or in-medium-count.
         final boolean isGlidingWithElytra = Bridge1_9.isGlidingWithElytra(player);
-        if (player.isFlying() 
-                || !isGlidingWithElytra && !ignoreAllowFlight && player.getAllowFlight()) {
+        if (player.isFlying() || !isGlidingWithElytra && !ignoreAllowFlight && player.getAllowFlight()) {
             return modelGameMode;
         }
         // TODO: ORDER IS RANDOM GUESSING. Is mixtures possible?
         if (fromLocation.isInLiquid()) {
-            // TODO: INCONSISTENT.
+            // TODO: INCONSISTENT. Check in medium count / past moves.
             return modelGameMode;
         }
-        if (!Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))) {
+        if (gameMode != GameMode.CREATIVE && !Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))) {
             return flyingModelLevitation;
         }
         if (fromLocation.isOnGroundOrResetCond()) {
-            // TODO: INCONSISTENT.
+            // TODO: INCONSISTENT. Check in medium count / past moves.
             return modelGameMode;
         }
         if (isGlidingWithElytra) { // Defensive: don't demand isGliding.
