@@ -132,26 +132,14 @@ public class Visible extends Check {
         }
         else {
             // Ray-tracing.
-            Vector direction = loc.getDirection();
             // Initialize.
             final BlockCache blockCache = this.wrapBlockCache.getBlockCache();
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
-            collides = checkRayTracing(eyeX, eyeY, eyeZ, direction.getX(), direction.getY(), direction.getZ(), blockX, blockY, blockZ, face, tags, data.debug);
-            if (collides) {
-                // Debug output.
-                if (data.debug) {
-                    debug(player, "pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
-                }
-                // Re-check with flying packets.
-                if (checker.checkFlyingQueue(eyeX, eyeY, eyeZ, useLoc.getYaw(), useLoc.getPitch(), 
-                        blockX, blockY, blockZ, flyingHandle, face, tags, data.debug, player)) {
-                    // Check passed.
-                    collides = false;
-                }
-                checker.cleanup();
-                useLoc.setWorld(null);
-            }
+            collides = !checker.checkFlyingQueue(eyeX, eyeY, eyeZ, loc.getYaw(), loc.getPitch(), 
+                    blockX, blockY, blockZ, flyingHandle, face, tags, data.debug, player);
+            checker.cleanup();
+            useLoc.setWorld(null);
             // Cleanup.
             rayTracing.cleanup();
             blockCache.cleanup();

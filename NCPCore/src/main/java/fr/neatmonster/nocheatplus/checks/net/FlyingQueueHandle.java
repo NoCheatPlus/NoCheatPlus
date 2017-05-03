@@ -20,6 +20,11 @@ public class FlyingQueueHandle implements IHandle<DataPacketFlying[]> {
 
     private final Player player;
     private DataPacketFlying[] queue;
+    /**
+     * Convenience flag for keeping track amongst multiple checks, which all get
+     * passed this FlyingQueueHandle.
+     */
+    private boolean currentLocationValid = true;
 
     public FlyingQueueHandle(Player player) {
         this.player = player;
@@ -84,6 +89,26 @@ public class FlyingQueueHandle implements IHandle<DataPacketFlying[]> {
      */
     public int sizeIfFetched() {
         return queue == null ? -1 : queue.length;
+    }
+
+    /**
+     * Test the currentLocationValid flag (convenience to keep track of a custom
+     * flag).
+     * 
+     * @return
+     */
+    public boolean isCurrentLocationValid() {
+        return currentLocationValid;
+    }
+
+    /**
+     * Set the currentLocationValid flag (convenience to keep track of a custom
+     * flag).
+     * 
+     * @param currentLocationValid
+     */
+    public void setCurrentLocationValid(boolean currentLocationValid) {
+        this.currentLocationValid = currentLocationValid;
     }
 
 }

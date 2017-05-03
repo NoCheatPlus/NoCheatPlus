@@ -13,11 +13,27 @@ public abstract class FlyingQueueLookBlockChecker {
      * Override to prevent setting elements that can't be used or for which
      * check returned false to null.
      */
-    protected boolean setUnusableToNull = true;
+    protected boolean invalidateFailed = true;
+
+    /**
+     * Run the check with the given oldPitch and oldYaw, unless invalidated.
+     * invalidateFailed applies.
+     */
+    protected boolean checkOldLook = true;
 
     protected abstract boolean check(final double x, final double y, final double z, 
             final float yaw, final float pitch,
             final int blockX, final int blockY, final int blockZ);
+
+    public FlyingQueueLookBlockChecker setInvalidateFailed(boolean invalidatedFailed) {
+        this.invalidateFailed = invalidatedFailed;
+        return this;
+    }
+
+    public FlyingQueueLookBlockChecker setCheckOldLook(boolean checkOldLook) {
+        this.checkOldLook = checkOldLook;
+        return this;
+    }
 
     /**
      * Run check with the given start position (e.g. eye coordinates), but use
@@ -41,6 +57,15 @@ public abstract class FlyingQueueLookBlockChecker {
     public boolean checkFlyingQueue(final double x, final double y, final double z, 
             final float oldYaw, final float oldPitch,
             final int blockX, final int blockY, final int blockZ, final FlyingQueueHandle flyingHandle) {
+        if (checkOldLook && flyingHandle.isCurrentLocationValid()) {
+            if (check(x, y, z, oldYaw, oldPitch, blockX, blockY, blockZ)) {
+                return true;
+            }
+            else {
+                // Invalidate.
+                flyingHandle.setCurrentLocationValid(false);
+            }
+        }
         final DataPacketFlying[] queue = flyingHandle.getHandle();
         if (queue.length == 0) {
             return false;
@@ -51,7 +76,7 @@ public abstract class FlyingQueueLookBlockChecker {
                 continue;
             }
             if (!packetData.hasLook) {
-                if (setUnusableToNull) {
+                if (invalidateFailed) {
                     queue[i] = null;
                 }
                 continue;
@@ -61,7 +86,7 @@ public abstract class FlyingQueueLookBlockChecker {
             // Simple heuristic: reduce impact of checking by skipping redundant entries.
             // TODO: Other heuristic / what's typical? 
             if (yaw == oldYaw && pitch == oldPitch) {
-                if (setUnusableToNull) {
+                if (invalidateFailed) {
                     queue[i] = null;
                 }
                 continue;
@@ -72,7 +97,7 @@ public abstract class FlyingQueueLookBlockChecker {
                 return true;
             }
             else {
-                if (setUnusableToNull) {
+                if (invalidateFailed) {
                     queue[i] = null;
                 }
             }

@@ -77,11 +77,11 @@ public class Reach extends Check {
             final ViolationData vd = new ViolationData(this, player, data.reachVL, distance, cc.reachActions);
             vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(data.reachDistance)));
             cancel = executeActions(vd).willCancel();
-        } else
+        } else {
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;
-        data.addPassedCheck(this.type);
-
+            data.addPassedCheck(this.type);
+        }
         return cancel;
     }
 

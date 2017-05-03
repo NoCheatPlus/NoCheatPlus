@@ -122,15 +122,13 @@ public abstract class AbstractBlockDirectionCheck<D extends ICheckData, C extend
         final int blockY = block.getY();
         final int blockZ = block.getZ();
         // The distance is squared initially.
-        double distance = checkBoulder(x, y, z, loc.getYaw(), loc.getPitch(), blockX, blockY, blockZ);
-        if (distance != Double.MAX_VALUE) {
-            if (checker.checkFlyingQueue(x, y, z, loc.getYaw(), loc.getPitch(), 
-                    blockX, blockY, blockZ, flyingHandle)) {
-                distance = Double.MAX_VALUE;
-            }
-            else {
-                distance = Math.min(distance, checker.getMinDistance());
-            }
+        double distance;
+        if (checker.checkFlyingQueue(x, y, z, loc.getYaw(), loc.getPitch(), 
+                blockX, blockY, blockZ, flyingHandle)) {
+            distance = Double.MAX_VALUE;
+        }
+        else {
+            distance = checker.getMinDistance();
         }
 
         // TODO: Consider a protected field with a tolerance value.
