@@ -217,14 +217,18 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
     @Override
     public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
         Registration<T> registration = getRegistration(registerFor, true);
-        T registered = registration.registerInstance(instance);
-        if (registered != null) {
-            logRegistryEvent("Registered (override) for " + registerFor.getName() + ": " + instance.getClass().getName());
+        T previouslyRegistered = registration.registerInstance(instance);
+        String msg = previouslyRegistered == null ? "Registered for " : "Registered (override) for ";
+        String registerForName = registerFor.getName();
+        String instanceName = instance.getClass().getName();
+        if (registerForName.equals(instanceName)) {
+            msg += "itself: " + instanceName;
         }
         else {
-            logRegistryEvent("Registered for " + registerFor.getName() + ": " + instance.getClass().getName());
+            msg += registerForName + ": " + instanceName;
         }
-        return registered;
+        logRegistryEvent(msg);
+        return previouslyRegistered;
     }
 
     @Override
