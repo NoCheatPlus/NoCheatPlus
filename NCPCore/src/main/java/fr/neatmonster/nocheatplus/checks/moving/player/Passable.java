@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.utilities.collision.Axis;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
@@ -55,16 +56,17 @@ public class Passable extends Check {
      * @return
      */
     public static boolean isPassable(Location from, Location to) {
+        // TODO ... alternate axes ? Currently only used in a simple check (y-axis only).
         return BlockProperties.isPassableAxisWise(from, to);
     }
 
-    private final ICollidePassable rayTracingActual = new PassableAxisTracing();
+    private final ICollidePassable rayTracing = new PassableAxisTracing();
     private final BlockChangeTracker blockTracker;
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
         // TODO: Configurable maxSteps?
-        rayTracingActual.setMaxSteps(60);
+        rayTracing.setMaxSteps(60);
         blockTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
@@ -80,43 +82,81 @@ public class Passable extends Check {
         // Block distances (sum, max) for from-to (not for loc!).
         final int manhattan = from.manhattan(to);
 
-        // Check default order first.
+        // Check default order first, then others.
+        rayTracing.setAxisOrder(Axis.AXIS_ORDER_YXZ);
         String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
         if (newTag != null) {
+            newTag = checkRayTracingAlernateOrder(player, from, to, manhattan, data, cc, tick, 
+                    useBlockChangeTracker, newTag);
+        }
+        // Finally handle violations.
+        if (newTag == null) {
+            // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
+            data.passableVL *= 0.99;
+            return null;
+        }
+        else {
             // Direct return.
             return potentialViolation(player, from, to, manhattan, newTag, data, cc);
         }
-        // TODO: Return already here, if not colliding?
-        // No early return on violation happened.
-        // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
-        data.passableVL *= 0.99;
-        return null;
     }
 
-    private String checkRayTracing(final Player player, final PlayerLocation from, final PlayerLocation to,
-            final int manhattan, final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
+    private String checkRayTracingAlernateOrder(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, final int manhattan, 
+            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker,
+            final String previousTag) {
+        /*
+         * General assumption for now: Not all combinations have to be checked.
+         * If y-first works, only XZ and ZX need to be checked. There may be
+         * more/less restrictions in vanilla client code (e.g. Z
+         * collision = end).
+         */
+        Axis axis = rayTracing.getCollidingAxis();
+        // (YXZ is the default order, for which ray-tracing collides.)
+        if (axis == Axis.X_AXIS || axis == Axis.Z_AXIS) {
+            // Test the horizontal alternative only.
+            rayTracing.setAxisOrder(Axis.AXIS_ORDER_YZX);
+            return checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+        }
+        else if (axis == Axis.Y_AXIS) {
+            // Test both horizontal options, each before vertical.
+            rayTracing.setAxisOrder(Axis.AXIS_ORDER_XZY);
+            if (checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker) == null) {
+                return null;
+            }
+            rayTracing.setAxisOrder(Axis.AXIS_ORDER_ZXY);
+            return checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+        }
+        else {
+            return previousTag; // In case nothing could be done.
+        }
+    }
+
+    private String checkRayTracing(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, final int manhattan, 
+            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
         String tags = null;
         // NOTE: axis order is set externally.
-        setNormalMargins(rayTracingActual, from);
-        rayTracingActual.set(from, to);
-        rayTracingActual.setIgnoreInitiallyColliding(true);
+        setNormalMargins(rayTracing, from);
+        rayTracing.set(from, to);
+        rayTracing.setIgnoreInitiallyColliding(true);
         if (useBlockChangeTracker) { // TODO: Extra flag for 'any' block changes.
-            rayTracingActual.setBlockChangeTracker(blockTracker, data.blockChangeRef, tick, from.getWorld().getUID());
+            rayTracing.setBlockChangeTracker(blockTracker, data.blockChangeRef, tick, from.getWorld().getUID());
         }
         //rayTracing.setCutOppositeDirectionMargin(true);
-        rayTracingActual.loop();
-        rayTracingActual.setIgnoreInitiallyColliding(false);
+        rayTracing.loop();
+        rayTracing.setIgnoreInitiallyColliding(false);
         //rayTracing.setCutOppositeDirectionMargin(false);
-        if (rayTracingActual.collides()) {
+        if (rayTracing.collides()) {
             tags = "raytracing_collide_";
         }
-        else if (rayTracingActual.getStepsDone() >= rayTracingActual.getMaxSteps()) {
+        else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
             tags = "raytracing_maxsteps_";
         }
         if (data.debug) {
-            debugExtraCollisionDetails(player, rayTracingActual, "std");
+            debugExtraCollisionDetails(player, rayTracing, "std");
         }
-        rayTracingActual.cleanup();
+        rayTracing.cleanup();
         return tags;
     }
 
