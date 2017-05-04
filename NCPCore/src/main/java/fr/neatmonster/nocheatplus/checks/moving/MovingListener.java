@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,6 +47,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -2087,6 +2090,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.resetSetBack(); // To force dataOnJoin to set it to loc.
         // Handle respawn like join.
         dataOnJoin(player, event.getRespawnLocation(), data, MovingConfig.getConfig(player), true);
+        // Patch up issues.
+        if (Bridge1_9.hasGetItemInOffHand() && player.isBlocking()) {
+            // Attempt to fix server-side-only blocking after respawn.
+            redoShield(player);
+        }
+    }
+
+    /**
+     * Attempt to fix server-side-only blocking after respawn.
+     * @param player
+     */
+    private void redoShield(final Player player) {
+        // Does not work: DataManager.getPlayerData(player).requestUpdateInventory();
+        final PlayerInventory inv = player.getInventory();
+        ItemStack stack = inv.getItemInOffHand();
+        if (stack != null && stack.getType() == Material.SHIELD) {
+            // Shield in off-hand.
+            inv.setItemInOffHand(stack);
+            return;
+        }
+        stack = inv.getItemInMainHand();
+        if (stack != null && stack.getType() == Material.SHIELD) {
+            // Shield in off-hand.
+            inv.setItemInMainHand(stack);
+            return;
+        }
     }
 
     @Override
