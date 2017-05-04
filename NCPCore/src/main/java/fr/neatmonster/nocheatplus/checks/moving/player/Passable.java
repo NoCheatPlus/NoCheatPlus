@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.player;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.bukkit.Location;
@@ -29,7 +30,6 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
-import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -41,7 +41,6 @@ public class Passable extends Check {
 
     // TODO: Configuration.
     // TODO: Test cases.
-    private static boolean rt_legacy = false;
     // TODO: Should keep an eye on passable vs. on-ground, when checking with reduced margins.
     // rt_xzFactor = 1.0; // Problems: Doors, fences. 
     private static double rt_xzFactor = 0.98;
@@ -56,30 +55,22 @@ public class Passable extends Check {
      * @return
      */
     public static boolean isPassable(Location from, Location to) {
-        return rt_legacy ? BlockProperties.isPassable(from, to) : BlockProperties.isPassableAxisWise(from, to);
+        return BlockProperties.isPassableAxisWise(from, to);
     }
 
-    // TODO: Store both and select on check (with config then).
-    private final ICollidePassable rayTracingLegacy = new PassableRayTracing();
     private final ICollidePassable rayTracingActual = new PassableAxisTracing();
     private final BlockChangeTracker blockTracker;
 
     public Passable() {
         super(CheckType.MOVING_PASSABLE);
         // TODO: Configurable maxSteps?
-        rayTracingLegacy.setMaxSteps(60);
         rayTracingActual.setMaxSteps(60);
         blockTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
             final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
-        if (rt_legacy) {
-            return checkLegacy(player, from, to, data, cc);
-        }
-        else {
-            return checkActual(player, from, to, data, cc, tick, useBlockChangeTracker);
-        }
+        return checkActual(player, from, to, data, cc, tick, useBlockChangeTracker);
     }
 
     private Location checkActual(final Player player, final PlayerLocation from, final PlayerLocation to, 
@@ -89,21 +80,13 @@ public class Passable extends Check {
         // Block distances (sum, max) for from-to (not for loc!).
         final int manhattan = from.manhattan(to);
 
-        // General condition check for using ray-tracing.
-        if (cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            final String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
-            if (newTag != null) {
-                // Direct return.
-                return potentialViolation(player, from, to, manhattan, newTag, data, cc);
-            }
-            // TODO: Return already here, if not colliding?
+        // Check default order first.
+        String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+        if (newTag != null) {
+            // Direct return.
+            return potentialViolation(player, from, to, manhattan, newTag, data, cc);
         }
-        else if (!to.isPassable()) {
-            // TODO: Only do ray tracing and remove this anyway?
-            // TODO: Do make use of isPassableBox. 
-            // TODO: Some cases seem not to be covered here (same block !?).
-            return potentialViolationLegacy(player, from, to, manhattan, "", data, cc);
-        }
+        // TODO: Return already here, if not colliding?
         // No early return on violation happened.
         // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
         data.passableVL *= 0.99;
@@ -113,6 +96,7 @@ public class Passable extends Check {
     private String checkRayTracing(final Player player, final PlayerLocation from, final PlayerLocation to,
             final int manhattan, final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
         String tags = null;
+        // NOTE: axis order is set externally.
         setNormalMargins(rayTracingActual, from);
         rayTracingActual.set(from, to);
         rayTracingActual.setIgnoreInitiallyColliding(true);
@@ -222,212 +206,13 @@ public class Passable extends Check {
      */
     private void debugExtraCollisionDetails(Player player, ICollidePassable rayTracing, String tag) {
         if (rayTracing.collides()) {
-            debug(player, "Raytracing collision (" + tag + "): " + rayTracing.getCollidingAxis());
+            debug(player, "Raytracing collision with order " + Arrays.toString(rayTracing.getAxisOrder()) 
+            + " (" + tag + "): " + rayTracing.getCollidingAxis());
         }
         else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
             debug(player, "Raytracing max steps exceeded (" + tag + "): "+ rayTracing.getCollidingAxis());
         }
         // TODO: Detect having used past block changes and log or set a tag.
-    }
-
-    private Location checkLegacy(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc) {
-        // TODO: Distinguish feet vs. box.
-
-        String tags = "";
-        // Block distances (sum, max) for from-to (not for loc!).
-        final int manhattan = from.manhattan(to);
-
-        // Skip moves inside of ignored blocks right away [works as long as we only check between foot-locations].
-        if (manhattan <= 1 && BlockProperties.isPassable(from.getTypeId())) {
-            // TODO: Monitor: BlockProperties.isPassable checks slightly different than before.
-            if (manhattan == 0){
-                return null;
-            } else {
-                // manhattan == 1
-                if (BlockProperties.isPassable(to.getTypeId())) {
-                    return null;
-                }
-            }
-        }
-
-        boolean toPassable = to.isPassable();
-        // General condition check for using ray-tracing.
-        if (toPassable && cc.passableRayTracingCheck 
-                && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
-            final String newTag = checkRayTracingLegacy(player, from, to, manhattan, data, cc);
-            if (newTag != null) {
-                toPassable = false;
-                tags = newTag;
-            }
-        }
-
-        // TODO: Checking order: If loc is not the same as from, a quick return here might not be wanted.
-        if (toPassable) {
-            // Quick return.
-            // (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
-            data.passableVL *= 0.99;
-            return null;
-        } else {
-            return potentialViolationLegacy(player, from, to, manhattan, tags, data, cc);
-        }
-    }
-
-    private String checkRayTracingLegacy(final Player player, final PlayerLocation from, final PlayerLocation to,
-            final int manhattan, final MovingData data, final MovingConfig cc) {
-        setNormalMargins(rayTracingLegacy, from);
-        rayTracingLegacy.set(from, to);
-        rayTracingLegacy.loop();
-        String tags = null;
-        if (rayTracingLegacy.collides() || rayTracingLegacy.getStepsDone() >= rayTracingLegacy.getMaxSteps()) {
-            if (data.debug) {
-                debugExtraCollisionDetails(player, rayTracingLegacy, "legacy");
-            }
-            final int maxBlockDist = manhattan <= 1 ? manhattan : from.maxBlockDist(to);
-            if (maxBlockDist <= 1 && rayTracingLegacy.getStepsDone() == 1 && !from.isPassable()) {
-                // Redo ray-tracing for moving out of blocks.
-                if (collidesIgnoreFirst(from, to)) {
-                    tags = "raytracing_2x_";
-                    if (data.debug) {
-                        debugExtraCollisionDetails(player, rayTracingLegacy, "ingoreFirst");
-                    }
-                }
-                else if (data.debug) {
-                    debug(player, "Allow moving out of a block.");
-                }
-            }
-            else{
-                if (!allowsSplitMove(from, to, manhattan, data)) {
-                    tags = "raytracing_";
-                }
-            }
-        }
-        // TODO: Future: If accuracy is demanded, also check the head position (or bounding box right away).
-        rayTracingLegacy.cleanup();
-        return tags;
-    }
-
-    /**
-     * Legacy skipping conditions, before triggering an actual violation.
-     * 
-     * @param player
-     * @param from
-     * @param to
-     * @param manhattan
-     * @param tags
-     * @param data
-     * @param cc
-     * @return
-     */
-    private Location potentialViolationLegacy(final Player player, 
-            final PlayerLocation from, final PlayerLocation to, final int manhattan, 
-            String tags, final MovingData data, final MovingConfig cc) {
-        // Moving into a block, possibly a violation.
-        // TODO: Do account for settings and ray-tracing here.
-
-        // First check if the player is moving from a passable location.
-        // If not, the move might still be allowed, if moving inside of the same block, or from and to have head position passable.
-        if (from.isPassable()) {
-            // Put one workaround for 1.5 high blocks here:
-            if (from.isBlockAbove(to) && (BlockProperties.getBlockFlags(to.getTypeId()) & BlockProperties.F_HEIGHT150) != 0) {
-                // Check if the move went from inside of the block.
-                if (BlockProperties.collidesBlock(to.getBlockCache(), 
-                        from.getX(), from.getY(), from.getZ(), 
-                        from.getX(), from.getY(), from.getZ(), 
-                        to.getBlockX(), to.getBlockY(), to.getBlockZ(), to.getOrCreateBlockCacheNode(), null,
-                        BlockProperties.getBlockFlags(to.getTypeId()))) {
-                    // Allow moving inside of 1.5 high blocks.
-                    return null;
-                }
-            }
-            // From should be the set back.
-            tags += "into";
-        }
-
-        //				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
-        // (Mind that this can be the case on the same block theoretically.)
-        // Keep loc as set back.
-        //				}
-        else if (manhattan == 1 && to.isBlockAbove(from) 
-                && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getBlockCache().getOrCreateBlockCacheNode(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ(), false), null)) {
-            //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + from.getBoxMarginVertical(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + from.getBoxMarginVertical()), from.getBlockZ()))) {
-            // Allow the move up if the head is free.
-            return null;
-        }
-        else if (manhattan > 0) {
-            // Otherwise keep from as set back.
-            tags += "cross";
-        }
-        else {
-            // manhattan == 0
-            // TODO: Even legacy ray-tracing will now account for actual initial collision.
-            return null;
-        }
-
-        return actualViolation(player, from, to, tags, data, cc);
-    }
-
-    /**
-     * Test collision with ignoring the first block.
-     * @param from
-     * @param to
-     * @return
-     */
-    private boolean collidesIgnoreFirst(PlayerLocation from, PlayerLocation to) {
-        rayTracingLegacy.set(from, to);
-        rayTracingLegacy.setIgnoreInitiallyColliding(true);
-        rayTracingLegacy.setCutOppositeDirectionMargin(true);
-        rayTracingLegacy.loop();
-        rayTracingLegacy.setIgnoreInitiallyColliding(false);
-        rayTracingLegacy.setCutOppositeDirectionMargin(false);
-        return rayTracingLegacy.collides() || rayTracingLegacy.getStepsDone() >= rayTracingLegacy.getMaxSteps();
-    }
-
-    /**
-     * Test the move split into y-move and horizontal move, provided some pre-conditions are met.
-     * @param from
-     * @param to
-     * @param manhattan
-     * @return
-     */
-    private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, final int manhattan, final MovingData data) {
-        if (!rayTracingLegacy.mightNeedSplitAxisHandling()) {
-            return false;
-        }
-        // Always check y first.
-        rayTracingLegacy.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
-        rayTracingLegacy.loop();
-        if (!rayTracingLegacy.collides() && rayTracingLegacy.getStepsDone() < rayTracingLegacy.getMaxSteps()) {
-            // horizontal second.
-            rayTracingLegacy.set(from.getX(), to.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
-            rayTracingLegacy.loop();
-            if (!rayTracingLegacy.collides() && rayTracingLegacy.getStepsDone() < rayTracingLegacy.getMaxSteps()) {
-                return true;
-            }
-        }
-        // Horizontal first may be obsolete, due to splitting moves anyway and due to not having been called ever (!). 
-        //        final double yDiff = to.getY() - from.getY() ;
-        //        if (manhattan <= 3 && Math.abs(yDiff)  < 1.0 && yDiff < 0.0) {
-        //            // Workaround for client-side calculations not being possible (y vs. horizontal move). Typically stairs.
-        //            // horizontal first.
-        //            if (data.debug) {
-        //                DebugUtil.debug(from.getPlayer().getName() + " passable - Test horizontal move first.");
-        //            }
-        //            rayTracingLegacy.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
-        //            rayTracingLegacy.loop();
-        //            if (!rayTracingLegacy.collides() && rayTracingLegacy.getStepsDone() < rayTracingLegacy.getMaxSteps()) {
-        //                // y second.
-        //                rayTracingLegacy.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
-        //                rayTracingLegacy.loop();
-        //                if (!rayTracingLegacy.collides() && rayTracingLegacy.getStepsDone() < rayTracingLegacy.getMaxSteps()) {
-        //                    return true;
-        //                }
-        //            }
-        //        }
-        if (data.debug) {
-            debug(from.getPlayer(), "Raytracing collision (split move): (no details)");
-        }
-        return false;
     }
 
 }

@@ -148,8 +148,6 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList noFallActions;
 
     public final boolean    passableCheck;
-    public final boolean	passableRayTracingCheck;
-    public final boolean	passableRayTracingBlockChangeOnly;
     // TODO: passableAccuracy: also use if not using ray-tracing
     public final ActionList passableActions;
     public final boolean    passableUntrackedTeleportCheck;
@@ -282,8 +280,6 @@ public class MovingConfig extends ACheckConfig {
         noFallActions = config.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
 
         passableCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
-        passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
-        passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
         passableActions = config.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
         passableUntrackedTeleportCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE);
         passableUntrackedCommandCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE);

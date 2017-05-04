@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.List;
 import java.util.UUID;
 
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
@@ -50,6 +51,16 @@ public interface ICollidePassable extends ICollideBlocks, ISetMargins {
             BlockChangeReference blockChangeReference, int tick, UUID worldId);
 
     /**
+     * Set the axis checking order, length must be 3, use Axis.NONE for
+     * skipping.
+     * 
+     * @param axisOrder
+     * @throws UnsupportedOperationException
+     *             If setting the order of axes is not supported.
+     */
+    public void setAxisOrder(List<Axis> axisOrder);
+
+    /**
      * Convenience: Call set and setBlockCache with the data from the
      * PlayerLocation instances. Should use from.getBlockCache() as BlockCache
      * instance.
@@ -73,6 +84,7 @@ public interface ICollidePassable extends ICollideBlocks, ISetMargins {
     /**
      * Remove reference to objects passed from outside (BlockCache,
      * BlockChangeTracker and similar, but not calling their cleanup methods).
+     * Should not reset previously set collision information.
      */
     public void cleanup();
 

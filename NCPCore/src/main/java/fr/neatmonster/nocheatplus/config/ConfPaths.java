@@ -603,9 +603,7 @@ public abstract class ConfPaths {
 
     public static final String  MOVING_PASSABLE                             = MOVING + "passable.";
     public static final String  MOVING_PASSABLE_CHECK                       = MOVING_PASSABLE + "active";
-    private static final String MOVING_PASSABLE_RAYTRACING                  = MOVING_PASSABLE + "raytracing.";
-    public static final String  MOVING_PASSABLE_RAYTRACING_CHECK            = MOVING_PASSABLE_RAYTRACING + "active";
-    public static final String  MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY  = MOVING_PASSABLE_RAYTRACING + "blockchangeonly";
+    //private static final String MOVING_PASSABLE_RAYTRACING                  = MOVING_PASSABLE + "raytracing.";
     public static final String  MOVING_PASSABLE_ACTIONS                     = MOVING_PASSABLE + "actions";
     private static final String MOVING_PASSABLE_UNTRACKED                   = MOVING_PASSABLE + "untracked.";
     private static final String MOVING_PASSABLE_UNTRACKED_TELEPORT          = MOVING_PASSABLE_UNTRACKED + "teleport.";
@@ -860,6 +858,10 @@ public abstract class ConfPaths {
     public  static final String MOVING_TRACE_MERGEDIST                      = "checks.moving.trace.mergedist";
     @Deprecated
     public static final String COMPATIBILITY_BLOCKS_IGNOREPASSABLE = "compatibility.blocks.ignorepassable";
+    @Deprecated
+    public static final String  MOVING_PASSABLE_RAYTRACING_CHECK            = "checks.moving.passable.raytracing.active";
+    @Deprecated
+    public static final String  MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY  = "checks.moving.passable.raytracing.blockchangeonly";
 
     /**
      * Get moved paths for which an annotation doesn't work.

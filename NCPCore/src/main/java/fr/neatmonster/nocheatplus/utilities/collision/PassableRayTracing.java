@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.List;
 import java.util.UUID;
 
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
@@ -94,6 +95,11 @@ public class PassableRayTracing extends RayTracing implements ICollidePassable {
     @Override
     public void setCutOppositeDirectionMargin(boolean cutOppositeDirectionMargin) {
         // (No effect.)
+    }
+
+    @Override
+    public void setAxisOrder(List<Axis> axisOrder) {
+        throw new UnsupportedOperationException();
     }
 
 }

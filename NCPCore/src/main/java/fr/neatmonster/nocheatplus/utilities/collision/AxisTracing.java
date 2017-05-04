@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.List;
+
 import org.bukkit.Location;
 
 /**
@@ -39,7 +41,10 @@ public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
     private double x0, y0, z0;
     /** End coordinates (center). */
     private double x1, y1, z1;
-    /** Margins for the bounding box, seen from center / start coordinates. Positive values. */
+    /**
+     * Margins for the bounding box, seen from center / start coordinates.
+     * Positive values.
+     */
     private double marginXpos, marginXneg, marginYpos, marginYneg, marginZpos, marginZneg;
 
     /**
@@ -106,6 +111,13 @@ public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
         return ignoreInitiallyColliding;
     }
 
+    @Override
+    public Axis[] getAxisOrder() {
+        final Axis[] out = new Axis[axisOrder.length];
+        System.arraycopy(axisOrder, 0, out, 0, axisOrder.length);
+        return out;
+    }
+
     /**
      * Indicate if a collision appeared during loop().
      * @return 
@@ -119,14 +131,29 @@ public abstract class AxisTracing implements ICollideBlocks, ISetMargins {
         return collidesAxis;
     }
 
+    /**
+     * Default order is AXIS_ORDER_YXZ.
+     */
     public void setDefaultAxisOrder() {
-        setAxisOrder(Axis.Y_AXIS, Axis.X_AXIS, Axis.Z_AXIS);
+        setAxisOrder(Axis.AXIS_ORDER_YXZ);
     }
 
     public void setAxisOrder(Axis first, Axis second, Axis third) {
         axisOrder[0] = first;
         axisOrder[1] = second;
         axisOrder[2] = third;
+    }
+
+    /**
+     * 
+     * @param axisOrder
+     *            Size must be three. Use Axis.NONE for skipping.
+     */
+    public void setAxisOrder(final List<Axis> axisOrder) {
+        if (axisOrder.size() != 3) {
+            throw new IllegalArgumentException("Size must be three.");
+        }
+        setAxisOrder(axisOrder.get(0), axisOrder.get(1), axisOrder.get(2));
     }
 
     @Override

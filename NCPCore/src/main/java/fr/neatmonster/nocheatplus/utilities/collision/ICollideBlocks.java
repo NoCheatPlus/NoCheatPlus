@@ -89,4 +89,12 @@ public interface ICollideBlocks {
      */
     public Axis getCollidingAxis();
 
+    /**
+     * Get an array with the axes in checking order. Length may vary, depending
+     * on the implementation.
+     * 
+     * @return
+     */
+    public Axis[] getAxisOrder();
+
 }

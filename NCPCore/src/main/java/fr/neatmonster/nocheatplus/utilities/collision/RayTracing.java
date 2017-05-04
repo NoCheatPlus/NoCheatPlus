@@ -370,6 +370,11 @@ public abstract class RayTracing implements ICollideBlocks {
     }
 
     @Override
+    public Axis[] getAxisOrder() {
+        return new Axis[] {Axis.XYZ_AXES};
+    }
+
+    @Override
     public boolean collides() {
         return collides;
     }

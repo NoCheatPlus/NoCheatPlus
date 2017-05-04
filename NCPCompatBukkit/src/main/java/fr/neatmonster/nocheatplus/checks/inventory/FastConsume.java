@@ -45,8 +45,6 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class FastConsume extends Check implements Listener, INotifyReload {
 
-
-
     public static void testAvailability(){
         if (!PlayerItemConsumeEvent.class.getSimpleName().equals("PlayerItemConsumeEvent")){
             throw new RuntimeException("This exception should not even get thrown.");

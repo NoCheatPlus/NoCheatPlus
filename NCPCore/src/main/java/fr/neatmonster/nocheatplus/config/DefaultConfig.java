@@ -424,8 +424,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:if cancel vl>30 log:nofall:0:5:icf cancel", 785);
 
         set(ConfPaths.MOVING_PASSABLE_CHECK, true, 785);
-        set(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK, true, 785);
-        set(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY, false, 785);
         set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>10 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel", 785);
         set(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE, true, 785);
         set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE, true, 785);

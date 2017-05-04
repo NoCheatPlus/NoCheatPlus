@@ -14,6 +14,10 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Represent an orientation concerning Axes (not necessarily a single one).
  * 
@@ -29,5 +33,20 @@ public enum Axis {
     XZ_AXES,
     XYZ_AXES,
     NONE;
+
+    // 
+    public static final List<Axis> AXIS_ORDER_YXZ = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{Y_AXIS, X_AXIS, Z_AXIS}));
+    public static final List<Axis> AXIS_ORDER_YZX = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{Y_AXIS, Z_AXIS, X_AXIS}));
+    public static final List<Axis> AXIS_ORDER_XZY = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{X_AXIS, Z_AXIS, Y_AXIS}));
+    public static final List<Axis> AXIS_ORDER_ZXY = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{Z_AXIS, X_AXIS, Y_AXIS}));
+    // 
+    public static final List<Axis> AXIS_ORDER_XYZ = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{X_AXIS, Y_AXIS, Z_AXIS}));
+    public static final List<Axis> AXIS_ORDER_ZYX = Collections.unmodifiableList(
+            Arrays.asList(new Axis[]{Z_AXIS, Y_AXIS, X_AXIS}));
 
 }
