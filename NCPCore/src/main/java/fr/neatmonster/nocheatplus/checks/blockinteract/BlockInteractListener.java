@@ -203,7 +203,7 @@ public class BlockInteractListener extends CheckListener {
         if (blockChecks) {
             // First the reach check.
             if (!cancelled && reach.isEnabled(player) 
-                    && reach.check(player, loc, block, flyingHandle, data, cc)) {
+                    && reach.check(player, loc, block, data, cc)) {
                 cancelled = true;
             }
 

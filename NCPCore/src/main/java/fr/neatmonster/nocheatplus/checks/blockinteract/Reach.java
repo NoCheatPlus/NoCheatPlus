@@ -23,7 +23,6 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 /**
@@ -54,7 +53,7 @@ public class Reach extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location loc, final Block block, 
-            final FlyingQueueHandle flyingHandle, final BlockInteractData data, final BlockInteractConfig cc) {
+            final BlockInteractData data, final BlockInteractConfig cc) {
 
         boolean cancel = false;
 
