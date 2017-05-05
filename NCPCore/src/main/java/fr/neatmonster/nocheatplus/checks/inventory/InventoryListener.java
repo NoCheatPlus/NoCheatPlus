@@ -89,7 +89,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     private final int idIllegalItem = counters.registerKey("illegalitem");
     private final int idEggOnEntity = counters.registerKey("eggonentity");
 
-    private final IGenericInstanceHandle<IEntityAccessVehicle> handleVehicles = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessVehicle.class);
+    private final IGenericInstanceHandle<IEntityAccessVehicle> handleVehicles = 
+            NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessVehicle.class);
 
     public InventoryListener() {
         super(CheckType.INVENTORY);
@@ -209,7 +210,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (fastClick.isEnabled(player)) {
             final InventoryConfig cc = InventoryConfig.getConfig(player);
             if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative) {
-                if (fastClick.check(player, now, event.getView(), slot, cursor, clicked, event.isShiftClick(), data, cc)) {
+                if (fastClick.check(player, now, event.getView(), slot, cursor, clicked, event.isShiftClick(), 
+                        data, cc)) {
                     // The check requested the event to be cancelled.
                     cancel = true;
                 }
@@ -232,7 +234,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
      * @param event
      * @param data
      */
-    private void outputDebugInventoryClick(final Player player, final int slot, final InventoryClickEvent event, final InventoryData data) {
+    private void outputDebugInventoryClick(final Player player, final int slot, final InventoryClickEvent event, 
+            final InventoryData data) {
         // TODO: Check if this breaks legacy compat (disable there perhaps).
         // TODO: Consider only logging where different from expected (CraftXY, more/other viewer than player). 
 
@@ -267,7 +270,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         debug(player, builder.toString());
     }
 
-    private void addInventory(final Player player, final Inventory inventory, final String prefix, final StringBuilder builder) {
+    private void addInventory(final Player player, final Inventory inventory, final String prefix, 
+            final StringBuilder builder) {
         builder.append(prefix);
         if (inventory == null) {
             builder.append("(none)");
@@ -308,7 +312,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (drop.isEnabled(event.getPlayer())) {
             if (drop.check(event.getPlayer())) {
                 // TODO: Is the following command still correct? If so, adapt actions.
-                // Cancelling drop events is not save (in certain circumstances items will disappear completely). So don't
+                /*
+                 * Cancelling drop events is not save (in certain circumstances
+                 * items will disappear completely). So don't
+                 */
                 // do it and kick players instead by default.
                 event.setCancelled(true);
             }
@@ -338,17 +345,20 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             final ItemStack item = event.getItem();
             final Material type = item.getType();
             // TODO: Get Magic values (800) from the config.
+            // TODO: Cancelled / deny use item -> reset all?
             if (type == Material.BOW) {
                 final long now = System.currentTimeMillis();
                 // It was a bow, the player starts to pull the string, remember this time.
-                data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
+                data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) 
+                        ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
             }
             else if (InventoryUtil.isConsumable(type)) {
                 final long now = System.currentTimeMillis();
                 // It was food, the player starts to eat some food, remember this time and the type of food.
                 data.instantEatFood = type;
-                data.instantEatInteract = (data.instantEatInteract > 0 && now - data.instantEatInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantEatInteract) : System.currentTimeMillis();
-                data.instantBowInteract = 0;
+                data.instantEatInteract = (data.instantEatInteract > 0 && now - data.instantEatInteract < 800) 
+                        ? Math.min(System.currentTimeMillis(), data.instantEatInteract) : System.currentTimeMillis();
+                        data.instantBowInteract = 0; // Who's monitoring this indentation code?
             } else resetAll = true;
 
             // Illegal enchantments hotfix check.
@@ -493,4 +503,5 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     //		// TODO Auto-generated method stub
     //		
     //	}
+
 }
