@@ -30,6 +30,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
+import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
@@ -96,8 +97,8 @@ public class MovingUtil {
     }
 
     /**
-     * Prerequisite is Bridge1_9.isGlidingWithElytra(player) having returned
-     * true.
+     * Consistency / cheat check. Prerequisite is
+     * Bridge1_9.isGlidingWithElytra(player) having returned true.
      * 
      * @param player
      * @param fromLocation
@@ -107,9 +108,37 @@ public class MovingUtil {
      */
     public static boolean isGlidingWithElytraValid(final Player player, final PlayerLocation fromLocation, 
             final MovingData data, final MovingConfig cc) {
-        // TODO: Extend by thisMove / past moves checking (partly a cheat detection).
-        // TODO: Short touch of water/vines (/ground?) is possible - use past moves or in-medium-count.
-        return !fromLocation.isOnGroundOrResetCond();
+
+        // Prevent forms of noclip - could be too coarse / false positives.
+        if (!fromLocation.isPassable()) {
+            return false;
+        }
+
+        // TODO: Confine/relax more, if needed (in-medium count, past moves).
+
+        // TODO: TEST LAVA (ordinary and boost, lift off and other).
+
+        // Check start glide conditions.
+        final PlayerMoveData firstPastMove = data.playerMoves.getFirstPastMove();
+        if (!firstPastMove.toIsValid || firstPastMove.modelFlying == null 
+                || !MovingConfig.ID_JETPACK_ELYTRA.equals(firstPastMove.modelFlying.id)) {
+            // Treat as a lift off.
+            return canLiftOffWithElytra(fromLocation, data);
+        }
+        // TODO: Past map states might allow lift off (...).
+        // TODO: Other abort conditions.
+
+        // Only the web can stop a player who isn't propelled by a rocket.
+        return data.fireworksBoostDuration > 0 || !fromLocation.isInWeb();
+    }
+
+    private static boolean canLiftOffWithElytra(final PlayerLocation fromLocation, final MovingData data) {
+        return !fromLocation.isInLiquid() && !fromLocation.isInWeb() 
+                && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND 
+                || data.liftOffEnvelope == LiftOffEnvelope.NORMAL);
+        // && !fromLocation.isOnGround() // TODO: Nice to have: been in air slightly before.
+        //|| data.combinedMediumPermanentCount > data.insideMediumCount
+        //&& data.combinedMediumPermanentCount > 15;
     }
 
     /**

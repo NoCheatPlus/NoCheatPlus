@@ -306,7 +306,11 @@ public class BlockInteractListener extends CheckListener {
          * HIGHEST to account for other plugins.
          */
         // Elytra boost.
-        if (event.getAction() == Action.RIGHT_CLICK_AIR 
+        final Block block = event.getClickedBlock();
+        if ((event.getAction() == Action.RIGHT_CLICK_AIR 
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK 
+                && block != null && BlockProperties.isLiquid(block.getType())
+                )
                 && event.isCancelled() && event.useItemInHand() != Result.DENY) {
             final ItemStack stack = Bridge1_9.getUsedItem(player, event);
             if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {

@@ -107,6 +107,12 @@ public class MovingConfig extends ACheckConfig {
         return ccNew;
     }
 
+    // Model flying ids.
+    public static final String ID_JETPACK_ELYTRA = "jetpack.elytra";
+    public static final String ID_POTION_LEVITATION = "potion.levitation";
+
+    // INSTANCE
+
     public final boolean    ignoreCreative;
     public final boolean    ignoreAllowFlight;
 
@@ -256,9 +262,9 @@ public class MovingConfig extends ACheckConfig {
         for (final GameMode gameMode : GameMode.values()) {
             flyingModelGameMode.put(gameMode, new ModelFlying("gamemode." + gameMode.name().toLowerCase(), config, ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
         }
-        flyingModelLevitation = new ModelFlying("potion.levitation", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "levitation.", defaultModel);
+        flyingModelLevitation = new ModelFlying(ID_POTION_LEVITATION, config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "levitation.", defaultModel);
         flyingModelLevitation.setScaleLevitationEffect(true); // Pirate.
-        flyingModelElytra = new ModelFlying("jetpack.elytra", config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", defaultModel);
+        flyingModelElytra = new ModelFlying(ID_JETPACK_ELYTRA, config, ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", defaultModel);
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
