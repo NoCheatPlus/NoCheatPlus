@@ -466,14 +466,14 @@ public class MovingConfig extends ACheckConfig {
         if (player.isFlying() || !isGlidingWithElytra && !ignoreAllowFlight && player.getAllowFlight()) {
             return modelGameMode;
         }
+        // Elytra.
+        if (isGlidingWithElytra) { // Defensive: don't demand isGliding.
+            return flyingModelElytra;
+        }
         // Levitation.
         if (gameMode != GameMode.CREATIVE && !Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))
                 && !fromLocation.isInLiquid()) {
             return flyingModelLevitation;
-        }
-        // Elytra.
-        if (isGlidingWithElytra) { // Defensive: don't demand isGliding.
-            return flyingModelElytra;
         }
         // Default by game mode.
         return modelGameMode;

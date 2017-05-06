@@ -88,9 +88,10 @@ public class MovingUtil {
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY, true)
-                && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) || fromLocation.isInLiquid())
                 && (!Bridge1_9.isGlidingWithElytra(player) 
                         || !isGlidingWithElytraValid(player, fromLocation, data, cc))
+                && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) 
+                        || fromLocation.isInLiquid())
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
     }
 
