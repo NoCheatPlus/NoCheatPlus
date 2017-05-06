@@ -32,6 +32,11 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  */
 public class RichEntityLocation extends RichBoundsLocation {
 
+    /*
+     * TODO: HumanEntity default with + height (1.11.2): elytra 0.6/0.6,
+     * sleeping 0.2/0.2, sneaking 0.6/1.65, normal 0.6/1.8
+     */
+
     /** The mc access. */
     // Final members //
     private final IHandle<MCAccess> mcAccess;
@@ -40,7 +45,11 @@ public class RichEntityLocation extends RichBoundsLocation {
     // Simple members //
 
     /** Full bounding box width. */
-    private double width; // TODO: This is the entity width, happens to usually be the bounding box width +-. Move to entity / replace.
+    /*
+     * TODO: This is the entity width, happens to usually be the bounding box
+     * width +-. Move to entity / replace.
+     */
+    private double width; 
 
     /** Some entity collision height. */
     private double height; // TODO: Move to entity / replace.
@@ -154,7 +163,8 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @return true, if successful
      */
     public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin) {
-        return blockCache.standsOnEntity(entity, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
+        return blockCache.standsOnEntity(entity, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, 
+                maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
     }
 
     /**
@@ -171,7 +181,8 @@ public class RichEntityLocation extends RichBoundsLocation {
             // Check if standing on an entity.
             // TODO: Get rid of needing an entity for checking this (!). Move to RichBoundsLocation.
             final double d1 = 0.25;
-            if (blockCache.standsOnEntity(entity, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1)) {
+            if (blockCache.standsOnEntity(entity, minX - d1, minY - yOnGround - d1, minZ - d1, 
+                    maxX + d1, minY + 0.25 + d1, maxZ + d1)) {
                 res = onGround = standsOnEntity = true;
             }
         }
@@ -264,7 +275,8 @@ public class RichEntityLocation extends RichBoundsLocation {
                 }
             }
         }
-        return BlockProperties.collides(blockCache, minX , maxY, minZ, maxX, maxY + marginAboveEyeHeight, maxZ, BlockProperties.F_GROUND | BlockProperties.F_SOLID);
+        return BlockProperties.collides(blockCache, minX , maxY, minZ, maxX, maxY + marginAboveEyeHeight, maxZ, 
+                BlockProperties.F_GROUND | BlockProperties.F_SOLID);
     }
 
     /**
@@ -278,7 +290,8 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Convenience constructor for using mcAccess.getHeight for fullHeight.
+     * Convenience constructor for using the maximum of mcAccess.getHeight() and
+     * eye height for fullHeight.
      *
      * @param location
      *            the location
@@ -293,7 +306,7 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Sets the.
+     * 
      *
      * @param location
      *            the location
@@ -311,7 +324,7 @@ public class RichEntityLocation extends RichBoundsLocation {
     }
 
     /**
-     * Sets the.
+     * 
      *
      * @param location
      *            the location
@@ -325,14 +338,16 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      *            the y on ground
      */
-    public void set(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
+    public void set(final Location location, final Entity entity, final double fullWidth, double fullHeight, 
+            final double yOnGround) {
         doSet(location, entity, fullWidth, fullHeight, yOnGround);
     }
 
     /**
      * Do set.<br>
      * For the bounding box height, the maximum of given fullHeight, eyeHeight
-     * with sneaking ignored and entity height is used.
+     * with sneaking ignored and entity height is used. Sets isLiving and
+     * eyeHeight.
      *
      * @param location
      *            the location
@@ -345,7 +360,10 @@ public class RichEntityLocation extends RichBoundsLocation {
      * @param yOnGround
      *            the y on ground
      */
-    protected void doSet(final Location location, final Entity entity, final double fullWidth, double fullHeight, final double yOnGround) {
+    protected void doSet(final Location location, final Entity entity, final double fullWidth, double fullHeight, 
+            final double yOnGround) {
+        final double eyeHeight;
+        final boolean isLiving;
         if (entity instanceof LivingEntity) {
             isLiving = true;
             final LivingEntity living = (LivingEntity) entity;
@@ -356,7 +374,27 @@ public class RichEntityLocation extends RichBoundsLocation {
             isLiving = false;
             eyeHeight = fullHeight;
         }
+        doSetExactHeight(location, entity, isLiving, fullWidth, eyeHeight, fullHeight, fullHeight, yOnGround);
+    }
+
+    /**
+     * 
+     * @param location
+     * @param entity
+     * @param isLiving
+     * @param fullWidth
+     * @param eyeHeight
+     * @param height
+     *            Set as height (as in entity.height).
+     * @param fullHeight
+     *            Bounding box height.
+     * @param yOnGround
+     */
+    protected void doSetExactHeight(final Location location, final Entity entity, final boolean isLiving, 
+            final double fullWidth, final double eyeHeight, final double height, final double fullHeight, 
+            final double yOnGround) {
         this.entity = entity;
+        this.isLiving = isLiving;
         final MCAccess mcAccess = this.mcAccess.getHandle();
         this.width = mcAccess.getWidth(entity);
         this.height = mcAccess.getHeight(entity);

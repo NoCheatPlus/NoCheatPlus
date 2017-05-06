@@ -86,7 +86,8 @@ public class PlayerLocation extends RichEntityLocation {
     }
 
     /**
-     * Sets the player location object.
+     * Sets the player location object. See
+     * {@link #set(Location, Player, double)}.
      *
      * @param location
      *            the location
@@ -98,7 +99,8 @@ public class PlayerLocation extends RichEntityLocation {
     }
 
     /**
-     * Sets the player location object. Does not set or reset blockCache.
+     * Sets the player location object. Does not account for special conditions like
+     * gliding with elytra with special casing, instead the maximum of accessible heights is used (eyeHeight, nms height/length). Does not set or reset blockCache.
      *
      * @param location
      *            the location
@@ -107,9 +109,25 @@ public class PlayerLocation extends RichEntityLocation {
      * @param yOnGround
      *            the y on ground
      */
-    public void set(final Location location, final Player player, final double yOnGround)
-    {
+    public void set(final Location location, final Player player, final double yOnGround) {
         super.set(location, player, yOnGround);
+        // Entity reference.
+        this.player = player;
+    }
+
+    /**
+     * Like set, but for the height properties only the given height is used, no
+     * special cases.
+     * 
+     * @param location
+     * @param player
+     * @param height
+     * @param yOnGround
+     */
+    public void setByGivenHeight(final Location location, final Player player, final double height, 
+            final double yOnGround) {
+        super.doSetExactHeight(location, player, true, getMCAccess().getWidth(player), 
+                height, height, height, yOnGround);
         // Entity reference.
         this.player = player;
     }
