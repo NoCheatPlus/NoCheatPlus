@@ -1988,7 +1988,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final float dataDist = Math.max(yDiff, data.noFallFallDistance);
             final double dataDamage = NoFall.getDamage(dataDist);
             if (damage > dataDamage + 0.5 || dataDamage <= 0.0) {
-                if (noFallVL(player, "fakefall", data, cc)) {
+                // TODO: Also relate past y-distance(s) to the fall distance (mc).
+
+                // Hot fix: allow fall damage in lava.
+                /*
+                 * TODO: Correctly model the half fall distance per in-lava move
+                 * and taking fall damage in lava. Should have a block flag for
+                 * this.
+                 */
+                final PlayerMoveData firstPastMove = data.playerMoves.getFirstPastMove();
+                if (pLoc.isOnGround() && pLoc.isInLava() 
+                        && firstPastMove.toIsValid && firstPastMove.yDistance < 0.0) {
+                    /*
+                     * TODO: Confine more lava height vs. past move y-distances.
+                     * Not sure this pays over implementing the halfing thing.
+                     */
+                    /*
+                     * 1. Strictly someone could attempt to accumulate fall
+                     * damage by help of fast place and pickup lava. 2. There
+                     * are other cases not ending up in lava, but having a
+                     * reduced fall distance (then bigger than nofall data).
+                     */
+                    if (data.debug) {
+                        debug(player, "NoFall/Damage: allow fall damage in lava (hotfix).");
+                    }
+                }
+                else if (noFallVL(player, "fakefall", data, cc)) {
                     // NOTE: Double violations are possible with the in-air check below.
                     // TODO: Differing sub checks, once cancel action...
                     player.setFallDistance(dataDist);
