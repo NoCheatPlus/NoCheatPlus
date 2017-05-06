@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -432,7 +433,21 @@ public class MovingConfig extends ACheckConfig {
         }
     }
 
+    /**
+     * Fetches data and config for sub checks (potentially redundant fetching).
+     * 
+     * @param player
+     * @param fromLocation
+     * @return
+     * @deprecated Having a from location but no config/data ...
+     */
+    @Deprecated
     public ModelFlying getModelFlying(final Player player, final PlayerLocation fromLocation) {
+        return getModelFlying(player, fromLocation, MovingData.getData(player), MovingConfig.getConfig(player));
+    }
+
+    public ModelFlying getModelFlying(final Player player, final PlayerLocation fromLocation,
+            final MovingData data, final MovingConfig cc) {
         final GameMode gameMode = player.getGameMode();
         final ModelFlying modelGameMode = flyingModelGameMode.get(gameMode);
         switch(gameMode) {
@@ -442,25 +457,21 @@ public class MovingConfig extends ACheckConfig {
                 // Specific checks.
                 break;
             default:
+                // Default by game mode (spectator, yet unknown).
                 return modelGameMode;
         }
-        // TODO: Short touch of water/vines (/ground?) is possible - use past moves or in-medium-count.
-        final boolean isGlidingWithElytra = Bridge1_9.isGlidingWithElytra(player);
+        final boolean isGlidingWithElytra = Bridge1_9.isGlidingWithElytra(player)
+                && MovingUtil.isGlidingWithElytraValid(player, fromLocation, data, cc);
+        // Actual flying (ignoreAllowFlight is a legacy option for rocket boots like flying).
         if (player.isFlying() || !isGlidingWithElytra && !ignoreAllowFlight && player.getAllowFlight()) {
             return modelGameMode;
         }
-        // TODO: ORDER IS RANDOM GUESSING. Is mixtures possible?
-        if (fromLocation.isInLiquid()) {
-            // TODO: INCONSISTENT. Check in medium count / past moves.
-            return modelGameMode;
-        }
-        if (gameMode != GameMode.CREATIVE && !Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))) {
+        // Levitation.
+        if (gameMode != GameMode.CREATIVE && !Double.isInfinite(Bridge1_9.getLevitationAmplifier(player))
+                && !fromLocation.isInLiquid()) {
             return flyingModelLevitation;
         }
-        if (fromLocation.isOnGroundOrResetCond()) {
-            // TODO: INCONSISTENT. Check in medium count / past moves.
-            return modelGameMode;
-        }
+        // Elytra.
         if (isGlidingWithElytra) { // Defensive: don't demand isGliding.
             return flyingModelElytra;
         }

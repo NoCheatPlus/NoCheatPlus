@@ -79,7 +79,7 @@ public class CreativeFly extends Check {
 
         // Some edge data for this move.
         final GameMode gameMode = player.getGameMode();
-        final ModelFlying model = cc.getModelFlying(player, from);
+        final ModelFlying model = cc.getModelFlying(player, from, data, cc);
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         //        if (!data.thisMove.from.extraPropertiesValid) {
         //            // TODO: Confine by model config flag or just always do [if the latter: do it in the listener]?

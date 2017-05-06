@@ -76,15 +76,39 @@ public class MovingUtil {
      * @param cc
      * @return
      */
-    public static final boolean shouldCheckSurvivalFly(final Player player, final PlayerLocation fromLocation, final MovingData data, final MovingConfig cc) {
+    public static final boolean shouldCheckSurvivalFly(final Player player, final PlayerLocation fromLocation, 
+            final MovingData data, final MovingConfig cc) {
         final GameMode gameMode = player.getGameMode();
+        /*
+         * TODO: Model rare to check conditions (elytra, ...) on base of one
+         * pre-check and a method to delegate to. Reuse method(s) with
+         * MovingConfig.
+         */
         return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY, true)
                 && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) || fromLocation.isInLiquid())
-                && (!Bridge1_9.isGlidingWithElytra(player) || fromLocation.isOnGroundOrResetCond())
+                && (!Bridge1_9.isGlidingWithElytra(player) 
+                        || !isGlidingWithElytraValid(player, fromLocation, data, cc))
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
+    }
+
+    /**
+     * Prerequisite is Bridge1_9.isGlidingWithElytra(player) having returned
+     * true.
+     * 
+     * @param player
+     * @param fromLocation
+     * @param data
+     * @param cc
+     * @return
+     */
+    public static boolean isGlidingWithElytraValid(final Player player, final PlayerLocation fromLocation, 
+            final MovingData data, final MovingConfig cc) {
+        // TODO: Extend by thisMove / past moves checking (partly a cheat detection).
+        // TODO: Short touch of water/vines (/ground?) is possible - use past moves or in-medium-count.
+        return !fromLocation.isOnGroundOrResetCond();
     }
 
     /**
