@@ -34,7 +34,8 @@ public class RichEntityLocation extends RichBoundsLocation {
 
     /*
      * TODO: HumanEntity default with + height (1.11.2): elytra 0.6/0.6,
-     * sleeping 0.2/0.2, sneaking 0.6/1.65, normal 0.6/1.8
+     * sleeping 0.2/0.2, sneaking 0.6/1.65, normal 0.6/1.8 - head height is 0.4
+     * with elytra, 0.2 with sleeping, height - 0.08 otherwise.
      */
 
     /** The mc access. */
@@ -397,6 +398,7 @@ public class RichEntityLocation extends RichBoundsLocation {
         this.isLiving = isLiving;
         final MCAccess mcAccess = this.mcAccess.getHandle();
         this.width = mcAccess.getWidth(entity);
+        this.eyeHeight = eyeHeight;
         this.height = mcAccess.getHeight(entity);
         standsOnEntity = false;
         super.set(location, fullWidth, fullHeight, yOnGround);

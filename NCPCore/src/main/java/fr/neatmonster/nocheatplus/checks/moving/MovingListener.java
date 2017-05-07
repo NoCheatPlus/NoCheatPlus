@@ -30,8 +30,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -64,6 +66,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
+import fr.neatmonster.nocheatplus.checks.moving.model.ModelFlying;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.player.CreativeFly;
@@ -208,6 +211,43 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Register vehicleChecks.
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(vehicleChecks);
         blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
+        if (Bridge1_9.hasEntityToggleGlideEvent()) {
+            queuedComponents.add(new Listener() {
+                @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+                public void onEntityToggleGlide(final EntityToggleGlideEvent event) {
+                    if (handleEntityToggleGlideEvent(event.getEntity(), event.isGliding())) {
+                        event.setCancelled(true);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 
+     * @param entity
+     * @param isGliding
+     * @return True, if the event is to be cancelled.
+     */
+    private boolean handleEntityToggleGlideEvent(final Entity entity, final boolean isGliding) {
+        // Ignore non players.
+        if (!(entity instanceof Player)) {
+            return false;
+        }
+        final Player player = (Player) entity;
+        if (isGliding && !Bridge1_9.isGlidingWithElytra(player)) { // Includes check for elytra item.
+            final PlayerMoveInfo info = aux.usePlayerMoveInfo();
+            info.set(player, player.getLocation(info.useLoc), null, 0.001); // Only restrict very near ground.
+            final MovingData data = MovingData.getData(player);
+            final boolean res = !MovingUtil.canLiftOffWithElytra(player, info.from, data);
+            info.cleanup();
+            aux.returnPlayerMoveInfo(info);
+            if (res && data.debug) {
+                debug(player, "Prevent toggle glide on.");
+            }
+            return res;
+        }
+        return false;
     }
 
     /**
@@ -625,15 +665,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
             checkCf = true;
             checkSf = false;
-            data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
-            data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
-            thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
-            // TODO: Adjust height of PlayerLocation more efficiently / fetch model early.
-            thisMove.modelFlying = cc.getModelFlying(player, pFrom, data, cc);
-            if (MovingConfig.ID_JETPACK_ELYTRA.equals(thisMove.modelFlying.getId())) {
-                pFrom.setByGivenHeight(from, player, 0.6, cc.yOnGround);
-                pTo.setByGivenHeight(to, player, 0.6, cc.yOnGround);
-            }
+            prepareCreativeFlyCheck(player, from, to, moveInfo, thisMove, multiMoveCount, tick, data, cc);
         }
         else {
             checkCf = checkSf = false;
@@ -896,8 +928,39 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             // Set back handling.
             prepareSetBack(player, event, newTo, data, cc);
+            // Prevent freezing (e.g. ascending with gliding set in water, but moving normally).
+            if ((thisMove.flyCheck == CheckType.MOVING_SURVIVALFLY
+                    || thisMove.flyCheck == CheckType.MOVING_CREATIVEFLY
+                    && pFrom.isInLiquid()
+                    ) && Bridge1_9.isGlidingWithElytra(player)) {
+                stopGliding(player);
+            }
             return true;
         }
+    }
+
+    private static void stopGliding(final Player player) {
+        player.setGliding(false);
+    }
+
+    private void prepareCreativeFlyCheck(final Player player, final Location from, final Location to, 
+            final PlayerMoveInfo moveInfo, final PlayerMoveData thisMove, final int multiMoveCount, 
+            final int tick, final MovingData data, final MovingConfig cc) {
+        data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
+        data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
+        // TODO: Adjust height of PlayerLocation more efficiently / fetch model early.
+        final ModelFlying model = cc.getModelFlying(player, moveInfo.from, data, cc);
+        if (MovingConfig.ID_JETPACK_ELYTRA.equals(model.getId())) {
+            final MCAccess mcAccess = this.mcAccess.getHandle();
+            MovingUtil.setElytraProperties(player, moveInfo.from, from, cc.yOnGround, mcAccess);
+            MovingUtil.setElytraProperties(player, moveInfo.to, to, cc.yOnGround, mcAccess);
+            thisMove.set(moveInfo.from, moveInfo.to);
+            if (multiMoveCount > 0) {
+                thisMove.multiMoveCount = multiMoveCount;
+            }
+        }
+        thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
+        thisMove.modelFlying = model;
     }
 
     /**

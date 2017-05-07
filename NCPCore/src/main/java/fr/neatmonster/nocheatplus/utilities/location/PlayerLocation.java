@@ -116,18 +116,18 @@ public class PlayerLocation extends RichEntityLocation {
     }
 
     /**
-     * Like set, but for the height properties only the given height is used, no
-     * special cases.
-     * 
+     * Set with specific height/length/eyeHeight properties.
      * @param location
      * @param player
+     * @param width
+     * @param eyeHeight
      * @param height
+     * @param fullHeight
      * @param yOnGround
      */
-    public void setByGivenHeight(final Location location, final Player player, final double height, 
-            final double yOnGround) {
-        super.doSetExactHeight(location, player, true, getMCAccess().getWidth(player), 
-                height, height, height, yOnGround);
+    public void set(final Location location, final Player player, final double width,  
+            final double eyeHeight, final double height, final double fullHeight, final double yOnGround) {
+        super.doSetExactHeight(location, player, true, width, eyeHeight, height, fullHeight, yOnGround);
         // Entity reference.
         this.player = player;
     }

@@ -571,12 +571,10 @@ public class SurvivalFly extends Check {
             // TODO: Is above stairs ?
         }
         // Count how long one is moving inside of a medium.
-        data.combinedMediumPermanentCount ++;
         if (oldLiftOffEnvelope != data.liftOffEnvelope) {
             data.insideMediumCount = 0;
             data.combinedMediumHCount = 0;
             data.combinedMediumHValue = 0.0;
-            data.combinedMediumPermanentCount = 0;
         }
         else if (!resetFrom || !resetTo) {
             data.insideMediumCount = 0;

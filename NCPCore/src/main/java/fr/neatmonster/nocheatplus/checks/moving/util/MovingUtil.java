@@ -30,7 +30,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
-import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.MoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.player.PlayerSetBackMethod;
@@ -89,10 +88,14 @@ public class MovingUtil {
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY, true)
-                && (!Bridge1_9.isGlidingWithElytra(player) 
-                        || !isGlidingWithElytraValid(player, fromLocation, data, cc))
-                && (Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) 
-                        || fromLocation.isInLiquid())
+                && (
+                        !Bridge1_9.isGlidingWithElytra(player) 
+                        || !isGlidingWithElytraValid(player, fromLocation, data, cc)
+                        )
+                && (
+                        Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) 
+                        || fromLocation.isInLiquid()
+                        )
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
     }
 
@@ -109,37 +112,110 @@ public class MovingUtil {
     public static boolean isGlidingWithElytraValid(final Player player, final PlayerLocation fromLocation, 
             final MovingData data, final MovingConfig cc) {
 
-        // Prevent forms of noclip - could be too coarse / false positives.
-        if (!fromLocation.isPassable()) {
-            return false;
-        }
-
-        // TODO: Confine/relax more, if needed (in-medium count, past moves).
-
+        // TODO: Configuration for which/if to check on either lift-off / unknown / gliding.
+        // TODO: Item durability?
         // TODO: TEST LAVA (ordinary and boost, lift off and other).
+        /*
+         * TODO: Allow if last move not touched ground (+-) after all the
+         * onGround check isn't much needed, if we can test for the relevant stuff (web?).
+         */
 
         // Check start glide conditions.
         final PlayerMoveData firstPastMove = data.playerMoves.getFirstPastMove();
-        if (!firstPastMove.toIsValid || firstPastMove.modelFlying == null 
+        if (
+                // Skip lift-off conditions if the EntityToggleGlideEvent is present (checked there).
+                !Bridge1_9.hasEntityToggleGlideEvent()
+                // Otherwise only treat as lift-off, if not already gliding.
+                && !firstPastMove.toIsValid || firstPastMove.modelFlying == null 
                 || !MovingConfig.ID_JETPACK_ELYTRA.equals(firstPastMove.modelFlying.getId())) {
             // Treat as a lift off.
-            return canLiftOffWithElytra(fromLocation, data);
+            // TODO: Past map states might allow lift off (...).
+            return canLiftOffWithElytra(player, fromLocation, data);
         }
-        // TODO: Past map states might allow lift off (...).
-        // TODO: Other abort conditions.
+
+        /*
+         * TODO: Test / verify it gets turned off if depleted during gliding,
+         * provided the client doesn't help knowing. (Only shortly tested with
+         * grep -r "ItemElytra.d" <- looks good.)
+         */
+        //        // Test late, as lift-off check also tests for this.
+        //        if (InventoryUtil.isItemBroken(player.getInventory().getChestplate())) {
+        //            return false;
+        //        }
+
+        /*
+         * TODO: Rather focus on abort conditions (in-medium stay time for
+         * special blocks, sleeping / dead / ...)?
+         */
 
         // Only the web can stop a player who isn't propelled by a rocket.
-        // TODO: If this is not lift-off, check with a lowered bounding box! 
-        return data.fireworksBoostDuration > 0 || !fromLocation.isInWeb();
+        return data.fireworksBoostDuration > 0 || !BlockProperties.collidesId(fromLocation.getBlockCache(), 
+                fromLocation.getMinX(), fromLocation.getMinY(), fromLocation.getMinZ(), 
+                fromLocation.getMaxX(), fromLocation.getMinY() + 0.6, fromLocation.getMaxZ(), Material.WEB);
     }
 
-    private static boolean canLiftOffWithElytra(final PlayerLocation fromLocation, final MovingData data) {
-        return !fromLocation.isInLiquid() && !fromLocation.isInWeb() 
-                && (data.liftOffEnvelope == LiftOffEnvelope.LIMIT_NEAR_GROUND 
-                || data.liftOffEnvelope == LiftOffEnvelope.NORMAL);
-        // && !fromLocation.isOnGround() // TODO: Nice to have: been in air slightly before.
-        //|| data.combinedMediumPermanentCount > data.insideMediumCount
-        //&& data.combinedMediumPermanentCount > 15;
+    /**
+     * Check lift-off (CB: on ground is done wrongly, inWater probably is
+     * correct, web is not checked).
+     * 
+     * @param fromLocation
+     * @param data
+     * @return
+     */
+    public static boolean canLiftOffWithElytra(final Player player, final PlayerLocation loc, 
+            final MovingData data) {
+        // TODO: Item durability here too?
+        // TODO: this/firstPast- Move not touching or not explicitly on ground would be enough?
+        return 
+                loc.isPassableBox() // Full box as if standing for lift-off.
+                && !loc.isInWeb()
+                // Durability is checked within PlayerConnection (toggling on).
+                // && !InventoryUtil.isItemBroken(player.getInventory().getChestplate())
+                /*
+                 * TODO: Could be a problem with too high yOnGround. Actual
+                 * cheating rather would have to be prevented by monitoring
+                 * jumping more tightly (low jump = set back, needs
+                 * false-positive-free checking (...)).
+                 */
+                && !loc.isOnGround(0.001) 
+                // Assume water is checked correctly.
+                //                && (
+                //                        !fromLocation.isInLiquid() // (Needs to check for actual block bounds).
+                //                        /*
+                //                         * Observed with head free, but feet clearly in water:
+                //                         * lift off from water (not 100% easy to do).
+                //                         */
+                //                        || !BlockProperties.isLiquid(fromLocation.getTypeId())
+                //                        || !BlockProperties.isLiquid(fromLocation.getTypeIdAbove())
+                //                        )
+                ;
+    }
+
+    /**
+     * Workaround for getEyeHeight not accounting for special conditions like
+     * gliding with elytra. (Sleeping is not checked.)
+     * 
+     * @param player
+     * @return
+     */
+    public static double getEyeHeight(final Player player) {
+        // TODO: Need a variant/method to test legitimate state transitions?
+        // TODO: EntityToggleGlideEvent
+        return Bridge1_9.isGlidingWithElytra(player) ? 0.4 : player.getEyeHeight();
+    }
+
+    /**
+     * Initialize pLoc with edge data specific to gliding with elytra.
+     * 
+     * @param player
+     * @param pLoc
+     * @param loc
+     * @param yOnGround
+     * @param mcAccess
+     */
+    public static void setElytraProperties(final Player player, final PlayerLocation pLoc, final Location loc,
+            final double yOnGround, final MCAccess mcAccess) {
+        pLoc.set(loc, player, mcAccess.getWidth(player), 0.4, 0.6, 0.6, yOnGround);
     }
 
     /**

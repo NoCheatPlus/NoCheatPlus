@@ -250,8 +250,6 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
     public int combinedMediumHCount = 0;
     /** Sum of actual speed / base speed for horizontal moving within air + certain medium. */
     public double combinedMediumHValue = 0.0;
-    /** Count combined medium successive moves, permanent. */
-    public int combinedMediumPermanentCount = 0; // TODO: Not 100% convinced of usefulness.
 
     // Locations shared between all checks.
     private Location    setBack = null;

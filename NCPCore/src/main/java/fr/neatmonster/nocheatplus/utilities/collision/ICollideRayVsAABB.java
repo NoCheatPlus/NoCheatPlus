@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import fr.neatmonster.nocheatplus.components.location.IGetBox3D;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 
 /**
@@ -72,6 +73,15 @@ public interface ICollideRayVsAABB extends IGetPosition {
      */
     public ICollideRayVsAABB setAABB(double targetX, double targetY, double targetZ,
             double boxMarginHorizontal, double boxMarginVertical);
+
+    /**
+     * Set the properties of the AABB, using a given boxIGetBox3D instance.
+     * 
+     * @param box
+     *            The 3D bounding box to set.
+     * @return The same instance for chaining.
+     */
+    public ICollideRayVsAABB setAABB(IGetBox3D box);
 
     /**
      * Set the properties of the AABB, using block coordinates and a margin.

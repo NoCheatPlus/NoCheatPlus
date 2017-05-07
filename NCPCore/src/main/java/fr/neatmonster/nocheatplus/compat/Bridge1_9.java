@@ -14,8 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.compat;
 
-import java.lang.reflect.Method;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -35,10 +33,11 @@ public class Bridge1_9 {
     public static final Material ELYTRA = Material.getMaterial("ELYTRA");
     public static final Material END_CRYSTAL_ITEM = Material.getMaterial("END_CRYSTAL");
 
-    private static Method getItemInOffHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInOffHand", ItemStack.class);
-    private static Method getItemInMainHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInMainHand", ItemStack.class);
+    private static final boolean hasGetItemInOffHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInOffHand", ItemStack.class) != null;
+    private static final boolean hasGetItemInMainHand = ReflectionUtil.getMethodNoArgs(PlayerInventory.class, "getItemInMainHand", ItemStack.class) != null;
 
-    private static Method isGliding = ReflectionUtil.getMethodNoArgs(Player.class, "isGliding", boolean.class);
+    private static final boolean hasIsGliding = ReflectionUtil.getMethodNoArgs(Player.class, "isGliding", boolean.class) != null;
+    private static final boolean hasEntityToggleGlideEvent = ReflectionUtil.getClass("org.bukkit.event.entity.EntityToggleGlideEvent") != null;
 
     public static boolean hasLevitation() {
         return LEVITATION != null;
@@ -57,15 +56,19 @@ public class Bridge1_9 {
     }
 
     public static boolean hasGetItemInOffHand() {
-        return getItemInOffHand != null;
+        return hasGetItemInOffHand;
     }
 
     public static boolean hasGetItemInMainHand() {
-        return getItemInMainHand != null;
+        return hasGetItemInMainHand;
     }
 
     public static boolean hasIsGliding() {
-        return isGliding != null;
+        return hasIsGliding;
+    }
+
+    public static boolean hasEntityToggleGlideEvent() {
+        return hasEntityToggleGlideEvent;
     }
 
     /**
@@ -128,12 +131,8 @@ public class Bridge1_9 {
 
     @SuppressWarnings("deprecation")
     public static ItemStack getItemInMainHand(final Player player) {
-        if (getItemInMainHand == null) {
-            return player.getItemInHand(); // As long as feasible (see: CraftInventoryPlayer).
-        }
-        else {
-            return player.getInventory().getItemInMainHand();
-        }
+        return hasGetItemInMainHand ? player.getInventory().getItemInMainHand() 
+                : player.getItemInHand(); // As long as feasible (see: CraftInventoryPlayer).
     }
 
     /**
@@ -143,21 +142,11 @@ public class Bridge1_9 {
      * @return In case the method is not present, null will be returned.
      */
     public static ItemStack getItemInOffHand(final Player player) {
-        if (getItemInOffHand == null) {
-            return null;
-        }
-        else {
-            return player.getInventory().getItemInOffHand();
-        }
+        return hasGetItemInOffHand ? player.getInventory().getItemInOffHand() : null;
     }
 
     public static boolean isGliding(final Player player) {
-        if (isGliding == null) {
-            return false;
-        }
-        else {
-            return player.isGliding();
-        }
+        return hasIsGliding ? player.isGliding() : false;
     }
 
     /**
@@ -183,7 +172,7 @@ public class Bridge1_9 {
             }
         }
     }
-    
+
     /**
      * Get the item that was used with this event, assume right click (not feet etc.).
      * @param player

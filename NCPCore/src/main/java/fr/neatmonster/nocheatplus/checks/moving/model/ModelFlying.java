@@ -98,12 +98,12 @@ public class ModelFlying {
         horizontalModSpeed(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_SPEED, defaults.getHorizontalModSpeed()));
         horizontalModSprint(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_MODSPRINT, defaults.getHorizontalModSprint()));
         verticalAscendModSpeed(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.getVerticalAscendModSpeed()));
-        // TODO: verticalAscendGliding.
+        verticalAscendGliding(defaults.getVerticalAscendGliding()); // Config ?
         maxHeight(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.getMaxHeight()));
         applyModifiers(config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.getApplyModifiers()));
         gravity(config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.getGravity()));
         ground(config.getBoolean(prefix + ConfPaths.SUB_GROUND, defaults.getGround()));
-        // TODO: scaleLevitationEffect.
+        scaleLevitationEffect(defaults.getScaleLevitationEffect()); // Config?
     }
 
     /**

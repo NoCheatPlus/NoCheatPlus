@@ -187,4 +187,23 @@ public class InventoryUtil {
                 (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET);
     }
 
+    /**
+     * Test for max durability, only makes sense with items that can be in
+     * inventory once broken, such as elytra. This method does not (yet) provide
+     * legacy support. This tests for ItemStack.getDurability() >=
+     * Material.getMaxDurability, so it only is suited for a context where this
+     * is what you want to check for.
+     * 
+     * @param stack
+     *            May be null, would yield true.
+     * @return
+     */
+    public static boolean isItemBroken(final ItemStack stack) {
+        if (stack == null) {
+            return true;
+        }
+        final Material mat = stack.getType();
+        return stack.getDurability() >= mat.getMaxDurability();
+    }
+
 }

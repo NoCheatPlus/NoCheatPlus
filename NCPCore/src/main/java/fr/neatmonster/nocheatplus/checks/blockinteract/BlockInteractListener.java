@@ -301,16 +301,28 @@ public class BlockInteractListener extends CheckListener {
         final BlockInteractData data = BlockInteractData.getData(player);
         data.setPlayerInteractEventResolution(event);
         /*
-         * TODO: BlockDamageEvent fires before MONITOR level, BlockBreak after
-         * (!). Thus resolution is set on LOWEST already, probably should be
-         * HIGHEST to account for other plugins.
+         * TODO: BlockDamageEvent fires before BlockInteract/MONITOR level,
+         * BlockBreak after (!). Thus resolution is set on LOWEST already,
+         * probably should be HIGHEST to account for other plugins.
          */
         // Elytra boost.
-        final Block block = event.getClickedBlock();
-        if ((event.getAction() == Action.RIGHT_CLICK_AIR 
-                || event.getAction() == Action.RIGHT_CLICK_BLOCK 
-                && block != null && BlockProperties.isLiquid(block.getType())
-                )
+        /*
+         * TODO: Cross check with the next incoming move: has an item been used,
+         * is gliding, reset if necessary.
+         */
+        //final Block block = event.getClickedBlock();
+        //        if (data.debug) {
+        //            debug(player, "BlockInteractResolution: cancelled=" + event.isCancelled() 
+        //            + " action=" + event.getAction() + " block=" + block + " item=" + Bridge1_9.getUsedItem(player, event));
+        //        }
+        if (
+                (
+                        event.getAction() == Action.RIGHT_CLICK_AIR 
+                        // Water doesn't happen, block typically is null.
+                        //                        || event.getAction() == Action.RIGHT_CLICK_BLOCK 
+                        //                        && block != null && BlockProperties.isLiquid(block.getType())
+                        // TODO: web ?
+                        )
                 && event.isCancelled() && event.useItemInHand() != Result.DENY) {
             final ItemStack stack = Bridge1_9.getUsedItem(player, event);
             if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {

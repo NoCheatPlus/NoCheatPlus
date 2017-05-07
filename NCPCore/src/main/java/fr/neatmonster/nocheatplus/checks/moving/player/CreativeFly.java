@@ -228,6 +228,9 @@ public class CreativeFly extends Check {
             // Maximum height check (silent set back).
             if (to.getY() > maximumHeight) {
                 setBack = data.getSetBack(to);
+                if (data.debug) {
+                    debug(player, "Maximum height exceeded, silent set-back.");
+                }
             }
             if (setBack == null) {
                 // Slowly reduce the violation level with each event.
@@ -375,9 +378,9 @@ public class CreativeFly extends Check {
         }
 
         // Related to elytra.
-        if (limitV == 0.0 && model.getVerticalAscendGliding()) {
+        if (model.getVerticalAscendGliding()) {
             // TODO: Better detection of an elytra model (extra flags?).
-            limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data);
+            limitV = Math.max(limitV, limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data));
         }
 
         if (model.getGravity()) {

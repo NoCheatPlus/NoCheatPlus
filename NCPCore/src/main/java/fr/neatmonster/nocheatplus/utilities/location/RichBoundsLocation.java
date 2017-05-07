@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReferen
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
+import fr.neatmonster.nocheatplus.components.location.IGetBox3D;
 import fr.neatmonster.nocheatplus.components.location.IGetBlockPosition;
 import fr.neatmonster.nocheatplus.components.location.IGetBukkitLocation;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
@@ -43,7 +44,7 @@ import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
  * @author asofold
  *
  */
-public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition {
+public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition, IGetBox3D {
 
     // TODO: Store IBlockCacheNode (s) ?
     // TODO: Consider switching back from default to private visibility (use getters for other places).
@@ -248,6 +249,36 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      */
     public double[] getBoundsAsDoubles() {
         return new double[] {minX, minY, minZ, maxX, maxY, maxZ};
+    }
+
+    @Override
+    public double getMinX() {
+        return minX;
+    }
+
+    @Override
+    public double getMinZ() {
+        return minZ;
+    }
+
+    @Override
+    public double getMaxX() {
+        return maxX;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return maxZ;
+    }
+
+    @Override
+    public double getMinY() {
+        return minY;
+    }
+
+    @Override
+    public double getMaxY() {
+        return maxY;
     }
 
     /**

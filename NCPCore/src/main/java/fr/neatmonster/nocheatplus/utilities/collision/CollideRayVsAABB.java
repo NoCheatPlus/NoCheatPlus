@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.utilities.collision;
 
+import fr.neatmonster.nocheatplus.components.location.IGetBox3D;
+
 public class CollideRayVsAABB implements ICollideRayVsAABB {
 
     private boolean findNearestPointIfNotCollide = false;
@@ -39,6 +41,12 @@ public class CollideRayVsAABB implements ICollideRayVsAABB {
         this.dirX = dirX;
         this.dirY = dirY;
         this.dirZ = dirZ;
+        return this;
+    }
+
+    @Override
+    public ICollideRayVsAABB setAABB(final IGetBox3D box) {
+        setAABB(box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
         return this;
     }
 
