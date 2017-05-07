@@ -129,6 +129,7 @@ public class MovingUtil {
         // TODO: Other abort conditions.
 
         // Only the web can stop a player who isn't propelled by a rocket.
+        // TODO: If this is not lift-off, check with a lowered bounding box! 
         return data.fireworksBoostDuration > 0 || !fromLocation.isInWeb();
     }
 

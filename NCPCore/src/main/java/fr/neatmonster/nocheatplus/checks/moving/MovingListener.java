@@ -628,6 +628,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
             thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
+            // TODO: Adjust height of PlayerLocation more efficiently / fetch model early.
+            thisMove.modelFlying = cc.getModelFlying(player, pFrom, data, cc);
+            if (MovingConfig.ID_JETPACK_ELYTRA.equals(thisMove.modelFlying.id)) {
+                pFrom.setByGivenHeight(from, player, 0.6, cc.yOnGround);
+                pTo.setByGivenHeight(to, player, 0.6, cc.yOnGround);
+            }
         }
         else {
             checkCf = checkSf = false;

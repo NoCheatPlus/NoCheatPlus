@@ -79,14 +79,14 @@ public class CreativeFly extends Check {
 
         // Some edge data for this move.
         final GameMode gameMode = player.getGameMode();
-        final ModelFlying model = cc.getModelFlying(player, from, data, cc);
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         //        if (!data.thisMove.from.extraPropertiesValid) {
         //            // TODO: Confine by model config flag or just always do [if the latter: do it in the listener]?
         //            data.thisMove.setExtraProperties(from, to);
         //        }
-        thisMove.modelFlying = model;
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
+        final ModelFlying model = thisMove.modelFlying;
+        // TODO: Other set back policy for elytra, e.g. not set in narrow spaces?
 
         // Proactive reset of elytraBoost (MC 1.11.2).
         if (data.fireworksBoostDuration > 0) {
