@@ -121,7 +121,7 @@ public class MovingUtil {
         // Check start glide conditions.
         final PlayerMoveData firstPastMove = data.playerMoves.getFirstPastMove();
         if (!firstPastMove.toIsValid || firstPastMove.modelFlying == null 
-                || !MovingConfig.ID_JETPACK_ELYTRA.equals(firstPastMove.modelFlying.id)) {
+                || !MovingConfig.ID_JETPACK_ELYTRA.equals(firstPastMove.modelFlying.getId())) {
             // Treat as a lift off.
             return canLiftOffWithElytra(fromLocation, data);
         }

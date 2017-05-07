@@ -25,74 +25,208 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
  */
 public class ModelFlying {
 
-    /**
-     * The id for this model. The default model id is null.
-     */
-    public final String id;
-
     /** The horizontal per-tick distance in creative mode. */
     public static final double HORIZONTAL_SPEED = 0.6D;
     /** The vertical per-tick distance in creative mode. */
-    public static final double VERTICAL_ASCEND_SPEED   = 1D;
+    public static final double VERTICAL_ASCEND_SPEED = 1D;
+
+    /**
+     * The id for this model. The default model id is null.
+     */
+    private final String id;
 
     /** Modifier for horizontal flying speed in per cent. */
-    public final double hModSpeed;
-    /** Additional modifier for horizontal flying speed (multiplier), when sprinting. */
-    public final double hModSprint;
+    private double horizontalModSpeed = 100.0;
+    /**
+     * Additional modifier for horizontal flying speed (multiplier), when
+     * sprinting.
+     */
+    private double horizontalModSprint = 1.92;
     /** Modifier for vertical flying speed in per cent, for ascending. */
-    public final double vModAscendSpeed;
+    private double verticalAscendModSpeed = 100.0;
     /** Maximum flying height above the maximum building height of the map. */
-    public final double maxHeight;
+    private double maxHeight = 128;
     /** Apply modifiers like sprint, flyspeed, walkspeed, potions. */
-    public final boolean applyModifiers;
+    private boolean applyModifiers = true;
     /** Allow falling with gravity, including friction. */
-    public final boolean gravity;
+    private boolean gravity = true;
     /** Default ground moving mechanics (jump, lost ground). */
-    public final boolean ground;
-
-    /** Ugly, but true. */
+    private boolean ground = true;
+    /**
+     * Allow an extra amount to ascend speed, scaling with the levitation effect
+     * level.
+     */
     private boolean scaleLevitationEffect = false;
 
-    // TODO: Switch to something else (non final, chaining with getters and setters)? [though models are referenced in past moves]
-    public ModelFlying(String id, double hModSpeed, double hModSprint, double vModAscendSpeed, double maxHeight, 
-            boolean applyModifiers, boolean gravity, final boolean ground) {
-        // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
-        // TODO: possibly other friction based envelope constraints.
-        // TODO: Check if needed: use fly/walk speed.
-        this.id = id;
-        this.hModSpeed = hModSpeed;
-        this.hModSprint = hModSprint;
-        this.vModAscendSpeed = vModAscendSpeed;
-        this.maxHeight = maxHeight;
-        this.applyModifiers = applyModifiers;
-        this.gravity = gravity;
-        this.ground = ground;
+    // TODO: vertical ascend/descend, limit gain a/d/v, limit abs. distance a/d/v
+    // TODO: possibly other friction based envelope constraints.
+    // TODO: Check if needed: use fly/walk speed.
+
+    private boolean locked = false;
+
+    /**
+     * Default model with null id.
+     */
+    public ModelFlying() {
+        this(null);
     }
 
+    public ModelFlying(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Initialize all settings from the given configuration with the given path
+     * prefix. Call lock() in order to prevent further changes.
+     * 
+     * @param id
+     * @param config
+     * @param prefix
+     *            (typically should include a dot, if it's not empty)
+     * @param defaults
+     *            Default settings to use, if there is no value set for a
+     *            certain property.
+     */
     public ModelFlying(String id, ConfigurationSection config, String prefix, ModelFlying defaults) {
         // For differing models, some paths may or may not be set in the default configuration.
-        this(
-                id,
-                config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_SPEED, defaults.hModSpeed),
-                config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_MODSPRINT, defaults.hModSprint),
-                config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.vModAscendSpeed),
-                config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.maxHeight),
-                config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.applyModifiers),
-                config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.gravity),
-                config.getBoolean(prefix + ConfPaths.SUB_GROUND, defaults.ground)
-                );
+        this(id);
+        horizontalModSpeed(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_SPEED, defaults.getHorizontalModSpeed()));
+        horizontalModSprint(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_MODSPRINT, defaults.getHorizontalModSprint()));
+        verticalAscendModSpeed(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.getVerticalAscendModSpeed()));
+        maxHeight(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.getMaxHeight()));
+        applyModifiers(config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.getApplyModifiers()));
+        gravity(config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.getGravity()));
+        ground(config.getBoolean(prefix + ConfPaths.SUB_GROUND, defaults.getGround()));
+        // TODO: scaleLevitationEffect.
     }
 
-    public ModelFlying() {
-        this(null, 100.0, 1.92, 100.0, 128, true, true, true);
+    /**
+     * Initialize from another model. Call lock() in order to prevent further
+     * changes.
+     * 
+     * @param id
+     * @param defaults
+     */
+    public ModelFlying(String id, ModelFlying defaults) {
+        this(id);
+        horizontalModSpeed(defaults.getHorizontalModSpeed());
+        horizontalModSprint(defaults.getHorizontalModSprint());
+        verticalAscendModSpeed(defaults.getVerticalAscendModSpeed());
+        maxHeight(defaults.getMaxHeight());
+        applyModifiers(defaults.getApplyModifiers());
+        gravity(defaults.getGravity());
+        ground(defaults.getGround());
+        scaleLevitationEffect(defaults.getScaleLevitationEffect());
     }
 
-    public boolean isScaleLevitationEffect() {
+    /**
+     * Call to prevent further changes.
+     * 
+     * @return
+     */
+    public ModelFlying lock() {
+        checkLocked();
+        locked = true;
+        return this;
+    }
+
+    /**
+     * Test if the model is locked against changes.
+     * 
+     * @return
+     */
+    public boolean isLocked() {
+        return locked;
+    }
+
+    private void checkLocked() {
+        if (locked) {
+            throw new RuntimeException("The model has been locked against changes.");
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public double getHorizontalModSpeed() {
+        return horizontalModSpeed;
+    }
+
+    public double getHorizontalModSprint() {
+        return horizontalModSprint;
+    }
+
+    public double getVerticalAscendModSpeed() {
+        return verticalAscendModSpeed;
+    }
+
+    public double getMaxHeight() {
+        return maxHeight;
+    }
+
+    public boolean getApplyModifiers() {
+        return applyModifiers;
+    }
+
+    public boolean getGravity() {
+        return gravity;
+    }
+
+    public boolean getGround() {
+        return ground;
+    }
+
+    public boolean getScaleLevitationEffect() {
         return scaleLevitationEffect;
     }
 
-    public void setScaleLevitationEffect(boolean scaleLevitationEffect) {
+    public ModelFlying horizontalModSpeed(double horizontalModSpeed) {
+        checkLocked();
+        this.horizontalModSpeed = horizontalModSpeed;
+        return this;
+    }
+
+    public ModelFlying horizontalModSprint(double horizontalModSprint) {
+        this.horizontalModSprint = horizontalModSprint;
+        checkLocked();
+        return this;
+    }
+
+    public ModelFlying verticalAscendModSpeed(double verticalAscendModSpeed) {
+        checkLocked();
+        this.verticalAscendModSpeed = verticalAscendModSpeed;
+        return this;
+    }
+
+    public ModelFlying maxHeight(double maxHeight) {
+        checkLocked();
+        this.maxHeight = maxHeight;
+        return this;
+    }
+
+    public ModelFlying applyModifiers(boolean applyModifiers) {
+        checkLocked();
+        this.applyModifiers = applyModifiers;
+        return this;
+    }
+
+    public ModelFlying gravity(boolean gravity) {
+        checkLocked();
+        this.gravity = gravity;
+        return this;
+    }
+
+    public ModelFlying ground(boolean ground) {
+        checkLocked();
+        this.ground = ground;
+        return this;
+    }
+
+    public ModelFlying scaleLevitationEffect(boolean scaleLevitationEffect) {
+        checkLocked();
         this.scaleLevitationEffect = scaleLevitationEffect;
+        return this;
     }
 
 }

@@ -108,7 +108,7 @@ public class CreativeFly extends Check {
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
 
         // Lost ground, if set so.
-        if (model.ground) {
+        if (model.getGround()) {
             MovingUtil.prepareFullCheck(from, to, thisMove, Math.max(cc.yOnGround, cc.noFallyOnGround));
             if (!thisMove.from.onGroundOrResetCond) {
                 if (from.isSamePos(to)) {
@@ -184,7 +184,7 @@ public class CreativeFly extends Check {
         }
 
         // Add tag for maximum height check (silent set back).
-        final double maximumHeight = model.maxHeight + player.getWorld().getMaxHeight();
+        final double maximumHeight = model.getMaxHeight() + player.getWorld().getMaxHeight();
         if (to.getY() > maximumHeight) {
             // TODO: Allow use velocity there (would need a flag to signal the actual check below)?
             tags.add("maxheight");
@@ -285,7 +285,7 @@ public class CreativeFly extends Check {
         double fSpeed;
 
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
-        if (model.applyModifiers) {
+        if (model.getApplyModifiers()) {
             final double speedModifier = mcAccess.getHandle().getFasterMovementAmplifier(player);
             if (Double.isInfinite(speedModifier)) {
                 fSpeed = 1.0;
@@ -298,7 +298,7 @@ public class CreativeFly extends Check {
                 fSpeed *= data.flySpeed / Magic.DEFAULT_FLYSPEED;
                 if (sprinting) {
                     // TODO: Prevent for pre-1.8?
-                    fSpeed *= model.hModSprint;
+                    fSpeed *= model.getHorizontalModSprint();
                     tags.add("sprint");
                 }
                 tags.add("flying");
@@ -312,7 +312,7 @@ public class CreativeFly extends Check {
             fSpeed = 1.0;
         }
 
-        double limitH = model.hModSpeed / 100.0 * ModelFlying.HORIZONTAL_SPEED * fSpeed;
+        double limitH = model.getHorizontalModSpeed() / 100.0 * ModelFlying.HORIZONTAL_SPEED * fSpeed;
 
         if (lastMove.toIsValid) {
             // TODO: Use last friction (as well)?
@@ -326,7 +326,7 @@ public class CreativeFly extends Check {
         //        double resultH = Math.max(0.0.0, hDistance - data.horizontalFreedom - limitH);
         double resultH = Math.max(0.0, hDistance - limitH);
 
-        if (model.applyModifiers) {
+        if (model.getApplyModifiers()) {
             data.bunnyhopDelay--;
             if (!flying && resultH > 0 && sprinting) {
                 // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
@@ -357,13 +357,13 @@ public class CreativeFly extends Check {
      * @return limitV, resultV (not normalized).
      */
     private double[] vDistAscend(final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean flying, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final ModelFlying model, final MovingData data, final MovingConfig cc) {
-        double limitV = model.vModAscendSpeed / 100.0 * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
+        double limitV = model.getVerticalAscendModSpeed() / 100.0 * ModelFlying.VERTICAL_ASCEND_SPEED; // * data.jumpAmplifier;
         double resultV = 0.0;
-        if (model.applyModifiers && flying && yDistance > 0.0) {
+        if (model.getApplyModifiers() && flying && yDistance > 0.0) {
             // Let fly speed apply with moving upwards.
             limitV *= data.flySpeed / Magic.DEFAULT_FLYSPEED;
         }
-        else if (model.isScaleLevitationEffect() && Bridge1_9.hasLevitation()) {
+        else if (model.getScaleLevitationEffect() && Bridge1_9.hasLevitation()) {
             // Exclude modifiers for now.
             final double levitation = Bridge1_9.getLevitationAmplifier(from.getPlayer());
             if (levitation > 0.0) {
@@ -380,9 +380,9 @@ public class CreativeFly extends Check {
             limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data);
         }
 
-        if (model.gravity) {
+        if (model.getGravity()) {
             // Friction with gravity.
-            if (yDistance > limitV && model.gravity && lastMove.toIsValid) { // TODO: gravity/friction?
+            if (yDistance > limitV && lastMove.toIsValid) { // TODO: gravity/friction?
                 // (Disregard gravity.)
                 // TODO: Use last friction (as well)?
                 double frictionDist = lastMove.yDistance * Magic.FRICTION_MEDIUM_AIR;
@@ -396,7 +396,7 @@ public class CreativeFly extends Check {
             }
         }
 
-        if (model.ground) {
+        if (model.getGround()) {
             // Jump lift off gain.
             // NOTE: This assumes SurvivalFly busies about moves with from.onGroundOrResetCond.
             if (yDistance > limitV && !thisMove.to.onGroundOrResetCond && !thisMove.from.onGroundOrResetCond && (
@@ -567,10 +567,10 @@ public class CreativeFly extends Check {
         if (thisMove.verVelUsed != null) {
             builder.append(" , vVelUsed: " + thisMove.verVelUsed);
         }
-        if (data.fireworksBoostDuration > 0 && model.id.equals("jetpack.elytra")) {
+        if (data.fireworksBoostDuration > 0 && MovingConfig.ID_JETPACK_ELYTRA.equals(model.getId())) {
             builder.append(" , boost: " + data.fireworksBoostDuration);
         }
-        builder.append(" , model: " + model.id);
+        builder.append(" , model: " + model.getId());
         if (!tags.isEmpty()) {
             builder.append(" , tags: ");
             builder.append(StringUtil.join(tags, "+"));
