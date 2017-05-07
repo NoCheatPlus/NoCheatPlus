@@ -259,16 +259,17 @@ public class MovingConfig extends ACheckConfig {
 
         creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
         final ModelFlying defaultModel = new ModelFlying("gamemode.creative", config, 
-                ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying());
+                ConfPaths.MOVING_CREATIVEFLY_MODEL + "creative.", new ModelFlying().lock());
         for (final GameMode gameMode : GameMode.values()) {
             flyingModelGameMode.put(gameMode, new ModelFlying("gamemode." + gameMode.name().toLowerCase(), config, 
-                    ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel));
+                    ConfPaths.MOVING_CREATIVEFLY_MODEL + (gameMode.name().toLowerCase()) + ".", defaultModel).lock());
         }
         flyingModelLevitation = new ModelFlying(ID_POTION_LEVITATION, config, 
                 ConfPaths.MOVING_CREATIVEFLY_MODEL + "levitation.", 
-                new ModelFlying(null, defaultModel).scaleLevitationEffect(true));
+                new ModelFlying(null, defaultModel).scaleLevitationEffect(true).lock());
         flyingModelElytra = new ModelFlying(ID_JETPACK_ELYTRA, config, 
-                ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", defaultModel);
+                ConfPaths.MOVING_CREATIVEFLY_MODEL + "elytra.", 
+                new ModelFlying(null, defaultModel).verticalAscendGliding(true).lock());
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, 
                 Permissions.MOVING_CREATIVEFLY);
 

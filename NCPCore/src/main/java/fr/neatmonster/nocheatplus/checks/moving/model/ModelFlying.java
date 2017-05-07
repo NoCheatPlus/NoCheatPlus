@@ -44,6 +44,11 @@ public class ModelFlying {
     private double horizontalModSprint = 1.92;
     /** Modifier for vertical flying speed in per cent, for ascending. */
     private double verticalAscendModSpeed = 100.0;
+    /**
+     * Apply special mechanics for allowing some vertical ascension with
+     * gliding.
+     */
+    private boolean verticalAscendGliding = false;
     /** Maximum flying height above the maximum building height of the map. */
     private double maxHeight = 128;
     /** Apply modifiers like sprint, flyspeed, walkspeed, potions. */
@@ -93,6 +98,7 @@ public class ModelFlying {
         horizontalModSpeed(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_SPEED, defaults.getHorizontalModSpeed()));
         horizontalModSprint(config.getDouble(prefix + ConfPaths.SUB_HORIZONTAL_MODSPRINT, defaults.getHorizontalModSprint()));
         verticalAscendModSpeed(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_ASCEND_SPEED, defaults.getVerticalAscendModSpeed()));
+        // TODO: verticalAscendGliding.
         maxHeight(config.getDouble(prefix + ConfPaths.SUB_VERTICAL_MAXHEIGHT, defaults.getMaxHeight()));
         applyModifiers(config.getBoolean(prefix + ConfPaths.SUB_MODIFIERS, defaults.getApplyModifiers()));
         gravity(config.getBoolean(prefix + ConfPaths.SUB_VERTICAL_GRAVITY, defaults.getGravity()));
@@ -112,6 +118,7 @@ public class ModelFlying {
         horizontalModSpeed(defaults.getHorizontalModSpeed());
         horizontalModSprint(defaults.getHorizontalModSprint());
         verticalAscendModSpeed(defaults.getVerticalAscendModSpeed());
+        verticalAscendGliding(defaults.getVerticalAscendGliding());
         maxHeight(defaults.getMaxHeight());
         applyModifiers(defaults.getApplyModifiers());
         gravity(defaults.getGravity());
@@ -161,6 +168,10 @@ public class ModelFlying {
         return verticalAscendModSpeed;
     }
 
+    public boolean getVerticalAscendGliding() {
+        return verticalAscendGliding;
+    }
+
     public double getMaxHeight() {
         return maxHeight;
     }
@@ -188,14 +199,20 @@ public class ModelFlying {
     }
 
     public ModelFlying horizontalModSprint(double horizontalModSprint) {
-        this.horizontalModSprint = horizontalModSprint;
         checkLocked();
+        this.horizontalModSprint = horizontalModSprint;
         return this;
     }
 
     public ModelFlying verticalAscendModSpeed(double verticalAscendModSpeed) {
         checkLocked();
         this.verticalAscendModSpeed = verticalAscendModSpeed;
+        return this;
+    }
+
+    public ModelFlying verticalAscendGliding(boolean verticalAscendGliding) {
+        checkLocked();
+        this.verticalAscendGliding = verticalAscendGliding;
         return this;
     }
 

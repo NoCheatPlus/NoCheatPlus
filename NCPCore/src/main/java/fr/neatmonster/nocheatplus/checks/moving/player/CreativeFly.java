@@ -375,7 +375,7 @@ public class CreativeFly extends Check {
         }
 
         // Related to elytra.
-        if (limitV == 0.0 && Bridge1_9.isGlidingWithElytra(from.getPlayer())) {
+        if (limitV == 0.0 && model.getVerticalAscendGliding()) {
             // TODO: Better detection of an elytra model (extra flags?).
             limitV = hackLytra(yDistance, limitV, thisMove, lastMove, data);
         }
