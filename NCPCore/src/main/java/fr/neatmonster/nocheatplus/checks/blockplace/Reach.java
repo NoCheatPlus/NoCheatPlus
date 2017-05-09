@@ -58,7 +58,8 @@ public class Reach extends Check {
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final BlockPlaceData data, final BlockPlaceConfig cc) {
+    public boolean check(final Player player, final double eyeHeight, final Block block, 
+            final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -67,7 +68,7 @@ public class Reach extends Check {
         // Distance is calculated from eye location to center of targeted block. If the player is further away from their
         // target than allowed, the difference will be assigned to "distance".
         final Location eyeLoc = player.getLocation(useLoc);
-        eyeLoc.setY(eyeLoc.getY() + player.getEyeHeight());
+        eyeLoc.setY(eyeLoc.getY() + eyeHeight);
         final double distance = TrigUtil.distance(eyeLoc, block) - distanceLimit;
 
         if (distance > 0) {

@@ -160,12 +160,13 @@ public class BlockBreakListener extends CheckListener {
         if (cc.reachCheck || cc.directionCheck) {
             flyingHandle = new FlyingQueueHandle(player);
             final Location loc = player.getLocation(useLoc);
+            final double eyeHeight = MovingUtil.getEyeHeight(player);
             // Is the block really in reach distance?
             if (!cancelled) {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
                     skippedRedundantChecks ++;
                 }
-                else if (reach.isEnabled(player) && reach.check(player, block, data)) {
+                else if (reach.isEnabled(player) && reach.check(player, eyeHeight, block, data)) {
                     cancelled = true;
                 }
             }
@@ -177,8 +178,8 @@ public class BlockBreakListener extends CheckListener {
                         || bdata.isPassedCheck(CheckType.BLOCKINTERACT_VISIBLE))) {
                     skippedRedundantChecks ++;
                 }
-                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, 
-                        data, cc)) {
+                else if (direction.isEnabled(player) && direction.check(player, loc, eyeHeight, block, 
+                        flyingHandle, data, cc)) {
                     cancelled = true;
                 }
             }

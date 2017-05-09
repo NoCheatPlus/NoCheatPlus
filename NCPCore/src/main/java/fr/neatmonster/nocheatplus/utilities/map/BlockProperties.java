@@ -39,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -1355,21 +1356,35 @@ public class BlockProperties {
     }
 
     /**
-     * TODO: repair signature some day (rid of PlayerLocation).
-     *
+     * Convenience method.
+     * 
      * @param blockId
-     *            the block id
      * @param itemInHand
      *            May be null.
      * @param helmet
      *            May be null.
      * @param player
-     *            the player
      * @param location
-     *            The normal location of a player.
-     * @return the breaking duration
+     * @return
      */
-    public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, final Player player, final Location location) {
+    public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, 
+            final Player player, final Location location) {
+        return getBreakingDuration(blockId, itemInHand, helmet, player, MovingUtil.getEyeHeight(player), location);
+    }
+
+    /**
+     * Convenience method.
+     * @param blockId
+     * @param itemInHand
+     * @param helmet
+     * @param player
+     * @param eyeHEight
+     * @param location
+     * @return
+     */
+    public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, 
+            final Player player, final double eyeHeight, final Location location) {
+
         final BlockCache blockCache = wrapBlockCache.getBlockCache();
         blockCache.setAccess(location.getWorld());
         pLoc.setBlockCache(blockCache);
@@ -1379,7 +1394,7 @@ public class BlockProperties {
         // Head in water.
         final int bx = pLoc.getBlockX();
         final int bz = pLoc.getBlockZ();
-        final double y = pLoc.getY() + player.getEyeHeight();
+        final double y = pLoc.getY() + eyeHeight;
         final int by = Location.locToBlock(y);
         final int headId = blockCache.getTypeId(bx, by, bz);
         final long headFlags = blockFlags[headId];

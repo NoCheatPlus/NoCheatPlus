@@ -111,8 +111,8 @@ public class Visible extends Check {
         rayTracing.setMaxSteps(60); // TODO: Configurable ?
     }
 
-    public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, 
-            final Action action, final FlyingQueueHandle flyingHandle, 
+    public boolean check(final Player player, final Location loc, final double eyeHeight, final Block block, 
+            final BlockFace face, final Action action, final FlyingQueueHandle flyingHandle, 
             final BlockInteractData data, final BlockInteractConfig cc) {
         // TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
         // TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
@@ -121,7 +121,7 @@ public class Visible extends Check {
         final int blockY = block.getY();
         final int blockZ = block.getZ();
         final double eyeX = loc.getX();
-        final double eyeY = loc.getY() + player.getEyeHeight();
+        final double eyeY = loc.getY() + eyeHeight;
         final double eyeZ = loc.getZ();
 
         tags.clear();

@@ -201,21 +201,22 @@ public class BlockInteractListener extends CheckListener {
         }
 
         if (blockChecks) {
+            final double eyeHeight = MovingUtil.getEyeHeight(player);
             // First the reach check.
             if (!cancelled && reach.isEnabled(player) 
-                    && reach.check(player, loc, block, data, cc)) {
+                    && reach.check(player, loc, eyeHeight, block, data, cc)) {
                 cancelled = true;
             }
 
             // Second the direction check
             if (!cancelled && direction.isEnabled(player) 
-                    && direction.check(player, loc, block, flyingHandle, data, cc)) {
+                    && direction.check(player, loc, eyeHeight, block, flyingHandle, data, cc)) {
                 cancelled = true;
             }
 
             // Ray tracing for freecam use etc.
             if (!cancelled && visible.isEnabled(player) 
-                    && visible.check(player, loc, block, face, action, flyingHandle, data, cc)) {
+                    && visible.check(player, loc, eyeHeight, block, face, action, flyingHandle, data, cc)) {
                 cancelled = true;
             }
         }

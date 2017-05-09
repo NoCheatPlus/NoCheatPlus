@@ -208,12 +208,13 @@ public class BlockPlaceListener extends CheckListener {
         if (cc.reachCheck || cc.directionCheck) {
             flyingHandle = new FlyingQueueHandle(player);
             final Location loc = player.getLocation(useLoc);
+            final double eyeHeight = MovingUtil.getEyeHeight(player);
             // Reach check (distance).
             if (!cancelled && !shouldSkipSome) {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
                     skippedRedundantChecks ++;
                 }
-                else if (reach.isEnabled(player) && reach.check(player, block, data, cc)) {
+                else if (reach.isEnabled(player) && reach.check(player, eyeHeight, block, data, cc)) {
                     cancelled = true;
                 }
             }
@@ -223,8 +224,8 @@ public class BlockPlaceListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
                     skippedRedundantChecks ++;
                 }
-                else if (direction.isEnabled(player) && direction.check(player, loc, block, flyingHandle, 
-                        data, cc)) {
+                else if (direction.isEnabled(player) && direction.check(player, loc, eyeHeight, block, 
+                        flyingHandle, data, cc)) {
                     cancelled = true;
                 }
             }

@@ -102,7 +102,10 @@ public abstract class AbstractBlockDirectionCheck<D extends ICheckData, C extend
      * 
      * @param player
      * @param loc
-     *            Location of the player.
+     *            Foot location to use as base for checking, with looking
+     *            direction set.
+     * @param eyeHeight
+     *            The eye height above the foot location.
      * @param block
      *            The block the player is supposed to be looking at.
      * @param flyingHandle
@@ -110,13 +113,13 @@ public abstract class AbstractBlockDirectionCheck<D extends ICheckData, C extend
      * @param cc
      * @return True, if the check has been failed.
      */
-    public boolean check(final Player player, final Location loc, final Block block, 
-            final FlyingQueueHandle flyingHandle, final D data, final C cc) {
+    public boolean check(final Player player, final Location loc, final double eyeHeight, 
+            final Block block, final FlyingQueueHandle flyingHandle, final D data, final C cc) {
 
         boolean cancel = false;
         // How far "off" is the player with their aim.
         final double x = loc.getX();
-        final double y = loc.getY() + player.getEyeHeight();
+        final double y = loc.getY() + eyeHeight;
         final double z = loc.getZ();
         final int blockX = block.getX();
         final int blockY = block.getY();
