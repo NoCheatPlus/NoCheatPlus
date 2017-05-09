@@ -658,7 +658,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             checkCf = false;
             checkSf = true;
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
-            thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
         }
         else if (cc.creativeFlyCheck 
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY, true) 
@@ -702,6 +701,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             || thisMove.hDistance > Magic.EXTREME_MOVE_DIST_HORIZONTAL)) {
                 // Test for friction and velocity.
                 newTo = checkExtremeMove(player, pFrom, pTo, data, cc);
+                if (newTo != null) {
+                    thisMove.flyCheck = checkSf ? CheckType.MOVING_SURVIVALFLY : CheckType.MOVING_CREATIVEFLY;
+                }
             }
 
             useBlockChangeTracker = newTo == null 
@@ -792,6 +794,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
+                thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
                 newTo = survivalFly.check(player, pFrom, pTo, multiMoveCount, data, cc, tick, time, useBlockChangeTracker);
             }
             // Only check NoFall, if not already vetoed.
@@ -838,6 +841,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else if (checkCf) {
             // CreativeFly
             if (newTo == null) {
+                thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
                 newTo = creativeFly.check(player, pFrom, pTo, data, cc, time, tick, useBlockChangeTracker);
             }
             data.sfHoverTicks = -1;
@@ -959,7 +963,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 thisMove.multiMoveCount = multiMoveCount;
             }
         }
-        thisMove.flyCheck = CheckType.MOVING_CREATIVEFLY;
         thisMove.modelFlying = model;
     }
 
