@@ -602,7 +602,25 @@ public class BlockProperties {
     public static final long F_ALLOW_LOWJUMP            = 0x4000000;
 
     /** One eighth block height (0.125). */
-    public static final long F_HEIGHT8_1            = 0x8000000;
+    public static final long F_HEIGHT8_1                = 0x8000000;
+
+    /**
+     * Fall distance is divided by 2, if a move goes through this medium
+     * (currently only supports liquid).
+     */
+    public static final long F_FALLDIST_HALF            = 0x10000000;
+
+    /**
+     * Fall distance is set to zero, if a move goes through this medium
+     * (currently only supports liquid).
+     */
+    public static final long F_FALLDIST_ZERO            = 0x20000000;
+
+    /** Minimum height 15/16 (1 - 0.0625). */
+    public static final long F_MIN_HEIGHT16_15          = 0x40000000;
+
+    /** Minimum height 1/16 (1 - 0.0625). */
+    public static final long F_MIN_HEIGHT16_1           = 0x80000000; // TODO: Lily pad min height of MC versions?
 
     // TODO: When flags are out, switch to per-block classes :p.
 
@@ -615,7 +633,8 @@ public class BlockProperties {
      */
     private static final Map<Long, String> flagNameMap = new LinkedHashMap<Long, String>();
     /**
-     * Map flag name to flag, both names starting with F_... and the name without F_.
+     * Map flag name to flag, both names starting with F_... and the name
+     * without F_.
      */
     private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
 
@@ -784,14 +803,14 @@ public class BlockProperties {
         for (final Material mat : new Material[]{
                 Material.STATIONARY_WATER, Material.WATER,
         }) {
-            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_WATER;
+            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_WATER | F_FALLDIST_ZERO;
         }
 
         // LAVA.
         for (final Material mat : new Material[]{
                 Material.LAVA, Material.STATIONARY_LAVA,
         }) {
-            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_LAVA;
+            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_LAVA | F_FALLDIST_HALF;
         }
 
         // Snow (1.4.x)

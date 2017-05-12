@@ -158,7 +158,8 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, final MovingData data, final MovingConfig cc) {
+    public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, 
+            final MovingData data, final MovingConfig cc) {
 
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final LocationData from = thisMove.from;
@@ -173,6 +174,11 @@ public class NoFall extends Check {
 
         // Reset-cond is not touched by yOnGround.
         // TODO: Distinguish water depth vs. fall distance ?
+        /*
+         * TODO: Account for flags instead (F_FALLDIST_ZERO and
+         * F_FALLDIST_HALF). Resetcond as trigger: if (resetFrom) { ...
+         */
+        // TODO: Also handle from and to independently (rather fire twice than wait for next time).
         final boolean fromReset = from.resetCond;
         final boolean toReset = to.resetCond;
 
@@ -204,12 +210,7 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || !toOnGround && thisMove.touchedGround) {
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) {
-                handleOnGround(player, minY, true, data, cc);
-            }
-            else {
-                adjustFallDistance(player, minY, true, data, cc);
-            }
+            touchDown(player, minY, data, cc); // Includes the current y-distance on descend!
             // Ensure very big/strange moves don't yield violations.
             if (toY - fromY <= -Magic.FALL_DAMAGE_DIST) {
                 data.noFallSkipAirCheck = true;
@@ -225,19 +226,17 @@ public class NoFall extends Check {
                 // In this case the player has traveled further: add the difference.
                 data.noFallFallDistance -= yDiff;
             }
-            if (cc.noFallDealDamage) {
-                handleOnGround(player, minY, true, data, cc);
-            }
-            else {
-                adjustFallDistance(player, minY, true, data, cc);
-            }
+            touchDown(player, minY, data, cc);
         }
         else {
             // Ensure fall distance is correct, or "anyway"?
         }
 
         // Set reference y for nofall (always).
-        // TODO: Consider setting this before handleOnGround (at least for resetTo).
+        /*
+         * TODO: Consider setting this before handleOnGround (at least for
+         * resetTo). This is after dealing damage, needs to be done differently.
+         */
         data.noFallMaxY = Math.max(Math.max(fromY, toY), data.noFallMaxY);
 
         // TODO: fall distance might be behind (!)
@@ -268,6 +267,22 @@ public class NoFall extends Check {
             debug(player, "NoFall: mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance + (oldNFDist < data.noFallFallDistance ? " (+" + (data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + data.noFallMaxY);
         }
 
+    }
+
+    /**
+     * Called during check.
+     * @param player
+     * @param minY
+     * @param data
+     * @param cc
+     */
+    private void touchDown(final Player player, final double minY, final MovingData data, final MovingConfig cc) {
+        if (cc.noFallDealDamage) {
+            handleOnGround(player, minY, true, data, cc);
+        }
+        else {
+            adjustFallDistance(player, minY, true, data, cc);
+        }
     }
 
     /**

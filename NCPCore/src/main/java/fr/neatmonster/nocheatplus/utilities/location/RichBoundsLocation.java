@@ -46,7 +46,6 @@ import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
  */
 public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition, IGetBox3D {
 
-    // TODO: Store IBlockCacheNode (s) ?
     // TODO: Consider switching back from default to private visibility (use getters for other places).
 
     // Simple members // 
@@ -81,8 +80,10 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     // "Light" object members (reset to null on set) //
 
-    // TODO: The following should be changed to primitive types, add one long for "checked"-flags. Booleans can be compressed into a long.
+    // TODO: primitive+isSet? AlmostBoolean?
     // TODO: All properties that can be set should have a "checked" flag, thus resetting the flag suffices.
+
+    // TODO: nodeAbove ?
 
     /** Type node for the block at the position. */
     IBlockCacheNode node = null;
