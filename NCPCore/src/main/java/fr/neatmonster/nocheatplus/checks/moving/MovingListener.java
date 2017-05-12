@@ -1724,7 +1724,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
         // Revert cancel on set back (only precise match).
-        if (data.isTeleported(event.getTo())) {
+        if (data.hasTeleported()) {
             // Teleport by NCP.
             // TODO: What if not scheduled.
             undoCancelledSetBack(player, event, data);
@@ -1733,12 +1733,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     private final void undoCancelledSetBack(final Player player, final PlayerTeleportEvent event,
             final MovingData data) {
-        final Location teleported = data.getTeleported();
         // Prevent cheaters getting rid of flying data (morepackets, other).
         // TODO: even more strict enforcing ?
         event.setCancelled(false); // TODO: Does this make sense? Have it configurable rather?
-        event.setTo(teleported); // ?
-        event.setFrom(teleported);
+        if (!data.isTeleported(event.getTo())) {
+            final Location teleported = data.getTeleported();
+            event.setTo(teleported);
+            /*
+             * Setting from ... not sure this is relevant. Idea was to avoid
+             * subtleties with other plugins, but it probably can't be
+             * estimated, if this means more or less 'subtleties' in the end
+             * (amortized).
+             */
+            event.setFrom(teleported);
+        }
         if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(
                     Streams.TRACE_FILE, player.getName() + " TP " + event.getCause() 
