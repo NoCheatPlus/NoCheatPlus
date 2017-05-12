@@ -1801,7 +1801,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Normal teleport
-        double fallDistance = data.noFallFallDistance;
+        final double fallDistance = data.noFallFallDistance;
         //        final LiftOffEnvelope oldEnv = data.liftOffEnvelope; // Remember for workarounds.
         data.clearFlyData();
         data.clearPlayerMorePacketsData();
@@ -1826,11 +1826,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Adjust fall distance, if set so.
             // TODO: How to account for plugins that reset the fall distance here?
             // TODO: Detect transition from valid flying that needs resetting the fall distance.
-            if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
+            if (event.getCause() == TeleportCause.UNKNOWN) {
+                // Always keep fall damage.
+                player.setFallDistance((float) fallDistance);
+                data.noFallFallDistance = (float) fallDistance;
+            }
+            else if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
                 // Reset fall distance if set so in the config.
                 if (!cc.noFallTpReset) {
                     // (Set fall distance if set to not reset.)
                     player.setFallDistance((float) fallDistance);
+                    data.noFallFallDistance = (float) fallDistance;
                 }
                 else if (fallDistance >= Magic.FALL_DAMAGE_DIST) {
                     data.noFallSkipAirCheck = true;
