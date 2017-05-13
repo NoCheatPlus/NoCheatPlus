@@ -24,16 +24,14 @@ import fr.neatmonster.nocheatplus.stats.Counters;
 
 public class CountersCommand extends BaseCommand {
 
-	public CountersCommand(JavaPlugin plugin) {
-		super(plugin, "counters", null); // TODO: Maybe add a permission.
-	}
+    public CountersCommand(JavaPlugin plugin) {
+        super(plugin, "counters", null); // TODO: Maybe add a permission.
+    }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
-		sender.sendMessage(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).getMergedCountsString(true));
-		return true;
-	}
-	
-	
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+        sender.sendMessage(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class).getMergedCountsString(true));
+        return true;
+    }
 
 }

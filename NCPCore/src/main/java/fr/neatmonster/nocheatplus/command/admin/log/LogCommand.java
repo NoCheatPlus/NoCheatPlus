@@ -18,15 +18,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.command.admin.log.counters.CountersCommand;
+import fr.neatmonster.nocheatplus.command.admin.log.stream.StreamCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 public class LogCommand extends BaseCommand{
 
-	public LogCommand(JavaPlugin plugin) {
-		super(plugin, "log", Permissions.COMMAND_LOG);
-		addSubCommands(
-			new CountersCommand(plugin)
-			);
-	}
+    public LogCommand(JavaPlugin plugin) {
+        super(plugin, "log", Permissions.COMMAND_LOG);
+        addSubCommands(
+                new CountersCommand(plugin),
+                new StreamCommand(plugin)
+                );
+    }
 
 }
