@@ -41,6 +41,7 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 public class GenericLogAction extends ActionWithParameters<ViolationData, ActionList> {
 
     public static class GenericLogActionConfig {
+
         /**
          * Config path to check for optimized actions or during runtime. Set to
          * null, to always log
@@ -55,7 +56,8 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
          */
         public final String actionConfigSuffix;
 
-        public GenericLogActionConfig(String configPathActive, StreamID streamID, boolean chatColor, Level level, String actionSuffix) {
+        public GenericLogActionConfig(String configPathActive, StreamID streamID, boolean chatColor, Level level, 
+                String actionSuffix) {
             this.configPathActive = configPathActive;
             this.streamID = streamID;
             this.chatColor = chatColor;
@@ -76,7 +78,8 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
     public GenericLogAction(final String name, final int delay, final int repeat, final String message, 
             final boolean checkActive, final GenericLogActionConfig... configs) {
         super(name, delay, repeat, message);
-        final List<GenericLogActionConfig> temp = new ArrayList<GenericLogAction.GenericLogActionConfig>(configs.length);
+        final List<GenericLogActionConfig> temp = new ArrayList<GenericLogAction.GenericLogActionConfig>(
+                configs.length);
         boolean replaceColor = false;
         boolean stripColor = false;
         boolean checkActiveUseful = false;
@@ -88,7 +91,8 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
             temp.add(config);
             if (config.chatColor) {
                 replaceColor = true;
-            } else {
+            }
+            else {
                 stripColor = true;
             }
             if (config.configPathActive != null) {
@@ -102,14 +106,17 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
     }
 
     @Override
-    public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, ActionList> config, final Integer threshold) {
+    public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, 
+            ActionList> config, final Integer threshold) {
         if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE) || configs.length == 0) {
             return null;
         }
-        final List<GenericLogActionConfig> temp = new ArrayList<GenericLogAction.GenericLogActionConfig>(configs.length);
+        final List<GenericLogActionConfig> temp = new ArrayList<GenericLogAction.GenericLogActionConfig>(
+                configs.length);
         for (int i = 0; i < configs.length; i ++) {
             final GenericLogActionConfig logConfig = configs[i];
-            if (checkActive && logConfig.configPathActive != null && !config.getBoolean(logConfig.configPathActive)) {
+            if (checkActive && logConfig.configPathActive != null 
+                    && !config.getBoolean(logConfig.configPathActive)) {
                 continue;
             }
             temp.add(logConfig);
@@ -129,7 +136,7 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
             return;
         }
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
-        final String message = super.getMessage(violationData);
+        final String message = getMessage(violationData);
         final String messageNoColor = stripColor ? ColorUtil.removeColors(message) : null;
         final String messageWithColor = replaceColor ? ColorUtil.replaceColors(message) : null;
         final ConfigFile configFile = checkActive ? ConfigManager.getConfigFile() : null;
@@ -167,7 +174,7 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
      * 
      * @param streamID
      *            Only pass original StreamID instances (e.g.
-     *            Streams.NOTIFY_INGAME).
+     *            Streams.NOTIFY_INGAME, or LogManager.getStreamID(...)).
      * @return If true, this might log to the referenced stream - it'll
      *         certainly log to that stream, if isOptimized returns true as
      *         well.

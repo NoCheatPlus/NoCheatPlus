@@ -57,13 +57,14 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
      */
     @Override
     public void execute(final D violationData) {
-        final String command = super.getMessage(violationData);
+        final String command = getMessage(violationData);
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
             if (logDebug) {
                 debug(violationData, command);
             }
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             StaticLog.logOnce(Level.WARNING, "Failed to execute the command '" + command + "': " + e.getMessage()
             + ", please check if everything is setup correct.", StringUtil.throwableToString(e));
         }
@@ -90,4 +91,5 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
     public String toString() {
         return "cmd:" + name + ":" + delay + ":" + repeat;
     }
+
 }
