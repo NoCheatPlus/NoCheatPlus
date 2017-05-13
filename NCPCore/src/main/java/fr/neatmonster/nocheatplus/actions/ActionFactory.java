@@ -46,18 +46,23 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
     public Action<ViolationData, ActionList> createAction(String actionDefinition) {
         actionDefinition = actionDefinition.toLowerCase();
 
-        if (actionDefinition.equals("cancel"))
+        if (actionDefinition.equals("cancel")) {
             return new CancelAction<ViolationData, ActionList>();
+        }
 
-        if (actionDefinition.startsWith("cmd:"))
+        if (actionDefinition.startsWith("cmd:")) {
             return parseCmdAction(actionDefinition.split(":", 2)[1]);
+        }
 
-        if (actionDefinition.startsWith("log:"))
+        if (actionDefinition.startsWith("cmdc:")) {
+            return parseCmdAction(actionDefinition.split(":", 2)[1], true);
+        }
+
+        if (actionDefinition.startsWith("log:")) {
             return parseLogAction(actionDefinition.split(":", 2)[1]);
+        }
 
-
-
-        throw new IllegalArgumentException("NoCheatPlus doesn't understand action '" + actionDefinition + "' at all");
+        throw new IllegalArgumentException("NoCheatPlus doesn't understand action '" + actionDefinition + "' at all.");
     }
 
 

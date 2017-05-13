@@ -21,6 +21,7 @@ import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.AbstractActionList.ActionListFactory;
 import fr.neatmonster.nocheatplus.actions.types.CommandAction;
+import fr.neatmonster.nocheatplus.actions.types.CommandActionWithColor;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -118,13 +119,26 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
     }
 
     /**
+     * Default: without replacing color codes.
+     * 
+     * @param definition
+     * @return
+     */
+    protected <PH extends ParameterHolder, LPH extends AbstractActionList<PH, LPH>> Action<PH, LPH> parseCmdAction(
+            final String definition) {
+        return parseCmdAction(definition, false);
+    }
+
+
+    /**
      * Parses the cmd action.
      * 
      * @param definition
      *            the definition
      * @return the action
      */
-    protected <PH extends ParameterHolder, LPH extends AbstractActionList<PH, LPH>> Action<PH, LPH> parseCmdAction(final String definition) {
+    protected <PH extends ParameterHolder, LPH extends AbstractActionList<PH, LPH>> Action<PH, LPH> parseCmdAction(
+            final String definition, final boolean replaceColor) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
         final Object command = lib.get(parts[0]);
@@ -146,6 +160,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
                 repeat = 0;
             }
 
-        return new CommandAction<PH, LPH>(name, delay, repeat, command.toString());
+        return replaceColor ? new CommandActionWithColor<PH, LPH>(name, delay, repeat, command.toString()) 
+                : new CommandAction<PH, LPH>(name, delay, repeat, command.toString());
     }
 }
