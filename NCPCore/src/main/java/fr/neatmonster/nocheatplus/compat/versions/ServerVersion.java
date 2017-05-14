@@ -99,6 +99,7 @@ public class ServerVersion {
         String lcServerVersion = serverVersion.trim().toLowerCase();
         for (String candidate : new String[] {
                 GenericVersion.parseVersionDelimiters(lcServerVersion, "(mc:", ")"),
+                GenericVersion.parseVersionDelimiters(lcServerVersion, "(mc:", "-pre"),
                 GenericVersion.parseVersionDelimiters(lcServerVersion, "mcpc-plus-", "-"),
                 GenericVersion.parseVersionDelimiters(lcServerVersion, "git-bukkit-", "-r"),
                 GenericVersion.parseVersionDelimiters(lcServerVersion, "", "-r"),
