@@ -622,6 +622,8 @@ public class BlockProperties {
     /** Minimum height 1/16 (1 - 0.0625). */
     public static final long F_MIN_HEIGHT16_1           = 0x80000000; // TODO: Lily pad min height of MC versions?
 
+    // TODO: Convenience constants combining all height / minheight flags.
+    
     // TODO: When flags are out, switch to per-block classes :p.
 
     // Special case activation flags.

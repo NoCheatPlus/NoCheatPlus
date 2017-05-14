@@ -122,7 +122,7 @@ public class MCAccessFactory {
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R2.MCAccessSpigotCB1_8_R2", // 1.8.3 (1_8_R2)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_8_R1.MCAccessSpigotCB1_8_R1", // 1.8 (1_8_R1)
 
-                // Dedicated CB (original)
+                // Dedicated CB (original / Spigot)
                 "fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100", // 1.7.10
                 "fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043", // 1.7.8|1.7.9
                 "fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026", // 1.7.5
