@@ -64,7 +64,7 @@ public class BlocksMC1_12 implements BlockPropertiesSetup {
                 );
 
         // Concrete powder
-        BlockInit.setAs(251, Material.DIRT);
+        BlockInit.setAs(252, Material.DIRT);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.12 blocks.");
     }
