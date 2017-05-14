@@ -25,7 +25,7 @@ public class StreamCommand extends BaseCommand {
 
     public StreamCommand(JavaPlugin plugin) {
         super(plugin, "stream", null); // No permission: currently console-only.
-        this.usage = "ncp log stream stream_id[@level][?color|?nocolor][+stream_id2[@level2][?color|?nocolor]...] (message...) ";
+        this.usage = "ncp log stream (stream_id)[@(level)][?color|?nocolor][+(stream_id2)[@(level2)][?color|?nocolor][+...]] (message...) ";
     }
 
     @Override
