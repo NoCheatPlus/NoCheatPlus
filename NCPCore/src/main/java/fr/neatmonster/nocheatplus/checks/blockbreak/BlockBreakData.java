@@ -105,7 +105,6 @@ public class BlockBreakData extends ACheckData {
 
     // Data of the fast break check.
     public final ActionFrequency fastBreakPenalties;
-    public int     fastBreakBuffer;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
     /** First time interaction with a block. */
     public long    fastBreakfirstDamage = System.currentTimeMillis();
