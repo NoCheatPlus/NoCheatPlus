@@ -124,7 +124,8 @@ public class BlockBreakConfig extends ACheckConfig {
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
         fastBreakStrict = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_STRICT);
         fastBreakDelay = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY);
-        fastBreakGrace = Math.max(data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000), data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE));
+        fastBreakGrace = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 
+                data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE, 2000));
         fastBreakBucketDur = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_DUR, 4000);
         fastBreakBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR, 0.99);
         fastBreakBuckets = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_N, 30);
