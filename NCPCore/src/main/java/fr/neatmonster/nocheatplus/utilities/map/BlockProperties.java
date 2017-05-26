@@ -623,7 +623,7 @@ public class BlockProperties {
     public static final long F_MIN_HEIGHT16_1           = 0x80000000; // TODO: Lily pad min height of MC versions?
 
     // TODO: Convenience constants combining all height / minheight flags.
-    
+
     // TODO: When flags are out, switch to per-block classes :p.
 
     // Special case activation flags.
@@ -2098,6 +2098,25 @@ public class BlockProperties {
      */
     public static final boolean isLiquid(final int id) {
         return (blockFlags[id] & F_LIQUID) != 0;
+    }
+
+    /**
+     * Test for water type of blocks.
+     * 
+     * @param blockType
+     * @return
+     */
+    public static final boolean isWater(final Material blockType) {
+        return isWater(getId(blockType));
+    }
+
+    /**
+     * Test for water type of blocks.
+     * @param id
+     * @return
+     */
+    public static final boolean isWater(final int id) {
+        return (blockFlags[id] & F_WATER) != 0;
     }
 
     /**

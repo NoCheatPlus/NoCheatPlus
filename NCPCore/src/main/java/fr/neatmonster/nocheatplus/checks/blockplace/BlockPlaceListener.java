@@ -48,6 +48,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -331,7 +332,7 @@ public class BlockPlaceListener extends CheckListener {
 
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final Material type = stack.getType();
-        if (type == Material.BOAT) {
+        if (InventoryUtil.isBoat(type)) {
             if (cc.preventBoatsAnywhere) {
                 checkBoatsAnywhere(player, event);
             }
@@ -351,7 +352,7 @@ public class BlockPlaceListener extends CheckListener {
         final Material mat = block.getType();
 
         // TODO: allow lava ?
-        if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
+        if (BlockProperties.isWater(mat)) {
             return;
         }
 
@@ -359,7 +360,7 @@ public class BlockPlaceListener extends CheckListener {
         final Material relMat = relBlock.getType();
 
         // TODO: Placing inside of water, but not "against" ?
-        if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) {
+        if (BlockProperties.isWater(relMat)) {
             return;
         }
 
