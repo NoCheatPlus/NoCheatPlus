@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.special;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.activation.ActivationUtil;
 import fr.neatmonster.nocheatplus.compat.blocks.AbstractBlockPropertiesPatch;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
@@ -23,14 +24,7 @@ public class MultiClientProtocolWaterLilyPatch extends AbstractBlockPropertiesPa
         .setConditionsOR()
         // TODO: Other/More ?
         ;
-        // ViaVersion
-        activation
-        .pluginExist("ViaVersion")
-        ;
-        // ProtocolSupport
-        activation
-        .pluginExist("ProtocolSupport")
-        ;
+        ActivationUtil.addMultiProtocolSupportPlugins(activation);
     }
 
     @Override
