@@ -27,6 +27,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.compat.activation.ActivationUtil;
+import fr.neatmonster.nocheatplus.components.registry.activation.Activation;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -102,7 +104,9 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final long       speedInterval;
     public final ActionList speedActions;
 
+    /** General activation flag. */
     public final boolean preventBoatsAnywhere;
+    public final boolean preventBoatsGround;
 
     /**
      * Instantiates a new block place configuration.
@@ -142,6 +146,9 @@ public class BlockPlaceConfig extends ACheckConfig {
         speedActions = config.getOptimizedActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
 
         preventBoatsAnywhere = config.getBoolean(ConfPaths.BLOCKPLACE_PREVENTMISC_BOATSANYWHERE);
+        Activation activation = ActivationUtil.addMultiProtocolSupportPlugins(
+                new Activation().setConditionsOR().minecraftVersionGT("1.12", true));
+        preventBoatsGround = !activation.isAvailable();
     }
 
     /* (non-Javadoc)

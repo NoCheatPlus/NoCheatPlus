@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -334,7 +335,9 @@ public class BlockPlaceListener extends CheckListener {
         final Material type = stack.getType();
         if (InventoryUtil.isBoat(type)) {
             if (cc.preventBoatsAnywhere) {
-                checkBoatsAnywhere(player, event);
+                // TODO: Alter config (activation, allow on top of ground).
+                // TODO: Version/plugin specific alteration for 'default'.
+                checkBoatsAnywhere(player, event, cc);
             }
         }
         else if (type == Material.MONSTER_EGG) {
@@ -346,9 +349,10 @@ public class BlockPlaceListener extends CheckListener {
         }
     }
 
-    private void checkBoatsAnywhere(final Player player, final PlayerInteractEvent event) {
+    private void checkBoatsAnywhere(final Player player, final PlayerInteractEvent event, 
+            final BlockPlaceConfig cc) {
         // Check boats-anywhere.
-        final org.bukkit.block.Block block = event.getClickedBlock();
+        final Block block = event.getClickedBlock();
         final Material mat = block.getType();
 
         // TODO: allow lava ?
@@ -356,11 +360,23 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
-        final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
+        // TODO: Shouldn't this be the opposite face?
+        final BlockFace blockFace = event.getBlockFace();
+        final Block relBlock = block.getRelative(blockFace);
         final Material relMat = relBlock.getType();
 
         // TODO: Placing inside of water, but not "against" ?
         if (BlockProperties.isWater(relMat)) {
+            return;
+        }
+
+        // Allow placing boats on ground since 1.12.
+        /*
+         * TODO: Prevent, if the placed boat would collide with any blocks or
+         * entities - alternatively perform post-mortem entity destruction.
+         */
+        if (!cc.preventBoatsGround && blockFace == BlockFace.UP && BlockProperties.isGround(mat) 
+                && BlockProperties.isPassable(block.getRelative(BlockFace.UP).getType())) {
             return;
         }
 
