@@ -370,16 +370,6 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
-        // Allow placing boats on ground since 1.12.
-        /*
-         * TODO: Prevent, if the placed boat would collide with any blocks or
-         * entities - alternatively perform post-mortem entity destruction.
-         */
-        if (!cc.preventBoatsGround && blockFace == BlockFace.UP && BlockProperties.isGround(mat) 
-                && BlockProperties.isPassable(block.getRelative(BlockFace.UP).getType())) {
-            return;
-        }
-
         // TODO: Add a check type for exemption?
         if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
             final Result previousUseBlock = event.useInteractedBlock();
