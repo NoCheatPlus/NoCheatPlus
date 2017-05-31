@@ -91,6 +91,7 @@ public class BlockInteractListener extends CheckListener {
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idCancelDead = counters.registerKey("cancel.dead");
+    private final int idCancelOffline = counters.registerKey("cancel.offline");
     private final int idInteractLookCurrent = counters.registerKey("block.interact.look.current");
     private final int idInteractLookFlyingFirst = counters.registerKey("block.interact.look.flying.first");
     private final int idInteractLookFlyingOther = counters.registerKey("block.interact.look.flying.other");
@@ -119,6 +120,9 @@ public class BlockInteractListener extends CheckListener {
              * blocks used etc.
              */
             cancelId = idCancelDead;
+        }
+        else if (!player.isOnline()) {
+            cancelId = idCancelOffline;
         }
         else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
             // Might log.
