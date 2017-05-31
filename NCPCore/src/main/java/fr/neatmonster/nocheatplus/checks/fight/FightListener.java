@@ -109,7 +109,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private final AuxMoving auxMoving = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class);
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idCancelDead = counters.registerKey("cancel.dead");
 
     // Assume it to stay the same all time.
     private final IGenericInstanceHandle<IBridgeCrossPlugin> crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IBridgeCrossPlugin.class);

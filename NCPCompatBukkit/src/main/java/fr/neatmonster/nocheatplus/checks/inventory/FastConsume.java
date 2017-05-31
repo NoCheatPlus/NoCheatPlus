@@ -52,7 +52,7 @@ public class FastConsume extends Check implements Listener, INotifyReload {
     }
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idCancelDead = counters.registerKey("cancel.dead");
 
     public FastConsume() {
         super(CheckType.INVENTORY_FASTCONSUME);

@@ -85,7 +85,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     private final Location useLoc = new Location(null, 0, 0, 0);
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idCancelDead = counters.registerKey("cancel.dead");
     private final int idIllegalItem = counters.registerKey("illegalitem");
     private final int idEggOnEntity = counters.registerKey("eggonentity");
 

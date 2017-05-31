@@ -90,7 +90,7 @@ public class BlockInteractListener extends CheckListener {
     private final Location useLoc = new Location(null, 0, 0, 0);
 
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idCancelDead = counters.registerKey("cancel.dead");
     private final int idInteractLookCurrent = counters.registerKey("block.interact.look.current");
     private final int idInteractLookFlyingFirst = counters.registerKey("block.interact.look.flying.first");
     private final int idInteractLookFlyingOther = counters.registerKey("block.interact.look.flying.other");
