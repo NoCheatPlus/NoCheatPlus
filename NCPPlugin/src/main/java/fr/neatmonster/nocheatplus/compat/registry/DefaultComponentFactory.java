@@ -88,10 +88,22 @@ public class DefaultComponentFactory {
                 ,
                 new Activation()
                 .neutralDescription("ProtocolLib 3.6.6 for PaperSpigot 1.8.x")
-                .pluginVersionEQ("ProtocolLib", "3.6.6")
+                .pluginVersionEQ("ProtocolLib", "4.1.0")
                 .serverVersionContainsIgnoreCase("paperspigot")
                 .minecraftVersionBetween("1.8", true, "1.9", false)
                 .advertise(true)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.6.6 for PaperSpigot 1.8.x")
+                .pluginVersionEQ("ProtocolLib", "4.1.0")
+                .serverVersionContainsIgnoreCase("tacospigot")
+                .minecraftVersionBetween("1.8", true, "1.9", false)
+                ,
+                new Activation()
+                .neutralDescription("ProtocolLib 3.6.6 for PaperSpigot 1.8.x")
+                .pluginVersionEQ("ProtocolLib", "4.1.0-SNAPSHOT-b315")
+                .serverVersionContainsIgnoreCase("tacospigot")
+                .minecraftVersionBetween("1.8", true, "1.9", false)
                 ,
                 new Activation()
                 .neutralDescription("ProtocolLib 3.6.4 before Minecraft 1.9")
