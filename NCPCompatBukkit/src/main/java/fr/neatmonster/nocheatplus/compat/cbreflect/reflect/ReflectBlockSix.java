@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.bukkit.Material;
+
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -211,7 +213,7 @@ public class ReflectBlockSix implements IReflectBlock {
     }
 
     @Override
-    public Object nms_getById(final int id) {
+    public Object nms_getById(final Material id) {
         if (this.nmsGetById == null) {
             fail();
         }

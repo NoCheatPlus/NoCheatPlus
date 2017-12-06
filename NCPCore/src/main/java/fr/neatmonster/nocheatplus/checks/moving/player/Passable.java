@@ -209,8 +209,6 @@ public class Passable extends Check {
             vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
             vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
             vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from, to)));
-            // TODO: Consider adding from.getTypeId() too, if blocks differ and non-air.
-            vd.setParameter(ParameterName.BLOCK_ID, "" + to.getTypeId());
             if (!tags.isEmpty()) {
                 vd.setParameter(ParameterName.TAGS, tags);
             }

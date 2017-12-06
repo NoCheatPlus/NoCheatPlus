@@ -89,14 +89,14 @@ public interface MCAccess extends IGetBlockCache, IEntityAccessDimensions {
      * @param id
      * @return MAYBE if undecided, YES or NO if decided.
      */
-    public AlmostBoolean isBlockSolid(int id);
+    public AlmostBoolean isBlockSolid(Material id);
 
     /**
      * NMS Block static..
      * @param id
      * @return MAYBE if undecided, YES or NO if decided.
      */
-    public AlmostBoolean isBlockLiquid(int id);
+    public AlmostBoolean isBlockLiquid(Material id);
 
     /**
      * Does only check y bounds, returns false if dead. This is called by

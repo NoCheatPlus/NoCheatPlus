@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.utilities.location;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -72,12 +73,12 @@ public class PlayerLocation extends RichEntityLocation {
                 // TODO: check onGroundMinY !?
                 onIce = false;
             } else {
-                final int id;
+                final Material id;
                 if (player.isSneaking() || player.isBlocking()) {
                     id = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ);
                 }
                 else {
-                    id = getTypeIdBelow().intValue();
+                    id = getTypeIdBelow();
                 }
                 onIce = BlockProperties.isIce(id);
             }

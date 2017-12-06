@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.compat.cbreflect.reflect;
 
+import org.bukkit.Material;
+
 /**
  * Reflection based block bounds fetching.
  * @author asofold
@@ -27,7 +29,7 @@ public interface IReflectBlock {
      * @param id
      * @return
      */
-    public Object nms_getById(int id);
+    public Object nms_getById(Material id);
 
     /**
      * Get the material for a Block instance.

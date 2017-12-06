@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -282,7 +283,7 @@ public class ReflectHelper {
      * @param id
      * @return Block instance (could be null).
      */
-    public Object nmsBlock_getById(int id) {
+    public Object nmsBlock_getById(Material id) {
         if (reflectBlock == null) {
             fail();
         }
@@ -310,7 +311,7 @@ public class ReflectHelper {
         return (Boolean) ReflectionUtil.invokeMethodNoArgs(this.reflectMaterial.nmsIsLiquid, material);
     }
 
-    public AlmostBoolean isBlockSolid(int id) {
+    public AlmostBoolean isBlockSolid(Material id) {
         Object obj = nmsBlock_getById(id);
         if (obj == null) {
             return AlmostBoolean.MAYBE;
@@ -322,7 +323,7 @@ public class ReflectHelper {
         return AlmostBoolean.match(nmsMaterial_isSolid(obj));
     }
 
-    public AlmostBoolean isBlockLiquid(int id) {
+    public AlmostBoolean isBlockLiquid(Material id) {
         Object obj = nmsBlock_getById(id);
         if (obj == null) {
             return AlmostBoolean.MAYBE;
@@ -339,7 +340,7 @@ public class ReflectHelper {
      * a method in world types.)
      * 
      * @param nmsWorld
-     * @param typeId
+     * @param id
      * @param x
      * @param y
      * @param z
@@ -347,7 +348,7 @@ public class ReflectHelper {
      *         cases like air/unspecified.
      */
     public double[] nmsWorld_fetchBlockShape(final Object nmsWorld, 
-            final int id, final int x, final int y, final int z) {
+            final Material id, final int x, final int y, final int z) {
         if (reflectBlock == null) {
             fail();
         }

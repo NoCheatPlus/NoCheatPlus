@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import org.bukkit.Material;
 
 public class MCAccessCBReflect extends MCAccessBukkitBase {
 
@@ -152,7 +153,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
+    public AlmostBoolean isBlockSolid(final Material id) {
         try {
             return helper.isBlockSolid(id);
         }
@@ -162,7 +163,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
+    public AlmostBoolean isBlockLiquid(final Material id) {
         try {
             return helper.isBlockLiquid(id);
         }

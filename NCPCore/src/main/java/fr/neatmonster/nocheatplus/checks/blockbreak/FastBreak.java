@@ -106,7 +106,6 @@ public class FastBreak extends Check {
                     final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, vlAdded, cc.fastBreakActions);
                     if (vd.needsParameters()) {
                         vd.setParameter(ParameterName.BLOCK_TYPE, blockType.toString());
-                        vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(blockType)));
                     }
                     cancel = executeActions(vd).willCancel();
                 }

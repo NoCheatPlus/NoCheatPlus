@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -43,9 +44,9 @@ public class BlockCacheBukkit extends BlockCache {
 
     @SuppressWarnings("deprecation")
     @Override
-    public int fetchTypeId(final int x, final int y, final int z) {
+    public Material fetchTypeId(final int x, final int y, final int z) {
         // TODO: consider setting type id and data at once.
-        return world.getBlockTypeIdAt(x, y, z);
+        return world.getBlockAt(x, y, z).getType();
     }
 
     @SuppressWarnings("deprecation")

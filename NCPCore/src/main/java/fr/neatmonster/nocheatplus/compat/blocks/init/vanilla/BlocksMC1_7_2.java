@@ -28,8 +28,8 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 public class BlocksMC1_7_2 implements BlockPropertiesSetup{
 
     public BlocksMC1_7_2() {
-        BlockInit.assertMaterialNameMatch(95, "stained", "glass");
-        BlockInit.assertMaterialNameMatch(174, "packed", "ice");
+        BlockInit.assertMaterialExists("STAINED_GLASS");
+        BlockInit.assertMaterialExists("PACKED_ICE");
     }
 
     @Override
@@ -37,21 +37,21 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
         // Block shapes.
 
         // Stained glass
-        BlockInit.setAs(95, Material.GLASS);
+        BlockInit.setAs("STAINED_GLASS", Material.GLASS);
         // Stained glass pane
-        BlockInit.setAs(160, 102);
+        BlockInit.setAs("STAINED_GLASS_PANE", "THIN_GLASS");
         // Leaves 2
-        BlockInit.setAs(161, Material.LEAVES);
+        BlockInit.setAs("LEAVES_2", Material.LEAVES);
         // Log 2
-        BlockInit.setAs(162, Material.LOG);
+        BlockInit.setAs("LOG_2", Material.LOG);
         // Acacia wood stairs
-        BlockInit.setAs(163, Material.WOOD_STAIRS);
+        BlockInit.setAs("ACACIA_STAIRS", Material.WOOD_STAIRS);
         // Oak wood stairs
-        BlockInit.setAs(164, Material.WOOD_STAIRS);
+        BlockInit.setAs("DARK_OAK_STAIRS", Material.WOOD_STAIRS);
         // Packed ice
-        BlockInit.setAs(174, Material.ICE);
+        BlockInit.setAs("PACKED_ICE", Material.ICE);
         // Large flowers
-        BlockInit.setAs(175, Material.YELLOW_FLOWER);
+        BlockInit.setAs("DOUBLE_PLANT", Material.YELLOW_FLOWER);
 
         // Block breaking.
         final long[] ironTimes = BlockProperties.secToMs(15, 7.5, 1.15, 0.75, 0.56, 1.25);
@@ -59,7 +59,7 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
         for (Material mat : new Material[]{
                 Material.LAPIS_ORE, Material.LAPIS_BLOCK, Material.IRON_ORE,
         }) {
-            BlockProperties.setBlockProps(BlockProperties.getId(mat), ironType);
+            BlockProperties.setBlockProps(mat, ironType);
         }
         final long[] diamondTimes = BlockProperties.secToMs(15, 7.5, 3.75, 0.75, 0.56, 1.25);
         final BlockProps diamondType = new BlockProps(BlockProperties.woodPickaxe, 3, diamondTimes);
@@ -67,7 +67,7 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
                 Material.REDSTONE_ORE, Material.GLOWING_REDSTONE_ORE,
                 Material.EMERALD_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
         }) {
-            BlockProperties.setBlockProps(BlockProperties.getId(mat), diamondType);
+            BlockProperties.setBlockProps(mat, diamondType);
         }
 
         StaticLog.logInfo("Added block-info for Minecraft 1.7.2 blocks.");
