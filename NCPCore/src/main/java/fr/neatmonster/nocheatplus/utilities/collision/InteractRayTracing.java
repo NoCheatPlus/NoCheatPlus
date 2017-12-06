@@ -15,11 +15,11 @@
 package fr.neatmonster.nocheatplus.utilities.collision;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.FakeBlockCache;
-import org.bukkit.Material;
 
 
 

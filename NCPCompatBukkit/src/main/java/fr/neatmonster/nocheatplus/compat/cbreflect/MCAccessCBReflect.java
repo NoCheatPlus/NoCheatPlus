@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.compat.cbreflect;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,7 +30,6 @@ import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
-import org.bukkit.Material;
 
 public class MCAccessCBReflect extends MCAccessBukkitBase {
 
