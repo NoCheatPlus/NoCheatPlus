@@ -28,9 +28,9 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 public class BlocksMC1_9 implements BlockPropertiesSetup {
 
     public BlocksMC1_9() {
-        BlockInit.assertMaterialNameMatch(198, "end_rod");
-        BlockInit.assertMaterialNameMatch(208, "GRASS_PATH");
-        BlockInit.assertMaterialNameMatch(209, "END_GATEWAY");
+        BlockInit.assertMaterialExists("END_ROD");
+        BlockInit.assertMaterialExists("GRASS_PATH");
+        BlockInit.assertMaterialExists("END_GATEWAY");
     }
 
     @Override
@@ -40,57 +40,57 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         final BlockProps instant = BlockProperties.instantType;
 
         // 198(END_ROD)
-        BlockFlags.addFlags(198, ground);
-        BlockProperties.setBlockProps(198, instant);
+        BlockFlags.addFlags("END_ROD", ground);
+        BlockProperties.setBlockProps("END_ROD", instant);
 
         // 199(CHORUS_PLANT) 
-        BlockFlags.addFlags(199, ground);
-        BlockProperties.setBlockProps(199, instant);
+        BlockFlags.addFlags("CHORUS_PLANT", ground);
+        BlockProperties.setBlockProps("CHORUS_PLANT", instant);
 
         // 200(CHORUS_FLOWER) 
-        BlockFlags.addFlags(200, ground);
-        BlockProperties.setBlockProps(200, instant);
+        BlockFlags.addFlags("CHORUS_FLOWER", ground);
+        BlockProperties.setBlockProps("CHORUS_FLOWER", instant);
 
         // 201(PURPUR_BLOCK / SOLID+GROUND) 
-        BlockInit.setAs(201, Material.SMOOTH_BRICK);
+        BlockInit.setAs("PURPUR_BLOCK", Material.SMOOTH_BRICK);
 
         // 202(PURPUR_PILLAR / SOLID+GROUND) 
-        BlockInit.setAs(202, Material.SMOOTH_BRICK); // Rough.
+        BlockInit.setAs("PURPUR_PILLAR", Material.SMOOTH_BRICK); // Rough.
 
         // 203(PURPUR_STAIRS / SOLID+GROUND) 
-        BlockInit.setAs(203, Material.SMOOTH_STAIRS); // Rough.
+        BlockInit.setAs("PURPUR_STAIRS", Material.SMOOTH_STAIRS); // Rough.
 
         // 204(PURPUR_DOUBLE_SLAB / SOLID+GROUND) 
-        BlockInit.setAs(204, Material.DOUBLE_STEP);
+        BlockInit.setAs("PURPUR_DOUBLE_SLAB", Material.DOUBLE_STEP);
 
         // 205(PURPUR_SLAB / SOLID+GROUND) 
-        BlockInit.setAs(205, Material.STEP);
+        BlockInit.setAs("PURPUR_SLAB", Material.STEP);
 
         // 206(END_BRICKS / SOLID+GROUND) 
-        BlockInit.setAs(206, Material.SANDSTONE);
+        BlockInit.setAs("END_BRICKS", Material.SANDSTONE);
 
         // 207(BEETROOT_BLOCK) 
-        BlockFlags.addFlags(207, ground);
-        BlockProperties.setBlockProps(207, instant);
+        BlockFlags.addFlags("BEETROOT_BLOCK", ground);
+        BlockProperties.setBlockProps("BEETROOT_BLOCK", instant);
 
         // 208(GRASS_PATH / SOLID+GROUND) 
-        BlockInit.setAs(208, Material.GRASS);
+        BlockInit.setAs("GRASS_PATH", Material.GRASS);
 
         // 209(END_GATEWAY) 
         // -> Leave flags as is (like air).
-        BlockProperties.setBlockProps(209, BlockProperties.indestructibleType);
+        BlockProperties.setBlockProps("END_GATEWAY", BlockProperties.indestructibleType);
 
         // 210(COMMAND_REPEATING / SOLID+GROUND) 
-        BlockInit.setAs(210, 137); // Like command block.
+        BlockInit.setAs("COMMAND_REPEATING", "COMMAND"); // Like command block.
 
         // 211(COMMAND_CHAIN / SOLID+GROUND) 
-        BlockInit.setAs(211, 137); // Like command block.
+        BlockInit.setAs("COMMAND_CHAIN", "COMMAND"); // Like command block.
 
         // 212(FROSTED_ICE / SOLID+GROUND) 
-        BlockInit.setAs(212, Material.ICE);
+        BlockInit.setAs("FROSTED_ICE", Material.ICE);
 
         // 255(STRUCTURE_BLOCK / SOLID+GROUND) 
-        BlockInit.setInstantAir(255);
+        BlockInit.setInstantAir("STRUCTURE_BLOCK");
 
         // Special case activation.
         // TODO: Is this the right place?

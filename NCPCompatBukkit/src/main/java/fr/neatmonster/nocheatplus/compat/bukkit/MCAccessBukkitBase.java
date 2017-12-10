@@ -103,9 +103,7 @@ public class MCAccessBukkitBase implements MCAccess {
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
-        @SuppressWarnings("deprecation")
-        final Material mat = Material.getMaterial(id); 
+    public AlmostBoolean isBlockSolid(final Material mat) {
         if (mat == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -228,9 +226,7 @@ public class MCAccessBukkitBase implements MCAccess {
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
-        @SuppressWarnings("deprecation")
-        final Material mat = Material.getMaterial(id); 
+    public AlmostBoolean isBlockLiquid(final Material mat) {
         if (mat == null) return AlmostBoolean.MAYBE;
         switch (mat) {
             case STATIONARY_LAVA:

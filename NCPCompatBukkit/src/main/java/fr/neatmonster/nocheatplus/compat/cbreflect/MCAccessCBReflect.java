@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.compat.cbreflect;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -152,7 +153,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
+    public AlmostBoolean isBlockSolid(final Material id) {
         try {
             return helper.isBlockSolid(id);
         }
@@ -162,7 +163,7 @@ public class MCAccessCBReflect extends MCAccessBukkitBase {
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
+    public AlmostBoolean isBlockLiquid(final Material id) {
         try {
             return helper.isBlockLiquid(id);
         }

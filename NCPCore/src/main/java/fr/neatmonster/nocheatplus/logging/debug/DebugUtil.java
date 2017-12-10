@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.logging.debug;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -151,7 +152,7 @@ public class DebugUtil {
         }
         builder.append(" id=");
         final IBlockCacheNode node = blockCache.getOrCreateBlockCacheNode(x, y, z, true);
-        final int id = node.getId();
+        final Material id = node.getId();
         builder.append(id);
         builder.append(" data=");
         builder.append(node.getData());

@@ -444,7 +444,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *
      * @return the type id above
      */
-    public int getTypeIdAbove() {
+    public Material getTypeIdAbove() {
         return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
     }
 
@@ -489,7 +489,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *
      * @return the type id
      */
-    public Integer getTypeId() {
+    public Material getTypeId() {
         if (node == null) {
             getOrCreateBlockCacheNode();
         }
@@ -501,7 +501,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *
      * @return the type id below
      */
-    public Integer getTypeIdBelow() {
+    public Material getTypeIdBelow() {
         if (nodeBelow == null) {
             getOrCreateBlockCacheNodeBelow();
         }
@@ -532,7 +532,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            the z
      * @return the type id
      */
-    public final int getTypeId(final int x, final int y, final int z) {
+    public final Material getTypeId(final int x, final int y, final int z) {
         return blockCache.getTypeId(x, y, z);
     }
 
@@ -654,7 +654,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
     public boolean isOnClimbable() {
         if (onClimbable == null) {
             // Early return with flags set and no climbable nearby.
-            final int typeId = getTypeId();
+            final Material typeId = getTypeId();
             if (blockFlags != null && (blockFlags & BlockProperties.F_CLIMBABLE) == 0
                     // Special case trap doors: // Better than increasing maxYOnGround.
                     && (blockFlags & BlockProperties.F_PASSABLE_X4) == 0
@@ -713,7 +713,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      *            the id
      * @return true, if successful
      */
-    public boolean standsOnBlock(final int id) {
+    public boolean standsOnBlock(final Material id) {
         if (!isOnGround()) {
             return false;
         }
@@ -801,7 +801,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
                 // TODO: Consider dropping this shortcut.
                 final int bY = Location.locToBlock(y - yOnGround);
                 final IBlockCacheNode useNode = bY == blockY ? getOrCreateBlockCacheNode() : (bY == blockY -1 ? getOrCreateBlockCacheNodeBelow() : blockCache.getOrCreateBlockCacheNode(blockX,  bY, blockZ, false));
-                final int id = useNode.getId();
+                final Material id = useNode.getId();
                 final long flags = BlockProperties.getBlockFlags(id);
                 // TODO: Might remove check for variable ?
                 if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0) {

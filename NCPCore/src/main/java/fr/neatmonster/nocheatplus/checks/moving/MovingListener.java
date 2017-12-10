@@ -1125,8 +1125,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 (
                         // 1: Ordinary.
                         to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround) 
-                        // 1: With carpet. TODO: Magic block id. Use isCarpet(id) instead.
-                        || to.getTypeId() == 171 && to.getY() - to.getBlockY() <= 0.9
+                        // 1: With carpet.
+                        || BlockProperties.isCarpet(to.getTypeId()) && to.getY() - to.getBlockY() <= 0.9
                         )
                 && MovingUtil.getRealisticFallDistance(player, from.getY(), to.getY(), data) > 1.0
                 // 0: Within wobble-distance.
@@ -2699,10 +2699,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (from.getBlockFlags() != 0) {
                 builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
             }
-            if (from.getTypeId() != 0) {
+            if (from.getTypeId() != Material.AIR) {
                 DebugUtil.addBlockInfo(builder, from, "\nfrom");
             }
-            if (from.getTypeIdBelow() != 0) {
+            if (from.getTypeIdBelow() != Material.AIR) {
                 DebugUtil.addBlockBelowInfo(builder, from, "\nfrom");
             }
             if (!from.isOnGround() && from.isOnGround(0.5)) {
@@ -2712,10 +2712,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (to.getBlockFlags() != 0) {
                 builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
             }
-            if (to.getTypeId() != 0) {
+            if (to.getTypeId() != Material.AIR) {
                 DebugUtil.addBlockInfo(builder, to, "\nto");
             }
-            if (to.getTypeIdBelow() != 0) {
+            if (to.getTypeIdBelow() != Material.AIR) {
                 DebugUtil.addBlockBelowInfo(builder, to, "\nto");
             }
             if (!to.isOnGround() && to.isOnGround(0.5)) {

@@ -552,7 +552,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping [tags]" + end, 785);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end, 785);
         set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.", 785);
-        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end, 785);
+        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blocktype]) faster than possible" + end, 785);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in their inventory too quickly" + end, 785);
         set(ConfPaths.STRINGS + ".fastconsume", start + "consumes [food] [tags] too fast" + end, 785);
         set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual (health [health])" + end, 785);
@@ -598,7 +598,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nofall", start + "tried to alter fall damage ([tags])" + end, 1057);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end, 785);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end, 785);
-        set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid]) from [locationfrom] to [locationto] distance [distance] " + end, 785);
+        set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blocktype]) from [locationfrom] to [locationto] distance [distance] " + end, 785);
         set(ConfPaths.STRINGS + ".relog", start + "relogs too fast" + end, 785);
         set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...", 785);
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!", 785);

@@ -32,7 +32,7 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 
     public BlocksMC1_5(){
         // Test if materials exist.
-        BlockInit.assertMaterialNameMatch(152, "redstone", "block");
+        BlockInit.assertMaterialExists("REDSTONE_BLOCK");
     }
 
     @Override
@@ -43,51 +43,51 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
         ////////////////////
 
         // 146 Trapped Chest
-        BlockInit.setAs(146, Material.CHEST);
+        BlockInit.setAs("TRAPPED_CHEST", Material.CHEST);
 
         // 147 Weighted Pressure Plate (Light)
         //		BlockFlags.addFlags(147, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs(147, Material.STONE_PLATE);
+        BlockInit.setAs("GOLD_PLATE", Material.STONE_PLATE);
 
         // 148 Weighted Pressure Plate (Heavy)
         //		BlockFlags.addFlags(148, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs(148, Material.STONE_PLATE);
+        BlockInit.setAs("IRON_PLATE", Material.STONE_PLATE);
 
         // 149 Redstone Comparator (inactive)
         //		BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs(149, Material.DIODE_BLOCK_OFF);
+        BlockInit.setAs("REDSTONE_COMPARATOR_OFF", Material.DIODE_BLOCK_OFF);
 
         // 150 Redstone Comparator (active)
         //		BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs(150, Material.DIODE_BLOCK_ON);
+        BlockInit.setAs("REDSTONE_COMPARATOR_ON", Material.DIODE_BLOCK_ON);
 
         // 151 Daylight Sensor
         //		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs(151, Material.HUGE_MUSHROOM_1);
+        BlockInit.setAs("DAYLIGHT_DETECTOR", Material.HUGE_MUSHROOM_1);
 
         // 152 Block of Redstone
-        BlockInit.setAs(152, Material.ENCHANTMENT_TABLE);
+        BlockInit.setAs("REDSTONE_BLOCK", Material.ENCHANTMENT_TABLE);
 
         // 153 Nether Quartz Ore
-        BlockInit.setAs(153, Material.COAL_ORE);
+        BlockInit.setAs("QUARTZ_ORE", Material.COAL_ORE);
 
         // 154 Hopper
-        BlockInit.setAs(154, Material.COAL_ORE);
+        BlockInit.setAs("HOPPER", Material.COAL_ORE);
         // TODO: Needs workaround. [workaround-flag + different purpose flag sets ?]
-        BlockFlags.addFlags(154, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
+        BlockFlags.addFlags("HOPPER", BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
 
         // 155 Block of Quartz
-        BlockInit.setAs(155, Material.SANDSTONE);
+        BlockInit.setAs("QUARTZ_BLOCK", Material.SANDSTONE);
 
         // 156 Quartz Stairs
-        BlockInit.setAs(156, Material.SANDSTONE_STAIRS);
+        BlockInit.setAs("QUARTZ_STAIRS", Material.SANDSTONE_STAIRS);
 
         // 157 Activator Rail
-        BlockInit.setAs(157, Material.DETECTOR_RAIL);
+        BlockInit.setAs("ACTIVATOR_RAIL", Material.DETECTOR_RAIL);
 
         // 158 Dropper
         //		BlockFlags.setFlagsAs(158, Material.DISPENSER);
-        BlockInit.setAs(158, Material.DISPENSER);
+        BlockInit.setAs("DROPPER", Material.DISPENSER);
 
 
         /////////////////////
@@ -95,11 +95,11 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
         ////////////////////
 
         // 78 Snow
-        BlockFlags.addFlags(78, BlockProperties.F_HEIGHT_8_INC);
-        BlockFlags.removeFlags(78, BlockProperties.F_HEIGHT_8SIM_INC);
+        BlockFlags.addFlags("SNOW", BlockProperties.F_HEIGHT_8_INC);
+        BlockFlags.removeFlags("SNOW", BlockProperties.F_HEIGHT_8SIM_INC);
 
         // 95 Locked chest
-        BlockProperties.setBlockProps(95, BlockProperties.instantType);
+        // BlockProperties.setBlockProps("LOCKED_CHEST", BlockProperties.instantType);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.5 blocks.");
     }

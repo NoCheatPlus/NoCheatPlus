@@ -40,29 +40,6 @@ public class RawConfigFile  extends YamlConfiguration {
     }
 
     /**
-     * Attempt to get an int id from a string.<br>
-     * Will return out of range numbers, attempts to parse materials.
-     * @param content
-     * @return
-     */
-    @SuppressWarnings("deprecation")
-    public static Integer parseTypeId(String content) {
-        content = content.trim().toUpperCase();
-        try {
-            return Integer.parseInt(content);
-        }
-        catch (NumberFormatException e){}
-        try {
-            Material mat = Material.matchMaterial(prepareMatchMaterial(content));
-            if (mat != null) {
-                return mat.getId();
-            }
-        }
-        catch (Exception e) {}
-        return null;
-    }
-
-    /**
      * Attempt to get a Material from a string.<br>
      * Will attempt to match the name but also type ids. 
      * @param content
@@ -71,11 +48,6 @@ public class RawConfigFile  extends YamlConfiguration {
     @SuppressWarnings("deprecation")
     public static Material parseMaterial(String content) {
         content = content.trim().toUpperCase();
-        try {
-            Integer id = Integer.parseInt(content);
-            return Material.getMaterial(id);
-        }
-        catch (NumberFormatException e){}
         try {
             return Material.matchMaterial(prepareMatchMaterial(content));
         }
@@ -152,56 +124,6 @@ public class RawConfigFile  extends YamlConfiguration {
         if (value < min) return min;
         else if (value > max) return max;
         else return value;
-    }
-
-    /**
-     * Attempt to get a type id from the path somehow, return null if nothing found.<br>
-     * Will attempt to interpret strings, will return negative or out of range values.
-     * @deprecated Not used, will be replaced by getMaterial, if needed.
-     * @param path
-     * @return
-     */
-    @Deprecated
-    public Integer getTypeId(final String path){
-        return getTypeId(path, null);
-    }
-
-    /**
-     * Attempt to get a type id from the path somehow, return preset if nothing found.<br>
-     * Will attempt to interpret strings, will return negative or out of range values.
-     * @deprecated Not used, will be replaced by getMaterial, if needed.
-     * @param path
-     * @param preset
-     * @return
-     */
-    @Deprecated
-    public Integer getTypeId(final String path, final Integer preset){
-        String content = getString(path, null);
-        if (content != null){
-            Integer id = parseTypeId(content);
-            if (id != null) return id;
-        }
-        int id = getInt(path, Integer.MAX_VALUE);
-        return id == Integer.MAX_VALUE ? preset : id;
-    }
-
-    /**
-     * Outputs warnings to console.
-     * @param path
-     * @param target Collection to fill ids into.
-     */
-    public void readMaterialIdsFromList(final String path, final Collection<Integer> target) {
-        final List<String> content = getStringList(path);
-        if (content == null || content.isEmpty()) return;
-        for (final String entry : content){
-            final Integer id = parseTypeId(entry);
-            if (id == null){
-                StaticLog.logWarning("Bad material entry (" + path +"): " + entry);
-            }
-            else{
-                target.add(id);
-            }
-        }
     }
 
     public AlmostBoolean getAlmostBoolean(final String path, final AlmostBoolean defaultValue) {

@@ -380,7 +380,7 @@ public class BlockInteractListener extends CheckListener {
         else {
             builder.append(") block: ");
             builder.append(block.getWorld().getName() + "/" + LocUtil.simpleFormat(block));
-            builder.append(" type: " + BlockProperties.getId(block.getType()));
+            builder.append(" type: " + block.getType());
             builder.append(" data: " + BlockProperties.getData(block));
             builder.append(" face: " + face);
         }

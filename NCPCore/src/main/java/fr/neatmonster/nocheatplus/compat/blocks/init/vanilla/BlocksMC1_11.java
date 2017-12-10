@@ -24,13 +24,29 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 @SuppressWarnings("deprecation")
 public class BlocksMC1_11 implements BlockPropertiesSetup {
 
-    private static final int first_shulker_box = 219;
-    private static final int last_shulker_box = 234;
+    private static final String[] shulker_boxes = new String[]{
+        "WHITE_SHULKER_BOX",
+        "ORANGE_SHULKER_BOX",
+        "MAGENTA_SHULKER_BOX",
+        "LIGHT_BLUE_SHULKER_BOX",
+        "YELLOW_SHULKER_BOX",
+        "LIME_SHULKER_BOX",
+        "PINK_SHULKER_BOX",
+        "GRAY_SHULKER_BOX",
+        "SILVER_SHULKER_BOX",
+        "CYAN_SHULKER_BOX",
+        "PURPLE_SHULKER_BOX",
+        "BLUE_SHULKER_BOX",
+        "BROWN_SHULKER_BOX",
+        "GREEN_SHULKER_BOX",
+        "RED_SHULKER_BOX",
+        "BLACK_SHULKER_BOX"
+    };
 
     public BlocksMC1_11() {
-        BlockInit.assertMaterialNameMatch(218, "OBSERVER");
-        for (int i = first_shulker_box; i <= last_shulker_box; i++) {
-            BlockInit.assertMaterialNameMatch(i, "SHULKER_BOX");
+        BlockInit.assertMaterialExists("OBSERVER");
+        for (String box : shulker_boxes) {
+            BlockInit.assertMaterialExists(box);
         }
     }
 
@@ -39,15 +55,15 @@ public class BlocksMC1_11 implements BlockPropertiesSetup {
         long solidFlags = BlockProperties.F_SOLID | BlockProperties.F_GROUND;
         // 218 OBSERVER
         // Wiki (16-11-25): 17.5, 2.65, 1.32, 0.9, 0.7, 0.45
-        BlockProperties.setBlockProps(218, new BlockProps(BlockProperties.woodPickaxe, 6,
+        BlockProperties.setBlockProps("OBSERVER", new BlockProps(BlockProperties.woodPickaxe, 6,
                 BlockProperties.secToMs(15.0, 2.2, 1.1, 0.7, 0.55, 0.45)));
-        BlockProperties.setBlockFlags(218, solidFlags);
+        BlockProperties.setBlockFlags("OBSERVER", solidFlags);
         // ALL SORTS OF SHULKER BOXES
-        for (int i = first_shulker_box; i <= last_shulker_box; i++) {
+        for (String box : shulker_boxes) {
             // Wiki (16-11-25): 9, 4.5, 2.25, 1.5, 1.15, 0.75
-            BlockProperties.setBlockProps(i, new BlockProps(BlockProperties.woodPickaxe, 6,
+            BlockProperties.setBlockProps(box, new BlockProps(BlockProperties.woodPickaxe, 6,
                     BlockProperties.secToMs(10.0, 1.45, 0.7, 0.5, 0.35, 0.2)));
-            BlockProperties.setBlockFlags(i, solidFlags);
+            BlockProperties.setBlockFlags(box, solidFlags);
         }
         StaticLog.logInfo("Added block-info for Minecraft 1.11 blocks.");
     }

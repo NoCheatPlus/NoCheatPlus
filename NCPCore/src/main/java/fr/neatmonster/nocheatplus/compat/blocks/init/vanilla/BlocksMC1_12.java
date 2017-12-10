@@ -13,13 +13,29 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 @SuppressWarnings("deprecation")
 public class BlocksMC1_12 implements BlockPropertiesSetup {
 
-    private static final int firstTerracotta = 235;
-    private static final int lastTerracotta = 250;
+    private static final String[] terracotta = new String[]{
+        "WHITE_GLAZED_TERRACOTTA",
+        "ORANGE_GLAZED_TERRACOTTA",
+        "MAGENTA_GLAZED_TERRACOTTA",
+        "LIGHT_BLUE_GLAZED_TERRACOTTA",
+        "YELLOW_GLAZED_TERRACOTTA",
+        "LIME_GLAZED_TERRACOTTA",
+        "PINK_GLAZED_TERRACOTTA",
+        "GRAY_GLAZED_TERRACOTTA",
+        "SILVER_GLAZED_TERRACOTTA",
+        "CYAN_GLAZED_TERRACOTTA",
+        "PURPLE_GLAZED_TERRACOTTA",
+        "BLUE_GLAZED_TERRACOTTA",
+        "BROWN_GLAZED_TERRACOTTA",
+        "GREEN_GLAZED_TERRACOTTA",
+        "RED_GLAZED_TERRACOTTA",
+        "BLACK_GLAZED_TERRACOTTA"
+    };
 
     public BlocksMC1_12() {
-        BlockInit.assertMaterialNameMatch(251, "CONCRETE");
-        for (int i = firstTerracotta; i <= lastTerracotta; i++) {
-            BlockInit.assertMaterialNameMatch(i, "GLAZED_TERRACOTTA");
+        BlockInit.assertMaterialExists("CONCRETE");
+        for (String glazed : terracotta) {
+            BlockInit.assertMaterialExists(glazed);
         }
     }
 
@@ -47,16 +63,16 @@ public class BlocksMC1_12 implements BlockPropertiesSetup {
 
         BlockProps props = new BlockProps(BlockProperties.woodPickaxe, 1.4f, 
                 BlockProperties.secToMs(7.0, 1.05, 0.55, 0.35, 0.3, 0.2));
-        for (int i = firstTerracotta; i <= lastTerracotta; i++) {
+           for (String glazed : terracotta) {
             // Set flags as with "hardened clay".
-            BlockFlags.setFlagsAs(i, 172);
+            BlockFlags.setFlagsAs(glazed, "HARD_CLAY");
             // Breaking times.
-            BlockProperties.setBlockProps(i, props);
+            BlockProperties.setBlockProps(glazed, props);
         }
 
         // Concrete
-        BlockFlags.setFlagsAs(251, Material.COBBLESTONE);
-        BlockProperties.setBlockProps(251,
+        BlockFlags.setFlagsAs("CONCRETE", Material.COBBLESTONE);
+        BlockProperties.setBlockProps("CONCRETE",
                 new BlockProps(BlockProperties.woodPickaxe, 1.8f,
                         // TODO: 2.7 with bare hands seems unlikely.
                         BlockProperties.secToMs(2.7, 1.35, 0.7, 0.45, 0.35, 0.25)
@@ -64,7 +80,7 @@ public class BlocksMC1_12 implements BlockPropertiesSetup {
                 );
 
         // Concrete powder
-        BlockInit.setAs(252, Material.DIRT);
+        BlockInit.setAs("CONCRETE_POWDER", Material.DIRT);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.12 blocks.");
     }

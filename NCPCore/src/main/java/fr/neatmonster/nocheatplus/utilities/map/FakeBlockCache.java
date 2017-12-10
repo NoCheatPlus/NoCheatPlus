@@ -35,7 +35,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap.Entry;
 public class FakeBlockCache extends BlockCache {
 
     /** Cached type-ids. */
-    private final CoordMap<Integer> idMapStored = new CoordHashMap<Integer>(23);
+    private final CoordMap<Material> idMapStored = new CoordHashMap<Material>(23);
 
     /** Cached data values. */
     private final CoordMap<Integer> dataMapStored = new CoordHashMap<Integer>(23);
@@ -110,7 +110,7 @@ public class FakeBlockCache extends BlockCache {
      *            the type
      */
     public void set(int x, int y, int z, Material type) {
-        set(x, y, z, BlockProperties.getId(type));
+        set(x, y, z, type, 0);
     }
 
     /**
@@ -128,23 +128,7 @@ public class FakeBlockCache extends BlockCache {
      *            the bounds
      */
     public void set(int x, int y, int z, Material type, double[] bounds) {
-        set(x, y, z, BlockProperties.getId(type), 0, bounds);
-    }
-
-    /**
-     * Set with data=0 and bounds=full.
-     *
-     * @param x
-     *            the x
-     * @param y
-     *            the y
-     * @param z
-     *            the z
-     * @param typeId
-     *            the type id
-     */
-    public void set(int x, int y, int z, int typeId) {
-        set(x, y, z, typeId, 0);
+        set(x, y, z, type, 0, bounds);
     }
 
     /**
@@ -161,7 +145,7 @@ public class FakeBlockCache extends BlockCache {
      * @param data
      *            the data
      */
-    public void set(int x, int y, int z, int typeId, int data) {
+    public void set(int x, int y, int z, Material typeId, int data) {
         set(x, y, z, typeId, data, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
@@ -181,7 +165,7 @@ public class FakeBlockCache extends BlockCache {
      * @param bounds
      *            Stores the given bounds directly.
      */
-    public void set(int x, int y, int z, int typeId, int data, double[] bounds) {
+    public void set(int x, int y, int z, Material typeId, int data, double[] bounds) {
         idMapStored.put(x, y, z, typeId);
         dataMapStored.put(x, y, z, data);
         if (bounds == null) {
@@ -211,7 +195,7 @@ public class FakeBlockCache extends BlockCache {
      *            the type
      */
     public void fill(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
-        fill(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
+        fill(x1, y1, z1, x2, y2, z2, type, 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
     /**
@@ -236,7 +220,7 @@ public class FakeBlockCache extends BlockCache {
      * @param bounds
      *            the bounds
      */
-    public void fill(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
+    public void fill(int x1, int y1, int z1, int x2, int y2, int z2, Material typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
                 for (int z = z1; z <= z2; z++) {
@@ -265,7 +249,7 @@ public class FakeBlockCache extends BlockCache {
      *            the type
      */
     public void walls(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
-        walls(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
+        walls(x1, y1, z1, x2, y2, z2, type, 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
     /**
@@ -290,7 +274,7 @@ public class FakeBlockCache extends BlockCache {
      * @param bounds
      *            the bounds
      */
-    public void walls(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
+    public void walls(int x1, int y1, int z1, int x2, int y2, int z2, Material typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
                 for (int z = z1; z <= z2; z++) {
@@ -321,7 +305,7 @@ public class FakeBlockCache extends BlockCache {
      *            the type
      */
     public void room(int x1, int y1, int z1, int x2, int y2, int z2, Material type) {
-        room(x1, y1, z1, x2, y2, z2, BlockProperties.getId(type), 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
+        room(x1, y1, z1, x2, y2, z2, type, 0, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
 
     /**
@@ -346,7 +330,7 @@ public class FakeBlockCache extends BlockCache {
      * @param bounds
      *            the bounds
      */
-    public void room(int x1, int y1, int z1, int x2, int y2, int z2, int typeId, int data, double[] bounds) {
+    public void room(int x1, int y1, int z1, int x2, int y2, int z2, Material typeId, int data, double[] bounds) {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y ++) {
                 for (int z = z1; z <= z2; z++) {
@@ -395,15 +379,14 @@ public class FakeBlockCache extends BlockCache {
             fullBounds = null;
         }
         // Assume id is always set.
-        final Iterator<Entry<Integer>> it = idMapStored.iterator();
-        final int airId = BlockProperties.getId(Material.AIR);
+        final Iterator<Entry<Material>> it = idMapStored.iterator();
         while (it.hasNext()) {
-            Entry<Integer> entry = it.next();
+            Entry<Material> entry = it.next();
             final int x = entry.getX();
             final int y = entry.getY();
             final int z = entry.getZ();
-            final Integer id = entry.getValue();
-            if (id == airId) {
+            final Material id = entry.getValue();
+            if (id == Material.AIR) {
                 builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
             }
             else {
@@ -442,10 +425,10 @@ public class FakeBlockCache extends BlockCache {
      * @see fr.neatmonster.nocheatplus.utilities.BlockCache#fetchTypeId(int, int, int)
      */
     @Override
-    public int fetchTypeId(int x, int y, int z) {
-        final Integer id = idMapStored.get(x, y, z);
+    public Material fetchTypeId(int x, int y, int z) {
+        final Material id = idMapStored.get(x, y, z);
         if (id == null) {
-            return BlockProperties.getId(Material.AIR);
+            return Material.AIR;
         } else {
             return id;
         }

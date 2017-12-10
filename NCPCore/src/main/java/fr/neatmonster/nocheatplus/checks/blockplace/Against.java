@@ -75,7 +75,6 @@ public class Against extends Check {
             data.againstVL += 1.0;
             final ViolationData vd = new ViolationData(this, player, data.againstVL, 1, cc.againstActions);
             vd.setParameter(ParameterName.BLOCK_TYPE, placedMat.toString());
-            vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(placedMat)));
             return executeActions(vd).willCancel();
         }
         else {

@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.utilities.collision;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -109,7 +110,7 @@ public class InteractRayTracing extends RayTracing {
      * @return
      */
     private boolean doesCollide(final int blockX, final int blockY, final int blockZ) {
-        final int id = blockCache.getTypeId(blockX, blockY, blockZ);
+        final Material id = blockCache.getTypeId(blockX, blockY, blockZ);
         final long flags = BlockProperties.getBlockFlags(id);
         if ((flags & BlockProperties.F_SOLID) == 0) {
             // Ignore non solid blocks anyway.

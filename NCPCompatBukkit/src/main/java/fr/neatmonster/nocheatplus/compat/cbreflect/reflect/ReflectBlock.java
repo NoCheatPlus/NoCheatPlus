@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import fr.neatmonster.nocheatplus.compat.cbreflect.reflect.ReflectHelper.ReflectFailureException;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import org.bukkit.Material;
 
 /**
  * Reflection for block shape getting (latest).
@@ -137,7 +138,7 @@ public class ReflectBlock implements IReflectBlock {
     }
 
     @Override
-    public Object nms_getById(final int id) {
+    public Object nms_getById(final Material id) {
         if (this.nmsGetById == null) {
             fail();
         }

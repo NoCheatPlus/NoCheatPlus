@@ -28,29 +28,29 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 public class BlocksMC1_6_1 implements BlockPropertiesSetup{
 
     public BlocksMC1_6_1(){
-        BlockInit.assertMaterialNameMatch(173, "coal", "block");
+        BlockInit.assertMaterialExists("COAL_BLOCK");
     }
 
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
 
         // Block of Coal: like block of redstone.
-        BlockInit.setAs(173, 152);
+        BlockInit.setAs("COAL_BLOCK", "REDSTONE_BLOCK");
 
         // Hardened Clay
-        BlockProperties.setBlockProps(172, new BlockProps(BlockProperties.woodPickaxe, 1.25f, BlockProperties.secToMs(6.25, 0.95, 0.5, 0.35, 0.25, 0.2)));
-        BlockFlags.setFlagsAs(172, Material.STONE); // TODO: Assumption (!).
+        BlockProperties.setBlockProps("HARD_CLAY", new BlockProps(BlockProperties.woodPickaxe, 1.25f, BlockProperties.secToMs(6.25, 0.95, 0.5, 0.35, 0.25, 0.2)));
+        BlockFlags.setFlagsAs("HARD_CLAY", Material.STONE); // TODO: Assumption (!).
 
         // Stained Clay: Set as hardened clay.
-        BlockInit.setAs(159, 172);
+        BlockInit.setAs("STAINED_CLAY", "HARD_CLAY");
 
         // Hay Bale
-        BlockInit.setPropsAs(170, Material.STONE_BUTTON);
-        BlockFlags.setFlagsAs(170, Material.STONE); // TODO: Assumption (!).
+        BlockInit.setPropsAs("HAY_BLOCK", Material.STONE_BUTTON);
+        BlockFlags.setFlagsAs("HAY_BLOCK", Material.STONE); // TODO: Assumption (!).
 
         // Carpet
-        BlockProperties.setBlockProps(171, new BlockProps(BlockProperties.noTool, 0.1f, BlockProperties.secToMs(0.15)));
-        BlockProperties.setBlockFlags(171, BlockProperties.F_GROUND|BlockProperties.F_IGN_PASSABLE|BlockProperties.F_GROUND_HEIGHT);
+        BlockProperties.setBlockProps("CARPET", new BlockProps(BlockProperties.noTool, 0.1f, BlockProperties.secToMs(0.15)));
+        BlockProperties.setBlockFlags("CARPET", BlockProperties.F_GROUND|BlockProperties.F_IGN_PASSABLE|BlockProperties.F_GROUND_HEIGHT|BlockProperties.F_CARPET);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.6.1 blocks.");
     }

@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.utilities.map;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -30,11 +31,6 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.CoordMap;
  *
  */
 public abstract class BlockCache {
-
-    // TODO: New concepts (Might switch to material, inspect MC+CB code for reliability and performance of block-ids during runtime).
-
-    /** The Constant ID_AIR. */
-    private static final int ID_AIR = 0;
 
     /**
      * Read access to a BlockCacheNode.
@@ -61,7 +57,7 @@ public abstract class BlockCache {
          * Always set.
          * @return
          */
-        public int getId();
+        public Material getId();
 
         /**
          * Ensure to test with isDataSet().
@@ -113,11 +109,11 @@ public abstract class BlockCache {
         private static final short FETCHED_BOUNDS = 0x04;
 
         private short fetched;
-        private final int id;
+        private Material id;
         private int data = 0;
         private double[] bounds = null;
 
-        public BlockCacheNode(int id) {
+        public BlockCacheNode(Material id) {
             this.id = id;
             fetched = FETCHED_ID;
         }
@@ -138,7 +134,7 @@ public abstract class BlockCache {
         }
 
         @Override
-        public int getId() {
+        public Material getId() {
             return id;
         }
 
@@ -197,7 +193,7 @@ public abstract class BlockCache {
     /** The max block y. */
     protected int maxBlockY =  255;
 
-    private final BlockCacheNode airNode = new BlockCacheNode(ID_AIR);
+    private final BlockCacheNode airNode = new BlockCacheNode(Material.AIR);
     // TODO: setBlockCacheConfig -> set static nodes (rather only by id).
 
     /**
@@ -238,7 +234,7 @@ public abstract class BlockCache {
      *            the z
      * @return the int
      */
-    public abstract int fetchTypeId(int x, int y, int z);
+    public abstract Material fetchTypeId(int x, int y, int z);
 
     /**
      * Fetch the data from the underlying world.
@@ -310,9 +306,9 @@ public abstract class BlockCache {
         if (node != null) {
             return node;
         }
-        final int id = (y < 0 || y > maxBlockY) ? ID_AIR : fetchTypeId(x, y, z);
+        final Material id = (y < 0 || y > maxBlockY) ? Material.AIR : fetchTypeId(x, y, z);
         // (Later: Static id-node map from config.)
-        if (id == ID_AIR) {
+        if (id == Material.AIR) {
             return airNode;
         }
         else {
@@ -333,7 +329,7 @@ public abstract class BlockCache {
      *            the z
      * @return the type id
      */
-    public int getTypeId(double x, double y, double z) {
+    public Material getTypeId(double x, double y, double z) {
         return getTypeId(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
     }
 
@@ -356,7 +352,7 @@ public abstract class BlockCache {
      *            the block
      * @return the type id
      */
-    public int getTypeId(final Block block) {
+    public Material getTypeId(final Block block) {
         return getTypeId(block.getX(), block.getY(), block.getZ());
     }
 
@@ -371,7 +367,7 @@ public abstract class BlockCache {
      *            the z
      * @return the type id
      */
-    public int getTypeId(final int x, final int y, final int z) {
+    public Material getTypeId(final int x, final int y, final int z) {
         return getOrCreateNode(x, y, z).getId();
     }
 
