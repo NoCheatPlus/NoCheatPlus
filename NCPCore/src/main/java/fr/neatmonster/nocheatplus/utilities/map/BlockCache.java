@@ -57,7 +57,7 @@ public abstract class BlockCache {
          * Always set.
          * @return
          */
-        public Material getId();
+        public Material getType();
 
         /**
          * Ensure to test with isDataSet().
@@ -134,7 +134,7 @@ public abstract class BlockCache {
         }
 
         @Override
-        public Material getId() {
+        public Material getType() {
             return id;
         }
 
@@ -172,7 +172,7 @@ public abstract class BlockCache {
         public boolean equals(final Object obj) {
             if (obj instanceof IBlockCacheNode) {
                 final IBlockCacheNode other = (IBlockCacheNode) obj;
-                return id == other.getId() 
+                return id == other.getType() 
                         && (!isDataFetched() && !other.isDataFetched() 
                                 || isDataFetched() && other.isDataFetched() && data == other.getData())
                         && (!isBoundsFetched() && !other.isBoundsFetched()
@@ -368,7 +368,7 @@ public abstract class BlockCache {
      * @return the type id
      */
     public Material getTypeId(final int x, final int y, final int z) {
-        return getOrCreateNode(x, y, z).getId();
+        return getOrCreateNode(x, y, z).getType();
     }
 
     /**

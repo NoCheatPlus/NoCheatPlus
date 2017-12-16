@@ -29,7 +29,7 @@ public interface IReflectBlock {
      * @param id
      * @return
      */
-    public Object nms_getById(Material id);
+    public Object nms_getByMaterial(Material id);
 
     /**
      * Get the material for a Block instance.

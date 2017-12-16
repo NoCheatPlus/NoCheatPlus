@@ -493,7 +493,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         if (node == null) {
             getOrCreateBlockCacheNode();
         }
-        return node.getId();
+        return node.getType();
     }
 
     /**
@@ -505,7 +505,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         if (nodeBelow == null) {
             getOrCreateBlockCacheNodeBelow();
         }
-        return nodeBelow.getId();
+        return nodeBelow.getType();
     }
 
     /**
@@ -801,7 +801,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
                 // TODO: Consider dropping this shortcut.
                 final int bY = Location.locToBlock(y - yOnGround);
                 final IBlockCacheNode useNode = bY == blockY ? getOrCreateBlockCacheNode() : (bY == blockY -1 ? getOrCreateBlockCacheNodeBelow() : blockCache.getOrCreateBlockCacheNode(blockX,  bY, blockZ, false));
-                final Material id = useNode.getId();
+                final Material id = useNode.getType();
                 final long flags = BlockProperties.getBlockFlags(id);
                 // TODO: Might remove check for variable ?
                 if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0) {

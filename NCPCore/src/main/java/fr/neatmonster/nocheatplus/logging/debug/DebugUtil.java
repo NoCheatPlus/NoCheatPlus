@@ -152,7 +152,7 @@ public class DebugUtil {
         }
         builder.append(" id=");
         final IBlockCacheNode node = blockCache.getOrCreateBlockCacheNode(x, y, z, true);
-        final Material id = node.getId();
+        final Material id = node.getType();
         builder.append(id);
         builder.append(" data=");
         builder.append(node.getData());

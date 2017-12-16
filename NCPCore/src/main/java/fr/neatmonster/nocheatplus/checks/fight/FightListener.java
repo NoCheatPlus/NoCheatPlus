@@ -731,6 +731,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Player player = (Player) entity;
         if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
             // Heal after death.
+            // TODO: Problematic. At least skip CUSTOM.
             event.setCancelled(true);
             counters.addPrimaryThread(idCancelDead, 1);
             return;
@@ -738,6 +739,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (event.getRegainReason() != RegainReason.SATIATED) {
             return;
         }
+        // TODO: EATING reason / peaceful difficulty / regen potion - byCaptain SpigotMC
         if (fastHeal.isEnabled(player) && fastHeal.check(player)) {
             // TODO: Can clients force events with 0-re-gain ?
             event.setCancelled(true);

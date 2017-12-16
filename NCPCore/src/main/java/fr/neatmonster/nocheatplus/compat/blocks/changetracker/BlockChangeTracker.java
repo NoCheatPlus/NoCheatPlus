@@ -786,7 +786,7 @@ public class BlockChangeTracker {
             for (final BlockChangeEntry entry : entries) {
                 if (entry.canUpdate(ref, direction)
                         && (matchFlags == 0 
-                        || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getId())) != 0)) {
+                        || (matchFlags & BlockProperties.getBlockFlags(entry.previousState.getType())) != 0)) {
                     return entry;
                 }
             }

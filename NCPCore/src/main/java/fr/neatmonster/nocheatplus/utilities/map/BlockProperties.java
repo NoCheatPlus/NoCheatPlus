@@ -2315,7 +2315,7 @@ public class BlockProperties {
     public static final boolean isPassable(final BlockCache access, 
             final double x, final double y, final double z, 
             final IBlockCacheNode node, final IBlockCacheNode nodeAbove) {
-        final Material id = node.getId();
+        final Material id = node.getType();
         // Simple exclusion check first.
         if (isPassable(id)) {
             return true;
@@ -2367,7 +2367,7 @@ public class BlockProperties {
         final int bx = Location.locToBlock(x);
         final int bz = Location.locToBlock(z);
         final IBlockCacheNode nodeBelow = access.getOrCreateBlockCacheNode(x, y, z, false);
-        final Material belowId = nodeBelow.getId();
+        final Material belowId = nodeBelow.getType();
         final long belowFlags = getBlockFlags(belowId); 
         if ((belowFlags & F_HEIGHT150) == 0 || isPassable(belowId)) {
             return true;
@@ -2458,7 +2458,7 @@ public class BlockProperties {
             final double dT) {
         // Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
         // TODO: Add a flag if a workaround exists (!), might store the type of workaround extra (generic!), or extra flags.
-        final Material id = node.getId();
+        final Material id = node.getType();
         final long flags = getBlockFlags(id);
         if ((flags & F_STAIRS) != 0) {
             if ((access.getData(bx, by, bz) & 0x4) != 0) {
@@ -2664,7 +2664,7 @@ public class BlockProperties {
     public static double getGroundMinHeight(final BlockCache access, 
             final int x, final int y, final int z, 
             final IBlockCacheNode node, final long flags) {
-        final Material id = node.getId();
+        final Material id = node.getType();
         final double[] bounds = node.getBounds(access, x, y, z);
         // TODO: Check which ones are really needed !
         if ((flags & F_HEIGHT_8SIM_INC) != 0) {
@@ -3042,7 +3042,7 @@ public class BlockProperties {
                 IBlockCacheNode nodeAbove = null;
                 for (int y = iMaxY; y >= iMinY; y--) {
                     final IBlockCacheNode node = access.getOrCreateBlockCacheNode(x, y, z, false);
-                    final Material id = node.getId();
+                    final Material id = node.getType();
                     final long cFlags = getBlockFlags(id);
                     if ((cFlags & flags) != 0) {
                         // Might collide.
@@ -3139,7 +3139,7 @@ public class BlockProperties {
                 IBlockCacheNode nodeAbove = null;
                 for (int y = iMaxY; y >= iMinY; y--) {
                     final IBlockCacheNode node = access.getOrCreateBlockCacheNode(x, y, z, false);
-                    if (id == node.getId()) {
+                    if (id == node.getType()) {
                         if (node.hasNonNullBounds().decideOptimistically()) {
                             if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, node, nodeAbove, flags)) {
                                 return true;
@@ -3311,7 +3311,7 @@ public class BlockProperties {
                 bminY = 0.0;
                 bmaxY = 0.125;
             }
-            else if (node.getId() == Material.ENDER_PORTAL_FRAME) {
+            else if (node.getType() == Material.ENDER_PORTAL_FRAME) {
                 // TODO: Test
                 // TODO: Other concepts ...
                 bminY = 0;
@@ -3381,7 +3381,7 @@ public class BlockProperties {
         if (node == null) {
             node = access.getOrCreateBlockCacheNode(x, y, z, false);
         }
-        final Material id = node.getId();
+        final Material id = node.getType();
         if (isLiquid(id)) {
             return true;
         }
@@ -3634,7 +3634,7 @@ public class BlockProperties {
             final IBlockCacheNode node, IBlockCacheNode nodeAbove) {
         // TODO: Relevant methods called here should be changed to use IBlockCacheNode (node, nodeAbove). 
 
-        final Material id = node.getId(); // TODO: Pass on the node (signatures...).
+        final Material id = node.getType(); // TODO: Pass on the node (signatures...).
         final long flags = getBlockFlags(id);
 
 
@@ -3706,7 +3706,7 @@ public class BlockProperties {
         if (nodeAbove == null) {
             nodeAbove = access.getOrCreateBlockCacheNode(x, y + 1, z, false);
         }
-        final Material aboveId = nodeAbove.getId();
+        final Material aboveId = nodeAbove.getType();
         final long aboveFlags = getBlockFlags(aboveId);
         if ((aboveFlags & F_IGN_PASSABLE) != 0) {
             // Ignore these (Note for above block check before ground property).
@@ -4029,7 +4029,7 @@ public class BlockProperties {
             final double dT) {
         // TODO: Method signature with node, nodeAbove.
         final IBlockCacheNode node = access.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
-        if (BlockProperties.isPassable(node.getId())) {
+        if (BlockProperties.isPassable(node.getType())) {
             return true;
         }
         double[] bounds = access.getBounds(blockX, blockY, blockZ);
@@ -4065,7 +4065,7 @@ public class BlockProperties {
             maxZ = dZ * dT + oZ + blockZ;
             minZ = oZ + blockZ;
         }
-        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, node, null, getBlockFlags(node.getId()) | F_COLLIDE_EDGES)) {
+        if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, node, null, getBlockFlags(node.getType()) | F_COLLIDE_EDGES)) {
             // TODO: Might check for fence too, here.
             return true;
         }
@@ -4113,7 +4113,7 @@ public class BlockProperties {
             final double maxX, final double maxY, final double maxZ) {
         // TODO: This mostly is copy and paste from isPassableRay.
         final IBlockCacheNode node = access.getOrCreateBlockCacheNode(blockX, blockY, blockZ, false);
-        final Material id = node.getId();
+        final Material id = node.getType();
         if (BlockProperties.isPassable(id)) {
             return true;
         }

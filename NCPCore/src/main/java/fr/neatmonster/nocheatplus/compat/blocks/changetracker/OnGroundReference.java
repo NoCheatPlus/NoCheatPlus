@@ -124,7 +124,7 @@ public class OnGroundReference {
             while(itEntries.hasNext()) {
                 entry = itEntries.next();
                 if (ref != null && !ref.canUpdateWith(entry)
-                        || !BlockProperties.isGround(entry.previousState.getId(), ignoreFlags)) {
+                        || !BlockProperties.isGround(entry.previousState.getType(), ignoreFlags)) {
                     entry = null;
                 }
                 else {
@@ -137,7 +137,7 @@ public class OnGroundReference {
         if (entry == null) {
             node = blockCache.getOrCreateBlockCacheNode(x, y, z, false);
             // Fast exclusion check right here.
-            if (!BlockProperties.isGround(node.getId(), ignoreFlags)) {
+            if (!BlockProperties.isGround(node.getType(), ignoreFlags)) {
                 entriesAbove = entries;
                 return false;
             }
@@ -183,7 +183,7 @@ public class OnGroundReference {
                 while(itEntries.hasNext()) {
                     entry = itEntries.next();
                     if (entry.nextEntryTick >= 0 && entryAbove.tick > entry.nextEntryTick
-                            || !BlockProperties.isGround(entry.previousState.getId(), ignoreFlags)) {
+                            || !BlockProperties.isGround(entry.previousState.getType(), ignoreFlags)) {
                         entry = null;
                     }
                     else {
@@ -200,7 +200,7 @@ public class OnGroundReference {
             if (entry == null) {
                 node = blockCache.getOrCreateBlockCacheNode(x, y, z, false);
                 // Fast exclusion check right here.
-                if (!BlockProperties.isGround(node.getId(), ignoreFlags)) {
+                if (!BlockProperties.isGround(node.getType(), ignoreFlags)) {
                     return false;
                 }
             }
@@ -252,7 +252,7 @@ public class OnGroundReference {
             while (itEntries.hasNext()) {
                 entry = itEntries.next();
                 node = entry.previousState;
-                if (BlockProperties.isGround(node.getId(), ignoreFlags)) {
+                if (BlockProperties.isGround(node.getType(), ignoreFlags)) {
                     // TODO: If nodeAbove is ground too, could exclude cases here.
                     return true;
                 }

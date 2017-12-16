@@ -137,12 +137,13 @@ public class ReflectBlock implements IReflectBlock {
         return blockPos;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public Object nms_getById(final Material id) {
+    public Object nms_getByMaterial(final Material id) {
         if (this.nmsGetById == null) {
             fail();
         }
-        return ReflectionUtil.invokeMethod(this.nmsGetById, null, id);
+        return ReflectionUtil.invokeMethod(this.nmsGetById, null, id.getId());
     }
 
     /**

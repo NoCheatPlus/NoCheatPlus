@@ -283,11 +283,11 @@ public class ReflectHelper {
      * @param id
      * @return Block instance (could be null).
      */
-    public Object nmsBlock_getById(Material id) {
+    public Object nmsBlock_getByMaterial(Material id) {
         if (reflectBlock == null) {
             fail();
         }
-        return this.reflectBlock.nms_getById(id);
+        return this.reflectBlock.nms_getByMaterial(id);
     }
 
     public Object nmsBlock_getMaterial(Object block) {
@@ -312,7 +312,7 @@ public class ReflectHelper {
     }
 
     public AlmostBoolean isBlockSolid(Material id) {
-        Object obj = nmsBlock_getById(id);
+        Object obj = nmsBlock_getByMaterial(id);
         if (obj == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -324,7 +324,7 @@ public class ReflectHelper {
     }
 
     public AlmostBoolean isBlockLiquid(Material id) {
-        Object obj = nmsBlock_getById(id);
+        Object obj = nmsBlock_getByMaterial(id);
         if (obj == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -352,7 +352,7 @@ public class ReflectHelper {
         if (reflectBlock == null) {
             fail();
         }
-        final Object nmsBlock = nmsBlock_getById(id);
+        final Object nmsBlock = nmsBlock_getByMaterial(id);
         if (nmsBlock == null) {
             return null;
         }
