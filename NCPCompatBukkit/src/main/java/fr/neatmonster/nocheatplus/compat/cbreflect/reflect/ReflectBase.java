@@ -17,7 +17,7 @@ package fr.neatmonster.nocheatplus.compat.cbreflect.reflect;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
-import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 
 public class ReflectBase {
 
@@ -39,8 +39,7 @@ public class ReflectBase {
             obcPackageName = null;
         }
         // nms
-        Object obj = ReflectionUtil.invokeMethodNoArgs(server, "getHandle");
-        clazz = obj.getClass();
+        clazz = ServerVersion.getNMSMinecraftServer();
         name = clazz.getPackage().getName();
         if (name.equals("net.minecraft.server") || name.indexOf("net.") == 0 && name.indexOf(".minecraft.") != -1 && name.indexOf(".server.") != -1) {
             nmsPackageName = name;

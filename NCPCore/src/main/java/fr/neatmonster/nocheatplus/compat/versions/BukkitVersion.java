@@ -42,7 +42,11 @@ public class BukkitVersion {
         // Initialize server version.
         final Server server = Bukkit.getServer();
         // Note that Bukkit.getVersion() should be used to get the version of Bukkit (...)
-        ServerVersion.setMinecraftVersion(ServerVersion.parseMinecraftVersion(server.getBukkitVersion(), server.getVersion()));
+        ServerVersion.setMinecraftVersion(ServerVersion.parseMinecraftVersion(
+                server.getBukkitVersion(), 
+                server.getVersion(),
+                ServerVersion.fetchNMSMinecraftServerVersion()
+                ));
 
         // Test availability/reliability of certain features.
         boolean uuidOnline = false;

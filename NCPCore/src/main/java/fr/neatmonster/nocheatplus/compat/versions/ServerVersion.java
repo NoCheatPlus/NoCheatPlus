@@ -14,6 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.compat.versions;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+
 /**
  * Static utility that stores the Minecraft version, providing some parsing
  * methods. This has to be initialized from an external source (e.g. a plugin
@@ -26,10 +31,10 @@ package fr.neatmonster.nocheatplus.compat.versions;
  */
 public class ServerVersion {
 
-    private static String minecraftVersion = GenericVersion.UNKNOWN_VERSION; 
+    private static String minecraftVersion = GenericVersion.UNKNOWN_VERSION;
 
     private static final String[][] versionTagsMatch = {
-        {"1.7.2-r", "1.7.2"}, // Example. Probably this method will just be removed.
+            {"1.7.2-r", "1.7.2"}, // Example. Probably this method will just be removed.
     };
 
     /**
@@ -62,6 +67,30 @@ public class ServerVersion {
             }
         }
         return null;
+    }
+
+    public static Class<?> getNMSMinecraftServer() {
+        final Server server = Bukkit.getServer();
+        try {
+            final Object obj = ReflectionUtil.invokeMethodNoArgs(server, "getHandle");
+            return obj.getClass();
+        }
+        catch (Throwable t) {
+            return null;
+        }
+    }
+
+    public static String fetchNMSMinecraftServerVersion() {
+        final Class<?> clazz = getNMSMinecraftServer();
+        if (clazz == null) {
+            return null;
+        }
+        try {
+            return (String) ReflectionUtil.invokeMethodNoArgs(clazz, "getVersion", String.class);
+        }
+        catch (Throwable t) {
+            return null;
+        }
     }
 
     /**
