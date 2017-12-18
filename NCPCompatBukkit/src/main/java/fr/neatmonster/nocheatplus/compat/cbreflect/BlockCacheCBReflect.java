@@ -45,7 +45,7 @@ public class BlockCacheCBReflect extends BlockCacheBukkit {
     @Override
     public double[] fetchBounds(int x, int y, int z) {
         try {
-            return helper.nmsWorld_fetchBlockShape(this.nmsWorld, this.getTypeId(x, y, z), x, y, z);
+            return helper.nmsWorld_fetchBlockShape(this.nmsWorld, this.getType(x, y, z), x, y, z);
         }
         catch (ReflectFailureException ex) {
             return super.fetchBounds(x, y, z);

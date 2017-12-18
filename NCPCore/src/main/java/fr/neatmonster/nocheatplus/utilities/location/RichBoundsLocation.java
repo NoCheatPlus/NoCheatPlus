@@ -445,7 +445,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return the type id above
      */
     public Material getTypeIdAbove() {
-        return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
+        return blockCache.getType(blockX, blockY + 1,  blockZ);
     }
 
     /**
@@ -533,7 +533,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      * @return the type id
      */
     public final Material getTypeId(final int x, final int y, final int z) {
-        return blockCache.getTypeId(x, y, z);
+        return blockCache.getType(x, y, z);
     }
 
     /**

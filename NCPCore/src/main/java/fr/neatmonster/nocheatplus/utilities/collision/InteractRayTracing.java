@@ -110,7 +110,7 @@ public class InteractRayTracing extends RayTracing {
      * @return
      */
     private boolean doesCollide(final int blockX, final int blockY, final int blockZ) {
-        final Material id = blockCache.getTypeId(blockX, blockY, blockZ);
+        final Material id = blockCache.getType(blockX, blockY, blockZ);
         final long flags = BlockProperties.getBlockFlags(id);
         if ((flags & BlockProperties.F_SOLID) == 0) {
             // Ignore non solid blocks anyway.

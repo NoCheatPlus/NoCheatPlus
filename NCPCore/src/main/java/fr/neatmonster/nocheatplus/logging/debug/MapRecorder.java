@@ -53,7 +53,7 @@ public class MapRecorder {
             if (margin > 0) {
                 recordCuboid(worldAccess, recorder, blockX - margin, blockY - margin, blockZ - margin, blockX + margin, blockY + margin, blockZ + margin);
             } else {
-                recorder.set(blockX, blockY, blockZ, worldAccess.getTypeId(blockX, blockY, blockZ), worldAccess.getData(blockX, blockY, blockZ), worldAccess.getBounds(blockX, blockY, blockZ));
+                recorder.set(blockX, blockY, blockZ, worldAccess.getType(blockX, blockY, blockZ), worldAccess.getData(blockX, blockY, blockZ), worldAccess.getBounds(blockX, blockY, blockZ));
             }
             return true;
         }
@@ -78,7 +78,7 @@ public class MapRecorder {
                 for (int y = yMin; y <= yMax; y ++) {
                     if (!recorder.hasIdEntry(x, y, z)) {
                         // Use get... methods for efficiency in certain use cases..
-                        recorder.set(x, y, z, worldAccess.getTypeId(x, y, z), worldAccess.getData(x, y, z), worldAccess.getBounds(x, y, z));
+                        recorder.set(x, y, z, worldAccess.getType(x, y, z), worldAccess.getData(x, y, z), worldAccess.getBounds(x, y, z));
                     }
                 }
             }

@@ -329,8 +329,8 @@ public abstract class BlockCache {
      *            the z
      * @return the type id
      */
-    public Material getTypeId(double x, double y, double z) {
-        return getTypeId(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
+    public Material getType(double x, double y, double z) {
+        return getType(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
     }
 
     /**
@@ -352,8 +352,8 @@ public abstract class BlockCache {
      *            the block
      * @return the type id
      */
-    public Material getTypeId(final Block block) {
-        return getTypeId(block.getX(), block.getY(), block.getZ());
+    public Material getType(final Block block) {
+        return getType(block.getX(), block.getY(), block.getZ());
     }
 
     /**
@@ -367,7 +367,7 @@ public abstract class BlockCache {
      *            the z
      * @return the type id
      */
-    public Material getTypeId(final int x, final int y, final int z) {
+    public Material getType(final int x, final int y, final int z) {
         return getOrCreateNode(x, y, z).getType();
     }
 

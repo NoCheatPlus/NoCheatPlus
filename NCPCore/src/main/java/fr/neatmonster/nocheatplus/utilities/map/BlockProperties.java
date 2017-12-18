@@ -1398,7 +1398,7 @@ public class BlockProperties {
         final int bz = pLoc.getBlockZ();
         final double y = pLoc.getY() + eyeHeight;
         final int by = Location.locToBlock(y);
-        final Material headId = blockCache.getTypeId(bx, by, bz);
+        final Material headId = blockCache.getType(bx, by, bz);
         final long headFlags = getBlockFlags(headId);
         final boolean inWater;
         if ((headFlags & F_WATER) == 0) {
@@ -1974,7 +1974,7 @@ public class BlockProperties {
      * @return true, if successful
      */
     public static final boolean canClimbUp(final BlockCache cache, final int x, final int y, final int z) {
-        final Material id = cache.getTypeId(x, y, z);
+        final Material id = cache.getType(x, y, z);
         if ((getBlockFlags(id) & F_CLIMBABLE) == 0) {
             return false;
         }
@@ -1982,16 +1982,16 @@ public class BlockProperties {
             return true;
         }
         // The direct way is a problem (backwards compatibility to before 1.4.5-R1.0).
-        if ((getBlockFlags(cache.getTypeId(x + 1, y, z)) & F_SOLID) != 0) {
+        if ((getBlockFlags(cache.getType(x + 1, y, z)) & F_SOLID) != 0) {
             return true;
         }
-        if ((getBlockFlags(cache.getTypeId(x - 1, y, z)) & F_SOLID) != 0) {
+        if ((getBlockFlags(cache.getType(x - 1, y, z)) & F_SOLID) != 0) {
             return true;
         }
-        if ((getBlockFlags(cache.getTypeId(x, y, z + 1)) & F_SOLID) != 0) {
+        if ((getBlockFlags(cache.getType(x, y, z + 1)) & F_SOLID) != 0) {
             return true;
         }
-        if ((getBlockFlags(cache.getTypeId(x, y, z - 1)) & F_SOLID) != 0) {
+        if ((getBlockFlags(cache.getType(x, y, z - 1)) & F_SOLID) != 0) {
             return true;
         }
         return false;
@@ -2209,7 +2209,7 @@ public class BlockProperties {
             return false;
         }
         // Basic flags and facing for trap door.
-        final long flags1 = getBlockFlags(access.getTypeId(x, y, z));
+        final long flags1 = getBlockFlags(access.getType(x, y, z));
         if ((flags1 & F_PASSABLE_X4) == 0) {
             return false;
         }
@@ -2226,7 +2226,7 @@ public class BlockProperties {
             return false;
         }
         // Basic flags and facing for ladder.
-        final Material belowId = access.getTypeId(x, y - 1, z);
+        final Material belowId = access.getType(x, y - 1, z);
         // Really confine to ladder here.
         if (belowId != Material.LADDER) {
             return false;
@@ -2978,7 +2978,7 @@ public class BlockProperties {
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = minY; y <= maxY; y++) {
-                    if ((getBlockFlags(access.getTypeId(x, y, z)) & flags) != 0) {
+                    if ((getBlockFlags(access.getType(x, y, z)) & flags) != 0) {
                         return true;
                     }
                 }
@@ -3092,7 +3092,7 @@ public class BlockProperties {
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
                 for (int y = iMinY; y <= iMaxY; y++) {
-                    if (mat == access.getTypeId(x, y, z)) {
+                    if (mat == access.getType(x, y, z)) {
                         return true;
                     }
                 }
@@ -3862,36 +3862,36 @@ public class BlockProperties {
         if ((data & 0x8) == 0) {
             // not falling.
             if ((dX > 0)) {
-                if (data < 7 && BlockProperties.isLiquid(access.getTypeId(x + 1, y, z)) && access.getData(x + 1, y, z) > data) {
+                if (data < 7 && BlockProperties.isLiquid(access.getType(x + 1, y, z)) && access.getData(x + 1, y, z) > data) {
                     return true;
                 }
-                else if (data > 0  && BlockProperties.isLiquid(access.getTypeId(x - 1, y, z)) && access.getData(x - 1, y, z) < data) {
+                else if (data > 0  && BlockProperties.isLiquid(access.getType(x - 1, y, z)) && access.getData(x - 1, y, z) < data) {
                     // reverse direction.
                     return true;
                 }
             } else if (dX < 0) {
-                if (data < 7 && BlockProperties.isLiquid(access.getTypeId(x - 1, y, z)) && access.getData(x - 1, y, z) > data) {
+                if (data < 7 && BlockProperties.isLiquid(access.getType(x - 1, y, z)) && access.getData(x - 1, y, z) > data) {
                     return true;
                 }
-                else if (data > 0  && BlockProperties.isLiquid(access.getTypeId(x + 1, y, z)) && access.getData(x + 1, y, z) < data) {
+                else if (data > 0  && BlockProperties.isLiquid(access.getType(x + 1, y, z)) && access.getData(x + 1, y, z) < data) {
                     // reverse direction.
                     return true;
                 }
             }
             if (dZ > 0) {
-                if (data < 7 && BlockProperties.isLiquid(access.getTypeId(x, y, z + 1)) && access.getData(x, y, z + 1) > data) {
+                if (data < 7 && BlockProperties.isLiquid(access.getType(x, y, z + 1)) && access.getData(x, y, z + 1) > data) {
                     return true;
                 }
-                else if (data > 0  && BlockProperties.isLiquid(access.getTypeId(x , y, z - 1)) && access.getData(x, y, z - 1) < data) {
+                else if (data > 0  && BlockProperties.isLiquid(access.getType(x , y, z - 1)) && access.getData(x, y, z - 1) < data) {
                     // reverse direction.
                     return true;
                 }
             }
             else if (dZ < 0 ) {
-                if (data < 7 && BlockProperties.isLiquid(access.getTypeId(x, y, z - 1)) && access.getData(x, y, z - 1) > data) {
+                if (data < 7 && BlockProperties.isLiquid(access.getType(x, y, z - 1)) && access.getData(x, y, z - 1) > data) {
                     return true;
                 }
-                else if (data > 0  && BlockProperties.isLiquid(access.getTypeId(x , y, z + 1)) && access.getData(x, y, z + 1) < data) {
+                else if (data > 0  && BlockProperties.isLiquid(access.getType(x , y, z + 1)) && access.getData(x, y, z + 1) < data) {
                     // reverse direction.
                     return true;
                 }
@@ -3934,7 +3934,7 @@ public class BlockProperties {
         for (int x = iMinX; x <= iMaxX; x++) {
             for (int z = iMinZ; z <= iMaxZ; z++) {
                 for (int y = iMinY; y <= iMaxY; y++) {
-                    flags |= getBlockFlags(access.getTypeId(x, y, z));
+                    flags |= getBlockFlags(access.getType(x, y, z));
                 }
             }
         }

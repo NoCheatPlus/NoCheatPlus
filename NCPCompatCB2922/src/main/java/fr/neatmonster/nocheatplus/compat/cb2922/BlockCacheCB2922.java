@@ -99,7 +99,7 @@ public class BlockCacheCB2922 extends BlockCache {
     public double[] fetchBounds(final int x, final int y, final int z){
         // TODO: change api for this / use nodes (!)
         @SuppressWarnings("deprecation")
-        final int id = getTypeId(x, y, z).getId();		
+        final int id = getType(x, y, z).getId();		
         final net.minecraft.server.v1_7_R1.Block block = net.minecraft.server.v1_7_R1.Block.e(id);
         if (block == null) return null;
         block.updateShape(iBlockAccess, x, y, z); // data from cache.

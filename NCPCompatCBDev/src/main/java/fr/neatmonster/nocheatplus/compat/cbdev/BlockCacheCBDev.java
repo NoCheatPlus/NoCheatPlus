@@ -94,7 +94,7 @@ public class BlockCacheCBDev extends BlockCache {
 
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
-        final Material id = getTypeId(x, y, z);
+        final Material id = getType(x, y, z);
         @SuppressWarnings("deprecation")
         final net.minecraft.server.v1_11_R1.Block block = net.minecraft.server.v1_11_R1.Block.getById(id.getId());
         if (block == null) {

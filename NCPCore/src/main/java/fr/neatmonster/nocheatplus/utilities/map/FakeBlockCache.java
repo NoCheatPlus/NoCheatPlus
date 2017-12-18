@@ -91,7 +91,7 @@ public class FakeBlockCache extends BlockCache {
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y ++) {
                 for (int z = minZ; z <= maxZ; z ++) {
-                    set(x, y, z, other.getTypeId(x, y, z), other.getData(x, y, z), other.getBounds(x, y, z));
+                    set(x, y, z, other.getType(x, y, z), other.getData(x, y, z), other.getBounds(x, y, z));
                 }
             }
         }

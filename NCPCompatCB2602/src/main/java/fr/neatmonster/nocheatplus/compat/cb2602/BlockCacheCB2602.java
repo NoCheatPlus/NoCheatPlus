@@ -45,7 +45,7 @@ public class BlockCacheCB2602 extends BlockCache {
         @SuppressWarnings("deprecation")
         @Override
         public int getTypeId(int x, int y, int z) {
-            return BlockCacheCB2602.this.getTypeId(x, y, z).getId();
+            return BlockCacheCB2602.this.getType(x, y, z).getId();
         }
 
         @Override
@@ -111,7 +111,7 @@ public class BlockCacheCB2602 extends BlockCache {
 
         // TODO: change api for this / use nodes (!)
         @SuppressWarnings("deprecation")
-        final int id = getTypeId(x, y, z).getId();		
+        final int id = getType(x, y, z).getId();		
         final net.minecraft.server.v1_4_R1.Block block = net.minecraft.server.v1_4_R1.Block.byId[id];
         if (block == null) {
             return null;

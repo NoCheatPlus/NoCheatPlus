@@ -66,7 +66,7 @@ public class BlockCacheSpigotCB1_10_R1 extends BlockCache {
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
         @SuppressWarnings("deprecation")
-        final int id = getTypeId(x, y, z).getId();		
+        final int id = getType(x, y, z).getId();		
         final net.minecraft.server.v1_10_R1.Block block = net.minecraft.server.v1_10_R1.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null blocks -> full ?

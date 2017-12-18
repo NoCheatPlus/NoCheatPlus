@@ -43,7 +43,7 @@ public class BlockCacheCB2545 extends BlockCache {
         @SuppressWarnings("deprecation")
         @Override
         public int getTypeId(final int x, final int y, final int z) {
-            return BlockCacheCB2545.this.getTypeId(x, y, z).getId();
+            return BlockCacheCB2545.this.getType(x, y, z).getId();
         }
 
 

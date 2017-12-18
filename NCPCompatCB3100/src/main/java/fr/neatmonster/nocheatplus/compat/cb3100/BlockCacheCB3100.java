@@ -92,7 +92,7 @@ public class BlockCacheCB3100 extends BlockCache {
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
         @SuppressWarnings("deprecation")
-        final int id = getTypeId(x, y, z).getId();		
+        final int id = getType(x, y, z).getId();		
         final net.minecraft.server.v1_7_R4.Block block = net.minecraft.server.v1_7_R4.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null bounds -> full ?

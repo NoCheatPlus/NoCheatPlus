@@ -94,7 +94,7 @@ public class BlockCacheCB3043 extends BlockCache {
 
         // TODO: change api for this / use nodes (!)
         @SuppressWarnings("deprecation")
-        final int id = getTypeId(x, y, z).getId();		
+        final int id = getType(x, y, z).getId();		
         final net.minecraft.server.v1_7_R3.Block block = net.minecraft.server.v1_7_R3.Block.e(id);
         if (block == null) return null;
         block.updateShape(iBlockAccess, x, y, z); // getData from cache.
