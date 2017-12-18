@@ -86,15 +86,17 @@ public class MCAccessCB2922 implements MCAccess{
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
-        final Block block = Block.e(id);
+    public AlmostBoolean isBlockSolid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.e(id.getId());
         if (block == null || block.getMaterial() == null) return AlmostBoolean.MAYBE;
         else return AlmostBoolean.match(block.getMaterial().isSolid());
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
-        final Block block = Block.e(id);
+    public AlmostBoolean isBlockLiquid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.e(id.getId());
         if (block == null || block.getMaterial() == null) return AlmostBoolean.MAYBE;
         else return AlmostBoolean.match(block.getMaterial().isLiquid());
     }

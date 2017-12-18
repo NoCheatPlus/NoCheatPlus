@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.compat.spigotcb1_8_R3;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
@@ -26,14 +27,11 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.EntityBoat;
-import net.minecraft.server.v1_8_R3.EnumDirection;
-import net.minecraft.server.v1_8_R3.IBlockAccess;
-import net.minecraft.server.v1_8_R3.IBlockData;
-import net.minecraft.server.v1_8_R3.TileEntity;
 
-public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess{
+public class BlockCacheSpigotCB1_8_R3 extends BlockCache {
 
     protected net.minecraft.server.v1_8_R3.WorldServer world;
+
     protected World bukkitWorld;
 
     public BlockCacheSpigotCB1_8_R3(World world) {
@@ -53,10 +51,9 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
         return this;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public int fetchTypeId(final int x, final int y, final int z) {
-        return bukkitWorld.getBlockTypeIdAt(x, y, z);
+    public Material fetchTypeId(final int x, final int y, final int z) {
+        return bukkitWorld.getBlockAt(x, y, z).getType();
     }
 
     @SuppressWarnings("deprecation")
@@ -67,13 +64,14 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
 
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
-        final int id = getTypeId(x, y, z);
+        @SuppressWarnings("deprecation")
+        final int id = getTypeId(x, y, z).getId();
         final net.minecraft.server.v1_8_R3.Block block = net.minecraft.server.v1_8_R3.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null bounds -> full ?
             return null;
         }
-        block.updateShape(this, new BlockPosition(x, y, z));
+        block.updateShape(world, new BlockPosition(x, y, z));
 
         // minX, minY, minZ, maxX, maxY, maxZ
         return new double[]{block.B(), block.D(), block.F(), block.C(),  block.E(),  block.G()};
@@ -123,26 +121,6 @@ public class BlockCacheSpigotCB1_8_R3 extends BlockCache implements IBlockAccess
         super.cleanup();
         world = null;
         bukkitWorld = null;
-    }
-
-    @Override
-    public int getBlockPower(BlockPosition pos, EnumDirection dir) {
-        return world.getBlockPower(pos, dir);
-    }
-
-    @Override
-    public TileEntity getTileEntity(BlockPosition pos) {
-        return world.getTileEntity(pos);
-    }
-
-    @Override
-    public IBlockData getType(BlockPosition pos) {
-        return world.getType(pos);
-    }
-
-    @Override
-    public boolean isEmpty(BlockPosition pos) {
-        return world.isEmpty(pos);
     }
 
 }

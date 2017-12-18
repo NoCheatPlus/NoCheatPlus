@@ -30,12 +30,53 @@ import net.minecraft.server.v1_4_5.Material;
 import net.minecraft.server.v1_4_5.TileEntity;
 import net.minecraft.server.v1_4_5.Vec3DPool;
 
-public class BlockCacheCB2512 extends BlockCache implements IBlockAccess{
+public class BlockCacheCB2512 extends BlockCache {
 
     /** Box for one time use, no nesting, no extra storing this(!). */
     protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
     protected net.minecraft.server.v1_4_5.World world;
+    protected World bukkitWorld;
+
+    private final IBlockAccess iBlockAccess = new IBlockAccess() {
+
+        @SuppressWarnings("deprecation")
+        @Override
+        public int getTypeId(int x, int y, int z) {
+            return BlockCacheCB2512.this.getTypeId(x, y, z).getId();
+        }
+
+        @Override
+        public int getData(int x, int y, int z) {
+            return BlockCacheCB2512.this.getData(x, y, z);
+        }
+
+        @Override
+        public Material getMaterial(final int x, final int y, final int z) {
+            return world.getMaterial(x, y, z);
+        }
+
+        @Override
+        public TileEntity getTileEntity(final int x, final int y, final int z) {
+            return world.getTileEntity(x, y, z);
+        }
+
+        @Override
+        public Vec3DPool getVec3DPool() {
+            return world.getVec3DPool();
+        }
+
+        @Override
+        public boolean isBlockFacePowered(final int arg0, final int arg1, final int arg2, final int arg3) {
+            return world.isBlockFacePowered(arg0, arg1, arg2, arg3);
+        }
+
+        @Override
+        public boolean t(final int x, final int y, final int z) {
+            return world.t(x, y, z);
+        }
+
+    };
 
     public BlockCacheCB2512(World world) {
         setAccess(world);
@@ -43,6 +84,7 @@ public class BlockCacheCB2512 extends BlockCache implements IBlockAccess{
 
     @Override
     public BlockCache setAccess(World world) {
+        this.bukkitWorld = world;
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
@@ -53,8 +95,8 @@ public class BlockCacheCB2512 extends BlockCache implements IBlockAccess{
     }
 
     @Override
-    public int fetchTypeId(final int x, final int y, final int z) {
-        return world.getTypeId(x, y, z);
+    public org.bukkit.Material fetchTypeId(final int x, final int y, final int z) {
+        return bukkitWorld.getBlockAt(x, y, z).getType();
     }
 
     @Override
@@ -66,10 +108,11 @@ public class BlockCacheCB2512 extends BlockCache implements IBlockAccess{
     public double[] fetchBounds(final int x, final int y, final int z){
 
         // TODO: change api for this / use nodes (!)
-        final int id = getTypeId(x, y, z);		
+        @SuppressWarnings("deprecation")
+        final int id = getTypeId(x, y, z).getId();		
         final net.minecraft.server.v1_4_5.Block block = net.minecraft.server.v1_4_5.Block.byId[id];
         if (block == null) return null;
-        block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
+        block.updateShape(iBlockAccess, x, y, z); // TODO: use THIS instead of world.
 
         // minX, minY, minZ, maxX, maxY, maxZ
         return new double[]{block.v(), block.x(), block.z(), block.w(),  block.y(),  block.A()};
@@ -111,31 +154,7 @@ public class BlockCacheCB2512 extends BlockCache implements IBlockAccess{
     public void cleanup() {
         super.cleanup();
         world = null;
-    }
-
-    @Override
-    public Material getMaterial(final int x, final int y, final int z) {
-        return world.getMaterial(x, y, z);
-    }
-
-    @Override
-    public TileEntity getTileEntity(final int x, final int y, final int z) {
-        return world.getTileEntity(x, y, z);
-    }
-
-    @Override
-    public Vec3DPool getVec3DPool() {
-        return world.getVec3DPool();
-    }
-
-    @Override
-    public boolean isBlockFacePowered(final int arg0, final int arg1, final int arg2, final int arg3) {
-        return world.isBlockFacePowered(arg0, arg1, arg2, arg3);
-    }
-
-    @Override
-    public boolean t(final int x, final int y, final int z) {
-        return world.t(x, y, z);
+        bukkitWorld = null;
     }
 
 }

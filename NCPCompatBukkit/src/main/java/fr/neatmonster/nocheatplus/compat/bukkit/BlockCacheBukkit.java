@@ -42,7 +42,6 @@ public class BlockCacheBukkit extends BlockCache {
         return this;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public Material fetchTypeId(final int x, final int y, final int z) {
         // TODO: consider setting type id and data at once.

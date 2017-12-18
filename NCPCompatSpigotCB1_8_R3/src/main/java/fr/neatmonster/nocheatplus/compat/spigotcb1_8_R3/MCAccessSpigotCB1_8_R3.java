@@ -37,7 +37,7 @@ import net.minecraft.server.v1_8_R3.EntityComplexPart;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MobEffectList;
 
-public class MCAccessSpigotCB1_8_R3 implements MCAccess{
+public class MCAccessSpigotCB1_8_R3 implements MCAccess {
 
     /**
      * Test for availability in constructor.
@@ -108,8 +108,9 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
-        final Block block = Block.getById(id);
+    public AlmostBoolean isBlockSolid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.getById(id.getId());
         if (block == null || block.getMaterial() == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -119,8 +120,9 @@ public class MCAccessSpigotCB1_8_R3 implements MCAccess{
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
-        final Block block = Block.getById(id);
+    public AlmostBoolean isBlockLiquid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.getById(id.getId());
         if (block == null || block.getMaterial() == null) {
             return AlmostBoolean.MAYBE;
         }

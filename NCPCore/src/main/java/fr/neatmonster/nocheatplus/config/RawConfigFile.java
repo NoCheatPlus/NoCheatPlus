@@ -40,15 +40,15 @@ public class RawConfigFile  extends YamlConfiguration {
     }
 
     /**
-     * Attempt to get a Material from a string.<br>
-     * Will attempt to match the name but also type ids. 
+     * Attempt to get a Material from a string.
+     * 
      * @param content
      * @return
      */
-    @SuppressWarnings("deprecation")
     public static Material parseMaterial(String content) {
         content = content.trim().toUpperCase();
         try {
+            // TODO: Custom lookup (both vanilla and Bukkit/Spigot).
             return Material.matchMaterial(prepareMatchMaterial(content));
         }
         catch (Exception e) {}

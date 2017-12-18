@@ -142,8 +142,9 @@ public class MCAccessSpigotCB1_9_R1 implements MCAccess {
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
-        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id);
+    public AlmostBoolean isBlockSolid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id.getId());
         if (material == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -153,8 +154,9 @@ public class MCAccessSpigotCB1_9_R1 implements MCAccess {
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
-        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id);
+    public AlmostBoolean isBlockLiquid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final net.minecraft.server.v1_9_R1.Material material = getMaterial(id.getId());
         if (material == null) {
             return AlmostBoolean.MAYBE;
         }

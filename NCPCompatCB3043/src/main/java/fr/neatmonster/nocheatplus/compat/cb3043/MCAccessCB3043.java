@@ -36,7 +36,7 @@ import net.minecraft.server.v1_7_R3.EntityComplexPart;
 import net.minecraft.server.v1_7_R3.EntityPlayer;
 import net.minecraft.server.v1_7_R3.MobEffectList;
 
-public class MCAccessCB3043 implements MCAccess{
+public class MCAccessCB3043 implements MCAccess {
 
     /**
      * Constructor to let it fail.
@@ -86,8 +86,9 @@ public class MCAccessCB3043 implements MCAccess{
     }
 
     @Override
-    public AlmostBoolean isBlockSolid(final int id) {
-        final Block block = Block.e(id);
+    public AlmostBoolean isBlockSolid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.e(id.getId());
         if (block == null || block.getMaterial() == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -97,8 +98,9 @@ public class MCAccessCB3043 implements MCAccess{
     }
 
     @Override
-    public AlmostBoolean isBlockLiquid(final int id) {
-        final Block block = Block.e(id);
+    public AlmostBoolean isBlockLiquid(final Material id) {
+        @SuppressWarnings("deprecation")
+        final Block block = Block.e(id.getId());
         if (block == null || block.getMaterial() == null) {
             return AlmostBoolean.MAYBE;
         }

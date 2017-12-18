@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.compat.cb2922;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftEntity;
@@ -30,12 +31,43 @@ import net.minecraft.server.v1_7_R1.IBlockAccess;
 import net.minecraft.server.v1_7_R1.TileEntity;
 import net.minecraft.server.v1_7_R1.Vec3DPool;
 
-public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
+public class BlockCacheCB2922 extends BlockCache {
 
     /** Box for one time use, no nesting, no extra storing this(!). */
     protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
     protected net.minecraft.server.v1_7_R1.WorldServer world;
+
+    protected World bukkitWorld;
+
+    private final IBlockAccess iBlockAccess = new IBlockAccess() {
+
+        @Override
+        public int getData(int x, int y, int z) {
+            return BlockCacheCB2922.this.getData(x, y, z);
+        }
+
+        @Override
+        public TileEntity getTileEntity(final int x, final int y, final int z) {
+            return world.getTileEntity(x, y, z);
+        }
+
+        @Override
+        public int getBlockPower(final int arg0, final int arg1, final int arg2, final int arg3) {
+            return world.getBlockPower(arg0, arg1, arg2, arg3);
+        }
+
+        @Override
+        public Block getType(int x, int y, int z) {
+            return world.getType(x, y, z);
+        }
+
+        @Override
+        public Vec3DPool getVec3DPool() {
+            return world.getVec3DPool();
+        }
+
+    };
 
     public BlockCacheCB2922(World world) {
         setAccess(world);
@@ -43,6 +75,7 @@ public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
 
     @Override
     public BlockCache setAccess(World world) {
+        this.bukkitWorld = world;
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
@@ -53,8 +86,8 @@ public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
     }
 
     @Override
-    public int fetchTypeId(final int x, final int y, final int z) {
-        return world.getTypeId(x, y, z);
+    public Material fetchTypeId(final int x, final int y, final int z) {
+        return bukkitWorld.getBlockAt(x, y, z).getType();
     }
 
     @Override
@@ -64,12 +97,12 @@ public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
 
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
-
         // TODO: change api for this / use nodes (!)
-        final int id = getTypeId(x, y, z);		
+        @SuppressWarnings("deprecation")
+        final int id = getTypeId(x, y, z).getId();		
         final net.minecraft.server.v1_7_R1.Block block = net.minecraft.server.v1_7_R1.Block.e(id);
         if (block == null) return null;
-        block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
+        block.updateShape(iBlockAccess, x, y, z); // data from cache.
 
         // minX, minY, minZ, maxX, maxY, maxZ
         return new double[]{block.x(), block.z(), block.B(), block.y(),  block.A(),  block.C()};
@@ -116,26 +149,7 @@ public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
     public void cleanup() {
         super.cleanup();
         world = null;
-    }
-
-    @Override
-    public TileEntity getTileEntity(final int x, final int y, final int z) {
-        return world.getTileEntity(x, y, z);
-    }
-
-    @Override
-    public int getBlockPower(final int arg0, final int arg1, final int arg2, final int arg3) {
-        return world.getBlockPower(arg0, arg1, arg2, arg3);
-    }
-
-    @Override
-    public Block getType(int x, int y, int z) {
-        return world.getType(x, y, z);
-    }
-
-    @Override
-    public Vec3DPool getVec3DPool() {
-        return world.getVec3DPool();
+        bukkitWorld = null;
     }
 
 }
