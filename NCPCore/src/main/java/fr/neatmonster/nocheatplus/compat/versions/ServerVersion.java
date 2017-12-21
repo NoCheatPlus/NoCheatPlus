@@ -69,11 +69,11 @@ public class ServerVersion {
         return null;
     }
 
-    public static Class<?> getNMSMinecraftServer() {
+    public static Object getNMSMinecraftServer() {
         final Server server = Bukkit.getServer();
         try {
-            final Object obj = ReflectionUtil.invokeMethodNoArgs(server, "getHandle");
-            return obj.getClass();
+            final Object obj = ReflectionUtil.invokeMethodNoArgs(server, "getServer");
+            return obj;
         }
         catch (Throwable t) {
             return null;
@@ -81,12 +81,12 @@ public class ServerVersion {
     }
 
     public static String fetchNMSMinecraftServerVersion() {
-        final Class<?> clazz = getNMSMinecraftServer();
-        if (clazz == null) {
+        final Object server = getNMSMinecraftServer();
+        if (server == null) {
             return null;
         }
         try {
-            return (String) ReflectionUtil.invokeMethodNoArgs(clazz, "getVersion", String.class);
+            return (String) ReflectionUtil.invokeMethodNoArgs(server, "getVersion", String.class);
         }
         catch (Throwable t) {
             return null;
