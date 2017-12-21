@@ -112,9 +112,10 @@ public class MCAccessFactory {
 
         final String[] classNames = new String[] {
                 // Current DEV / LATEST: CB (Spigot)
-                "fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // latest / tests.
+                //"fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev", // latest / tests.
 
                 // Dedicated: CB (Spigot)
+                "fr.neatmonster.nocheatplus.compat.spigotcb1_11_R1.MCAccessSpigotCB1_11_R1", // 1.11.2 (1_11_R1)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_10_R1.MCAccessSpigotCB1_10_R1", // 1.10-1.10.2 (1_10_R1)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R2.MCAccessSpigotCB1_9_R2", // 1.9.4 (1_9_R2)
                 "fr.neatmonster.nocheatplus.compat.spigotcb1_9_R1.MCAccessSpigotCB1_9_R1", // 1.9-1.9.3 (1_9_R1)

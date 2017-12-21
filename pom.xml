@@ -162,6 +162,7 @@
 				<module>NCPCompatSpigotCB1_9_R1</module>
 				<module>NCPCompatSpigotCB1_9_R2</module>
 				<module>NCPCompatSpigotCB1_10_R1</module>
+				<module>NCPCompatSpigotCB1_11_R1</module>
 				<module>NCPCompatCBDev</module>
 				<!-- Non minimal above. -->
 			</modules>
