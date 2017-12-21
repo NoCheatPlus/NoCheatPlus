@@ -39,7 +39,7 @@ public class ReflectBase {
             obcPackageName = null;
         }
         // nms
-        clazz = ServerVersion.getNMSMinecraftServer();
+        clazz = ServerVersion.getNMSMinecraftServer().getClass();
         name = clazz.getPackage().getName();
         if (name.equals("net.minecraft.server") || name.indexOf("net.") == 0 && name.indexOf(".minecraft.") != -1 && name.indexOf(".server.") != -1) {
             nmsPackageName = name;
