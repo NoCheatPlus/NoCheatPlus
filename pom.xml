@@ -115,7 +115,7 @@
 			</activation>
 			<modules>
 				<!-- Non minimal below. -->
-				<module>NCPCompatCBDev</module>
+				<module>NCPCompatSpigotCB1_11_R1</module>
 				<!-- Non minimal above. -->
 			</modules>
 		</profile>
