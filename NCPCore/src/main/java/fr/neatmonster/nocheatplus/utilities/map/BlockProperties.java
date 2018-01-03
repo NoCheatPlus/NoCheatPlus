@@ -152,15 +152,29 @@ public class BlockProperties {
          * @param id
          *            the id
          * @return the by id
+         * @deprecated Nothing to do with ids.
          */
+        @Deprecated
         public static final MaterialBase getById(final int id) {
+            return getByIndex(id);
+        }
+
+        /**
+         * Get the index of this base material within the relevant materials or
+         * breaking times array.
+         * 
+         * @param index
+         * @return
+         */
+        public static final MaterialBase getByIndex(final int index) {
             for (final MaterialBase base : MaterialBase.values()) {
-                if (base.index == id) {
+                if (base.index == index) {
                     return base;
                 }
             }
-            throw new IllegalArgumentException("Bad id: " + id);
+            throw new IllegalArgumentException("Bad index: " + index);
         }
+
     }
 
     /**
@@ -535,7 +549,15 @@ public class BlockProperties {
     /** Block has full xz-bounds. */
     public static final long F_XZ100                = 0x800;
 
-    /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
+    /**
+     * This flag indicates that everything between the minimum ground height and
+     * the height of the block can also be stood on. See
+     * {@link #getGroundMinHeight(BlockCache, int, int, int, IBlockCacheNode, long)}
+     * for minimum height.<br>
+     * In addition this flag directly triggers a passable workaround for
+     * otherwise colliding blocks
+     * ({@link #isPassableWorkaround(BlockCache, int, int, int, double, double, double, IBlockCacheNode, double, double, double, double)}).
+     */
     public static final long F_GROUND_HEIGHT        = 0x1000;
 
     /** 
@@ -617,15 +639,21 @@ public class BlockProperties {
      */
     public static final long F_FALLDIST_ZERO            = 0x20000000;
 
-    /** Minimum height 15/16 (1 - 0.0625). */
+    /**
+     * Minimum height 15/16 (1 - 0.0625). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
     public static final long F_MIN_HEIGHT16_15          = 0x40000000;
 
-    /** Minimum height 1/16 (1 - 0.0625). */
+    /**
+     * Minimum height 1/16 (1 - 0.0625). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
     public static final long F_MIN_HEIGHT16_1           = 0x80000000; // TODO: Lily pad min height of MC versions?
 
     /** CARPET. **/
-     public static final long F_CARPET                  = 0x100000000L;
-    
+    public static final long F_CARPET                  = 0x100000000L;
+
     // TODO: Convenience constants combining all height / minheight flags.
 
     // TODO: When flags are out, switch to per-block classes :p.
@@ -2720,6 +2748,15 @@ public class BlockProperties {
             return 0.0;
         }
         else if ((flags & F_GROUND_HEIGHT) != 0) {
+            // Subsequent min height flags.
+            if ((flags & F_MIN_HEIGHT16_1) != 0) {
+                // 1/16
+                return 0.0625;
+            }
+            if ((flags & F_MIN_HEIGHT16_15) != 0) {
+                // 15/16
+                return 0.9375;
+            }
             // Default height is used.
             if (id == Material.SOIL) {
                 return bounds[4];
