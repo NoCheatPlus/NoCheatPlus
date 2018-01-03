@@ -640,13 +640,13 @@ public class BlockProperties {
     public static final long F_FALLDIST_ZERO            = 0x20000000;
 
     /**
-     * Minimum height 15/16 (1 - 0.0625). <br>
+     * Minimum height 15/16 (0.9375 = 1 - 0.0625). <br>
      * Only applies with F_GROUND_HEIGHT set.
      */
     public static final long F_MIN_HEIGHT16_15          = 0x40000000;
 
     /**
-     * Minimum height 1/16 (1 - 0.0625). <br>
+     * Minimum height 1/16 (0.0625). <br>
      * Only applies with F_GROUND_HEIGHT set.
      */
     public static final long F_MIN_HEIGHT16_1           = 0x80000000; // TODO: Lily pad min height of MC versions?
