@@ -13,6 +13,12 @@
 	<profiles>
 		<profile>
 			<id>ncp_base</id>
+			<activation>
+				<property>
+					<!-- Prevent use with setting skip_ncp_base e.g.: -Dskip_ncp_base -->
+					<name>!skip_ncp_base</name>
+				</property>
+			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>junit</groupId>

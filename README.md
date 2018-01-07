@@ -37,16 +37,16 @@ All profiles for reference:
 
 | Profile | Description |
 | :------------------ | :-------------- |
-| `-P ncp_base` | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
+| `-P ncp_base` _or none_ | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
 | `-P all,ncp_base` | All compatibility modules. |
-| `-P spigot1_7_r4,ncp_base` | Just Spigot 1.7 R4 (MC 1.7.10). |
-| `-P spigot1_8_r3,ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
-| `-P spigot1_9_r1,ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
-| `-P spigot1_9_r2,ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
-| `-P spigot1_10_r1,ncp_base` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
-| `-P spigot1_11_r1,ncp_base` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
-| `-P spigot1_12_r1,ncp_base` | Just Spigot 1.12 R1 (MC 1.12-1.12.2). |
-| `-P cbdev,ncp_base` | The latest version in development. |
+| `-P spigot1_7_r4` | Just Spigot 1.7 R4 (MC 1.7.10). |
+| `-P spigot1_8_r3` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
+| `-P spigot1_9_r1` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
+| `-P spigot1_9_r2` | Just Spigot 1.9 R2 (MC 1.9.4). |
+| `-P spigot1_10_r1` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
+| `-P spigot1_11_r1` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
+| `-P spigot1_12_r1` | Just Spigot 1.12 R1 (MC 1.12-1.12.2). |
+| `-P cbdev` | The latest version in development. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
 
