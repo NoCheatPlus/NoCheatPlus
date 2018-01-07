@@ -20,9 +20,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,15 +32,15 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
-import net.minecraft.server.v1_11_R1.AxisAlignedBB;
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.DamageSource;
-import net.minecraft.server.v1_11_R1.EntityComplexPart;
-import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.IBlockAccess;
-import net.minecraft.server.v1_11_R1.IBlockData;
-import net.minecraft.server.v1_11_R1.MobEffectList;
+import net.minecraft.server.v1_12_R1.AxisAlignedBB;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.DamageSource;
+import net.minecraft.server.v1_12_R1.EntityComplexPart;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.IBlockAccess;
+import net.minecraft.server.v1_12_R1.IBlockData;
+import net.minecraft.server.v1_12_R1.MobEffectList;
 
 public class MCAccessCBDev implements MCAccess {
 
@@ -61,24 +61,24 @@ public class MCAccessCBDev implements MCAccess {
         if (ReflectionUtil.getConstructor(BlockPosition.class, int.class, int.class, int.class) == null) {
             throw new RuntimeException();
         }
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.EntityLiving.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.EntityLiving.class, 
                 new String[]{"getHeadHeight"}, float.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.EntityPlayer.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.EntityPlayer.class, 
                 new String[]{"getHealth"}, float.class);
-        ReflectionUtil.checkMembers(net.minecraft.server.v1_11_R1.AxisAlignedBB.class, double.class,
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_12_R1.AxisAlignedBB.class, double.class,
                 "a", "b", "c", "d", "e", "f");
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.AttributeInstance.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.AttributeInstance.class, 
                 new String[]{"b"}, double.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.AttributeModifier.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.AttributeModifier.class, 
                 new String[]{"c"}, int.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.AttributeModifier.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.AttributeModifier.class, 
                 new String[]{"d"}, double.class);
-        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_11_R1.Material.class, 
+        ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_12_R1.Material.class, 
                 new String[]{"isSolid", "isLiquid"}, boolean.class);
         // TODO: Confine the following by types as well.
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_11_R1.", 
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_12_R1.", 
                 new String[] {"Entity" , "length", "width", "locY"});
-        ReflectionUtil.checkMembers("net.minecraft.server.v1_11_R1.", 
+        ReflectionUtil.checkMembers("net.minecraft.server.v1_12_R1.", 
                 new String[] {"EntityPlayer" , "dead", "deathTicks", "invulnerableTicks"});
 
         // obc: getHandle() for CraftWorld, CraftPlayer, CraftEntity.
@@ -102,13 +102,13 @@ public class MCAccessCBDev implements MCAccess {
 
     @Override
     public String getMCVersion() {
-        // 1.11 (1_11_R1)
-        return "1.11-1.11.2";
+        // 1.12 (1_12_R1)
+        return "1.12-1.12.2";
     }
 
     @Override
     public String getServerVersionTag() {
-        return "Spigot-CB-1.11_R1";
+        return "Spigot-CB-1.12_R1";
     }
 
     @Override
@@ -129,7 +129,7 @@ public class MCAccessCBDev implements MCAccess {
     @Override
     public double getHeight(final Entity entity) {
         // (entity.getHeight() returns the length field, but we access nms anyway.)
-        final net.minecraft.server.v1_11_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
+        final net.minecraft.server.v1_12_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
         final AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
         final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
         if (entity instanceof LivingEntity) {
@@ -139,7 +139,7 @@ public class MCAccessCBDev implements MCAccess {
         }
     }
 
-    private net.minecraft.server.v1_11_R1.Material getMaterial(int blockId) {
+    private net.minecraft.server.v1_12_R1.Material getMaterial(int blockId) {
         final Block block = Block.getById(blockId);
         if (block == null) {
             return null;
@@ -151,7 +151,7 @@ public class MCAccessCBDev implements MCAccess {
     @Override
     public AlmostBoolean isBlockSolid(final Material id) {
         @SuppressWarnings("deprecation")
-        final net.minecraft.server.v1_11_R1.Material material = getMaterial(id.getId());
+        final net.minecraft.server.v1_12_R1.Material material = getMaterial(id.getId());
         if (material == null) {
             return AlmostBoolean.MAYBE;
         }
@@ -163,7 +163,7 @@ public class MCAccessCBDev implements MCAccess {
     @Override
     public AlmostBoolean isBlockLiquid(final Material id) {
         @SuppressWarnings("deprecation")
-        final net.minecraft.server.v1_11_R1.Material material = getMaterial(id.getId());
+        final net.minecraft.server.v1_12_R1.Material material = getMaterial(id.getId());
         if (material == null) {
             return AlmostBoolean.MAYBE;
         }

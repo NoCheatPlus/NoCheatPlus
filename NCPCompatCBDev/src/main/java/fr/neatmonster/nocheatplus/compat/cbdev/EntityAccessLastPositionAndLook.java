@@ -14,7 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessLastPositionAndLook;
@@ -25,10 +25,10 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositionAndLook {
 
     public EntityAccessLastPositionAndLook() {
-        ReflectionUtil.checkMembers(net.minecraft.server.v1_11_R1.Entity.class, double.class, new String[] {
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_12_R1.Entity.class, double.class, new String[] {
                 "lastX", "lastY", "lastZ"
         });
-        ReflectionUtil.checkMembers(net.minecraft.server.v1_11_R1.Entity.class, float.class, new String[] {
+        ReflectionUtil.checkMembers(net.minecraft.server.v1_12_R1.Entity.class, float.class, new String[] {
                 "lastYaw", "lastPitch"
         });
     }
@@ -36,7 +36,7 @@ public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositio
     @Override
     public void getPositionAndLook(final Entity entity, final ISetPositionWithLook location) {
         // TODO: Error handling / conventions.
-        final net.minecraft.server.v1_11_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+        final net.minecraft.server.v1_12_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
         location.setX(nmsEntity.lastX);
         location.setY(nmsEntity.lastY);
         location.setZ(nmsEntity.lastZ);
@@ -46,7 +46,7 @@ public class EntityAccessLastPositionAndLook implements IEntityAccessLastPositio
 
     @Override
     public void setPositionAndLook(Entity entity, IGetPositionWithLook location) {
-        final net.minecraft.server.v1_11_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+        final net.minecraft.server.v1_12_R1.Entity nmsEntity = ((CraftEntity) entity).getHandle();
         nmsEntity.lastX = location.getX();
         nmsEntity.lastY = location.getY();
         nmsEntity.lastZ = location.getZ();

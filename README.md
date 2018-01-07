@@ -28,6 +28,7 @@ Set goals to: ```install:install-file -Dfile=<PATH TO JAR> -DgroupId=org.bukkit 
 On Windows the <PATH TO JAR> might look like:  ```X:\...\craftbukkit\3042\craftbukkit-1.7.5-R0.1-20140408.020329-16.jar```
 To let it run you might have to set the base directory, e.g. to ```${workspace_loc}```, it does not seem to have significance.
 Do set the correct version alongside the file name. On newer version of maven, you might do with much simplified goals, because the pom files inside the jars are parsed.
+  * **The latest versions of BuildTools.jar will automatically install the necessary server jars into the local .m2 repository (e.g. on linux) - provided configuration paths are standard. Thus you don't need to do this manually anymore, if you then build NCP with the specific profile, if you have run BuildTools.jar to generate the server jars on that machine/environment.**
 
 All profiles for reference:
 
@@ -45,6 +46,7 @@ _For some building environments you might need to both set the profiles and set 
 | `-P spigot1_9_r2 -P ncp_base` | `spigot1_9_r2` and `ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
 | `-P spigot1_10_r1 -P ncp_base` | `spigot1_10_r1` and `ncp_base` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
 | `-P spigot1_11_r1 -P ncp_base` | `spigot1_11_r1` and `ncp_base` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
+| `-P spigot1_12_r1 -P ncp_base` | `spigot1_12_r1` and `ncp_base` | Just Spigot 1.12 R1 (MC 1.12-1.12.2). |
 | `-P cbdev -P ncp_base` | `cbdev` and `ncp_base` | The latest version in development. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
