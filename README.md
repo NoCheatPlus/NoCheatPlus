@@ -37,7 +37,7 @@ All profiles for reference:
 | Profile | Description |
 | :------------------ | :-------------- |
 | `-P ncp_base` _or none_ | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
-| `-P all,ncp_base` | All compatibility modules. |
+| `-P all` | All compatibility modules. |
 | `-P spigot1_7_r4` | Just Spigot 1.7 R4 (MC 1.7.10). |
 | `-P spigot1_8_r3` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
 | `-P spigot1_9_r1` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
