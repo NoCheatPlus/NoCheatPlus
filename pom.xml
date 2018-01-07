@@ -35,70 +35,6 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>spigot1_7_r4</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatCB3100</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_8_r3</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatSpigotCB1_8_R3</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_9_r1</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatSpigotCB1_9_R1</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_9_r2</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatSpigotCB1_9_R2</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_10_r1</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatSpigotCB1_10_R1</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_11_r1</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatSpigotCB1_11_R1</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>spigot1_12_r1</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatCBDev</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
-			<id>cbdev</id>
-			<modules>
-				<!-- Non minimal below. -->
-				<module>NCPCompatCBDev</module>
-				<!-- Non minimal above. -->
-			</modules>
-		</profile>
-		<profile>
 			<id>all</id>
 			<modules>
 				<!-- Non minimal below. -->
@@ -126,6 +62,71 @@
 				<!-- Non minimal above. -->
 			</modules>
 		</profile>
+		<profile>
+			<id>cbdev</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatCBDev</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_12_r1</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatCBDev</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_11_r1</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_11_R1</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_10_r1</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_10_R1</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_9_r2</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_9_R2</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_9_r1</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_9_R1</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_8_r3</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatSpigotCB1_8_R3</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+		<profile>
+			<id>spigot1_7_r4</id>
+			<modules>
+				<!-- Non minimal below. -->
+				<module>NCPCompatCB3100</module>
+				<!-- Non minimal above. -->
+			</modules>
+		</profile>
+
 	</profiles>
 
 	<repositories>
