@@ -32,8 +32,7 @@ Do set the correct version alongside the file name. On newer version of maven, y
 
 All profiles for reference:
 
-** Activation parameters have been removed, only profiles are used - ncp_base does not need to be referenced anymore **
-
+**Activation parameters have been removed. Maven profiles remain for selection of modules - ncp_base does not need to be referenced anymore.**
 
 | Profile | Description |
 | :------------------ | :-------------- |
