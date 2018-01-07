@@ -32,22 +32,21 @@ Do set the correct version alongside the file name. On newer version of maven, y
 
 All profiles for reference:
 
-**As of now, you do need to activate the ncp_base profile in addition to whichever other profile you may be using.**
+**As of now, you do need to activate the ncp_base profile in addition to whichever other profile you may be using. Activation parameters have been removed, only profiles are used. **
 
-_For some building environments you might need to both set the profiles and set the build parameters - to be on the safe side, just set both._
 
-| Profile | Parameter set to `true` | Description |
-| :------------------ | :----------------------------- | :-------------- |
-| `-P ncp_base` | `ncp_base` | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
-| `-P all -P ncp_base` | `cbdedicated` and `ncp_base` | All compatibility modules. |
-| `-P spigot1_7_r4 -P ncp_base` | `spigot1_7_r4` and `ncp_base` | Just Spigot 1.7 R4 (MC 1.7.10). |
-| `-P spigot1_8_r3 -P ncp_base` | `spigot1_8_r3` and `ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
-| `-P spigot1_9_r1 -P ncp_base` | `spigot1_9_r1` and `ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
-| `-P spigot1_9_r2 -P ncp_base` | `spigot1_9_r2` and `ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
-| `-P spigot1_10_r1 -P ncp_base` | `spigot1_10_r1` and `ncp_base` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
-| `-P spigot1_11_r1 -P ncp_base` | `spigot1_11_r1` and `ncp_base` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
-| `-P spigot1_12_r1 -P ncp_base` | `spigot1_12_r1` and `ncp_base` | Just Spigot 1.12 R1 (MC 1.12-1.12.2). |
-| `-P cbdev -P ncp_base` | `cbdev` and `ncp_base` | The latest version in development. |
+| Profile | Description |
+| :------------------ | :-------------- |
+| `-P ncp_base` | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
+| `-P all,ncp_base` | All compatibility modules. |
+| `-P spigot1_7_r4,ncp_base` | Just Spigot 1.7 R4 (MC 1.7.10). |
+| `-P spigot1_8_r3,ncp_base` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
+| `-P spigot1_9_r1,ncp_base` | Just Spigot 1.9 R1 (MC 1.9-1.9.3). |
+| `-P spigot1_9_r2,ncp_base` | Just Spigot 1.9 R2 (MC 1.9.4). |
+| `-P spigot1_10_r1,ncp_base` | Just Spigot 1.10 R1 (MC 1.10-1.10.2). |
+| `-P spigot1_11_r1,ncp_base` | Just Spigot 1.11 R1 (MC 1.11-1.11.2). |
+| `-P spigot1_12_r1,ncp_base` | Just Spigot 1.12 R1 (MC 1.12-1.12.2). |
+| `-P cbdev,ncp_base` | The latest version in development. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
 

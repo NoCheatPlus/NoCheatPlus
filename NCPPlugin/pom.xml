@@ -13,13 +13,6 @@
 	<profiles>
 		<profile>
 			<id>ncp_base</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<property>
-					<name>ncp_base</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>junit</groupId>
@@ -52,12 +45,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_7_r4</id>
-			<activation>
-				<property>
-					<name>spigot1_7_r4</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -70,12 +57,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_8_r3</id>
-			<activation>
-				<property>
-					<name>spigot1_8_r3</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -88,12 +69,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_9_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_9_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -106,12 +81,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_9_r2</id>
-			<activation>
-				<property>
-					<name>spigot1_9_r2</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -124,12 +93,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_10_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_10_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -142,12 +105,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_11_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_11_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -160,12 +117,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_12_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_12_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -178,12 +129,6 @@
 		</profile>
 		<profile>
 			<id>cbdev</id>
-			<activation>
-				<property>
-					<name>cbdev</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>
@@ -196,12 +141,6 @@
 		</profile>
 		<profile>
 			<id>all</id>
-			<activation>
-				<property>
-					<name>cbdedicated</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<dependencies>
 				<!-- Non minimal below. -->
 				<dependency>

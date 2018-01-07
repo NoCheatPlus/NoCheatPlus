@@ -19,10 +19,9 @@
 		<profile>
 			<id>ncp_base</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
-					<name>ncp_base</name>
-					<value>true</value>
+					<!-- Prevent use with setting skip_ncp_base e.g.: -Dskip_ncp_base -->
+					<name>!skip_ncp_base</name>
 				</property>
 			</activation>
 			<modules>
@@ -37,12 +36,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_7_r4</id>
-			<activation>
-				<property>
-					<name>spigot1_7_r4</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatCB3100</module>
@@ -51,12 +44,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_8_r3</id>
-			<activation>
-				<property>
-					<name>spigot1_8_r3</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatSpigotCB1_8_R3</module>
@@ -65,12 +52,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_9_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_9_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatSpigotCB1_9_R1</module>
@@ -79,12 +60,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_9_r2</id>
-			<activation>
-				<property>
-					<name>spigot1_9_r2</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatSpigotCB1_9_R2</module>
@@ -93,12 +68,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_10_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_10_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatSpigotCB1_10_R1</module>
@@ -107,12 +76,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_11_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_11_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatSpigotCB1_11_R1</module>
@@ -121,12 +84,6 @@
 		</profile>
 		<profile>
 			<id>spigot1_12_r1</id>
-			<activation>
-				<property>
-					<name>spigot1_12_r1</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatCBDev</module>
@@ -135,12 +92,6 @@
 		</profile>
 		<profile>
 			<id>cbdev</id>
-			<activation>
-				<property>
-					<name>cbdev</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatCBDev</module>
@@ -149,12 +100,6 @@
 		</profile>
 		<profile>
 			<id>all</id>
-			<activation>
-				<property>
-					<name>cbdedicated</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<modules>
 				<!-- Non minimal below. -->
 				<module>NCPCompatCB2512</module>
