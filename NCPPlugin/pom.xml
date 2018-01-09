@@ -10,45 +10,39 @@
 
 	<packaging>jar</packaging>
 
+	<!-- Default dependencies. -->
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.8.8-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcore</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcompatbukkit</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcompatprotocollib</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<!-- Special dependencies activated by profiles. -->
 	<profiles>
-		<profile>
-			<id>ncp_base</id>
-			<activation>
-				<property>
-					<!-- Prevent use with setting skip_ncp_base e.g.: -Dskip_ncp_base -->
-					<name>!skip_ncp_base</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-					<version>4.8.2</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.bukkit</groupId>
-					<artifactId>bukkit</artifactId>
-					<version>1.8.8-R0.1-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcore</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatbukkit</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatprotocollib</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-			</dependencies>
-		</profile>
 		<profile>
 			<id>spigot1_7_r4</id>
 			<dependencies>

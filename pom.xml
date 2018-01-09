@@ -15,25 +15,19 @@
 		<BUILD_SERIES>?</BUILD_SERIES>
 	</properties>
 
+	<!-- Default modules. -->
+	<modules>
+		<module>NCPBuildBase</module>
+		<module>NCPCommons</module>
+		<module>NCPCore</module>
+		<module>NCPCompatBukkit</module>
+		<module>NCPCompatProtocolLib</module>
+		<module>NCPPlugin</module>
+		<module>NoCheatPlus</module>
+	</modules>
+
+	<!-- Special modules activated by profiles. -->
 	<profiles>
-		<profile>
-			<id>ncp_base</id>
-			<activation>
-				<property>
-					<!-- Prevent use with setting skip_ncp_base e.g.: -Dskip_ncp_base -->
-					<name>!skip_ncp_base</name>
-				</property>
-			</activation>
-			<modules>
-				<module>NCPBuildBase</module>
-				<module>NCPCommons</module>
-				<module>NCPCore</module>
-				<module>NCPCompatBukkit</module>
-				<module>NCPCompatProtocolLib</module>
-				<module>NCPPlugin</module>
-				<module>NoCheatPlus</module>
-			</modules>
-		</profile>
 		<profile>
 			<id>all</id>
 			<modules>
