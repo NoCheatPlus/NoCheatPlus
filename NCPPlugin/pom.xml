@@ -10,6 +10,15 @@
 
 	<packaging>jar</packaging>
 
+	<description>Mainly contains the plugin class and the factories.
+
+For the plugin/artifact version see the NoCheatPlus module.</description>
+	<parent>
+		<groupId>fr.neatmonster</groupId>
+		<artifactId>nocheatplus-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
+
 	<!-- Default dependencies. -->
 	<dependencies>
 		<dependency>
@@ -39,228 +48,14 @@
 			<artifactId>ncpcompatprotocollib</artifactId>
 			<version>1.1-SNAPSHOT</version>
 		</dependency>
+		<!-- "Non free" might later be an extra profile. -->
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcompatnonfree</artifactId>
+			<version>1.1-SNAPSHOT</version>
+			<type>pom</type>
+		</dependency>
 	</dependencies>
-
-	<!-- Special dependencies activated by profiles. -->
-	<profiles>
-		<profile>
-			<id>spigot1_7_r4</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb3100</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_8_r3</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_8_r3</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_9_r1</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_9_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_9_r2</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_10_r1</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_10_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_11_r1</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_11_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>spigot1_12_r1</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcbdev</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>cbdev</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcbdev</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-		<profile>
-			<id>all</id>
-			<dependencies>
-				<!-- Non minimal below. -->
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcbdev</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_11_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_10_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_9_r2</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_9_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_8_r3</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_8_r2</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatspigotcb1_8_r1</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb3100</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb3043</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb3026</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2922</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2882</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2808</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2794</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2763</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2691</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2645</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2602</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2545</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>fr.neatmonster</groupId>
-					<artifactId>ncpcompatcb2512</artifactId>
-					<version>1.1-SNAPSHOT</version>
-				</dependency>
-				<!-- Non minimal above. -->
-			</dependencies>
-		</profile>
-	</profiles>
-
-	<description>Mainly contains the plugin class and the factories.
-
-For the plugin/artifact version see the NoCheatPlus module.</description>
-	<parent>
-		<groupId>fr.neatmonster</groupId>
-		<artifactId>nocheatplus-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
-	</parent>
 
 	<build>
 		<plugins>
