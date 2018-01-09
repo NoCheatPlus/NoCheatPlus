@@ -32,11 +32,11 @@ Do set the correct version alongside the file name. On newer version of maven, y
 
 All profiles for reference:
 
-**Activation parameters have been removed. Maven profiles remain for selection of modules - ncp_base does not need to be referenced anymore.**
+**Maven profiles remain for selection of compatibility modules, activation parameters have been removed, ncp_base has been removed.**
 
 | Profile | Description |
 | :------------------ | :-------------- |
-| `-P ncp_base` _or none_ | Default profile without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
+| none_ | Default build without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
 | `-P all` | All compatibility modules. |
 | `-P spigot1_7_r4` | Just Spigot 1.7 R4 (MC 1.7.10). |
 | `-P spigot1_8_r3` | Just Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
