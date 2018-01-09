@@ -30,10 +30,10 @@
 
 	<description>Compatibility for SpigotCB1_10_R1.
 
-To add a new compat module two other pom.xml files have to be modified:
-- Root pom (parent): Add as module within profile with id 'all'.
-- NCPPlugin: Add as dependency for the profile with id 'all'.
-- (Add a new profile for this specific module, altering both poms mentioned above. If the profile already exists, pointing at ncpcompatspigotcb1_10_R1, a new profile can be made with updating NCPCompatSpigotCB1_10_R1 then.)
+To add a new compat module the pom.xml file within NCPCompatNonFree has to be modified:
+- Add as module within the profile with id 'all'.
+- Add as dependency within the profile with id 'all'.
+- (Add a new profile with both the module and dependency set.)
 
 The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, EntityAccessFactory, AttributeAccessFactory).</description>
 

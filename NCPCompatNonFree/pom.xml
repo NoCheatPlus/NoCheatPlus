@@ -6,7 +6,14 @@
 	<artifactId>ncpcompatnonfree</artifactId>
 	<version>1.1-SNAPSHOT</version>
 	<name>NCPCompatNonFree</name>
-	<description>Combine compatibility modules with dependencies that can't be obtained from a public maven  repository, such as CraftBukkit or Spigot builds, hence &quot;NonFree&quot;.</description>
+	<description>Combine compatibility modules with dependencies that can't be obtained from a public maven  repository, such as CraftBukkit or Spigot builds, hence &quot;NonFree&quot;.
+
+To add a new compat module:
+- Add as module within the profile with id 'all'.
+- Add as dependency within the profile with id 'all'.
+- (Add a new profile with both the module and dependency set.)
+
+The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, EntityAccessFactory, AttributeAccessFactory).</description>
 	<parent>
 		<groupId>fr.neatmonster</groupId>
 		<artifactId>nocheatplus-parent</artifactId>
