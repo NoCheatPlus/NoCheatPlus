@@ -4,8 +4,8 @@ NoCheatPlus is a fork of the famous anti-cheat plugin [NoCheat](https://dev.bukk
 
 Installation
 ---------
-* Install a Spigot server (see [Links](https://github.com/NoCheatPlus/NoCheatPlus/#links)).
-* Download NoCheatPlus (see [Links](https://github.com/NoCheatPlus/NoCheatPlus/#links)).
+* [Install a Spigot server](https://github.com/NoCheatPlus/NoCheatPlus/#obtain-a-build-of-spigot)
+* [Download NoCheatPlus](https://github.com/NoCheatPlus/NoCheatPlus/#download)
 * Drop the NoCheatPlus.jar in to the plugins folder.
 * Start your Spigot/CraftBukkit server. (Using /reload can have unwanted side effects with players still online, but also with complex plugins and cross-plugin dependencies, so we don't recommend it. Usually it should work with NCP.)
 
