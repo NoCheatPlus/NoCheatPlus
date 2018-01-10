@@ -62,11 +62,13 @@ Links
 ---------
 
 Project
+* [NoCheatPlus at SpigotMC](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/)
 * [NoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/nocheatplus/)
 
 Download
-* [BukkitDev (staff approved)](https://dev.bukkit.org/server-mods/nocheatplus/files/)
-* [Jenkins (development versions)](https://ci.md-5.net/job/NoCheatPlus/)
+* [BukkitDev (approved by staff)](https://dev.bukkit.org/server-mods/nocheatplus/files/)
+* [SpigotMC (not inspected by staff)](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/updates)
+* [Jenkins (all builds including development versions)](https://ci.md-5.net/job/NoCheatPlus/)
 
 Support and Documentation
 * [Issues/Tickets](https://github.com/NoCheatPlus/Issues/issues)
@@ -80,8 +82,6 @@ Developers
 * [API](https://github.com/NoCheatPlus/Docs/wiki/API)
 * [Contribute](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
 
-TODO: BLEEDING REPO
-
-Related
+Related Plugins
 * [ProtocolLib at BukkitDev](https://dev.bukkit.org/bukkit-plugins/protocollib)
 * [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
