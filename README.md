@@ -19,7 +19,7 @@ Tips
 Compiling NoCheatPlus
 ---------
 * NoCheatPlus used to be compiled with java 6 compliance (note OpenJDK, possibly we'll switch to 8 directly, once appropriate, e.g. with ProtocolLib dropping support for 7.).
-* We use [Maven](http://maven.apache.org/download.cgi) 3 to handle the dependencies.
+* We use [Maven](http://maven.apache.org/download.cgi) 3 to handle the dependencies. Tested both with Eclipse and Jenkins is Maven 3.3.9.
 * You can compile with this Maven goal: `mvn clean package`, for a standard build. To also (re-) build "non free" compatibility modules that depend on Spigot or the like, Maven profiles can be chosen. For reference on profiles see the table below. See the NCPCompatNonFree sub module for reference on how to add custom modules. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to add the source inclusion to the NoCheatPlus/pom.xml as well.
 * Jar files for the dedicated compat modules, which your local maven repository might be missing, can be installed manually.
 Example for Eclipse with embedded maven:
