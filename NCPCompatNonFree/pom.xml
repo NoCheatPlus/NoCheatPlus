@@ -20,6 +20,7 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 
+	<packaging>pom</packaging>
 
 	<!-- Profile based activation of modules and dependencies. -->
 	<profiles>
@@ -48,6 +49,7 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 				<module>NCPCompatSpigotCB1_9_R2</module>
 				<module>NCPCompatSpigotCB1_10_R1</module>
 				<module>NCPCompatSpigotCB1_11_R1</module>
+				<!-- ... -->
 				<module>NCPCompatCBDev</module>
 			</modules>
 
@@ -57,6 +59,7 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 					<artifactId>ncpcompatcbdev</artifactId>
 					<version>1.1-SNAPSHOT</version>
 				</dependency>
+				<!-- ... -->
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatspigotcb1_11_r1</artifactId>
@@ -174,6 +177,8 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 			</dependencies>
 		</profile>
 
+		<!-- ... -->
+
 		<profile>
 			<id>spigot1_12_r1</id>
 			<modules>
@@ -274,7 +279,6 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 
 	</profiles>
 
-
 	<build>
 		<plugins>
 			<plugin>
@@ -287,5 +291,4 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 		</plugins>
 	</build>
 
-	<packaging>pom</packaging>
 </project>

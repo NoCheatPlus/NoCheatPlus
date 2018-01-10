@@ -24,9 +24,18 @@
 		<module>NCPCompatProtocolLib</module>
 		<module>NCPPlugin</module>
 		<module>NoCheatPlus</module>
-		<!-- "Non free" might later be an extra profile. -->
-		<module>NCPCompatNonFree</module>
 	</modules>
+
+	<!-- Profiles for enabling/disabling features. -->
+	<profiles>
+		<profile>
+			<id>nonfree_build</id>
+			<modules>
+				<module>NCPCompatNonFree</module>
+				<module>NCPCompatNonFreeJar</module>
+			</modules>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>

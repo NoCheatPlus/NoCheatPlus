@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.neatmonster</groupId>
+	<artifactId>ncpcompatnonfreejar</artifactId>
+	<version>1.2-SNAPSHOT</version>
+	<name>NCPCompatNonFreeJar</name>
+	<description>Create a jar from NCPCompatNonFree.</description>
+	<parent>
+		<groupId>fr.neatmonster</groupId>
+		<artifactId>nocheatplus-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>ncpcompatnonfree</artifactId>
+			<version>1.1-SNAPSHOT</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
+
+	<!-- Profile based activation of jar file build -->
+	<profiles>
+		<profile>
+			<id>nonfree_build</id>
+			<distributionManagement>
+				<repository>
+					<id>md_5-releases</id>
+					<url>https://repo.md-5.net/content/repositories/releases/</url>
+				</repository>
+				<snapshotRepository>
+					<id>md_5-snapshots</id>
+					<url>https://repo.md-5.net/content/repositories/snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+			<!-- Building -->
+			<build>
+				<defaultGoal>clean package</defaultGoal>
+				<directory>../../target</directory> <!-- Build it two levels up, because it is the one we care about -->
+				<finalName>NCPCompatNonFree</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<artifactSet>
+										<includes>
+											<include>fr.neatmonster:*</include>
+										</includes>
+										<!-- Clearly not sure about excludes... -->
+										<!-- <excludes> <exclude>fr.neatmonster:nocheatplus-parent</exclude> 
+											</excludes> -->
+									</artifactSet>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<configuration>
+							<!-- <skip>true</skip> -->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+
+
+
+
+
+
+</project>
