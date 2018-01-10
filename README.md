@@ -51,6 +51,7 @@ Profiles for choice of "non free" compatibility modules to build:
 | `-P spigot1_11_r1` | Spigot 1.11 R1 (MC 1.11-1.11.2). |
 | `-P spigot1_12_r1` | Spigot 1.12 R1 (MC 1.12-1.12.2). |
 | `-P cbdev` | The latest version in development. |
+| `-P cblegacy` | The pre-DMCA CraftBukkit builds. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
 

@@ -277,6 +277,93 @@ The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, Enti
 			</dependencies>
 		</profile>
 
+		<profile>
+			<id>cblegacy</id>
+
+			<modules>
+				<module>NCPCompatCB2512</module>
+				<module>NCPCompatCB2545</module>
+				<module>NCPCompatCB2602</module>
+				<module>NCPCompatCB2645</module>
+				<module>NCPCompatCB2691</module>
+				<module>NCPCompatCB2763</module>
+				<module>NCPCompatCB2794</module>
+				<module>NCPCompatCB2808</module>
+				<module>NCPCompatCB2882</module>
+				<module>NCPCompatCB2922</module>
+				<module>NCPCompatCB3026</module>
+				<module>NCPCompatCB3043</module>
+			</modules>
+
+			<dependencies>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb3043</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb3026</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2922</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2882</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2808</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2794</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2763</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2691</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2645</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2602</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb3100</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2545</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>fr.neatmonster</groupId>
+					<artifactId>ncpcompatcb2512</artifactId>
+					<version>1.1-SNAPSHOT</version>
+				</dependency>
+			</dependencies>
+		</profile>
+
 	</profiles>
 
 	<build>
