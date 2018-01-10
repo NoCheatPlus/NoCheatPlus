@@ -47,13 +47,13 @@ Profiles for choice of "non free" compatibility modules to build:
 | :------------------ | :-------------- |
 | _none_ | Default build without any of the native access modules, might pose compatibility issues with latest Minecraft versions. The reflection based module is included here. |
 | `-P all` | All compatibility modules. |
-| `-P spigot1_7_r4` | Spigot 1.7 R4 (MC 1.7.10). |
-| `-P spigot1_8_r3` | Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
-| `-P spigot1_9_r2` | Spigot 1.9 R2 (MC 1.9.4). |
-| `-P spigot1_10_r1` | Spigot 1.10 R1 (MC 1.10-1.10.2). |
-| `-P spigot1_11_r1` | Spigot 1.11 R1 (MC 1.11-1.11.2). |
-| `-P spigot1_12_r1` | Spigot 1.12 R1 (MC 1.12-1.12.2). |
 | `-P cbdev` | The latest version in development. |
+| `-P spigot1_12_r1` | Spigot 1.12 R1 (MC 1.12-1.12.2). |
+| `-P spigot1_11_r1` | Spigot 1.11 R1 (MC 1.11-1.11.2). |
+| `-P spigot1_10_r1` | Spigot 1.10 R1 (MC 1.10-1.10.2). |
+| `-P spigot1_9_r2` | Spigot 1.9 R2 (MC 1.9.4). |
+| `-P spigot1_8_r3` | Spigot 1.8 R3 (MC 1.8.4-1.8.8). |
+| `-P spigot1_7_r4` | Spigot 1.7 R4 (MC 1.7.10). |
 | `-P cblegacy` | The pre-DMCA CraftBukkit builds. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
