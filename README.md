@@ -34,9 +34,9 @@ Options and profiles related to enabling/disabling including/building "non free"
 
 | Profile | Parameter | Description |
 | :------------------ | :-------------- | :-------------- |
-| _none_ | _none_ | The "non free" modules are included via a pre-built jar file from the repository. |
-| -P nonfree_build | _none_ | Enable building "non free" compatibility modules. The NCPCompatNonFree jar file is built/installed/(deployed). |
-| _none_ | -Dno_nonfree | The "non free" modules are neither built, nor included via a pre-built jar file. |
+| `-P nonfree_include` | _none_ | The "non free" modules are included via a pre-built jar file from the repository. |
+| `-P nonfree_build` | _none_ | Enable building "non free" compatibility modules. The NCPCompatNonFree jar file is built/installed/(deployed). |
+| _none_ | _none_ | The "non free" modules are neither built, nor included via a pre-built jar file. |
 
 Profiles for choice of "non free" compatibility modules to build:
 

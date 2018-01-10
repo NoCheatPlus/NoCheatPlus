@@ -67,7 +67,7 @@ For the plugin/artifact version see the NoCheatPlus module.</description>
 					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatnonfreejar</artifactId>
 					<version>1.2-SNAPSHOT</version>
-					<!-- <scope>compile</scope> -->
+					<scope>compile</scope>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -75,17 +75,12 @@ For the plugin/artifact version see the NoCheatPlus module.</description>
 
 		<profile>
 			<id>nonfree_include</id>
-			<activation>
-				<property>
-					<name>!no_nonfree</name>
-				</property>
-			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>fr.neatmonster</groupId>
 					<artifactId>ncpcompatnonfreejar</artifactId>
 					<version>1.2-SNAPSHOT</version>
-					<!-- <scope>compile</scope> -->
+					<scope>compile</scope>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
