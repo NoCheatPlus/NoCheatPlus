@@ -20,8 +20,11 @@ Compiling NoCheatPlus
 ---------
 * NoCheatPlus used to be compiled with java 6 compliance (note OpenJDK, possibly we'll switch to 8 directly, once appropriate, e.g. with ProtocolLib dropping support for 7.).
 * We use [Maven](http://maven.apache.org/download.cgi) 3 to handle the dependencies. Tested both with Eclipse and Jenkins is Maven 3.3.9.
-* You can compile with this Maven goal: `mvn clean package`, for a standard build. To also (re-) build "non free" compatibility modules that depend on Spigot or the like, Maven profiles can be chosen. For reference on profiles see the table below. See the NCPCompatNonFree sub module for reference on how to add custom modules. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to add the source inclusion to the NoCheatPlus/pom.xml as well.
-* Jar files for the dedicated compat modules, which your local maven repository might be missing, can be installed manually.
+* You can compile with this Maven goal: `mvn clean package`, for a build without any of the "non free" modules, which depened on not publicly downloadable resources, such as the CraftBukkit/Spigot server jar - the reflection based compatibility module is still contained. 
+* In order to include a pre-built jar with the "non free" modules contained, use `-P nonfree_include`.
+* To also (re-) build "non free" compatibility modules, use `-P nonfree_build` as well as activating the appropriate module to build via a profile such as `-P cbdev` - see the tables below for reference.
+* Have a look at the NCPCompatNonFree sub module for reference on how to add custom compatibility modules. If you add custom modules with a different package naming than `fr.neatmonster`, you might have to update the includes section within  NCPCompatNonFreeJar as well. The related factories are located within the NCPPlugin module (e.g. MCAccessFactory).
+* "Non free" jar file dependencies needed for the dedicated compat modules, which your local maven repository might be missing, can be installed manually.
 Example for Eclipse with embedded maven:
 Add a new maven build run configuration, name it appropriately, e.g. ```Install CB 1.7.5```.
 Set goals to: ```install:install-file -Dfile=<PATH TO JAR> -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.7.5-R0.1-SNAPSHOT -Dpackaging=jar```
