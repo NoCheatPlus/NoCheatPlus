@@ -4,17 +4,50 @@ NoCheatPlus is a fork of the famous anti-cheat plugin [NoCheat](https://dev.bukk
 
 Installation
 ---------
-* Get [CraftBukkit](http://wiki.bukkit.org/Setting_up_a_server) or [Spigot](https://www.spigotmc.org/threads/buildtools-updates-information.42865/)
-* Download NoCheatPlus from either [BukkitDev (staff approved)](https://dev.bukkit.org/server-mods/nocheatplus/files/) or [Jenkins (development versions)](https://ci.md-5.net/job/NoCheatPlus/).
-* Drop the NoCheatPlus.jar in to your plugins folder.
+* Install a Spigot server (see [Links](https://github.com/NoCheatPlus/NoCheatPlus/#links)).
+* Download NoCheatPlus (see [Links](https://github.com/NoCheatPlus/NoCheatPlus/#links)).
+* Drop the NoCheatPlus.jar in to the plugins folder.
 * Start your Spigot/CraftBukkit server. (Using /reload can have unwanted side effects with players still online, but also with complex plugins and cross-plugin dependencies, so we don't recommend it. Usually it should work with NCP.)
 
-Tips
+Hints
 ---------
-* Be sure that your Spigot/CraftBukkit and NoCheatPlus versions match together.
+* Be sure that your Spigot/CraftBukkit and NoCheatPlus versions match together. The latest version of NCP is compatible with a wide range of CraftBukkit/Spigot versions ([See the notable builds page for a quick overview.]()).
 * Don't use tabs in the config.yml file.
-* Use [ProtocolLib](https://dev.bukkit.org/bukkit-plugins/protocollib) for full efficiency of the fight checks and other. Using version of ProtocolLib that is supported by NCP is essential, as otherwise some checks will be disabled.
+* Use [ProtocolLib](https://dev.bukkit.org/bukkit-plugins/protocollib) for full efficiency of the fight checks and other. Using a version of ProtocolLib that is supported by NCP is essential, as otherwise some checks will be disabled.
 * For compatibility with other plugins such as mcMMO, citizens and more check out [CompatNoCheatPlus](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/).
+
+Links
+---------
+
+###### Project
+* [NoCheatPlus at SpigotMC](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/)
+* [NoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/nocheatplus/)
+
+###### Download
+* [BukkitDev (approved by staff)](https://dev.bukkit.org/server-mods/nocheatplus/files/)
+* [SpigotMC (not inspected by staff)](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/updates)
+* [Jenkins (all builds including development versions)](https://ci.md-5.net/job/NoCheatPlus/)
+
+###### Support and Documentation
+* [Issues/Tickets](https://github.com/NoCheatPlus/Issues/issues)
+* [Wiki](https://github.com/NoCheatPlus/Docs/wiki)
+* [Configuration](https://github.com/NoCheatPlus/Docs/wiki/Configuration)
+* [Permissions](https://github.com/NoCheatPlus/Docs/wiki/Permissions)
+* [Commands](https://github.com/NoCheatPlus/Docs/wiki/Commands)
+
+###### Developers
+* [License (GPLv3)](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
+* [API](https://github.com/NoCheatPlus/Docs/wiki/API)
+* [Contribute](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
+
+###### Related Plugins
+* [ProtocolLib at BukkitDev](https://dev.bukkit.org/bukkit-plugins/protocollib)
+* [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
+
+###### Obtain a build of Spigot
+* [Get the latest BuildTools.jar](https://hub.spigotmc.org/jenkins/job/BuildTools/)
+* [Run according to instructions](https://www.spigotmc.org/wiki/buildtools/)
+* ([Server installation instructions](https://www.spigotmc.org/wiki/spigot-installation/))
 
 Compiling NoCheatPlus
 ---------
@@ -57,31 +90,3 @@ Profiles for choice of "non free" compatibility modules to build:
 | `-P cblegacy` | The pre-DMCA CraftBukkit builds. |
 
 (On the long run, only the latest module for a major Minecraft release may be be kept, such as 1_8_r3 for all of 1.8.x.)
-
-Links
----------
-
-Project
-* [NoCheatPlus at SpigotMC](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/)
-* [NoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/nocheatplus/)
-
-Download
-* [BukkitDev (approved by staff)](https://dev.bukkit.org/server-mods/nocheatplus/files/)
-* [SpigotMC (not inspected by staff)](https://www.spigotmc.org/resources/nocheatplus2015-07-25.26/updates)
-* [Jenkins (all builds including development versions)](https://ci.md-5.net/job/NoCheatPlus/)
-
-Support and Documentation
-* [Issues/Tickets](https://github.com/NoCheatPlus/Issues/issues)
-* [Wiki](https://github.com/NoCheatPlus/Docs/wiki)
-* [Configuration](https://github.com/NoCheatPlus/Docs/wiki/Configuration)
-* [Permissions](https://github.com/NoCheatPlus/Docs/wiki/Permissions)
-* [Commands](https://github.com/NoCheatPlus/Docs/wiki/Commands)
-
-Developers
-* [License (GPLv3)](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
-* [API](https://github.com/NoCheatPlus/Docs/wiki/API)
-* [Contribute](https://github.com/NoCheatPlus/NoCheatPlus/blob/master/CONTRIBUTING.md)
-
-Related Plugins
-* [ProtocolLib at BukkitDev](https://dev.bukkit.org/bukkit-plugins/protocollib)
-* [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
