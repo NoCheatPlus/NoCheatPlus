@@ -17,8 +17,10 @@ package fr.neatmonster.nocheatplus.utilities.ds.map;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -692,6 +694,21 @@ public class HashMapLOW <K, V> {
      */
     public Iterator<Entry<K, V>> iterator() {
         return size == 0 ? new LHMIterator<K, V>(null, null) : new LHMIterator<K, V>(this, buckets);
+    }
+
+    /**
+     * Get all keys as a LinkedHashSet fit for iteration. The returned set is a
+     * new instance, so changes don't affect the original HashMapLOW instance.
+     * 
+     * @return
+     */
+    public Collection<K> getKeys() {
+        final Set<K> out = new LinkedHashSet<K>();
+        final Iterator<Entry<K, V>> it = iterator();
+        while (it.hasNext()) {
+            out.add(it.next().getKey());
+        }
+        return out;
     }
 
 }
