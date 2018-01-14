@@ -92,7 +92,6 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     // Not static
     private int foundInconsistencies = 0;
 
-    // TODO: Switch to UUIDs as keys, get data by uuid when possible, use PlayerMap for getting
     /** PlayerData storage. */
     private final HashMapLOW<UUID, PlayerData> playerData = new HashMapLOW<UUID, PlayerData>(100);
 
@@ -161,6 +160,11 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * remove "as much as reasonable".
      */
     public void checkExpiration() {
+        /*
+         * TODO: A generic method that both busies about expiration checking and
+         * being triggered for bulk removal otherwise (whenever individual
+         * remove calls have been issued).
+         */
         if (!doExpireData || durExpireData <= 0) {
             return;
         }
@@ -456,9 +460,10 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
 
         if (checkType == CheckType.ALL) {
-            // TODO: Don't remove PlayerData for online players.
+            // TODO: Don't remove PlayerData at all for online players.
             // TODO: Fetch/use UUID early, and check validity of name.
             if (playerId != null) {
+                // TODO: Still prefer bulk removal: add to a (primary thread) set of to be removed ids.
                 instance.playerData.remove(playerId);
             }
         }
@@ -484,7 +489,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         else {
             // Attempt precise removal.
             final boolean debug = data.getDebug();
-            String debugText = "[" + checkType + "] [" + playerName + "] Data removal: " ;
+            String debugText = debug ? "[" + checkType + "] [" + playerName + "] Data removal: " : null;
             boolean res = false;
             if (data instanceof IRemoveSubCheckData 
                     && ((IRemoveSubCheckData) data).removeSubCheckData(checkType)) {
