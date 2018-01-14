@@ -64,7 +64,9 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.PlayerMap.PlayerInfo;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
+import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
@@ -95,13 +97,16 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     /** PlayerData storage. */
     private final HashMapLOW<UUID, PlayerData> playerData = new HashMapLOW<UUID, PlayerData>(100);
 
+    /** Primary thread only (no lock for this field): UUIDs to remove upon next bulk removal. */
+    private final Set<UUID> bulkPlayerDataRemoval = new LinkedHashSet<UUID>();
+
     /**
      * Access order for playerName (exact) -> ms time of logout.
      * <hr>
      * Later this might hold central player data objects instead of the long
      * only.
      */
-    private final Map<String, Long> lastLogout = new LinkedHashMap<String, Long>(50, 0.75f, true);
+    private final Map<UUID, Long> lastLogout = new LinkedHashMap<UUID, Long>(50, 0.75f, true);
 
     /**
      * Keeping track of online players. Currently id/name mappings are not kept
@@ -135,6 +140,28 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     /** Violation history and execution history. */
     private boolean deleteHistory = false;
 
+    private final OnDemandTickListener rareTasksListener = new OnDemandTickListener() {
+
+        private int delayUnregister = 0;
+
+        @Override
+        public boolean delegateTick(final int tick, final long timeLast) {
+            if (rareTasks()) {
+                delayUnregister = 10;
+                return true;
+            }
+            else {
+                if (delayUnregister == 0) {
+                    return false;
+                }
+                else {
+                    delayUnregister --;
+                    return true;
+                }
+            }
+        }
+    };
+
     /**
      * Sets the static instance reference.
      */
@@ -148,7 +175,8 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         if (GenericVersion.compareVersions(version, "1.8") >= 0 || version.equals("1.7.10") && Bukkit.getServer().getVersion().toLowerCase().indexOf("spigot") != -1) {
             // Safe to assume Spigot, don't store Player instances.
             playerMap = new PlayerMap(false);
-        } else {
+        }
+        else {
             // Likely an older version without efficient mapping.
             playerMap = new PlayerMap(true);
         }
@@ -160,63 +188,128 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * remove "as much as reasonable".
      */
     public void checkExpiration() {
-        /*
-         * TODO: A generic method that both busies about expiration checking and
-         * being triggered for bulk removal otherwise (whenever individual
-         * remove calls have been issued).
-         */
         if (!doExpireData || durExpireData <= 0) {
             return;
         }
         final long now = System.currentTimeMillis();
         final Set<CheckDataFactory> factories = new LinkedHashSet<CheckDataFactory>();
-        final Set<Entry<String, Long>> entries = lastLogout.entrySet();
-        final Iterator<Entry<String, Long>> iterator = entries.iterator();
-        final List<UUID> removeIds = new LinkedList<UUID>();
+        final Set<Entry<UUID, Long>> entries = lastLogout.entrySet();
+        final Iterator<Entry<UUID, Long>> iterator = entries.iterator();
         while (iterator.hasNext()) {
-            final Entry<String, Long> entry = iterator.next();
+            final Entry<UUID, Long> entry = iterator.next();
             final long ts = entry.getValue();
             if (now - ts <= durExpireData) {
                 break;
             }
+            final UUID playerId = entry.getKey();
             // TODO: LEGACY handling: switch to UUIDs here for sure.
-            final String playerName = entry.getKey();
-            if (deleteData) {
-                factories.clear();
-                for (final CheckType type : CheckType.values()) {
-                    final CheckDataFactory factory = type.getDataFactory();
-                    if (factory != null) {
-                        factories.add(factory);
-                    }
-                }
-                for (final CheckDataFactory factory : factories) {
-                    factory.removeData(playerName);
-                }
-                clearComponentData(CheckType.ALL, playerName);
-                // TODO: Fetch/use UUID early, and check validity of name.
-                final UUID playerId = getUUID(playerName);
-                if (playerId != null) {
-                    removeIds.add(playerId); // For bulk removal.
-                }
-            }
-            if (deleteData || deleteHistory) {
-                removeExecutionHistory(CheckType.ALL, playerName);
-            }
-            if (deleteHistory) {
-                ViolationHistory.removeHistory(playerName);
-            }
+            legacyPlayerDataExpirationRemovalByName(playerId, factories, deleteData);
+            bulkPlayerDataRemoval.add(playerId); // For bulk removal.
             iterator.remove();
         }
         // Bulk removal of PlayerData.
-        if (!removeIds.isEmpty()) {
-            playerData.remove(removeIds);
+        if (!bulkPlayerDataRemoval.isEmpty()) {
+            doBulkPlayerDataRemoval(); // Using this method allows checking for delayed removal etc.
         }
+    }
+
+    private final void legacyPlayerDataExpirationRemovalByName(final UUID playerId, 
+            final Set<CheckDataFactory> factories, final boolean deleteData) {
+        final String playerName = DataManager.getPlayerName(playerId);
+        if (playerName == null) {
+            // TODO: WARN
+            return;
+        }
+        // TODO: Validity of name?
+        if (deleteData) {
+            factories.clear();
+            for (final CheckType type : CheckType.values()) {
+                final CheckDataFactory factory = type.getDataFactory();
+                if (factory != null) {
+                    factories.add(factory);
+                }
+            }
+            for (final CheckDataFactory factory : factories) {
+                factory.removeData(playerName);
+            }
+            clearComponentData(CheckType.ALL, playerName);
+        }
+        if (deleteData || deleteHistory) {
+            removeExecutionHistory(CheckType.ALL, playerName);
+        }
+        if (deleteHistory) {
+            ViolationHistory.removeHistory(playerName);
+        }
+    }
+
+    /**
+     * Called by the rareTasksListener (OnDemandTickListener).
+     * @return "Did something" - true if data was removed or similar, i.e. reset the removal delay counter. False if nothing relevant had been done.
+     */
+    private final boolean rareTasks() {
+        boolean something = false;
+        if (!bulkPlayerDataRemoval.isEmpty()) {
+            doBulkPlayerDataRemoval();
+            something = true;
+        }
+        return something;
+    }
+
+    /**
+     * Primary thread only. This checks for if players are/should be online.
+     */
+    private final void doBulkPlayerDataRemoval() {
+        int size = bulkPlayerDataRemoval.size();
+        if (size > 0) {
+            // Test for online players.
+            final Iterator<UUID> it = bulkPlayerDataRemoval.iterator();
+            while (it.hasNext()) {
+                boolean skip = !lastLogout.containsKey(it.next());
+                // TODO: Also remove fake players, thus test for logged in too.
+                /**
+                 * Things will get shifty, once we use PlayerData during
+                 * asynchronous login. Then we'd need to use flags and store
+                 * ticks or time stamps, both global and in PlayerData, in order
+                 * to postpone removal (global flag set -> fetch existing data
+                 * here and check further).
+                 */
+                if (skip) {
+                    it.remove();
+                    size --;
+                    continue;
+                }
+            }
+            // Actually remove data.
+            if (size > 0) {
+                playerData.remove(bulkPlayerDataRemoval);
+                bulkPlayerDataRemoval.clear();
+                if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.STATUS, "Bulk PlayerData removal: " + size);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the exact player name, stored internally.
+     * @param playerId
+     */
+    public static String getPlayerName(final UUID playerId) {
+        final PlayerInfo info = instance.playerMap.getPlayerInfo(playerId);
+        if (info != null && info.exactName != null) {
+            return info.exactName;
+        }
+        final PlayerData data = instance.playerData.get(playerId);
+        if (data != null && data.playerName != null) {
+            return data.playerName;
+        }
+        return null;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        lastLogout.remove(player.getName());
+        lastLogout.remove(player.getUniqueId());
         CombinedData.getData(player).lastJoinTime = System.currentTimeMillis(); 
         addOnlinePlayer(player);
     }
@@ -237,7 +330,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      */
     private final void onPlayerLeave(final Player player) {
         final long now = System.currentTimeMillis();
-        lastLogout.put(player.getName(), now);
+        lastLogout.put(player.getUniqueId(), now);
         CombinedData.getData(player).lastLogoutTime = now;
         removeOnlinePlayer(player);
     }
@@ -341,8 +434,8 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
         ViolationHistory.clear(checkType);
         if (checkType == CheckType.ALL) {
-            // TODO: Don't remove PlayerData for online players.
-            instance.playerData.clear(); // TODO
+            instance.bulkPlayerDataRemoval.addAll(instance.playerData.getKeys());
+            instance.doBulkPlayerDataRemoval(); // Only removes offline player data.
         }
     }
 
@@ -368,14 +461,16 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         for (final CheckDataFactory factory : factories) {
             if (factory instanceof ICanHandleTimeRunningBackwards) {
                 ((ICanHandleTimeRunningBackwards) factory).handleTimeRanBackwards();
-            } else {
+            }
+            else {
                 factory.removeAllData();
             }
         }
         for (final IRemoveData rmd : instance.iRemoveData) {
             if (rmd instanceof ICanHandleTimeRunningBackwards) {
                 ((ICanHandleTimeRunningBackwards) rmd).handleTimeRanBackwards();
-            } else {
+            }
+            else {
                 rmd.removeAllData();
             }
         }
@@ -433,13 +528,13 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         // TODO: Once working, use the most correct name from PlayerData.
         final UUID playerId = pd == null ? getUUID(playerName) : pd.playerId;
 
-
         if (checkType == null) {
             checkType = CheckType.ALL;
         }
         boolean had = false;
 
         // Check extended registered components.
+        // TODO: "System data" might not be wise to erase for online players.
         if (clearComponentData(checkType, playerName)) {
             had = true;
         }
@@ -460,11 +555,10 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         }
 
         if (checkType == CheckType.ALL) {
-            // TODO: Don't remove PlayerData at all for online players.
             // TODO: Fetch/use UUID early, and check validity of name.
             if (playerId != null) {
-                // TODO: Still prefer bulk removal: add to a (primary thread) set of to be removed ids.
-                instance.playerData.remove(playerId);
+                instance.bulkPlayerDataRemoval.add(playerId);
+                instance.rareTasksListener.register();
             }
         }
 
@@ -654,7 +748,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * @param player
      */
     private void removeOnlinePlayer(final Player player) {
-        // TODO: Consider to only remove the Player instance?
+        // TODO: Consider to only remove the Player instance? Yes do so... and remove the mapping if the full data expires only.
         playerMap.remove(player);
     }
 
@@ -665,6 +759,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     @Override
     public void onDisable() {
         clearData(CheckType.ALL);
+        playerData.clear(); // Also clear for online players.
         iRemoveData.clear();
         clearConfigs();
         lastLogout.clear();
