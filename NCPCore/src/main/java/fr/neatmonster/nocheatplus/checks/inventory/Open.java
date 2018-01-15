@@ -18,9 +18,12 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
+import fr.neatmonster.nocheatplus.hooks.ExemptionSettings;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /**
@@ -33,6 +36,8 @@ public class Open extends Check implements IDisableListener{
     private static Open instance = null;
 
     private UUID nestedPlayer = null;
+
+    private final IHandle<ExemptionSettings> exeSet = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(ExemptionSettings.class);
 
     // TODO: Add specific contexts (allow different settings for fight / blockbreak etc.).
 
@@ -62,7 +67,9 @@ public class Open extends Check implements IDisableListener{
      * @return If cancelling some event is opportune (open inventory and cancel flag set).
      */
     public boolean check(final Player player) {
-        if (!isEnabled(player) || !InventoryUtil.hasInventoryOpen(player)) {
+        if (exeSet.getHandle().isRegardedAsNpc(player)
+                || !isEnabled(player) 
+                || !InventoryUtil.hasInventoryOpen(player)) {
             return false;
         }
         final InventoryConfig cc = InventoryConfig.getConfig(player);

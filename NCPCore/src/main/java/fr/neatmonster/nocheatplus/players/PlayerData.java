@@ -126,12 +126,27 @@ public class PlayerData implements IData {
     /** Not sure this is the future of extra properties. */
     private Set<String> tags = null;
 
+    /*
+     * TODO: Consider updating the UUID for stuff like
+     * "exempt player/name on next login". This also implies the addition of a
+     * method to force-postpone data removal, as well as configuration for how
+     * exactly to apply/timeout, plus new syntax for 'ncp exempt' (flags/side
+     * conditions like +login/...).
+     */
     /** Unique id of the player. */
     final UUID playerId;
+
+    // TODO: Names should get updated. (In which case)
     /** Exact case name of the player. */
     final String playerName;
     /** Lower case name of the player. */
     final String lcName;
+
+    /*
+     * TODO: Flags/counters for (async-login,) login, join, 'online', kick, quit
+     * + shouldBeOnline(). 'online' means that some action has been recorded.
+     * Same/deduce: isFake(), as opposed to ExemptionSettings.isRegardedAsNPC().
+     */
 
     private final PlayerTickListener playerTickListener;
 
