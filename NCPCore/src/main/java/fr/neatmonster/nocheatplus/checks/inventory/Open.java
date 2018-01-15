@@ -67,7 +67,9 @@ public class Open extends Check implements IDisableListener{
      * @return If cancelling some event is opportune (open inventory and cancel flag set).
      */
     public boolean check(final Player player) {
-        if (exeSet.getHandle().isRegardedAsNpc(player)
+        if (
+                // TODO: POC: Item duplication with teleporting NPCS, having their inventory open.
+                exeSet.getHandle().isRegardedAsNpc(player)
                 || !isEnabled(player) 
                 || !InventoryUtil.hasInventoryOpen(player)) {
             return false;
