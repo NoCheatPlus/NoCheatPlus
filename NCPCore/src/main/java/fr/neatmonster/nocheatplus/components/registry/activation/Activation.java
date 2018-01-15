@@ -20,8 +20,10 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
@@ -460,8 +462,33 @@ public class Activation implements IDescriptiveActivation {
      * @param condition
      * @return
      */
-    public IActivation condition(IActivation condition) {
+    public Activation condition(IActivation condition) {
         conditions.add(condition);
+        return this;
+    }
+
+    private boolean checkUnitTest() {
+        NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        return api == null || api.getClass().getSimpleName().startsWith("UnitTest");
+    }
+
+    public Activation unitTest() {
+        conditions.add(new IActivation() {
+            @Override
+            public boolean isAvailable() {
+                return checkUnitTest();
+            }
+        });
+        return this;
+    }
+
+    public Activation notUnitTest() {
+        conditions.add(new IActivation() {
+            @Override
+            public boolean isAvailable() {
+                return !checkUnitTest();
+            }
+        });
         return this;
     }
 
