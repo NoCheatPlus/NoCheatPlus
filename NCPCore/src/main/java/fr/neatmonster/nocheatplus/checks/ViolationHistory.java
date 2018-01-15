@@ -361,7 +361,7 @@ public class ViolationHistory {
             final ViolationLevel vl = it.next();
             final CheckType refType = checkTypeMap.get(vl.check);
             if (refType == null) continue;
-            if (refType == checkType || APIUtils.isParent(checkType, refType)){
+            if (refType == checkType || APIUtils.isAncestor(checkType, refType)){
                 found = true;
                 it.remove();
             }

@@ -107,7 +107,7 @@ public class FightData extends ACheckData implements IRemoveSubCheckData {
 
 
     public static CheckDataFactory getCheckDataFactory(CheckType checkType) {
-        if (checkType != CheckType.FIGHT && !APIUtils.isParent(CheckType.FIGHT, checkType)) {
+        if (checkType != CheckType.FIGHT && !APIUtils.isAncestor(CheckType.FIGHT, checkType)) {
             throw new IllegalArgumentException("Can only return a CheckDataFactory for the check group FIGHT.");
         }
         switch(checkType) {

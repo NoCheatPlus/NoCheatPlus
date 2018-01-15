@@ -203,7 +203,7 @@ public class TopCommand extends BaseCommand{
                 type = CheckType.valueOf(args[i].trim().toUpperCase().replace('-', '_').replace('.', '_'));
             } catch (Throwable t) {} // ...
             if (type != null) {
-                checkTypes.addAll(APIUtils.getWithChildren(type)); // Includes type.
+                checkTypes.addAll(APIUtils.getWithDescendants(type)); // Includes type.
             }
         }
         if (checkTypes.isEmpty()) {

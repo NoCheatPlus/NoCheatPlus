@@ -26,22 +26,40 @@ public class TestCheckType {
     @Test
     public void testIsParent() {
         for (CheckType parent : CheckType.values()) {
-            if (parent != CheckType.ALL && !APIUtils.isParent(CheckType.ALL, parent)) {
+            if (parent != CheckType.ALL && !APIUtils.isAncestor(CheckType.ALL, parent)) {
                 fail("Expect ALL to be parent of " + parent + " .");
             }
             // Rough simplified check by naming.
             String parentName = parent.getName();
             for (final CheckType child : CheckType.values()) {
                 if (child == parent) {
-                    if (APIUtils.isParent(parent, child)) {
+                    if (APIUtils.isAncestor(parent, child)) {
                         fail("Check can't be parent of itself: " + parent);
                     }
                     // Ignore otherwise.
                     continue;
                 }
                 String childName = child.getName();
-                if (childName.startsWith(parentName) && childName.charAt(parentName.length()) == '.' && !APIUtils.isParent(parent, child)) {
+                if (childName.startsWith(parentName) && childName.charAt(parentName.length()) == '.' && !APIUtils.isAncestor(parent, child)) {
                     fail("Expect " + parentName + " to be parent of " + childName + ".");
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testChildren() {
+        for (CheckType checkType : CheckType.values()) {
+            // checkType is child of parent.
+            if (checkType.getParent() != null) {
+                if (!APIUtils.getDescendants(checkType.getParent()).contains(checkType)) {
+                    fail("Expect parents children to contain self: " + checkType);
+                }
+            }
+            // checkType is direct parent of all children.
+            for (CheckType child : APIUtils.getDescendants(checkType)) {
+                if (child.getParent() != checkType) {
+                    fail("Expect " + checkType + " to be direct parent of " + child + ", insteat parent is set to: " + child.getParent());
                 }
             }
         }
@@ -51,7 +69,7 @@ public class TestCheckType {
     public void testNeedsSynchronization() {
         for (CheckType parent : new CheckType[]{CheckType.CHAT, CheckType.NET}) {
             for (CheckType type : CheckType.values()) {
-                if ((parent == type || APIUtils.isParent(parent, type)) && !APIUtils.needsSynchronization(type)) {
+                if ((parent == type || APIUtils.isAncestor(parent, type)) && !APIUtils.needsSynchronization(type)) {
                     fail("Expect " + type + " to need synchronization, as it is child of " + parent);
                 }
             }

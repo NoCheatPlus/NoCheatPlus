@@ -30,11 +30,11 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
  */
 public class APIUtils {
 
-    /** Only the children. */
-    private static final Map<CheckType, Set<CheckType>> childrenMap = new HashMap<CheckType, Set<CheckType>>();
+    /** All descendants recursively. */
+    private static final Map<CheckType, Set<CheckType>> descendantsMap = new HashMap<CheckType, Set<CheckType>>();
 
-    /** Check including children, for convenient iteration. */
-    private static final Map<CheckType, Set<CheckType>> withChildrenMap = new HashMap<CheckType, Set<CheckType>>();
+    /** Check including all descendants recursively, for convenient iteration. */
+    private static final Map<CheckType, Set<CheckType>> withDescendantsMap = new HashMap<CheckType, Set<CheckType>>();
 
     /** Checks/groups that might be run off the primary thread. */
     private static final Set<CheckType> needSync = new HashSet<CheckType>();
@@ -45,33 +45,37 @@ public class APIUtils {
         for (final CheckType type : CheckType.values()) {
             map.put(type, new LinkedHashSet<CheckType>());
         }
-        for (final CheckType type : CheckType.values()){
+        for (final CheckType type : CheckType.values()) {
             if (type != CheckType.ALL) {
                 map.get(CheckType.ALL).add(type);
             }
-            for (final CheckType other : CheckType.values()){
-                if (isParent(other, type)) {
+            for (final CheckType other : CheckType.values()) {
+                if (isAncestor(other, type)) {
                     map.get(other).add(type);
                 }
             }
         }
-        for (final CheckType parent : map.keySet()){
+        for (final CheckType parent : map.keySet()) {
             final Set<CheckType> set = map.get(parent);
-            childrenMap.put(parent, Collections.unmodifiableSet(set));
+            descendantsMap.put(parent, Collections.unmodifiableSet(set));
             final Set<CheckType> wpSet = new LinkedHashSet<CheckType>(set);
             wpSet.add(parent);
-            withChildrenMap.put(parent, Collections.unmodifiableSet(wpSet));
+            withDescendantsMap.put(parent,
+                    Collections.unmodifiableSet(wpSet));
         }
         // needSync: Note that tests use the same definitions.
-        for (final CheckType checkType : new CheckType[]{CheckType.CHAT, CheckType.NET}) {
+        for (final CheckType checkType : new CheckType[] { CheckType.CHAT,
+                CheckType.NET }) {
             needSync.add(checkType);
         }
         boolean added = true;
         while (added) { // Just in case.
             added = false;
-            for (final CheckType checkType: CheckType.values()) {
+            for (final CheckType checkType : CheckType.values()) {
                 // Fill in needSync.
-                if (checkType.getParent() != null && !needSync.contains(checkType) && needSync.contains(checkType.getParent())) {
+                if (checkType.getParent() != null
+                        && !needSync.contains(checkType)
+                        && needSync.contains(checkType.getParent())) {
                     needSync.add(checkType);
                     added = true;
                 }
@@ -87,8 +91,9 @@ public class APIUtils {
      *            the check type
      * @return the children
      */
-    public static final Set<CheckType> getChildren(final CheckType type) {
-        return childrenMap.get(type);
+    public static final Set<CheckType> getDescendants(
+            final CheckType type) {
+        return descendantsMap.get(type);
     }
 
     /**
@@ -99,37 +104,43 @@ public class APIUtils {
      *            the check type
      * @return the children
      */
-    public static final Set<CheckType> getWithChildren(final CheckType type) {
-        return withChildrenMap.get(type);
+    public static final Set<CheckType> getWithDescendants(
+            final CheckType type) {
+        return withDescendantsMap.get(type);
     }
 
     /**
-     * Check if the supposed parent is ancestor of the supposed child. Does not
-     * check versus the supposed child directly.
+     * Check if the supposed ancestor is an ancestor of the supposed descendant.
+     * Equality doesn't match here.
      * 
-     * @param supposedParent
+     * @param supposedAncestor
      *            the supposed parent
-     * @param supposedChild
+     * @param supposedDescendant
      *            the supposed child
      * @return true, if is parent
      */
-    public static final boolean isParent(final CheckType supposedParent, final CheckType supposedChild) {
+    public static final boolean isAncestor(final CheckType supposedAncestor,
+            final CheckType supposedDescendant) {
         // TODO: Perhaps rename to isAncestor !?
-        if (supposedParent == supposedChild) {
+        if (supposedAncestor == supposedDescendant) {
             return false;
-        }
-        else if (supposedParent == CheckType.ALL) {
+        } else if (supposedAncestor == CheckType.ALL) {
             return true;
         }
-        CheckType parent = supposedChild.getParent();
+        CheckType parent = supposedDescendant.getParent();
         while (parent != null)
-            if (parent == supposedParent) {
+            if (parent == supposedAncestor) {
                 return true;
-            }
-            else {
+            } else {
                 parent = parent.getParent();
             }
         return false;
+    }
+
+    @Deprecated
+    public static final boolean isParent(final CheckType supposedAncestor,
+            final CheckType supposedDescendant) {
+        return isAncestor(supposedAncestor, supposedDescendant);
     }
 
     /**
@@ -144,6 +155,16 @@ public class APIUtils {
      */
     public static final boolean needsSynchronization(final CheckType type) {
         return needSync.contains(type);
+    }
+
+    @Deprecated
+    public static final Set<CheckType> getChildren(final CheckType type) {
+        return getDescendants(type);
+    }
+
+    @Deprecated
+    public static final Set<CheckType> getWithChildren(final CheckType type) {
+        return getWithDescendants(type);
     }
 
 }
