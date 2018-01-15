@@ -20,7 +20,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.IPatchBlockPropertiesSetup;
-import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.special.MultiClientProtocolWaterLilyPatch;
+import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.special.MultiClientProtocolBlockShapePatch;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -57,7 +57,7 @@ public class VanillaBlocksFactory {
         }
         // Patches for special circumstances.
         for (IPatchBlockPropertiesSetup patch : new IPatchBlockPropertiesSetup[]{
-                new MultiClientProtocolWaterLilyPatch(),
+                new MultiClientProtocolBlockShapePatch(),
         }) {
             try {
                 if (patch.isAvailable()) {
