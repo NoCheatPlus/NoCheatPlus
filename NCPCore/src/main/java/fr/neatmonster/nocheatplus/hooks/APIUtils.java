@@ -14,8 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.hooks;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -32,10 +31,10 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 public class APIUtils {
 
     /** Only the children. */
-    private static final Map<CheckType, CheckType[]> childrenMap = new HashMap<CheckType, CheckType[]>();
+    private static final Map<CheckType, Set<CheckType>> childrenMap = new HashMap<CheckType, Set<CheckType>>();
 
     /** Check including children, for convenient iteration. */
-    private static final Map<CheckType, CheckType[]> withChildrenMap = new HashMap<CheckType, CheckType[]>();
+    private static final Map<CheckType, Set<CheckType>> withChildrenMap = new HashMap<CheckType, Set<CheckType>>();
 
     /** Checks/groups that might be run off the primary thread. */
     private static final Set<CheckType> needSync = new HashSet<CheckType>();
@@ -43,22 +42,25 @@ public class APIUtils {
     static {
         // Parent/children relations.
         final Map<CheckType, Set<CheckType>> map = new HashMap<CheckType, Set<CheckType>>();
-        for (final CheckType type : CheckType.values())
+        for (final CheckType type : CheckType.values()) {
             map.put(type, new LinkedHashSet<CheckType>());
+        }
         for (final CheckType type : CheckType.values()){
-            if (type != CheckType.ALL) map.get(CheckType.ALL).add(type);
+            if (type != CheckType.ALL) {
+                map.get(CheckType.ALL).add(type);
+            }
             for (final CheckType other : CheckType.values()){
-                if (isParent(other, type)) map.get(other).add(type);
+                if (isParent(other, type)) {
+                    map.get(other).add(type);
+                }
             }
         }
         for (final CheckType parent : map.keySet()){
             final Set<CheckType> set = map.get(parent);
-            final CheckType[] a = new CheckType[set.size()];
-            childrenMap.put(parent, set.toArray(a));
-            final CheckType[] aw = new CheckType[set.size() + 1]; 
-            set.toArray(aw);
-            aw[set.size()] = parent;
-            withChildrenMap.put(parent, aw);
+            childrenMap.put(parent, Collections.unmodifiableSet(set));
+            final Set<CheckType> wpSet = new LinkedHashSet<CheckType>(set);
+            wpSet.add(parent);
+            withChildrenMap.put(parent, Collections.unmodifiableSet(wpSet));
         }
         // needSync: Note that tests use the same definitions.
         for (final CheckType checkType : new CheckType[]{CheckType.CHAT, CheckType.NET}) {
@@ -78,32 +80,32 @@ public class APIUtils {
     }
 
     /**
-     * Return an unmodifiable collection of children for the given check type. Always returns a collection, does not
-     * contain check type itself.
+     * Return an unmodifiable collection of children for the given check type.
+     * Always returns a collection, does not contain check type itself.
      * 
      * @param type
      *            the check type
      * @return the children
      */
-    public static final Collection<CheckType> getChildren(final CheckType type) {
-        return Arrays.asList(childrenMap.get(type));
+    public static final Set<CheckType> getChildren(final CheckType type) {
+        return childrenMap.get(type);
     }
 
     /**
-     * Return an unmodifiable collection of the given check type with children. Always returns a collection, does 
-     * contain the check type itself.
+     * Return an unmodifiable collection of the given check type with children.
+     * Always returns a collection, does contain the check type itself.
      * 
      * @param type
      *            the check type
      * @return the children
      */
-    public static final Collection<CheckType> getWithChildren(final CheckType type) {
-        return Arrays.asList(withChildrenMap.get(type));
+    public static final Set<CheckType> getWithChildren(final CheckType type) {
+        return withChildrenMap.get(type);
     }
 
     /**
-     * Check if the supposed parent is ancestor of the supposed child. Does not check versus the supposed child
-     * directly.
+     * Check if the supposed parent is ancestor of the supposed child. Does not
+     * check versus the supposed child directly.
      * 
      * @param supposedParent
      *            the supposed parent
@@ -112,6 +114,7 @@ public class APIUtils {
      * @return true, if is parent
      */
     public static final boolean isParent(final CheckType supposedParent, final CheckType supposedChild) {
+        // TODO: Perhaps rename to isAncestor !?
         if (supposedParent == supposedChild) {
             return false;
         }
