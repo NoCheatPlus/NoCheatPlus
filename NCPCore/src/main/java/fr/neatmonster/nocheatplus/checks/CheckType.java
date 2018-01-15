@@ -39,7 +39,8 @@ import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
- * Type of checks (containing configuration and dataFactory classes, name and permission).
+ * Type of checks (containing configuration and dataFactory classes, name and
+ * permission).
  */
 public enum CheckType {
     ALL(Permissions.CHECKS),
@@ -93,7 +94,8 @@ public enum CheckType {
     FIGHT_GODMODE(FIGHT, Permissions.FIGHT_GODMODE),
     FIGHT_NOSWING(FIGHT, Permissions.FIGHT_NOSWING),
     FIGHT_REACH(FIGHT, Permissions.FIGHT_REACH),
-    FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT, FightConfig.factory, FightData.selfHitDataFactory),
+    FIGHT_SELFHIT(CheckTypeType.CHECK, FIGHT, Permissions.FIGHT_SELFHIT, 
+            FightConfig.factory, FightData.selfHitDataFactory),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
     INVENTORY(InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
@@ -125,6 +127,15 @@ public enum CheckType {
 
     UNKNOWN;
 
+    public static enum CheckTypeType {
+        SPECIAL,
+        GROUP,
+        CHECK
+    }
+
+    /** The type of the check type. */
+    private final CheckTypeType type;
+
     /** If not null, this is the check group usually. */
     private final CheckType parent;
 
@@ -141,15 +152,16 @@ public enum CheckType {
      * Special purpose check types (likely not actual checks).
      */
     private CheckType() {
-        this(null, null, null);
+        this(CheckTypeType.SPECIAL, null, null, null, null);
     }
 
     /**
      * Special purpose for grouping (ALL).
+     * 
      * @param permission
      */
     private CheckType(final String permission){
-        this(null, null, permission);
+        this(CheckTypeType.SPECIAL, null, permission, null, null);
     }
 
     private CheckType(final CheckType parent) {
@@ -157,36 +169,53 @@ public enum CheckType {
     }
 
     /**
-     * Constructor for root checks or check groups, that are not grouped under another check type.
+     * Constructor for root checks or check groups, that are not grouped under
+     * another check type.
+     * 
      * @param configFactory
      * @param dataFactory
      * @param permission
      */
-    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, final String permission) {
-        this(null, permission, configFactory, dataFactory);
+    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, 
+            final String permission) {
+        this(CheckTypeType.GROUP, null, permission, configFactory, dataFactory);
     }
 
     /**
      * Constructor for sub-checks grouped under another check type.
+     * 
      * @param parent
      * @param permission
      */
     private CheckType(final CheckType parent, final String permission) {
-        this(parent, permission, parent.getConfigFactory(), parent.getDataFactory());
+        this(CheckTypeType.CHECK, parent, permission, parent.getConfigFactory(), parent.getDataFactory());
     }
 
     /**
-     * General constructor (usually used for root check groups).
-     * @param parent Super check type (usually the group).
-     * @param permission Bypass permission.
-     * @param configFactory Check config factory.
-     * @param dataFactory Check data factory.
+     * General constructor
+     * 
+     * @param type
+     *            The type of the check type.
+     * @param parent
+     *            Super check type (usually the group).
+     * @param permission
+     *            Bypass permission.
+     * @param configFactory
+     *            Check config factory.
+     * @param dataFactory
+     *            Check data factory.
      */
-    private CheckType(final CheckType parent, final String permission, final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+    private CheckType(final CheckTypeType type, final CheckType parent, final String permission, 
+            final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+        this.type = type;
         this.parent = parent;
         this.permission = permission;
         this.configFactory = configFactory;
         this.dataFactory = dataFactory;
+    }
+
+    public CheckTypeType getType() {
+        return type;
     }
 
     /**
@@ -235,7 +264,9 @@ public enum CheckType {
     }
 
     /**
-     * Quick permission check for cached entriy only (for async checks). If not present, after failure will need to deal with this.
+     * Quick permission check for cached entriy only (for async checks). If not
+     * present, after failure will need to deal with this.
+     * 
      * @param player
      * @return
      */
@@ -244,7 +275,9 @@ public enum CheckType {
     }
 
     /**
-     * Quick permission check for cached entries only (for async checks). If not present, after failure will need to deal with this.
+     * Quick permission check for cached entries only (for async checks). If not
+     * present, after failure will need to deal with this.
+     * 
      * @param player
      * @param permission
      * @return
