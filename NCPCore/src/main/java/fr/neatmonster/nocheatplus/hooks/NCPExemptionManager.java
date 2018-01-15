@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /**
@@ -58,7 +59,9 @@ public class NCPExemptionManager {
      * Set the settings to apply from that moment on. <br>
      * Note that there is no cleanup, thus you should perform cleanup yourself,
      * in case of passing a custom sub class of ExemptionSettings, for the case
-     * of your plugin disabling or NPC disabling.
+     * of your plugin disabling or NPC disabling. The given ExemptionSettings
+     * instance will be registered as a generic instance for the
+     * ExemptionSettings class.
      * 
      * @param settings
      *            If null, the default implementation will be used, otherwise
@@ -67,6 +70,7 @@ public class NCPExemptionManager {
      */
     public static void setExemptionSettings(ExemptionSettings settings) {
         NCPExemptionManager.settings = settings;
+        NCPAPIProvider.getNoCheatPlusAPI().registerGenericInstance(ExemptionSettings.class, settings);
     }
 
     /**
