@@ -45,6 +45,9 @@ import fr.neatmonster.nocheatplus.logging.LogManager;
  * ComponentWithName (tag)</li>
  * <hr>
  * Not sure about all the login-denial API, some of those might get removed.
+ * <hr>
+ * NOTE: Class names for implementations of the NoCheatPlusAPI which aim at unit
+ * tests, where server access might not work, should start with "UnitTest".
  * 
  * @author asofold
  *

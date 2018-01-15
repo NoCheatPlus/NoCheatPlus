@@ -31,15 +31,18 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 public class PluginTests {
 
     /**
-     * Dummy API, providing only a minimal subset of functionality for offline-testing. Some methods do nothing, some throw an UnsupportedOperationException, some will do something (set/get MCAccess).
+     * Dummy API, providing only a minimal subset of functionality for
+     * offline-testing. Some methods do nothing, some throw an
+     * UnsupportedOperationException, some will do something (set/get MCAccess).
+     * 
      * @author asofold
      *
      */
-    public static class DummyNoCheatPlusAPI implements NoCheatPlusAPI {
+    public static class UnitTestNoCheatPlusAPI implements NoCheatPlusAPI {
 
         private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
 
-        public DummyNoCheatPlusAPI() {
+        public UnitTestNoCheatPlusAPI() {
             genericInstanceRegistry.registerGenericInstance(MCAccess.class, new MCAccessBukkit());
         }
 
@@ -162,9 +165,9 @@ public class PluginTests {
 
     }
 
-    public static void setDummNoCheatPlusAPI(boolean force) {
+    public static void setUnitTestNoCheatPlusAPI(boolean force) {
         if (force || NCPAPIProvider.getNoCheatPlusAPI() == null) {
-            NCPAPIProvider.setNoCheatPlusAPI(new DummyNoCheatPlusAPI());
+            NCPAPIProvider.setNoCheatPlusAPI(new UnitTestNoCheatPlusAPI());
         }
     }
 

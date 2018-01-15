@@ -71,7 +71,7 @@ public class BlockTests {
      * Initialize BlockProperties with default config and Bukkit-API compliance :p.
      */
     public static void initBlockProperties() {
-        PluginTests.setDummNoCheatPlusAPI(false);
+        PluginTests.setUnitTestNoCheatPlusAPI(false);
         BlockProperties.init(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class), new DefaultConfigWorldConfigProvider());
     }
 
