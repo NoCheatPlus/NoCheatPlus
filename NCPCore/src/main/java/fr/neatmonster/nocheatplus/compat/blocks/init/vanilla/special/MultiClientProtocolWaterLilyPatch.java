@@ -19,12 +19,13 @@ public class MultiClientProtocolWaterLilyPatch extends AbstractBlockPropertiesPa
 
     public MultiClientProtocolWaterLilyPatch() {
         activation
-        .neutralDescription("WATER_LILY block shape patch for multi client protocol support around 1.7.x - 1.11.x.")
+        .neutralDescription("WATER_LILY block shape patch for multi client protocol support around 1.7.x - 1.12.x.")
         .advertise(true)
-        .setConditionsOR()
+        .setConditionsAND()
+        .notUnitTest()
+        .condition(ActivationUtil.getMultiProtocolSupportPluginActivation())
         // TODO: Other/More ?
         ;
-        ActivationUtil.addMultiProtocolSupportPlugins(activation);
     }
 
     @Override

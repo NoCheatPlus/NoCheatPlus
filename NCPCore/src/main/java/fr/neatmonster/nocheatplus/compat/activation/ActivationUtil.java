@@ -10,27 +10,24 @@ import fr.neatmonster.nocheatplus.components.registry.activation.Activation;
  */
 public class ActivationUtil {
 
-    private static final String ERROR_NEED_CONDITION_OR = "Must use setConditionOR() with this method.";
-
     /**
-     * Auxiliary method to activate with any of the typical protocol support
-     * plugins existing (currently: ViaVersion, ProtocolSupport).
+     * Auxiliary method to get an Activation instance that activates with any of
+     * the typical protocol support plugins existing (currently: ViaVersion,
+     * ProtocolSupport).
      * 
      * @param activation
-     * @return The given Activation instance.
-     * @throws IllegalArgumentException
-     *             If getConditionOr does not return true.
+     * @return An activation instance for any of the typical multi protocol
+     *         support plugins.
      */
-    public static Activation addMultiProtocolSupportPlugins(Activation activation) {
-        // TODO: Typically there is more confinement necessary, more specific naming will be needed.
-        if (!activation.getConditionsOR()) {
-            throw new IllegalArgumentException(ERROR_NEED_CONDITION_OR);
-        }
-        // ViaVersion
-        activation.pluginExist("ViaVersion");
-        // ProtocolSupport
-        activation.pluginExist("ProtocolSupport");
-        return activation;
+    public static Activation getMultiProtocolSupportPluginActivation() {
+        return new Activation()
+                .setConditionsOR()
+
+                // ViaVersion
+                .pluginExist("ViaVersion")
+                // ProtocolSupport
+                .pluginExist("ProtocolSupport")
+                ;
     }
 
 }
