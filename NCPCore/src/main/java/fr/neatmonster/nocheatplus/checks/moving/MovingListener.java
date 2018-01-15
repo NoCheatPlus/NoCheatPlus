@@ -668,7 +668,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else {
             checkCf = checkSf = false;
-            // (thisMove.flyCheck stays UNKNOWN.)
+            // (thisMove.flyCheck stays null.)
         }
 
         // Pre-check checks (hum), either for cf or for sf.

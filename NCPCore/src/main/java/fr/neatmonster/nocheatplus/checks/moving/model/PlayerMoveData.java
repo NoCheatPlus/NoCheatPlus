@@ -95,7 +95,7 @@ public class PlayerMoveData extends MoveData {
         hAllowedDistanceBase = 0.0;
         hAllowedDistance = 0.0;
         // Meta stuff.
-        flyCheck = CheckType.UNKNOWN;
+        flyCheck = null;
         modelFlying = null;
         multiMoveCount = 0;
         verVelUsed = null;

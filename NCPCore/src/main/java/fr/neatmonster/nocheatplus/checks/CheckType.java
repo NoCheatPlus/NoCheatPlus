@@ -45,7 +45,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public enum CheckType {
     ALL(Permissions.CHECKS),
 
-    BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory, Permissions.BLOCKBREAK),
+    BLOCKBREAK(CheckType.ALL, BlockBreakConfig.factory, BlockBreakData.factory, Permissions.BLOCKBREAK),
     /** This will allow breaking all special blocks, currently only liquid. Later there might be more sub-types. */
     BLOCKBREAK_BREAK(BLOCKBREAK, Permissions.BLOCKBREAK_BREAK),
     BLOCKBREAK_DIRECTION(BLOCKBREAK, Permissions.BLOCKBREAK_DIRECTION),
@@ -55,13 +55,13 @@ public enum CheckType {
     BLOCKBREAK_REACH(BLOCKBREAK, Permissions.BLOCKBREAK_REACH),
     BLOCKBREAK_WRONGBLOCK(BLOCKBREAK, Permissions.BLOCKBREAK_WRONGBLOCK),
 
-    BLOCKINTERACT(BlockInteractConfig.factory, BlockInteractData.factory, Permissions.BLOCKINTERACT),
+    BLOCKINTERACT(CheckType.ALL, BlockInteractConfig.factory, BlockInteractData.factory, Permissions.BLOCKINTERACT),
     BLOCKINTERACT_DIRECTION(BLOCKINTERACT, Permissions.BLOCKINTERACT_DIRECTION),
     BLOCKINTERACT_REACH(BLOCKINTERACT, Permissions.BLOCKINTERACT_REACH),
     BLOCKINTERACT_SPEED(BLOCKINTERACT, Permissions.BLOCKINTERACT_SPEED),
     BLOCKINTERACT_VISIBLE(BLOCKINTERACT, Permissions.BLOCKINTERACT_VISIBLE),
 
-    BLOCKPLACE(BlockPlaceConfig.factory, BlockPlaceData.factory, Permissions.BLOCKPLACE),
+    BLOCKPLACE(CheckType.ALL, BlockPlaceConfig.factory, BlockPlaceData.factory, Permissions.BLOCKPLACE),
     BLOCKPLACE_AGAINST(BLOCKPLACE, Permissions.BLOCKPLACE_AGAINST),
     BLOCKPLACE_AUTOSIGN(BLOCKPLACE, Permissions.BLOCKPLACE_AUTOSIGN),
     BLOCKPLACE_DIRECTION(BLOCKPLACE, Permissions.BLOCKPLACE_DIRECTION),
@@ -70,7 +70,7 @@ public enum CheckType {
     BLOCKPLACE_REACH(BLOCKPLACE, Permissions.BLOCKBREAK_REACH),
     BLOCKPLACE_SPEED(BLOCKPLACE, Permissions.BLOCKPLACE_SPEED),
 
-    CHAT(ChatConfig.factory, ChatData.factory, Permissions.CHAT),
+    CHAT(CheckType.ALL, ChatConfig.factory, ChatData.factory, Permissions.CHAT),
     CHAT_CAPTCHA(CHAT, Permissions.CHAT_CAPTCHA),
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
     CHAT_COMMANDS(CHAT, Permissions.CHAT_COMMANDS),
@@ -79,14 +79,14 @@ public enum CheckType {
     CHAT_RELOG(CHAT, Permissions.CHAT_RELOG),
 
 
-    COMBINED(CombinedConfig.factory, CombinedData.factory, Permissions.COMBINED),
+    COMBINED(CheckType.ALL, CombinedConfig.factory, CombinedData.factory, Permissions.COMBINED),
     COMBINED_BEDLEAVE(COMBINED, Permissions.COMBINED_BEDLEAVE),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
     COMBINED_MUNCHHAUSEN(COMBINED, Permissions.COMBINED_MUNCHHAUSEN),
     /** Rather for data removal and exemption. */
     COMBINED_YAWRATE(COMBINED),
 
-    FIGHT(FightConfig.factory, FightData.factory, Permissions.FIGHT),
+    FIGHT(CheckType.ALL, FightConfig.factory, FightData.factory, Permissions.FIGHT),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),
     FIGHT_CRITICAL(FIGHT, Permissions.FIGHT_CRITICAL),
     FIGHT_DIRECTION(FIGHT, Permissions.FIGHT_DIRECTION),
@@ -98,7 +98,7 @@ public enum CheckType {
             FightConfig.factory, FightData.selfHitDataFactory),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
-    INVENTORY(InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
+    INVENTORY(CheckType.ALL, InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
     INVENTORY_DROP(INVENTORY, Permissions.INVENTORY_DROP),
     INVENTORY_FASTCLICK(INVENTORY, Permissions.INVENTORY_FASTCLICK),
     INVENTORY_FASTCONSUME(INVENTORY, Permissions.INVENTORY_FASTCONSUME),
@@ -108,7 +108,7 @@ public enum CheckType {
     INVENTORY_ITEMS(INVENTORY, Permissions.INVENTORY_ITEMS),
     INVENTORY_OPEN(INVENTORY, Permissions.INVENTORY_OPEN),
 
-    MOVING(MovingConfig.factory, MovingData.factory, Permissions.MOVING),
+    MOVING(CheckType.ALL, MovingConfig.factory, MovingData.factory, Permissions.MOVING),
     MOVING_CREATIVEFLY(MOVING, Permissions.MOVING_CREATIVEFLY),
     MOVING_MOREPACKETS(MOVING, Permissions.MOVING_MOREPACKETS),
     MOVING_NOFALL(MOVING, Permissions.MOVING_NOFALL),
@@ -118,18 +118,21 @@ public enum CheckType {
     MOVING_VEHICLE_MOREPACKETS(MOVING_VEHICLE, Permissions.MOVING_VEHICLE_MOREPACKETS),
     MOVING_VEHICLE_ENVELOPE(MOVING_VEHICLE, Permissions.MOVING_VEHICLE_ENVELOPE),
 
-    NET(new NetConfigCache(), new NetDataFactory(), Permissions.NET),
+    NET(CheckType.ALL, new NetConfigCache(), new NetDataFactory(), Permissions.NET),
     NET_ATTACKFREQUENCY(NET, Permissions.NET_ATTACKFREQUENCY),
     NET_FLYINGFREQUENCY(NET, Permissions.NET_FLYINGFREQUENCY),
     NET_KEEPALIVEFREQUENCY(NET, Permissions.NET_KEEPALIVEFREQUENCY),
     NET_PACKETFREQUENCY(NET, Permissions.NET_PACKETFREQUENCY),
     NET_SOUNDDISTANCE(NET), // Can not exempt players from this one.
 
-    UNKNOWN;
+    ;
 
     public static enum CheckTypeType {
+        /** Special types, like ALL */
         SPECIAL,
+        /** Potentially obsolete: A check group that is not a check itself. */
         GROUP,
+        /** An actual check. Could in future still have sub checks. */
         CHECK
     }
 
@@ -149,23 +152,12 @@ public enum CheckType {
     private final String permission;
 
     /**
-     * Special purpose check types (likely not actual checks).
-     */
-    private CheckType() {
-        this(CheckTypeType.SPECIAL, null, null, null, null);
-    }
-
-    /**
      * Special purpose for grouping (ALL).
      * 
      * @param permission
      */
     private CheckType(final String permission){
         this(CheckTypeType.SPECIAL, null, permission, null, null);
-    }
-
-    private CheckType(final CheckType parent) {
-        this(parent, null);
     }
 
     /**
@@ -176,9 +168,20 @@ public enum CheckType {
      * @param dataFactory
      * @param permission
      */
-    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, 
+    private CheckType(final CheckType parent, 
+            final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, 
             final String permission) {
-        this(CheckTypeType.GROUP, null, permission, configFactory, dataFactory);
+        this(CheckTypeType.GROUP, parent, permission, configFactory, dataFactory);
+    }
+
+    /**
+     * Constructor for sub-checks grouped under another check type, without
+     * having a permission set.
+     * 
+     * @param parent
+     */
+    private CheckType(final CheckType parent) {
+        this(parent, null);
     }
 
     /**

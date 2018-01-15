@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.hooks;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,9 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
  */
 public class APIUtils {
 
+    /** Direct children only. */
+    private static final Map<CheckType, Set<CheckType>> directChildrenMap = new HashMap<CheckType, Set<CheckType>>();
+
     /** All descendants recursively. */
     private static final Map<CheckType, Set<CheckType>> descendantsMap = new HashMap<CheckType, Set<CheckType>>();
 
@@ -41,6 +45,9 @@ public class APIUtils {
 
     static {
         // Parent/children relations.
+
+        // Recursive first.
+        // TODO: Really recursive (...). So create direct children first, then others from those.
         final Map<CheckType, Set<CheckType>> map = new HashMap<CheckType, Set<CheckType>>();
         for (final CheckType type : CheckType.values()) {
             map.put(type, new LinkedHashSet<CheckType>());
@@ -63,33 +70,46 @@ public class APIUtils {
             withDescendantsMap.put(parent,
                     Collections.unmodifiableSet(wpSet));
         }
+
+        // Direct children only.
+        for (final CheckType parent : map.keySet()) {
+            final Set<CheckType> set = new LinkedHashSet<CheckType>(map.get(parent));
+            final Iterator<CheckType> it = set.iterator();
+            while (it.hasNext()) {
+                if (it.next().getParent() != parent) {
+                    it.remove();
+                }
+            }
+            directChildrenMap.put(parent, Collections.unmodifiableSet(set));
+        }
+
         // needSync: Note that tests use the same definitions.
         for (final CheckType checkType : new CheckType[] { CheckType.CHAT,
                 CheckType.NET }) {
-            needSync.add(checkType);
-        }
-        boolean added = true;
-        while (added) { // Just in case.
-            added = false;
-            for (final CheckType checkType : CheckType.values()) {
-                // Fill in needSync.
-                if (checkType.getParent() != null
-                        && !needSync.contains(checkType)
-                        && needSync.contains(checkType.getParent())) {
-                    needSync.add(checkType);
-                    added = true;
-                }
-            }
+            needSync.addAll(getWithDescendants(checkType));
         }
     }
 
     /**
-     * Return an unmodifiable collection of children for the given check type.
-     * Always returns a collection, does not contain check type itself.
+     * Get an unmodifiable collection of direct children for the given check
+     * type. Always returns a collection, does not contain check type itself.
      * 
      * @param type
      *            the check type
      * @return the children
+     */
+    public static final Set<CheckType> getDirectChildren(
+            final CheckType type) {
+        return directChildrenMap.get(type);
+    }
+
+    /**
+     * Get an unmodifiable collection of descendants for the given check type.
+     * Always returns a collection, does not contain check type itself.
+     * 
+     * @param type
+     *            the check type
+     * @return the descendants
      */
     public static final Set<CheckType> getDescendants(
             final CheckType type) {
@@ -97,12 +117,12 @@ public class APIUtils {
     }
 
     /**
-     * Return an unmodifiable collection of the given check type with children.
+     * Get an unmodifiable collection of the given check type with descendants.
      * Always returns a collection, does contain the check type itself.
      * 
      * @param type
      *            the check type
-     * @return the children
+     * @return the given check type with descendants
      */
     public static final Set<CheckType> getWithDescendants(
             final CheckType type) {
@@ -144,7 +164,7 @@ public class APIUtils {
     }
 
     /**
-     * Return if the check type requires synchronization. This indicates, if a
+     * Test if the check type requires synchronization. This indicates, if a
      * check can be called off primary thread at all.
      * <hr>
      * That should be CHAT and NET checks, currently.

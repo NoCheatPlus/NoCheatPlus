@@ -48,16 +48,16 @@ public class TestCheckType {
     }
 
     @Test
-    public void testChildren() {
+    public void testDirectChildren() {
         for (CheckType checkType : CheckType.values()) {
             // checkType is child of parent.
             if (checkType.getParent() != null) {
-                if (!APIUtils.getDescendants(checkType.getParent()).contains(checkType)) {
+                if (!APIUtils.getDirectChildren(checkType.getParent()).contains(checkType)) {
                     fail("Expect parents children to contain self: " + checkType);
                 }
             }
             // checkType is direct parent of all children.
-            for (CheckType child : APIUtils.getDescendants(checkType)) {
+            for (CheckType child : APIUtils.getDirectChildren(checkType)) {
                 if (child.getParent() != checkType) {
                     fail("Expect " + checkType + " to be direct parent of " + child + ", insteat parent is set to: " + child.getParent());
                 }
