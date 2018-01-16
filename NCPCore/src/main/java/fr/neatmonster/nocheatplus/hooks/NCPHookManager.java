@@ -32,6 +32,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 
 /**
  * After-check-failure hook manager integrated into NoCheatPlus.
@@ -70,7 +71,7 @@ public final class NCPHookManager {
     static{
         // Fill the map to be sure that thread safety can be guaranteed.
         for (final CheckType type : CheckType.values()){
-            if (APIUtils.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
+            if (CheckTypeUtil.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
             else hooksByChecks.put(type, new ArrayList<NCPHook>());
         }
     }
@@ -430,7 +431,7 @@ public final class NCPHookManager {
         final CheckType type = violationData.check.getType();
         final List<NCPHook> hooksCheck = hooksByChecks.get(type);
         if (!hooksCheck.isEmpty()){
-            if (APIUtils.needsSynchronization(type)){
+            if (CheckTypeUtil.needsSynchronization(type)){
                 synchronized (hooksCheck) {
                     return applyHooks(type, violationData.player, violationData, hooksCheck);
                 }

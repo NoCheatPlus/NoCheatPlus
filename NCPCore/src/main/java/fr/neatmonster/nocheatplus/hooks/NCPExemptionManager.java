@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 
 /**
  * API for exempting players of checks, checked before calculations are done.
@@ -79,7 +80,7 @@ public class NCPExemptionManager {
     public static final void clear() {
         // Use put with a new map to keep entries to stay thread safe.
         for (final CheckType checkType : CheckType.values()) {
-            if (APIUtils.needsSynchronization(checkType)) {
+            if (CheckTypeUtil.needsSynchronization(checkType)) {
                 exempted.put(checkType, Collections.synchronizedSet(new HashSet<UUID>()));
             }
             else {
@@ -109,7 +110,7 @@ public class NCPExemptionManager {
      */
     public static final void exemptPermanently(final UUID id, final CheckType checkType) {
         exempted.get(checkType).add(id);
-        for (final CheckType child : APIUtils.getDescendants(checkType)) {
+        for (final CheckType child : CheckTypeUtil.getDescendants(checkType)) {
             exempted.get(child).add(id);
         }
     }
@@ -212,7 +213,7 @@ public class NCPExemptionManager {
      */
     public static final void unexempt(final UUID id,  final CheckType checkType) {
         exempted.get(checkType).remove(id);
-        for (final CheckType child : APIUtils.getDescendants(checkType)) {
+        for (final CheckType child : CheckTypeUtil.getDescendants(checkType)) {
             exempted.get(child).remove(id);
         }
     }

@@ -37,8 +37,8 @@ import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.VLView;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 import fr.neatmonster.nocheatplus.utilities.FCFSComparator;
 
 public class TopCommand extends BaseCommand{
@@ -203,7 +203,7 @@ public class TopCommand extends BaseCommand{
                 type = CheckType.valueOf(args[i].trim().toUpperCase().replace('-', '_').replace('.', '_'));
             } catch (Throwable t) {} // ...
             if (type != null) {
-                checkTypes.addAll(APIUtils.getWithDescendants(type)); // Includes type.
+                checkTypes.addAll(CheckTypeUtil.getWithDescendants(type)); // Includes type.
             }
         }
         if (checkTypes.isEmpty()) {

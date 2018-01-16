@@ -61,10 +61,10 @@ import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.players.PlayerMap.PlayerInfo;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -389,7 +389,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     public static boolean removeExecutionHistory(final CheckType type, final String playerName) {
         boolean removed = false;
         // TODO: design ...
-        for (final CheckType refType : APIUtils.getWithDescendants(type)) {
+        for (final CheckType refType : CheckTypeUtil.getWithDescendants(type)) {
             final Map<String, ExecutionHistory> map = instance.executionHistories.get(refType);
             if (map != null && map.remove(playerName) != null) {
                 removed = true;
@@ -406,7 +406,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      */
     public static void clearData(final CheckType checkType) {
         final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-        for (final CheckType type : APIUtils.getWithDescendants(checkType)) {
+        for (final CheckType type : CheckTypeUtil.getWithDescendants(checkType)) {
             final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
             if (map != null) {
                 map.clear();
@@ -427,7 +427,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             }
             else if (rmd instanceof IHaveCheckType) {
                 final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
-                if (refType == checkType || APIUtils.isAncestor(checkType, refType)) {
+                if (refType == checkType || CheckTypeUtil.isAncestor(checkType, refType)) {
                     rmd.removeAllData();
                 }
             }
@@ -448,7 +448,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     public static void handleSystemTimeRanBackwards() {
         // Collect data factories and clear execution history.
         final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-        for (final CheckType type : APIUtils.getWithDescendants(CheckType.ALL)) {
+        for (final CheckType type : CheckTypeUtil.getWithDescendants(CheckType.ALL)) {
             final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
             if (map != null) {
                 map.clear();
@@ -541,7 +541,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
 
         // Collect factories.
         final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-        for (CheckType otherType : APIUtils.getWithDescendants(checkType)) {
+        for (CheckType otherType : CheckTypeUtil.getWithDescendants(checkType)) {
             final CheckDataFactory otherFactory = otherType.getDataFactory();
             if (otherFactory != null) {
                 factories.add(otherFactory);
@@ -634,7 +634,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             }
             else if (rmd instanceof IHaveCheckType) {
                 final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
-                if (refType == checkType || APIUtils.isAncestor(checkType, refType)) {
+                if (refType == checkType || CheckTypeUtil.isAncestor(checkType, refType)) {
                     if (rmd.removeData(PlayerName) != null) {
                         removed = true;
                     }

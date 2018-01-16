@@ -28,7 +28,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.access.SubCheckDataFactory;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
@@ -107,7 +107,7 @@ public class FightData extends ACheckData implements IRemoveSubCheckData {
 
 
     public static CheckDataFactory getCheckDataFactory(CheckType checkType) {
-        if (checkType != CheckType.FIGHT && !APIUtils.isAncestor(CheckType.FIGHT, checkType)) {
+        if (checkType != CheckType.FIGHT && !CheckTypeUtil.isAncestor(CheckType.FIGHT, checkType)) {
             throw new IllegalArgumentException("Can only return a CheckDataFactory for the check group FIGHT.");
         }
         switch(checkType) {

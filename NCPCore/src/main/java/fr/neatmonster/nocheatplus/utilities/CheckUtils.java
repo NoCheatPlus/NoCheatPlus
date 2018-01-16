@@ -30,7 +30,6 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -189,7 +188,7 @@ public class CheckUtils {
             else if (data.hasCachedPermission(permission)) {
                 return true;
             }
-            if (!APIUtils.needsSynchronization(checkType)) {
+            if (!CheckTypeUtil.needsSynchronization(checkType)) {
                 // Checking for exemption can cause harm now.
                 improperAPIAccess(checkType);
             }

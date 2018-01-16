@@ -8,7 +8,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree;
 import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree.CheckTypeTreeNode;
 import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree.CheckTypeTreeNodeFactory;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 
 
 public class TestCheckTypeTree {
@@ -41,7 +41,7 @@ public class TestCheckTypeTree {
             if (rct.getParent() != null && node.getParent().getCheckType() != rct.getParent()) {
                 fail("Wrong type of parent.");
             }
-            if (node.getChildren().size() != APIUtils.getDirectChildren(checkType).size()) {
+            if (node.getChildren().size() != CheckTypeUtil.getDirectChildren(checkType).size()) {
                 fail("Wrong size of children.");
             }
         }

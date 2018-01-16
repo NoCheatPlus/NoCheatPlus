@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 import fr.neatmonster.nocheatplus.utilities.FCFSComparator;
 
 /**
@@ -361,7 +361,7 @@ public class ViolationHistory {
             final ViolationLevel vl = it.next();
             final CheckType refType = checkTypeMap.get(vl.check);
             if (refType == null) continue;
-            if (refType == checkType || APIUtils.isAncestor(checkType, refType)){
+            if (refType == checkType || CheckTypeUtil.isAncestor(checkType, refType)){
                 found = true;
                 it.remove();
             }

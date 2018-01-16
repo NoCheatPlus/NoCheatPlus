@@ -10,7 +10,7 @@ import java.util.Set;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree.CheckTypeTreeNode;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 
 /**
  * Swift sketch of a tree structure, meant to span all check types, holding
@@ -42,7 +42,7 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
                 final CheckTypeTreeNodeFactory<N> factory) {
             this.checkType = checkType;
             this.parent = parent;
-            final Set<CheckType> childrenTypes = APIUtils.getDirectChildren(checkType);
+            final Set<CheckType> childrenTypes = CheckTypeUtil.getDirectChildren(checkType);
             final List<N> children = new ArrayList<N>(childrenTypes.size());
             for (CheckType childType : childrenTypes) {
                 children.add(factory.newNode(childType, (N) this));
