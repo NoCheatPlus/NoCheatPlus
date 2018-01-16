@@ -40,6 +40,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
  * @author asofold
  */
 public final class NCPHookManager {
+
     /** Ids given to hooks. */
     private static int                                 maxHookId     = 0;
 
@@ -70,9 +71,13 @@ public final class NCPHookManager {
 
     static{
         // Fill the map to be sure that thread safety can be guaranteed.
-        for (final CheckType type : CheckType.values()){
-            if (CheckTypeUtil.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
-            else hooksByChecks.put(type, new ArrayList<NCPHook>());
+        for (final CheckType type : CheckType.values()) {
+            if (CheckTypeUtil.needsSynchronization(type)) {
+                hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
+            }
+            else {
+                hooksByChecks.put(type, new ArrayList<NCPHook>());
+            }
         }
     }
 
@@ -103,11 +108,13 @@ public final class NCPHookManager {
      * @return the hook id
      */
     public static Integer addHook(CheckType[] checkTypes, final NCPHook hook) {
-        if (checkTypes == null)
+        if (checkTypes == null) {
             checkTypes = new CheckType[] {CheckType.ALL};
+        }
         final Integer hookId = getId(hook);
-        for (final CheckType checkType : checkTypes)
+        for (final CheckType checkType : checkTypes) {
             addToMappings(checkType, hook);
+        }
         logHookAdded(hook);
         return hookId;
     }
@@ -122,9 +129,13 @@ public final class NCPHookManager {
      */
     private static void addToMapping(final CheckType checkType, final NCPHook hook) {
         final List<NCPHook> hooks = hooksByChecks.get(checkType);
-        if (!hooks.contains(hook)){
-            if (!(hook instanceof ILast) && (hook instanceof IStats || hook instanceof IFirst)) hooks.add(0, hook);
-            else hooks.add(hook);
+        if (!hooks.contains(hook)) {
+            if (!(hook instanceof ILast) && (hook instanceof IStats || hook instanceof IFirst)) {
+                hooks.add(0, hook);
+            }
+            else {
+                hooks.add(hook);
+            }
             Collections.sort(hooks, HookComparator);
         }
     }
@@ -139,36 +150,9 @@ public final class NCPHookManager {
      *            the hook
      */
     private static void addToMappings(final CheckType checkType, final NCPHook hook) {
-        if (checkType == CheckType.ALL) {
-            for (final CheckType refType : CheckType.values())
-                addToMapping(refType, hook);
-            return;
+        for (final CheckType refType : CheckTypeUtil.getWithDescendants(checkType)) {
+            addToMapping(refType, hook);
         }
-        addToMapping(checkType, hook);
-        for (final CheckType refType : CheckType.values())
-            addToMappingsRecursively(checkType, refType, hook);
-    }
-
-    /**
-     * Add to mappings if checkType is a parent in the tree structure leading to refType.
-     * 
-     * @param checkType
-     * @param refType
-     * @param hook
-     * @return If the
-     */
-    private static boolean addToMappingsRecursively(final CheckType checkType, final CheckType refType,
-            final NCPHook hook) {
-        if (refType.getParent() == null)
-            return false;
-        else if (refType.getParent() == checkType) {
-            addToMapping(refType, hook);
-            return true;
-        } else if (addToMappingsRecursively(checkType, refType.getParent(), hook)) {
-            addToMapping(refType, hook);
-            return true;
-        } else
-            return false;
     }
 
     /**
@@ -186,8 +170,9 @@ public final class NCPHookManager {
         for (int i = 0; i < hooks.size(); i++) {
             final NCPHook hook = hooks.get(i);
             try {
-                if (hook.onCheckFailure(checkType, player, info) && !(hook instanceof IStats))
+                if (hook.onCheckFailure(checkType, player, info) && !(hook instanceof IStats)) {
                     return true;
+                }
             } catch (final Throwable t) {
                 // TODO: maybe distinguish some exceptions here (interrupted ?).
                 logHookFailure(checkType, player, hook, t);
@@ -229,8 +214,9 @@ public final class NCPHookManager {
         final List<NCPHook> hooks = new LinkedList<NCPHook>();
         for (final Integer refId : allHooks.keySet()) {
             final NCPHook hook = allHooks.get(refId);
-            if (hook.getHookName().equals(hookName) && !hooks.contains(hook))
+            if (hook.getHookName().equals(hookName) && !hooks.contains(hook)) {
                 hooks.add(hook);
+            }
         }
         return hooks;
     }
@@ -243,9 +229,10 @@ public final class NCPHookManager {
      * @return unique id associated with that hook (returns an existing id if hook is already present)
      */
     private static Integer getId(final NCPHook hook) {
-        if (hook == null)
+        if (hook == null) {
             // Just in case.
             throw new NullPointerException("Hooks must not be null.");
+        }
         Integer id = null;
         for (final Integer refId : allHooks.keySet())
             if (hook == allHooks.get(refId)) {
@@ -327,8 +314,9 @@ public final class NCPHookManager {
      */
     public static Collection<NCPHook> removeAllHooks() {
         final Collection<NCPHook> hooks = getAllHooks();
-        for (final NCPHook hook : hooks)
+        for (final NCPHook hook : hooks) {
             removeHook(hook);
+        }
         return hooks;
     }
 
@@ -356,8 +344,9 @@ public final class NCPHookManager {
      */
     public static NCPHook removeHook(final Integer hookId) {
         final NCPHook hook = allHooks.get(hookId);
-        if (hook == null)
+        if (hook == null) {
             return null;
+        }
         removeFromMappings(hook, hookId);
         logHookRemoved(hook);
         return hook;
@@ -377,8 +366,9 @@ public final class NCPHookManager {
                 hookId = refId;
                 break;
             }
-        if (hookId == null)
+        if (hookId == null) {
             return null;
+        }
         removeFromMappings(hook, hookId);
         logHookRemoved(hook);
         return hookId;
@@ -395,8 +385,9 @@ public final class NCPHookManager {
         final Set<Integer> ids = new LinkedHashSet<Integer>();
         for (final NCPHook hook : hooks) {
             final Integer id = removeHook(hook);
-            if (id != null)
+            if (id != null) {
                 ids.add(id);
+            }
         }
         return ids;
     }
@@ -410,8 +401,9 @@ public final class NCPHookManager {
      */
     public static Collection<NCPHook> removeHooks(final String hookName) {
         final Collection<NCPHook> hooks = getHooksByName(hookName);
-        if (hooks.isEmpty())
+        if (hooks.isEmpty()) {
             return null;
+        }
         removeHooks(hooks);
         return hooks;
     }
@@ -430,8 +422,8 @@ public final class NCPHookManager {
         // Return true as soon as one hook returns true. Test hooks, if present.
         final CheckType type = violationData.check.getType();
         final List<NCPHook> hooksCheck = hooksByChecks.get(type);
-        if (!hooksCheck.isEmpty()){
-            if (CheckTypeUtil.needsSynchronization(type)){
+        if (!hooksCheck.isEmpty()) {
+            if (CheckTypeUtil.needsSynchronization(type)) {
                 synchronized (hooksCheck) {
                     return applyHooks(type, violationData.player, violationData, hooksCheck);
                 }

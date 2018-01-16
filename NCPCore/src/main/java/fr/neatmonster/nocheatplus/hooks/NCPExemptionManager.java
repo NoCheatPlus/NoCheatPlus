@@ -109,9 +109,8 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void exemptPermanently(final UUID id, final CheckType checkType) {
-        exempted.get(checkType).add(id);
-        for (final CheckType child : CheckTypeUtil.getDescendants(checkType)) {
-            exempted.get(child).add(id);
+        for (final CheckType refType : CheckTypeUtil.getWithDescendants(checkType)) {
+            exempted.get(refType).add(id);
         }
     }
 
@@ -212,9 +211,8 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void unexempt(final UUID id,  final CheckType checkType) {
-        exempted.get(checkType).remove(id);
-        for (final CheckType child : CheckTypeUtil.getDescendants(checkType)) {
-            exempted.get(child).remove(id);
+        for (final CheckType refType : CheckTypeUtil.getWithDescendants(checkType)) {
+            exempted.get(refType).remove(id);
         }
     }
 
