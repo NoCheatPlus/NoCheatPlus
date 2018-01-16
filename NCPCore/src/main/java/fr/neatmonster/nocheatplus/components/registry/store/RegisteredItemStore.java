@@ -14,9 +14,9 @@ import java.util.Set;
 import fr.neatmonster.nocheatplus.components.registry.exception.AlreadyRegisteredException;
 import fr.neatmonster.nocheatplus.components.registry.order.IGetRegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.IRegisterWithOrder;
-import fr.neatmonster.nocheatplus.components.registry.order.RegisterWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.AbstractRegistrationOrderSort;
+import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 
 /**

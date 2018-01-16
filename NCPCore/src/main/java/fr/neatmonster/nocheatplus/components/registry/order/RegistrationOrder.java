@@ -1,5 +1,10 @@
 package fr.neatmonster.nocheatplus.components.registry.order;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +21,56 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.CoordHash;
  *
  */
 public class RegistrationOrder {
+
+    /**
+     * General registration order for a type.
+     * 
+     * @author asofold
+     *
+     */
+    @Documented
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RegisterWithOrder {
+        /** Crude workaround for an Integer that may be null. */
+        public String basePriority() default "";
+        public String tag() default "";
+        public String beforeTag() default "";
+        public String afterTag() default "";
+    }
+
+    /**
+     * Aimed at event listeners, to provide a default order.
+     * 
+     * @author asofold
+     *
+     */
+    @Documented
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RegisterEventsWithOrder {
+        /** Crude workaround for an Integer that may be null. */
+        public String basePriority() default "";
+        public String tag() default "";
+        public String beforeTag() default "";
+        public String afterTag() default "";
+    }
+
+    /**
+     * Aimed at event handlers.
+     * @author asofold
+     *
+     */
+    @Documented
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RegisterMethodWithOrder {
+        /** Crude workaround for an Integer that may be null. */
+        public String basePriority() default "";
+        public String tag() default "";
+        public String beforeTag() default "";
+        public String afterTag() default "";
+    }
 
     /**
      * Compare on base of basePriority. Entries with null priority are sorted to
@@ -497,6 +552,32 @@ public class RegistrationOrder {
      * @throws NumberFormatException, if basePriority can't be parsed.
      */
     public RegistrationOrder(RegisterWithOrder bluePrint) {
+        // TODO: InvalidOrderException via static method for parsing.
+        this(bluePrint.basePriority().isEmpty() ? null : Integer.parseInt(bluePrint.basePriority()), 
+                bluePrint.tag().isEmpty() ? null : bluePrint.tag(), 
+                        bluePrint.beforeTag().isEmpty() ? null : bluePrint.beforeTag(), 
+                                bluePrint.afterTag().isEmpty() ? null : bluePrint.afterTag());
+    }
+
+    /**
+     * 
+     * @param bluePrint
+     * @throws NumberFormatException, if basePriority can't be parsed.
+     */
+    public RegistrationOrder(RegisterEventsWithOrder bluePrint) {
+        // TODO: InvalidOrderException via static method for parsing.
+        this(bluePrint.basePriority().isEmpty() ? null : Integer.parseInt(bluePrint.basePriority()), 
+                bluePrint.tag().isEmpty() ? null : bluePrint.tag(), 
+                        bluePrint.beforeTag().isEmpty() ? null : bluePrint.beforeTag(), 
+                                bluePrint.afterTag().isEmpty() ? null : bluePrint.afterTag());
+    }
+
+    /**
+     * 
+     * @param bluePrint
+     * @throws NumberFormatException, if basePriority can't be parsed.
+     */
+    public RegistrationOrder(RegisterMethodWithOrder bluePrint) {
         // TODO: InvalidOrderException via static method for parsing.
         this(bluePrint.basePriority().isEmpty() ? null : Integer.parseInt(bluePrint.basePriority()), 
                 bluePrint.tag().isEmpty() ? null : bluePrint.tag(), 
