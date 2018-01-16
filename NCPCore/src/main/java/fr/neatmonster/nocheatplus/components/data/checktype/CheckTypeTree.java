@@ -68,6 +68,24 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
         }
     }
 
+    public static interface Visitor<N extends CheckTypeTreeNode<N>> {
+        /*
+         * TODO: Not so sure this really is far reaching, due to performance
+         * questions: With concurrent access, a stored instance doesn't do, so
+         * we'll keep checking for the primary thread and either use the stored
+         * one or create new ones. Thinkable direction could be to use stored
+         * instances within thread-local data objects (for NET data), but still
+         * odd calls to teleportation can wreck this. Could distinguish visit
+         * under lock (write) and visit without lock (read) with COW inside.
+         */
+        /**
+         * Called for visiting a node.
+         * @param node
+         * @return Return true in order to continue visiting further nodes, false to abort.
+         */
+        public boolean visit(N node);
+    }
+
     private final N rootNode;
 
     private final Map<CheckType, N> nodeMap = new LinkedHashMap<CheckType, N>();
@@ -105,6 +123,49 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
 
     public N getNode(CheckType checkType) {
         return nodeMap.get(checkType);
+    }
+
+    public void visitWithDescendants(final CheckType checkType, final Visitor<N> visitor) {
+        visitWithDescendants(getNode(checkType), visitor);
+    }
+
+    public void visitWithDescendants(final N node, final Visitor<N> visitor) {
+        if (!visitor.visit(node)) {
+            return;
+        }
+        visitDescendants(node, visitor);
+    }
+
+    public void visitDescendants(final CheckType checkType, final Visitor<N> visitor) {
+        visitDescendants(getNode(checkType), visitor);
+    }
+
+    public void visitDescendants(final N parentNode, final Visitor<N> visitor) {
+        for (final N childNode : parentNode.getChildren()) {
+            visitWithDescendants(childNode, visitor);
+        }
+    }
+
+    public void visitWithAncestors(final CheckType checkType, final Visitor<N> visitor) {
+        visitWithAncestors(getNode(checkType), visitor);
+    }
+
+    public void visitWithAncestors(final N node, final Visitor<N> visitor) {
+        if (!visitor.visit(node)) {
+            return;
+        }
+        visitAncestors(node, visitor);
+    }
+
+    public void visitAncestors(final CheckType checkType, final Visitor<N> visitor) {
+        visitAncestors(getNode(checkType), visitor);
+    }
+
+    public void visitAncestors(final N node, final Visitor<N> visitor) {
+        final N parent = node.getParent();
+        if (parent != null) {
+            visitWithAncestors(parent, visitor);
+        }
     }
 
 }
