@@ -125,47 +125,51 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
         return nodeMap.get(checkType);
     }
 
-    public void visitWithDescendants(final CheckType checkType, final Visitor<N> visitor) {
-        visitWithDescendants(getNode(checkType), visitor);
+    public boolean visitWithDescendants(final CheckType checkType, final Visitor<N> visitor) {
+        return visitWithDescendants(getNode(checkType), visitor);
     }
 
-    public void visitWithDescendants(final N node, final Visitor<N> visitor) {
+    public boolean visitWithDescendants(final N node, final Visitor<N> visitor) {
         if (!visitor.visit(node)) {
-            return;
+            return false;
         }
-        visitDescendants(node, visitor);
+        return visitDescendants(node, visitor);
     }
 
-    public void visitDescendants(final CheckType checkType, final Visitor<N> visitor) {
-        visitDescendants(getNode(checkType), visitor);
+    public boolean visitDescendants(final CheckType checkType, final Visitor<N> visitor) {
+        return visitDescendants(getNode(checkType), visitor);
     }
 
-    public void visitDescendants(final N parentNode, final Visitor<N> visitor) {
+    public boolean visitDescendants(final N parentNode, final Visitor<N> visitor) {
         for (final N childNode : parentNode.getChildren()) {
-            visitWithDescendants(childNode, visitor);
+            if (!visitWithDescendants(childNode, visitor)) {
+                return false;
+            }
         }
+        return true; // Not aborted.
     }
 
-    public void visitWithAncestors(final CheckType checkType, final Visitor<N> visitor) {
-        visitWithAncestors(getNode(checkType), visitor);
+    public boolean visitWithAncestors(final CheckType checkType, final Visitor<N> visitor) {
+        return visitWithAncestors(getNode(checkType), visitor);
     }
 
-    public void visitWithAncestors(final N node, final Visitor<N> visitor) {
+    public boolean visitWithAncestors(final N node, final Visitor<N> visitor) {
         if (!visitor.visit(node)) {
-            return;
+            return false;
         }
-        visitAncestors(node, visitor);
+        return visitAncestors(node, visitor);
     }
 
-    public void visitAncestors(final CheckType checkType, final Visitor<N> visitor) {
-        visitAncestors(getNode(checkType), visitor);
+    public boolean visitAncestors(final CheckType checkType, final Visitor<N> visitor) {
+        return visitAncestors(getNode(checkType), visitor);
     }
 
-    public void visitAncestors(final N node, final Visitor<N> visitor) {
+    public boolean visitAncestors(final N node, final Visitor<N> visitor) {
         final N parent = node.getParent();
         if (parent != null) {
-            visitWithAncestors(parent, visitor);
+            return visitWithAncestors(parent, visitor);
         }
+        return true; // Not aborted.
     }
 
 }
