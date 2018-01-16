@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
 import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
+import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 
 
@@ -41,13 +42,20 @@ import fr.neatmonster.nocheatplus.logging.LogManager;
  * the plugin is enabled, all components will be unregistered in onDisable.</li>
  * <li>References to all components will be held until onDisable is
  * finished.</li>
- * <li>Interfaces checked for managed listeners: IHaveMethodOrder (method),
- * ComponentWithName (tag)</li>
+ * <li>Event registration and unregistering via passing a
+ * {@link org.bukkit.event.Listener} is possible, see
+ * {@link fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit} and
+ * {@link fr.neatmonster.nocheatplus.event.mini.MiniListenerRegistry} for
+ * details on how to apply
+ * {@link fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder}
+ * for controlling the order of event processing and further options. Fetch the
+ * event registry via {@link #getEventRegistry()}</li>
  * <hr>
  * Not sure about all the login-denial API, some of those might get removed.
  * <hr>
  * NOTE: Class names for implementations of the NoCheatPlusAPI which aim at unit
  * tests, where server access might not work, should start with "UnitTest".
+ * <hr>
  * 
  * @author asofold
  *
@@ -165,5 +173,20 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * @return
      */
     public BlockChangeTracker getBlockChangeTracker();
+
+    /**
+     * Get the registry to register events with the
+     * {@link org.bukkit.plugin.PluginManager}, e.g. for the case that
+     * {@link #addComponent(Object)} and similar is not sufficient/appropriate.
+     * <br>
+     * <br>
+     * For details see
+     * {@link fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit} and
+     * {@link fr.neatmonster.nocheatplus.event.mini.MiniListenerRegistry}.
+     * <hr>
+     * 
+     * @return
+     */
+    public EventRegistryBukkit getEventRegistry();
 
 }

@@ -743,7 +743,6 @@ public abstract class ConfPaths {
     // Compatibility section (possibly temporary).
     @GlobalConfig
     public static final String COMPATIBILITY                             = "compatibility.";
-    public static final String COMPATIBILITY_MANAGELISTENERS             = COMPATIBILITY + "managelisteners";
 
     private static final String COMPATIBILITY_EXEMPTIONS                 = COMPATIBILITY + "exemptions.";
     private static final String COMPATIBILITY_EXEMPTIONS_REMOVE          = COMPATIBILITY_EXEMPTIONS + "remove.";
@@ -797,8 +796,6 @@ public abstract class ConfPaths {
     public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION    = "protection.plugins.hide.messages.nopermission";
     @Moved(newPath = PROTECT_COMMANDS_CONSOLEONLY_ACTIVE)
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY            = "miscellaneous.opinconsoleonly";
-    @Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
-    public static final String  MISCELLANEOUS_MANAGELISTENERS            = "miscellaneous.managelisteners";
     @Moved(newPath = INVENTORY_OPEN_CHECK)
     public static final String  INVENTORY_ENSURECLOSE                    = "checks.inventory.ensureclose";
     @Moved(newPath = LOGGING_EXTENDED_STATUS)
@@ -862,6 +859,10 @@ public abstract class ConfPaths {
     public static final String  MOVING_PASSABLE_RAYTRACING_CHECK            = "checks.moving.passable.raytracing.active";
     @Deprecated
     public static final String  MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY  = "checks.moving.passable.raytracing.blockchangeonly";
+    @Deprecated
+    public static final String  MISCELLANEOUS_MANAGELISTENERS            = "miscellaneous.managelisteners";
+    @Deprecated
+    public static final String COMPATIBILITY_MANAGELISTENERS             = "compatibility.managelisteners";
 
     /**
      * Get moved paths for which an annotation doesn't work.

@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -160,6 +161,11 @@ public class PluginTests {
 
         @Override
         public BlockChangeTracker getBlockChangeTracker() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public EventRegistryBukkit getEventRegistry() {
             throw new UnsupportedOperationException();
         }
 

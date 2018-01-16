@@ -606,7 +606,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".vehicleenvelope", start + "moved a vehicle too fast ([tags])" + end, 785);
 
         // Compatibility settings.
-        set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false, 785);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE, true, 785);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_KEYS, Arrays.asList("nocheat.exempt"), 785);
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_NPC_ACTIVE, true, 785);

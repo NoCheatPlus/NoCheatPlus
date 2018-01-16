@@ -84,7 +84,6 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
-import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHoldSubComponents;
@@ -101,8 +100,7 @@ import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
-import fr.neatmonster.nocheatplus.event.ListenerManager;
+import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.hooks.ExemptionSettings;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
@@ -178,9 +176,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     final LinkedList<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
 
-    private final ListenerManager listenerManager = new ListenerManager(this, false);
-
-    private boolean manageListeners = true;
+    private final EventRegistryBukkit eventRegistry = new EventRegistryBukkit(this);
 
     protected boolean lateListenerRegistered = false;
 
@@ -568,37 +564,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     private void addListener(final Listener listener) {
         // private: Use addComponent.
-        if (manageListeners) {
-            String tag = "NoCheatPlus";
-            if (listener instanceof ComponentWithName) {
-                tag = ((ComponentWithName) listener).getComponentName();
-            }
-            listenerManager.registerAllEventHandlers(listener, tag);
-            listeners.add(listener);
-        }
-        else {
-            Bukkit.getPluginManager().registerEvents(listener, this);
-            if (listener instanceof IHaveMethodOrder) {
-                // TODO: Might log the order too, might prevent registration ?
-                // TODO: Alternative: queue listeners and register after startup (!)
-                logManager.warning(Streams.INIT, "Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
-            }
-        }
-    }
-
-    /**
-     * Test if NCP uses the ListenerManager at all.
-     * @return If so.
-     */
-    public boolean doesManageListeners() {
-        return manageListeners;
+        eventRegistry.register(listener);
+        listeners.add(listener);
     }
 
     @Override
     public void removeComponent(final Object obj) {
         if (obj instanceof Listener) {
             listeners.remove((Listener) obj);
-            listenerManager.remove((Listener) obj);
+            eventRegistry.unregisterAttached((Listener) obj);
         }
         if (obj instanceof PermStateReceiver) {
             permStateReceivers.remove((PermStateReceiver) obj);
@@ -659,15 +633,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Remove listener references.
         if (verbose) {
-            if (listenerManager.hasListenerMethods()) {
-                logManager.info(Streams.INIT, "Cleanup ListenerManager...");
-            }
-            else {
-                logManager.info(Streams.INIT, "(ListenerManager not in use, prevent registering...)");
-            }
+            logManager.info(Streams.INIT, "Cleanup event registry (Bukkit)...");
         }
-        listenerManager.setRegisterDirectly(false);
-        listenerManager.clear();
+        // TODO: Prevent register feature ?
+        eventRegistry.clear();
         lateListenerRegistered = false;
 
         BukkitScheduler sched = getServer().getScheduler();
@@ -932,18 +901,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Set some instance members.
         setInstanceMembers(config);
 
-        // Listener manager.
-        manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
-        if (manageListeners) {
-            listenerManager.setRegisterDirectly(true);
-            listenerManager.registerAllWithBukkit();
-        }
-        else {
-            // Just for safety.
-            listenerManager.setRegisterDirectly(false);
-            listenerManager.clear();
-        }
-
         // Register some generic stuff.
         // (Deny change some.)
         registerGenericInstance(new Counters());
@@ -955,7 +912,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         registerGenericInstance(new PassengerUtil());
         genericInstanceRegistry.denyChangeExistingRegistration(PassengerUtil.class);
         // (Allow override others.)
-        registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) listenerManager.hashCode() * (long) logManager.hashCode())));
+        registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) eventRegistry.hashCode() * (long) logManager.hashCode())));
         addComponent(new BridgeCrossPlugin());
 
         // Initialize MCAccess.
@@ -1558,6 +1515,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public BlockChangeTracker getBlockChangeTracker() {
         return blockChangeTracker;
+    }
+
+    @Override
+    public EventRegistryBukkit getEventRegistry() {
+        return eventRegistry;
     }
 
 }
