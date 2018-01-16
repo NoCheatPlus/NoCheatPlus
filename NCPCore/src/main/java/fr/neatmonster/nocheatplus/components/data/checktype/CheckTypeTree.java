@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.components.data.checktype;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
             for (CheckType childType : childrenTypes) {
                 children.add(factory.newNode(childType, (N) this));
             }
-            this.children = children;
+            this.children = Collections.unmodifiableList(children);
         }
 
         public CheckType getCheckType() {
@@ -58,7 +59,7 @@ public abstract class CheckTypeTree<N extends CheckTypeTreeNode<N>> {
         }
 
         /**
-         * An unmodifiable collection.
+         * An unmodifiable list.
          * 
          * @return
          */
