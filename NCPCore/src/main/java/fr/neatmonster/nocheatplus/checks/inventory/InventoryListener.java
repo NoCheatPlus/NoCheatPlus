@@ -294,7 +294,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    protected void onPlayerDropItem(final PlayerDropItemEvent event) {
+    public void onPlayerDropItem(final PlayerDropItemEvent event) {
 
         final Player player = event.getPlayer();
 

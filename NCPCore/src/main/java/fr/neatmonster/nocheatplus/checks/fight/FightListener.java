@@ -699,7 +699,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            the event
      */
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void onEntityDeathEvent(final EntityDeathEvent event) {
+    public void onEntityDeathEvent(final EntityDeathEvent event) {
         // Only interested in dying players.
         final Entity entity = event.getEntity();
         if (entity instanceof Player) {
@@ -717,8 +717,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            the event
      */
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void onPlayerAnimation(final PlayerAnimationEvent event) {
+    public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Set a flag telling us that the arm has been swung.
+        // TODO: Packet inversion ~ tackle via time stamp (tick) + counter (allow first).
         FightData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 
