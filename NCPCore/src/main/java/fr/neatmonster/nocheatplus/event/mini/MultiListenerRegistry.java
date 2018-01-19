@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.event.mini;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -90,23 +91,10 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
      * @param method
      * @return
      */
-    protected <E extends EB> MiniListener<E> getMiniListener(final Object listener, final Method method, final RegistrationOrder order) {
-        try {
-            if (!method.getReturnType().equals(void.class)) {
-                return null;
-            }
-            Class<?>[] parameters = method.getParameterTypes();
-            if (parameters.length != 1) {
-                return null;
-            }
-            @SuppressWarnings({ "unchecked", "unused" })
-            Class<E> eventClass = (Class<E>) parameters[0];
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-        } catch (Throwable t) {
-            return null;
-        }
+    protected <E extends EB> MiniListener<E> getMiniListener(final Object listener, 
+            final Method method, final RegistrationOrder order) {
+        @SuppressWarnings({ "unchecked", "unused" })
+        Class<E> eventClass = (Class<E>) method.getParameterTypes()[0];
         MiniListener<E> miniListener = new MiniListenerWithOrder<E>() {
             @Override
             public void onEvent(E event) {
@@ -133,6 +121,29 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
             }
         };
         return miniListener;
+    }
+
+    protected boolean check_and_prepare_method(final Method method) {
+        try {
+            if (!method.getReturnType().equals(void.class)) {
+                return false;
+            }
+            Class<?>[] parameters = method.getParameterTypes();
+            if (parameters.length != 1) {
+                return false;
+            }
+            if (!Modifier.isPublic(method.getModifiers())) {
+                // TODO: Specific log.
+                return false;
+            }
+            if (!method.isAccessible()) {
+                // TODO: Can this be minimized?
+                method.setAccessible(true);
+            }
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /**
@@ -162,14 +173,24 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
         if (order == null) {
             order = defaultOrder;
         }
-        int shouldBe = 0;
+        /*
+         * TODO: Collect checked methods first. If methods fail checking, could
+         * prevent register any. Since complex hooks/plugins may register
+         * multiple listeners, it's probably better to register what works, but
+         * pass success/failure state to the caller, thinking ahead of a
+         * registry context (policy: unregister all if any listener method fails
+         * to register).
+         */
         for (Method method : listenerClass.getMethods()) {
             if (shouldBeEventHandler(method)) {
-                shouldBe ++;
-                MiniListener<? extends EB> miniListener = register(listener, method, 
-                        getPriority(method, defaultPriority), order, 
-                        getIgnoreCancelled(method, defaultIgnoreCancelled));
+                MiniListener<? extends EB> miniListener = null;
+                if (check_and_prepare_method(method)) {
+                    miniListener = register(listener, method, 
+                            getPriority(method, defaultPriority), order, 
+                            getIgnoreCancelled(method, defaultIgnoreCancelled));
+                }
                 if (miniListener == null) {
+                    // TODO: ReflectionUtil.toStringSpecialCase(Method) -> With type parameters (simple).
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, 
                             "Could not register event listener: " + listener.getClass().getName()
                             + "#" + method.getName());
@@ -177,9 +198,6 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
                     listeners.add(miniListener);
                 }
             }
-        }
-        if (shouldBe > listeners.size()) {
-            // TODO: Unregister and throw ? Should perhaps depend on configuration.
         }
         if (!listeners.isEmpty()) {
             attach(listeners, listener);
