@@ -719,7 +719,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Set a flag telling us that the arm has been swung.
-        // TODO: Packet inversion ~ tackle via time stamp (tick) + counter (allow first).
+        /*
+         * TODO: First one always fails: Packet inversion on 1.12.2? This could
+         * be moved to packet level (register either).
+         */
         FightData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 

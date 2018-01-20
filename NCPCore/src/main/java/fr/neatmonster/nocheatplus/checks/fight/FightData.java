@@ -202,7 +202,7 @@ public class FightData extends ACheckData implements IRemoveSubCheckData {
     public int					   godModeAcc 					= 0;
 
     // Data of the no swing check.
-    public boolean                 noSwingArmSwung;
+    public boolean                 noSwingArmSwung = true; // TODO: First is free for now, 1.12.2, other?
 
     // Data of the reach check.
     public double                  reachMod = 1.0;
