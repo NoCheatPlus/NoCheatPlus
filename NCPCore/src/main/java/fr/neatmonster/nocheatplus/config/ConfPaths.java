@@ -44,6 +44,7 @@ public abstract class ConfPaths {
     public static final String SUB_MODSPRINT                             = "modsprint";
     /** No trailing dot! */
     public static final String SUB_OVERRIDEFLAGS                         = "overrideflags";
+    public static final String SUB_BREAKINGTIME                          = "breakingtime";
     public static final String SUB_SPEED                                 = "speed";
     public static final String SUB_VERTICAL                              = "vertical";
     public static final String SUB_VERTICALSPEED                         = "verticalspeed"; // Phase out.

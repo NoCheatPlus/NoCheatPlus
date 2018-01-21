@@ -427,6 +427,30 @@ public class BlockProperties {
             return efficiency;
         }
 
+        /**
+         * Add properties defined in a (config line of) string.
+         * 
+         * @param def
+         * @return
+         * @throws All sorts of exceptions (number format, enum constants, runtime).
+         */
+        public BlockBreakKey fromString(String def) {
+            String[] parts = def.split(":");
+            // First fully parse:
+            if (parts.length != 4) {
+                throw new IllegalArgumentException("Accept key definition with 4 parts only, input: " + def);
+            }
+            Material blockType = Material.matchMaterial(parts[0]);
+            ToolType toolType = ToolType.valueOf(parts[1].toUpperCase());
+            MaterialBase materialBase = MaterialBase.valueOf(parts[2].toUpperCase());
+            int efficiency = Integer.parseInt(parts[3]);
+            return this
+                    .blockType(blockType)
+                    .toolType(toolType)
+                    .materialBase(materialBase)
+                    .efficiency(efficiency);
+        }
+
         @Override
         public int hashCode() {
             // TODO: ...
@@ -3086,6 +3110,19 @@ public class BlockProperties {
      */
     public static void applyConfig(final RawConfigFile config, final String pathPrefix) {
 
+        // Breaking time overrides for specific side conditions.
+        ConfigurationSection section = config.getConfigurationSection(pathPrefix + ConfPaths.SUB_BREAKINGTIME);
+        for (final String input : section.getKeys(false)) {
+            try {
+                BlockProperties.setBreakingTimeOverride(new BlockBreakKey().fromString(input.trim()), 
+                        section.getLong(input));
+            }
+            catch (Exception e) {
+                StaticLog.logWarning("Bad breaking time override (" + pathPrefix + ConfPaths.SUB_BREAKINGTIME + "): " + input);
+                StaticLog.logWarning(e);
+            }
+        }
+
         // Allow instant breaking.
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK)) {
             final Material id = RawConfigFile.parseMaterial(input);
@@ -3098,7 +3135,7 @@ public class BlockProperties {
         }
 
         // Override block flags.
-        ConfigurationSection section = config.getConfigurationSection(pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS);
+        section = config.getConfigurationSection(pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS);
         if (section != null) {
             final Map<String, Object> entries = section.getValues(false);
             boolean hasErrors = false;
