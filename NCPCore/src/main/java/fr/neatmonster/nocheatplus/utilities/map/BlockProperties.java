@@ -346,6 +346,116 @@ public class BlockProperties {
         }
     }
 
+    /**
+     * Key for the specific block breaking time override table, mapping to the
+     * breaking time. Aim at configuration defaults, stating the more or less
+     * exact side conditions.
+     * 
+     * @author asofold
+     *
+     */
+    public static class BlockBreakKey {
+
+        private Material blockType = null;
+        @SuppressWarnings("unused")
+        private ToolType toolType = null;
+        @SuppressWarnings("unused")
+        private MaterialBase materialBase = null;
+
+        /** Efficiency enchantment. */
+        private Integer efficiency = null;
+
+        // TODO: Thinkable: head in liquid, attributes, player enchantments.
+
+        // TODO: SHOULD: Read from config.
+        /*
+         * TODO: COULD: add support for a command to auto track these entries
+         * and create config entries automatically. Should change methods to use
+         * this class as input (best with full side conditions).
+         */
+
+        /**
+         * Empty constructor, no properties set.
+         */
+        public BlockBreakKey() {
+        }
+
+        /**
+         * Copy constructor.
+         * 
+         * @param key
+         */
+        public BlockBreakKey(BlockBreakKey key) {
+            blockType = key.blockType;
+            toolType = key.toolType;
+            materialBase = key.materialBase;
+            efficiency = key.efficiency;
+        }
+
+        public BlockBreakKey blockType(Material blockType) {
+            this.blockType = blockType;
+            return this;
+        }
+        public Material blockType() {
+            return blockType;
+        }
+
+        public BlockBreakKey toolType(ToolType toolType) {
+            this.toolType = toolType;
+            return this;
+        }
+
+        public ToolType toolType() {
+            return toolType;
+        }
+
+        public BlockBreakKey materialBase(MaterialBase materialBase) {
+            this.materialBase = materialBase;
+            return this;
+        }
+
+        public MaterialBase materialBase() {
+            return materialBase;
+        }
+
+        public BlockBreakKey efficiency(int efficiency) {
+            this.efficiency = efficiency;
+            return this;
+        }
+
+        public int efficiency() {
+            return efficiency;
+        }
+
+        @Override
+        public int hashCode() {
+            // TODO: ...
+            return (blockType == null ? 0 : blockType.hashCode() * 11)
+                    ^ (toolType == null ? 0 : toolType.hashCode() * 137)
+                    ^ (materialBase == null ? 0 : materialBase.hashCode() * 1193)
+                    ^ (efficiency == null ? 0 : efficiency.hashCode() * 12791);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof BlockBreakKey) {
+                final BlockBreakKey other = (BlockBreakKey) obj;
+                // TODO: Some should be equals later.
+                return blockType == other.blockType 
+                        && efficiency == other.efficiency // fastest first.
+                        && toolType == other.toolType
+                        && materialBase == other.materialBase;
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "BlockBreakKey(blockType=" + blockType + "toolType=" + toolType + "materialBase=" + materialBase + " efficiency=" + efficiency + ")";
+        }
+
+    }
+
     /** Liquid height if no solid/full blocks are above. */
     protected static final double LIQUID_HEIGHT_LOWERED = 80000002;
 
@@ -357,6 +467,11 @@ public class BlockProperties {
 
     /** Map for the tool properties. */
     protected static Map<Material, ToolProps> tools = new LinkedHashMap<Material, ToolProps>(50, 0.5f);
+
+    /**
+     * Direct overrides for specific side conditions.
+     */
+    private static Map<BlockBreakKey, Long> breakingTimeOverrides = new HashMap<BlockProperties.BlockBreakKey, Long>();
 
     /** Breaking time for indestructible materials. */
     public static final long indestructible = Long.MAX_VALUE;
@@ -1120,6 +1235,9 @@ public class BlockProperties {
             setBlock(mat, ironDoorType);
         }
         setBlock(Material.IRON_BLOCK, ironBlockType);
+        setBreakingTimeOverridesByEfficiency(new BlockBreakKey().blockType(Material.IRON_BLOCK)
+                .toolType(ToolType.PICKAXE).materialBase(MaterialBase.WOOD),
+                ironBlockType.breakingTimes[1], 6200L, 3500L, 2050L, 1350L, 900L);
         setBlock(Material.DIAMOND_BLOCK, diamondBlockType);
         setBlock(Material.ENDER_CHEST, new BlockProps(woodPickaxe, 22.5f));
         setBlock(Material.OBSIDIAN, new BlockProps(diamondPickaxe, 50, secToMs(250, 125, 62.5, 41.6, 9.4, 20.8)));
@@ -1144,6 +1262,21 @@ public class BlockProperties {
             setBlock(mat, indestructibleType); 
         }
         // blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
+    }
+
+    /**
+     * Set breaking time overrides for specific side conditions. Starting at
+     * efficiency 0, the breaking time is fetched from the given times array,
+     * with efficiency level being the index, always starting at 0.
+     * 
+     * @param baseKey
+     * @param times
+     */
+    public static void setBreakingTimeOverridesByEfficiency(final BlockBreakKey baseKey, 
+            final long... times) {
+        for (int i = 0; i < times.length; i++) {
+            setBreakingTimeOverride(new BlockBreakKey(baseKey).efficiency(i), times[i]);
+        }
     }
 
     /**
@@ -1369,6 +1502,28 @@ public class BlockProperties {
     }
 
     /**
+     * Set a breaking time override for specific side conditions. Copies the key
+     * for internal storage.
+     * 
+     * @param key
+     * @param breakingTime
+     *            The breaking time in milliseconds.
+     */
+    public static void setBreakingTimeOverride(final BlockBreakKey key, long breakingTime) {
+        breakingTimeOverrides.put(new BlockBreakKey(key), breakingTime);
+    }
+
+    /**
+     * Get a breaking time override for specific side conditions.
+     * 
+     * @param key
+     * @return The breaking time in milliseconds or null, if not set.
+     */
+    public static Long getBreakingTimeOverride(final BlockBreakKey key) {
+        return breakingTimeOverrides.get(key);
+    }
+
+    /**
      * Convenience method.
      *
      * @param BlockType
@@ -1471,18 +1626,42 @@ public class BlockProperties {
      *            the haste
      * @return the breaking duration
      */
-    public static long getBreakingDuration(final Material blockId, final ItemStack itemInHand, final boolean onGround, final boolean inWater, final boolean aquaAffinity, final int haste) {
+    public static long getBreakingDuration(final Material blockId, final ItemStack itemInHand, 
+            final boolean onGround, final boolean inWater, final boolean aquaAffinity, final int haste) {
         // TODO: more configurability / load from file for blocks (i.e. set for shears etc.
         if (isAir(itemInHand)) {
-            return getBreakingDuration(blockId, getBlockProps(blockId), noTool, onGround, inWater, aquaAffinity, 0);
+            return getBreakingDuration(blockId, getBlockProps(blockId), noTool, 
+                    onGround, inWater, aquaAffinity, 0, 0); // Nor efficiency nor haste do apply.
         }
         else {
             int efficiency = 0;
             if (itemInHand.containsEnchantment(Enchantment.DIG_SPEED)) {
                 efficiency = itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
             }
-            return getBreakingDuration(blockId, getBlockProps(blockId), getToolProps(itemInHand.getType()), onGround, inWater, aquaAffinity, efficiency, haste);
+            return getBreakingDuration(blockId, 
+                    getBlockProps(blockId), getToolProps(itemInHand.getType()), 
+                    onGround, inWater, aquaAffinity, efficiency, haste);
         }
+    }
+
+    /**
+     * 
+     * @param blockId
+     * @param blockProps
+     * @param toolProps
+     * @param onGround
+     * @param inWater
+     * @param aquaAffinity
+     * @param efficiency
+     * @return
+     * @deprecated Public method not containing haste.
+     */
+    public static long getBreakingDuration(final Material blockId, 
+            final BlockProps blockProps, final ToolProps toolProps, 
+            final  boolean onGround, final boolean inWater, boolean aquaAffinity, 
+            int efficiency) {
+        return getBreakingDuration(blockId, blockProps, toolProps, 
+                onGround, inWater, aquaAffinity, efficiency, 0);
     }
 
     /**
@@ -1507,31 +1686,45 @@ public class BlockProperties {
      *            at all, so 1 is haste I, 2 is haste II).
      * @return the breaking duration
      */
-    public static long getBreakingDuration(final Material blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
-        final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
+    public static long getBreakingDuration(final Material blockId, 
+            final BlockProps blockProps, final ToolProps toolProps, 
+            final  boolean onGround, final boolean inWater, boolean aquaAffinity, 
+            int efficiency, int haste) {
+        final long dur = getBreakingDurationNoHaste(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
         return haste > 0 ? (long) (Math.pow(0.8, haste) * dur) : dur;
     }
 
     /**
-     * Gets the breaking duration.
-     *
+     * Breaking duration without haste applied.
+     * 
      * @param blockId
-     *            the block id
      * @param blockProps
-     *            the block props
      * @param toolProps
-     *            the tool props
      * @param onGround
-     *            the on ground
      * @param inWater
-     *            the in water
      * @param aquaAffinity
-     *            the aqua affinity
      * @param efficiency
-     *            the efficiency
-     * @return the breaking duration
+     * @return
      */
-    public static long getBreakingDuration(final Material blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
+    private static long getBreakingDurationNoHaste(final Material blockId, 
+            final BlockProps blockProps, final ToolProps toolProps, 
+            final  boolean onGround, final boolean inWater, boolean aquaAffinity, 
+            int efficiency) {
+        // First check for direct breaking time overrides.
+        final BlockBreakKey bbKey = new BlockBreakKey();
+        // Add the basic properties.
+        bbKey.blockType(blockId)
+        .toolType(toolProps.toolType)
+        .materialBase(toolProps.materialBase)
+        .efficiency(efficiency) // TODO: Might leave this out and calculate based on the already fetched.
+        ;
+        Long override = breakingTimeOverrides.get(bbKey);
+        if (override != null) {
+            return override;
+        }
+        // TODO: Keep up to date with BlockBreakKey, allow inWater and haste to not be set (calculate).
+
+        // Classic calculation.
         boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
         if (efficiency > 0) {
             // Workaround until something better is found..
