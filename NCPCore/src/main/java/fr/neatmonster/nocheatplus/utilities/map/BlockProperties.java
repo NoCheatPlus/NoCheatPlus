@@ -1744,7 +1744,8 @@ public class BlockProperties {
         ;
         Long override = breakingTimeOverrides.get(bbKey);
         if (override != null) {
-            return override;
+            float mult = getBlockBreakingPenaltyMultiplier(onGround, inWater, aquaAffinity);
+            return mult == 1.0f ? override : (long) (mult * override);
         }
         // TODO: Keep up to date with BlockBreakKey, allow inWater and haste to not be set (calculate).
 
@@ -1818,14 +1819,10 @@ public class BlockProperties {
         }
 
         if (isValidTool || blockProps.tool.toolType == ToolType.NONE) {
-            float mult = 1f;
-            if (inWater && !aquaAffinity) {
-                mult *= breakPenaltyInWater;
+            float mult = getBlockBreakingPenaltyMultiplier(onGround, inWater, aquaAffinity);
+            if (mult != 1f) {
+                duration *= mult;
             }
-            if (!onGround) {
-                mult *= breakPenaltyOffGround;
-            }
-            duration = (long) (mult * duration);
 
             // Efficiency level.
             if (efficiency > 0) {
@@ -1893,6 +1890,18 @@ public class BlockProperties {
             }
         }
         return Math.max(0, duration);
+    }
+
+    private static float getBlockBreakingPenaltyMultiplier(
+            final boolean onGround, final boolean inWater, final boolean aquaAffinity) {
+        float mult = 1f;
+        if (inWater && !aquaAffinity) {
+            mult *= breakPenaltyInWater;
+        }
+        if (!onGround) {
+            mult *= breakPenaltyOffGround;
+        }
+        return mult;
     }
 
     /**
