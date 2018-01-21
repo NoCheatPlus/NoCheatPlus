@@ -430,7 +430,7 @@ public class BlockProperties {
     public static final BlockProps goldBlockType = new BlockProps(woodPickaxe, 3, secToMs(15, 7.5, 3.75, 0.7, 0.55, 1.2));
 
     /** The Constant ironBlockType. */
-    public static final BlockProps ironBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 2.0, 1.25, 0.95, 2.0));
+    public static final BlockProps ironBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 1.875, 1.25, 0.95, 2.0));
 
     /** The Constant diamondBlockType. */
     public static final BlockProps diamondBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 6.0, 1.25, 0.95, 2.0));
