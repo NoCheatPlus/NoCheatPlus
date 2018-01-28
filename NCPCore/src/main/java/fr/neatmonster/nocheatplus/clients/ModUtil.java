@@ -26,6 +26,8 @@ import fr.neatmonster.nocheatplus.clients.motd.ZombeMOTD;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 /**
  * Utilities for dealing with client mods. This is likely to by just a refactoring stage.
@@ -36,12 +38,12 @@ public class ModUtil {
 
     // TODO: Consider to register individual codes in a generic way, detect conflicts (+tests?).
     private static final ClientMOTD[] motdS = new ClientMOTD[]{
-        new ReiMOTD(),
-        new ZombeMOTD(),
-        new SmartMovingMOTD(),
-        new CJBMOTD(),
-        new MCAutoMapMOTD(),
-        new JourneyMapMOTD()
+            new ReiMOTD(),
+            new ZombeMOTD(),
+            new SmartMovingMOTD(),
+            new CJBMOTD(),
+            new MCAutoMapMOTD(),
+            new JourneyMapMOTD()
     };
 
     /**
@@ -61,8 +63,9 @@ public class ModUtil {
         final boolean allowAll = config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL);
 
         String message = "";
+        final PlayerData data = DataManager.getPlayerData(player);
         for (int i = 0; i < motdS.length; i++){
-            message = motdS[i].onPlayerJoin(message, player, allowAll);
+            message = motdS[i].onPlayerJoin(message, player, data, allowAll);
         }
 
         if (!message.isEmpty()){

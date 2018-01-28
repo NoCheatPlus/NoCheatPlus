@@ -58,6 +58,8 @@ import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -135,6 +137,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private boolean handleNormalDamage(final Player player, final boolean attackerIsFake,
             final Entity damaged, final boolean damagedIsFake,
             final double originalDamage, final double finalDamage, final int tick, final FightData data) {
+
+        final PlayerData pData = DataManager.getPlayerData(player);
         final FightConfig cc = FightConfig.getConfig(player);
 
         // Hotfix attempt for enchanted books.
@@ -192,7 +196,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //     			damagedPlayer.getLocation(useLoc2);
             //     		}
             // Log.
-            if (data.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+            if (data.debug && DataManager.getPlayerData(damagedPlayer).hasPermission(
+                    Permissions.ADMINISTRATION_DEBUG, damagedPlayer)) {
                 damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getHandle().getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
             }
             // Check for self hit exploits (mind that projectiles are excluded from this.)
@@ -283,7 +288,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         // TODO: Consider to always check improbable (first?). At least if config.always or speed or net.attackfrequency are enabled.
 
-        if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc)) {
+        if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc, pData)) {
             // TODO: Check config for settings.
             cancelled = true;
         }
@@ -292,7 +297,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             cancelled = true;
         }
 
-        if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING)) {
+        if (!cancelled && player.isBlocking() 
+                && !pData.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING, player)) {
             // TODO: Permission ?
             cancelled = true;
         }
@@ -303,11 +309,13 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (reachEnabled || directionEnabled) {
                 if (damagedTrace != null) {
                     // Checks that use the LocationTrace instance of the attacked entity/player.
-                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedIsFake, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
+                    cancelled = locationTraceChecks(player, loc, data, cc, pData, 
+                            damaged, damagedIsFake, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
                 }
                 else {
                     // Still use the classic methods for non-players. maybe[]
-                    if (reachEnabled && reach.check(player, loc, damaged, damagedIsFake, damagedLoc, data, cc)) {
+                    if (reachEnabled && reach.check(player, loc, damaged, damagedIsFake, damagedLoc, 
+                            data, cc, pData)) {
                         cancelled = true;
                     }
 
@@ -363,7 +371,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     final MovingConfig mCc = MovingConfig.getConfig(player);
                     final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                     moveInfo.set(player, loc, null, mCc.yOnGround);
-                    if (now <= mData.timeSprinting + mCc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, mData, mCc)) {
+                    if (now <= mData.timeSprinting + mCc.sprintingGrace 
+                            && MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, mData, mCc, pData)) {
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
                         mData.lostSprintCount = 7;
@@ -408,7 +417,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @return If to cancel (true) or not (false).
      */
     private boolean locationTraceChecks(final Player player, final Location loc, 
-            final FightData data, final FightConfig cc, 
+            final FightData data, final FightConfig cc, final PlayerData pData,
             final Entity damaged, final boolean damagedIsFake,
             final Location damagedLoc, LocationTrace damagedTrace, 
             final long tick, final long now,  final boolean reachEnabled, final boolean directionEnabled) {
@@ -471,7 +480,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: violation vs. reachPassed + directionPassed (current: fail one = fail all).
         if (reachEnabled) {
             // TODO: Might ignore if already cancelled by mixed/silent cancel.
-            if (reach.loopFinish(player, loc, damaged, reachContext, successEntry, violation, data, cc)) {
+            if (reach.loopFinish(player, loc, damaged, reachContext, successEntry, violation, 
+                    data, cc, pData)) {
                 cancelled = true;
             }
         }

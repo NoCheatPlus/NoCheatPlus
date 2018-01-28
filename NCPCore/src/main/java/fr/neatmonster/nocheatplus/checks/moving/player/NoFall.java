@@ -31,6 +31,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
 /**
@@ -344,9 +345,9 @@ public class NoFall extends Check {
      * @param cc
      * @return
      */
-    public boolean isEnabled(final Player player , final MovingConfig cc) {
+    public boolean isEnabled(final Player player , final MovingConfig cc, final PlayerData pData) {
         return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL, true) 
-                && !player.hasPermission(Permissions.MOVING_NOFALL);
+                && !pData.hasPermission(Permissions.MOVING_NOFALL, player);
     }
 
 }

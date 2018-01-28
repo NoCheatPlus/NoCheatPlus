@@ -17,29 +17,31 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 public class ZombeMOTD extends ClientMOTD {
 
     @Override
-    public String onPlayerJoin(String message, Player player, boolean allowAll) {
+    public String onPlayerJoin(final String message, final Player player, final PlayerData data, 
+            final boolean allowAll) {
 
         String zombe = "";
 
         // TODO: Is there a compact version (just one prefix)?
 
         // Disable Zombe's noclip.
-        if (allowAll || player.hasPermission(Permissions.ZOMBE_NOCLIP)){
+        if (allowAll || data.hasPermission(Permissions.ZOMBE_NOCLIP, player)){
             zombe += "§f §f §4 §0 §9 §6";
         }
 
         if (!allowAll){
             // Disable Zombe's fly mod.
-            if (!player.hasPermission(Permissions.ZOMBE_FLY)){
+            if (!data.hasPermission(Permissions.ZOMBE_FLY, player)){
                 zombe += "§f §f §1 §0 §2 §4";
             }
 
             // Disable Zombe's cheat.
-            if (!player.hasPermission(Permissions.ZOMBE_CHEAT)){
+            if (!data.hasPermission(Permissions.ZOMBE_CHEAT, player)){
                 zombe += "§f §f §2 §0 §4 §8";
             }
         }

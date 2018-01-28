@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 /**
  * JourneyMap + VoxelMap mod.
@@ -26,7 +27,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public class JourneyMapMOTD extends ClientMOTD {
 
     @Override
-    public String onPlayerJoin(String message, Player player, boolean allowAll) {
+    public String onPlayerJoin(final String message, final Player player, final PlayerData data, final boolean allowAll) {
 
         if (allowAll) {
             return message;
@@ -35,12 +36,12 @@ public class JourneyMapMOTD extends ClientMOTD {
         String journeyMap = "";
 
         // Disable JourneyMap's Radar.
-        if (!player.hasPermission(Permissions.JOURNEY_RADAR)) {
+        if (!data.hasPermission(Permissions.JOURNEY_RADAR, player)) {
             journeyMap += "§3 §6 §3 §6 §3 §6 §e";
         }
 
         // Disable JourneyMap's CaveMap.
-        if (!player.hasPermission(Permissions.JOURNEY_CAVE)) {
+        if (!data.hasPermission(Permissions.JOURNEY_CAVE, player)) {
             journeyMap += "§3 §6 §3 §6 §3 §6 §d";
         }
 

@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
@@ -46,10 +47,13 @@ public class FlyingFrequency extends Check {
      * @param cc
      * @return
      */
-    public boolean check(final Player player, final DataPacketFlying packetData, final long time, final NetData data, final NetConfig cc) {
+    public boolean check(final Player player, final DataPacketFlying packetData, final long time, 
+            final NetData data, final NetConfig cc, final PlayerData pData) {
         data.flyingFrequencyAll.add(time, 1f);
         final float allScore = data.flyingFrequencyAll.score(1f);
-        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS && !CheckUtils.hasBypass(CheckType.NET_FLYINGFREQUENCY, player, data) && executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions).willCancel()) {
+        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS 
+                && !CheckUtils.hasBypass(CheckType.NET_FLYINGFREQUENCY, player, pData) 
+                && executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions).willCancel()) {
             return true;
         } else {
             return false;

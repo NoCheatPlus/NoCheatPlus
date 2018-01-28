@@ -37,6 +37,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 /**
  * Type of checks (containing configuration and dataFactory classes, name and
@@ -149,14 +150,14 @@ public enum CheckType {
     private final CheckDataFactory dataFactory;
 
     /** The bypass permission. */
-    private final String permission;
+    private final RegisteredPermission permission;
 
     /**
      * Special purpose for grouping (ALL).
      * 
      * @param permission
      */
-    private CheckType(final String permission){
+    private CheckType(final RegisteredPermission permission){
         this(CheckTypeType.SPECIAL, null, permission, null, null);
     }
 
@@ -170,7 +171,7 @@ public enum CheckType {
      */
     private CheckType(final CheckType parent, 
             final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, 
-            final String permission) {
+            final RegisteredPermission permission) {
         this(CheckTypeType.GROUP, parent, permission, configFactory, dataFactory);
     }
 
@@ -190,7 +191,7 @@ public enum CheckType {
      * @param parent
      * @param permission
      */
-    private CheckType(final CheckType parent, final String permission) {
+    private CheckType(final CheckType parent, final RegisteredPermission permission) {
         this(CheckTypeType.CHECK, parent, permission, parent.getConfigFactory(), parent.getDataFactory());
     }
 
@@ -208,7 +209,8 @@ public enum CheckType {
      * @param dataFactory
      *            Check data factory.
      */
-    private CheckType(final CheckTypeType type, final CheckType parent, final String permission, 
+    private CheckType(final CheckTypeType type, final CheckType parent, 
+            final RegisteredPermission permission, 
             final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
         this.type = type;
         this.parent = parent;
@@ -262,31 +264,8 @@ public enum CheckType {
      * 
      * @return the permission
      */
-    public String getPermission() {
+    public RegisteredPermission getPermission() {
         return permission;
-    }
-
-    /**
-     * Quick permission check for cached entriy only (for async checks). If not
-     * present, after failure will need to deal with this.
-     * 
-     * @param player
-     * @return
-     */
-    public boolean hasCachedPermission(final Player player){
-        return hasCachedPermission(player, getPermission());
-    }
-
-    /**
-     * Quick permission check for cached entries only (for async checks). If not
-     * present, after failure will need to deal with this.
-     * 
-     * @param player
-     * @param permission
-     * @return
-     */
-    public boolean hasCachedPermission(final Player player, final String permission){
-        return dataFactory.getData(player).hasCachedPermission(permission);
     }
 
     /**

@@ -16,16 +16,16 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 
 /**
  * String utility methods (working with or returning strings).
- * @author mc_dev
+ * @author asofold
  *
  */
 public class StringUtil {
@@ -48,6 +48,19 @@ public class StringUtil {
         fdec1.setDecimalFormatSymbols(sym);
         fdec1.setMaximumFractionDigits(1);
         fdec1.setMinimumIntegerDigits(1);
+    }
+
+    /**
+     * List by boxing.
+     * @param chars
+     * @return
+     */
+    public static List<Character> characterList(char...chars) {
+        final List<Character> res = new ArrayList<Character>(chars.length);
+        for (int i = 0; i < chars.length; i++) {
+            res.add(chars[i]);
+        }
+        return res;
     }
 
     /**
@@ -121,14 +134,38 @@ public class StringUtil {
 
     /**
      * Split input by all characters given (convenience method).
+     * 
      * @param input
      * @param chars
-     * @return
+     * @return An (Array)List with the results.
      */
     public static List<String> split(String input, Character... chars){
-        List<String> out = new LinkedList<String>();
+        return split(input, Arrays.asList(chars));
+    }
+
+    /**
+     * Split input by all characters given (convenience method).
+     * 
+     * @param input
+     * @param chars
+     * @return An (Array)List with the results.
+     */
+    public static List<String> splitChars(String input, char... chars){
+        return split(input, characterList(chars));
+    }
+
+    /**
+     * Split input by all characters given (convenience method).
+     * 
+     * @param input
+     * @param chars
+     * @return An (Array)List with the results.
+     */
+    public static List<String> split(String input, Collection<Character> chars){
+        // TODO: Construct one regular expression to do the entire job!?
+        List<String> out = new ArrayList<String>();
         out.add(input);
-        List<String> queue = new LinkedList<String>();
+        List<String> queue = new ArrayList<String>();
         for (final char c : chars){
             String hex = Integer.toHexString((int) c);
             switch (hex.length()){
@@ -154,6 +191,27 @@ public class StringUtil {
         }
         return out;
     }
+
+    /**
+     * Add non empty strings to an output (Array)List.
+     * 
+     * @param input
+     * @param trim
+     * @return
+     */
+    public static List<String> getNonEmpty(final List<String> input, boolean trim) {
+        final List<String> output = new ArrayList<String>();
+        for (String x : input) {
+            if (trim) {
+                x = x.trim();
+            }
+            if (!x.isEmpty()) {
+                output.add(x);
+            }
+        }
+        return output;
+    }
+
 
     /**
      * Return if the two Strings are similar based on the given threshold.
@@ -352,6 +410,24 @@ public class StringUtil {
      */
     public static String formatDiff(final double current, final double previous) {
         return current == previous ? "0" : ((current > previous ? "+" : "-") + fdec3.format(Math.abs(current - previous)));
+    }
+
+    public static boolean startsWithAnyOf(final String input, final String... startsWith) {
+        for (int i = 0; i < startsWith.length; i++) {
+            if (input.startsWith(startsWith[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean endsWithAnyOf(final String input, final String... endsWith) {
+        for (int i = 0; i < endsWith.length; i++) {
+            if (input.endsWith(endsWith[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

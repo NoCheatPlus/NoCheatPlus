@@ -38,6 +38,15 @@ public class BlockInit {
         }
     }
 
+    public static Material getMaterial(String name) {
+        try {
+            return Material.matchMaterial(name.toUpperCase());
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * Set block breaking properties same as the block of the given material.
      * @param newId

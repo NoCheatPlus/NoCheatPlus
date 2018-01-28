@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
@@ -91,14 +93,15 @@ public class Captcha extends Check implements ICaptcha{
     public void resetCaptcha(Player player){
         ChatData data = ChatData.getData(player);
         synchronized (data) {
-            resetCaptcha(ChatConfig.getConfig(player), data);
+            resetCaptcha(player, ChatConfig.getConfig(player), data, DataManager.getPlayerData(player));
         }
     }
 
     @Override
-    public void resetCaptcha(ChatConfig cc, ChatData data){
+    public void resetCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData){
         data.captchTries = 0;
-        if (shouldCheckCaptcha(cc, data) || shouldStartCaptcha(cc, data)){
+        if (shouldCheckCaptcha(player, cc, data, pData) 
+                || shouldStartCaptcha(player, cc, data, pData)){
             generateCaptcha(cc, data, true);
         }
     }
@@ -110,12 +113,12 @@ public class Captcha extends Check implements ICaptcha{
     }
 
     @Override
-    public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
-        return cc.captchaCheck && !data.captchaStarted && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
+    public boolean shouldStartCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData) {
+        return cc.captchaCheck && !data.captchaStarted && !pData.hasPermission(Permissions.CHAT_CAPTCHA, player);
     }
 
     @Override
-    public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
-        return cc.captchaCheck && data.captchaStarted  && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
+    public boolean shouldCheckCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData) {
+        return cc.captchaCheck && data.captchaStarted  && !pData.hasPermission(Permissions.CHAT_CAPTCHA, player);
     }
 }

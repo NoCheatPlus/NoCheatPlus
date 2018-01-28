@@ -48,6 +48,8 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
@@ -151,6 +153,7 @@ public class BlockPlaceListener extends CheckListener {
         }
         boolean cancelled = false;
 
+        final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
         final BlockPlaceData data = BlockPlaceData.getData(player);
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final BlockInteractData bdata = BlockInteractData.getData(player);
@@ -239,7 +242,7 @@ public class BlockPlaceListener extends CheckListener {
 
         // Surrounding material.
         if (!cancelled && against.isEnabled(player) && against.check(player, block, placedMat, blockAgainst, 
-                isInteractBlock, data, cc)) {
+                isInteractBlock, data, cc, pData)) {
             cancelled = true;
         }
 
@@ -335,9 +338,10 @@ public class BlockPlaceListener extends CheckListener {
         final Material type = stack.getType();
         if (InventoryUtil.isBoat(type)) {
             if (cc.preventBoatsAnywhere) {
+                final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
                 // TODO: Alter config (activation, allow on top of ground).
                 // TODO: Version/plugin specific alteration for 'default'.
-                checkBoatsAnywhere(player, event, cc);
+                checkBoatsAnywhere(player, event, cc, pData);
             }
         }
         else if (type == Material.MONSTER_EGG) {
@@ -350,7 +354,7 @@ public class BlockPlaceListener extends CheckListener {
     }
 
     private void checkBoatsAnywhere(final Player player, final PlayerInteractEvent event, 
-            final BlockPlaceConfig cc) {
+            final BlockPlaceConfig cc, final PlayerData pData) {
         // Check boats-anywhere.
         final Block block = event.getClickedBlock();
         final Material mat = block.getType();
@@ -371,7 +375,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // TODO: Add a check type for exemption?
-        if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
+        if (!pData.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE, player)) {
             final Result previousUseBlock = event.useInteractedBlock();
             event.setCancelled(true);
             event.setUseItemInHand(Result.DENY);

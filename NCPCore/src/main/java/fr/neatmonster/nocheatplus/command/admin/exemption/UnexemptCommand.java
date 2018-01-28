@@ -92,7 +92,9 @@ public class UnexemptCommand extends BaseCommand {
      */
     @Override
     public boolean testPermission(CommandSender sender, Command command, String alias, String[] args) {
-        return super.testPermission(sender, command, alias, args) || args.length >= 2 && args[1].trim().equalsIgnoreCase(sender.getName()) && sender.hasPermission(permission + ".self");
+        return super.testPermission(sender, command, alias, args) 
+                || args.length >= 2 && args[1].trim().equalsIgnoreCase(sender.getName()) 
+                && sender.hasPermission(Permissions.COMMAND_UNEXEMPT_SELF.getBukkitPermission());
     }
 
 }

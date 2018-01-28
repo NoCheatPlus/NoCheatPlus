@@ -77,6 +77,27 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 2, 785);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS, false, 785);
 
+        // Permission settings.
+        set(ConfPaths.PERMISSIONS_POLICY_DEFAULT, "ALWAYS", 1140);
+        /*
+         * TODO: Setting the rules paths forces people to keep those entries -
+         * note: put to the end, if in the way, order should be preserved.
+         * Consider a preventupdateconfig strategy (where to, where not to), if
+         * a parent path already is set.
+         */
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#admin#debug", "INTERVAL:5", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#admin*", "ALWAYS", 1140);
+        // TODO: Command permissions are always checked anyway :p. Will be changed...
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#command*", "ALWAYS", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#bypass*", "ALWAYS", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#net#*", "INTERVAL:2", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#commands", "INTERVAL:2", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#text", "INTERVAL:2", 1140);
+        // Relog, logins: Note: aims at login denial, would invalidate once offline/world change. +- not sure.
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#relog", "INTERVAL:5", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#logins", "INTERVAL:5", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#moving#survivalfly#*", "INTERVAL:5", 1140);
+
         // Protection features.
         // Hide plugins.
         set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true, 785);
@@ -160,7 +181,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true, 785);
         set(ConfPaths.BLOCKPLACE_SPEED_INTERVAL, 45L, 785);
         set(ConfPaths.BLOCKPLACE_SPEED_ACTIONS,
-                "cancel vl>150 log:bpspeed:3:5:if cancel vl>1000 log:bpspeed:3:5:cif cancel");
+                "cancel vl>150 log:bpspeed:3:5:if cancel vl>1000 log:bpspeed:3:5:cif cancel", 785);
 
         set(ConfPaths.BLOCKPLACE_PREVENTMISC_BOATSANYWHERE, true);
 
@@ -616,7 +637,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE, true, 785);
         set(ConfPaths.COMPATIBILITY_SERVER_CBDEDICATED_ENABLE, true, 785);
         set(ConfPaths.COMPATIBILITY_SERVER_CBREFLECT_ENABLE, true, 785);
-        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_BREAKINGTIME + ".IRON_BLOCK:PICKAXE:DIAMOND:12", 1);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_BREAKINGTIME + ".IRON_BLOCK:PICKAXE:DIAMOND:12", 1139);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>(), 785);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + Material.SNOW.name().toLowerCase(), "default", 785);
         // Make blocks ign_passable+ground_height.

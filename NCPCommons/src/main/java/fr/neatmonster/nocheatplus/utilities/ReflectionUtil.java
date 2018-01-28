@@ -285,7 +285,27 @@ public class ReflectionUtil {
      * @param returnTypePreference
      * @return
      */
-    public static Method seekMethodNoArgs(final Class<?> objClass, final String methodName, final Class<?>[] returnTypePreference) {
+    public static Method seekMethodNoArgs(final Class<?> objClass, final String methodName, 
+            final Class<?>[] returnTypePreference) {
+        return seekMethodNoArgs(objClass, methodName, false, returnTypePreference);
+    }
+
+    /**
+     * Iterate over all methods, attempt to return best matching return type
+     * (earliest in array).
+     * 
+     * @param objClass
+     * @param methodName
+     * @param returnTypePreference
+     * @return
+     */
+    public static Method seekMethodIgnoreArgs(final Class<?> objClass, final String methodName, 
+            final Class<?>... returnTypePreference) {
+        return seekMethodNoArgs(objClass, methodName, true, returnTypePreference);
+    }
+
+    private static Method seekMethodNoArgs(final Class<?> objClass, final String methodName, 
+            boolean ignoreArgs, final Class<?>... returnTypePreference) {
         // Collect methods that might work.
         Method methodFound = null;
         int returnTypeIndex = returnTypePreference.length; // This can be 0 for no preferences given.
@@ -293,7 +313,7 @@ public class ReflectionUtil {
         for (final Method method : objClass.getMethods()){
             if (method.getName().equals(methodName)){
                 final Class<?>[] parameterTypes = method.getParameterTypes();
-                if (parameterTypes.length == 0){
+                if (ignoreArgs || parameterTypes.length == 0){
                     // Override the found method if none found yet or if the return type matches the preferred policy.
                     final Class<?> returnType = method.getReturnType();
                     if (methodFound == null){

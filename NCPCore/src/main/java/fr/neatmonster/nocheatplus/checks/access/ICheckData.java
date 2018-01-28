@@ -38,24 +38,4 @@ public interface ICheckData extends IData{
      */
     public boolean getDebug();
 
-
-    /**
-     * Check if an entry for the given permission exists.
-     * @param permission
-     * @return
-     */
-    public boolean hasCachedPermissionEntry(String permission);
-    /**
-     * Check if the user has the permission. If no entry is present, a false result is assumed an after failure check is made and the cache must be registered for updating.
-     * @param permission
-     * @return
-     */
-    public boolean hasCachedPermission(String permission);
-
-    /**
-     * Set a cached permission.
-     * @param permission
-     * @param value
-     */
-    public void setCachedPermission(String permission, boolean value);
 }

@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -32,6 +33,8 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  *
  */
 public final class PlayerMap {
+
+    // TODO: Remove, store in PlayerData (WeakHandle rather), perhaps keep some of the fetching logic.
 
     /**
      * Carry basic information about players.
@@ -234,14 +237,21 @@ public final class PlayerMap {
         if (hasGetPlayer_UUID) {
             return Bukkit.getPlayer(id);
         } else {
-            // Backwards compatibility.
-            return scanForPlayer(id);
+            // HACKS
+            final PlayerData pData = DataManager.getPlayerData(id);
+            if (pData != null && pData.playerName != null) {
+                return getPlayer(pData.playerName);
+            }
+            else {
+                // Backwards compatibility.
+                return scanForPlayer(id);                
+            }
         }
     }
 
     private Player scanForPlayer(final UUID id) {
         // TODO: Add a mapping for id->name for this case?
-        for (final Player player : Bukkit.getOnlinePlayers()) {
+        for (final Player player : BridgeMisc.getOnlinePlayers()) {
             if (id.equals(player.getUniqueId())) {
                 return player;
             }

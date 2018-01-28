@@ -20,6 +20,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -47,6 +49,7 @@ public class InstantBow extends Check {
      */
     public boolean check(final Player player, final float force, final long now) {
 
+        final PlayerData pData = DataManager.getPlayerData(player);
         final InventoryData data = InventoryData.getData(player);
         final InventoryConfig cc = InventoryConfig.getConfig(player);
 
@@ -92,7 +95,7 @@ public class InstantBow extends Check {
             }
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
             player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
 

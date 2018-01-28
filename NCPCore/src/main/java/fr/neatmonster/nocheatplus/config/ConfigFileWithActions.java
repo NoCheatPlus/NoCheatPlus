@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.actions.AbstractActionFactory;
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionData;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 public abstract class ConfigFileWithActions<D extends ActionData, L extends AbstractActionList<D, L>> extends RawConfigFile {
 
@@ -58,7 +59,7 @@ public abstract class ConfigFileWithActions<D extends ActionData, L extends Abst
      *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
-    public L getOptimizedActionList(final String path, final String permission)
+    public L getOptimizedActionList(final String path, final RegisteredPermission permission)
     {
         return getDefaultActionList(path, permission).getOptimizedCopy(this);
     }
@@ -74,7 +75,7 @@ public abstract class ConfigFileWithActions<D extends ActionData, L extends Abst
      *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
-    public L getDefaultActionList(final String path, final String permission)
+    public L getDefaultActionList(final String path, final RegisteredPermission permission)
     {
         if (factory == null){
             setActionFactory();

@@ -30,6 +30,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
+
 /**
  * Base command class, featuring some features.<br>
  * Taken from the Archer plugin (@asofold), extended by aliases.
@@ -101,7 +103,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
     protected final A access;
     public final String label;
     /** Permission necessary to use this command. May be null. */
-    public final String permission;
+    public final RegisteredPermission permission;
     /** Sub commands for delegation. */
     protected final Map<String, AbstractCommand<?>> subCommands = new LinkedHashMap<String, AbstractCommand<?>>();
     /** The index in args to check for sub-commands. -1 stands for default, either parent + 1 or 0 */
@@ -118,7 +120,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
      * @param label Lower-case.
      * @param permission
      */
-    public AbstractCommand(A access, String label, String permission){
+    public AbstractCommand(A access, String label, RegisteredPermission permission){
         this(access, label, permission, null);
     }
 
@@ -129,7 +131,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
      * @param permission May be null (no permission necessary).
      * @param aliases May be null (no aliases). If given, the aliases only take effect for tab completion and selection of sub commands. Lower-case.
      */
-    public AbstractCommand(A access, String label, String permission, String[] aliases){
+    public AbstractCommand(A access, String label, RegisteredPermission permission, String[] aliases){
         this.access = access;
         this.label = label;
         this.permission = permission;
@@ -213,7 +215,8 @@ public abstract class AbstractCommand<A> implements TabExecutor{
      * @return
      */
     public boolean testPermission(CommandSender sender, Command command, String alias, String args[]){
-        return permission == null || sender.hasPermission(permission);
+        // TODO: Relay to PlayerData or not (...).
+        return permission == null || sender.hasPermission(permission.getBukkitPermission());
     }
 
 }

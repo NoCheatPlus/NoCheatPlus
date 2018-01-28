@@ -17,6 +17,9 @@ package fr.neatmonster.nocheatplus.test;
 
 import static org.junit.Assert.fail;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -118,18 +121,55 @@ public class TestStringUtil {
             fail("Expect leftTrim to return null for null input, got instead: '" + StringUtil.leftTrim(null) + "'.");
         }
         for (String[] spec : new String[][]{
-                {"", ""},
-                {" ", ""},
-                {" \t", ""},
-                {"Z", "Z"},
-                {"=(/CG%§87rgv", "=(/CG%§87rgv"},
-                {" X", "X"},
-                {"Y ", "Y "},
-                {"  TEST", "TEST"},
-                {"\t\n TEST", "TEST"},
-                {"   TEST ", "TEST "}
+            {"", ""},
+            {" ", ""},
+            {" \t", ""},
+            {"Z", "Z"},
+            {"=(/CG%§87rgv", "=(/CG%§87rgv"},
+            {" X", "X"},
+            {"Y ", "Y "},
+            {"  TEST", "TEST"},
+            {"\t\n TEST", "TEST"},
+            {"   TEST ", "TEST "}
         }) {
             testLeftTrim(spec[0], spec[1]);
         }
+    }
+
+    private void testSplitChars(String input, int expectedLength, char countChar, char... chars) {
+        int count = StringUtil.count(input, countChar);
+        List<String> res = StringUtil.splitChars(input, chars);
+        if (res.size() != expectedLength) {
+            fail("Expected length differs. expect=" + expectedLength + " actual=" + res.size());
+        }
+        if (StringUtil.count(StringUtil.join(res, ""), countChar) != count) {
+            fail("Number of countChar has varied between input and output.");
+        }
+    }
+
+    @Test
+    public void testSplitChars() {
+        testSplitChars("a,1,.3a-a+6", 6, 'a', ',', '.', '-', '+');
+    }
+
+    private void testNonEmpty(Collection<String> nonEmpty) {
+        for (String x : nonEmpty) {
+            if (x.isEmpty()) {
+                fail("Empty string in non empty.");
+            }
+        }
+    }
+
+    private void testNonEmptySplit(String input, int expectedSize, char... chars) {
+        List<String> res = StringUtil.getNonEmpty(StringUtil.splitChars(input, chars), true);
+        if (res.size() != expectedSize) {
+            fail("Expected length differs. expect=" + expectedSize + " actual=" + res.size());
+        }
+        testNonEmpty(res);
+    }
+
+    @Test
+    public void testGetNonEmpty() {
+        testNonEmptySplit("a,1,.3a-a+6", 5, ',', '.', '-', '+');
     }
 }

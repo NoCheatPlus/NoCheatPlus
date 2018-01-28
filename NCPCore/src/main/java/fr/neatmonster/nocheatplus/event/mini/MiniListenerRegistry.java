@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.event.mini;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +28,9 @@ import java.util.Set;
 import fr.neatmonster.nocheatplus.components.registry.order.IGetRegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterEventsWithOrder;
+import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterWithOrder;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
  * 
@@ -37,6 +40,8 @@ import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.Re
  * <br>
  * Supports registration of MiniListener instances with order (FCFS):
  * <ul>
+ * <li>Annotation
+ * {@link fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder}</li>
  * <li>Implement the interface
  * {@link fr.neatmonster.nocheatplus.components.registry.order.IGetRegistrationOrder}</li>
  * <li>Annotation
@@ -45,7 +50,6 @@ import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.Re
  * {@link fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterWithOrder}</li>
  * <li>the given defaultOrder</li>
  * </ul>
- * (Method annotations are not supported for the MiniListener class.) <br>
  * <hr>
  * 
  * @param <EB>
@@ -210,6 +214,30 @@ public abstract class MiniListenerRegistry<EB, P> {
         }
     }
 
+    protected <E extends EB> RegistrationOrder getRegistrationOrder(
+            Class<E> eventClass, MiniListener<E> listener, RegistrationOrder defaultOrder) {
+        Class<?> listenerClass = listener.getClass();
+        Method method = ReflectionUtil.getMethod(listenerClass, "onEvent", eventClass);
+        if (method != null) {
+            // TODO: otherwise throw earlier.
+            if (method.isAnnotationPresent(RegisterMethodWithOrder.class)) {
+                return new RegistrationOrder(method.getAnnotation(RegisterMethodWithOrder.class));
+            }
+        }
+        if (listener instanceof IGetRegistrationOrder) {
+            return ((IGetRegistrationOrder) listener).getRegistrationOrder();
+        }
+        if (listenerClass.isAnnotationPresent(RegisterEventsWithOrder.class)) {
+            return new RegistrationOrder(listenerClass.getAnnotation(RegisterEventsWithOrder.class));
+        }
+        else if (listenerClass.isAnnotationPresent(RegisterWithOrder.class)) {
+            return new RegistrationOrder(listenerClass.getAnnotation(RegisterWithOrder.class));
+        }
+        else {
+            return defaultOrder;
+        }
+    }
+
     /**
      * Register a MiniListener instance for the given event class and base
      * priority. Further ignoreCancelled controls if cancelled events are
@@ -218,6 +246,8 @@ public abstract class MiniListenerRegistry<EB, P> {
      * <br>
      * Supports registration of MiniListener instances with order (FCFS):
      * <ul>
+     * <li>Annotation
+     * {@link fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder}</li>
      * <li>Implement the interface
      * {@link fr.neatmonster.nocheatplus.components.registry.order.IGetRegistrationOrder}</li>
      * <li>Annotation
@@ -226,7 +256,6 @@ public abstract class MiniListenerRegistry<EB, P> {
      * {@link fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterWithOrder}</li>
      * <li>the given defaultOrder</li>
      * </ul>
-     * (Method annotations are not supported for the MiniListener class.) <br>
      * <hr>
      * 
      * @param eventClass
@@ -243,22 +272,8 @@ public abstract class MiniListenerRegistry<EB, P> {
     public <E extends EB> void register(Class<E> eventClass, MiniListener<E> listener, 
             P basePriority, RegistrationOrder defaultOrder, boolean ignoreCancelled) {
         // TODO: Can/should the eventClass be read from listener parameters [means constraints on MiniListener?] ?
-        RegistrationOrder order = null;
-        if (listener instanceof IGetRegistrationOrder) {
-            order = ((IGetRegistrationOrder) listener).getRegistrationOrder();
-        }
-        if (order == null) {
-            Class<?> listenerClass = listener.getClass();
-            if (listenerClass.isAnnotationPresent(RegisterEventsWithOrder.class)) {
-                order = new RegistrationOrder(listenerClass.getAnnotation(RegisterEventsWithOrder.class));
-            }
-            else if (listenerClass.isAnnotationPresent(RegisterWithOrder.class)) {
-                order = new RegistrationOrder(listenerClass.getAnnotation(RegisterWithOrder.class));
-            }
-            else {
-                order = defaultOrder;
-            }
-        }
+        final RegistrationOrder order = getRegistrationOrder(eventClass, listener, defaultOrder);
+
         // TODO: Accept RegisterEventsWithOrder (and RegisterWithOrder) with listener.
         // TODO: Accept IRegisterWithOrder with listener.
         Map<P, MiniListenerNode<? extends EB, P>> prioMap = classMap.get(eventClass);

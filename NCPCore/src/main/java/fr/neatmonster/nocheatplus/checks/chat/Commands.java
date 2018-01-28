@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -32,18 +33,20 @@ public class Commands extends Check {
         super(CheckType.CHAT_COMMANDS);
     }
 
-    public boolean check(final Player player, final String message, final ICaptcha captcha) {
+    public boolean check(final Player player, final String message, 
+            final ChatConfig cc, final PlayerData pData, 
+            final ICaptcha captcha) {
 
         final long now = System.currentTimeMillis();
         final int tick = TickTask.getTick();
 
-        final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
-        final boolean captchaEnabled = !cc.captchaSkipCommands && CheckUtils.isEnabled(CheckType.CHAT_CAPTCHA, player, data, cc); 
+        final boolean captchaEnabled = !cc.captchaSkipCommands 
+                && CheckUtils.isEnabled(CheckType.CHAT_CAPTCHA, player, cc, pData); 
         if (captchaEnabled){
             synchronized (data) {
-                if (captcha.shouldCheckCaptcha(cc, data)){
+                if (captcha.shouldCheckCaptcha(player, cc, data, pData)){
                     captcha.checkCaptcha(player, message, cc, data, true);
                     return true;
                 }

@@ -31,7 +31,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
@@ -57,17 +58,25 @@ import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
+import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
+import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.event.mini.MiniListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.permissions.PermissionPolicy;
+import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
+import fr.neatmonster.nocheatplus.permissions.PermissionSettings;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.players.PlayerMap.PlayerInfo;
 import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
-import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.ds.corw.DualSet;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
@@ -87,7 +96,9 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
  *
  */
 @SetupOrder(priority = -80)
-public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, IDisableListener{
+public class DataManager implements INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, IDisableListener{
+
+    // TODO: Should/can some data structures share the same lock?
 
     private static DataManager instance = null;
 
@@ -99,6 +110,8 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
 
     /** Primary thread only (no lock for this field): UUIDs to remove upon next bulk removal. */
     private final Set<UUID> bulkPlayerDataRemoval = new LinkedHashSet<UUID>();
+
+    private final DualSet<UUID> frequentPlayerTasks = new DualSet<UUID>();
 
     /**
      * Access order for playerName (exact) -> ms time of logout.
@@ -124,6 +137,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     /**
      * Execution histories of the checks.
      */
+    // TODO: Move to PlayerData / CheckTypeTree (NodeS).
     private final Map<CheckType, Map<String, ExecutionHistory>> executionHistories = new HashMap<CheckType, Map<String,ExecutionHistory>>();
 
     /** Flag if data expiration is active at all. */
@@ -140,32 +154,69 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     /** Violation history and execution history. */
     private boolean deleteHistory = false;
 
-    private final OnDemandTickListener rareTasksListener = new OnDemandTickListener() {
+    /**
+     * Reference for passing to PlayerData for handling permission caching and
+     * policies.
+     */
+    // TODO: Per world registries, update with world change (!).
+    private final PermissionRegistry permissionRegistry;
 
-        private int delayUnregister = 0;
+    private final TickListener tickListener = new TickListener() {
+
+        private int delayRareTasks = 0;
 
         @Override
-        public boolean delegateTick(final int tick, final long timeLast) {
-            if (rareTasks()) {
-                delayUnregister = 10;
-                return true;
+        public void onTick(final int tick, final long timeLast) {
+            if (rareTasks(tick, timeLast)) {
+                delayRareTasks = 10;
             }
             else {
-                if (delayUnregister == 0) {
-                    return false;
+                if (delayRareTasks == 0) {
                 }
                 else {
-                    delayUnregister --;
-                    return true;
+                    delayRareTasks --;
                 }
             }
+            frequentTasks(tick, timeLast);
         }
+    };
+
+    private final MiniListener<?>[] miniListeners = new MiniListener<?>[] {
+        new MiniListener<PlayerQuitEvent>() {
+            @Override
+            @EventHandler(priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            public void onEvent(final PlayerQuitEvent event) {
+                playerLeaves(event.getPlayer());
+            }
+        },
+        new MiniListener<PlayerKickEvent>() {
+            @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            public void onEvent(final PlayerKickEvent event) {
+                playerLeaves(event.getPlayer());
+            }
+        },
+        new MiniListener<PlayerJoinEvent>() {
+            @EventHandler(priority = EventPriority.LOWEST)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            public void onEvent(final PlayerJoinEvent event) {
+                playerJoins(event);
+            }
+        },
+        new MiniListener<PlayerChangedWorldEvent>() {
+            @EventHandler(priority = EventPriority.LOWEST)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            public void onEvent(final PlayerChangedWorldEvent event) {
+                playerChangedWorld(event);
+            }
+        },
     };
 
     /**
      * Sets the static instance reference.
      */
-    public DataManager() {
+    public DataManager(final PermissionRegistry permissionRegistry) {
         instance = this;
         if (ServerVersion.isMinecraftVersionUnknown()) {
             // True hacks.
@@ -180,6 +231,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             // Likely an older version without efficient mapping.
             playerMap = new PlayerMap(true);
         }
+        this.permissionRegistry = permissionRegistry;
     }
 
     /**
@@ -246,13 +298,28 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * Called by the rareTasksListener (OnDemandTickListener).
      * @return "Did something" - true if data was removed or similar, i.e. reset the removal delay counter. False if nothing relevant had been done.
      */
-    private final boolean rareTasks() {
+    private final boolean rareTasks(final int tick, final long timeLast) {
         boolean something = false;
         if (!bulkPlayerDataRemoval.isEmpty()) {
             doBulkPlayerDataRemoval();
             something = true;
         }
+        // TODO: Process rarePlayerTasks
         return something;
+    }
+
+    /**
+     * On tick.
+     */
+    private final void frequentTasks(final int tick, final long timeLast) {
+        frequentPlayerTasks.mergePrimaryThread();
+        final Iterator<UUID> it = frequentPlayerTasks.iteratorPrimaryThread();
+        while (it.hasNext()) {
+            final PlayerData pData = getOrCreatePlayerData(it.next(), null, false);
+            if (pData.processTickFrequent(tick, timeLast)) {
+                it.remove();
+            }
+        }
     }
 
     /**
@@ -264,18 +331,24 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             // Test for online players.
             final Iterator<UUID> it = bulkPlayerDataRemoval.iterator();
             while (it.hasNext()) {
-                boolean skip = !lastLogout.containsKey(it.next());
+                final UUID playerId = it.next();
+                boolean skip = !lastLogout.containsKey(playerId);
                 // TODO: Also remove fake players, thus test for logged in too.
-                /**
-                 * Things will get shifty, once we use PlayerData during
-                 * asynchronous login. Then we'd need to use flags and store
-                 * ticks or time stamps, both global and in PlayerData, in order
-                 * to postpone removal (global flag set -> fetch existing data
-                 * here and check further).
+                /*
+                 * TODO: Multi stage removal: (1) non essential like permission
+                 * cache, (2) essential like set-back location, (3) all. In
+                 * addition things will get shifty, once we use PlayerData
+                 * during asynchronous login - possibly we'll need parked data
+                 * then, also considering offline servers.
                  */
                 if (skip) {
                     it.remove();
                     size --;
+                    final PlayerData data = playerData.get(playerId);
+                    if (data != null) {
+                        // Should be online, keep essential data.
+                        data.removeData(true);
+                    }
                     continue;
                 }
             }
@@ -306,33 +379,39 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         return null;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    private void playerJoins(final PlayerJoinEvent event) {
+        final long timeNow = System.currentTimeMillis();
         final Player player = event.getPlayer();
-        lastLogout.remove(player.getUniqueId());
-        CombinedData.getData(player).lastJoinTime = System.currentTimeMillis(); 
+        final UUID playerId = player.getUniqueId();
+        lastLogout.remove(playerId);
+        final PlayerData pData = getOrCreatePlayerData(playerId, player.getName(), true);
+        pData.onPlayerJoin(timeNow);
+        CombinedData.getData(player).lastJoinTime = timeNow; 
         addOnlinePlayer(player);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(final PlayerQuitEvent event) {
-        onPlayerLeave(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerKick(final PlayerKickEvent event) {
-        onPlayerLeave(event.getPlayer());
     }
 
     /**
      * Quit or kick.
      * @param player
      */
-    private final void onPlayerLeave(final Player player) {
-        final long now = System.currentTimeMillis();
-        lastLogout.put(player.getUniqueId(), now);
-        CombinedData.getData(player).lastLogoutTime = now;
+    private void playerLeaves(final Player player) {
+        final long timeNow = System.currentTimeMillis();
+        final UUID playerId = player.getUniqueId();
+        lastLogout.put(playerId, timeNow);
+        final PlayerData pData = playerData.get(playerId);
+        if (pData != null) {
+            pData.onPlayerLeave(timeNow);
+        }
+        // TODO: put lastLogoutTime to PlayerData !
+        CombinedData.getData(player).lastLogoutTime = timeNow;
         removeOnlinePlayer(player);
+    }
+
+    private void playerChangedWorld(final PlayerChangedWorldEvent event) {
+        final Player player = event.getPlayer();
+        final UUID playerId = player.getUniqueId();
+        final PlayerData pData = getOrCreatePlayerData(playerId, player.getName(), true);
+        pData.onPlayerChangedWorld(event.getFrom(), player.getWorld());
     }
 
     @Override
@@ -350,6 +429,23 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
         durExpireData = config.getLong(ConfPaths.DATA_EXPIRATION_DURATION, 1, 1000000, 60) * 60000L; // in minutes
         deleteData = config.getBoolean(ConfPaths.DATA_EXPIRATION_DATA, true); // hidden.
         deleteHistory = config.getBoolean(ConfPaths.DATA_EXPIRATION_HISTORY);
+        // TODO: Per world permission registries: need world configs (...).
+        Set<RegisteredPermission> changedPermissions = null;
+        try {
+            // TODO: Only update if changes are there - should have a config-path hash+size thing (+ setting).
+            changedPermissions = permissionRegistry.updateSettings(PermissionSettings.fromConfig(config, 
+                    ConfPaths.PERMISSIONS_POLICY_DEFAULT, ConfPaths.PERMISSIONS_POLICY_RULES));
+        }
+        catch (Exception e) {
+            StaticLog.logSevere("Failed to read the permissions setup. Relay to ALWAYS policy.");
+            StaticLog.logSevere(e);
+            permissionRegistry.updateSettings(new PermissionSettings(null, null, new PermissionPolicy()));
+        }
+        // Invalidate all already fetched permissions.
+        final Iterator<Entry<UUID, PlayerData>> it = playerData.iterator();
+        while (it.hasNext()) {
+            it.next().getValue().adjustSettings(changedPermissions);
+        }
     }
 
     /**
@@ -475,7 +571,11 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             }
         }
         ViolationHistory.clear(CheckType.ALL);
-        // (Not removing PlayerData instances.)
+        // PlayerData
+        final Iterator<Entry<UUID, PlayerData>> it = instance.playerData.iterator();
+        while (it.hasNext()) {
+            it.next().getValue().handleTimeRanBackwards();
+        }
     }
 
     /**
@@ -558,7 +658,6 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
             // TODO: Fetch/use UUID early, and check validity of name.
             if (playerId != null) {
                 instance.bulkPlayerDataRemoval.add(playerId);
-                instance.rareTasksListener.register();
             }
         }
 
@@ -730,8 +829,34 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * Initializing with online players.
      */
     public void onEnable() {
+        TickTask.addTickListener(tickListener);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        for (final MiniListener<?> listener : miniListeners) {
+            api.addComponent(listener, false);
+        }
         for (final Player player : BridgeMisc.getOnlinePlayers()) {
             addOnlinePlayer(player);
+        }
+    }
+
+    /**
+     * Cleanup method, removes all data and config, but does not call
+     * ConfigManager.cleanup.
+     */
+    @Override
+    public void onDisable() {
+        // TODO: Process pending set backs etc. -> iterate playerData -> onDisable.
+        clearData(CheckType.ALL);
+        playerData.clear(); // Also clear for online players.
+        iRemoveData.clear();
+        clearConfigs();
+        lastLogout.clear();
+        executionHistories.clear();
+        playerMap.clear();
+        // Finally alert (summary) if inconsistencies found.
+        if (foundInconsistencies > 0) {
+            StaticLog.logWarning("DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
+            foundInconsistencies = 0;
         }
     }
 
@@ -750,26 +875,6 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     private void removeOnlinePlayer(final Player player) {
         // TODO: Consider to only remove the Player instance? Yes do so... and remove the mapping if the full data expires only.
         playerMap.remove(player);
-    }
-
-    /**
-     * Cleanup method, removes all data and config, but does not call
-     * ConfigManager.cleanup.
-     */
-    @Override
-    public void onDisable() {
-        clearData(CheckType.ALL);
-        playerData.clear(); // Also clear for online players.
-        iRemoveData.clear();
-        clearConfigs();
-        lastLogout.clear();
-        executionHistories.clear();
-        playerMap.clear();
-        // Finally alert (summary) if inconsistencies found.
-        if (foundInconsistencies > 0) {
-            StaticLog.logWarning("DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
-            foundInconsistencies = 0;
-        }
     }
 
     @Override
@@ -824,6 +929,31 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
     }
 
     /**
+     * GetOrCreate means controlled by a flag in this case.
+     * <hr>
+     * Future may be to get rid of the static methods here, which may exist
+     * within NCPStaticSomething then.
+     * 
+     * @param playerId
+     * @param playerName
+     * @param create
+     *            Create if not present.
+     * @return
+     */
+    public PlayerData getOrCreatePlayerData(final UUID playerId, final String playerName, final boolean create) {
+        final PlayerData data = playerData.get(playerId);
+        if (!create || data != null) {
+            return data;
+        }
+        else {
+            // Creating this should be mostly harmless.
+            final PlayerData newData = new PlayerData(playerId, playerName, permissionRegistry);
+            final PlayerData oldData =  playerData.putIfAbsent(playerId, newData);
+            return oldData == null ? newData : oldData;
+        }
+    }
+
+    /**
      * Get a PlayerData instance in any case - always creates a PlayerData
      * instance, if none is present. This method should be preferred, as it
      * hides details.
@@ -844,19 +974,7 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      * @return
      */
     public static PlayerData getPlayerData(final UUID playerId, final String playerName, final boolean create) {
-        final PlayerData data = instance.playerData.get(playerId);
-        if (data != null) {
-            return data;
-        }
-        else if (!create) {
-            return null;
-        }
-        else {
-            // Creating this should be mostly harmless.
-            final PlayerData newData = new PlayerData(playerId, playerName);
-            final PlayerData oldData = instance.playerData.putIfAbsent(playerId, newData);
-            return oldData == null ? newData : oldData;
-        }
+        return instance.getOrCreatePlayerData(playerId, playerName, create);
     }
 
     /**
@@ -887,6 +1005,30 @@ public class DataManager implements Listener, INeedConfig, ComponentRegistry<IRe
      */
     public boolean storesPlayerInstances() {
         return playerMap.storesPlayerInstances();
+    }
+
+    /**
+     * Might yield false negatives, should be reasonable on performance.
+     * 
+     * @param playerId
+     * @return
+     */
+    public static boolean isFrequentPlayerTaskScheduled(final UUID playerId) {
+        // TODO : Efficient impl / optimized methods?
+        if (Bukkit.isPrimaryThread()) {
+            return instance.frequentPlayerTasks.containsPrimaryThread(playerId);
+        }
+        else {
+            return instance.frequentPlayerTasks.containsAsynchronous(playerId);
+        }
+    }
+
+    protected static void registerFrequentPlayerTaskPrimaryThread(final UUID playerId) {
+        instance.frequentPlayerTasks.addPrimaryThread(playerId);
+    }
+
+    protected static void registerFrequentPlayerTaskAsynchronous(final UUID playerId) {
+        instance.frequentPlayerTasks.addAsynchronous(playerId);
     }
 
 }

@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 /**
  * Check if the placing is legitimate in terms of surrounding materials.
@@ -37,8 +38,9 @@ public class Against extends Check {
         super(CheckType.BLOCKPLACE_AGAINST);
     }
 
-    public boolean check(final Player player, final Block block, final Material placedMat, final Block blockAgainst, 
-            final boolean isInteractBlock, final BlockPlaceData data, final BlockPlaceConfig cc) {
+    public boolean check(final Player player, final Block block, final Material placedMat, 
+            final Block blockAgainst, final boolean isInteractBlock, 
+            final BlockPlaceData data, final BlockPlaceConfig cc, final PlayerData pData) {
         boolean violation = false;
         // TODO: Make more precise (workarounds like WATER_LILY, general points, such as action?).
         // Workaround for signs on cactus and similar.
@@ -57,7 +59,7 @@ public class Against extends Check {
             if (isInteractBlock && !BlockProperties.isAir(matAgainst) && ! BlockProperties.isLiquid(matAgainst)) {
                 // Block was placed against something (e.g. cactus), allow it.
             }
-            else if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
+            else if (!pData.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR, player)) {
                 violation = true;
             }
         }
@@ -65,7 +67,7 @@ public class Against extends Check {
             // TODO: F_PLACE_AGAINST_WATER|LIQUID...
             if ((placedMat != Material.WATER_LILY 
                     || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  
-                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
+                    && !pData.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS, player)) {
                 violation = true;
             }
         }

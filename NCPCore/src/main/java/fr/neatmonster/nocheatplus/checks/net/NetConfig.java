@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 /**
  * Configuration for the net checks (fast version, sparse).
@@ -61,7 +62,8 @@ public class NetConfig extends ACheckConfig {
     public final boolean supersededFlyingCancelWaiting;
 
     public NetConfig(final ConfigFile config) {
-        super(config, ConfPaths.NET, new String[] {
+        // TODO: These permissions should have default policies.
+        super(config, ConfPaths.NET, new RegisteredPermission[] {
                 Permissions.NET_ATTACKFREQUENCY,
                 Permissions.NET_FLYINGFREQUENCY, 
                 Permissions.NET_KEEPALIVEFREQUENCY,

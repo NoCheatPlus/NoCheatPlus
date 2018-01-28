@@ -217,6 +217,10 @@ public abstract class DualCollection<T, C extends Collection<T>> {
             }
         }
         else {
+            if (primaryThreadCollection == null) {
+                primaryThreadCollection = newCollection();
+                emptyCount = 0;
+            }
             primaryThreadCollection.addAll(asynchronousCollection);
             asynchronousCollection.clear();
         }
@@ -244,6 +248,7 @@ public abstract class DualCollection<T, C extends Collection<T>> {
     public boolean addPrimaryThread(T element) {
         if (primaryThreadCollection == null) {
             primaryThreadCollection = newCollection();
+            emptyCount = 0;
         }
         return primaryThreadCollection.add(element);
     }
@@ -258,6 +263,7 @@ public abstract class DualCollection<T, C extends Collection<T>> {
     public boolean addAllPrimaryThread(Collection<T> elements) {
         if (primaryThreadCollection == null) {
             primaryThreadCollection = newCollection();
+            emptyCount = 0;
         }
         return primaryThreadCollection.addAll(elements);
     }

@@ -33,6 +33,8 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 
@@ -122,7 +124,8 @@ public class CheckUtils {
      *            given check type.
      * @return true, if is enabled
      */
-    public static boolean isEnabled(final CheckType checkType, final Player player, final ICheckData data, final ICheckConfig cc) {
+    public static boolean isEnabled(final CheckType checkType, final Player player, 
+            final ICheckConfig cc, final PlayerData pData) {
         if (cc == null) {
             if (!checkType.isEnabled(player)) {
                 return false;
@@ -131,7 +134,7 @@ public class CheckUtils {
         else if (!cc.isEnabled(checkType)) {
             return false;
         }
-        return !hasBypass(checkType, player, data);
+        return !hasBypass(checkType, player, pData);
     }
 
     /**
@@ -144,14 +147,13 @@ public class CheckUtils {
      *            the check type
      * @param player
      *            the player
-     * @param data
-     *            If data is null, the data factory will be used for the given
-     *            check type.
+     * @param pData
+     *            Must not be null.
      * @return true, if successful
      */
-    public static boolean hasBypass(final CheckType checkType, final Player player, final ICheckData data) {
+    public static boolean hasBypass(final CheckType checkType, final Player player, final PlayerData pData) {
         // TODO: Checking for the thread might be a temporary measure.
-        return hasBypass(checkType, player, data, Bukkit.isPrimaryThread());
+        return hasBypass(checkType, player, pData, Bukkit.isPrimaryThread());
     }
 
     /**
@@ -162,38 +164,41 @@ public class CheckUtils {
      *            the check type
      * @param player
      *            the player
-     * @param data
-     *            If data is null, the data factory will be used for the given
-     *            check type.
+     * @param pData
+     *            Must not be null.
      * @param isPrimaryThread
      *            If set to true, this must be the primary server thread as
      *            returned by Bukkit.isPrimaryThread().
      * @return true, if successful
      */
-    public static boolean hasBypass(final CheckType checkType, final Player player, final ICheckData data,
+    public static boolean hasBypass(final CheckType checkType, final Player player, final PlayerData pData, 
             final boolean isPrimaryThread) {
-        // TODO: Checking for the thread might be a temporary measure.
-        final String permission =  checkType.getPermission();
-        if (isPrimaryThread) {
-            if (permission != null && player.hasPermission(permission)) {
+        // TODO: Thread testing should be removed, once thread-safe read is implemented for exemption too.
+        /*
+         * TODO: Thread context information may be part of a CheckPipeline
+         * object later on (alongside PlayerData and other policy stuff),
+         * replacing some of the arguments (IsPrimaryThread must be rock solid
+         * information.).
+         */
+
+        /*
+         * TODO: Once thread-safe read has been implemented, check the fastest
+         * thing first (likely exemption).
+         */
+
+        final RegisteredPermission permission =  checkType.getPermission();
+        if (permission != null) {
+            // Check permission policy/cache regardless of the thread context.
+            if (pData.hasPermission(permission, player)) {
                 return true;
             }
-        }
-        else if (permission != null) {
-            if (data == null) {
-                if (checkType.hasCachedPermission(player, permission)) {
-                    return true;
-                }
-            }
-            else if (data.hasCachedPermission(permission)) {
-                return true;
-            }
-            if (!CheckTypeUtil.needsSynchronization(checkType)) {
+            // TODO: Refine this error message +- put in place where it needs to be.
+            if (!isPrimaryThread && !CheckTypeUtil.needsSynchronization(checkType)) {
                 // Checking for exemption can cause harm now.
                 improperAPIAccess(checkType);
             }
         }
-        // TODO: ExemptionManager relies on the initial definition for which type can be checked off main thread.
+        // TODO: New exemption implementation (thread-safe read).
         // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
         return NCPExemptionManager.isExempted(player, checkType, isPrimaryThread);
     }

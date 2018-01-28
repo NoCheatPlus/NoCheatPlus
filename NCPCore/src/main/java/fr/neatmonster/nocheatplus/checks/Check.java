@@ -24,13 +24,13 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -193,8 +193,8 @@ public abstract class Check implements IDebugPlayer {
      * @param cc
      * @return
      */
-    public boolean isEnabled(final Player player, final ICheckData data, final ICheckConfig cc) {
-        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, data);
+    public boolean isEnabled(final Player player, final ICheckConfig cc, final PlayerData pData) {
+        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, pData);
     }
 
     /**
@@ -206,7 +206,7 @@ public abstract class Check implements IDebugPlayer {
      * @return
      */
     public boolean isEnabled(final Player player, final ICheckConfig cc) {
-        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, null);
+        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
     }
 
     /**
@@ -218,7 +218,7 @@ public abstract class Check implements IDebugPlayer {
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
-        return type.isEnabled(player) && !CheckUtils.hasBypass(type, player, null);
+        return type.isEnabled(player) && !CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
     }
 
     /**
@@ -229,7 +229,7 @@ public abstract class Check implements IDebugPlayer {
      * @return
      */
     public boolean hasBypass(final Player player) {
-        return CheckUtils.hasBypass(type, player, null);
+        return CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
     }
 
     @Override

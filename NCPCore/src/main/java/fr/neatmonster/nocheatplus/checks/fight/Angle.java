@@ -87,7 +87,9 @@ public class Angle extends Check {
      * @param cc
      * @return
      */
-    public boolean check(final Player player, final Location loc, final Entity damagedEntity, final boolean worldChanged, final FightData data, final FightConfig cc) {
+    public boolean check(final Player player, final Location loc, 
+            final Entity damagedEntity, final boolean worldChanged, 
+            final FightData data, final FightConfig cc) {
 
         if (worldChanged){
             data.angleHits.clear();

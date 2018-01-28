@@ -28,6 +28,8 @@ import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StreamID;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
@@ -131,8 +133,10 @@ public class GenericLogAction extends ActionWithParameters<ViolationData, Action
     @Override
     public void execute(final ViolationData violationData) {
         // TODO: Consider permission caching or removing the feature? [Besides, check earlier?]
-        final String permissionSilent = violationData.getPermissionSilent();
-        if (permissionSilent != null && violationData.player.hasPermission(permissionSilent)) {
+        final RegisteredPermission permissionSilent = violationData.getPermissionSilent();
+        // TODO: Store PlayerData in ViolationData ? Must query cache here.
+        if (permissionSilent != null 
+                && DataManager.getPlayerData(violationData.player).hasPermission(permissionSilent, violationData.player)) {
             return;
         }
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();

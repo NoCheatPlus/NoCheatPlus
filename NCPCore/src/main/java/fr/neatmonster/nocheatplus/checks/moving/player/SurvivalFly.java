@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
@@ -117,7 +118,8 @@ public class SurvivalFly extends Check {
      * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final int multiMoveCount, final MovingData data, final MovingConfig cc, 
+            final int multiMoveCount, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData,
             final int tick, final long now, final boolean useBlockChangeTracker) {
         tags.clear();
         if (data.debug) {
@@ -314,14 +316,16 @@ public class SurvivalFly extends Check {
         if (hasHdist) {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
-            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, false);
+            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, false);
             // Judge if horizontal speed is above limit.
             hDistanceAboveLimit = hDistance - hAllowedDistance;
 
             // Velocity, buffers and after failure checks.
             if (hDistanceAboveLimit > 0) {
                 // TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
-                final double[] res = hDistAfterFailure(player, from, to, hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, data, cc, false);
+                final double[] res = hDistAfterFailure(player, from, to, 
+                        hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, 
+                        data, cc, pData, false);
                 hAllowedDistance = res[0];
                 hDistanceAboveLimit = res[1];
                 hFreedom = res[2];
@@ -392,7 +396,8 @@ public class SurvivalFly extends Check {
             if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > thisMove.walkSpeed && !data.hasActiveHorVel()) {
                 // (Ignore some cases, in order to prevent false positives.)
                 // TODO: speed effects ?
-                if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+                if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) 
+                        && !pData.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING, player)) {
                     // (Might have to account for speeding permissions.)
                     // TODO: hDistance is too harsh?
                     hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
@@ -455,7 +460,9 @@ public class SurvivalFly extends Check {
             }
         }
         else {
-            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, multiMoveCount, lastMove, data, cc);
+            final double[] res = vDistAir(now, player, from, fromOnGround, resetFrom, 
+                    to, toOnGround, resetTo, hDistanceAboveLimit, yDistance, multiMoveCount, lastMove, 
+                    data, cc, pData);
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
         }
@@ -821,7 +828,10 @@ public class SurvivalFly extends Check {
      *            Only set to true after having failed with it set to false.
      * @return Allowed distance.
      */
-    private double setAllowedhDist(final Player player, final boolean sprinting, final PlayerMoveData thisMove, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+    private double setAllowedhDist(final Player player, final boolean sprinting, 
+            final PlayerMoveData thisMove, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData,
+            final boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
@@ -855,13 +865,15 @@ public class SurvivalFly extends Check {
             // (Friction is used as is.)
         }
         // TODO: !sfDirty is very coarse, should use friction instead.
-        else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
+        else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) 
+                && (!checkPermissions || !pData.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING, player))) {
             hAllowedDistance = Magic.modSneak * thisMove.walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
             // TODO: Attribute modifiers can count in here, e.g. +0.5 (+ 50% doesn't seem to pose a problem, neither speed effect 2).
         }
         // TODO: !sfDirty is very coarse, should use friction instead.
-        else if (!sfDirty && thisMove.from.onGround && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
+        else if (!sfDirty && thisMove.from.onGround && player.isBlocking() 
+                && (!checkPermissions || !pData.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING, player))) {
             hAllowedDistance = Magic.modBlock * thisMove.walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
@@ -924,7 +936,7 @@ public class SurvivalFly extends Check {
         }
 
         // Speeding bypass permission (can be combined with other bypasses).
-        if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
+        if (checkPermissions && pData.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING, player)) {
             hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
         }
 
@@ -992,7 +1004,8 @@ public class SurvivalFly extends Check {
     private double[] vDistAir(final long now, final Player player, final PlayerLocation from, 
             final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, 
             final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, 
-            final int multiMoveCount, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
+            final int multiMoveCount, final PlayerMoveData lastMove, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData) {
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;
@@ -1274,7 +1287,8 @@ public class SurvivalFly extends Check {
             }
             else {
                 // Potential violation.
-                if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP) && data.getOrUseVerticalVelocity(yDistance) == null) {
+                if (!pData.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP, player) 
+                        && data.getOrUseVerticalVelocity(yDistance) == null) {
                     vDistanceAboveLimit = yDistance - cc.sfStepHeight;
                     tags.add("step");
                 }
@@ -1524,7 +1538,11 @@ public class SurvivalFly extends Check {
      * @param skipPermChecks
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
-    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
+    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, 
+            double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData, 
+            final boolean skipPermChecks) {
 
         // TODO: Still not entirely sure about this checking order.
         // TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
@@ -1535,7 +1553,7 @@ public class SurvivalFly extends Check {
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
         if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
             // TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
-            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, true);
+            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, true);
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks");
         }

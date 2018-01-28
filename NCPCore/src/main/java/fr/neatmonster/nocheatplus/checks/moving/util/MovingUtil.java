@@ -77,7 +77,7 @@ public class MovingUtil {
      * @return
      */
     public static final boolean shouldCheckSurvivalFly(final Player player, final PlayerLocation fromLocation, 
-            final MovingData data, final MovingConfig cc) {
+            final MovingData data, final MovingConfig cc, final PlayerData pData) {
         final GameMode gameMode = player.getGameMode();
         /*
          * TODO: Model rare to check conditions (elytra, ...) on base of one
@@ -96,7 +96,7 @@ public class MovingUtil {
                         Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) 
                         || fromLocation.isInLiquid()
                         )
-                && !player.hasPermission(Permissions.MOVING_SURVIVALFLY);
+                && !pData.hasPermission(Permissions.MOVING_SURVIVALFLY, player);
     }
 
     /**

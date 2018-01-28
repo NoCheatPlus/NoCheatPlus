@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
+import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -1285,7 +1286,14 @@ public class BlockProperties {
         }) {
             setBlock(mat, indestructibleType); 
         }
+        // 95 Locked chest
         // blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
+        Material mat = BlockInit.getMaterial("LOCKED_CHEST");
+        if (mat != null) {
+            BlockFlags.setFlagsAs(mat.name(), Material.CHEST);
+            // Breaks like chest later on.
+            setBlockProps(mat.name(), BlockProperties.instantType);
+        }
     }
 
     /**

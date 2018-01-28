@@ -35,6 +35,7 @@ import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.StreamID;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 /**
  * Violation specific data, for executing actions.<br>
@@ -94,7 +95,9 @@ public class ViolationData implements IViolationInfo, ActionData {
      * @param actions
      *            the actions
      */
-    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions) {
+    public ViolationData(final Check check, final Player player, 
+            final double vL, final double addedVL, 
+            final ActionList actions) {
         this(check, player, vL, addedVL, actions, null);
     }
 
@@ -117,7 +120,9 @@ public class ViolationData implements IViolationInfo, ActionData {
      * @param penaltyList
      *            IPenaltyList instances for filling in, or null to skip.
      */
-    public ViolationData(final Check check, final Player player, final double vL, final double addedVL, final ActionList actions, final IPenaltyList penaltyList) {
+    public ViolationData(final Check check, final Player player, 
+            final double vL, final double addedVL, 
+            final ActionList actions, final IPenaltyList penaltyList) {
         this.check = check;
         this.player = player;
         this.vL = vL;
@@ -340,7 +345,7 @@ public class ViolationData implements IViolationInfo, ActionData {
         return vL;
     }
 
-    public String getPermissionSilent() {
+    public RegisteredPermission getPermissionSilent() {
         return actions.permissionSilent;
     }
 

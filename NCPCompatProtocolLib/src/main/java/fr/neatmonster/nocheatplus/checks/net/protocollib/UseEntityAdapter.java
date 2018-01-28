@@ -32,6 +32,8 @@ import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class UseEntityAdapter extends BaseAdapter {
@@ -171,9 +173,11 @@ public class UseEntityAdapter extends BaseAdapter {
         boolean cancel = false;
 
         // AttackFrequency
-        if (isAttack && attackFrequency.isEnabled(player, data, cc) 
-                && attackFrequency.check(player, time, data, cc)) {
-            cancel = true;
+        if (isAttack) {
+            final PlayerData pData = DataManager.getPlayerData(player);
+            if (attackFrequency.isEnabled(player, cc, pData) && attackFrequency.check(player, time, data, cc)) {
+                cancel = true;
+            }
         }
 
         if (cancel) {

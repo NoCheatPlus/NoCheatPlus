@@ -55,6 +55,8 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
@@ -210,8 +212,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (fastClick.isEnabled(player)) {
             final InventoryConfig cc = InventoryConfig.getConfig(player);
             if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative) {
-                if (fastClick.check(player, now, event.getView(), slot, cursor, clicked, event.isShiftClick(), 
-                        data, cc)) {
+                final PlayerData pData = DataManager.getPlayerData(player);
+                if (fastClick.check(player, now, 
+                        event.getView(), slot, cursor, clicked, event.isShiftClick(), 
+                        data, cc, pData)) {
                     // The check requested the event to be cancelled.
                     cancel = true;
                 }

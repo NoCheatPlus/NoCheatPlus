@@ -98,9 +98,6 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
         BlockFlags.addFlags("SNOW", BlockProperties.F_HEIGHT_8_INC);
         BlockFlags.removeFlags("SNOW", BlockProperties.F_HEIGHT_8SIM_INC);
 
-        // 95 Locked chest
-        // BlockProperties.setBlockProps("LOCKED_CHEST", BlockProperties.instantType);
-
         StaticLog.logInfo("Added block-info for Minecraft 1.5 blocks.");
     }
 

@@ -19,11 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.AbstractActionList.ActionListFactory;
 import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.CommandActionWithColor;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 public abstract class AbstractActionFactory <D extends ActionData, L extends AbstractActionList<D, L>>{
 
@@ -56,8 +58,11 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
      *            by '.silent' to obtain the log action bypass permission.
      * @return the action list
      */
-    public L createActionList(final String definition, final String permission) {
-        final L list = listFactory.getNewActionList(permission == null ? null : permission + ".silent");
+    public L createActionList(final String definition, final RegisteredPermission permission) {
+        final RegisteredPermission permissionSilent = permission == null ? null 
+                : NCPAPIProvider.getNoCheatPlusAPI().getPermissionRegistry().getOrRegisterPermission(
+                        permission.getStringRepresentation() + ".silent");
+        final L list = listFactory.getNewActionList(permissionSilent);
 
         // Do check for null, to allow removing default actions, for better robustness.
         if (definition == null) return list;

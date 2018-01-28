@@ -41,8 +41,9 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 /**
@@ -102,9 +103,10 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     @EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
+        final PlayerData pData = DataManager.getPlayerData(player);
+        pData.requestLazyPermissionUpdate(ChatConfig.getConfig(player).getCachePermissions());
         ChatData.getData(player).currentWorldName = player.getWorld().getName();
-        // Tell TickTask to update cached permissions.
-        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
+
     }
 
     /**
@@ -121,8 +123,9 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 
         // Tell TickTask to update cached permissions.
         // (Might omit this if already cancelled.)
-        // TODO: Implement to only update on "timeout" or checks being activated at all.
-        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
+        final PlayerData pData = DataManager.getPlayerData(player);
+        final ChatConfig cc = ChatConfig.getConfig(player);
+        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
 
         // First the color check.
         if (!alreadyCancelled && color.isEnabled(player)) {
@@ -131,7 +134,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 
         // Then the no chat check.
         // TODO: isMainThread: Could consider event.isAsync ?
-        if (textChecks(player, event.getMessage(), false, alreadyCancelled)) {
+        if (textChecks(player, event.getMessage(), cc, pData, false, alreadyCancelled)) {
             event.setCancelled(true);
         }
 
@@ -148,9 +151,9 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         final Player player = event.getPlayer();
 
         // Tell TickTask to update cached permissions.
-        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
-
+        final PlayerData pData = DataManager.getPlayerData(player);
         final ChatConfig cc = ChatConfig.getConfig(player);
+        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
 
         // Checks that replace parts of the message (color).
         if (color.isEnabled(player)) {
@@ -193,15 +196,16 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
             // Treat as chat.
             // TODO: Consider requesting permission updates on these, for consistency.
             // TODO: Cut off the command ?.
-            if (textChecks(player, checkMessage, true, false)) {
+            if (textChecks(player, checkMessage, cc, pData, true, false)) {
                 event.setCancelled(true);
             }
         }
         else if (!commandExclusions.hasAnyPrefixWords(messageVars)) {
             // Treat as command.
-            if (commands.isEnabled(player) && commands.check(player, checkMessage, captcha)) {
+            if (commands.isEnabled(player) && commands.check(player, checkMessage, cc, pData, captcha)) {
                 event.setCancelled(true);
-            } else {
+            }
+            else {
                 // TODO: Consider always checking these?
                 // Note that this checks for prefixes, not prefix words.
                 final MovingConfig mcc = MovingConfig.getConfig(player);
@@ -236,8 +240,11 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         return cancel;
     }
 
-    private boolean textChecks(final Player player, final String message, final boolean isMainThread, final boolean alreadyCancelled) {
-        return text.isEnabled(player) && text.check(player, message, captcha, isMainThread, alreadyCancelled);
+    private boolean textChecks(final Player player, final String message, 
+            final ChatConfig cc, final PlayerData pData,
+            final boolean isMainThread, final boolean alreadyCancelled) {
+        return text.isEnabled(player) && text.check(player, message, cc, pData, 
+                captcha, isMainThread, alreadyCancelled);
     }
 
     /**
@@ -251,17 +258,17 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     public void onPlayerLogin(final PlayerLoginEvent event) {
         if (event.getResult() != Result.ALLOWED) return;
         final Player player = event.getPlayer();
+        final PlayerData pData = DataManager.getPlayerData(player);
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
         // Tell TickTask to update cached permissions.
-        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
-        // Force permission update.
-        TickTask.updatePermissions(); // TODO: This updates ALL... something more efficient ?
+        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
+        // (No forced permission update, because the associated permissions are treated as hints rather.)
 
         // Reset captcha of player if needed.
         synchronized(data) {
-            captcha.resetCaptcha(cc, data);
+            captcha.resetCaptcha(player, cc, data, pData);
         }
         // Fast relog check.
         if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data)) {
@@ -282,16 +289,20 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     }
 
     @Override
-    public void playerJoins(final Player player) { 
+    public void playerJoins(final Player player) {
+        final PlayerData pData = DataManager.getPlayerData(player);
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
+        // Cross-check hack: ChatData holds the current world name (TBD: PlayerData.getWorldInfo() rather).
         data.currentWorldName = player.getWorld().getName();
         synchronized (data) {
-            if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)) {
-                // shouldCheckCaptcha: only if really enabled.
-                // TODO: Later: add check for cc.captchaOnLogin or so (before shouldCheckCaptcha).
-                // TODO: maybe schedule this to come after other plugins messages.
-                captcha.sendNewCaptcha(player, cc, data);
+            if (captcha.isEnabled(player, cc, pData)) {
+                if (captcha.shouldCheckCaptcha(player, cc, data, pData)) {
+                    // shouldCheckCaptcha: only if really enabled.
+                    // TODO: Later: add check for cc.captchaOnLogin or so (before shouldCheckCaptcha).
+                    // TODO: maybe schedule this to come after other plugins messages.
+                    captcha.sendNewCaptcha(player, cc, data);
+                }
             }
         }
     }

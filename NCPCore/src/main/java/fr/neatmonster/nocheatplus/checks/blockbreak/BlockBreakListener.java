@@ -43,6 +43,8 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -120,6 +122,7 @@ public class BlockBreakListener extends CheckListener {
         // Do the actual checks, if still needed. It's a good idea to make computationally cheap checks first, because
         // it may save us from doing the computationally expensive checks.
 
+        final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
         final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);
         final BlockInteractData bdata = BlockInteractData.getData(player);
@@ -136,7 +139,7 @@ public class BlockBreakListener extends CheckListener {
 
         // Has the player broken a block that was not damaged before?
         final boolean wrongBlockEnabled = wrongBlock.isEnabled(player);
-        if (wrongBlockEnabled && wrongBlock.check(player, block, cc, data, isInstaBreak)) {
+        if (wrongBlockEnabled && wrongBlock.check(player, block, cc, data, pData, isInstaBreak)) {
             cancelled = true;
         }
 
@@ -147,7 +150,7 @@ public class BlockBreakListener extends CheckListener {
 
         // Has the player broken blocks faster than possible?
         if (!cancelled && gameMode != GameMode.CREATIVE
-                && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data)) {
+                && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data, pData)) {
             cancelled = true;
         }
 
@@ -191,7 +194,7 @@ public class BlockBreakListener extends CheckListener {
 
         // Destroying liquid blocks.
         if (!cancelled && BlockProperties.isLiquid(block.getType()) 
-                && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID) 
+                && !pData.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID, player) 
                 && !NCPExemptionManager.isExempted(player, CheckType.BLOCKBREAK_BREAK, true)){
             cancelled = true;
         }

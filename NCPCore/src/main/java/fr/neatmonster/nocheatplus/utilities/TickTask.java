@@ -15,7 +15,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,14 +29,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData.PlayerTickListener;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 // TODO: Auto-generated Javadoc
@@ -50,55 +46,6 @@ import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
  *
  */
 public class TickTask implements Runnable {
-
-    /**
-     * The Class PermissionUpdateEntry.
-     */
-    protected static final class PermissionUpdateEntry{ 
-
-        /** The check type. */
-        public final CheckType checkType;
-
-        /** The player name. */
-        public final String playerName;
-
-        /** The hash code. */
-        private final int hashCode;
-
-        /**
-         * Instantiates a new permission update entry.
-         *
-         * @param playerName
-         *            the player name
-         * @param checkType
-         *            the check type
-         */
-        public PermissionUpdateEntry(final String playerName, final CheckType checkType) {
-            this.playerName = playerName;
-            this.checkType = checkType;
-            hashCode = playerName.hashCode() ^ checkType.hashCode();
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-        @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof PermissionUpdateEntry)) {
-                return false;
-            }
-            final PermissionUpdateEntry other = (PermissionUpdateEntry) obj;
-            return playerName.equals(other.playerName) && checkType.equals(other.checkType);
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-    }
 
     /**
      * The Class ImprobableUpdateEntry.
@@ -122,16 +69,8 @@ public class TickTask implements Runnable {
     /** The Constant lagMaxTicks. */
     public static final int lagMaxTicks = 80;
 
-    /** Lock for accessing permissionUpdates. */
-    private static final Object permissionLock = new Object();
-    /** Permissions to update: player name -> check type. */
-    private static Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
     /** Improbable entries to update. */
     private static Map<UUID, ImprobableUpdateEntry> improbableUpdates = new LinkedHashMap<UUID, TickTask.ImprobableUpdateEntry>(50);
-
-    /** PlayerTickListener instances, run player specific tasks on tick. */
-    // TODO: For thread-safe adding : another set under synchronization update under lock.
-    private static final Set<PlayerTickListener> playerTickListeners = new LinkedHashSet<PlayerTickListener>();
 
     /** The Constant improbableLock. */
     private static final ReentrantLock improbableLock = new ReentrantLock();
@@ -200,36 +139,6 @@ public class TickTask implements Runnable {
     }
 
     /**
-     * Force a permissions update.<br>
-     * Note: Only call from the main thread!
-     */
-    public static void updatePermissions() {
-        final Set<PermissionUpdateEntry> copyPermissions;
-        synchronized (permissionLock) {
-            if (permissionUpdates.isEmpty()) {
-                return;
-            }
-            copyPermissions = permissionUpdates;
-            permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
-        }
-        for (final PermissionUpdateEntry entry : copyPermissions) {
-            final Player player = DataManager.getPlayer(entry.playerName); // Might use exact name by contract.
-            if (player == null || !player.isOnline()) {
-                continue;
-            }
-            final String[] perms = entry.checkType.getConfigFactory().getConfig(player).getCachePermissions();
-            if (perms == null) {
-                continue;
-            }
-            final ICheckData data = entry.checkType.getDataFactory().getData(player);
-            for (int j = 0; j < perms.length; j ++) {
-                final String permission = perms[j];
-                data.setCachedPermission(permission, player.hasPermission(permission));
-            }
-        }
-    }
-
-    /**
      * Force update improbable levels.<br>
      * Note: Only call from the main thread!
      */
@@ -254,43 +163,6 @@ public class TickTask implements Runnable {
     }
 
     // Public static access methods
-    /**
-     * Access method to request permission updates.<br>
-     * NOTE: Thread safe.
-     *
-     * @param playerName
-     *            the player name
-     * @param checkType
-     *            the check type
-     */
-    public static void requestPermissionUpdate(final String playerName, final CheckType checkType) {
-        synchronized(permissionLock) {
-            if (locked) {
-                return;
-            }
-            permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
-        }
-    }
-
-    /**
-     * Run player specific tasks on tick.
-     * @param playerTickListener
-     */
-    public static void addPlayerTickListener(final PlayerTickListener playerTickListener) {
-        if (!locked) {
-            playerTickListeners.add(playerTickListener);
-        }
-    }
-
-    /**
-     * Test if a player specific task is scheduled.
-     * 
-     * @param playerTickListener
-     * @return
-     */
-    public static boolean isPlayerTiskListenerThere(final PlayerTickListener playerTickListener) {
-        return playerTickListeners.contains(playerTickListener);
-    }
 
     /**
      * Request actions execution.<br>
@@ -350,6 +222,7 @@ public class TickTask implements Runnable {
             if (locked) {
                 return; // TODO: Boolean return value ?
             }
+            // TODO: Consider sorting (set + lazily generated sorted array).
             if (!tickListeners.contains(listener)) {
                 tickListeners.add(listener);
             }
@@ -613,9 +486,6 @@ public class TickTask implements Runnable {
      * Empty queues (better call after setLocked(true)) and tickListeners.
      */
     public static void purge() {
-        synchronized (permissionLock) {
-            permissionUpdates.clear();
-        }
         synchronized (actionLock) {
             delayedActions.clear();
         }
@@ -624,9 +494,6 @@ public class TickTask implements Runnable {
         improbableLock.unlock();
         synchronized (tickListeners) {
             tickListeners.clear();
-        }
-        if (Bukkit.isPrimaryThread()) {
-            playerTickListeners.clear();
         }
     }
 
@@ -677,23 +544,6 @@ public class TickTask implements Runnable {
         }
     }
 
-    private void processPlayerTickListeners(final int tick, final long timeLast) {
-        // TODO: Not sure: Make a copy list, clear original. Add to original if to stay. [Concurrent modification.]
-        final Iterator<PlayerTickListener> it = playerTickListeners.iterator();
-        while (it.hasNext()) {
-            final PlayerTickListener listener = it.next();
-            try {
-                if (listener.processOnTick(tick, timeLast)) {
-                    it.remove();
-                }
-            }
-            catch (Throwable t) {
-                StaticLog.logSevere("(TickTask) PlayerTickListener generated an exception:");
-                StaticLog.logSevere(t);
-            }
-        }
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
@@ -703,12 +553,6 @@ public class TickTask implements Runnable {
         updateImprobable();
         // Actions.
         executeActions();
-        // Set back (after actions, for now, because actions may contain a set back action later on).
-        if (!playerTickListeners.isEmpty()) {
-            processPlayerTickListeners(tick, timeLast);
-        }
-        // Permissions.
-        updatePermissions();
         // Listeners.
         notifyListeners();
 

@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
@@ -160,7 +161,7 @@ public class ChatConfig extends ACheckConfig {
      *            the data
      */
     public ChatConfig(final ConfigFile config) {
-        super(config, ConfPaths.CHAT, new String[]{
+        super(config, ConfPaths.CHAT, new RegisteredPermission[]{
                 // Only the permissions needed for async. checking.
                 Permissions.CHAT_COLOR,
                 Permissions.CHAT_TEXT,

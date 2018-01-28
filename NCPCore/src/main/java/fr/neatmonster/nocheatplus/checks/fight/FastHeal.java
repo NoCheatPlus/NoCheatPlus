@@ -19,6 +19,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -33,6 +35,7 @@ public class FastHeal extends Check {
 
     public boolean check(final Player player){
         final long time = System.currentTimeMillis();
+        final PlayerData pData = DataManager.getPlayerData(player);
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
         boolean cancel = false;
@@ -60,7 +63,7 @@ public class FastHeal extends Check {
             }
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
             player.sendMessage("Regain health(SATIATED): " + (time - data.fastHealRefTime) + " ms "+ "(buffer=" + data.fastHealBuffer + ")" +" , cancel=" + cancel);
         }
 

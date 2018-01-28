@@ -28,6 +28,9 @@ import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHand
 import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 public class PluginTests {
 
@@ -42,9 +45,13 @@ public class PluginTests {
     public static class UnitTestNoCheatPlusAPI implements NoCheatPlusAPI {
 
         private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
+        private final PermissionRegistry permissionRegistry = new PermissionRegistry(10000);
 
         public UnitTestNoCheatPlusAPI() {
             genericInstanceRegistry.registerGenericInstance(MCAccess.class, new MCAccessBukkit());
+            for (RegisteredPermission rp : Permissions.getPermissions()) {
+                permissionRegistry.addRegisteredPermission(rp);
+            }
         }
 
         @Override
@@ -167,6 +174,11 @@ public class PluginTests {
         @Override
         public EventRegistryBukkit getEventRegistry() {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public PermissionRegistry getPermissionRegistry() {
+            return permissionRegistry;
         }
 
     }

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 public abstract class AbstractActionList<D extends ActionData,  L extends AbstractActionList<D, L>>{
 
@@ -33,14 +34,14 @@ public abstract class AbstractActionList<D extends ActionData,  L extends Abstra
          *            The permission to bypass log actions.
          * @return
          */
-        public L getNewActionList(String permissionSilent);
+        public L getNewActionList(RegisteredPermission permissionSilent);
     }
 
     /** Something to return if nothing is set. */
     protected static final Action<?, ?>[] emptyArray = new Action[0];
 
     /** This is a very bad design decision, but it's also really convenient to define this here. */
-    public final String                  permissionSilent;
+    public final RegisteredPermission                  permissionSilent;
 
     /** The actions of this AbstractActionList, "bundled" by threshold (violation level). */
     private final Map<Integer, Action<D, L>[]> actions    = new HashMap<Integer, Action<D, L>[]>();
@@ -56,7 +57,7 @@ public abstract class AbstractActionList<D extends ActionData,  L extends Abstra
      * @param permissionSilent
      *            The permission to to bypass logging actions.
      */
-    public AbstractActionList(final String permissionSilent, final ActionListFactory<D, L> listFactory) {
+    public AbstractActionList(final RegisteredPermission permissionSilent, final ActionListFactory<D, L> listFactory) {
         this.listFactory = listFactory;
         this.permissionSilent = permissionSilent;
     }

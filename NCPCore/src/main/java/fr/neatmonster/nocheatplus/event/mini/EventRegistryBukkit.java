@@ -30,6 +30,7 @@ import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
  * A MultiListenerRegistry that registers Bukkit types with a Spigot/CraftBukkit
@@ -197,6 +198,62 @@ public class EventRegistryBukkit extends MultiListenerRegistry<Event, EventPrior
      */
     public void register(Listener listener, RegistrationOrder defaultOrder) {
         internalRegister(listener, defaultOrder);
+    }
+
+    /**
+     * Convenience method for component registration. Use @EventHandler to
+     * specify EventPriority and ignoreCancelled. See
+     * {@link fr.neatmonster.nocheatplus.event.mini.MiniListenerRegistry#register(Class, MiniListener, Object, RegistrationOrder, boolean)}
+     * for reference on how to set up order.
+     * 
+     * @param eventClass Type of event to register for.
+     * @param listener
+     * @throws IllegalArgumentException
+     *             If @EventHandler is not present or mismatching types.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Event> void register(Class<E> eventClass, MiniListener<E> listener) {
+        final Class<MiniListener<E>> clazz = (Class<MiniListener<E>>) listener.getClass();
+        EventHandler eh;
+        try {
+            Method method = clazz.getMethod("onEvent", eventClass);
+            if (!method.isAnnotationPresent(EventHandler.class)) {
+                throw new IllegalArgumentException("Must have @EventHandler annotation: " + clazz.getName());
+            }
+            eh = method.getAnnotation(EventHandler.class);
+            eventClass = (Class<E>) method.getParameterTypes()[0];
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(e);
+        }
+        register(eventClass, listener, eh.priority(), null, eh.ignoreCancelled());
+    }
+
+    /**
+     * Convenience method for component registration. Use @EventHandler to
+     * specify EventPriority and ignoreCancelled. See
+     * {@link fr.neatmonster.nocheatplus.event.mini.MiniListenerRegistry#register(Class, MiniListener, Object, RegistrationOrder, boolean)}
+     * for reference on how to set up order.
+     * 
+     * @param listener
+     * @throws IllegalArgumentException
+     *             If @EventHandler is not present or mismatching types.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends Event> void register (MiniListener<E> listener) {
+        // TODO: Throw something if there is more than one method, or implement differently.
+        Class<E> eventClass;
+        final Class<MiniListener<E>> clazz = (Class<MiniListener<E>>) listener.getClass();
+        try {
+            Method method = ReflectionUtil.seekMethodIgnoreArgs(clazz, "onEvent");
+            eventClass = (Class<E>) method.getParameterTypes()[0];
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException(e);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(e);
+        }
+        register(eventClass, listener);
     }
 
     private Collection<MiniListener<? extends Event>> internalRegister(Listener listener, 

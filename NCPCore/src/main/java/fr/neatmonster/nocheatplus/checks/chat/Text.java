@@ -32,6 +32,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -67,13 +68,13 @@ public class Text extends Check implements INotifyReload {
      * @param alreadyCancelled 
      * @return
      */
-    public boolean check(final Player player, final String message, final ICaptcha captcha, boolean isMainThread, final boolean alreadyCancelled) {
-
-        final ChatConfig cc = ChatConfig.getConfig(player);
+    public boolean check(final Player player, final String message, 
+            final ChatConfig cc, final PlayerData pData,
+            final ICaptcha captcha, boolean isMainThread, final boolean alreadyCancelled) {
         final ChatData data = ChatData.getData(player);
 
         synchronized (data) {
-            return unsafeCheck(player, message, captcha, cc, data, isMainThread, alreadyCancelled);
+            return unsafeCheck(player, message, captcha, cc, data, pData, isMainThread, alreadyCancelled);
         }
     }
 
@@ -109,11 +110,12 @@ public class Text extends Check implements INotifyReload {
      * @return
      */
     private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
-            final ChatConfig cc, final ChatData data, boolean isMainThread, final boolean alreadyCancelled) {
+            final ChatConfig cc, final ChatData data, final PlayerData pData,
+            boolean isMainThread, final boolean alreadyCancelled) {
 
         // Test captcha.
         // TODO: Skip captcha for "handleaschat" commands? [controversial potential]
-        if (captcha.shouldCheckCaptcha(cc, data)) {
+        if (captcha.shouldCheckCaptcha(player, cc, data, pData)) {
             captcha.checkCaptcha(player, message, cc, data, isMainThread);
             return true;
         } else if (alreadyCancelled) {
@@ -286,7 +288,7 @@ public class Text extends Check implements INotifyReload {
             }
             data.textVL += added;
 
-            if (captcha.shouldStartCaptcha(cc, data)) {
+            if (captcha.shouldStartCaptcha(player, cc, data, pData)) {
                 captcha.sendNewCaptcha(player, cc, data);
                 cancel = true;
             }

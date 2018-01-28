@@ -17,11 +17,13 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 public class SmartMovingMOTD extends ClientMOTD {
 
     @Override
-    public String onPlayerJoin(String message, Player player, boolean allowAll) {
+    public String onPlayerJoin(final String message, final Player player, final PlayerData data, 
+            final boolean allowAll) {
 
         if (allowAll){
             return message;
@@ -32,32 +34,32 @@ public class SmartMovingMOTD extends ClientMOTD {
         // TODO: Is there a compact version (just one prefix)?
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_CLIMBING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_CLIMBING, player)){
             smartMoving += "§0§1§0§1§2§f§f";
         }
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_SWIMMING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_SWIMMING, player)){
             smartMoving += "§0§1§3§4§f§f";
         }
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_CRAWLING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_CRAWLING, player)){
             smartMoving += "§0§1§5§f§f";
         }
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_SLIDING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_SLIDING, player)){
             smartMoving += "§0§1§6§f§f";
         }
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_JUMPING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_JUMPING, player)){
             smartMoving += "§0§1§8§9§a§b§f§f";
         }
 
         // Disable Smart Moving's climbing.
-        if (!player.hasPermission(Permissions.SMARTMOVING_FLYING)){
+        if (!data.hasPermission(Permissions.SMARTMOVING_FLYING, player)){
             smartMoving += "§0§1§7§f§f";
         }
 

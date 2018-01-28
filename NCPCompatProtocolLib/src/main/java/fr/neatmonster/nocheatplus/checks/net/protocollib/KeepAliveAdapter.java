@@ -29,6 +29,8 @@ import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 /**
  * Limit keep alive packet frequency, set lastKeepAliveTime (even if disabled,
@@ -62,6 +64,7 @@ public class KeepAliveAdapter extends BaseAdapter {
             return;
         }
         // Always update last received time.
+        final PlayerData pData = DataManager.getPlayerData(player);
         final NetData data = dataFactory.getData(player);
         data.lastKeepAliveTime = time;
         final NetConfig cc = configFactory.getConfig(player);
@@ -70,7 +73,7 @@ public class KeepAliveAdapter extends BaseAdapter {
         // TODO: Match vs. outgoing keep alive requests.
         // TODO: Better modeling of actual packet sequences (flying vs. keep alive vs. request/ping).
         // TODO: Better integration with god-mode check / trigger reset ndt.
-        if (cc.keepAliveFrequencyActive && frequencyCheck.check(player, time, data, cc)) {
+        if (cc.keepAliveFrequencyActive && frequencyCheck.check(player, time, data, cc, pData)) {
             event.setCancelled(true);
         }
     }

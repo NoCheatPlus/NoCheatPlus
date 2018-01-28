@@ -18,22 +18,27 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.PluginTests;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
+import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 
 public class TestActions {
 
     @Test
     public void testOptimizedLogActionEmpty() {
+        PluginTests.setUnitTestNoCheatPlusAPI(false);
+        PermissionRegistry pReg = NCPAPIProvider.getNoCheatPlusAPI().getPermissionRegistry();
         final ConfigFile config = new DefaultConfig();
         config.set("actions", "log:dummy:0:0:icf");
         config.set("strings.dummy", "dummy");
         config.set(ConfPaths.LOGGING_ACTIVE, false);
-        ActionList actionList = config.getOptimizedActionList("actions", "dummy");
+        ActionList actionList = config.getOptimizedActionList("actions", pReg.getOrRegisterPermission("dummy")) ;
         Action<ViolationData, ActionList>[] actions = actionList.getActions(0.0);
         if (actions.length != 0) {
             fail("Wrong number of actions.");

@@ -56,6 +56,8 @@ import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
@@ -340,6 +342,7 @@ public class VehicleChecks extends CheckListener {
             final Location from, final Location to, final Player player, final boolean fake, 
             final MovingData data) {
         // TODO: Detect teleportation and similar.
+        final PlayerData pData = DataManager.getPlayerData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
         // Exclude certain vehicle types.
         if (cc.ignoredVehicles.contains(vehicleType)) {
@@ -401,7 +404,8 @@ public class VehicleChecks extends CheckListener {
         MovingUtil.prepareFullCheck(moveInfo.from, moveInfo.to, thisMove, cc.yOnGround);
         thisMove.setExtraVehicleProperties(vehicle);
         // Call checkVehicleMove for actual checks.
-        checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, moveInfo, thisMove, firstPastMove, player, fake, data, cc);
+        checkVehicleMove(vehicle, vehicleType, vehicleLocation, world, moveInfo, thisMove, firstPastMove, 
+                player, fake, data, cc, pData);
         // Cleanup.
         aux.returnVehicleMoveInfo(moveInfo);
     }
@@ -472,9 +476,11 @@ public class VehicleChecks extends CheckListener {
      * @param data
      * @param cc2 
      */
-    private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, final Location vehicleLocation,
-            final World world, final VehicleMoveInfo moveInfo, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
-            final Player player, final boolean fake, final MovingData data, MovingConfig cc) {
+    private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, 
+            final Location vehicleLocation, final World world, 
+            final VehicleMoveInfo moveInfo, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
+            final Player player, final boolean fake, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData) {
         // TODO: (private or public?)
 
         data.joinOrRespawn = false;
@@ -515,7 +521,7 @@ public class VehicleChecks extends CheckListener {
         // Moving envelope check(s).
         // TODO: Use set back storage for testing if this is appropriate (use SetBackEntry instead, remove Location retrieval then?).
         if ((newTo == null || data.vehicleSetBacks.getSafeMediumEntry().isValidAndOlderThan(newTo))
-                && vehicleEnvelope.isEnabled(player, data, cc)) {
+                && vehicleEnvelope.isEnabled(player, cc, pData)) {
             // Skip if this is the first move after set back, with to=set back.
             if (data.timeSinceSetBack == 0 || thisMove.to.hashCode() == data.lastSetBackHash) {
                 // TODO: This is a hot fix, to prevent a set back loop. Depends on having only the morepackets set back for vehicles.
@@ -539,7 +545,7 @@ public class VehicleChecks extends CheckListener {
         // More packets: Sort this in last, to avoid setting the set back early. Always check to adjust set back, for now.
         // TODO: Still always update the frequency part?
         if ((newTo == null || data.vehicleSetBacks.getMidTermEntry().isValidAndOlderThan(newTo))) {
-            if (vehicleMorePackets.isEnabled(player, data, cc)) {
+            if (vehicleMorePackets.isEnabled(player, cc, pData)) {
                 final SetBackEntry tempNewTo = vehicleMorePackets.check(player, thisMove, newTo, data, cc);
                 if (tempNewTo != null) {
                     newTo = tempNewTo;
@@ -802,11 +808,11 @@ public class VehicleChecks extends CheckListener {
         final Entity attacker = event.getAttacker();
         if (attacker instanceof Player && passengerUtil.isPassenger(attacker, event.getVehicle())) {
             final Player player = (Player) attacker;
-            final MovingData data = MovingData.getData(player);
             final MovingConfig cc = MovingConfig.getConfig(player);
             if (cc.vehiclePreventDestroyOwn) {
-                if (CheckUtils.isEnabled(CheckType.MOVING_SURVIVALFLY, player, data, cc)
-                        || CheckUtils.isEnabled(CheckType.MOVING_CREATIVEFLY, player, data, cc)) {
+                final PlayerData pData = DataManager.getPlayerData(player);
+                if (CheckUtils.isEnabled(CheckType.MOVING_SURVIVALFLY, player, cc, pData)
+                        || CheckUtils.isEnabled(CheckType.MOVING_CREATIVEFLY, player, cc, pData)) {
                 }
                 event.setCancelled(true);
                 // TODO: This message must be configurable.

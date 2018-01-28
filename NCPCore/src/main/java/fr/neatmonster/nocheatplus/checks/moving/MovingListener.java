@@ -277,11 +277,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Check if the player has to be reset.
             // To "cancel" the event, we teleport the player.
             final Location loc = player.getLocation(useLoc);
+            final PlayerData pData = DataManager.getPlayerData(player);
             final MovingData data = MovingData.getData(player);
             Location target = null;
             final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
             moveInfo.set(player, loc, null, cc.yOnGround);
-            final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc);
+            final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc, pData);
             aux.returnPlayerMoveInfo(moveInfo);
             if (sfCheck) {
                 target = data.getSetBack(loc);
@@ -582,6 +583,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return true;
         }
 
+        final PlayerData pData = DataManager.getPlayerData(player);
         final String playerName = player.getName(); // TODO: Could switch to UUID here (needs more changes).
 
         // Check for location consistency.
@@ -654,14 +656,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Check which fly check to use.
         final boolean checkCf;
         final boolean checkSf;
-        if (MovingUtil.shouldCheckSurvivalFly(player, pFrom, data, cc)) {
+        if (MovingUtil.shouldCheckSurvivalFly(player, pFrom, data, cc, pData)) {
             checkCf = false;
             checkSf = true;
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
         }
         else if (cc.creativeFlyCheck 
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY, true) 
-                && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
+                && !pData.hasPermission(Permissions.MOVING_CREATIVEFLY, player)) {
             checkCf = true;
             checkSf = false;
             prepareCreativeFlyCheck(player, from, to, moveInfo, thisMove, multiMoveCount, tick, data, cc);
@@ -769,7 +771,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR 
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE, true) 
-                && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+                && !pData.hasPermission(Permissions.MOVING_PASSABLE, player)) {
             // Passable is checked first to get the original set back locations from the other checks, if needed. 
             newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
             if (newTo != null) {
@@ -795,7 +797,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (newTo == null) {
                 // Only check if passable has not already set back.
                 thisMove.flyCheck = CheckType.MOVING_SURVIVALFLY;
-                newTo = survivalFly.check(player, pFrom, pTo, multiMoveCount, data, cc, tick, time, useBlockChangeTracker);
+                newTo = survivalFly.check(player, pFrom, pTo, multiMoveCount, data, cc, pData, 
+                        tick, time, useBlockChangeTracker);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
@@ -855,7 +858,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Morepackets.
         if (cc.morePacketsCheck && (newTo == null || data.isMorePacketsSetBackOldest())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS, true) 
-                && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
+                && !pData.hasPermission(Permissions.MOVING_MOREPACKETS, player)) {
             /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
             to avoid packet speeding using micro-violations.) */
             final Location mpNewTo = morePackets.check(player, pFrom, pTo, newTo == null, data, cc);
@@ -2043,6 +2046,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.clearNoFallData();
             return;
         }
+        final PlayerData pData = DataManager.getPlayerData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
         final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final double yOnGround = Math.max(cc.noFallyOnGround, cc.yOnGround);
@@ -2050,7 +2054,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         moveInfo.set(player, loc, null, yOnGround);
         final PlayerLocation pLoc = moveInfo.from;
         pLoc.collectBlockFlags(yOnGround);
-        if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, pLoc, data, cc) || !noFall.isEnabled(player, cc)) {
+        if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, pLoc, data, cc, pData) 
+                || !noFall.isEnabled(player, cc)) {
             data.clearNoFallData();
             useLoc.setWorld(null);
             aux.returnPlayerMoveInfo(moveInfo);
@@ -2407,14 +2412,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (player.isFlying() || event.isFlying() && !event.isCancelled()) {
             return;
         }
+        final PlayerData pData = DataManager.getPlayerData(player);
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
         final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
         final Location loc = player.getLocation(useLoc);
         moveInfo.set(player, loc, null, cc.yOnGround);
         // TODO: data.isVelocityJumpPhase() might be too harsh, but prevents too easy abuse.
-        if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc) || data.isVelocityJumpPhase() ||
-                BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround)) {
+        if (!MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc, pData) 
+                || data.isVelocityJumpPhase()
+                || BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround)) {
             useLoc.setWorld(null);
             aux.returnPlayerMoveInfo(moveInfo);
             return;
@@ -2488,7 +2495,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Don't do the heavier checking here, let moving checks reset these.
                 continue;
             }
-            if (checkHover(player, data, cc, info)) {
+            final PlayerData pData = DataManager.getPlayerData(player);
+            if (checkHover(player, data, cc, pData, info)) {
                 rem.add(playerName);
             }
         }
@@ -2552,7 +2560,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param info
      * @return
      */
-    private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final PlayerMoveInfo info) {
+    private boolean checkHover(final Player player, 
+            final MovingData data, final MovingConfig cc, final PlayerData pData,
+            final PlayerMoveInfo info) {
         // Check if player is on ground.
         final Location loc = player.getLocation(useLoc); // useLoc.setWorld(null) is done in onTick.
         info.set(player, loc, null, cc.yOnGround);
@@ -2573,7 +2583,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Re-Check if survivalfly can apply at all.
                 final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, cc.yOnGround);
-                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc)) {
+                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc, pData)) {
                     handleHoverViolation(player, loc, cc, data);
                     // Assume the player might still be hovering.
                     res = false;

@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
 import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
+import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 
 
 
@@ -188,5 +189,13 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * @return
      */
     public EventRegistryBukkit getEventRegistry();
+
+    /**
+     * Get the internal permission registry, holding internal id mappings and
+     * caching policies. (This is detached from Bukkit.)
+     * 
+     * @return
+     */
+    public PermissionRegistry getPermissionRegistry();
 
 }

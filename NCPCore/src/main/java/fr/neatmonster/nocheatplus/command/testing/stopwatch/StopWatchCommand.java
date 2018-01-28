@@ -25,13 +25,14 @@ import fr.neatmonster.nocheatplus.command.testing.stopwatch.distance.DistanceCom
 import fr.neatmonster.nocheatplus.command.testing.stopwatch.returnmargin.ReturnCommand;
 import fr.neatmonster.nocheatplus.command.testing.stopwatch.start.StartCommand;
 import fr.neatmonster.nocheatplus.command.testing.stopwatch.stop.StopCommand;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 
 /**
  * Root command. <br>
  * Intended features: current time with /stopwatch, sub commands: start+stop, distance, return to location<br>
  * TODO: countdown
- * @author mc_dev
+ * @author asofold
  *
  */
 public class StopWatchCommand extends BaseCommand {
@@ -39,7 +40,7 @@ public class StopWatchCommand extends BaseCommand {
     private final StopWatchRegistry registry = new StopWatchRegistry();
 
     public StopWatchCommand(final JavaPlugin access) {
-        super(access, "stopwatch", "nocheatplus.command.stopwatch", new String[]{"sw"});
+        super(access, "stopwatch", Permissions.COMMAND_STOPWATCH, new String[]{"sw"});
 
         access.getServer().getScheduler().scheduleSyncDelayedTask(access, new Runnable() {
             @Override

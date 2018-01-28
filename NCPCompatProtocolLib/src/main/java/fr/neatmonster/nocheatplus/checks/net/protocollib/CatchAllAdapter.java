@@ -29,6 +29,8 @@ import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.NetStatic;
 import fr.neatmonster.nocheatplus.checks.net.PacketFrequency;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 /**
  * Pre-1.9.
@@ -82,10 +84,12 @@ public class CatchAllAdapter extends BaseAdapter {
             return;
         }
         if (cc.packetFrequencyActive) {
-            final NetData data = dataFactory.getData(player);
-            if (packetFrequency.isEnabled(player, data, cc) 
-                    && packetFrequency.check(player, data, cc)) {
-                event.setCancelled(true);
+            final PlayerData pData = DataManager.getPlayerData(player);
+            if (packetFrequency.isEnabled(player, cc, pData)) {
+                final NetData data = dataFactory.getData(player);
+                if (packetFrequency.check(player, data, cc)) {
+                    event.setCancelled(true);
+                }
             }
         }
     }

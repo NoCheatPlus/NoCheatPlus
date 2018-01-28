@@ -14,179 +14,218 @@
  */
 package fr.neatmonster.nocheatplus.permissions;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * The various permission nodes used by NoCheatPlus.
  */
 public class Permissions {
+
+    /** Next id to use. */
+    private static int id = 1;
+    private static final Map<String, RegisteredPermission> permissions = new LinkedHashMap<String, RegisteredPermission>();
+
+    private static final RegisteredPermission add(String stringRepresentation) {
+        // TODO: Other concept / lock (?) once the plugin has fetched all on load.
+        RegisteredPermission permission = new RegisteredPermission(id, stringRepresentation);
+        if (permissions.containsKey(permission.getLowerCaseStringRepresentation())) {
+            return permissions.get(permission.getLowerCaseStringRepresentation());
+        }
+        else {
+            id++;
+            permissions.put(permission.getLowerCaseStringRepresentation(), permission);
+            return permission;
+        }
+    }
+
     private static final String NOCHEATPLUS                  = "nocheatplus";
 
     // Access to all commands and debug info.
     private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
-    public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
+    public static final RegisteredPermission  ADMINISTRATION_DEBUG         = add(ADMINISTRATION + ".debug");
 
     // Bypasses held extra from command permissions.
     private static final String BYPASS                       = NOCHEATPLUS + ".bypass";
-    public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
+    public static final RegisteredPermission BYPASS_DENY_LOGIN            = add(BYPASS + "denylogin");
 
     // Bypass command filter.
     private static final String FILTER                       = NOCHEATPLUS + ".filter";
-    public static final String  FILTER_COMMAND               = FILTER + ".command";
-    public static final String  FILTER_COMMAND_NOCHEATPLUS   = FILTER_COMMAND + ".nocheatplus";
+    public static final RegisteredPermission  FILTER_COMMAND               = add(FILTER + ".command");
+    public static final RegisteredPermission  FILTER_COMMAND_NOCHEATPLUS   = add(FILTER_COMMAND + ".nocheatplus");
 
     // Notifications (in-game).
-    public static final String  NOTIFY                       = NOCHEATPLUS + ".notify";
+    public static final RegisteredPermission  NOTIFY                       = add(NOCHEATPLUS + ".notify");
 
     // Command permissions.
-    public static final String  COMMAND                      = NOCHEATPLUS + ".command";
-    public static final String  COMMAND_COMMANDS             = COMMAND + ".commands";
-    public static final String  COMMAND_DEBUG                = COMMAND + ".debug";
-    public static final String  COMMAND_EXEMPT               = COMMAND + ".exempt";
-    public static final String  COMMAND_EXEMPTIONS           = COMMAND + ".exemptions";
-    public static final String  COMMAND_INFO                 = COMMAND + ".info";
-    public static final String  COMMAND_INSPECT              = COMMAND + ".inspect";
-    public static final String  COMMAND_LAG                  = COMMAND + ".lag";
-    public static final String  COMMAND_LOG                  = COMMAND + ".log";
-    public static final String  COMMAND_NOTIFY               = COMMAND + ".notify";
-    public static final String  COMMAND_RELOAD               = COMMAND + ".reload";
-    public static final String  COMMAND_REMOVEPLAYER         = COMMAND + ".removeplayer";
-    public static final String  COMMAND_RESET                = COMMAND + ".reset";
-    public static final String  COMMAND_TOP                  = COMMAND + ".top";
-    public static final String  COMMAND_UNEXEMPT             = COMMAND + ".unexempt";
-    public static final String  COMMAND_VERSION              = COMMAND + ".version";
+    public static final RegisteredPermission  COMMAND                      = add(NOCHEATPLUS + ".command");
+    public static final RegisteredPermission  COMMAND_COMMANDS             = add(COMMAND + ".commands");
+    public static final RegisteredPermission  COMMAND_DEBUG                = add(COMMAND + ".debug");
+    public static final RegisteredPermission  COMMAND_EXEMPT               = add(COMMAND + ".exempt");
+    public static final RegisteredPermission  COMMAND_EXEMPT_SELF          = add(COMMAND_EXEMPT + ".self");
+    public static final RegisteredPermission  COMMAND_EXEMPTIONS           = add(COMMAND + ".exemptions");
+    public static final RegisteredPermission  COMMAND_INFO                 = add(COMMAND + ".info");
+    public static final RegisteredPermission  COMMAND_INSPECT              = add(COMMAND + ".inspect");
+    public static final RegisteredPermission  COMMAND_LAG                  = add(COMMAND + ".lag");
+    public static final RegisteredPermission  COMMAND_LOG                  = add(COMMAND + ".log");
+    public static final RegisteredPermission  COMMAND_NOTIFY               = add(COMMAND + ".notify");
+    public static final RegisteredPermission  COMMAND_RELOAD               = add(COMMAND + ".reload");
+    public static final RegisteredPermission  COMMAND_REMOVEPLAYER         = add(COMMAND + ".removeplayer");
+    public static final RegisteredPermission  COMMAND_REMOVEPLAYER_SELF    = add(COMMAND_REMOVEPLAYER + ".self");
+    public static final RegisteredPermission  COMMAND_RESET                = add(COMMAND + ".reset");
+    public static final RegisteredPermission  COMMAND_TOP                  = add(COMMAND + ".top");
+    public static final RegisteredPermission  COMMAND_UNEXEMPT             = add(COMMAND + ".unexempt");
+    public static final RegisteredPermission  COMMAND_UNEXEMPT_SELF        = add(COMMAND_UNEXEMPT + ".self");
+    public static final RegisteredPermission  COMMAND_VERSION              = add(COMMAND + ".version");
 
     // Auxiliary Command permissions.
-    public static final String  COMMAND_ALLOWLOGIN           = COMMAND + ".allowlogin";
-    public static final String  COMMAND_BAN                  = COMMAND + ".ban";
-    public static final String  COMMAND_DELAY                = COMMAND + ".delay";
-    public static final String  COMMAND_DENYLOGIN            = COMMAND + ".denylogin";
-    public static final String  COMMAND_KICK                 = COMMAND + ".kick";
-    public static final String  COMMAND_KICKLIST             = COMMAND + ".kicklist";
-    public static final String  COMMAND_TELL                 = COMMAND + ".tell";
+    public static final RegisteredPermission  COMMAND_ALLOWLOGIN           = add(COMMAND + ".allowlogin");
+    public static final RegisteredPermission  COMMAND_BAN                  = add(COMMAND + ".ban");
+    public static final RegisteredPermission  COMMAND_DELAY                = add(COMMAND + ".delay");
+    public static final RegisteredPermission  COMMAND_DENYLOGIN            = add(COMMAND + ".denylogin");
+    public static final RegisteredPermission  COMMAND_KICK                 = add(COMMAND + ".kick");
+    public static final RegisteredPermission  COMMAND_KICKLIST             = add(COMMAND + ".kicklist");
+    public static final RegisteredPermission  COMMAND_TELL                 = add(COMMAND + ".tell");
+    public static final RegisteredPermission  COMMAND_STOPWATCH            = add(COMMAND + ".stopwatch");
 
     // Permissions for the individual checks.
-    public static final String  CHECKS                       = NOCHEATPLUS + ".checks";
+    public static final RegisteredPermission  CHECKS                       = add(NOCHEATPLUS + ".checks");
 
-    public static final String  BLOCKBREAK                   = CHECKS + ".blockbreak";
-    public static final String  BLOCKBREAK_BREAK             = BLOCKBREAK + ".break";
-    public static final String  BLOCKBREAK_BREAK_LIQUID      = BLOCKBREAK_BREAK + ".liquid";
-    public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
-    public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
-    public static final String  BLOCKBREAK_FREQUENCY         = BLOCKBREAK + ".frequency";
-    public static final String  BLOCKBREAK_NOSWING           = BLOCKBREAK + ".noswing";
-    public static final String  BLOCKBREAK_REACH             = BLOCKBREAK + ".reach";
-    public static final String  BLOCKBREAK_WRONGBLOCK        = BLOCKBREAK + ".wrongblock";
+    public static final RegisteredPermission  BLOCKBREAK                   = add(CHECKS + ".blockbreak");
+    public static final RegisteredPermission  BLOCKBREAK_BREAK             = add(BLOCKBREAK + ".break");
+    public static final RegisteredPermission  BLOCKBREAK_BREAK_LIQUID      = add(BLOCKBREAK_BREAK + ".liquid");
+    public static final RegisteredPermission  BLOCKBREAK_DIRECTION         = add(BLOCKBREAK + ".direction");
+    public static final RegisteredPermission  BLOCKBREAK_FASTBREAK         = add(BLOCKBREAK + ".fastbreak");
+    public static final RegisteredPermission  BLOCKBREAK_FREQUENCY         = add(BLOCKBREAK + ".frequency");
+    public static final RegisteredPermission  BLOCKBREAK_NOSWING           = add(BLOCKBREAK + ".noswing");
+    public static final RegisteredPermission  BLOCKBREAK_REACH             = add(BLOCKBREAK + ".reach");
+    public static final RegisteredPermission  BLOCKBREAK_WRONGBLOCK        = add(BLOCKBREAK + ".wrongblock");
 
-    public static final String  BLOCKINTERACT                = CHECKS + ".blockinteract";
-    public static final String  BLOCKINTERACT_DIRECTION      = BLOCKINTERACT + ".direction";
-    public static final String  BLOCKINTERACT_REACH          = BLOCKINTERACT + ".reach";
-    public static final String  BLOCKINTERACT_SPEED          = BLOCKINTERACT + ".speed";
-    public static final String  BLOCKINTERACT_VISIBLE        = BLOCKINTERACT + ".visible";
+    public static final RegisteredPermission  BLOCKINTERACT                = add(CHECKS + ".blockinteract");
+    public static final RegisteredPermission  BLOCKINTERACT_DIRECTION      = add(BLOCKINTERACT + ".direction");
+    public static final RegisteredPermission  BLOCKINTERACT_REACH          = add(BLOCKINTERACT + ".reach");
+    public static final RegisteredPermission  BLOCKINTERACT_SPEED          = add(BLOCKINTERACT + ".speed");
+    public static final RegisteredPermission  BLOCKINTERACT_VISIBLE        = add(BLOCKINTERACT + ".visible");
 
-    public static final String  BLOCKPLACE                   = CHECKS + ".blockplace";
-    public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
-    public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
-    public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
-    public static final String  BLOCKPLACE_AUTOSIGN          = BLOCKPLACE + ".autosign";
-    public static final String  BLOCKPLACE_BOATSANYWHERE     = BLOCKPLACE + ".boatsanywhere";
-    public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
-    public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
-    public static final String  BLOCKPLACE_NOSWING           = BLOCKPLACE + ".noswing";
-    public static final String  BLOCKPLACE_REACH             = BLOCKPLACE + ".reach";
-    public static final String  BLOCKPLACE_SPEED             = BLOCKPLACE + ".speed";
+    public static final RegisteredPermission  BLOCKPLACE                   = add(CHECKS + ".blockplace");
+    public static final RegisteredPermission  BLOCKPLACE_AGAINST           = add(BLOCKPLACE + ".against");
+    public static final RegisteredPermission  BLOCKPLACE_AGAINST_AIR       = add(BLOCKPLACE_AGAINST + ".air");
+    public static final RegisteredPermission  BLOCKPLACE_AGAINST_LIQUIDS   = add(BLOCKPLACE_AGAINST + ".liquids");
+    public static final RegisteredPermission  BLOCKPLACE_AUTOSIGN          = add(BLOCKPLACE + ".autosign");
+    public static final RegisteredPermission  BLOCKPLACE_BOATSANYWHERE     = add(BLOCKPLACE + ".boatsanywhere");
+    public static final RegisteredPermission  BLOCKPLACE_DIRECTION         = add(BLOCKPLACE + ".direction");
+    public static final RegisteredPermission  BLOCKPLACE_FASTPLACE         = add(BLOCKPLACE + ".fastplace");
+    public static final RegisteredPermission  BLOCKPLACE_NOSWING           = add(BLOCKPLACE + ".noswing");
+    public static final RegisteredPermission  BLOCKPLACE_REACH             = add(BLOCKPLACE + ".reach");
+    public static final RegisteredPermission  BLOCKPLACE_SPEED             = add(BLOCKPLACE + ".speed");
 
-    public static final String  CHAT                         = CHECKS + ".chat";
-    public static final String  CHAT_CAPTCHA                 = CHAT + ".captcha";
-    public static final String  CHAT_COLOR                   = CHAT + ".color";
-    public static final String  CHAT_COMMANDS                = CHAT + ".commands";
-    public static final String  CHAT_LOGINS                  = CHAT + ".logins";
-    public static final String  CHAT_RELOG                   = CHAT + ".relog";
-    public static final String  CHAT_TEXT                    = CHAT + ".text";
+    public static final RegisteredPermission  CHAT                         = add(CHECKS + ".chat");
+    public static final RegisteredPermission  CHAT_CAPTCHA                 = add(CHAT + ".captcha");
+    public static final RegisteredPermission  CHAT_COLOR                   = add(CHAT + ".color");
+    public static final RegisteredPermission  CHAT_COMMANDS                = add(CHAT + ".commands");
+    public static final RegisteredPermission  CHAT_LOGINS                  = add(CHAT + ".logins");
+    public static final RegisteredPermission  CHAT_RELOG                   = add(CHAT + ".relog");
+    public static final RegisteredPermission  CHAT_TEXT                    = add(CHAT + ".text");
 
-    public static final String  COMBINED                     = CHECKS + ".combined";
-    public static final String  COMBINED_BEDLEAVE            = COMBINED + ".bedleave";
-    public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
-    public static final String  COMBINED_MUNCHHAUSEN         = COMBINED + ".munchhausen";
+    public static final RegisteredPermission  COMBINED                     = add(CHECKS + ".combined");
+    public static final RegisteredPermission  COMBINED_BEDLEAVE            = add(COMBINED + ".bedleave");
+    public static final RegisteredPermission  COMBINED_IMPROBABLE          = add(COMBINED + ".improbable");
+    public static final RegisteredPermission  COMBINED_MUNCHHAUSEN         = add(COMBINED + ".munchhausen");
 
-    public static final String  FIGHT                        = CHECKS + ".fight";
-    public static final String  FIGHT_ANGLE                  = FIGHT + ".angle";
-    public static final String  FIGHT_CRITICAL               = FIGHT + ".critical";
-    public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
-    public static final String  FIGHT_FASTHEAL               = FIGHT + ".fastheal";
-    public static final String  FIGHT_GODMODE                = FIGHT + ".godmode";
-    public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";
-    public static final String  FIGHT_REACH                  = FIGHT + ".reach";
-    public static final String  FIGHT_SELFHIT                = FIGHT + ".selfhit";
-    public static final String  FIGHT_SPEED                  = FIGHT + ".speed";
+    public static final RegisteredPermission  FIGHT                        = add(CHECKS + ".fight");
+    public static final RegisteredPermission  FIGHT_ANGLE                  = add(FIGHT + ".angle");
+    public static final RegisteredPermission  FIGHT_CRITICAL               = add(FIGHT + ".critical");
+    public static final RegisteredPermission  FIGHT_DIRECTION              = add(FIGHT + ".direction");
+    public static final RegisteredPermission  FIGHT_FASTHEAL               = add(FIGHT + ".fastheal");
+    public static final RegisteredPermission  FIGHT_GODMODE                = add(FIGHT + ".godmode");
+    public static final RegisteredPermission  FIGHT_NOSWING                = add(FIGHT + ".noswing");
+    public static final RegisteredPermission  FIGHT_REACH                  = add(FIGHT + ".reach");
+    public static final RegisteredPermission  FIGHT_SELFHIT                = add(FIGHT + ".selfhit");
+    public static final RegisteredPermission  FIGHT_SPEED                  = add(FIGHT + ".speed");
 
-    public static final String  INVENTORY                    = CHECKS + ".inventory";
-    public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
-    public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
-    public static final String  INVENTORY_FASTCONSUME        = INVENTORY + ".fastconsume";
-    public static final String  INVENTORY_GUTENBERG          = INVENTORY + ".gutenberg";
-    public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
-    public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
-    public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
-    public static final String  INVENTORY_OPEN               = INVENTORY + ".open";
+    public static final RegisteredPermission  INVENTORY                    = add(CHECKS + ".inventory");
+    public static final RegisteredPermission  INVENTORY_DROP               = add(INVENTORY + ".drop");
+    public static final RegisteredPermission  INVENTORY_FASTCLICK          = add(INVENTORY + ".fastclick");
+    public static final RegisteredPermission  INVENTORY_FASTCONSUME        = add(INVENTORY + ".fastconsume");
+    public static final RegisteredPermission  INVENTORY_GUTENBERG          = add(INVENTORY + ".gutenberg");
+    public static final RegisteredPermission  INVENTORY_INSTANTBOW         = add(INVENTORY + ".instantbow");
+    public static final RegisteredPermission  INVENTORY_INSTANTEAT         = add(INVENTORY + ".instanteat");
+    public static final RegisteredPermission  INVENTORY_ITEMS              = add(INVENTORY + ".items");
+    public static final RegisteredPermission  INVENTORY_OPEN               = add(INVENTORY + ".open");
 
-    public static final String  NET                          = CHECKS + ".net";
-    public static final String  NET_ATTACKFREQUENCY          = NET + ".attackfrequency";
-    public static final String  NET_FLYINGFREQUENCY          = NET + ".flyingfrequency";
-    public static final String  NET_KEEPALIVEFREQUENCY       = NET + ".keepalivefrequency";
-    public static final String  NET_PACKETFREQUENCY          = NET + ".packetfrequency";
+    public static final RegisteredPermission  NET                          = add(CHECKS + ".net");
+    public static final RegisteredPermission  NET_ATTACKFREQUENCY          = add(NET + ".attackfrequency");
+    public static final RegisteredPermission  NET_FLYINGFREQUENCY          = add(NET + ".flyingfrequency");
+    public static final RegisteredPermission  NET_KEEPALIVEFREQUENCY       = add(NET + ".keepalivefrequency");
+    public static final RegisteredPermission  NET_PACKETFREQUENCY          = add(NET + ".packetfrequency");
 
-    public static final String  MOVING                       = CHECKS + ".moving";
-    public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
-    public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
-    public static final String  MOVING_NOFALL                = MOVING + ".nofall";
-    public static final String  MOVING_PASSABLE              = MOVING + ".passable";
-    public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
-    public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
-    public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
-    public static final String  MOVING_SURVIVALFLY_SPEEDING  = MOVING_SURVIVALFLY + ".speeding";
-    public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
-    public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
-    public static final String  MOVING_VEHICLE               = MOVING + ".vehicle";
-    public static final String  MOVING_VEHICLE_MOREPACKETS   = MOVING_VEHICLE + ".morepackets";
-    public static final String  MOVING_VEHICLE_ENVELOPE      = MOVING_VEHICLE + ".envelope";
+    public static final RegisteredPermission  MOVING                       = add(CHECKS + ".moving");
+    public static final RegisteredPermission  MOVING_CREATIVEFLY           = add(MOVING + ".creativefly");
+    public static final RegisteredPermission  MOVING_MOREPACKETS           = add(MOVING + ".morepackets");
+    public static final RegisteredPermission  MOVING_NOFALL                = add(MOVING + ".nofall");
+    public static final RegisteredPermission  MOVING_PASSABLE              = add(MOVING + ".passable");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY           = add(MOVING + ".survivalfly");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY_BLOCKING  = add(MOVING_SURVIVALFLY + ".blocking");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY_SNEAKING  = add(MOVING_SURVIVALFLY + ".sneaking");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY_SPEEDING  = add(MOVING_SURVIVALFLY + ".speeding");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY_SPRINTING = add(MOVING_SURVIVALFLY + ".sprinting");
+    public static final RegisteredPermission  MOVING_SURVIVALFLY_STEP      = add(MOVING_SURVIVALFLY + ".step");
+    public static final RegisteredPermission  MOVING_VEHICLE               = add(MOVING + ".vehicle");
+    public static final RegisteredPermission  MOVING_VEHICLE_MOREPACKETS   = add(MOVING_VEHICLE + ".morepackets");
+    public static final RegisteredPermission  MOVING_VEHICLE_ENVELOPE      = add(MOVING_VEHICLE + ".envelope");
 
     // Permissions for the individual client mods.
     private static final String MODS                         = NOCHEATPLUS + ".mods";
 
     private static final String CJB                          = MODS + ".cjb";
-    public static final String  CJB_FLY                      = CJB + ".fly";
-    public static final String  CJB_RADAR                    = CJB + ".radar";
-    public static final String  CJB_XRAY                     = CJB + ".xray";
+    public static final RegisteredPermission  CJB_FLY                      = add(CJB + ".fly");
+    public static final RegisteredPermission  CJB_RADAR                    = add(CJB + ".radar");
+    public static final RegisteredPermission  CJB_XRAY                     = add(CJB + ".xray");
 
     private static final String MINECRAFTAUTOMAP             = MODS + ".minecraftautomap";
-    public static final String  MINECRAFTAUTOMAP_CAVE        = MINECRAFTAUTOMAP + ".cave";
-    public static final String  MINECRAFTAUTOMAP_ORES        = MINECRAFTAUTOMAP + ".ores";
-    public static final String  MINECRAFTAUTOMAP_RADAR       = MINECRAFTAUTOMAP + ".radar";
+    public static final RegisteredPermission  MINECRAFTAUTOMAP_CAVE        = add(MINECRAFTAUTOMAP + ".cave");
+    public static final RegisteredPermission  MINECRAFTAUTOMAP_ORES        = add(MINECRAFTAUTOMAP + ".ores");
+    public static final RegisteredPermission  MINECRAFTAUTOMAP_RADAR       = add(MINECRAFTAUTOMAP + ".radar");
 
     private static final String REI                          = MODS + ".rei";
-    public static final String  REI_CAVE                     = REI + ".cave";
-    public static final String  REI_RADAR                    = REI + ".radar";
-    public static final String  REI_RADAR_ANIMAL             = REI_RADAR + ".animal";
-    public static final String  REI_RADAR_PLAYER             = REI_RADAR + ".player";
-    public static final String  REI_RADAR_MOB                = REI_RADAR + ".mob";
-    public static final String  REI_RADAR_OTHER              = REI_RADAR + ".other";
-    public static final String  REI_RADAR_SLIME              = REI_RADAR + ".slime";
-    public static final String  REI_RADAR_SQUID              = REI_RADAR + ".squid";
+    public static final RegisteredPermission  REI_CAVE                     = add(REI + ".cave");
+    public static final RegisteredPermission  REI_RADAR                    = add(REI + ".radar");
+    public static final RegisteredPermission  REI_RADAR_ANIMAL             = add(REI_RADAR + ".animal");
+    public static final RegisteredPermission  REI_RADAR_PLAYER             = add(REI_RADAR + ".player");
+    public static final RegisteredPermission  REI_RADAR_MOB                = add(REI_RADAR + ".mob");
+    public static final RegisteredPermission  REI_RADAR_OTHER              = add(REI_RADAR + ".other");
+    public static final RegisteredPermission  REI_RADAR_SLIME              = add(REI_RADAR + ".slime");
+    public static final RegisteredPermission  REI_RADAR_SQUID              = add(REI_RADAR + ".squid");
 
     private static final String SMARTMOVING                  = MODS + ".smartmoving";
-    public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
-    public static final String  SMARTMOVING_CRAWLING         = SMARTMOVING + ".crawling";
-    public static final String  SMARTMOVING_FLYING           = SMARTMOVING + ".flying";
-    public static final String  SMARTMOVING_JUMPING          = SMARTMOVING + ".jumping";
-    public static final String  SMARTMOVING_SLIDING          = SMARTMOVING + ".sliding";
-    public static final String  SMARTMOVING_SWIMMING         = SMARTMOVING + ".swimming";
+    public static final RegisteredPermission  SMARTMOVING_CLIMBING         = add(SMARTMOVING + ".climbing");
+    public static final RegisteredPermission  SMARTMOVING_CRAWLING         = add(SMARTMOVING + ".crawling");
+    public static final RegisteredPermission  SMARTMOVING_FLYING           = add(SMARTMOVING + ".flying");
+    public static final RegisteredPermission  SMARTMOVING_JUMPING          = add(SMARTMOVING + ".jumping");
+    public static final RegisteredPermission  SMARTMOVING_SLIDING          = add(SMARTMOVING + ".sliding");
+    public static final RegisteredPermission  SMARTMOVING_SWIMMING         = add(SMARTMOVING + ".swimming");
 
     private static final String ZOMBE                        = MODS + ".zombe";
-    public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
-    public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
-    public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
+    public static final RegisteredPermission  ZOMBE_CHEAT                  = add(ZOMBE + ".cheat");
+    public static final RegisteredPermission  ZOMBE_FLY                    = add(ZOMBE + ".fly");
+    public static final RegisteredPermission  ZOMBE_NOCLIP                 = add(ZOMBE + ".noclip");
 
     private static final String JOURNEY                      = MODS + ".journey";
-    public static final String  JOURNEY_RADAR                = JOURNEY + ".radar";
-    public static final String  JOURNEY_CAVE                 = JOURNEY + ".cavemap";
+    public static final RegisteredPermission  JOURNEY_RADAR                = add(JOURNEY + ".radar");
+    public static final RegisteredPermission  JOURNEY_CAVE                 = add(JOURNEY + ".cavemap");
+
+    /**
+     * Get a new list with all permissions that have been added up to now. (As
+     * long as CheckType is static/final, CheckType initialization will add to
+     * here, then the plugin will fetch to create the internal
+     * PermissionRegistry.)
+     * 
+     * @return
+     */
+    public static List<RegisteredPermission> getPermissions() {
+        return new ArrayList<RegisteredPermission>(permissions.values());
+    }
 
 }

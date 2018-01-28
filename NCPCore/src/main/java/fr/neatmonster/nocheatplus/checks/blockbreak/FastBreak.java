@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -56,7 +57,8 @@ public class FastBreak extends Check {
      * @param elaspedTime
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final AlmostBoolean isInstaBreak, final BlockBreakConfig cc, final BlockBreakData data) {
+    public boolean check(final Player player, final Block block, final AlmostBoolean isInstaBreak, 
+            final BlockBreakConfig cc, final BlockBreakData data, final PlayerData pData) {
         final long now = System.currentTimeMillis();
         boolean cancel = false;
 
@@ -117,8 +119,9 @@ public class FastBreak extends Check {
             data.fastBreakVL *= 0.9D;
         }
 
-        if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if ((data.debug) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
             // General stats:
+            // TODO: Replace stats by new system (BlockBreakKey once complete), commands to inspect / auto-config.
             if (data.stats != null) {
                 data.stats.addStats(data.stats.getId(blockType+ "/u", true), elapsedTime);
                 data.stats.addStats(data.stats.getId(blockType + "/r", true), expectedBreakingTime);

@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 public class WrongBlock extends Check {
@@ -41,7 +42,9 @@ public class WrongBlock extends Check {
      * @param isInstaBreak 
      * @return
      */
-    public boolean check(final Player player, final Block block, final BlockBreakConfig cc, final BlockBreakData data, final AlmostBoolean isInstaBreak) {
+    public boolean check(final Player player, final Block block, 
+            final BlockBreakConfig cc, final BlockBreakData data, final PlayerData pData,
+            final AlmostBoolean isInstaBreak) {
 
         boolean cancel = false;
 
@@ -77,7 +80,7 @@ public class WrongBlock extends Check {
         }
 
         if (wrongBlock) {
-            if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+            if ((data.debug) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
                 player.sendMessage("WrongBlock failure with dist: " + dist);
             }
             data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);

@@ -134,6 +134,12 @@ public abstract class ConfPaths {
      */
     public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
 
+    // Permission caching setup.
+    private static final String PERMISSIONS                              = "permissions.";
+    private static final String PERMISSIONS_POLICY                       = PERMISSIONS + "policy.";
+    public static final  String PERMISSIONS_POLICY_DEFAULT                = PERMISSIONS_POLICY + "default";
+    public static final  String PERMISSIONS_POLICY_RULES                  = PERMISSIONS_POLICY + "rules";
+
     private static final String PROTECT                                  = "protection.";
     // Clients settings.
     private static final String PROTECT_CLIENTS                          = PROTECT + "clients.";

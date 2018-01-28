@@ -17,11 +17,13 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 public class CJBMOTD extends ClientMOTD {
 
     @Override
-    public String onPlayerJoin(String message, Player player, boolean allowAll) {
+    public String onPlayerJoin(final String message, final Player player, final PlayerData data, 
+            final boolean allowAll) {
 
         if (allowAll){
             return message;
@@ -34,17 +36,17 @@ public class CJBMOTD extends ClientMOTD {
         // TODO: Fly and xray removed ?
 
         // Disable CJB's fly mod.
-        if (!player.hasPermission(Permissions.CJB_FLY)){
+        if (!data.hasPermission(Permissions.CJB_FLY, player)){
             cjb += "§3 §9 §2 §0 §0 §1";
         }
 
         // Disable CJB's xray.
-        if (!player.hasPermission(Permissions.CJB_XRAY)){
+        if (!data.hasPermission(Permissions.CJB_XRAY, player)){
             cjb += "§3 §9 §2 §0 §0 §2";
         }
 
         // Disable CJB's radar.
-        if (!player.hasPermission(Permissions.CJB_RADAR)){
+        if (!data.hasPermission(Permissions.CJB_RADAR, player)){
             cjb += "§3 §9 §2 §0 §0 §3";
         }
 

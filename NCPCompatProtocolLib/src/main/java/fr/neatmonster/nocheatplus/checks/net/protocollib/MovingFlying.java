@@ -44,6 +44,8 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -265,8 +267,9 @@ public class MovingFlying extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
+        final PlayerData pData = DataManager.getPlayerData(player);
         if (!cancel && !skipFlyingFrequency 
-                && flyingFrequency.check(player, packetData, time, data, cc)) {
+                && flyingFrequency.check(player, packetData, time, data, cc, pData)) {
             cancel = true;
         }
 

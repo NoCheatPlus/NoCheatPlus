@@ -53,12 +53,13 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
  * The /nocheatplus or /ncp command handler, delegates to sub commands.
  */
-public class NoCheatPlusCommand extends BaseCommand{
+public class NoCheatPlusCommand extends BaseCommand {
 
     /**
      * The event triggered when NoCheatPlus configuration is reloaded.
@@ -132,8 +133,8 @@ public class NoCheatPlusCommand extends BaseCommand{
      * Retrieve a collection with all sub-command permissions.
      * @return
      */
-    public Collection<String> getAllSubCommandPermissions(){
-        final Set<String> set = new LinkedHashSet<String>(rootLabels.size());
+    public Collection<RegisteredPermission> getAllSubCommandPermissions(){
+        final Set<RegisteredPermission> set = new LinkedHashSet<RegisteredPermission>(rootLabels.size());
         for (final String label : rootLabels){
             set.add(subCommands.get(label).permission);
         }
@@ -153,7 +154,8 @@ public class NoCheatPlusCommand extends BaseCommand{
             return false;
         }
 
-        if (sender.hasPermission(Permissions.FILTER_COMMAND_NOCHEATPLUS)){
+        // TODO: Fetch from PlayerData or not...
+        if (sender.hasPermission(Permissions.FILTER_COMMAND_NOCHEATPLUS.getBukkitPermission())){
             // Check sub-commands.
             if (args.length > 0){
                 AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());

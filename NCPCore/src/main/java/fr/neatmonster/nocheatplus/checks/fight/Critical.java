@@ -32,6 +32,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
@@ -56,7 +57,8 @@ public class Critical extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location loc, final FightData data, final FightConfig cc) {
+    public boolean check(final Player player, final Location loc, 
+            final FightData data, final FightConfig cc, final PlayerData pData) {
         boolean cancel = false;
 
         final double mcFallDistance = (double) player.getFallDistance();
@@ -80,7 +82,7 @@ public class Critical extends Check {
                 // TODO: Use past move tracking to check for SurvivalFly and the like?
                 final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, ccM.yOnGround);
-                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, dataM, ccM)) {
+                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, dataM, ccM, pData)) {
                     data.criticalVL += 1.0;
                     // Execute whatever actions are associated with this check and 
                     //  the violation level and find out if we should cancel the event.
