@@ -336,6 +336,18 @@ public abstract class DualCollection<T, C extends Collection<T>> {
     }
 
     /**
+     * Return a merged collection and clear internal ones - primary thread only.
+     * 
+     * @return Returns null, if no elements are contained.
+     */
+    public Collection<T> getMergePrimaryThreadAndClear() {
+        mergePrimaryThread();
+        final Collection<T> res = this.primaryThreadCollection;
+        this.primaryThreadCollection = null;
+        return (res == null || res.isEmpty()) ? null : res;
+    }
+
+    /**
      * Clear the primary thread collection. <br>
      * Primary thread only.
      * 
