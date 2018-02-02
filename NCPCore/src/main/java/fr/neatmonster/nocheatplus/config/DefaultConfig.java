@@ -79,24 +79,24 @@ public class DefaultConfig extends ConfigFile {
 
         // Permission settings.
         set(ConfPaths.PERMISSIONS_POLICY_DEFAULT, "ALWAYS", 1140);
-        /*
-         * TODO: Setting the rules paths forces people to keep those entries -
-         * note: put to the end, if in the way, order should be preserved.
-         * Consider a preventupdateconfig strategy (where to, where not to), if
-         * a parent path already is set.
-         */
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#admin#debug", "INTERVAL:5", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#admin*", "ALWAYS", 1140);
-        // TODO: Command permissions are always checked anyway :p. Will be changed...
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#command*", "ALWAYS", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#bypass*", "ALWAYS", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#net#*", "INTERVAL:2", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#commands", "INTERVAL:2", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#text", "INTERVAL:2", 1140);
-        // Relog, logins: Note: aims at login denial, would invalidate once offline/world change. +- not sure.
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#relog", "INTERVAL:5", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#chat#logins", "INTERVAL:5", 1140);
-        set(ConfPaths.PERMISSIONS_POLICY_RULES + ".nocheatplus#checks#moving#survivalfly#*", "INTERVAL:5", 1140);
+        set(ConfPaths.PERMISSIONS_POLICY_RULES, Arrays.asList(
+                "nocheatplus.admin.debug :: INTERVAL:5",
+                "nocheatplus.admin* :: ALWAYS",
+                // TODO: NOTIFY (not command).
+                // TODO: Command permissions are always checked anyway :p. Will be changed...
+                "nocheatplus.command* :: ALWAYS",
+                "nocheatplus.bypass* :: ALWAYS",
+                "regex:^nocheatplus\\.checks\\..*\\.silent$ :: FALSE",
+                /*
+                 * Relog, logins: Note: aims at login denial, would invalidate
+                 * once offline/world change. +- not sure.
+                 */
+                "nocheatplus.checks.chat.relog :: INTERVAL:10",
+                "nocheatplus.checks.chat.logins :: INTERVAL:10",
+                "nocheatplus.checks.chat.* :: INTERVAL:2",
+                "nocheatplus.checks.net.* :: INTERVAL:2",
+                "nocheatplus.checks.moving.survivalfly.* :: INTERVAL:5" // (Excludes the sf base permission.)
+                ), 1140);
 
         // Protection features.
         // Hide plugins.

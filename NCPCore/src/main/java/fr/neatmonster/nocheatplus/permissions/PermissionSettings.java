@@ -170,13 +170,18 @@ public class PermissionSettings {
         }
         final Map<String, PermissionPolicy> explicitPolicy = new LinkedHashMap<String, PermissionPolicy>();
         final List<PermissionRule> implicitRules = new LinkedList<PermissionSettings.PermissionRule>();
-        final ConfigurationSection section = config.getConfigurationSection(pathRules);
-        for (String ruleDef : section.getKeys(false)) {
-            String policyDef = null;
+
+        // TODO: Change to List ! +- separators.
+        final List<String> defs = config.getStringList(pathRules);
+        for (String def : defs) {
+            String[] split = def.split(": ", 2);
+            if (split.length != 2) {
+                throw new IllegalArgumentException("Must the separate matching rule from the policy definition by ' :: '.");
+            }
+            final String ruleDef = RegisteredPermission.toLowerCaseStringRepresentation(split[0].trim());
+            final String policyDef = split[1].trim();
             try {
-                policyDef = section.getString(ruleDef);
                 final PermissionPolicy policy = new PermissionPolicy().setPolicyFromConfigLine(policyDef);
-                ruleDef = RegisteredPermission.toLowerCaseStringRepresentation(ruleDef.trim()).replace('#', '.');
                 final PermissionRule rule = getMatchingRule(ruleDef, policy);
                 if (rule == null) {
                     explicitPolicy.put(ruleDef, policy);
