@@ -9,8 +9,8 @@ import fr.neatmonster.nocheatplus.permissions.PermissionPolicy;
 public class TestPermissionPolicy {
 
     private void testToConfigString(PermissionPolicy policy, String expected) {
-        if (!policy.toConfigString().equals(expected)) {
-            fail("Expect toConfigString() to result in '" + expected + "', got instead: '" + policy.toConfigString() + "'");
+        if (!policy.policyToConfigLine().equals(expected)) {
+            fail("Expect toConfigString() to result in '" + expected + "', got instead: '" + policy.policyToConfigLine() + "'");
         }
     }
 
@@ -27,9 +27,9 @@ public class TestPermissionPolicy {
     }
 
     private void testFromConfigString(PermissionPolicy policy) {
-        String to = policy.toConfigString();
+        String to = policy.policyToConfigLine();
         PermissionPolicy policy2 = new PermissionPolicy();
-        policy2.setFromConfigString(to);
+        policy2.setPolicyFromConfigLine(to);
         if (!policy.isPolicyEquivalent(policy2)) {
             fail("to+from config string yields non equivalent policy.");
         }
@@ -38,9 +38,9 @@ public class TestPermissionPolicy {
     private void testFromConfigString(PermissionPolicy equivalent, String... inputs) {
         for (String input : inputs) {
             PermissionPolicy policy2 = new PermissionPolicy();
-            policy2.setFromConfigString(input);
+            policy2.setPolicyFromConfigLine(input);
             if (!equivalent.isPolicyEquivalent(policy2)) {
-                fail("Expect equivalent policy to '" + equivalent.toConfigString() + "', got instead: " + policy2.toConfigString());
+                fail("Expect equivalent policy to '" + equivalent.policyToConfigLine() + "', got instead: " + policy2.policyToConfigLine());
             }
         }
     }

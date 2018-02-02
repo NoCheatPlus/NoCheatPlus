@@ -142,7 +142,7 @@ public class PermissionPolicy {
      * @throws IllegalArgumentException
      *             on errors.
      */
-    public PermissionPolicy setFromConfigString(final String input) {
+    public PermissionPolicy setPolicyFromConfigLine(final String input) {
         final List<String> split = StringUtil.getNonEmpty(StringUtil.splitChars(input.trim(), ' ', ':', ','), true);
         FetchingPolicy fetchingPolicy;
         long interval = 0;
@@ -211,7 +211,24 @@ public class PermissionPolicy {
         return this;
     }
 
-    public String toConfigString() {
+    /**
+     * Minimized config line, skipping some defaults.
+     * 
+     * @return
+     */
+    public String policyToConfigLine() {
+        return policyToConfigLine(true);
+    }
+
+    /**
+     * 
+     * @param skipDefaults
+     *            Only applies to extras like invalidation policy. The fetching
+     *            policy and in case of INTERVAL the interval, are always
+     *            included.
+     * @return
+     */
+    public String policyToConfigLine(final boolean skipDefaults) {
         final StringBuilder builder = new StringBuilder(124);
         builder.append(fetchingPolicy.name());
         if (fetchingPolicy == FetchingPolicy.INTERVAL) {
@@ -219,11 +236,11 @@ public class PermissionPolicy {
             builder.append(((double) fetchingInterval) / 1000.0);
         }
         // Only add flags set to false.
-        if (!invalidationOffline()) {
-            builder.append(",-offline");
+        if (!skipDefaults || !invalidationOffline()) {
+            builder.append("," + (invalidationOffline() ? "+" : "-") + "offline");
         }
-        if (!invalidationWorld()) {
-            builder.append(",-world");
+        if (!skipDefaults || !invalidationWorld()) {
+            builder.append("," + (invalidationWorld() ? "+" : "-") + "world");
         }
         return builder.toString();
     }

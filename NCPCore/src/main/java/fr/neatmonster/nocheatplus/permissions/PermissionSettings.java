@@ -163,7 +163,7 @@ public class PermissionSettings {
             final String pathDefaultPolicy, final String pathRules) {
         final PermissionPolicy defaultPolicy = new PermissionPolicy();
         try {
-            defaultPolicy.setFromConfigString(config.getString(pathDefaultPolicy));
+            defaultPolicy.setPolicyFromConfigLine(config.getString(pathDefaultPolicy));
         }
         catch (Exception e) {
             throw new RuntimeException("Bad default policy definition.", e);
@@ -175,7 +175,7 @@ public class PermissionSettings {
             String policyDef = null;
             try {
                 policyDef = section.getString(ruleDef);
-                final PermissionPolicy policy = new PermissionPolicy().setFromConfigString(policyDef);
+                final PermissionPolicy policy = new PermissionPolicy().setPolicyFromConfigLine(policyDef);
                 ruleDef = RegisteredPermission.toLowerCaseStringRepresentation(ruleDef.trim()).replace('#', '.');
                 final PermissionRule rule = getMatchingRule(ruleDef, policy);
                 if (rule == null) {
