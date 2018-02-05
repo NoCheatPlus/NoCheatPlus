@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -43,6 +44,7 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.AccountEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.FrictionAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
+import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
@@ -1303,13 +1305,41 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      * @return If the velocity jump phase is still active (sfDirty).
      */
     public boolean resetVelocityJumpPhase() {
-        if (horVel.hasActive() || horVel.hasQueued()) {
+        return resetVelocityJumpPhase(null);
+    }
+
+    /**
+     * See {@link #resetVelocityJumpPhase()}.
+     * @param tags
+     * @return
+     */
+    public boolean resetVelocityJumpPhase(final Collection<String> tags) {
+        if (horVel.hasActive() || horVel.hasQueued() 
+                || sfDirty && shouldRetainSFDirty(tags)) {
             // TODO: What with vertical ?
-            sfDirty = true;
-        } else {
-            sfDirty = false;
+            return sfDirty = true;
         }
-        return sfDirty;
+        else {
+            return sfDirty = false;
+        }
+    }
+
+    private final boolean shouldRetainSFDirty(final Collection<String> tags) {
+        final PlayerMoveData thisMove = playerMoves.getLatestValidMove();
+        if (thisMove == null || !thisMove.toIsValid || thisMove.yDistance >= 0.0) {
+            final SimpleEntry entry = verVel.peek(
+                    thisMove == null ? 0.05 : thisMove.yDistance, 0, 4, 0.0);
+            if (entry != null && entry.hasFlag(VelocityFlags.ORIGIN_BLOCK_BOUNCE)
+                    || thisMove != null && thisMove.verVelUsed != null 
+                    && thisMove.verVelUsed.hasFlag(VelocityFlags.ORIGIN_BLOCK_BOUNCE)) {
+                // TODO: Strictly, pastground_from/to should rather be skipped instead of this.
+                if (tags != null) {
+                    tags.add("retain_dirty_bounce"); // +- block/push
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1378,6 +1408,14 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      */
     public int getMorePacketsSetBackAge() {
         return playerMoveCount - morePacketsSetBackResetTime;
+    }
+
+    /**
+     * Remove from start while the flag is present.
+     * @param originBlockBounce
+     */
+    public void removeLeadingQueuedVerticalVelocityByFlag(final long flag) {
+        verVel.removeLeadingQueuedVerticalVelocityByFlag(flag);
     }
 
 }

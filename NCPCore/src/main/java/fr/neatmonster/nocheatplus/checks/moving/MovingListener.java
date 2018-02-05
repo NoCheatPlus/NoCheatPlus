@@ -718,7 +718,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // TODO: Mixed ground (e.g. slime blocks + slabs), specifically on pushing.
                 // TODO: More on fall damage. What with sneaking + past states?
                 // TODO: With past states: What does jump effects do here?
-                if (to.getY() < from.getY()) {
+                if (thisMove.yDistance < 0.0) {
                     // Prepare bounce: The center of the player must be above the block.
                     // Common pre-conditions.
                     // TODO: Check if really leads to calling the method for pistons (checkBounceEnvelope vs. push).
@@ -737,9 +737,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             checkNf = false; // Skip NoFall.
                         }
                         if (verticalBounce == BounceType.NO_BOUNCE && useBlockChangeTracker) { 
-                            verticalBounce = checkPastStateBounceDescend(player, pFrom, pTo, thisMove, lastMove, 
-                                    tick, data, cc);
-                            if (verticalBounce != BounceType.NO_BOUNCE) {
+                            if (checkPastStateBounceDescend(player, pFrom, pTo, thisMove, lastMove, 
+                                    tick, data, cc) != BounceType.NO_BOUNCE) {
+                                // Not set verticalBounce, as this is ascending and it's already force used.
                                 checkNf = false; // Skip NoFall.
                             }
                         }
@@ -754,9 +754,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             || useBlockChangeTracker 
                             // 0-dist moves count in: && thisMove.yDistance >= 0.415 
                             && thisMove.yDistance <= 1.515 // TODO: MAGIC
-                            && checkPastStateBounceAscend(player, pFrom, pTo, thisMove, lastMove, tick, data, cc)
                             ) {
-                        checkNf = false;
+                        verticalBounce = checkPastStateBounceAscend(player, pFrom, pTo, 
+                                thisMove, lastMove, tick, data, cc);
+                        if (verticalBounce != BounceType.NO_BOUNCE) {
+                            checkNf = false;
+                        }
                     }
                 }
             }
@@ -1018,10 +1021,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         return BounceType.NO_BOUNCE; // Nothing found, return no bounce.
     }
 
-    private boolean checkPastStateBounceAscend(
+    private BounceType checkPastStateBounceAscend(
             final Player player, final PlayerLocation from, final PlayerLocation to,
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, final int tick, 
             final MovingData data, final MovingConfig cc) {
+
         // TODO: More preconditions.
         // TODO: Nail down to more precise side conditions for larger jumps, if possible.
         final UUID worldId = from.getWorld().getUID();
@@ -1037,15 +1041,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Center push.
                 entryBelowY_POS != null
                 // Off center push.
-                || thisMove.yDistance < 1.015 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
+                || thisMove.yDistance < 1.515 && from.matchBlockChangeMatchResultingFlags(blockChangeTracker, 
                         data.blockChangeRef, Direction.Y_POS, Math.min(.415, thisMove.yDistance), 
                         BlockProperties.F_BOUNCE25)
                 ) {
             if (data.debug) {
                 debug(player, "Direct block push with bounce (" + (entryBelowY_POS == null ? "off_center)." : "center)."));
             }
-            amount = Math.min(Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515), 
-                    2.525); // TODO: EXACT MAGIC.
+            amount = Math.min(
+                    Math.max(0.505, 1.0 + (double) from.getBlockY() - from.getY() + 1.515),
+                    2.525);
+            /*
+             * TODO: EXACT MAGIC.
+             */
             if (entryBelowY_POS != null) {
                 data.blockChangeRef.updateSpan(entryBelowY_POS);
             }
@@ -1080,39 +1088,41 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
              * TODO: USE EXISTING velocity with bounce flag set first, then peek
              * / add. (might while peek -> has bounce flag: remove velocity)
              */
-            if (data.peekVerticalVelocity(amount, 2, 3) == null) {
-                /*
-                 * TODO: Concepts for limiting... max amount based on side
-                 * conditions such as block height+1.5, max coordinate, max
-                 * amount per use, ALLOW_ZERO flag/boolean and set in
-                 * constructor, demand max. 1 zero dist during validity. Bind
-                 * use to initial xz coordinates... Too precise = better with
-                 * past move tracking, or a sub-class of SimpleEntry with better
-                 * access signatures including thisMove.
-                 */
-                /*
-                 * TODO: Also account for current yDistance here? E.g. Add two
-                 * entries, split based on current yDistance?
-                 */
-                final SimpleEntry vel = new SimpleEntry(tick, amount, FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND, 4);
-                data.verticalBounce = vel;
-                data.useVerticalBounce(player);
-                if (data.debug) {
-                    debug(player, "checkPastStateBounceAscend: add velocity: " + vel);
-                }
-                return true;
+            data.removeLeadingQueuedVerticalVelocityByFlag(VelocityFlags.ORIGIN_BLOCK_BOUNCE);
+            /*
+             * TODO: Concepts for limiting... max amount based on side
+             * conditions such as block height+1.5, max coordinate, max
+             * amount per use, ALLOW_ZERO flag/boolean and set in
+             * constructor, demand max. 1 zero dist during validity. Bind
+             * use to initial xz coordinates... Too precise = better with
+             * past move tracking, or a sub-class of SimpleEntry with better
+             * access signatures including thisMove.
+             */
+            /*
+             * TODO: Also account for current yDistance here? E.g. Add two
+             * entries, split based on current yDistance?
+             */
+            final SimpleEntry vel = new SimpleEntry(tick, amount, 
+                    FLAGS_VELOCITY_BOUNCE_BLOCK_MOVE_ASCEND, 4);
+            data.verticalBounce = vel;
+            data.useVerticalBounce(player);
+            data.useVerticalVelocity(thisMove.yDistance);
+            //if (thisMove.yDistance > 0.42) {
+            //    data.setFrictionJumpPhase();
+            //}
+            if (data.debug) {
+                debug(player, "checkPastStateBounceAscend: set velocity: " + vel);
             }
-            else if (data.debug) {
-                debug(player, "checkPastStateBounceAscend: Don't add velocity.");
-            }
+            // TODO: Exact type to return.
+            return BounceType.STATIC_PAST_AND_PUSH;
         }
         // TODO: There is a special case with 1.0 up on pistons pushing horizontal only (!).
-        return false;
+        return BounceType.NO_BOUNCE;
     }
 
     /**
      * Pre conditions: A slime block is underneath and the player isn't really
-     * sneaking.<br>
+     * sneaking. This does not account for pistons pushing (slime) blocks.<br>
      * 
      * @param player
      * @param from

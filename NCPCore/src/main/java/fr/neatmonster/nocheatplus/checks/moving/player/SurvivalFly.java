@@ -249,7 +249,7 @@ public class SurvivalFly extends Check {
             if (!thisMove.from.onGround && !thisMove.to.onGround) {
                 // Lost ground workaround has just been applied, check resetting of the dirty flag.
                 // TODO: Always/never reset with any ground touched?
-                data.resetVelocityJumpPhase();
+                data.resetVelocityJumpPhase(tags);
             }
             else if (multiMoveCount == 0 && thisMove.from.onGround && !lastMove.touchedGround
                     && TrigUtil.isSamePosAndLook(thisMove.from, lastMove.to)) {
@@ -262,7 +262,7 @@ public class SurvivalFly extends Check {
         }
 
         // Renew the "dirty"-flag (in-air phase affected by velocity).
-        if (data.isVelocityJumpPhase() || data.resetVelocityJumpPhase()) {
+        if (data.isVelocityJumpPhase() || data.resetVelocityJumpPhase(tags)) {
             // (Reset is done after checks run.) 
             tags.add("dirty");
         }
@@ -611,7 +611,7 @@ public class SurvivalFly extends Check {
                 data.sfLowJump = false;
             }
             if (hFreedom <= 0.0 && thisMove.verVelUsed == null) {
-                data.resetVelocityJumpPhase();
+                data.resetVelocityJumpPhase(tags);
             }
         }
         else if (resetFrom) {
@@ -623,7 +623,7 @@ public class SurvivalFly extends Check {
             // not resetting nolowjump (?)...
             // Don't reset velocity phase unless moving into resetcond.
             //            if (hFreedom <= 0.0 && data.verVelUsed == null && (!data.noFallAssumeGround || fromOnGround)) {
-            //                data.resetVelocityJumpPhase();
+            //                data.resetVelocityJumpPhase(tags);
             //            }
         }
         else {

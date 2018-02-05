@@ -59,6 +59,10 @@ public class SimpleEntry {
         this.flags = flags;
     }
 
+    public boolean hasFlag(final long flag) {
+        return (flags & flag) == flag;
+    }
+
     public String toString() {
         return "SimpleEntry(tick=" + tick + " value=" + value + " flags=" + flags + " activate=" + actCount + "/" + initialActCount + ")";
     }

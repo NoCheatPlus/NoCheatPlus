@@ -135,4 +135,20 @@ public class MoveTrace <MD extends MoveData> {
         currentMove.invalidate();
     }
 
+    /**
+     * Return the current move if valid, or the first past move if valid, or
+     * null if neither is valid.
+     * 
+     * @return
+     */
+    public MD getLatestValidMove() {
+        if (currentMove.valid) {
+            return currentMove;
+        }
+        else {
+            final MD move = pastMoves.get(0);
+            return move.valid ? move : null;
+        }
+    }
+
 }

@@ -265,4 +265,24 @@ public class SimpleAxisVelocity {
         this.unusedActive = unusedActive;
     }
 
+    /**
+     * Remove from start while the flag is present.
+     * @param originBlockBounce
+     */
+    public void removeLeadingQueuedVerticalVelocityByFlag(final long flag) {
+        if (queued.isEmpty()) {
+            return;
+        }
+        final Iterator<SimpleEntry> it = queued.iterator();
+        while (it.hasNext()) {
+            final SimpleEntry entry = it.next();
+            if (entry.hasFlag(flag)) {
+                it.remove();
+            }
+            else {
+                break;
+            }
+        }
+    }
+
 }
