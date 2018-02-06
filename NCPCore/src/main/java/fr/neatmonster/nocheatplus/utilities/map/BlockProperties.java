@@ -4490,7 +4490,7 @@ public class BlockProperties {
         int added = 0;
         final int iMinX = Location.locToBlock(minX);
         final int iMaxX = Location.locToBlock(maxX);
-        final int iMinY = Location.locToBlock(minY);
+        final int iMinY = Location.locToBlock(minY - 0.5); // Include height150 blocks.
         final int iMaxY = Location.locToBlock(maxY);
         final int iMinZ = Location.locToBlock(minZ);
         final int iMaxZ = Location.locToBlock(maxZ);
