@@ -683,8 +683,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // TODO: More adaptive margin / method (bounding boxes).
         final boolean useBlockChangeTracker;
+        final double previousSetBackY;
 
         if (checkSf || checkCf) {
+            previousSetBackY = data.hasSetBack() ? data.getSetBackY() : Double.NEGATIVE_INFINITY;
             // Ensure we have a set back set.
             MovingUtil.checkSetBack(player, pFrom, data, this);
 
@@ -771,6 +773,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else {
             // TODO: Might still allow block change tracker with only passable enabled.
             useBlockChangeTracker = false;
+            previousSetBackY = Double.NEGATIVE_INFINITY;
         }
 
         // Check passable first to prevent set back override.
@@ -826,12 +829,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
                 // NoFall.
                 if (checkNf) {
-                    noFall.check(player, pFrom, pTo, data, cc);
+                    noFall.check(player, pFrom, pTo, previousSetBackY, data, cc);
                 }
             }
             else {
                 if (checkNf && cc.sfSetBackPolicyFallDamage) {
-                    if (noFall.estimateDamage(player, from.getY(), data) < 1.0) {
+                    if (!noFall.willDealFallDamage(player, from.getY(), previousSetBackY, data)) {
                         // TODO: Consider making this / damage amount configurable.
                         mightSkipNoFall = true;
                     }
@@ -2160,8 +2163,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
         }
         aux.returnPlayerMoveInfo(moveInfo);
-        // Fall-back check.
-        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : Magic.FALL_DAMAGE_DIST);
+        // Fall-back check (skip with jump amplifier).
+        final double maxD = data.jumpAmplifier > 0.0 ? NoFall.getDamage((float) NoFall.getApplicableFallHeight(player, loc.getY(), data))
+                : NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : Magic.FALL_DAMAGE_DIST);
         if (maxD > damage) {
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);

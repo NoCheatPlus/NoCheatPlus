@@ -66,11 +66,17 @@ public class NoFall extends Check {
      * @param mcPlayer
      * @param data
      * @param y
+     * @param previousSetBackY
+     *            The set back y from lift-off. If not present:
+     *            Double.NEGATIVE_INFINITY.
      */
-    private void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
+    private void handleOnGround(final Player player, final double y, final double previousSetBackY,
+            final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
         // Damage to be dealt.
-        final double maxD = estimateDamage(player, y, data);
-        if (maxD >= 1.0) {
+        final float fallDist = (float) getApplicableFallHeight(player, y, previousSetBackY, data);
+        final double maxD = getDamage(fallDist);
+
+        if (maxD >= Magic.FALL_DAMAGE_MINIMUM) {
             // Check skipping conditions.
             if (cc.noFallSkipAllowFlight && player.getAllowFlight()) {
                 data.clearNoFallData();
@@ -95,15 +101,54 @@ public class NoFall extends Check {
     }
 
     /**
-     * Convenience method to estimate fall damage at a certain y-level, checking data and mc-fall-distance.
+     * Estimate the applicable fall height for the given data.
+     * 
      * @param player
      * @param y
+     * @param previousSetBackY
+     *            The set back y from lift-off. If not present:
+     *            Double.NEGATIVE_INFINITY.
      * @param data
      * @return
      */
-    public double estimateDamage(final Player player, final double y, final MovingData data) {
+    private static double getApplicableFallHeight(final Player player, final double y, 
+            final double previousSetBackY, final MovingData data) {
         //return getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
-        return getDamage(Math.max((float) (data.noFallMaxY - y), data.noFallFallDistance));
+        final double yDistance = Math.max(data.noFallMaxY - y, data.noFallFallDistance);
+        if (yDistance > 0.0 && data.jumpAmplifier > 0.0 
+                && previousSetBackY != Double.NEGATIVE_INFINITY) {
+            // Fall height counts below previous set-back-y.
+            // TODO: Likely updating the amplifier after lift-off doesn't make sense.
+            // TODO: In case of velocity... skip too / calculate max exempt height?
+            final double correction = data.noFallMaxY - previousSetBackY;
+            if (correction > 0.0) {
+                final float effectiveDistance = (float) Math.max(0.0, yDistance - correction);
+                return effectiveDistance;
+            }
+        }
+        return yDistance;
+    }
+
+    public static double getApplicableFallHeight(final Player player, final double y, final MovingData data) {
+        return getApplicableFallHeight(player, y, 
+                data.hasSetBack() ? data.getSetBackY() : Double.NEGATIVE_INFINITY, data);
+    }
+
+    /**
+     * Test if fall damage would be dealt accounting for the given data.
+     * 
+     * @param player
+     * @param y
+     * @param previousSetBackY
+     *            The set back y from lift-off. If not present:
+     *            Double.NEGATIVE_INFINITY.
+     * @param data
+     * @return
+     */
+    public boolean willDealFallDamage(final Player player, final double y, 
+            final double previousSetBackY, final MovingData data) {
+        return getDamage((float) getApplicableFallHeight(player, y, 
+                previousSetBackY, data)) - Magic.FALL_DAMAGE_DIST >= Magic.FALL_DAMAGE_MINIMUM;
     }
 
     /**
@@ -158,8 +203,12 @@ public class NoFall extends Check {
      *            the from
      * @param to
      *            the to
+     * @param previousSetBackY
+     *            The set back y from lift-off. If not present:
+     *            Double.NEGATIVE_INFINITY.
      */
     public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, 
+            final double previousSetBackY,
             final MovingData data, final MovingConfig cc) {
 
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
@@ -211,7 +260,7 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || !toOnGround && thisMove.touchedGround) {
             // Check if to deal damage (fall back damage check).
-            touchDown(player, minY, data, cc); // Includes the current y-distance on descend!
+            touchDown(player, minY, previousSetBackY, data, cc); // Includes the current y-distance on descend!
             // Ensure very big/strange moves don't yield violations.
             if (toY - fromY <= -Magic.FALL_DAMAGE_DIST) {
                 data.noFallSkipAirCheck = true;
@@ -227,7 +276,7 @@ public class NoFall extends Check {
                 // In this case the player has traveled further: add the difference.
                 data.noFallFallDistance -= yDiff;
             }
-            touchDown(player, minY, data, cc);
+            touchDown(player, minY, previousSetBackY, data, cc);
         }
         else {
             // Ensure fall distance is correct, or "anyway"?
@@ -272,14 +321,19 @@ public class NoFall extends Check {
 
     /**
      * Called during check.
+     * 
      * @param player
      * @param minY
+     * @param previousSetBackY
+     *            The set back y from lift-off. If not present:
+     *            Double.NEGATIVE_INFINITY.
      * @param data
      * @param cc
      */
-    private void touchDown(final Player player, final double minY, final MovingData data, final MovingConfig cc) {
+    private void touchDown(final Player player, final double minY, final double previousSetBackY,
+            final MovingData data, final MovingConfig cc) {
         if (cc.noFallDealDamage) {
-            handleOnGround(player, minY, true, data, cc);
+            handleOnGround(player, minY, previousSetBackY, true, data, cc);
         }
         else {
             adjustFallDistance(player, minY, true, data, cc);
@@ -336,7 +390,8 @@ public class NoFall extends Check {
     public void checkDamage(final Player player, final MovingData data, final double y) {
         final MovingConfig cc = MovingConfig.getConfig(player);
         // Deal damage.
-        handleOnGround(player, y, false, data, cc);
+        handleOnGround(player, y, data.hasSetBack() ? data.getSetBackY() : Double.NEGATIVE_INFINITY, 
+                false, data, cc);
     }
 
     /**

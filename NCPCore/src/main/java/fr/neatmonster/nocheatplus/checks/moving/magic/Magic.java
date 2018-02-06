@@ -96,6 +96,8 @@ public class Magic {
 
     /** The lower bound of fall distance for taking fall damage. */
     public static final double FALL_DAMAGE_DIST = 3.0;
+    /** The minimum damage amount that actually should get applied. */
+    public static final double FALL_DAMAGE_MINIMUM = 1.0;
 
     /**
      * The maximum distance that can be achieved with bouncing back from slime
