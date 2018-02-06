@@ -642,6 +642,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
 
         // Potion effect "Jump".
+        /*
+         * TODO: Jump amplifier should be set in PlayerMoveData, and/or only get
+         * updated for lift off (?).
+         */
         final double jumpAmplifier = aux.getJumpAmplifier(player);
         if (jumpAmplifier > data.jumpAmplifier) {
             data.jumpAmplifier = jumpAmplifier;
@@ -2691,10 +2695,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             builder.append("(e_speed=" + (speed + 1) + ")");
         }
         final double slow = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SLOW);
-        if (Double.isInfinite(slow)) {
+        if (!Double.isInfinite(slow)) {
             builder.append("(e_slow=" + (slow + 1) + ")");
         }
-        if (Double.isInfinite(jump)) {
+        if (!Double.isInfinite(jump)) {
             builder.append("(e_jump=" + (jump + 1) + ")");
         }
         if (strider != 0) {
