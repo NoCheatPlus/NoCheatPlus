@@ -186,13 +186,25 @@ public class LostGround {
                     }
 
                     // Special cases.
-                    if (yDistance == 0.0 && lastMove.yDistance <= -0.23 && (hDistance <= lastMove.hDistance * 1.1)) {
+                    if (yDistance == 0.0 && lastMove.yDistance <= -0.1515 
+                            && (hDistance <= lastMove.hDistance * 1.1) // Uh oh / dirty flag?
+                            ) {
                         // Similar to couldstep, with 0 y-distance but slightly above any ground nearby (no micro move!).
                         // TODO: (hDistance <= data.sfLastHDist || hDistance <= hDistanceBaseRef)
                         // TODO: Confining in x/z direction in general: should detect if collided in that direction (then skip the x/z dist <= last time).
                         // TODO: Temporary test (should probably be covered by one of the above instead).
                         // TODO: Code duplication with edgeasc7 below.
-                        if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), to.getZ(), from.getX(), from.getY(), from.getZ(), hDistance, to.getBoxMarginHorizontal(), 0.3, data, "asc5", tags, from.getMCAccess())) {
+                        /*
+                         * xzMargin 0.15: equipped end portal frame (observed
+                         * and supposedly fixed on MC 1.12.2) - might use an
+                         * even lower tolerance value here, once there is time
+                         * to testing this.
+                         */
+                        final double xzMargin = lastMove.yDistance <= -0.23 ? 0.3 : 0.15;
+                        if (lostGroundEdgeAsc(player, from.getBlockCache(), to.getWorld(), to.getX(), to.getY(), 
+                                to.getZ(), from.getX(), from.getY(), from.getZ(), 
+                                hDistance, to.getBoxMarginHorizontal(), xzMargin, 
+                                data, "asc5", tags, from.getMCAccess())) {
                             return true;
                         }
                     }
