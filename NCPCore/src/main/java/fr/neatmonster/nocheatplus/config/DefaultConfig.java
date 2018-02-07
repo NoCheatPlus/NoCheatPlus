@@ -64,7 +64,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_BACKEND_FILE_FILENAME, "nocheatplus.log", 785);
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, true, 785);
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, "&cNCP: &f", 785);
-        set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false, 785);
 
         // Data settings.
         // Expired offline players data.
@@ -80,6 +79,7 @@ public class DefaultConfig extends ConfigFile {
         // Permission settings.
         set(ConfPaths.PERMISSIONS_POLICY_DEFAULT, "ALWAYS", 1140);
         set(ConfPaths.PERMISSIONS_POLICY_RULES, Arrays.asList(
+                "nocheatplus.notify :: INTERVAL:60, -world, -offline", // Not sure about this one.
                 "nocheatplus.admin.debug :: INTERVAL:5",
                 "nocheatplus.admin* :: ALWAYS",
                 // TODO: NOTIFY (not command).
@@ -96,7 +96,7 @@ public class DefaultConfig extends ConfigFile {
                 "nocheatplus.checks.chat.* :: INTERVAL:2",
                 "nocheatplus.checks.net.* :: INTERVAL:2",
                 "nocheatplus.checks.moving.survivalfly.* :: INTERVAL:5" // (Excludes the sf base permission.)
-                ), 1140);
+                ), 1142);
 
         // Protection features.
         // Hide plugins.

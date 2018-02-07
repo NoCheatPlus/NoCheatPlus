@@ -39,7 +39,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -95,8 +94,6 @@ import fr.neatmonster.nocheatplus.components.registry.feature.IPostRegisterRunna
 import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGenericInstance;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.NCPListener;
-import fr.neatmonster.nocheatplus.components.registry.feature.NameSetPermState;
-import fr.neatmonster.nocheatplus.components.registry.feature.PermStateReceiver;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -156,10 +153,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Central logging access point. */
     private BukkitLogManager logManager = null; // Not final, but intended to stay, once set [change to init=syso?].
 
-    /** Names of players with a certain permission. */
-    // TODO: Maintain NOTIFY within DataManager, set per world fetching policy.
-    private final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY.getLowerCaseStringRepresentation());
-
     /** Lower case player name to milliseconds point of time of release */
     private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
 
@@ -185,20 +178,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     private final EventRegistryBukkit eventRegistry = new EventRegistryBukkit(this);
 
-    private boolean lateListenerRegistered = false;
-
     /** The event listeners (Bukkit Listener, MiniListener). */
     private final List<Object> listeners       = new ArrayList<Object>();
 
     /** Components that need notification on reloading.
      * (Kept here, for if during runtime some might get added.)*/
     private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
-
-    /** If to use subscriptions or not. */
-    private boolean useSubscriptions = false;
-
-    /** Permission states stored on a per-world basis, updated with join/quit/kick.  */
-    private final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
 
     /** Components that check consistency. */
     private final List<ConsistencyChecker> consistencyCheckers = new ArrayList<ConsistencyChecker>();
@@ -370,46 +355,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     @Override
     public int sendAdminNotifyMessage(final String message) {
-        if (useSubscriptions) {
-            // TODO: Might respect console settings, or add extra config section (e.g. notifications).
-            return sendAdminNotifyMessageSubscriptions(message);
-        }
-        else {
-            return sendAdminNotifyMessageStored(message);
-        }
-    }
-
-    @Deprecated
-    private boolean hasTurnedOffNotifications(final String playerName) {
-        final PlayerData data = DataManager.getPlayerData(playerName);
-        return data != null && data.getNotifyOff();
-    }
-
-    private boolean hasTurnedOffNotifications(final Player player) {
-        return DataManager.getPlayerData(player).getNotifyOff();
-    }
-
-    /**
-     * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
-     * @param message
-     * @return
-     */
-    public int sendAdminNotifyMessageStored(final String message) {
-        final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY.getLowerCaseStringRepresentation());
-        if (names == null) return 0;
-        int done = 0;
-        for (final String name : names) {
-            if (hasTurnedOffNotifications(name)) {
-                // Has turned off notifications.
-                continue;
-            }
-            final Player player = DataManager.getPlayerExact(name);
-            if (player != null) {
-                player.sendMessage(message);
-                done ++;
-            }
-        }
-        return done;
+        // TODO: Does this always work?
+        return sendAdminNotifyMessageSubscriptions(message);
     }
 
     /**
@@ -423,32 +370,25 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final Permission bukkitPerm = Permissions.NOTIFY.getBukkitPermission();
         final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(
                 lcPerm);
-        final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY.getLowerCaseStringRepresentation());
-        final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
+        final Set<String> done = new HashSet<String>(permissibles.size());
         for (final Permissible permissible : permissibles) {
-            if (permissible instanceof CommandSender && permissible.hasPermission(bukkitPerm)) {
+            if (permissible instanceof CommandSender) {
                 final CommandSender sender = (CommandSender) permissible;
-                if ((sender instanceof Player) && hasTurnedOffNotifications((Player) sender)) {
-                    continue;
-                }
-
-                sender.sendMessage(message);
-                done.add(sender.getName());
-            }
-        }
-        // Fall-back checking for players.
-        if (names != null) {
-            for (final String name : names) {
-                if (!done.contains(name)) {
-                    final Player player = DataManager.getPlayerExact(name);
-                    if (player != null && player.hasPermission(bukkitPerm)) {
-                        if (hasTurnedOffNotifications(player)) {
-                            continue;
-                        }
-                        player.sendMessage(message); 
-                        done.add(name);
+                if (sender instanceof Player) {
+                    // Use the permission caching feature.
+                    final Player player = (Player) sender;
+                    final PlayerData data = DataManager.getPlayerData(player);
+                    if (data.getNotifyOff() || !data.hasPermission(Permissions.NOTIFY, player)) {
+                        continue;
                     }
                 }
+                else if (!sender.hasPermission(bukkitPerm)) {
+                    // TODO: Add permission cache for non-player-things?
+                    continue;
+                }
+                // Finally send.
+                sender.sendMessage(message);
+                done.add(sender.getName());
             }
         }
         return done.size();
@@ -543,11 +483,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             TickTask.addTickListener((TickListener) obj);
             added = true;
         }
-        if (obj instanceof PermStateReceiver) {
-            // No immediate update done.
-            permStateReceivers.add((PermStateReceiver) obj);
-            added = true;
-        }
         if (obj instanceof ConsistencyChecker) {
             consistencyCheckers.add((ConsistencyChecker) obj);
             added = true;
@@ -621,9 +556,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             listeners.remove(obj);
             eventRegistry.unregisterAttached(obj); // Never know (e.g. attach all listeners to each other).
         }
-        if (obj instanceof PermStateReceiver) {
-            permStateReceivers.remove((PermStateReceiver) obj);
-        }
         if (obj instanceof TickListener) {
             TickTask.removeTickListener((TickListener) obj);
         }
@@ -684,7 +616,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // TODO: Prevent register feature ?
         eventRegistry.clear();
-        lateListenerRegistered = false;
 
         BukkitScheduler sched = getServer().getScheduler();
 
@@ -782,8 +713,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         listeners.clear();
         // Remove config listeners.
         notifyReload.clear();
-        // World specific permissions.
-        permStateReceivers.clear();
         // Sub registries.
         subRegistries.clear();
         // Just in case: clear the subComponentHolders.
@@ -992,7 +921,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Add the "low level" system components first.
         for (final Object obj : new Object[]{
-                nameSetPerms,
                 getCoreListener(),
                 // Put ReloadListener first, because Checks could also listen to it.
                 new ReloadHook(),
@@ -1159,7 +1087,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             logManager.severe(Streams.INIT, t);
         }
         for (final Player player : onlinePlayers) {
-            updatePermStateReceivers(player);
             if (player.isSleeping()) {
                 CombinedData.getData(player).wasInBed = true;
             }
@@ -1167,10 +1094,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (onlinePlayers.length > 0) {
             logManager.info(Streams.INIT, "Updated data for " + onlinePlayers.length + " players (post-enable).");
         }
-        // Register late listener.
-        // TODO: Instead register a MiniListener with appropriate order (see getCoreListener).
-        Bukkit.getPluginManager().registerEvents(getLateListener(), this);
-        lateListenerRegistered = true;
         // Finished.
         logManager.info(Streams.INIT, "Post-enable finished.");
         // Log version to file (queued).
@@ -1225,7 +1148,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     private void setInstanceMembers(final ConfigFile config) {
         configProblemsChat = ConfigManager.isConfigUpToDate(config, config.getInt(ConfPaths.CONFIGVERSION_NOTIFYMAXPATHS));
         configProblemsFile = configProblemsChat == null ? null : ConfigManager.isConfigUpToDate(config, -1);
-        useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
         clearExemptionsOnJoin = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN);
         clearExemptionsOnLeave = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE);
         NCPExemptionManager.setExemptionSettings(new ExemptionSettings(config));
@@ -1310,20 +1232,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /**
-     * Listener to be registered in postEnable. Flag must be set elsewhere.
-     * 
-     * @return
-     */
-    private Listener getLateListener() {
-        return new NCPListener() {
-            @EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
-            public void onPlayerJoinLowestLate(final PlayerJoinEvent event) {
-                updatePermStateReceivers(event.getPlayer());
-            }
-        };
-    }
-
-    /**
      * Quick solution to hide the listener methods, expect refactoring.
      * @return
      */
@@ -1352,19 +1260,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
             @EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
             public void onPlayerJoinLowest(final PlayerJoinEvent event) {
-                final Player player = event.getPlayer();
-                if (!lateListenerRegistered) {
-                    /*
-                     * TODO: Register a MiniListener with appropriate order set
-                     * (needs order to be set everywhere).
-                     */
-                    // Let's see if this gets logged with big servers :).
-                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Player " + player.getName() + " joins before the post-enable task has run.");
-                    // (Assume postEnable will run and call updatePermStateReceivers(player).)
-                } else {
-                    updatePermStateReceivers(player);
-                }
                 if (clearExemptionsOnJoin) {
+                    final Player player = event.getPlayer();
                     NCPExemptionManager.unexempt(player);
                 }
             }
@@ -1373,11 +1270,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             public void onPlayerJoinLow(final PlayerJoinEvent event) {
                 // LOWEST is for DataMan and CombinedListener.
                 onJoinLow(event.getPlayer());
-            }
-
-            @EventHandler(priority = EventPriority.LOWEST)
-            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event) {
-                updatePermStateReceivers(event.getPlayer());
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1394,9 +1286,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     private void onJoinLow(final Player player) {
         final String playerName = player.getName();
-        if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY.getLowerCaseStringRepresentation())) {
+        final PlayerData data = DataManager.getPlayerData(player);
+        if (data.hasPermission(Permissions.NOTIFY, player)) { // Updates the cache.
             // Login notifications...
-            final PlayerData data = DataManager.getPlayerData(player);
             //			// Update available.
             //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 
@@ -1425,9 +1317,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     private void onLeave(final Player player) {
-        for (final PermStateReceiver pr : permStateReceivers) {
-            pr.removePlayer(player.getName());
-        }
         for (final JoinLeaveListener jlListener : joinLeaveListeners) {
             try{
                 jlListener.playerLeaves(player);
@@ -1439,22 +1328,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         if (clearExemptionsOnLeave) {
             NCPExemptionManager.unexempt(player);
-        }
-    }
-
-    private void updatePermStateReceivers(final Player player) {
-        final Map<String, Boolean> checked = new HashMap<String, Boolean>(20);
-        final String name = player.getName();
-        // TODO: Get rid / use PlayerData instead !
-        for (final PermStateReceiver pr : permStateReceivers) {
-            for (final String permission : pr.getDefaultPermissions()) {
-                Boolean state = checked.get(permission);
-                if (state == null) {
-                    state = player.hasPermission(permission);
-                    checked.put(permission, state);
-                }
-                pr.setPermission(name, permission, state);
-            }
         }
     }
 

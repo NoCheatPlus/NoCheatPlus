@@ -91,7 +91,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_FILE_PREFIX              = LOGGING_BACKEND_FILE + "prefix";
     private static final String LOGGING_BACKEND_INGAMECHAT               = LOGGING_BACKEND + "ingamechat.";
     public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE        = LOGGING_BACKEND_INGAMECHAT + "active";
-    public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
     public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX        = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
     private static final String LOGGING_EXTENDED                         = LOGGING + "extended.";
@@ -791,8 +790,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_FILENAME                         = "logging.filename";
     @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_ACTIVE)
     public static final String  LOGGING_INGAMECHAT                       = "logging.ingamechat";
-    @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
-    public static final String  LOGGING_USESUBSCRIPTIONS                 = "logging.usesubscriptions";
     @Moved(newPath = PROTECT_PLUGINS_HIDE_ACTIVE)
     public static final String  MISCELLANEOUS_PROTECTPLUGINS             = "miscellaneous.protectplugins";
     @Moved(newPath = PROTECT_CLIENTS_MOTD_ALLOWALL)
@@ -870,6 +867,10 @@ public abstract class ConfPaths {
     public static final String  MISCELLANEOUS_MANAGELISTENERS            = "miscellaneous.managelisteners";
     @Deprecated
     public static final String COMPATIBILITY_MANAGELISTENERS             = "compatibility.managelisteners";
+    @Deprecated
+    public static final String  LOGGING_USESUBSCRIPTIONS                 = "logging.usesubscriptions";
+    @Deprecated
+    public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = "logging.backend.ingamechat.subscriptions";
 
     /**
      * Get moved paths for which an annotation doesn't work.
