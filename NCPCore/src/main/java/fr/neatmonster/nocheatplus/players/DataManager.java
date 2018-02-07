@@ -182,6 +182,11 @@ public class DataManager implements INeedConfig, ComponentRegistry<IRemoveData>,
     };
 
     private final MiniListener<?>[] miniListeners = new MiniListener<?>[] {
+        /*
+         * TODO: Constants in a class 'ListenerTags', plus a plan
+         * (system.data.player.nocheatplus, system.nocheatplus.data ??,
+         * nocheatplus.system.data.player...). (RegistryTags for other?).
+         */
         new MiniListener<PlayerQuitEvent>() {
             @Override
             @EventHandler(priority = EventPriority.MONITOR)

@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionPolicy.FetchingPolicy;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.DualSet;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
@@ -82,7 +83,10 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
      * data-related.
      */
 
-    // TODO: Use the same lock for permissions stuff ?
+    /** Monitor player task load across all players (nanoseconds per server tick). */
+    private static ActionFrequency taskLoad = new ActionFrequency(6, 7);
+    /** Some measure for heavy load, for skipping some of the (lazy) updating. */
+    private static float heavyLoad = 1000000f; // 1 ms = 2 % of a tick.
 
     // Default tags.
     public static final String TAG_NOTIFY_OFF = "notify_off";
@@ -93,6 +97,8 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
     //////////////
     // Instance //
     //////////////
+
+    // TODO: Use the same lock for permissions stuff ?
 
     /** Not sure this is the future of extra properties. */
     private Set<String> tags = null;
@@ -212,15 +218,19 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
     @SuppressWarnings("deprecation")
     private void frequentTasks(final int tick, final long timeLast, final Player player) {
         if (player != null) { // Common criteria ...
-            if (requestPlayerSetBack) {
-                requestPlayerSetBack = false;
-                MovingUtil.processStoredSetBack(player, "Player set back on tick: ");
-            }
             if (player.isOnline()) {
+                long nanos = System.nanoTime();
+                // Set back.
+                if (requestPlayerSetBack) {
+                    requestPlayerSetBack = false;
+                    MovingUtil.processStoredSetBack(player, "Player set back on tick: ");
+                }
+                // Inventory update.
                 if (requestUpdateInventory) {
                     requestUpdateInventory = false;
                     player.updateInventory();
                 }
+                // Permission updates (high priority).
                 final Collection<RegisteredPermission> updatable = updatePermissions.getMergePrimaryThreadAndClear();
                 if (updatable != null) {
                     for (final RegisteredPermission registeredPermission : updatable) {
@@ -228,9 +238,12 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
                         hasPermission(registeredPermission, player);
                     }
                 }
+                nanos = System.nanoTime() - nanos;
+                if (nanos > 0L) {
+                    taskLoad.add(tick, nanos);
+                }
             } // (The player is online.)
         } // (The player is not null.)
-
     }
 
     private boolean hasLazyTasks() {
@@ -248,13 +261,24 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         if (player == null) {
             return true;
         }
+        long nanos = System.nanoTime();
+        taskLoad.update(tick);
+        final boolean isHeavyLoad = taskLoad.score(1f) > heavyLoad;
         updatePermissionsLazy.mergePrimaryThread();
         final Iterator<RegisteredPermission> it = updatePermissionsLazy.iteratorPrimaryThread();
+        // TODO: Load balancing with other tasks ?
         while (it.hasNext()) {
             hasPermission(it.next(), player);
             it.remove();
+            if (isHeavyLoad) {
+                break;
+            }
         }
         boolean hasWrk = it.hasNext();
+        nanos = System.nanoTime() - nanos;
+        if (nanos > 0L) {
+            taskLoad.add(tick, nanos);
+        }
         return !hasWrk;
     }
 

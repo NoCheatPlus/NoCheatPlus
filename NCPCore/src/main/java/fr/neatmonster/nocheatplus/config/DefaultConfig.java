@@ -82,7 +82,6 @@ public class DefaultConfig extends ConfigFile {
                 "nocheatplus.notify :: INTERVAL:60, -world, -offline", // Not sure about this one.
                 "nocheatplus.admin.debug :: INTERVAL:5",
                 "nocheatplus.admin* :: ALWAYS",
-                // TODO: NOTIFY (not command).
                 // TODO: Command permissions are always checked anyway :p. Will be changed...
                 "nocheatplus.command* :: ALWAYS",
                 "nocheatplus.bypass* :: ALWAYS",
