@@ -247,19 +247,24 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     };
 
+    /**
+     * Run post-enable for the players who were already online during onEnable,
+     * assuming that there would've been events between.
+     * 
+     * @author asofold
+     *
+     */
     private class PostEnableTask implements Runnable {
 
-        private final NoCheatPlusCommand commandHandler;
         private final Player[] onlinePlayers;
 
-        private PostEnableTask(NoCheatPlusCommand commandHandler, Player[] onlinePlayers) {
-            this.commandHandler = commandHandler;
+        private PostEnableTask(Player[] onlinePlayers) {
             this.onlinePlayers = onlinePlayers;
         }
 
         @Override
         public void run() {
-            postEnable(commandHandler, onlinePlayers);
+            postEnable(onlinePlayers);
         }
 
     }
@@ -1031,6 +1036,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
 
+        // Add default .silent and command/filter child permissions.
+        addDefaultChildPermissions(commandHandler);
+
+        ////////////////////////////////
+        // Tasks, post-rumble-logging
+        ////////////////////////////////
+
         // Set up the tick task.
         TickTask.start(this);
 
@@ -1077,7 +1089,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: re-map ExemptionManager !
         // TODO: Disable all checks for these players for one tick ?
         // TODO: Prepare check data for players [problem: permissions]?
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new PostEnableTask(commandHandler, onlinePlayers));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new PostEnableTask(onlinePlayers));
 
         // Mid-term cleanup (seconds range).
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -1104,15 +1116,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
-    /**
-     * Actions to be done after enable of  all plugins. This aims at reloading mainly.
-     */
-    private void postEnable(final NoCheatPlusCommand commandHandler, final Player[] onlinePlayers) {
-        logManager.info(Streams.INIT, "Post-enable running...");
+    private void addDefaultChildPermissions(final NoCheatPlusCommand commandHandler) {
+        logManager.debug(Streams.INIT, "Set default child permissions...");
         try {
             // Set child permissions for commands for faster checking.
-            // TODO: ALWAYS checking: Once config is set up, add default entries with ALWAYS policy.
-            // TODO: Alter signature to RegisteredPermission, still command permissions are checked directly.
             PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), 
                     Permissions.FILTER_COMMAND_NOCHEATPLUS, 
                     PermissionDefault.OP);
@@ -1121,7 +1128,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             logManager.severe(Streams.INIT, t);
         }
         // Set .silent child permissions for all check permissions.
-        // TODO: Use the PermissionRegistry for .silent permissions.
         for (CheckType checkType : CheckType.values()) {
             final RegisteredPermission permission = checkType.getPermission();
             if (permission == null) {
@@ -1135,6 +1141,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 logManager.severe(Streams.INIT, t);
             }
         }
+    }
+
+    /**
+     * Actions to be done after enable of  all plugins. This aims at reloading mainly.
+     */
+    private void postEnable(final Player[] onlinePlayers) {
+        logManager.info(Streams.INIT, "Post-enable running...");
+
         try {
             // Command protection feature.
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
@@ -1154,6 +1168,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             logManager.info(Streams.INIT, "Updated data for " + onlinePlayers.length + " players (post-enable).");
         }
         // Register late listener.
+        // TODO: Instead register a MiniListener with appropriate order (see getCoreListener).
         Bukkit.getPluginManager().registerEvents(getLateListener(), this);
         lateListenerRegistered = true;
         // Finished.
@@ -1339,6 +1354,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             public void onPlayerJoinLowest(final PlayerJoinEvent event) {
                 final Player player = event.getPlayer();
                 if (!lateListenerRegistered) {
+                    /*
+                     * TODO: Register a MiniListener with appropriate order set
+                     * (needs order to be set everywhere).
+                     */
                     // Let's see if this gets logged with big servers :).
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Player " + player.getName() + " joins before the post-enable task has run.");
                     // (Assume postEnable will run and call updatePermStateReceivers(player).)
@@ -1426,6 +1445,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     private void updatePermStateReceivers(final Player player) {
         final Map<String, Boolean> checked = new HashMap<String, Boolean>(20);
         final String name = player.getName();
+        // TODO: Get rid / use PlayerData instead !
         for (final PermStateReceiver pr : permStateReceivers) {
             for (final String permission : pr.getDefaultPermissions()) {
                 Boolean state = checked.get(permission);
