@@ -31,468 +31,551 @@ commands:
                /<command> commands: List all commands, adds rarely used ones.
 
 permissions:
+    # Check silent permissions (no log alerts if present).
+    nocheatplus.checks.blockbreak.break.silent:
+        default: false
+    nocheatplus.checks.blockbreak.direction.silent:
+        default: false
+    nocheatplus.checks.blockbreak.fastbreak.silent:
+        default: false
+    nocheatplus.checks.blockbreak.frequency.silent:
+        default: false
+    nocheatplus.checks.blockbreak.noswing.silent:
+        default: false
+    nocheatplus.checks.blockbreak.reach.silent:
+        default: false
+    nocheatplus.checks.blockbreak.wrongblock.silent:
+        default: false
+    nocheatplus.checks.blockinteract.direction.silent:
+        default: false
+    nocheatplus.checks.blockinteract.reach.silent:
+        default: false
+    nocheatplus.checks.blockinteract.speed.silent:
+        default: false
+    nocheatplus.checks.blockinteract.visible.silent:
+        default: false
+    nocheatplus.checks.blockplace.against.silent:
+        default: false
+    nocheatplus.checks.blockplace.autosign.silent:
+        default: false
+    nocheatplus.checks.blockplace.direction.silent:
+        default: false
+    nocheatplus.checks.blockplace.fastplace.silent:
+        default: false
+    nocheatplus.checks.blockplace.noswing.silent:
+        default: false
+    nocheatplus.checks.blockbreak.reach.silent:
+        default: false
+    nocheatplus.checks.blockplace.speed.silent:
+        default: false
+    nocheatplus.checks.chat.captcha.silent:
+        default: false
+    nocheatplus.checks.chat.color.silent:
+        default: false
+    nocheatplus.checks.chat.commands.silent:
+        default: false
+    nocheatplus.checks.chat.text.silent:
+        default: false
+    nocheatplus.checks.chat.logins.silent:
+        default: false
+    nocheatplus.checks.chat.relog.silent:
+        default: false
+    nocheatplus.checks.combined.bedleave.silent:
+        default: false
+    nocheatplus.checks.combined.improbable.silent:
+        default: false
+    nocheatplus.checks.combined.munchhausen.silent:
+        default: false
+    nocheatplus.checks.fight.angle.silent:
+        default: false
+    nocheatplus.checks.fight.critical.silent:
+        default: false
+    nocheatplus.checks.fight.direction.silent:
+        default: false
+    nocheatplus.checks.fight.fastheal.silent:
+        default: false
+    nocheatplus.checks.fight.godmode.silent:
+        default: false
+    nocheatplus.checks.fight.noswing.silent:
+        default: false
+    nocheatplus.checks.fight.reach.silent:
+        default: false
+    nocheatplus.checks.fight.selfhit.silent:
+        default: false
+    nocheatplus.checks.fight.speed.silent:
+        default: false
+    nocheatplus.checks.inventory.drop.silent:
+        default: false
+    nocheatplus.checks.inventory.fastclick.silent:
+        default: false
+    nocheatplus.checks.inventory.fastconsume.silent:
+        default: false
+    nocheatplus.checks.inventory.gutenberg.silent:
+        default: false
+    nocheatplus.checks.inventory.instantbow.silent:
+        default: false
+    nocheatplus.checks.inventory.instanteat.silent:
+        default: false
+    nocheatplus.checks.inventory.items.silent:
+        default: false
+    nocheatplus.checks.inventory.open.silent:
+        default: false
+    nocheatplus.checks.moving.creativefly.silent:
+        default: false
+    nocheatplus.checks.moving.morepackets.silent:
+        default: false
+    nocheatplus.checks.moving.nofall.silent:
+        default: false
+    nocheatplus.checks.moving.passable.silent:
+        default: false
+    nocheatplus.checks.moving.survivalfly.silent:
+        default: false
+    nocheatplus.checks.moving.vehicle.silent:
+        default: false
+    nocheatplus.checks.moving.vehicle.morepackets.silent:
+        default: false
+    nocheatplus.checks.moving.vehicle.envelope.silent:
+        default: false
+    nocheatplus.checks.net.attackfrequency.silent:
+        default: false
+    nocheatplus.checks.net.flyingfrequency.silent:
+        default: false
+    nocheatplus.checks.net.keepalivefrequency.silent:
+        default: false
+    nocheatplus.checks.net.packetfrequency.silent:
+        default: false
+    # Check bypass permissions:
+    nocheatplus.checks:
+        description: Allow the player to bypass all checks.
+        children:
+            nocheatplus.checks.blockbreak:
+                description: Allow the player to bypass all BlockBreak checks.
+                children:
+                    nocheatplus.checks.blockbreak.break:
+                        description: Allow the player to break special blocks.
+                        children:
+                          nocheatplus.checks.blockbreak.break.liquid:
+                            description: Allow players to break liquid.
+                    nocheatplus.checks.blockbreak.direction:
+                        description: Allow the player to bypass to Direction check.
+                    nocheatplus.checks.blockbreak.fastbreak:
+                        description: Allow the player to bypass the FastBreak check.
+                    nocheatplus.checks.blockbreak.frequency:
+                        description: Allow the player to bypass the Frequency check.
+                    nocheatplus.checks.blockbreak.noswing:
+                        description: Allow the player to bypass the NoSwing check.
+                    nocheatplus.checks.blockbreak.reach:
+                        description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.blockbreak.wrongblock:
+                        description: Allow the player to bypass the WorngBlock check.
+            nocheatplus.checks.blockinteract:
+                description: Allow the player to bypass all BlockInteract checks.
+                children:
+                    nocheatplus.checks.blockinteract.direction:
+                        description: Allow the player to bypass to Direction check.
+                    nocheatplus.checks.blockinteract.reach:
+                        description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.blockinteract.speed:
+                        description: Allow the player to bypass the Speed check.
+                    nocheatplus.checks.blockinteract.visible:
+                        description: Allow the player to bypass the Visible check.
+            nocheatplus.checks.blockplace:
+                description: Allow the player to bypass all BlockPlace checks.
+                children:
+                    nocheatplus.checks.blockplace.against:
+                        description: Allow the player to place blocks against other blocks.
+                        children:
+                            nocheatplus.checks.blockplace.against.liquids:
+                                description: Allow the player to place blocks against liquids.
+                            nocheatplus.checks.blockplace.against.air:
+                                description: Allow the player to place blocks against air.
+                    nocheatplus.checks.blockplace.autosign:
+                        description: Allow bypassing the autosign check.
+                    nocheatplus.checks.blockplace.boatsanywhere:
+                        description: Allow the player to place boats on the ground.
+                    nocheatplus.checks.blockplace.direction:
+                        description: Allow the player to bypass to Direction check.
+                    nocheatplus.checks.blockplace.fastplace:
+                        description: Allow the player to bypass the FastPlace check.
+                    nocheatplus.checks.blockplace.noswing:
+                        description: Allow the player to bypass the NoSwing check.
+                    nocheatplus.checks.blockplace.reach:
+                        description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.blockplace.speed:
+                        description: Allow the player to bypass the Speed check.
+            nocheatplus.checks.chat:
+                description: Allow the player to bypass all Chat checks.
+                children:
+                    nocheatplus.checks.chat.captcha:
+                        description: Allow the player to bypass the captcha check (currently the text/commands violation handling would replace it!).
+                    nocheatplus.checks.chat.color:
+                        description: Allow the player to bypass the Color check.
+                    nocheatplus.checks.chat.commands:
+                        description: Allow the player to bypass the commands check.
+                    nocheatplus.checks.chat.logins:
+                        description: Allow the player to bypass the logins check.
+                    nocheatplus.checks.chat.relog:
+                        description: Allow the player to bypass the relog check.
+                    nocheatplus.checks.chat.text:
+                        description: Allow the player to bypass the text check.
+            nocheatplus.checks.combined:
+                description: Allow the player to bypass all combined checks.
+                children:
+                     nocheatplus.checks.combined.bedleave:
+                         description: Allow to bypass the bedleave check (fly, god).
+                     nocheatplus.checks.combined.improbable:
+                         description: Allow the player to bypass the Improbable check.
+                     nocheatplus.checks.combined.munchhausen:
+                         description: Allow flying with fishing rods! The check is deactivated by default, though.
+            nocheatplus.checks.fight:
+                description: Allow the player to bypass all Fight checks.
+                children:
+                    nocheatplus.checks.fight.angle:
+                        description: Allow the player to bypass the Angle check.
+                    nocheatplus.checks.fight.critical:
+                        description: Allow the player to bypass the Critical check.
+                    nocheatplus.checks.fight.direction:
+                        description: Allow the player to bypass the Direction check.
+                    nocheatplus.checks.fight.fastheal:
+                        description: Allow the player to bypass the FastHeal check.
+                    nocheatplus.checks.fight.godmode:
+                        description: Allow the player to bypass the GodMode check.
+                    nocheatplus.checks.fight.noswing:
+                        description: Allow the player to bypass the NoSwing check.
+                    nocheatplus.checks.fight.reach:
+                        description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.fight.selfhit:
+                        description: Allow the player to bypass the SelfHit check.
+                    nocheatplus.checks.fight.speed:
+                        description: Allow the player to bypass the Speed check.
+            nocheatplus.checks.inventory:
+                description: Allow the player to bypass all Inventory checks.
+                children:
+                    nocheatplus.checks.inventory.drop:
+                        description: Allow the player to bypass the Drop check.
+                    nocheatplus.checks.inventory.fastclick:
+                        description: Allow the player to bypass the FastClick check.
+                    nocheatplus.checks.inventory.fastconsume:
+                        description: Allow to bypass the FastConsume check.
+                    nocheatplus.checks.inventory.gutenberg:
+                        description: Allow to bypass the Gutenberg check.
+                    nocheatplus.checks.inventory.instantbow:
+                        description: Allow the player to bypass the InstantBow check.
+                    nocheatplus.checks.inventory.instanteat:
+                        description: Allow the player to bypass the InstantEat check.
+                    nocheatplus.checks.inventory.items:
+                        description: Allow the player to bypass the items check (illegal enchantments/dupes).
+                    nocheatplus.checks.inventory.open:
+                        description: Check for open inventories on special transitions, such as teleportation.
+            nocheatplus.checks.moving:
+                description: Allow the player to bypass all Moving checks.
+                children:
+                    nocheatplus.checks.moving.creativefly:
+                        description: Allow the player to bypass the CreativeFly check.
+                        children:
+                            nocheatplus.checks.moving.survivalfly: true
+                    nocheatplus.checks.moving.morepackets:
+                        description: Allow the player to bypass the MorePackets check.
+                    nocheatplus.checks.moving.morepacketsvehicle:
+                        description: "Legacy permission! Use instead: nocheatplus.checks.moving.vehicle.morepackets"
+                        children:
+                            nocheatplus.checks.moving.vehicle.morepackets: true
+                    nocheatplus.checks.moving.nofall:
+                        description: Allow the player to bypass the NoFall check.
+                    nocheatplus.checks.moving.passable:
+                        description: Allow bypassing the Passable check.
+                    nocheatplus.checks.moving.survivalfly:
+                        description: Allow the player to bypass the SurvivalFly check.
+                        children:
+                            nocheatplus.checks.moving.survivalfly.blocking:
+                                description: Allow the player to move without speed limits and to attack entities while blocking.
+                            nocheatplus.checks.moving.survivalfly.sneaking:
+                                description: Allow the player to move without speed limits while sneaking.
+                            nocheatplus.checks.moving.survivalfly.speeding:
+                                description: Allow the player to move at higher speeds.
+                            nocheatplus.checks.moving.survivalfly.sprinting:
+                                description: Allow the player to sprint backwards.
+                            nocheatplus.checks.moving.survivalfly.step:
+                                description: Allow the player to use the 'step' functionality of his client.
+                    nocheatplus.checks.moving.vehicle:
+                        description: Allow bypassing all checks for players moving as passengers of vehicles/other.
+                        children:
+                            nocheatplus.checks.moving.vehicle.morepackets:
+                                description: Allow bypassing the morepackets check for vehicles.
+                            nocheatplus.checks.moving.vehicle.envelope:
+                                description: Allow bypassing the moving envelope check for vehicles.
+            nocheatplus.checks.net:
+              description: Allow a player to bypass the net (packet) checks.
+              children:
+                nocheatplus.checks.net.attackfrequency:
+                  description: Bypass the AttackFrequency check (attack speed).
+                nocheatplus.checks.net.flyingfrequency:
+                  description: Bypass the FlyingFrequency check (flying packet spam).
+                nocheatplus.checks.net.keepalivefrequency:
+                  description: Bypass the KeepAliveFrequency check (keep alive packet spam).
+                nocheatplus.checks.net.packetfrequency:
+                  description: Bypass the PacketFrequency check (overall packet spam).
+    
+    nocheatplus.mods:
+        description: Allow the player to use all the client mods.
+        children:
+            nocheatplus.mods.cjb:
+                description: Allow the player to use the CJB mod.
+                children:
+                    nocheatplus.mods.cjb.fly:
+                        description: Allow the player to use CJB's fly mod.
+                    nocheatplus.mods.cjb.radar:
+                        description: Allow the player to use CJB's radar.
+                    nocheatplus.mods.cjb.xray:
+                        description: Allow the player to use CJB's xray.
+            nocheatplus.mods.journey:
+                description: Allow players too use mapping features of the JourneyMap mod (Same codes as VoxelMap).
+                children:
+                    nocheatplus.mods.journey.radar:
+                        description: Radar features (JourneyMap, VoxelMap).
+                    nocheatplus.mods.journey.cavemap:
+                        description: Cave map features (JourneyMap, VoxelMap).
+            nocheatplus.mods.minecraftautomap:
+                description: Allow the player to use the Minecraft AutoMap mod.
+                children:
+                    nocheatplus.mods.minecraftautomap.cave:
+                        description: Allow the player to use Minecraft AutoMap's cave mode.
+                    nocheatplus.mods.minecraftautomap.ores:
+                        description: Allow the player to use Minecraft AutoMap's ores detector.
+                    nocheatplus.mods.minecraftautomap.radar:
+                        description: Allow the player to use Minecraft AutoMap's radar.
+            nocheatplus.mods.rei:
+                description: Allow the player to use the Rei's Minimap mod.
+                children:
+                    nocheatplus.mods.rei.cave:
+                        description: Allow the player to use Rei's Minimap cave mode.
+                    nocheatplus.mods.rei.radar:
+                        description: Allow the player to use Rei's Minimap radar.
+                        children:
+                            nocheatplus.mods.rei.radar.player:
+                                description: Allow the player to use Rei's Minimap player radar
+                            nocheatplus.mods.rei.radar.animal:
+                                description: Allow the player to use Rei's Minimap animal radar
+                            nocheatplus.mods.rei.radar.mob:
+                                description: Allow the player to use Rei's Minimap mob radar
+                            nocheatplus.mods.rei.radar.slime:
+                                description: Allow the player to use Rei's Minimap slime radar
+                            nocheatplus.mods.rei.radar.squid:
+                                description: Allow the player to use Rei's Minimap squid radar
+                            nocheatplus.mods.rei.radar.other:
+                                description: Allow the player to use Rei's Minimap other radar
+            nocheatplus.mods.smartmoving:
+                description: Allow the player to use the Smart Moving mod.
+                children:
+                    nocheatplus.mods.smartmoving.climbing:
+                        description: Allow the player to use Smart Moving's climbing movement.
+                    nocheatplus.mods.smartmoving.crawling:
+                        description: Allow the player to use Smart Moving's crawling movement.
+                    nocheatplus.mods.smartmoving.flying:
+                        description: Allow the player to use Smart Moving's flying movement.
+                    nocheatplus.mods.smartmoving.jumping:
+                        description: Allow the player to use Smart Moving's jumping movement.
+                    nocheatplus.mods.smartmoving.sliding:
+                        description: Allow the player to use Smart Moving's sliding movement.
+                    nocheatplus.mods.smartmoving.swimming:
+                        description: Allow the player to use Smart Moving's swimming movement.
+            nocheatplus.mods.zombe:
+                description: Allow the player to use the Zombe mod.
+                children:                        
+                    nocheatplus.mods.zombe.cheat:
+                        description: Allow the player to use Zombe's cheat.
+                    nocheatplus.mods.zombe.fly:
+                        description: Allow the player to use Zombe's fly mod.
+                    nocheatplus.mods.zombe.noclip:
+                        description: Allow the player to use Zombe's noclip.
+    
+    nocheatplus.notify:
+        description: Receive notifications about violations in-game.
+    
+    nocheatplus.filter.command:
+        description: Allows use of all commands protected by the command protection, like the ncp root command. Does not give functionality but allow seeing usage and tab-completion of the command. In future there can be many children not listed in this config.
+        children:
+            nocheatplus.filter.command.nocheatplus:
+                description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with certain aspects of super-perms.
+    
+    # Command permissions:
+    nocheatplus.command:
+        description: "All command permissions, do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
+        children:
+            nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.notify:
+                description: Allow toggling notifications.
+                children:
+                    nocheatplus.notify: true
+            nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.reload:
+                description: Allow the player to reload NoCheatPlus configuration.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.top:
+                description: Allow to search violation history for top violations.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.info:
+                description: Allow to see violation info about a player.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.inspect:
+                description: Allow to see detailed information about online players.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.exemptions:
+                description: Allow to see exemptions for a player.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.exempt:
+                description: Allow to add exemptions for a player.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.unexempt:
+                description: Allow to remove exemptions from  a player.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.ban:
+                description: Allow use of the ncp ban command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.kick:
+                description: Allow use of the ncp kick command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.denylist:
+                description: Allow use of the ncp denylist command (view players who are denied to login right now).
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.lag:
+                description: Allow use of the ncp lag command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.tell:
+                description: Allow use of the ncp tell command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.delay:
+                description: Allow use of the ncp delay command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.denylogin:
+                description: Allow use of the ncp denylogin command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.allowlogin:
+                description: Allow use of the ncp allowlogin command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.version:
+                description: Allow use of the ncp version command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.removeplayer:
+                description: Allow use of the ncp removeplayer command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.commands:
+                description: Allow use of the ncp commands command.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.log:
+                description: Show various stats/debugging information. [Incomplete, experimental.]
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.reset:
+                description: Reset statistics or debugging counters.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.debug:
+                description: Start logging debug information for a player (lots of output, log file).
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+            nocheatplus.command.stopwatch:
+                description: Stop watch functionality. See tab-completion and feedback.
+                children:
+                    nocheatplus.filter.command.nocheatplus: true
+    
+    # Bypass permissions (other than checks):
+    nocheatplus.bypass:
+        description: Bypass other features than checks.
+        children:
+            nocheatplus.bypass.denylogin:
+                description: Bypass the login denial, such as exists with the ncp denylogin command.
+    
+    # Various shortcuts:
+    nocheatplus.shortcut:
+        description: 'Shortcut permissions designed to be somewhat "safe" to give (see children permissions).'
+        children:
+            nocheatplus.shortcut.info:
+                description: Info commands about players.
+                children:
+                    nocheatplus.command.notify: true
+                    nocheatplus.command.top: true
+                    nocheatplus.command.info: true
+                    nocheatplus.command.exemptions: true
+                    nocheatplus.command.denylist: true
+                    nocheatplus.command.commands: true
+                    nocheatplus.command.stopwatch: true
+                    # TODO: Put lag here ?
+            nocheatplus.shortcut.monitor:
+                description: All monitoring commands such as player and system info (including plugins).
+                children:
+                    nocheatplus.shortcut.info: true
+                    nocheatplus.command.version: true
+                    nocheatplus.command.lag: true
+                    # TODO: All commands !?
+                    nocheatplus.filter.command: true
+                    # TODO: inspect ?
+            nocheatplus.shortcut.safeadmin:
+                description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
+                children:
+                    nocheatplus.shortcut.monitor: true
+                    nocheatplus.command.allowlogin: true
+                    nocheatplus.command.exempt: true
+                    nocheatplus.command.unexempt: true
+                    nocheatplus.command.removeplayer: true
+                    nocheatplus.filter.command: true
+                    nocheatplus.bypass.denylogin: true
+                    # TODO: inspect ?
+            nocheatplus.shortcut.bypass:
+                description: Bypass everything that can be bypassed.
+                children:
+                    nocheatplus.bypass: true
+                    nocheatplus.filter.command: true
+                    nocheatplus.shortcut.cheater:
+                        description: Allow use of all cheating, excludes bypassing temp-kick and command protection and similar.
+                        children:
+                            nocheatplus.checks: true
+                            nocheatplus.mods: true
+              
+    # Shortcut: convenient testing.
+    nocheatplus.tester:
+        description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
+        children:
+            # TODO: Might just inherit from shortcut.info.
+            nocheatplus.shortcut.monitor: true
+            nocheatplus.admin.debug: true
+            nocheatplus.command.exempt.self: true
+            nocheatplus.command.unexempt.self: true
+            nocheatplus.command.removeplayer.self: true
+    
+    # Shortcut: full administrator without check-bypass-permissions:
+    nocheatplus.admin:
+        description: "Give the player all administration rights (does not exclude from checks), do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
+        children:
+            # TODO: move debug permission (debug.XYZ?).
+            nocheatplus.admin.debug:
+                description: Receive debugging information (or cause console logs on other occasions).
+            
+            nocheatplus.bypass.denylogin: true
+            nocheatplus.filter.command: true
+            nocheatplus.command: true
+    
+    # OP thing
     nocheatplus:
         description: Allow the player to bypass all checks and give him all administration permissions.
         children:
-            # Check bypass permissions:
-            nocheatplus.checks:
-                description: Allow the player to bypass all checks.
-                children:
-                    nocheatplus.checks.blockbreak:
-                        description: Allow the player to bypass all BlockBreak checks.
-                        children:
-                            nocheatplus.checks.blockbreak.break:
-                                description: Allow the player to break special blocks.
-                                children:
-                                  nocheatplus.checks.blockbreak.break.liquid:
-                                    description: Allow players to break liquid.
-                            nocheatplus.checks.blockbreak.direction:
-                                description: Allow the player to bypass to Direction check.
-                            nocheatplus.checks.blockbreak.fastbreak:
-                                description: Allow the player to bypass the FastBreak check.
-                            nocheatplus.checks.blockbreak.frequency:
-                                description: Allow the player to bypass the Frequency check.
-                            nocheatplus.checks.blockbreak.noswing:
-                                description: Allow the player to bypass the NoSwing check.
-                            nocheatplus.checks.blockbreak.reach:
-                                description: Allow the player to bypass the Reach check.
-                            nocheatplus.checks.blockbreak.wrongblock:
-                                description: Allow the player to bypass the WorngBlock check.
-                    nocheatplus.checks.blockinteract:
-                        description: Allow the player to bypass all BlockInteract checks.
-                        children:
-                            nocheatplus.checks.blockinteract.direction:
-                                description: Allow the player to bypass to Direction check.
-                            nocheatplus.checks.blockinteract.reach:
-                                description: Allow the player to bypass the Reach check.
-                            nocheatplus.checks.blockinteract.speed:
-                                description: Allow the player to bypass the Speed check.
-                            nocheatplus.checks.blockinteract.visible:
-                                description: Allow the player to bypass the Visible check.
-                    nocheatplus.checks.blockplace:
-                        description: Allow the player to bypass all BlockPlace checks.
-                        children:
-                            nocheatplus.checks.blockplace.against:
-                                description: Allow the player to place blocks against other blocks.
-                                children:
-                                    nocheatplus.checks.blockplace.against.liquids:
-                                        description: Allow the player to place blocks against liquids.
-                                    nocheatplus.checks.blockplace.against.air:
-                                        description: Allow the player to place blocks against air.
-                            nocheatplus.checks.blockplace.autosign:
-                                description: Allow bypassing the autosign check.
-                            nocheatplus.checks.blockplace.boatsanywhere:
-                                description: Allow the player to place boats on the ground.
-                            nocheatplus.checks.blockplace.direction:
-                                description: Allow the player to bypass to Direction check.
-                            nocheatplus.checks.blockplace.fastplace:
-                                description: Allow the player to bypass the FastPlace check.
-                            nocheatplus.checks.blockplace.noswing:
-                                description: Allow the player to bypass the NoSwing check.
-                            nocheatplus.checks.blockplace.reach:
-                                description: Allow the player to bypass the Reach check.
-                            nocheatplus.checks.blockplace.speed:
-                                description: Allow the player to bypass the Speed check.
-                    nocheatplus.checks.chat:
-                        description: Allow the player to bypass all Chat checks.
-                        children:
-                            nocheatplus.checks.chat.captcha:
-                                description: Allow the player to bypass the captcha check (currently the text/commands violation handling would replace it!).
-                            nocheatplus.checks.chat.color:
-                                description: Allow the player to bypass the Color check.
-                            nocheatplus.checks.chat.commands:
-                                description: Allow the player to bypass the commands check.
-                            nocheatplus.checks.chat.logins:
-                                description: Allow the player to bypass the logins check.
-                            nocheatplus.checks.chat.relog:
-                                description: Allow the player to bypass the relog check.
-                            nocheatplus.checks.chat.text:
-                                description: Allow the player to bypass the text check.
-                    nocheatplus.checks.combined:
-                        description: Allow the player to bypass all combined checks.
-                        children:
-                             nocheatplus.checks.combined.bedleave:
-                                 description: Allow to bypass the bedleave check (fly, god).
-                             nocheatplus.checks.combined.improbable:
-                                 description: Allow the player to bypass the Improbable check.
-                             nocheatplus.checks.combined.munchhausen:
-                                 description: Allow flying with fishing rods! The check is deactivated by default, though.
-                    nocheatplus.checks.fight:
-                        description: Allow the player to bypass all Fight checks.
-                        children:
-                            nocheatplus.checks.fight.angle:
-                                description: Allow the player to bypass the Angle check.
-                            nocheatplus.checks.fight.critical:
-                                description: Allow the player to bypass the Critical check.
-                            nocheatplus.checks.fight.direction:
-                                description: Allow the player to bypass the Direction check.
-                            nocheatplus.checks.fight.fastheal:
-                                description: Allow the player to bypass the FastHeal check.
-                            nocheatplus.checks.fight.godmode:
-                                description: Allow the player to bypass the GodMode check.
-                            nocheatplus.checks.fight.noswing:
-                                description: Allow the player to bypass the NoSwing check.
-                            nocheatplus.checks.fight.reach:
-                                description: Allow the player to bypass the Reach check.
-                            nocheatplus.checks.fight.selfhit:
-                                description: Allow the player to bypass the SelfHit check.
-                            nocheatplus.checks.fight.speed:
-                                description: Allow the player to bypass the Speed check.
-                    nocheatplus.checks.inventory:
-                        description: Allow the player to bypass all Inventory checks.
-                        children:
-                            nocheatplus.checks.inventory.drop:
-                                description: Allow the player to bypass the Drop check.
-                            nocheatplus.checks.inventory.fastclick:
-                                description: Allow the player to bypass the FastClick check.
-                            nocheatplus.checks.inventory.fastconsume:
-                                description: Allow to bypass the FastConsume check.
-                            nocheatplus.checks.inventory.gutenberg:
-                                description: Allow to bypass the Gutenberg check.
-                            nocheatplus.checks.inventory.instantbow:
-                                description: Allow the player to bypass the InstantBow check.
-                            nocheatplus.checks.inventory.instanteat:
-                                description: Allow the player to bypass the InstantEat check.
-                            nocheatplus.checks.inventory.items:
-                                description: Allow the player to bypass the items check (illegal enchantments/dupes).
-                            nocheatplus.checks.inventory.open:
-                                description: Check for open inventories on special transitions, such as teleportation.
-                    nocheatplus.checks.moving:
-                        description: Allow the player to bypass all Moving checks.
-                        children:
-                            nocheatplus.checks.moving.creativefly:
-                                description: Allow the player to bypass the CreativeFly check.
-                                children:
-                                    nocheatplus.checks.moving.survivalfly: true
-                            nocheatplus.checks.moving.morepackets:
-                                description: Allow the player to bypass the MorePackets check.
-                            nocheatplus.checks.moving.morepacketsvehicle:
-                                description: "Legacy permission! Use instead: nocheatplus.checks.moving.vehicle.morepackets"
-                                children:
-                                    nocheatplus.checks.moving.vehicle.morepackets: true
-                            nocheatplus.checks.moving.nofall:
-                                description: Allow the player to bypass the NoFall check.
-                            nocheatplus.checks.moving.passable:
-                                description: Allow bypassing the Passable check.
-                            nocheatplus.checks.moving.survivalfly:
-                                description: Allow the player to bypass the SurvivalFly check.
-                                children:
-                                    nocheatplus.checks.moving.survivalfly.blocking:
-                                        description: Allow the player to move without speed limits and to attack entities while blocking.
-                                    nocheatplus.checks.moving.survivalfly.sneaking:
-                                        description: Allow the player to move without speed limits while sneaking.
-                                    nocheatplus.checks.moving.survivalfly.speeding:
-                                        description: Allow the player to move at higher speeds.
-                                    nocheatplus.checks.moving.survivalfly.sprinting:
-                                        description: Allow the player to sprint backwards.
-                                    nocheatplus.checks.moving.survivalfly.step:
-                                        description: Allow the player to use the 'step' functionality of his client.
-                            nocheatplus.checks.moving.vehicle:
-                                description: Allow bypassing all checks for players moving as passengers of vehicles/other.
-                                children:
-                                    nocheatplus.checks.moving.vehicle.morepackets:
-                                        description: Allow bypassing the morepackets check for vehicles.
-                                    nocheatplus.checks.moving.vehicle.envelope:
-                                        description: Allow bypassing the moving envelope check for vehicles.
-                    nocheatplus.checks.net:
-                      description: Allow a player to bypass the net (packet) checks.
-                      children:
-                        nocheatplus.checks.net.attackfrequency:
-                          description: Bypass the AttackFrequency check (attack speed).
-                        nocheatplus.checks.net.flyingfrequency:
-                          description: Bypass the FlyingFrequency check (flying packet spam).
-                        nocheatplus.checks.net.keepalivefrequency:
-                          description: Bypass the KeepAliveFrequency check (keep alive packet spam).
-                        nocheatplus.checks.net.packetfrequency:
-                          description: Bypass the PacketFrequency check (overall packet spam).  
-            
-            nocheatplus.mods:
-                description: Allow the player to use all the client mods.
-                children:
-                    nocheatplus.mods.cjb:
-                        description: Allow the player to use the CJB mod.
-                        children:
-                            nocheatplus.mods.cjb.fly:
-                                description: Allow the player to use CJB's fly mod.
-                            nocheatplus.mods.cjb.radar:
-                                description: Allow the player to use CJB's radar.
-                            nocheatplus.mods.cjb.xray:
-                                description: Allow the player to use CJB's xray.
-                    nocheatplus.mods.journey:
-                        description: Allow players too use mapping features of the JourneyMap mod (Same codes as VoxelMap).
-                        children:
-                            nocheatplus.mods.journey.radar:
-                                description: Radar features (JourneyMap, VoxelMap).
-                            nocheatplus.mods.journey.cavemap:
-                                description: Cave map features (JourneyMap, VoxelMap).
-                    nocheatplus.mods.minecraftautomap:
-                        description: Allow the player to use the Minecraft AutoMap mod.
-                        children:
-                            nocheatplus.mods.minecraftautomap.cave:
-                                description: Allow the player to use Minecraft AutoMap's cave mode.
-                            nocheatplus.mods.minecraftautomap.ores:
-                                description: Allow the player to use Minecraft AutoMap's ores detector.
-                            nocheatplus.mods.minecraftautomap.radar:
-                                description: Allow the player to use Minecraft AutoMap's radar.
-                    nocheatplus.mods.rei:
-                        description: Allow the player to use the Rei's Minimap mod.
-                        children:
-                            nocheatplus.mods.rei.cave:
-                                description: Allow the player to use Rei's Minimap cave mode.
-                            nocheatplus.mods.rei.radar:
-                                description: Allow the player to use Rei's Minimap radar.
-                                children:
-                                    nocheatplus.mods.rei.radar.player:
-                                        description: Allow the player to use Rei's Minimap player radar
-                                    nocheatplus.mods.rei.radar.animal:
-                                        description: Allow the player to use Rei's Minimap animal radar
-                                    nocheatplus.mods.rei.radar.mob:
-                                        description: Allow the player to use Rei's Minimap mob radar
-                                    nocheatplus.mods.rei.radar.slime:
-                                        description: Allow the player to use Rei's Minimap slime radar
-                                    nocheatplus.mods.rei.radar.squid:
-                                        description: Allow the player to use Rei's Minimap squid radar
-                                    nocheatplus.mods.rei.radar.other:
-                                        description: Allow the player to use Rei's Minimap other radar
-                    nocheatplus.mods.smartmoving:
-                        description: Allow the player to use the Smart Moving mod.
-                        children:
-                            nocheatplus.mods.smartmoving.climbing:
-                                description: Allow the player to use Smart Moving's climbing movement.
-                            nocheatplus.mods.smartmoving.crawling:
-                                description: Allow the player to use Smart Moving's crawling movement.
-                            nocheatplus.mods.smartmoving.flying:
-                                description: Allow the player to use Smart Moving's flying movement.
-                            nocheatplus.mods.smartmoving.jumping:
-                                description: Allow the player to use Smart Moving's jumping movement.
-                            nocheatplus.mods.smartmoving.sliding:
-                                description: Allow the player to use Smart Moving's sliding movement.
-                            nocheatplus.mods.smartmoving.swimming:
-                                description: Allow the player to use Smart Moving's swimming movement.
-                    nocheatplus.mods.zombe:
-                        description: Allow the player to use the Zombe mod.
-                        children:                        
-                            nocheatplus.mods.zombe.cheat:
-                                description: Allow the player to use Zombe's cheat.
-                            nocheatplus.mods.zombe.fly:
-                                description: Allow the player to use Zombe's fly mod.
-                            nocheatplus.mods.zombe.noclip:
-                                description: Allow the player to use Zombe's noclip.
-            
-            nocheatplus.notify:
-                description: Receive notifications about violations in-game.
-            
-            nocheatplus.filter.command:
-                description: Allows use of all commands protected by the command protection, like the ncp root command. Does not give functionality but allow seeing usage and tab-completion of the command. In future there can be many children not listed in this config.
-                children:
-                    nocheatplus.filter.command.nocheatplus:
-                        description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with certain aspects of super-perms.
-            
-            # Command permissions:
-            nocheatplus.command:
-                description: "All command permissions, do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
-                children:
-                    nocheatplus.command.notify:
-                        description: Allow toggling notifications.
-                        children:
-                            nocheatplus.notify: true
-                    nocheatplus.command.reload:
-                        description: Allow the player to reload NoCheatPlus configuration.
-                    nocheatplus.command.top:
-                        description: Allow to search violation history for top violations.
-                    nocheatplus.command.info:
-                        description: Allow to see violation info about a player.
-                    nocheatplus.command.inspect:
-                        description: Allow to see detailed information about online players.
-                    nocheatplus.command.exemptions:
-                        description: Allow to see exemptions for a player.
-                    nocheatplus.command.exempt:
-                        description: Allow to add exemptions for a player.
-                    nocheatplus.command.unexempt:
-                        description: Allow to remove exemptions from  a player.
-                    nocheatplus.command.ban:
-                        description: Allow use of the ncp ban command.
-                    nocheatplus.command.kick:
-                        description: Allow use of the ncp kick command.
-                    nocheatplus.command.denylist:
-                        description: Allow use of the ncp denylist command (view players who are denied to login right now).
-                    nocheatplus.command.lag:
-                        description: Allow use of the ncp lag command.
-                    nocheatplus.command.tell:
-                        description: Allow use of the ncp tell command.
-                    nocheatplus.command.delay:
-                        description: Allow use of the ncp delay command.
-                    nocheatplus.command.denylogin:
-                        description: Allow use of the ncp denylogin command.
-                    nocheatplus.command.allowlogin:
-                        description: Allow use of the ncp allowlogin command.
-                    nocheatplus.command.version:
-                        description: Allow use of the ncp version command.
-                    nocheatplus.command.removeplayer:
-                        description: Allow use of the ncp removeplayer command.
-                    nocheatplus.command.commands:
-                        description: Allow use of the ncp commands command.
-                    nocheatplus.command.log:
-                        description: Show various stats/debugging information. [Incomplete, experimental.]
-                    nocheatplus.command.reset:
-                        description: Reset statistics or debugging counters.
-                    nocheatplus.command.debug:
-                        description: Start logging debug information for a player (lots of output, log file).
-                    nocheatplus.command.stopwatch:
-                        description: Stop watch functionality. See tab-completion and feedback.
-                    # Legacy:
-                    nocheatplus.command.tempkick:
-                        description: Obsolete, use nocheatplus.command.denylogin instead.
-                        children:
-                            nocheatplus.command.denylogin: true
-                    nocheatplus.command.unkick:
-                        description: Obsolete, use nocheatplus.command.allowlogin instead.
-                        children:
-                            nocheatplus.command.allowlogin: true
-            
-            # Bypass permissions (other than checks):
-            nocheatplus.bypass:
-                description: Bypass other features than checks.
-                children:
-                    nocheatplus.bypass.denylogin:
-                        description: Bypass the login denial, such as exists with the ncp denylogin command.
-            
-            # Various shortcuts:
-            nocheatplus.shortcut:
-                description: 'Shortcut permissions designed to be somewhat "safe" to give (see children permissions).'
-                children:
-                    nocheatplus.shortcut.info:
-                        description: Info commands about players.
-                        children:
-                            nocheatplus.command.notify: true
-                            nocheatplus.command.top: true
-                            nocheatplus.command.info: true
-                            nocheatplus.command.exemptions: true
-                            nocheatplus.command.denylist: true
-                            nocheatplus.command.commands: true
-                            nocheatplus.command.stopwatch: true
-                            # TODO: Put lag here ?
-                    nocheatplus.shortcut.monitor:
-                        description: All monitoring commands such as player and system info (including plugins).
-                        children:
-                            nocheatplus.shortcut.info: true
-                            nocheatplus.command.version: true
-                            nocheatplus.command.lag: true
-                            # TODO: All commands !?
-                            nocheatplus.filter.command: true
-                            # TODO: inspect ?
-                    nocheatplus.shortcut.safeadmin:
-                        description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
-                        children:
-                            nocheatplus.shortcut.monitor: true
-                            nocheatplus.command.allowlogin: true
-                            nocheatplus.command.exempt: true
-                            nocheatplus.command.unexempt: true
-                            nocheatplus.command.removeplayer: true
-                            nocheatplus.filter.command: true
-                            nocheatplus.bypass.denylogin: true
-                            # TODO: inspect ?
-                    nocheatplus.shortcut.bypass:
-                        description: Bypass everything that can be bypassed.
-                        children:
-                            nocheatplus.bypass: true
-                            nocheatplus.filter.command: true
-                            nocheatplus.shortcut.cheater:
-                                description: Allow use of all cheating, excludes bypassing temp-kick and command protection and similar.
-                                children:
-                                    nocheatplus.checks: true
-                                    nocheatplus.mods: true
-                      
-            # Shortcut: convenient testing.
-            nocheatplus.tester:
-                description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
-                children:
-                    # TODO: Might just inherit from shortcut.info.
-                    nocheatplus.shortcut.monitor: true
-                    nocheatplus.admin.debug: true
-                    nocheatplus.command.exempt.self: true
-                    nocheatplus.command.unexempt.self: true
-                    nocheatplus.command.removeplayer.self: true
-            
-            # Shortcut: full administrator without check-bypass-permissions:
-            nocheatplus.admin:
-                description: "Give the player all administration rights (does not exclude from checks), do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
-                children:
-                    # TODO: move debug permission (debug.XYZ?).
-                    nocheatplus.admin.debug:
-                        description: Receive debugging information (or cause console logs on other occasions).
-                    
-                    nocheatplus.bypass.denylogin: true
-                    nocheatplus.filter.command: true
-                    nocheatplus.command: true
-                    
-                    # Left in for compatibility reasons:
-                    nocheatplus.admin.notify:
-                        description: Obsolete, use nocheatplus.command.notify and/or nocheatplus.notify instead.
-                        children:
-                            nocheatplus.command.notify: true
-                    nocheatplus.admin.reload:
-                        description: Obsolete, use nocheatplus.command.reload instead.
-                        children:
-                            nocheatplus.command.reload: true
-                    nocheatplus.admin.info:
-                        description: Obsolete, use nocheatplus.command.info instead.
-                        children:
-                            nocheatplus.command.info: true
-                    nocheatplus.admin.exemptions:
-                        description: Obsolete, use nocheatplus.command.exemptions instead.
-                        children:
-                            nocheatplus.command.exemptions: true
-                    nocheatplus.admin.exempt:
-                        description: Obsolete, use nocheatplus.command.exempt instead.
-                        children:
-                            nocheatplus.command.exempt: true
-                    nocheatplus.admin.unexempt:
-                        description: Obsolete, use nocheatplus.command.unexempt instead.
-                        children:
-                            nocheatplus.command.unexempt: true
-                    nocheatplus.admin.ban:
-                        description: Obsolete, use nocheatplus.command.ban instead.
-                        children:
-                            nocheatplus.command.ban: true
-                    nocheatplus.admin.kick:
-                        description: Obsolete, use nocheatplus.command.kick instead.
-                        children:
-                            nocheatplus.command.kick: true
-                    nocheatplus.admin.kicklist:
-                        description: Obsolete, use nocheatplus.command.denylist instead.
-                        children:
-                            nocheatplus.command.denylist: true
-                    nocheatplus.admin.lag:
-                        description: Obsolete, use nocheatplus.command.lag instead.
-                        children:
-                            nocheatplus.command.lag: true
-                    nocheatplus.admin.tell:
-                        description: Obsolete, use nocheatplus.command.tell instead.
-                        children:
-                            nocheatplus.command.tell: true
-                    nocheatplus.admin.delay:
-                        description: Obsolete, use nocheatplus.command.delay instead.
-                        children:
-                            nocheatplus.command.delay: true
-                    nocheatplus.admin.tempkick:
-                        description: Obsolete, use nocheatplus.command.denylogin instead.
-                        children:
-                            nocheatplus.command.denylogin: true
-                    nocheatplus.admin.unkick:
-                        description: Obsolete, use nocheatplus.command.allowlogin instead.
-                        children:
-                            nocheatplus.command.allowlogin: true
-                    nocheatplus.admin.version:
-                        description: Obsolete, use nocheatplus.command.version instead.
-                        children:
-                            nocheatplus.command.version: true
-                    nocheatplus.admin.removeplayer:
-                        description: Obsolete, use nocheatplus.command.removeplayer instead.
-                        children:
-                            nocheatplus.command.removeplayer: true
-                    nocheatplus.admin.commands:
-                        description: Obsolete, use nocheatplus.command.commands instead.
-                        children:
-                            nocheatplus.command.commands: true
-            
+            nocheatplus.admin: true
+            nocheatplus.shortcut.bypass: true

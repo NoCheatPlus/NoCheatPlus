@@ -46,12 +46,10 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
@@ -818,17 +816,27 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Lazy initialization of basics (static API, configuration, logging).
      */
     private void setupBasics() {
+        // Ensure permissions are registered early.
+        for (RegisteredPermission rp : Permissions.getPermissions()) {
+            if (permissionRegistry.getPermissionInfo(rp.getId()) == null) {
+                permissionRegistry.addRegisteredPermission(rp);
+            }
+        }
+        // API.
         if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
             NCPAPIProvider.setNoCheatPlusAPI(this);
         }
+        // Initialize server version.
         if (ServerVersion.getMinecraftVersion() == GenericVersion.UNKNOWN_VERSION) {
             BukkitVersion.init();
         }
+        // Configuration.
         if (!ConfigManager.isInitialized()) {
             ConfigManager.init(this);
             // Basic setup for exemption (uses CheckType). This is redundant, but should not hurt.
             NCPExemptionManager.setExemptionSettings(new ExemptionSettings(ConfigManager.getConfigFile()));
         }
+        // Logging.
         if (logManager == null || logManager.getStreamID(Streams.STATUS.name) != Streams.STATUS) {
             logManager = new BukkitLogManager(this);
             StaticLog.setStreamID(Streams.INIT);
@@ -843,11 +851,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                             return NoCheatPlus.this.getRegistryStreamId();
                         }
                     }, "[GenericInstanceRegistry] ");
-        }
-        for (RegisteredPermission rp : Permissions.getPermissions()) {
-            if (permissionRegistry.getPermissionInfo(rp.getId()) == null) {
-                permissionRegistry.addRegisteredPermission(rp);
-            }
         }
     }
 
@@ -964,9 +967,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
 
-        // Add default .silent and command/filter child permissions.
-        addDefaultChildPermissions(commandHandler);
-
         ////////////////////////////////
         // Tasks, post-rumble-logging
         ////////////////////////////////
@@ -1044,42 +1044,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     }
 
-    private void addDefaultChildPermissions(final NoCheatPlusCommand commandHandler) {
-        logManager.debug(Streams.INIT, "Set default child permissions...");
-        try {
-            // Set child permissions for commands for faster checking.
-            PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), 
-                    Permissions.FILTER_COMMAND_NOCHEATPLUS, 
-                    PermissionDefault.OP);
-        } catch (Throwable t) {
-            logManager.severe(Streams.INIT, "Failed to complement permissions: " + t.getClass().getSimpleName());
-            logManager.severe(Streams.INIT, t);
-        }
-        // Set .silent child permissions for all check permissions.
-        for (CheckType checkType : CheckType.values()) {
-            final RegisteredPermission permission = checkType.getPermission();
-            if (permission == null) {
-                continue;
-            }
-            try {
-                // PermissionDefault.FALSE: Ensure it's not there by accident / non-typical.;
-                PermissionUtil.addChildPermissionBySuffix(permission, "silent", permissionRegistry, PermissionDefault.FALSE, false);
-            } catch (Throwable t) {
-                logManager.severe(Streams.INIT, "Failed to add .silent child permission for " + permission + ": " + t.getClass().getSimpleName());
-                logManager.severe(Streams.INIT, t);
-            }
-        }
-    }
-
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
     private void postEnable(final Player[] onlinePlayers) {
         logManager.info(Streams.INIT, "Post-enable running...");
-
+        final ConfigFile config = ConfigManager.getConfigFile();
         try {
             // Command protection feature.
-            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+            if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
                 setupCommandProtection();
             }
         } catch (Throwable t) {

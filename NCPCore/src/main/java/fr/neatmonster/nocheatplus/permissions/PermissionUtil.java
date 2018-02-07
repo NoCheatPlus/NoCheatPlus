@@ -33,7 +33,7 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class PermissionUtil {
 
-    static final String AUTO_GENERATED = "Auto-generated permission (NoCheatPlus).";
+    public static final String AUTO_GENERATED = "Auto-generated permission (NoCheatPlus).";
 
     /**
      * Entry for what the old state of a command was.
