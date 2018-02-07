@@ -192,11 +192,11 @@ public class CheckUtils {
             if (pData.hasPermission(permission, player)) {
                 return true;
             }
-            // TODO: Refine this error message +- put in place where it needs to be.
-            if (!isPrimaryThread && !CheckTypeUtil.needsSynchronization(checkType)) {
-                // Checking for exemption can cause harm now.
-                improperAPIAccess(checkType);
-            }
+        }
+        // TODO: Refine this error message +- put in place where it needs to be.
+        if (!isPrimaryThread && !CheckTypeUtil.needsSynchronization(checkType)) {
+            // Checking for exemption can cause harm now.
+            improperAPIAccess(checkType);
         }
         // TODO: New exemption implementation (thread-safe read).
         // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
