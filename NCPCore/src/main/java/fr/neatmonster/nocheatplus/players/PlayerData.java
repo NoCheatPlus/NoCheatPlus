@@ -35,6 +35,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionNode;
 import fr.neatmonster.nocheatplus.permissions.PermissionPolicy.FetchingPolicy;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.DualSet;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
@@ -85,8 +86,16 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
 
     /** Monitor player task load across all players (nanoseconds per server tick). */
     private static ActionFrequency taskLoad = new ActionFrequency(6, 7);
-    /** Some measure for heavy load, for skipping some of the (lazy) updating. */
-    private static float heavyLoad = 1000000f; // 1 ms = 2 % of a tick.
+    private static final int ticksMonitored = taskLoad.numberOfBuckets() * (int) taskLoad.bucketDuration();
+    private static final long msMonitored = ticksMonitored * 50;
+    /**
+     * Some measure for heavy load, for skipping some of the (lazy) updating.
+     * Assume 1% of a tick in average as heavy - just for this task. This still
+     * is problematic, if System.nanoTime() just has milliseconds resolution,
+     * because we'll be adding up zeros most of the time here. Perhaps just
+     * relaying to TickTask.getLag is enough.
+     */
+    private static float heavyLoad = 500000f / (float) ticksMonitored;
 
     // Default tags.
     public static final String TAG_NOTIFY_OFF = "notify_off";
@@ -263,23 +272,24 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         }
         long nanos = System.nanoTime();
         taskLoad.update(tick);
-        final boolean isHeavyLoad = taskLoad.score(1f) > heavyLoad;
-        updatePermissionsLazy.mergePrimaryThread();
-        final Iterator<RegisteredPermission> it = updatePermissionsLazy.iteratorPrimaryThread();
-        // TODO: Load balancing with other tasks ?
-        while (it.hasNext()) {
-            hasPermission(it.next(), player);
-            it.remove();
-            if (isHeavyLoad) {
-                break;
-            }
-        }
-        boolean hasWrk = it.hasNext();
-        nanos = System.nanoTime() - nanos;
-        if (nanos > 0L) {
-            taskLoad.add(tick, nanos);
-        }
-        return !hasWrk;
+        final boolean isHeavyLoad = taskLoad.score(1f) > heavyLoad 
+                || TickTask.getLag(msMonitored, true) > 1.1f;
+                updatePermissionsLazy.mergePrimaryThread();
+                final Iterator<RegisteredPermission> it = updatePermissionsLazy.iteratorPrimaryThread();
+                // TODO: Load balancing with other tasks ?
+                while (it.hasNext()) {
+                    hasPermission(it.next(), player);
+                    it.remove();
+                    if (isHeavyLoad) {
+                        break;
+                    }
+                }
+                boolean hasWrk = it.hasNext();
+                nanos = System.nanoTime() - nanos;
+                if (nanos > 0L) {
+                    taskLoad.add(tick, nanos);
+                }
+                return !hasWrk;
     }
 
     private void registerFrequentPlayerTask() {
