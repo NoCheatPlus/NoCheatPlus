@@ -15,7 +15,6 @@
 package fr.neatmonster.nocheatplus.checks.access;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 /**
  * This interface must be implemented by all configuration classes.
@@ -38,11 +37,5 @@ public interface ICheckConfig {
 
     /** On the fly debug flags, to be set by commands and similar. */ 
     public void setDebug(boolean debug);
-
-    /**
-     * Retrieve the permissions that have to be updated for this check.
-     * @return An array of permissions, may be null.
-     */
-    public RegisteredPermission[] getCachePermissions();
 
 }

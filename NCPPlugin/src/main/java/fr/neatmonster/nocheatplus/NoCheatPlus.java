@@ -53,6 +53,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
+import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatListener;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
@@ -61,6 +62,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
@@ -967,6 +969,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
 
+        // Tell the permission registry, which permissions should get updated.
+        // TODO: confine by check enabled flags.
+        permissionRegistry.preferKeepUpdated(NetConfig.getPreferKeepUpdatedPermissions());
+        permissionRegistry.preferKeepUpdated(ChatConfig.getPreferKeepUpdatedPermissions());
+        permissionRegistry.arrangePreferKeepUpdated();
+
         ////////////////////////////////
         // Tasks, post-rumble-logging
         ////////////////////////////////
@@ -1049,6 +1057,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     private void postEnable(final Player[] onlinePlayers) {
         logManager.info(Streams.INIT, "Post-enable running...");
+        // Update permission registry internals for permissions preferred to be updated.
+        // (By now checks should have noted what they want.)
+        permissionRegistry.arrangePreferKeepUpdated();
+
         final ConfigFile config = ConfigManager.getConfigFile();
         try {
             // Command protection feature.

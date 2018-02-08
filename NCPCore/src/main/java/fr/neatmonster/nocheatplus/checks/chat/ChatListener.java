@@ -103,8 +103,6 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     @EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
-        final PlayerData pData = DataManager.getPlayerData(player);
-        pData.requestLazyPermissionUpdate(ChatConfig.getConfig(player).getCachePermissions());
         ChatData.getData(player).currentWorldName = player.getWorld().getName();
 
     }
@@ -125,7 +123,6 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         // (Might omit this if already cancelled.)
         final PlayerData pData = DataManager.getPlayerData(player);
         final ChatConfig cc = ChatConfig.getConfig(player);
-        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
 
         // First the color check.
         if (!alreadyCancelled && color.isEnabled(player)) {
@@ -153,7 +150,6 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         // Tell TickTask to update cached permissions.
         final PlayerData pData = DataManager.getPlayerData(player);
         final ChatConfig cc = ChatConfig.getConfig(player);
-        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
 
         // Checks that replace parts of the message (color).
         if (color.isEnabled(player)) {
@@ -262,8 +258,6 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
-        // Tell TickTask to update cached permissions.
-        pData.requestLazyPermissionUpdate(cc.getCachePermissions());
         // (No forced permission update, because the associated permissions are treated as hints rather.)
 
         // Reset captcha of player if needed.

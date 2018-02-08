@@ -31,6 +31,22 @@ import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
  */
 public class NetConfig extends ACheckConfig {
 
+    private static RegisteredPermission[] preferKeepUpdatedPermissions = new RegisteredPermission[] {
+            Permissions.NET_ATTACKFREQUENCY,
+            Permissions.NET_FLYINGFREQUENCY, 
+            Permissions.NET_KEEPALIVEFREQUENCY,
+            Permissions.NET_PACKETFREQUENCY,
+    };
+
+    public static RegisteredPermission[] getPreferKeepUpdatedPermissions() {
+        // TODO: Individual checks might want to register these, or just on permission checking.
+        return preferKeepUpdatedPermissions;
+    }
+
+    /////////////
+    // Instance
+    /////////////
+
     public final boolean attackFrequencyActive;
     public final float attackFrequencyLimitSecondsHalf;
     public final float attackFrequencyLimitSecondsOne;
@@ -63,12 +79,7 @@ public class NetConfig extends ACheckConfig {
 
     public NetConfig(final ConfigFile config) {
         // TODO: These permissions should have default policies.
-        super(config, ConfPaths.NET, new RegisteredPermission[] {
-                Permissions.NET_ATTACKFREQUENCY,
-                Permissions.NET_FLYINGFREQUENCY, 
-                Permissions.NET_KEEPALIVEFREQUENCY,
-                Permissions.NET_PACKETFREQUENCY,
-        });
+        super(config, ConfPaths.NET);
 
         final ConfigFile globalConfig = ConfigManager.getConfigFile();
 

@@ -558,7 +558,7 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
      *            May be null.
      */
     public void requestLazyPermissionUpdate(final RegisteredPermission...registeredPermissions) {
-        if (registeredPermissions == null) {
+        if (registeredPermissions == null || registeredPermissions.length == 0) {
             return;
         }
         if (Bukkit.isPrimaryThread()) {
@@ -586,6 +586,7 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
 
     void onPlayerJoin(final long timeNow) {
         invalidateOffline();
+        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedOffline());
     }
 
     private void invalidateOffline() {
@@ -594,7 +595,14 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         while (it.hasNext()) {
             final PermissionNode node = it.next().getValue();
             final PermissionInfo info = node.getPermissionInfo();
-            if (info.invalidationOffline() || info.invalidationWorld()) {
+            if (info.invalidationOffline() 
+                    /*
+                     * TODO: world based should only be invalidated with world
+                     * changing. Therefore store the last world info
+                     * (UUID/name?) in PlayerData and use on login for
+                     * comparison.
+                     */
+                    || info.invalidationWorld()) {
                 // TODO: Really count leave as world change?
                 node.invalidate();
             }
@@ -618,6 +626,7 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
                 node.invalidate();
             }
         }
+        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedWorld());
     }
 
     /**

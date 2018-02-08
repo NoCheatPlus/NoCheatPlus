@@ -2,12 +2,15 @@ package fr.neatmonster.nocheatplus.permissions;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.neatmonster.nocheatplus.components.registry.exception.AlreadyRegisteredException;
+import fr.neatmonster.nocheatplus.components.registry.exception.NotRegisteredException;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
@@ -27,6 +30,16 @@ public class PermissionRegistry {
     private final HashMapLOW<Integer, PermissionInfo> infosInt = new HashMapLOW<Integer, PermissionInfo>(lock, 100);
     /** No need to map to the strings in an extra step here. */
     private final HashMapLOW<String, PermissionInfo> infosString = new HashMapLOW<String, PermissionInfo>(lock, 100);
+
+    // TODO: Might do lazy tasks for all player data regularly.
+    /**
+     * All registered permissions that are meant to be kept updated for players.
+     * Guarantees are not to actually keep them updated, but might lazily update
+     * them with world changing and logging on.
+     */
+    private final LinkedHashSet<RegisteredPermission> preferKeepUpdated = new LinkedHashSet<RegisteredPermission>();
+    private RegisteredPermission[] preferKeepUpdatedWorld = new RegisteredPermission[0];
+    private RegisteredPermission[] preferKeepUpdatedOffline = new RegisteredPermission[0];
 
     /**
      * 
@@ -130,6 +143,7 @@ public class PermissionRegistry {
     }
 
     /**
+     * (Primary thread only.)
      * 
      * @param settings
      * @return All registered permissions for which the policy has changed (by
@@ -153,7 +167,72 @@ public class PermissionRegistry {
             // Still set in either case, in case we missed something (cheap).
             info.set(newPolicy);
         }
+        arrangePreferKeepUpdated();
         return changed;
+    }
+
+    /**
+     * (Primary thread only.)
+     */
+    public void arrangePreferKeepUpdated() {
+        final List<RegisteredPermission> preferKeepUpdatedWorld = new LinkedList<RegisteredPermission>();
+        final List<RegisteredPermission> preferKeepUpdatedOffline = new LinkedList<RegisteredPermission>();
+        // (No permanent updating yet.)
+        for (final RegisteredPermission registeredPermission : this.preferKeepUpdated) {
+            final PermissionInfo info = infosInt.get(registeredPermission.getId());
+            switch (info.fetchingPolicy()) {
+                case FALSE:
+                case TRUE:
+                    // Skip only these.
+                    continue;
+                case ALWAYS:
+                case INTERVAL:
+                    // Update as often as makes sense in this context.
+                    // TODO: Might later run lazy tasks permanently for online players.
+                    preferKeepUpdatedOffline.add(registeredPermission);
+                    preferKeepUpdatedWorld.add(registeredPermission);
+                    break;
+                default:
+                    if (info.invalidationOffline()) {
+                        preferKeepUpdatedOffline.add(registeredPermission);
+                    }
+                    else if (info.invalidationWorld()) { // TODO: 'else' as long as world includes offline.
+                        preferKeepUpdatedOffline.add(registeredPermission); // TODO: as long as world includes offline.
+                        preferKeepUpdatedWorld.add(registeredPermission);
+                    }
+                    break;
+            }
+        }
+        this.preferKeepUpdatedWorld = preferKeepUpdatedWorld.toArray(new RegisteredPermission[preferKeepUpdatedWorld.size()]);
+        this.preferKeepUpdatedOffline = preferKeepUpdatedOffline.toArray(new RegisteredPermission[preferKeepUpdatedOffline.size()]);
+    }
+
+    /**
+     * Permissions will be sorted into areas, depending on the set policies.
+     * However that will only happen with either calling
+     * arrangePreferKeepUpdated() or updateSettings(PermissionSettings).
+     * 
+     * @param registeredPermissions
+     */
+    public void preferKeepUpdated(final RegisteredPermission... registeredPermissions) {
+        for (final RegisteredPermission registeredPermission : registeredPermissions) {
+            final PermissionInfo info = infosInt.get(registeredPermission.getId());
+            if (info == null) {
+                throw new NotRegisteredException("Id not registered: " + registeredPermission.getId());
+            }
+            if (info.getRegisteredPermission() != registeredPermission) {
+                throw new AlreadyRegisteredException("RegisteredPermission instances should be identical.");
+            }
+            preferKeepUpdated.add(info.getRegisteredPermission()); // Add the already registered object.
+        }
+    }
+
+    public RegisteredPermission[] getPreferKeepUpdatedWorld() {
+        return preferKeepUpdatedWorld;
+    }
+
+    public RegisteredPermission[] getPreferKeepUpdatedOffline() {
+        return preferKeepUpdatedOffline;
     }
 
 }

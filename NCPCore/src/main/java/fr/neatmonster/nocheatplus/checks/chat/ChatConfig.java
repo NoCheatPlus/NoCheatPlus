@@ -51,8 +51,20 @@ public class ChatConfig extends ACheckConfig {
         }
     };
 
+    private static RegisteredPermission[] preferKeepUpdatedPermissions = new RegisteredPermission[]{
+            // Only the permissions needed for async. checking.
+            Permissions.CHAT_COLOR,
+            Permissions.CHAT_TEXT,
+            Permissions.CHAT_CAPTCHA,
+            // TODO: COMMANDS, in case of handleascommand?
+    };
+
     /** The map containing the configurations per world. */
     private static final Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
+
+    public static RegisteredPermission[] getPreferKeepUpdatedPermissions() {
+        return preferKeepUpdatedPermissions;
+    }
 
     /**
      * Clear all the configurations.
@@ -161,12 +173,7 @@ public class ChatConfig extends ACheckConfig {
      *            the data
      */
     public ChatConfig(final ConfigFile config) {
-        super(config, ConfPaths.CHAT, new RegisteredPermission[]{
-                // Only the permissions needed for async. checking.
-                Permissions.CHAT_COLOR,
-                Permissions.CHAT_TEXT,
-                Permissions.CHAT_CAPTCHA,
-        });
+        super(config, ConfPaths.CHAT);
 
         captchaCheck = config.getBoolean(ConfPaths.CHAT_CAPTCHA_CHECK);
         captchaSkipCommands = config.getBoolean(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS);
