@@ -634,10 +634,10 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
      * @param changedPermissions 
      */
     public void adjustSettings(final Set<RegisteredPermission> changedPermissions) {
-        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
+        final Iterator<RegisteredPermission> it = changedPermissions.iterator();
         while (it.hasNext()) {
-            final PermissionNode node = it.next().getValue();
-            if (changedPermissions.contains(node.getPermissionInfo().getRegisteredPermission())) {
+            final PermissionNode node = permissions.get(it.next().getId());
+            if (node != null) {
                 node.invalidate();
             }
         }
