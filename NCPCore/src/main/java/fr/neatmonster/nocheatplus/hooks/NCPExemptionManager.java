@@ -14,11 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.hooks;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -26,26 +21,26 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.CheckTypeUtil;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 
 /**
  * API for exempting players of checks, checked before calculations are done.
+ * <hr>
+ * Refactoring stage: Route to DataManager/PlayerData, which will somehow
+ * attempt to mimic legacy behavior. Do note that checking for meta data and
+ * other specialties are not handled within DataManager/PlayerData yet.
+ * <hr>
+ * Except clear and accessing settings, it will be "safe" to access methods
+ * asynchronously to the server primary thread, however isExempted always
+ * reflects a non-synchronized state of all thread contexts, while exempt and
+ * unexempt will be local to the thread-context (primary thread, asynchronous).
  * 
  * @author asofold
  */
 public class NCPExemptionManager {
 
     private static ExemptionSettings settings = new ExemptionSettings();
-
-    /**
-     * A map associating a check type with the unique ids of its exempted
-     * players.
-     */
-    private static final Map<CheckType, Set<UUID>> exempted          = new HashMap<CheckType, Set<UUID>>();
-
-    static {
-        clear();
-    }
 
     /**
      * Get the current settings.
@@ -78,15 +73,7 @@ public class NCPExemptionManager {
      * Remove all exemptions.
      */
     public static final void clear() {
-        // Use put with a new map to keep entries to stay thread safe.
-        for (final CheckType checkType : CheckType.values()) {
-            if (CheckTypeUtil.needsSynchronization(checkType)) {
-                exempted.put(checkType, Collections.synchronizedSet(new HashSet<UUID>()));
-            }
-            else {
-                exempted.put(checkType, new HashSet<UUID>());
-            }
-        }
+        DataManager.clearAllExemptions();
     }
 
     /**
@@ -109,9 +96,11 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void exemptPermanently(final UUID id, final CheckType checkType) {
-        for (final CheckType refType : CheckTypeUtil.getWithDescendants(checkType)) {
-            exempted.get(refType).add(id);
+        final PlayerData data = DataManager.getPlayerData(id);
+        if (data != null) {
+            data.exempt(checkType);
         }
+        // TODO: else throw ?
     }
 
     /**
@@ -152,7 +141,8 @@ public class NCPExemptionManager {
      * @return If the entity is exempted from checks right now.
      */
     public static final boolean isExempted(final UUID id, final CheckType checkType) {
-        return exempted.get(checkType).contains(id);
+        final PlayerData data = DataManager.getPlayerData(id);
+        return data != null && data.isExempted(checkType);
     }
 
     /**
@@ -211,8 +201,9 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void unexempt(final UUID id,  final CheckType checkType) {
-        for (final CheckType refType : CheckTypeUtil.getWithDescendants(checkType)) {
-            exempted.get(refType).remove(id);
+        final PlayerData data = DataManager.getPlayerData(id);
+        if (data != null) {
+            data.unexempt(checkType);
         }
     }
 

@@ -181,26 +181,25 @@ public class CheckUtils {
          * information.).
          */
 
-        /*
-         * TODO: Once thread-safe read has been implemented, check the fastest
-         * thing first (likely exemption).
-         */
-
-        final RegisteredPermission permission =  checkType.getPermission();
-        if (permission != null) {
-            // Check permission policy/cache regardless of the thread context.
-            if (pData.hasPermission(permission, player)) {
-                return true;
-            }
-        }
         // TODO: Refine this error message +- put in place where it needs to be.
         if (!isPrimaryThread && !CheckTypeUtil.needsSynchronization(checkType)) {
-            // Checking for exemption can cause harm now.
+            /*
+             * Checking for exemption can't cause harm anymore, however even
+             * fetching data or configuration might still lead to everything
+             * exploding.
+             */
             improperAPIAccess(checkType);
         }
-        // TODO: New exemption implementation (thread-safe read).
-        // TODO: Maybe a solution: force sync into primary thread a) each time b) once with lazy force set to use copy on write [for the player or global?]. 
-        return NCPExemptionManager.isExempted(player, checkType, isPrimaryThread);
+        // Exemption check.
+        if (NCPExemptionManager.isExempted(player, checkType, isPrimaryThread)) {
+            return true;
+        }
+        // Check permission policy/cache regardless of the thread context.
+        final RegisteredPermission permission =  checkType.getPermission();
+        if (permission != null && pData.hasPermission(permission, player)) {
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -21,15 +21,19 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.hooks.ExemptionContext;
 import fr.neatmonster.nocheatplus.permissions.PermissionInfo;
 import fr.neatmonster.nocheatplus.permissions.PermissionNode;
 import fr.neatmonster.nocheatplus.permissions.PermissionPolicy.FetchingPolicy;
@@ -107,17 +111,21 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
     // Instance //
     //////////////
 
-    // TODO: Use the same lock for permissions stuff ?
+    /** Per player lock. */
+    /*
+     * TODO: Impact of using this everywhere is uncertain. For exemptions and
+     * permissions it'll be ok, because nodes get created once for most, but for
+     * permission updates (merge primary thread) and the like, it'll not be as
+     * certain.
+     */
+    private final Lock lock = new ReentrantLock();
 
     /** Not sure this is the future of extra properties. */
     private Set<String> tags = null;
 
     /*
-     * TODO: Consider updating the UUID for stuff like
-     * "exempt player/name on next login". This also implies the addition of a
-     * method to force-postpone data removal, as well as configuration for how
-     * exactly to apply/timeout, plus new syntax for 'ncp exempt' (flags/side
-     * conditions like +login/...).
+     * TODO: Concept for updating names for UUIDs -> + OfflinePlayerData,
+     * uncertain when/how to access.
      */
     /** Unique id of the player. */
     final UUID playerId;
@@ -138,16 +146,19 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
     private final PermissionRegistry permissionRegistry;
 
     /** Permission cache. */
-    private final HashMapLOW<Integer, PermissionNode> permissions = new HashMapLOW<Integer, PermissionNode>(35);
+    private final HashMapLOW<Integer, PermissionNode> permissions = new HashMapLOW<Integer, PermissionNode>(lock, 35);
 
     private boolean requestUpdateInventory = false;
     private boolean requestPlayerSetBack = false;
 
     private boolean frequentPlayerTaskShouldBeScheduled = false;
     /** Actually queried ones. */
-    private final DualSet<RegisteredPermission> updatePermissions = new DualSet<RegisteredPermission>();
+    private final DualSet<RegisteredPermission> updatePermissions = new DualSet<RegisteredPermission>(lock);
     /** Possibly needed in future. */
-    private final DualSet<RegisteredPermission> updatePermissionsLazy = new DualSet<RegisteredPermission>();
+    private final DualSet<RegisteredPermission> updatePermissionsLazy = new DualSet<RegisteredPermission>(lock);
+
+    /** TODO: Soon to add minimized offline data, so these kind of things don't impact as much. */
+    private final PlayerCheckTypeTree checkTypeTree = new PlayerCheckTypeTree(lock);
 
     /** Unregister the tasks once 0 count is reached. */
     private short frequentTaskDelayUnregister = 0;
@@ -654,6 +665,120 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         permissions.clear(); // Might keep login-related permissions. Implement a 'retain-xy' or 'essential' flag?
         updatePermissions.clearPrimaryThread();
         updatePermissionsLazy.clearPrimaryThread();
+    }
+
+    /**
+     * Mimic legacy behavior (non-nested) - exempt including descendants
+     * recursively. Note that contexts other than
+     * ExemptionContext.LEGACY_NON_NESTED will not be touched.
+     * 
+     * @param checkType
+     */
+    public void exempt(final CheckType checkType) {
+        checkTypeTree.exempt(checkType, ExemptionContext.LEGACY_NON_NESTED);
+        // TODO: Handlers?
+    }
+
+    /**
+     * Mimic legacy behavior (non-nested) - unexempt including descendants
+     * recursively. Note that contexts other than
+     * ExemptionContext.LEGACY_NON_NESTED will not be touched.
+     * <hr>
+     * Primary thread and asynchronous access are separated and yield different
+     * results, it's imperative to always unexempt properly for asyncrhonous
+     * thread contexts, as isExempted reflects a mixture of both.
+     * 
+     * @param checkType
+     */
+    public void unexempt(final CheckType checkType) {
+        checkTypeTree.unexemptAll(checkType, ExemptionContext.LEGACY_NON_NESTED);
+        // TODO: Handlers?
+    }
+
+    /**
+     * Exempt with reference to the given context with descendants recursively.
+     * <br>
+     * Note that multiple calls to exempt demand multiple calls to
+     * unexempt(CheckType, ExemptionContext).
+     * <hr>
+     * Primary thread and asynchronous access are separated and yield different
+     * results, it's imperative to always unexempt properly for asyncrhonous
+     * thread contexts, as isExempted reflects a mixture of both.
+     * 
+     * @param checkType
+     * @param context
+     */
+    public void exempt(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.exempt(checkType, context);
+    }
+
+    /**
+     * Unexempt once, including descendants recursively. <br>
+     * Note that for multiple calls to exempt with one context, multiple calls
+     * to unexempt with that context may be necessary to fully unexempt, or call
+     * unexemptAll for the context.
+     * <hr>
+     * ExemptionContext.LEGACY_NON_NESTED is not automatically calling
+     * unexemptAll as is done with the legacy signature unexempt(CheckType).
+     * <hr>
+     * Primary thread and asynchronous access are separated and yield different
+     * results, it's imperative to always unexempt properly for asyncrhonous
+     * thread contexts, as isExempted reflects a mixture of both.
+     * 
+     * @param checkType
+     * @param context
+     */
+    public void unexempt(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.unexempt(checkType, context);
+    }
+
+
+    /**
+     * Remove all (potentially nested) entries context for the given checkType
+     * and descendants recursively.
+     * <hr>
+     * Primary thread and asynchronous access are separated and yield different
+     * results, it's imperative to always unexempt properly for asyncrhonous
+     * thread contexts, as isExempted reflects a mixture of both.
+     * 
+     * @param checkType
+     * @param context
+     */
+    public void unexemptAll(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.unexemptAll(checkType, context);
+    }
+
+    /**
+     * Test for exemption.
+     * <hr>
+     * Thread-safe read (not synchronized).
+     * 
+     * @param checkType
+     * @return
+     */
+    public boolean isExempted(final CheckType checkType) {
+        return checkTypeTree.isExempted(checkType);
+    }
+
+    /**
+     * Clear all exemptions, for all thread contexts.
+     * <hr>
+     * Call from the primary thread only.
+     */
+    public void clearAllExemptions() {
+        checkTypeTree.clearAllExemptions();
+    }
+
+    /**
+     * Clear all exemptions for the given checkType and descendants recursively,
+     * for all thread contexts.
+     * <hr>
+     * Call from the primary thread only.
+     * 
+     * @param checkType
+     */
+    public void clearAllExemptions(final CheckType checkType) {
+        checkTypeTree.clearAllExemptions(checkType);
     }
 
 }

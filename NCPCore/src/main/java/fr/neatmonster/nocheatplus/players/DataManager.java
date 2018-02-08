@@ -1036,4 +1036,14 @@ public class DataManager implements INeedConfig, ComponentRegistry<IRemoveData>,
         instance.frequentPlayerTasks.addAsynchronous(playerId);
     }
 
+    /**
+     * 
+     */
+    public static void clearAllExemptions() {
+        final Iterator<Entry<UUID, PlayerData>> it = instance.playerData.iterator();
+        while (it.hasNext()) {
+            it.next().getValue().clearAllExemptions();
+        }
+    }
+
 }
