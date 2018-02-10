@@ -349,6 +349,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS, 7, 785);
         set(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT, 6, 785);
 
+        set(ConfPaths.FIGHT_WRONGTURN_CHECK, true, 1143);
+        set(ConfPaths.FIGHT_WRONGTURN_ACTIONS, "cancel cmd:kick_wrongturn log:log_wrongturn:0:15:fci", 1143);
+
         set(ConfPaths.INVENTORY_DROP_CHECK, true, 785);
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100, 785);
         set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20L, 785);
@@ -611,7 +614,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickpackets", "ncp delay ncp kick [player] Too many packets (extreme lag?)", 785);
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] You tried to hit yourself!", 785);
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!", 785);
+        set(ConfPaths.STRINGS + ".kick_wrongturn", "ncp kick [player] Wrong turn!", 1143);
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end, 785);
+        set(ConfPaths.STRINGS + ".log_wrongturn", start + "looked wrongly" + end, 1143);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent too many moves ([packets] [tags])" + end, 785);
         set(ConfPaths.STRINGS + ".msgtempdenylogin", "You are temporarily denied to join this server.", 785);
         set(ConfPaths.STRINGS + ".munchhausen", start + "almost made it off the pit" + end, 785);

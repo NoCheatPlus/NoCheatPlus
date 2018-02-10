@@ -516,6 +516,10 @@ public abstract class ConfPaths {
     public static final String  FIGHT_SPEED_SHORTTERM_TICKS              = FIGHT_SPEED_SHORTTERM + "ticks";
     public static final String  FIGHT_SPEED_ACTIONS                      = FIGHT_SPEED + "actions";
 
+    private static final String FIGHT_WRONGTURN                          = FIGHT + "wrongturn.";
+    public static final String  FIGHT_WRONGTURN_CHECK                    = FIGHT_WRONGTURN + "active";
+    public static final String  FIGHT_WRONGTURN_ACTIONS                  = FIGHT_WRONGTURN + "actions";
+
     private static final String FIGHT_YAWRATE                            = FIGHT + "yawrate.";
     public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + "active";
 

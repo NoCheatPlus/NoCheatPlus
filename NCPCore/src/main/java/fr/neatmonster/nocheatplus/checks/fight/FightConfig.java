@@ -126,6 +126,9 @@ public class FightConfig extends ACheckConfig {
     public final int        speedShortTermTicks;
     public final ActionList speedActions;
 
+    public final boolean wrongTurnEnabled;
+    public final ActionList wrongTurnActions;
+
     // Special flags:
     public final boolean    yawRateCheck;
     public final boolean    cancelDead;
@@ -190,6 +193,10 @@ public class FightConfig extends ACheckConfig {
         speedShortTermLimit = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT);
         speedShortTermTicks = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS);
         speedActions = data.getOptimizedActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
+
+        wrongTurnEnabled = data.getBoolean(ConfPaths.FIGHT_WRONGTURN_CHECK);
+        wrongTurnActions = data.getOptimizedActionList(ConfPaths.FIGHT_WRONGTURN_ACTIONS, 
+                CheckType.FIGHT_WRONGTURN.getPermission());
 
 
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);

@@ -98,6 +98,7 @@ public enum CheckType {
     FIGHT_SELFHIT(CheckTypeType.CHECK, FIGHT, Permissions.FIGHT_SELFHIT, 
             FightConfig.factory, FightData.selfHitDataFactory),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
+    FIGHT_WRONGTURN(FIGHT, null),
 
     INVENTORY(CheckType.ALL, InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
     INVENTORY_DROP(INVENTORY, Permissions.INVENTORY_DROP),

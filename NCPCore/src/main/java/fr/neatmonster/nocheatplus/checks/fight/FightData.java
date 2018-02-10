@@ -152,6 +152,7 @@ public class FightData extends ACheckData implements IRemoveSubCheckData {
     public double                  noSwingVL;
     public double                  reachVL;
     public double                  speedVL;
+    public double                  wrongTurnVL;
 
     // Shared
     public String lastWorld			= "";
