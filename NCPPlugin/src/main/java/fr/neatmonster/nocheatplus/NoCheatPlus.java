@@ -95,6 +95,8 @@ import fr.neatmonster.nocheatplus.components.registry.feature.IRegisterAsGeneric
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.NCPListener;
 import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
+import fr.neatmonster.nocheatplus.components.registry.lockable.BasicLockable;
+import fr.neatmonster.nocheatplus.components.registry.lockable.ILockable;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -134,6 +136,10 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
+
+    private static final Object lockableAPIsecret = new Object();
+    private static final ILockable lockableAPI = new BasicLockable(lockableAPIsecret, 
+            true, true, true);
 
     private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
 
@@ -825,9 +831,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             }
         }
         // API.
-        if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
-            NCPAPIProvider.setNoCheatPlusAPI(this);
-        }
+        updateNoCheatPlusAPI();
         // Initialize server version.
         if (ServerVersion.getMinecraftVersion() == GenericVersion.UNKNOWN_VERSION) {
             BukkitVersion.init();
@@ -853,6 +857,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                             return NoCheatPlus.this.getRegistryStreamId();
                         }
                     }, "[GenericInstanceRegistry] ");
+        }
+    }
+
+    private void updateNoCheatPlusAPI() {
+        if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
+            lockableAPI.unlock(lockableAPIsecret);
+            NCPAPIProvider.setNoCheatPlusAPI(this, lockableAPI);
+            lockableAPI.lock(lockableAPIsecret);
         }
     }
 

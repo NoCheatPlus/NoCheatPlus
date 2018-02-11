@@ -15,30 +15,58 @@
 package fr.neatmonster.nocheatplus;
 
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.registry.lockable.ILockable;
 
 /**
  * Static API provider utility.
- * @author mc_dev
+ * 
+ * @author asofold
  *
  */
 public class NCPAPIProvider {
-	private static NoCheatPlusAPI noCheatPlusAPI = null;
-	
-	/**
-	 * Get the registered API instance. This will work after the plugin has loaded (onLoad), asynchronous calls should be possible, however calls after plugin disable or before it is loaded should fail.
-	 */
-	public static NoCheatPlusAPI getNoCheatPlusAPI(){
-		return noCheatPlusAPI;
-	}
-	
-	/**
-	 * Setter for the NoCheatPlusAPI instance.
-	 * <hr>
-	 * For internal use only (onLoad).<br>
-	 * Setting this to anything else than the NoCheatPlus plugin instance might lead to inconsistencies.
-	 * @param noCheatPlusAPI
-	 */
-	protected static void setNoCheatPlusAPI(NoCheatPlusAPI noCheatPlusAPI){
-		NCPAPIProvider.noCheatPlusAPI = noCheatPlusAPI;
-	}
+    private static NoCheatPlusAPI noCheatPlusAPI = null;
+    /** Support locking against changing. */
+    private static ILockable lockableNoCheatPlusAPI = null;
+
+    /**
+     * Get the registered API instance. This will work after the plugin has
+     * loaded (onLoad), asynchronous calls should be possible, however calls
+     * after plugin disable or before it is loaded should fail.
+     */
+    public static NoCheatPlusAPI getNoCheatPlusAPI(){
+        return noCheatPlusAPI;
+    }
+
+    /**
+     * Set the NoCheaPlusAPI without locking against changes. Further see:
+     * {@link #setNoCheatPlusAPI(NoCheatPlusAPI, ILockable)}
+     * 
+     * @param noCheatPlusAPI
+     */
+    static void setNoCheatPlusAPI(NoCheatPlusAPI noCheatPlusAPI) {
+        setNoCheatPlusAPI(noCheatPlusAPI, null);
+    }
+
+    /**
+     * Setter for the NoCheatPlusAPI instance.
+     * <hr>
+     * For internal use only (onLoad).<br>
+     * Setting this to anything else than the NoCheatPlus plugin instance might
+     * lead to inconsistencies.
+     * 
+     * @param noCheatPlusAPI
+     * @param lockable
+     *            The IILockable instance to use for locking against changes.
+     * @throws IllegalStateException
+     *             If the API is locked against overriding by a previously set
+     *             ILockable instance.
+     */
+    static void setNoCheatPlusAPI(NoCheatPlusAPI noCheatPlusAPI, ILockable lockable){
+        if (lockableNoCheatPlusAPI != null) {
+            lockableNoCheatPlusAPI.throwIfLocked();
+        }
+        NCPAPIProvider.noCheatPlusAPI = noCheatPlusAPI;
+        lockableNoCheatPlusAPI = lockable;
+    }
+
 }
