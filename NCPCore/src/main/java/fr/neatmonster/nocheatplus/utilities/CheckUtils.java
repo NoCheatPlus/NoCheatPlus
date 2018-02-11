@@ -191,7 +191,7 @@ public class CheckUtils {
             improperAPIAccess(checkType);
         }
         // Exemption check.
-        if (NCPExemptionManager.isExempted(player, checkType, isPrimaryThread)) {
+        if (NCPExemptionManager.isExempted(player, checkType)) {
             return true;
         }
         // Check permission policy/cache regardless of the thread context.

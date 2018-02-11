@@ -401,7 +401,7 @@ public class NoFall extends Check {
      * @return
      */
     public boolean isEnabled(final Player player , final MovingConfig cc, final PlayerData pData) {
-        return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL, true) 
+        return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) 
                 && !pData.hasPermission(Permissions.MOVING_NOFALL, player);
     }
 

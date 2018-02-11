@@ -87,7 +87,7 @@ public class MovingUtil {
         return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY, true)
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
                 && (
                         !Bridge1_9.isGlidingWithElytra(player) 
                         || !isGlidingWithElytraValid(player, fromLocation, data, cc)

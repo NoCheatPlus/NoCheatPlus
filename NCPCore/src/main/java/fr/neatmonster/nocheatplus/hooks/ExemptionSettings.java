@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.NPC;
 
@@ -158,17 +157,6 @@ public class ExemptionSettings {
     }
 
     /**
-     * Top level check for exemption by meta data, including NPCs. Meta data is
-     * only checked if this is the primary thread (!).
-     * 
-     * @param entity
-     * @return
-     */
-    public boolean isExemptedBySettings(final Entity entity) {
-        return isExemptedBySettings(entity, Bukkit.isPrimaryThread());
-    }
-
-    /**
      * Test if according to this instance of settings, the player is regarded as
      * an NPC. Meta data is only checked if this is the primary thread (!).
      * 
@@ -176,20 +164,14 @@ public class ExemptionSettings {
      * @param isPrimaryThread
      * @return
      */
-    public boolean isExemptedBySettings(final Entity entity, final boolean isPrimaryThread) {
-        return isPrimaryThread && defaultMetaData.hasAnyMetaDataKey(entity) 
-                || npcWildCardExempt && isRegardedAsNpc(entity, isPrimaryThread);
+    public boolean isExemptedBySettings(final Entity entity) {
+        return defaultMetaData.hasAnyMetaDataKey(entity) 
+                || npcWildCardExempt && isRegardedAsNpc(entity);
     }
 
-    /**
-     * Test if according to this instance of settings, the player is regarded as
-     * an NPC.Meta data is only checked if this is the primary thread (!).
-     * 
-     * @param entity
-     * @return
-     */
-    public boolean isRegardedAsNpc(final Entity entity) {
-        return isRegardedAsNpc(entity, Bukkit.isPrimaryThread());
+    @Deprecated
+    public boolean isExemptedBySettings(final Entity entity, final boolean isPrimaryThread) {
+        return isExemptedBySettings(entity);
     }
 
     /**
@@ -200,8 +182,13 @@ public class ExemptionSettings {
      * @param isPrimaryThread
      * @return
      */
+    public boolean isRegardedAsNpc(final Entity entity) {
+        return npcBukkitInterface && (entity instanceof NPC) || npcMetaData.hasAnyMetaDataKey(entity);
+    }
+
+    @Deprecated
     public boolean isRegardedAsNpc(final Entity entity, final boolean isPrimaryThread) {
-        return npcBukkitInterface && (entity instanceof NPC) || isPrimaryThread && npcMetaData.hasAnyMetaDataKey(entity);
+        return isRegardedAsNpc(entity);
     }
 
 }

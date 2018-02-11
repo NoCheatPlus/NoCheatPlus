@@ -16,7 +16,6 @@ package fr.neatmonster.nocheatplus.hooks;
 
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -146,19 +145,6 @@ public class NCPExemptionManager {
     }
 
     /**
-     * Check for exemption, including meta data. Convenience method, testing for
-     * primary thread.
-     * 
-     * @see #isExempted(Player, CheckType, boolean)
-     * @param player
-     * @param checkType
-     * @return
-     */
-    public static final boolean isExempted(final Player player, final CheckType checkType) {
-        return isExempted(player, checkType,  Bukkit.isPrimaryThread());
-    }
-
-    /**
      * Check if a player is exempted from a check right now. This also checks
      * for exemption by meta data, iff it's called from within execution of the
      * primary thread. Wild card exemption for NPCs is also checked.
@@ -174,10 +160,15 @@ public class NCPExemptionManager {
      *            meta data can't be checked!
      * @return If the player is exempted from the check right now.
      */
+    public static final boolean isExempted(final Player player, final CheckType checkType) {
+        return isExempted(player.getUniqueId(), checkType) 
+                || settings.isExemptedBySettings(player);
+    }
+
+    @Deprecated
     public static final boolean isExempted(final Player player, final CheckType checkType,
             final boolean isPrimaryThread) {
-        return isExempted(player.getUniqueId(), checkType) 
-                || settings.isExemptedBySettings(player, isPrimaryThread);
+        return isExempted(player, checkType);
     }
 
     /**

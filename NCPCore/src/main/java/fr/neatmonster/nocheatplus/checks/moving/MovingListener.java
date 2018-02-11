@@ -666,7 +666,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
         }
         else if (cc.creativeFlyCheck 
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY, true) 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) 
                 && !pData.hasPermission(Permissions.MOVING_CREATIVEFLY, player)) {
             checkCf = true;
             checkSf = false;
@@ -780,7 +780,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // TODO: Redesign to set set backs later (queue + invalidate).
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR 
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE, true) 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) 
                 && !pData.hasPermission(Permissions.MOVING_PASSABLE, player)) {
             // Passable is checked first to get the original set back locations from the other checks, if needed. 
             newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
@@ -867,7 +867,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Morepackets.
         if (cc.morePacketsCheck && (newTo == null || data.isMorePacketsSetBackOldest())
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS, true) 
+                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) 
                 && !pData.hasPermission(Permissions.MOVING_MOREPACKETS, player)) {
             /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
             to avoid packet speeding using micro-violations.) */
