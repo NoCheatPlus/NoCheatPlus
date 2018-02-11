@@ -463,6 +463,9 @@ public class BlockProperties {
 
         @Override
         public boolean equals(final Object obj) {
+            if (obj == this) {
+                return true;
+            }
             if (obj instanceof BlockBreakKey) {
                 final BlockBreakKey other = (BlockBreakKey) obj;
                 // TODO: Some should be equals later.

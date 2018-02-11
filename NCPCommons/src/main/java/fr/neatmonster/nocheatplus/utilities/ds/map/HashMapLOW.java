@@ -96,7 +96,8 @@ public class HashMapLOW <K, V> {
             // By specification, not intended to be useful here.
             if (obj instanceof Entry<?, ?>) {
                 final Entry<?, ?> entry = (Entry<?, ?>) obj;
-                return (key == null ? entry.getKey() == null : key.equals(entry.getKey()))
+                return obj == this
+                        || (key == null ? entry.getKey() == null : key.equals(entry.getKey()))
                         && (value == null ? entry.getValue() == null : value.equals(entry.getValue()));
             }
             else {

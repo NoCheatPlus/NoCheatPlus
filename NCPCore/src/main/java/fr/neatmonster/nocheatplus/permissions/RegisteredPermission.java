@@ -105,6 +105,9 @@ public class RegisteredPermission {
 
     @Override
     public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
         if (obj instanceof Integer) {
             return id.intValue() == ((Integer) obj).intValue();
         }

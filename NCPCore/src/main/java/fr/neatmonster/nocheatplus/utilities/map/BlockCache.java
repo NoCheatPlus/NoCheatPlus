@@ -170,6 +170,9 @@ public abstract class BlockCache {
 
         @Override
         public boolean equals(final Object obj) {
+            if (obj == this) {
+                return true;
+            }
             if (obj instanceof IBlockCacheNode) {
                 final IBlockCacheNode other = (IBlockCacheNode) obj;
                 return id == other.getType() 

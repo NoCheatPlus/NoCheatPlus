@@ -54,11 +54,16 @@ public class TestCoordMap {
         }
         @Override
         public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
             if (obj instanceof Pos){
                 Pos other = (Pos) obj;
                 return other.hash == hash && other.x == x && other.y == y && other.z == z;
             }
-            else return false;
+            else {
+                return false;
+            }
         }
         @Override
         public int hashCode() {
