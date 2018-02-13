@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * The Drop check will find out if a player drops too many items within a short amount of time.
@@ -42,8 +44,9 @@ public class Drop extends Check {
         // Take time once.
         final long time = System.currentTimeMillis();
 
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
-        final InventoryData data = InventoryData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+                final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
 
         boolean cancel = false;
 

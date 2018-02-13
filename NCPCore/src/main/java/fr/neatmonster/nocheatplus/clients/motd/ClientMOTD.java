@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.clients.motd;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Setup for all "motd" sending for enabling/disabling client mod features.
@@ -32,6 +32,6 @@ public abstract class ClientMOTD {
      * @param allowAll
      * @return The message to send / process further.
      */
-    public abstract String onPlayerJoin(String message, Player player, PlayerData data, 
+    public abstract String onPlayerJoin(String message, Player player, IPlayerData data, 
             boolean allowAll);
 }

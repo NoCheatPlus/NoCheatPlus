@@ -14,11 +14,9 @@
  */
 package fr.neatmonster.nocheatplus.checks.net;
 
-import org.bukkit.entity.Player;
-
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Convenience for providing several checks with a lazy-init handle for fetching
@@ -32,7 +30,7 @@ import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
  */
 public class FlyingQueueHandle implements IHandle<DataPacketFlying[]> {
 
-    private final Player player;
+    private final IPlayerData pData;
     private DataPacketFlying[] queue;
     /**
      * Convenience flag for keeping track amongst multiple checks, which all get
@@ -40,14 +38,15 @@ public class FlyingQueueHandle implements IHandle<DataPacketFlying[]> {
      */
     private boolean currentLocationValid = true;
 
-    public FlyingQueueHandle(Player player) {
-        this.player = player;
+    public FlyingQueueHandle(IPlayerData pData) {
+        // TODO: PlayerData ?
+        this.pData = pData;
     }
 
     @Override
     public DataPacketFlying[] getHandle() {
         if (queue == null) {
-            queue = ((NetData) CheckType.NET.getDataFactory().getData(player)).copyFlyingQueue();
+            queue = pData.getGenericInstance(NetData.class).copyFlyingQueue();
         }
         return queue;
     }

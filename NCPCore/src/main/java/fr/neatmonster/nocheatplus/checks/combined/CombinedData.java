@@ -14,64 +14,13 @@
  */
 package fr.neatmonster.nocheatplus.checks.combined;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.entity.Player;
-
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 public class CombinedData extends ACheckData implements IRemoveSubCheckData {
-
-    /** The factory creating data. */
-    public static final CheckDataFactory factory = new CheckDataFactory() {
-        @Override
-        public final ICheckData getData(final Player player) {
-            return CombinedData.getData(player);
-        }
-
-        @Override
-        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
-            return CombinedData.playersMap.get(playerName);
-        }
-
-        @Override
-        public ICheckData removeData(final String playerName) {
-            return CombinedData.removeData(playerName);
-        }
-
-        @Override
-        public void removeAllData() {
-            clear();
-        }
-    };
-
-    private static final Map<String, CombinedData> playersMap = new HashMap<String, CombinedData>();
-
-    public static CombinedData getData(final Player player) {
-        final String playerName = player.getName(); 
-        CombinedData data = playersMap.get(playerName);
-        if (data == null){
-            data = new CombinedData(CombinedConfig.getConfig(player));
-            playersMap.put(playerName, data);
-        }
-        return data;
-    }
-
-    public static ICheckData removeData(final String playerName) {
-        return playersMap.remove(playerName);
-    }
-
-    public static void clear(){
-        playersMap.clear();
-    }
 
     // VLs
     public double bedLeaveVL = 0;
@@ -98,14 +47,11 @@ public class CombinedData extends ACheckData implements IRemoveSubCheckData {
     public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
 
     // General data
+    // TODO: -> PlayerData (-> OfflinePlayerData)
     public String lastWorld = "";
     public long lastJoinTime;
     public long lastLogoutTime;
     public long lastMoveTime;
-
-    public CombinedData(final CombinedConfig config){
-        super(config);
-    }
 
     @Override
     public boolean removeSubCheckData(final CheckType checkType) {

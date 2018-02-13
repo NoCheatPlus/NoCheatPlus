@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerFishEvent.State;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Very, very important check.
@@ -34,10 +36,12 @@ public class MunchHausen extends Check {
     public boolean checkFish(final Player player, final Entity caught, final State state) {
         if (caught == null || !(caught instanceof Player)) return false;
         final Player caughtPlayer = (Player) caught;
-        final CombinedData data = CombinedData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
         if (player.equals(caughtPlayer)){
             data.munchHausenVL += 1.0;
-            if (executeActions(player, data.munchHausenVL, 1.0, CombinedConfig.getConfig(player).munchHausenActions).willCancel()){
+            if (executeActions(player, data.munchHausenVL, 1.0, 
+                    pData.getGenericInstance(CombinedConfig.class).munchHausenActions).willCancel()){
                 return true;
             }
         }

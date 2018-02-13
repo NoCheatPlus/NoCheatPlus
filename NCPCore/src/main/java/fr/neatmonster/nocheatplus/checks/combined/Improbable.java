@@ -21,6 +21,8 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -41,8 +43,21 @@ public class Improbable extends Check implements IDisableListener{
      * @param now
      * @return
      */
-    public static final boolean check(final Player player, final float weight, final long now, final String tags){
-        return instance.checkImprobable(player, weight, now, tags);
+    public static final boolean check(final Player player, final float weight, final long now, 
+            final String tags, final IPlayerData pData){
+        return instance.checkImprobable(player, weight, now, tags, pData);
+    }
+
+    /**
+     * Feed the check but no violations processing (convenience method).
+     * @param player
+     * @param weight
+     * @param now
+     * @param pData
+     */
+    public static final void feed(final Player player, final float weight, final long now,
+            final IPlayerData pData){
+        pData.getGenericInstance(CombinedData.class).improbableCount.add(now, weight);
     }
 
     /**
@@ -51,8 +66,8 @@ public class Improbable extends Check implements IDisableListener{
      * @param weight
      * @param now
      */
-    public static final void feed(final Player player, final float weight, final long now){
-        CombinedData.getData(player).improbableCount.add(now, weight);
+    public static void feed(final Player player, final float weight, long now) {
+        feed(player, weight, now, DataManager.getPlayerData(player));
     }
 
     ////////////////////////////////////
@@ -64,16 +79,19 @@ public class Improbable extends Check implements IDisableListener{
         instance = this;
     }
 
-    private boolean checkImprobable(final Player player, final float weight, final long now, final String tags) {
-        if (!isEnabled(player)) return false;
-        final CombinedData data = CombinedData.getData(player);
-        final CombinedConfig cc = CombinedConfig.getConfig(player);
+    private boolean checkImprobable(final Player player, final float weight, final long now, 
+            final String tags, final IPlayerData pData) {
+        if (!pData.isCheckActive(type, player)) {
+            return false;
+        }
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
+        final CombinedConfig cc = pData.getGenericInstance(CombinedConfig.class);
         data.improbableCount.add(now, weight);
         final float shortTerm = data.improbableCount.bucketScore(0);
         double violation = 0;
         boolean violated = false;
         if (shortTerm * 0.8f > cc.improbableLevel / 20.0){
-            final float lag = cc.lag ? TickTask.getLag(data.improbableCount.bucketDuration(), true) : 1f;
+            final float lag = pData.getCurrentWorldData().shouldAdjustToLag(type) ? TickTask.getLag(data.improbableCount.bucketDuration(), true) : 1f;
             if (shortTerm / lag > cc.improbableLevel / 20.0){
                 violation += shortTerm * 2d / lag;
                 violated = true;
@@ -81,7 +99,7 @@ public class Improbable extends Check implements IDisableListener{
         }
         final double full = data.improbableCount.score(1.0f);
         if (full > cc.improbableLevel){
-            final float lag = cc.lag ? TickTask.getLag(data.improbableCount.bucketDuration() * data.improbableCount.numberOfBuckets(), true) : 1f;
+            final float lag = pData.getCurrentWorldData().shouldAdjustToLag(type) ? TickTask.getLag(data.improbableCount.bucketDuration() * data.improbableCount.numberOfBuckets(), true) : 1f;
             if (full / lag > cc.improbableLevel){
                 violation += full / lag;
                 violated = true;

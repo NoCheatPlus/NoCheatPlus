@@ -21,51 +21,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
-import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 public class CombinedConfig extends ACheckConfig {
 
-    /** The factory creating configurations. */
-    public static final CheckConfigFactory factory = new CheckConfigFactory() {
-        @Override
-        public final ICheckConfig getConfig(final Player player) {
-            return CombinedConfig.getConfig(player);
-        }
-
-        @Override
-        public void removeAllConfigs() {
-            clear(); // Band-aid.
-        }
-    };
-
-    private static final Map<String, CombinedConfig> worldsMap = new HashMap<String, CombinedConfig>();
-
-    public static CombinedConfig getConfig(final Player player) {
-        final String worldName = player.getWorld().getName();
-        CombinedConfig cc = worldsMap.get(worldName);
-        if (cc == null){
-            cc = new CombinedConfig(ConfigManager.getConfigFile(worldName));
-            worldsMap.put(worldName, cc);
-        }
-        return cc;
-    }
-
-
     // Bedleave check.
-    public final boolean        bedLeaveCheck;
     public final ActionList     bedLeaveActions;
 
     // Ender pearl
@@ -74,7 +43,6 @@ public class CombinedConfig extends ACheckConfig {
 
     // Improbable check
     /** Do mind that this flag is not used by all components. */
-    public final boolean        improbableCheck;
     public final float          improbableLevel;
     public final ActionList     improbableActions;
 
@@ -87,7 +55,6 @@ public class CombinedConfig extends ACheckConfig {
     public final boolean                    invulnerableTriggerAlways;
     public final boolean                    invulnerableTriggerFallDistance;
 
-    public final boolean 		munchHausenCheck;
     public final ActionList 	munchHausenActions;
 
     // Last yaw tracking 
@@ -97,16 +64,15 @@ public class CombinedConfig extends ACheckConfig {
     public final int        yawRatePenaltyMin;
     public final int        yawRatePenaltyMax;
 
-    public CombinedConfig(final ConfigFile config) {
-        super(config, ConfPaths.COMBINED);
+    public CombinedConfig(final IWorldData worldData) {
+        super(worldData);
+        final ConfigFile config = worldData.getRawConfiguration();
 
-        bedLeaveCheck = config.getBoolean(ConfPaths.COMBINED_BEDLEAVE_CHECK);
         bedLeaveActions = config.getOptimizedActionList(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, Permissions.COMBINED_BEDLEAVE);
 
         enderPearlCheck = config.getBoolean(ConfPaths.COMBINED_ENDERPEARL_CHECK);
         enderPearlPreventClickBlock = config.getBoolean(ConfPaths.COMBINED_ENDERPEARL_PREVENTCLICKBLOCK);
 
-        improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK);
         improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL);
         improbableActions = config.getOptimizedActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);
 
@@ -147,7 +113,6 @@ public class CombinedConfig extends ACheckConfig {
         invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
         invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 
-        munchHausenCheck = config.getBoolean(ConfPaths.COMBINED_MUNCHHAUSEN_CHECK);
         munchHausenActions = config.getOptimizedActionList(ConfPaths.COMBINED_MUNCHHAUSEN_ACTIONS, Permissions.COMBINED_MUNCHHAUSEN);
 
         yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
@@ -155,27 +120,6 @@ public class CombinedConfig extends ACheckConfig {
         yawRatePenaltyFactor = (float) config.getDouble(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR);
         yawRatePenaltyMin = config.getInt(ConfPaths.COMBINED_YAWRATE_PENALTY_MIN);
         yawRatePenaltyMax = config.getInt(ConfPaths.COMBINED_YAWRATE_PENALTY_MAX);
-    }
-
-    @Override
-    public boolean isEnabled(final CheckType checkType) {
-        switch(checkType){
-            case COMBINED_IMPROBABLE:
-                return improbableCheck;
-            case COMBINED_BEDLEAVE:
-                return bedLeaveCheck;
-            case COMBINED_MUNCHHAUSEN:
-                return munchHausenCheck;
-            case COMBINED_YAWRATE:
-                // Always on, depends on other checks.
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public static void clear() {
-        worldsMap.clear();
     }
 
 }

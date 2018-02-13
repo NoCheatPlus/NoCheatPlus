@@ -29,7 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.ITraceEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -71,7 +71,7 @@ public class Reach extends Check {
      */
     public boolean check(final Player player, final Location pLoc, 
             final Entity damaged, final boolean damagedIsFake, final Location dRef, 
-            final FightData data, final FightConfig cc, final PlayerData pData) {
+            final FightData data, final FightConfig cc, final IPlayerData pData) {
         boolean cancel = false;
 
         // The maximum distance allowed to interact with an entity in survival mode.
@@ -114,7 +114,8 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, violation, cc.reachActions).willCancel();
-            if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
+            if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), 
+                    "fight.reach", pData)){
                 cancel = true;
             }
             if (cancel && cc.reachPenalty > 0){
@@ -146,7 +147,7 @@ public class Reach extends Check {
             data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
 
-        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+        if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
             player.sendMessage("NC+: Attack/reach " + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
         }
 
@@ -163,7 +164,9 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public ReachContext getContext(final Player player, final Location pLoc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+    public ReachContext getContext(final Player player, final Location pLoc, 
+            final Entity damaged, final Location damagedLoc, 
+            final FightData data, final FightConfig cc) {
         final ReachContext context = new ReachContext();
         context.distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : cc.reachSurvivalDistance + getDistMod(damaged);
         context.distanceMin = (context.distanceLimit - cc.reachReduceDistance) / context.distanceLimit;
@@ -234,7 +237,7 @@ public class Reach extends Check {
      */
     public boolean loopFinish(final Player player, final Location pLoc, final Entity damaged, 
             final ReachContext context, final ITraceEntry traceEntry, final boolean forceViolation, 
-            final FightData data, final FightConfig cc, final PlayerData pData) {
+            final FightData data, final FightConfig cc, final IPlayerData pData) {
         final double lenpRel = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
         if (lenpRel == Double.MAX_VALUE) {
             return false;
@@ -251,7 +254,8 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, violation, cc.reachActions).willCancel();
-            if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
+            if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), 
+                    "fight.reach", pData)){
                 cancel = true;
             }
             if (cancel && cc.reachPenalty > 0){
@@ -284,7 +288,7 @@ public class Reach extends Check {
             data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
 
-        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+        if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
             // TODO: Height: remember successful ITraceEntry
             player.sendMessage("NC+: Attack/reach " + damaged.getType()+ (traceEntry == null ? "" : (" height=" + traceEntry.getBoxMarginVertical())) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(data.reachMod));
         }

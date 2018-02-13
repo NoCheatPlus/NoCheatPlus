@@ -1,3 +1,17 @@
+/*
+ * This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package fr.neatmonster.nocheatplus.players;
 
 import java.util.Collections;
@@ -8,14 +22,20 @@ import java.util.concurrent.locks.Lock;
 import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
+import fr.neatmonster.nocheatplus.components.data.checktype.CheckNodeWithDebug;
 import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree;
-import fr.neatmonster.nocheatplus.components.data.checktype.CheckTypeTree.CheckTypeTreeNode;
+import fr.neatmonster.nocheatplus.components.data.checktype.IBaseCheckNode;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.hooks.ExemptionContext;
 import fr.neatmonster.nocheatplus.players.PlayerCheckTypeTree.PlayerCheckTypeTreeNode;
+import fr.neatmonster.nocheatplus.worlds.IWorldCheckNode;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * <hr>
- * Exemption and unexemption are handled within two contexts: primary thread and
+ * Exempting and unexempting are handled within two contexts: primary thread and
  * asynchronous. Exemption testing may account for both states (without
  * synchronization).
  * 
@@ -34,7 +54,9 @@ public class PlayerCheckTypeTree extends CheckTypeTree<PlayerCheckTypeTreeNode>{
      * @author asofold
      *
      */
-    static class PlayerCheckTypeTreeNode extends CheckTypeTreeNode<PlayerCheckTypeTreeNode> {
+    static class PlayerCheckTypeTreeNode extends CheckNodeWithDebug<PlayerCheckTypeTreeNode> implements IBaseCheckNode {
+
+        // TODO: Compactify flags?
 
         /**
          * Explicitly exempted by API call (cumulative flag), excludes checking for
@@ -169,11 +191,77 @@ public class PlayerCheckTypeTree extends CheckTypeTree<PlayerCheckTypeTreeNode>{
         /**
          * Primary thread only, must call under lock.
          */
-        public void clearAllExemptions() {
+        void clearAllExemptions() {
             exemptedAsynchronous = false;
             exemptedPrimaryThread = false;
             exemptionsAsynchronous = null;
             exemptionsPrimaryThread = null;
+        }
+
+        /**
+         * Set configDebug recursively and then update.
+         * 
+         * @param worldData
+         */
+        void updateDebug(final IWorldData worldData) {
+            setDebugNoUpdate(worldData);
+            updateDebug(worldData.getRawConfiguration());
+        }
+
+        /**
+         * Recursively set configDebug, no update.
+         * 
+         * @param worldData
+         */
+        private void setDebugNoUpdate(final IWorldData worldData) {
+            final IWorldCheckNode worldNode = worldData.getCheckNode(getCheckType());
+            // Just adjust recursively.
+            // TODO: Simplicity of interface: hard set to the resulting value.
+            configDebug.setValue(worldNode.isDebugActive(), worldNode.getOverrideTypeDebug());
+            for (final PlayerCheckTypeTreeNode node : getChildren()) {
+                node.updateDebug(worldData);
+            }
+        }
+
+        /**
+         * Update to given configuration.
+         * 
+         * @param rawConfiguration
+         */
+        @SuppressWarnings("unchecked")
+        void updateDebug(ConfigFile rawConfiguration) {
+            configFlagUpdate(rawConfiguration, true, accessDebug);
+        }
+
+        /**
+         * Hard-reset the debug properties to the underlying IWorldData instance.
+         * 
+         * @param worldData
+         */
+        void resetDebug(final IWorldData worldData) {
+            resetDebugNoUpdate(worldData);
+            updateDebug(worldData.getRawConfiguration());
+        }
+
+        private void resetDebugNoUpdate(IWorldData worldData) {
+            final IWorldCheckNode worldNode = worldData.getCheckNode(getCheckType());
+            // Just adjust recursively.
+            // TODO: Simplicity of interface: hard set to the resulting value.
+            /*
+             * TODO: Itchy/modeling: A permanent override for a player gets
+             * reset by a permanent override for a world.
+             */
+            configDebug.resetValue(worldNode.isDebugActive(), worldNode.getOverrideTypeDebug());
+            for (final PlayerCheckTypeTreeNode node : getChildren()) {
+                node.resetDebugNoUpdate(worldData);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        void overrideDebug(final ConfigFile rawConfiguration,
+                final CheckType checkType, final AlmostBoolean active, 
+                final OverrideType overrideType, final boolean overrideChildren) {
+            configFlagOverride(rawConfiguration, active, overrideType, overrideChildren, accessDebug);
         }
 
     }

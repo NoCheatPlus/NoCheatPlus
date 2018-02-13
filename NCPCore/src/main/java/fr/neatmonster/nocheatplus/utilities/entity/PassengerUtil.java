@@ -30,6 +30,8 @@ import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -167,11 +169,12 @@ public class PassengerUtil {
      * @param debug
      *            the debug
      */
-    public void teleportWithPassengers(final Entity vehicle, final Player player, final Location location, 
-            final boolean debug) {
+    public void teleportWithPassengers(final Entity vehicle, final Player player, 
+            final Location location, final boolean debug, final IPlayerData pData) {
         final List<Entity> originalPassengers = handleVehicle.getHandle().getEntityPassengers(vehicle);
         teleportWithPassengers(vehicle, player, location, debug, 
-                originalPassengers.toArray(new Entity[originalPassengers.size()]), false);
+                originalPassengers.toArray(new Entity[originalPassengers.size()]), 
+                false, pData);
     }
 
     /**
@@ -192,13 +195,14 @@ public class PassengerUtil {
      * @param CheckPassengers Set to true to compare current with original passengers.
      */
     public void teleportWithPassengers(final Entity vehicle, final Player player, final Location location, 
-            final boolean debug, final Entity[] originalPassengers, final boolean checkPassengers) {
+            final boolean debug, final Entity[] originalPassengers, final boolean checkPassengers,
+            final IPlayerData pData) {
         // TODO: Rubber band issue needs synchronizing with packet level and ignore certain incoming ones?
         // TODO: This handling could conflict with WorldGuard region flags.
         // TODO: Account for nested passengers and inconsistencies.
         // TODO: Conception: Restore the passengers at the time of setting the vehicle set back?
 
-        final MovingData data = MovingData.getData(player);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
         data.isVehicleSetBack = true;
         int otherPlayers = 0;
         boolean playerIsOriginalPassenger = false;
@@ -208,7 +212,8 @@ public class PassengerUtil {
                 break;
             }
             else if (originalPassengers[i] instanceof Player) {
-                MovingData.getData((Player) originalPassengers[i]).isVehicleSetBack = true;
+                DataManager.getGenericInstance((Player) originalPassengers[i], 
+                        MovingData.class).isVehicleSetBack = true;
                 otherPlayers ++;
             }
         }
@@ -228,7 +233,7 @@ public class PassengerUtil {
         //            }
         //        }
         if (!playerIsOriginalPassenger) {
-            if (data.debug) {
+            if (debug) {
                 CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "Vehicle set back: This player is not an original passenger.");
             }
             //            redoPassengers = true;
@@ -271,7 +276,8 @@ public class PassengerUtil {
             // Add the player first,  if not an original passenger (special case, idk, replaced by squids perhaps).
             if (!playerIsOriginalPassenger) {
                 // (Not sure: always add first, until another case is needed.)
-                teleportPlayerPassenger(player, vehicle, location, vehicleTeleported, data);
+                teleportPlayerPassenger(player, vehicle, location, vehicleTeleported, 
+                        data, debug);
             }
             // Add all other original passengers in a generic way, distinguish players.
             for (int i = 0; i < originalPassengers.length; i++) {
@@ -279,8 +285,10 @@ public class PassengerUtil {
                 if (passenger.isValid() && !passenger.isDead()) {
                     // Cross world cases?
                     if (passenger instanceof Player) {
-                        if (teleportPlayerPassenger((Player) passenger, vehicle, location, vehicleTeleported, 
-                                MovingData.getData((Player) passenger))) {
+                        if (teleportPlayerPassenger((Player) passenger, 
+                                vehicle, location, vehicleTeleported, 
+                                DataManager.getGenericInstance((Player) passenger, MovingData.class),
+                                debug)) {
                             if (player.equals(passenger)) {
                                 playerTeleported = true;
                             }
@@ -323,7 +331,8 @@ public class PassengerUtil {
      * @return
      */
     private final boolean teleportPlayerPassenger(final Player player, final Entity vehicle, 
-            final Location location, final boolean vehicleTeleported, final MovingData data) {
+            final Location location, final boolean vehicleTeleported, final MovingData data,
+            final boolean debug) {
         final boolean playerTeleported;
         if (player.isOnline() && !player.isDead()) {
             // Mask player teleport as a set back.
@@ -345,7 +354,7 @@ public class PassengerUtil {
                 // TODO: Set backs get invalidated somewhere, likely on an extra unknown TP. Use data.isVehicleSetBack in MovingListener/teleport.
                 if (data.vehicleSetBacks.getFirstValidEntry(location) == null) {
                     // At least ensure one of the entries has to match the location we teleported the vehicle to.
-                    if (data.debug) {
+                    if (debug) {
                         CheckUtils.debug(player, CheckType.MOVING_VEHICLE, "No set back is matching the vehicle location that it has just been set back to. Reset all lazily to: " + location);
                     }
                     data.vehicleSetBacks.resetAllLazily(location);
@@ -354,7 +363,7 @@ public class PassengerUtil {
                 final VehicleMoveData firstPastMove = data.vehicleMoves.getFirstPastMove();
                 if (!firstPastMove.valid || firstPastMove.toIsValid 
                         || !TrigUtil.isSamePos(firstPastMove.from, location)) {
-                    final MovingConfig cc = MovingConfig.getConfig(player);
+                    final MovingConfig cc = DataManager.getGenericInstance(player, MovingConfig.class);
                     NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(AuxMoving.class).resetVehiclePositions(vehicle, location, data, cc);
                 }
             }

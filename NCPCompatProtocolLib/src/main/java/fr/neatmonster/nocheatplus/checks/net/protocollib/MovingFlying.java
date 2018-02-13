@@ -33,6 +33,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.FlyingFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
@@ -40,16 +41,16 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying.PACKET_CONTENT;
 import fr.neatmonster.nocheatplus.checks.net.model.TeleportQueue.AckReference;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * Run checks related to moving (pos/look/flying). Skip packets that shouldn't
@@ -110,10 +111,12 @@ public class MovingFlying extends BaseAdapter {
     public MovingFlying(Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
         super(plugin, ListenerPriority.LOW, initPacketTypes());
-
+        // Keep the CheckType NET for now.
         // Add feature tags for checks.
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
-            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(FlyingFrequency.class.getSimpleName()));
+        if (NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().isActiveAnywhere(
+                CheckType.NET_FLYINGFREQUENCY)) {
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags(
+                    "checks", Arrays.asList(FlyingFrequency.class.getSimpleName()));
         }
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(flyingFrequency);
     }
@@ -155,12 +158,13 @@ public class MovingFlying extends BaseAdapter {
             return;
         }
         final Player player = event.getPlayer();
-        final NetData data = dataFactory.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final NetData data = pData.getGenericInstance(NetData.class);
         final AlmostBoolean matched = data.teleportQueue.processAck(teleportId);
         if (matched.decideOptimistically()) {
-            CheckUtils.subtract(System.currentTimeMillis(), 1, data.flyingFrequencyAll);
+            ActionFrequency.subtract(System.currentTimeMillis(), 1, data.flyingFrequencyAll);
         }
-        if (data.debug) {
+        if (pData.isDebugActive(this.checkType)) { // TODO: FlyingFrequency / NET_MOVING? + check others who depend
             debug(player, "Confirm teleport packet" + (matched.decideOptimistically() ? (" (matched=" + matched + ")") : "") + ": " + teleportId);
         }
     }
@@ -191,14 +195,17 @@ public class MovingFlying extends BaseAdapter {
             return;
         }
 
-        final NetConfig cc = configFactory.getConfig(player.getWorld());
+        final IPlayerData pData = DataManager.getPlayerData(player);
         // Always update last received time.
-        final NetData data = dataFactory.getData(player);
+        final NetData data = pData.getGenericInstance(NetData.class);
         data.lastKeepAliveTime = time; // Update without much of a contract.
         // TODO: Leniency options too (packet order inversion). -> current: flyingQueue is fetched.
-        if (!cc.flyingFrequencyActive) {
+        final IWorldData worldData = pData.getCurrentWorldDataSafe();
+        if (!worldData.isCheckActive(CheckType.NET_FLYINGFREQUENCY)) {
             return;
         }
+
+        final NetConfig cc = pData.getGenericInstance(NetConfig.class);
         boolean cancel = false;
 
         // Interpret the packet content.
@@ -211,14 +218,14 @@ public class MovingFlying extends BaseAdapter {
             if (isInvalidContent(packetData)) {
                 // TODO: extra actions: log and kick (cancel state is not evaluated)
                 event.setCancelled(true);
-                if (data.debug) {
+                if (pData.isDebugActive(this.checkType)) {
                     debug(player, "Incoming packet, cancel due to malicious content: " + packetData.toString());
                 }
                 return;
             }
             switch(data.teleportQueue.processAck(packetData)) {
                 case WAITING: {
-                    if (data.debug) {
+                    if (pData.isDebugActive(this.checkType)) {
                         debug(player, "Incoming packet, still waiting for ACK on outgoing position.");
                     }
                     if (confirmTeleportType != null && cc.supersededFlyingCancelWaiting) {
@@ -250,7 +257,7 @@ public class MovingFlying extends BaseAdapter {
                 case ACK: {
                     // Skip processing ACK packets, no cancel.
                     skipFlyingFrequency = true;
-                    if (data.debug) {
+                    if (pData.isDebugActive(this.checkType)) {
                         debug(player, "Incoming packet, interpret as ACK for outgoing position.");
                     }
                 }
@@ -267,8 +274,8 @@ public class MovingFlying extends BaseAdapter {
 
         // Actual packet frequency check.
         // TODO: Consider using the NetStatic check.
-        final PlayerData pData = DataManager.getPlayerData(player);
         if (!cancel && !skipFlyingFrequency 
+                && !pData.hasBypass(CheckType.NET_FLYINGFREQUENCY, player)
                 && flyingFrequency.check(player, packetData, time, data, cc, pData)) {
             cancel = true;
         }
@@ -285,7 +292,7 @@ public class MovingFlying extends BaseAdapter {
         if (cancel) {
             event.setCancelled(true);
         }
-        if (data.debug) {
+        if (pData.isDebugActive(this.checkType)) {
             debug(player, (packetData == null ? "(Incompatible data)" : packetData.toString()) + (event.isCancelled() ? " CANCEL" : ""));
         }
     }

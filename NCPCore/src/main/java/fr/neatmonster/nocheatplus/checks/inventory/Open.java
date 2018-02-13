@@ -24,6 +24,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
 import fr.neatmonster.nocheatplus.hooks.ExemptionSettings;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /**
@@ -74,7 +76,8 @@ public class Open extends Check implements IDisableListener{
                 || !InventoryUtil.hasInventoryOpen(player)) {
             return false;
         }
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
         if (cc.openClose) {
             final UUID id = player.getUniqueId();
             if (this.nestedPlayer == null || !id.equals(this.nestedPlayer)) {

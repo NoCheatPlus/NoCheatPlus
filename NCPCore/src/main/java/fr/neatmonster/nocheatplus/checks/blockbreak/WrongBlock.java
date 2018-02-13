@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 public class WrongBlock extends Check {
@@ -43,7 +43,7 @@ public class WrongBlock extends Check {
      * @return
      */
     public boolean check(final Player player, final Block block, 
-            final BlockBreakConfig cc, final BlockBreakData data, final PlayerData pData,
+            final BlockBreakConfig cc, final BlockBreakData data, final IPlayerData pData,
             final AlmostBoolean isInstaBreak) {
 
         boolean cancel = false;
@@ -52,6 +52,7 @@ public class WrongBlock extends Check {
         final int dist = Math.min(4, data.clickedX == Integer.MAX_VALUE ? 100 : TrigUtil.manhattan(data.clickedX, data.clickedY, data.clickedZ, block));
         final boolean wrongBlock;
         final long now = System.currentTimeMillis();
+        final boolean debug = pData.isDebugActive(type);
         // TODO: Remove isInstaBreak argument or use it.
         if (dist == 0) {
             if (wrongTime) {
@@ -65,7 +66,7 @@ public class WrongBlock extends Check {
             // One might to a concession in case of instant breaking.
             // TODO: WHY ?
             if (now - data.wasInstaBreak < 60) {
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Skip on Manhattan 1 and wasInstaBreak within 60 ms.");
                 }
                 wrongBlock = false;
@@ -80,7 +81,7 @@ public class WrongBlock extends Check {
         }
 
         if (wrongBlock) {
-            if ((data.debug) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
+            if ((debug) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
                 player.sendMessage("WrongBlock failure with dist: " + dist);
             }
             data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);
@@ -89,7 +90,7 @@ public class WrongBlock extends Check {
                 if (executeActions(player, score, 1D, cc.wrongBlockActions).willCancel()) {
                     cancel = true;
                 }
-                if (Improbable.check(player, 2.0f, now, "blockbreak.wrongblock")) {
+                if (Improbable.check(player, 2.0f, now, "blockbreak.wrongblock", pData)) {
                     cancel = true;
                 }
             }

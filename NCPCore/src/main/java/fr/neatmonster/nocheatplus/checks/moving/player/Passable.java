@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.collision.Axis;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollidePassable;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableAxisTracing;
@@ -70,13 +71,20 @@ public class Passable extends Check {
         blockTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
     }
 
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
-        return checkActual(player, from, to, data, cc, tick, useBlockChangeTracker);
+    public Location check(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc, final IPlayerData pData, 
+            final int tick, final boolean useBlockChangeTracker) {
+        return checkActual(player, from, to, data, cc, pData, tick, useBlockChangeTracker);
     }
 
-    private Location checkActual(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
+    private Location checkActual(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc, final IPlayerData pData,
+            final int tick, final boolean useBlockChangeTracker) {
+
+        final boolean debug = pData.isDebugActive(type);
+
         // TODO: Distinguish feet vs. box.
 
         // Block distances (sum, max) for from-to (not for loc!).
@@ -84,9 +92,11 @@ public class Passable extends Check {
 
         // Check default order first, then others.
         rayTracing.setAxisOrder(Axis.AXIS_ORDER_YXZ);
-        String newTag = checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+        String newTag = checkRayTracing(player, from, to, manhattan, 
+                data, cc, debug, tick, useBlockChangeTracker);
         if (newTag != null) {
-            newTag = checkRayTracingAlernateOrder(player, from, to, manhattan, data, cc, tick, 
+            newTag = checkRayTracingAlernateOrder(player, from, to, manhattan, 
+                    debug, data, cc, tick, 
                     useBlockChangeTracker, newTag);
         }
         // Finally handle violations.
@@ -97,13 +107,16 @@ public class Passable extends Check {
         }
         else {
             // Direct return.
-            return potentialViolation(player, from, to, manhattan, newTag, data, cc);
+            return potentialViolation(player, from, to, manhattan, 
+                    debug, newTag, data, cc);
         }
     }
 
     private String checkRayTracingAlernateOrder(final Player player, 
-            final PlayerLocation from, final PlayerLocation to, final int manhattan, 
-            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker,
+            final PlayerLocation from, final PlayerLocation to, 
+            final int manhattan, final boolean debug,
+            final MovingData data, final MovingConfig cc, 
+            final int tick, final boolean useBlockChangeTracker,
             final String previousTag) {
         /*
          * General assumption for now: Not all combinations have to be checked.
@@ -116,16 +129,19 @@ public class Passable extends Check {
         if (axis == Axis.X_AXIS || axis == Axis.Z_AXIS) {
             // Test the horizontal alternative only.
             rayTracing.setAxisOrder(Axis.AXIS_ORDER_YZX);
-            return checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+            return checkRayTracing(player, from, to, manhattan, data, cc, 
+                    debug, tick, useBlockChangeTracker);
         }
         else if (axis == Axis.Y_AXIS) {
             // Test both horizontal options, each before vertical.
             rayTracing.setAxisOrder(Axis.AXIS_ORDER_XZY);
-            if (checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker) == null) {
+            if (checkRayTracing(player, from, to, manhattan, data, cc, 
+                    debug, tick, useBlockChangeTracker) == null) {
                 return null;
             }
             rayTracing.setAxisOrder(Axis.AXIS_ORDER_ZXY);
-            return checkRayTracing(player, from, to, manhattan, data, cc, tick, useBlockChangeTracker);
+            return checkRayTracing(player, from, to, manhattan, data, cc, 
+                    debug, tick, useBlockChangeTracker);
         }
         else {
             return previousTag; // In case nothing could be done.
@@ -134,7 +150,8 @@ public class Passable extends Check {
 
     private String checkRayTracing(final Player player, 
             final PlayerLocation from, final PlayerLocation to, final int manhattan, 
-            final MovingData data, final MovingConfig cc, final int tick, final boolean useBlockChangeTracker) {
+            final MovingData data, final MovingConfig cc, final boolean debug,
+            final int tick, final boolean useBlockChangeTracker) {
         String tags = null;
         // NOTE: axis order is set externally.
         setNormalMargins(rayTracing, from);
@@ -153,7 +170,7 @@ public class Passable extends Check {
         else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
             tags = "raytracing_maxsteps_";
         }
-        if (data.debug) {
+        if (debug) {
             debugExtraCollisionDetails(player, rayTracing, "std");
         }
         rayTracing.cleanup();
@@ -182,22 +199,25 @@ public class Passable extends Check {
      * @return
      */
     private Location potentialViolation(final Player player, 
-            final PlayerLocation from, final PlayerLocation to, final int manhattan, 
+            final PlayerLocation from, final PlayerLocation to, 
+            final int manhattan, final boolean debug,
             String tags, final MovingData data, final MovingConfig cc) {
 
         // TODO: Might need the workaround for fences.
 
-        return actualViolation(player, from, to, tags, data, cc);
+        return actualViolation(player, from, to, tags, debug, data, cc);
     }
 
-    private Location actualViolation(final Player player, final PlayerLocation from, final PlayerLocation to,
-            final String tags, final MovingData data, final MovingConfig cc) {
+    private Location actualViolation(final Player player, 
+            final PlayerLocation from, final PlayerLocation to,
+            final String tags, final boolean debug,
+            final MovingData data, final MovingConfig cc) {
         Location setBackLoc = null; // Alternative to from.getLocation().
 
         // Prefer the set back location from the data.
         if (data.hasSetBack()) {
             setBackLoc = data.getSetBack(to);
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Using set back location for passable.");
             }
         }
@@ -205,7 +225,7 @@ public class Passable extends Check {
         // Return the reset position.
         data.passableVL += 1d;
         final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
-        if (data.debug || vd.needsParameters()) {
+        if (debug || vd.needsParameters()) {
             vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
             vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
             vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from, to)));
@@ -221,7 +241,7 @@ public class Passable extends Check {
                 newTo = LocUtil.clone(setBackLoc);
             } else {
                 newTo = from.getLocation();
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Using from location for passable.");
                 }
             }

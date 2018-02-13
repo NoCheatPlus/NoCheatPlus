@@ -24,8 +24,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.hooks.ILast;
 import fr.neatmonster.nocheatplus.hooks.IStats;
@@ -33,6 +31,8 @@ import fr.neatmonster.nocheatplus.hooks.NCPHook;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -106,23 +106,14 @@ public class AllViolationsHook implements NCPHook, ILast, IStats {
         }
         boolean debugSet = false;
         if (config.debugOnly || config.debug) {
-            // TODO: Better mix the debug flag into IViolationInfo, for best performance.
-            final CheckDataFactory factory = checkType.getDataFactory();
-            if (config.debugOnly && factory == null) {
+            // TODO: Better mix the debug flag into IViolationInfo, for best performance AND consistency.
+            // TODO: (If debug is not in IViolationInfo, switch to PlayerData.isDebug(CheckType).)
+            final IPlayerData pData = DataManager.getPlayerData(player);
+            debugSet = pData.isDebugActive(checkType);
+            if (config.debugOnly && !debugSet) {
                 return false;
-            } else {
-                final ICheckData data = factory.getData(player);
-                if (data == null) {
-                    if (config.debugOnly) {
-                        return false;
-                    }
-                } else {
-                    debugSet = data.getDebug();
-                    if (config.debugOnly && !debugSet) {
-                        return false;
-                    }
-                }
             }
+
         }
         log(checkType, player, info, config.allToTrace || debugSet, config.allToNotify);
         return false;

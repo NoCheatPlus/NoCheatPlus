@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 public class BedLeave extends Check {
 
@@ -32,8 +33,8 @@ public class BedLeave extends Check {
      *            the player
      * @return If to prevent action (use the set back location of survivalfly).
      */
-    public boolean checkBed(final Player player) {
-        final CombinedData data = CombinedData.getData(player);
+    public boolean checkBed(final Player player, final IPlayerData pData) {
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
 
         boolean cancel = false;
         // Check if the player had been in bed at all.
@@ -44,7 +45,8 @@ public class BedLeave extends Check {
             // TODO: add tag
 
             // And return if we need to do something or not.
-            if (executeActions(player, data.bedLeaveVL, 1D, CombinedConfig.getConfig(player).bedLeaveActions).willCancel()){
+            if (executeActions(player, data.bedLeaveVL, 1D, 
+                    pData.getGenericInstance(CombinedConfig.class).bedLeaveActions).willCancel()){
                 cancel = true;
             }
         } else{

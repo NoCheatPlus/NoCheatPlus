@@ -28,12 +28,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
-import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.hooks.ExemptionContext;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.PermissionInfo;
 import fr.neatmonster.nocheatplus.permissions.PermissionNode;
 import fr.neatmonster.nocheatplus.permissions.PermissionPolicy.FetchingPolicy;
@@ -43,6 +45,9 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.DualSet;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
+import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
+import fr.neatmonster.nocheatplus.worlds.WorldIdentifier;
 
 /**
  * Central player-specific data object.
@@ -80,13 +85,9 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
  * @author asofold
  *
  */
-public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
+public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
 
-    /*
-     * TODO: Still consider interfaces, even if this is the only implementation.
-     * E.g. for requesting on-tick action, permission-related, (check-)
-     * data-related.
-     */
+    // TODO: IPlayerData for the more official API.
 
     /** Monitor player task load across all players (nanoseconds per server tick). */
     private static ActionFrequency taskLoad = new ActionFrequency(6, 7);
@@ -128,13 +129,18 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
      * uncertain when/how to access.
      */
     /** Unique id of the player. */
-    final UUID playerId;
+    private final UUID playerId;
 
-    // TODO: Names should get updated. (In which case)
+    // TODO: Names could/should get updated. (In which case?)
     /** Exact case name of the player. */
-    final String playerName;
+    private final String playerName;
     /** Lower case name of the player. */
-    final String lcName;
+    private final String lcName;
+
+    private long lastJoinTime = 0;
+
+    /** The IWorldData instance of the current world (at least while online). */
+    private IWorldData currentWorldData = null;
 
     /*
      * TODO: Flags/counters for (async-login,) login, join, 'online', kick, quit
@@ -189,7 +195,7 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
      * @param timeLast
      * @return True, of the listener is to be removed, false otherwise.
      */
-    protected boolean processTickFrequent(final int tick, final long timeLast) {
+    boolean processTickFrequent(final int tick, final long timeLast) {
         if (frequentTaskDelayUnregister == 0) {
             frequentTaskDelayUnregister = frequentTaskUnregisterDefaultDelay;
         }
@@ -243,7 +249,7 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
                 // Set back.
                 if (requestPlayerSetBack) {
                     requestPlayerSetBack = false;
-                    MovingUtil.processStoredSetBack(player, "Player set back on tick: ");
+                    MovingUtil.processStoredSetBack(player, "Player set back on tick: ", this);
                 }
                 // Inventory update.
                 if (requestUpdateInventory) {
@@ -326,16 +332,187 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         return DataManager.isFrequentPlayerTaskScheduled(playerId);
     }
 
+    private PermissionNode getOrCreatePermissionNode(final RegisteredPermission registeredPermission) {
+        // Optimistic creation (concurrency).
+        final PermissionNode node = new PermissionNode(permissionRegistry.getPermissionInfo(registeredPermission.getId()));
+        final PermissionNode oldNode = permissions.putIfAbsent(registeredPermission.getId(), node);
+        return oldNode == null ? node : oldNode;
+    }
+
     /**
-     * Permission check (thread-safe, results and impact of asynchronous queries depends on
-     * settings +- TBD).
+     * Fetch the permission hard, no putting to cache, just return the result.
+     * For off-primary-server-thread access, this will wait for a
+     * BukkitRunnable/TickTask task to finish, at an extraordinary performance
+     * penalty.
      * 
-     * @param registeredPermission Must not be null, must be registered.
+     * @param registeredPermission
      * @param player
-     *            May be null (if lucky the permission is set to static/timed
-     *            and/or has already been fetched).
-     * @return
+     * @return MAYBE in case permissions could not be fetched or 
      */
+    private AlmostBoolean fetchPermission(final RegisteredPermission registeredPermission, Player player) {
+        if (Bukkit.isPrimaryThread()) {
+            if (player == null) {
+                player = DataManager.getPlayer(this.playerId);
+                if (player == null) {
+                    return AlmostBoolean.MAYBE;
+                }
+            }
+            // Minimal update within the primary thread.
+            return player.hasPermission(registeredPermission.getBukkitPermission()) ? AlmostBoolean.YES : AlmostBoolean.NO;
+        }
+        else {
+            requestPermissionUpdate(registeredPermission);
+            /*
+             * TODO: UNCERTAIN: request related permission right away ? Inefficient in case of exemption.
+             * 
+             */
+            return AlmostBoolean.MAYBE;
+        }
+    }
+
+    @Override
+    public void handleTimeRanBackwards() {
+        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
+        final long timeNow = System.currentTimeMillis();
+        while (it.hasNext()) {
+            final PermissionNode node = it.next().getValue();
+            switch (node.getFetchingPolicy()) {
+                case INTERVAL:
+                    node.invalidate();
+                    break;
+                case ONCE:
+                    node.setState(node.getLastState(), timeNow);
+                    break;
+                default:
+                    // Ignore.
+                    break;
+            }
+        }
+    }
+
+    void requestPermissionUpdatePrimaryThread(final RegisteredPermission registeredPermission) {
+        // Might throw something :p.
+        updatePermissions.addPrimaryThread(registeredPermission);
+        registerFrequentPlayerTaskPrimaryThread();
+    }
+
+    void requestPermissionUpdateAsynchronous(final RegisteredPermission registeredPermission) {
+        updatePermissions.addAsynchronous(registeredPermission);
+        registerFrequentPlayerTaskAsynchronous();
+    }
+
+    private void requestLazyPermissionsUpdateNonEmpty(final RegisteredPermission... registeredPermissions) {
+        if (Bukkit.isPrimaryThread()) {
+            requestLazyPermissionUpdatePrimaryThread(registeredPermissions);
+        }
+        else {
+            requestLazyPermissionUpdateAsynchronous(registeredPermissions);
+        }
+    }
+
+    void requestLazyPermissionUpdatePrimaryThread(final RegisteredPermission... registeredPermissions) {
+        // Might throw something :p.
+        updatePermissionsLazy.addAllPrimaryThread(Arrays.asList(registeredPermissions));
+        registerFrequentPlayerTaskPrimaryThread();
+    }
+
+    void requestLazyPermissionUpdateAsynchronous(final RegisteredPermission... registeredPermissions) {
+        updatePermissionsLazy.addAllAsynchronous(Arrays.asList(registeredPermissions));
+        registerFrequentPlayerTaskAsynchronous();
+    }
+
+    void onPlayerLeave(final long timeNow) {
+        invalidateOffline();
+    }
+
+    /**
+     * Early adaption on player join.
+     * 
+     * @param world
+     * @param timeNow
+     */
+    void onPlayerJoin(final World world, final long timeNow,
+            final WorldDataManager worldDataManager) {
+        // Only update world if the data hasn't just been created.
+        updateCurrentWorld(world, worldDataManager);
+        invalidateOffline();
+        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedOffline());
+        lastJoinTime = timeNow;
+    }
+
+    private void updateCurrentWorld(final World world, 
+            final WorldDataManager worldDataManager) {
+        updateCurrentWorld(worldDataManager.getWorldData(world));
+    }
+
+    /**
+     * Allow direct call from DataManager after object creation.
+     * 
+     * @param worldData
+     */
+    void updateCurrentWorld(final IWorldData worldData) {
+        // TODO: Consider storing last world too.
+        currentWorldData = worldData;
+        checkTypeTree.getNode(CheckType.ALL).updateDebug(worldData);
+    }
+
+    private void invalidateOffline() {
+        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
+        // TODO: More efficient: get unmodifiable collection from registry?
+        while (it.hasNext()) {
+            final PermissionNode node = it.next().getValue();
+            final PermissionInfo info = node.getPermissionInfo();
+            if (info.invalidationOffline() 
+                    /*
+                     * TODO: world based should only be invalidated with world
+                     * changing. Therefore store the last world info
+                     * (UUID/name?) in PlayerData and use on login for
+                     * comparison.
+                     */
+                    || info.invalidationWorld()) {
+                // TODO: Really count leave as world change?
+                node.invalidate();
+            }
+        }
+    }
+
+    /**
+     * Early adaption on world change.
+     * 
+     * @param oldWorld
+     * @param newWorld
+     */
+    void onPlayerChangedWorld(final World oldWorld, final World newWorld,
+            final WorldDataManager worldDataManager) {
+        updateCurrentWorld(newWorld, worldDataManager);
+        // TODO: Double-invalidation (previous policy and target world policy)
+        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
+        // TODO: More efficient: get unmodifiable collection from registry?
+        while (it.hasNext()) {
+            final PermissionNode node = it.next().getValue();
+            final PermissionInfo info = node.getPermissionInfo();
+            if (info.invalidationWorld()) {
+                node.invalidate();
+            }
+        }
+        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedWorld());
+    }
+
+    /**
+     * Called with adjusting to the configuration (enable / config reload).
+     * @param changedPermissions 
+     */
+    public void adjustSettings(final Set<RegisteredPermission> changedPermissions) {
+        final Iterator<RegisteredPermission> it = changedPermissions.iterator();
+        while (it.hasNext()) {
+            final PermissionNode node = permissions.get(it.next().getId());
+            if (node != null) {
+                node.invalidate();
+            }
+        }
+    }
+
+    @Override
     public boolean hasPermission(final RegisteredPermission registeredPermission, final Player player) {
         // Check cache and policy. 
         PermissionNode node = permissions.get(registeredPermission.getId());
@@ -378,42 +555,186 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         }
     }
 
-    private PermissionNode getOrCreatePermissionNode(final RegisteredPermission registeredPermission) {
-        // Optimistic creation (concurrency).
-        final PermissionNode node = new PermissionNode(permissionRegistry.getPermissionInfo(registeredPermission.getId()));
-        final PermissionNode oldNode = permissions.putIfAbsent(registeredPermission.getId(), node);
-        return oldNode == null ? node : oldNode;
+
+    @Override
+    public void requestPermissionUpdate(final RegisteredPermission registeredPermission) {
+        if (Bukkit.isPrimaryThread()) {
+            requestPermissionUpdatePrimaryThread(registeredPermission);
+        }
+        else {
+            requestPermissionUpdateAsynchronous(registeredPermission);
+        }
+    }
+
+    @Override
+    public void requestLazyPermissionUpdate(final RegisteredPermission... registeredPermissions) {
+        if (registeredPermissions == null || registeredPermissions.length == 0) {
+            return;
+        }
+        else {
+            requestLazyPermissionsUpdateNonEmpty(registeredPermissions);
+        }
     }
 
     /**
-     * Fetch the permission hard, no putting to cache, just return the result.
-     * For off-primary-server-thread access, this will wait for a
-     * BukkitRunnable/TickTask task to finish, at an extraordinary performance
-     * penalty.
+     * Remove extra stored data, keeping "essential" data if set so. "Essential"
+     * data can't be recovered once deleted, like set-back locations for players
+     * who leave in-air (once stored here at all).
      * 
-     * @param registeredPermission
-     * @param player
-     * @return MAYBE in case permissions could not be fetched or 
+     * @param keepEssentialData
      */
-    private AlmostBoolean fetchPermission(final RegisteredPermission registeredPermission, Player player) {
-        if (Bukkit.isPrimaryThread()) {
-            if (player == null) {
-                player = DataManager.getPlayer(this.playerId);
-                if (player == null) {
-                    return AlmostBoolean.MAYBE;
-                }
-            }
-            // Minimal update within the primary thread.
-            return player.hasPermission(registeredPermission.getBukkitPermission()) ? AlmostBoolean.YES : AlmostBoolean.NO;
+    public void removeData(boolean keepEssentialData) {
+        // TODO: Interface / stages.
+        permissions.clear(); // Might keep login-related permissions. Implement a 'retain-xy' or 'essential' flag?
+        updatePermissions.clearPrimaryThread();
+        updatePermissionsLazy.clearPrimaryThread();
+    }
+
+    @Override
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    @Override
+    public String getPlayerNameLowerCase() {
+        return lcName;
+    }
+
+    @Override
+    public UUID getPlayerId() {
+        return playerId;
+    }
+
+    @Override
+    public long getLastJoinTime() {
+        return lastJoinTime;
+    }
+
+    @Override
+    public void exempt(final CheckType checkType) {
+        checkTypeTree.exempt(checkType, ExemptionContext.LEGACY_NON_NESTED);
+        // TODO: Handlers?
+    }
+
+    @Override
+    public void unexempt(final CheckType checkType) {
+        checkTypeTree.unexemptAll(checkType, ExemptionContext.LEGACY_NON_NESTED);
+        // TODO: Handlers?
+    }
+
+    @Override
+    public void exempt(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.exempt(checkType, context);
+    }
+
+    @Override
+    public void unexempt(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.unexempt(checkType, context);
+    }
+
+
+    @Override
+    public void unexemptAll(final CheckType checkType, final ExemptionContext context) {
+        checkTypeTree.unexemptAll(checkType, context);
+    }
+
+    @Override
+    public boolean isExempted(final CheckType checkType) {
+        return checkTypeTree.isExempted(checkType);
+    }
+
+    @Override
+    public void clearAllExemptions() {
+        checkTypeTree.clearAllExemptions();
+    }
+
+    @Override
+    public void clearAllExemptions(final CheckType checkType) {
+        checkTypeTree.clearAllExemptions(checkType);
+    }
+
+    @Override
+    public WorldIdentifier getCurrentWorldIdentifier() {
+        return currentWorldData.getWorldIdentifier();
+    }
+
+    @Override
+    public IWorldData getCurrentWorldData() {
+        return currentWorldData;
+    }
+
+    @Override
+    public IWorldData getCurrentWorldDataSafe() {
+        return currentWorldData == null 
+                ? NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().getDefaultWorldData() 
+                        : currentWorldData;
+    }
+
+    @Override
+    public boolean isCheckActive(final CheckType checkType, final Player player) {
+        // (No consistency checks for player id / world.)
+        return isCheckActive(checkType, player, getCurrentWorldDataSafe());
+    }
+
+    @Override
+    public boolean isCheckActive(final CheckType checkType, final Player player,
+            final IWorldData worldData) {
+        // TODO: Move the implementation of CheckUtils here (efficiency with exemption).
+        return worldData.isCheckActive(checkType) 
+                && !hasBypass(checkType, player, worldData);
+    }
+
+    @Override
+    public boolean hasBypass(final CheckType checkType, final Player player) {
+        return hasBypass(checkType, player, getCurrentWorldDataSafe());
+    }
+
+    /**
+     * Bypass check including exemption and permission.
+     * 
+     * @param checkType
+     * @param player
+     * @param isPrimaryThread
+     * @return
+     */
+    public boolean hasBypass(final CheckType checkType, final Player player, 
+            final IWorldData worldData) {
+        // TODO: Expose or not.
+        // Exemption check.
+        // TODO: More efficient implementation, ExemptionSettings per world in worldData.
+        if (NCPExemptionManager.isExempted(player, checkType)) {
+            return true;
         }
-        else {
-            requestPermissionUpdate(registeredPermission);
-            /*
-             * TODO: UNCERTAIN: request related permission right away ? Inefficient in case of exemption.
-             * 
-             */
-            return AlmostBoolean.MAYBE;
+        // Check permission policy/cache regardless of the thread context.
+        final RegisteredPermission permission = checkType.getPermission();
+        if (permission != null && hasPermission(permission, player)) {
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean isDebugActive(final CheckType checkType) {
+        return checkTypeTree.getNode(checkType).isDebugActive();
+    }
+
+    @Override
+    public void resetDebug() {
+        resetDebug(CheckType.ALL);
+    }
+
+    @Override
+    public void resetDebug(final CheckType checkType) {
+        this.checkTypeTree.getNode(checkType).resetDebug(
+                currentWorldData == null ? getCurrentWorldDataSafe() : currentWorldData);
+    }
+
+    @Override
+    public void overrideDebug(final CheckType checkType, final AlmostBoolean active, 
+            final OverrideType overrideType, final boolean overrideChildren) {
+        this.checkTypeTree.getNode(CheckType.ALL).overrideDebug(
+                getCurrentWorldDataSafe().getRawConfiguration(),
+                checkType, active, overrideType, overrideChildren);
     }
 
     /**
@@ -469,316 +790,47 @@ public class PlayerData implements IData, ICanHandleTimeRunningBackwards {
         }
     }
 
-    /**
-     * Check if notifications are turned off, this does not bypass permission
-     * checks.
-     * 
-     * @return
-     */
+    @Override
     public boolean getNotifyOff() {
         return hasTag(TAG_NOTIFY_OFF);
     }
 
-    /**
-     * Allow or turn off notifications. A player must have the admin.notify
-     * permission to receive notifications.
-     * 
-     * @param notifyOff
-     *            set to true to turn off notifications.
-     */
+    @Override
     public void setNotifyOff(final boolean notifyOff) {
         setTag(TAG_NOTIFY_OFF, notifyOff);
     }
 
-    /**
-     * Let the inventory be updated (run in TickTask).
-     */
+    @Override
     public void requestUpdateInventory() {
         this.requestUpdateInventory = true;
         registerFrequentPlayerTask();
     }
 
-    /**
-     * Let the player be set back to the location stored in moving data (run in
-     * TickTask). Only applies if it's set there.
-     */
+    @Override
     public void requestPlayerSetBack() {
         this.requestPlayerSetBack = true;
         registerFrequentPlayerTask();
     }
 
-    /**
-     * Test if it's set to process a player set back on tick. This does not
-     * check MovingData.hasTeleported().
-     * 
-     * @return
-     */
+    @Override
     public boolean isPlayerSetBackScheduled() {
         return this.requestPlayerSetBack 
                 && (frequentPlayerTaskShouldBeScheduled || isFrequentPlayerTaskScheduled());
     }
 
     @Override
-    public void handleTimeRanBackwards() {
-        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
-        final long timeNow = System.currentTimeMillis();
-        while (it.hasNext()) {
-            final PermissionNode node = it.next().getValue();
-            switch (node.getFetchingPolicy()) {
-                case INTERVAL:
-                    node.invalidate();
-                    break;
-                case ONCE:
-                    node.setState(node.getLastState(), timeNow);
-                    break;
-                default:
-                    // Ignore.
-                    break;
-            }
-        }
+    public <T> T getGenericInstance(Class<T> registeredFor) {
+        // TODO: 1. Check for cache (local).
+        // TODO: 2. Check for registered factory (local)
+        // 3. Check proxy registry.
+        // TODO: Explicit registration for proxy registry needed (PlayerDataManager).
+        // TODO: Store these in the local cache too (override/replace on world change etc registered too).
+        return getCurrentWorldDataSafe().getGenericInstance(registeredFor);
     }
 
-    /**
-     * Request a permission cache update.
-     * @param registeredPermission
-     */
-    public void requestPermissionUpdate(final RegisteredPermission registeredPermission) {
-        if (Bukkit.isPrimaryThread()) {
-            requestPermissionUpdatePrimaryThread(registeredPermission);
-        }
-        else {
-            requestPermissionUpdateAsynchronous(registeredPermission);
-        }
-    }
-
-    protected void requestPermissionUpdatePrimaryThread(final RegisteredPermission registeredPermission) {
-        // Might throw something :p.
-        updatePermissions.addPrimaryThread(registeredPermission);
-        registerFrequentPlayerTaskPrimaryThread();
-    }
-
-    protected void requestPermissionUpdateAsynchronous(final RegisteredPermission registeredPermission) {
-        updatePermissions.addAsynchronous(registeredPermission);
-        registerFrequentPlayerTaskAsynchronous();
-    }
-
-    /**
-     * Low priority permission update for check type specific permissions.
-     * 
-     * @param registeredPermissions
-     *            May be null.
-     */
-    public void requestLazyPermissionUpdate(final RegisteredPermission...registeredPermissions) {
-        if (registeredPermissions == null || registeredPermissions.length == 0) {
-            return;
-        }
-        if (Bukkit.isPrimaryThread()) {
-            requestLazyPermissionUpdatePrimaryThread(registeredPermissions);
-        }
-        else {
-            requestLazyPermissionUpdateAsynchronous(registeredPermissions);
-        }
-    }
-
-    protected void requestLazyPermissionUpdatePrimaryThread(final RegisteredPermission... registeredPermissions) {
-        // Might throw something :p.
-        updatePermissionsLazy.addAllPrimaryThread(Arrays.asList(registeredPermissions));
-        registerFrequentPlayerTaskPrimaryThread();
-    }
-
-    protected void requestLazyPermissionUpdateAsynchronous(final RegisteredPermission... registeredPermissions) {
-        updatePermissionsLazy.addAllAsynchronous(Arrays.asList(registeredPermissions));
-        registerFrequentPlayerTaskAsynchronous();
-    }
-
-    void onPlayerLeave(final long timeNow) {
-        invalidateOffline();
-    }
-
-    void onPlayerJoin(final long timeNow) {
-        invalidateOffline();
-        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedOffline());
-    }
-
-    private void invalidateOffline() {
-        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
-        // TODO: More efficient: get unmodifiable collection from registry?
-        while (it.hasNext()) {
-            final PermissionNode node = it.next().getValue();
-            final PermissionInfo info = node.getPermissionInfo();
-            if (info.invalidationOffline() 
-                    /*
-                     * TODO: world based should only be invalidated with world
-                     * changing. Therefore store the last world info
-                     * (UUID/name?) in PlayerData and use on login for
-                     * comparison.
-                     */
-                    || info.invalidationWorld()) {
-                // TODO: Really count leave as world change?
-                node.invalidate();
-            }
-        }
-    }
-
-    /**
-     * Early adaption.
-     * 
-     * @param oldWorld
-     * @param newWorld
-     */
-    void onPlayerChangedWorld(final World oldWorld, final World newWorld) {
-        // TODO: Double-invalidation (previous policy and target world policy)
-        final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
-        // TODO: More efficient: get unmodifiable collection from registry?
-        while (it.hasNext()) {
-            final PermissionNode node = it.next().getValue();
-            final PermissionInfo info = node.getPermissionInfo();
-            if (info.invalidationWorld()) {
-                node.invalidate();
-            }
-        }
-        requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedWorld());
-    }
-
-    /**
-     * Called with adjusting to the configuration (enable / config reload).
-     * @param changedPermissions 
-     */
-    public void adjustSettings(final Set<RegisteredPermission> changedPermissions) {
-        final Iterator<RegisteredPermission> it = changedPermissions.iterator();
-        while (it.hasNext()) {
-            final PermissionNode node = permissions.get(it.next().getId());
-            if (node != null) {
-                node.invalidate();
-            }
-        }
-    }
-
-    /**
-     * Remove extra stored data, keeping "essential" data if set so. "Essential"
-     * data can't be recovered once deleted, like set-back locations for players
-     * who leave in-air (once stored here at all).
-     * 
-     * @param keepEssentialData
-     */
-    public void removeData(boolean keepEssentialData) {
-        permissions.clear(); // Might keep login-related permissions. Implement a 'retain-xy' or 'essential' flag?
-        updatePermissions.clearPrimaryThread();
-        updatePermissionsLazy.clearPrimaryThread();
-    }
-
-    /**
-     * Mimic legacy behavior (non-nested) - exempt including descendants
-     * recursively. Note that contexts other than
-     * ExemptionContext.LEGACY_NON_NESTED will not be touched.
-     * 
-     * @param checkType
-     */
-    public void exempt(final CheckType checkType) {
-        checkTypeTree.exempt(checkType, ExemptionContext.LEGACY_NON_NESTED);
-        // TODO: Handlers?
-    }
-
-    /**
-     * Mimic legacy behavior (non-nested) - unexempt including descendants
-     * recursively. Note that contexts other than
-     * ExemptionContext.LEGACY_NON_NESTED will not be touched.
-     * <hr>
-     * Primary thread and asynchronous access are separated and yield different
-     * results, it's imperative to always unexempt properly for asyncrhonous
-     * thread contexts, as isExempted reflects a mixture of both.
-     * 
-     * @param checkType
-     */
-    public void unexempt(final CheckType checkType) {
-        checkTypeTree.unexemptAll(checkType, ExemptionContext.LEGACY_NON_NESTED);
-        // TODO: Handlers?
-    }
-
-    /**
-     * Exempt with reference to the given context with descendants recursively.
-     * <br>
-     * Note that multiple calls to exempt demand multiple calls to
-     * unexempt(CheckType, ExemptionContext).
-     * <hr>
-     * Primary thread and asynchronous access are separated and yield different
-     * results, it's imperative to always unexempt properly for asyncrhonous
-     * thread contexts, as isExempted reflects a mixture of both.
-     * 
-     * @param checkType
-     * @param context
-     */
-    public void exempt(final CheckType checkType, final ExemptionContext context) {
-        checkTypeTree.exempt(checkType, context);
-    }
-
-    /**
-     * Unexempt once, including descendants recursively. <br>
-     * Note that for multiple calls to exempt with one context, multiple calls
-     * to unexempt with that context may be necessary to fully unexempt, or call
-     * unexemptAll for the context.
-     * <hr>
-     * ExemptionContext.LEGACY_NON_NESTED is not automatically calling
-     * unexemptAll as is done with the legacy signature unexempt(CheckType).
-     * <hr>
-     * Primary thread and asynchronous access are separated and yield different
-     * results, it's imperative to always unexempt properly for asyncrhonous
-     * thread contexts, as isExempted reflects a mixture of both.
-     * 
-     * @param checkType
-     * @param context
-     */
-    public void unexempt(final CheckType checkType, final ExemptionContext context) {
-        checkTypeTree.unexempt(checkType, context);
-    }
-
-
-    /**
-     * Remove all (potentially nested) entries context for the given checkType
-     * and descendants recursively.
-     * <hr>
-     * Primary thread and asynchronous access are separated and yield different
-     * results, it's imperative to always unexempt properly for asyncrhonous
-     * thread contexts, as isExempted reflects a mixture of both.
-     * 
-     * @param checkType
-     * @param context
-     */
-    public void unexemptAll(final CheckType checkType, final ExemptionContext context) {
-        checkTypeTree.unexemptAll(checkType, context);
-    }
-
-    /**
-     * Test for exemption.
-     * <hr>
-     * Thread-safe read (not synchronized).
-     * 
-     * @param checkType
-     * @return
-     */
-    public boolean isExempted(final CheckType checkType) {
-        return checkTypeTree.isExempted(checkType);
-    }
-
-    /**
-     * Clear all exemptions, for all thread contexts.
-     * <hr>
-     * Call from the primary thread only.
-     */
-    public void clearAllExemptions() {
-        checkTypeTree.clearAllExemptions();
-    }
-
-    /**
-     * Clear all exemptions for the given checkType and descendants recursively,
-     * for all thread contexts.
-     * <hr>
-     * Call from the primary thread only.
-     * 
-     * @param checkType
-     */
-    public void clearAllExemptions(final CheckType checkType) {
-        checkTypeTree.clearAllExemptions(checkType);
+    @Override
+    public <T> void removeGenericInstance(Class<T> registeredFor) {
+        // TODO: implement
     }
 
 }

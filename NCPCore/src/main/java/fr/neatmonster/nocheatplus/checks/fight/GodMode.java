@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -47,7 +48,8 @@ public class GodMode extends Check {
      * @param damage
      * @return
      */
-    public boolean check(final Player player, final boolean playerIsFake, final double damage, final FightData data){
+    public boolean check(final Player player, final boolean playerIsFake, 
+            final double damage, final FightData data, final IPlayerData pData){
         final int tick = TickTask.getTick();
 
         final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
@@ -145,16 +147,16 @@ public class GodMode extends Check {
             }
         }
 
-        final FightConfig cc = FightConfig.getConfig(player); 
+        final FightConfig cc = pData.getGenericInstance(FightConfig.class); 
 
         // Check for client side lag.
         final long now = System.currentTimeMillis();
         final long maxAge = cc.godModeLagMaxAge;
         long keepAlive = Long.MIN_VALUE;
         if (NCPAPIProvider.getNoCheatPlusAPI().hasFeatureTag("checks", "KeepAliveFrequency")) {
-            keepAlive = ((NetData) (CheckType.NET_KEEPALIVEFREQUENCY.getDataFactory().getData(player))).lastKeepAliveTime;
+            keepAlive = pData.getGenericInstance(NetData.class).lastKeepAliveTime;
         }
-        keepAlive = Math.max(keepAlive, CheckUtils.guessKeepAliveTime(player, now, maxAge));
+        keepAlive = Math.max(keepAlive, CheckUtils.guessKeepAliveTime(player, now, maxAge, pData));
 
         if (keepAlive != Double.MIN_VALUE && now - keepAlive > cc.godModeLagMinAge && now - keepAlive < maxAge){
             // Assume lag.
@@ -169,7 +171,8 @@ public class GodMode extends Check {
         if (data.godModeAcc > 2){
             // TODO: To match with old checks vls / actions, either change actions or apply a factor.
             data.godModeVL += delta;
-            if (executeActions(player, data.godModeVL, delta, FightConfig.getConfig(player).godModeActions).willCancel()){
+            if (executeActions(player, data.godModeVL, delta, 
+                    pData.getGenericInstance(FightConfig.class).godModeActions).willCancel()){
                 cancel = true;
             }
             else {

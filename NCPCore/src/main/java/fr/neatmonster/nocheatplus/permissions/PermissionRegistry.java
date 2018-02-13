@@ -38,6 +38,13 @@ public class PermissionRegistry {
 
     // TODO: Suffix permissions, because it's tedious to define constants for them. Might auto register within somewhere else.
 
+    /*
+     * TODO: Per world (rule/proxy) registries, with one central registry for
+     * ids (per-world registries would proxy id registration, but have their own
+     * rule settings). THUS, have the rule registry as a common super class, an
+     * interface for the full thing.
+     */
+
     private int nextId;
     private final Lock lock = new ReentrantLock();
     private PermissionSettings settings = new PermissionSettings(null, null, new PermissionPolicy());

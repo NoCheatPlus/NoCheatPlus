@@ -14,21 +14,17 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * Minimal implementation, doing nothing.
- * @author mc_dev
+ * @author asofold
  *
  */
 public abstract class ACheckConfig implements ICheckConfig {
 
-    /** For on the fly debug setting. */
-    public boolean debug = false; // TODO: Might make private.
-
-    /** If to adapt to server side lag. */
-    public final boolean lag;
+    /** World data storage for this world. */
+    public final IWorldData worldData;
 
     /**
      * 
@@ -36,21 +32,9 @@ public abstract class ACheckConfig implements ICheckConfig {
      * @param pathPrefix Path prefix for the check section (example for use: prefix+"debug").
      * @param cachePermissions  cachePermissions Permissions to hold in player data cache. Can be null.
      */
-    public ACheckConfig(final ConfigFile config, final String pathPrefix){
-        // TODO: Path prefix construction is somewhat inconsistent with debug hierarchy ?
-        debug = config.getBoolean(pathPrefix + ConfPaths.SUB_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false));
-        // TODO: Use lag flag where appropriate and document it (or get rid of it).
-        lag = config.getBoolean(pathPrefix + ConfPaths.SUB_LAG, true) && config.getBoolean(ConfPaths.MISCELLANEOUS_LAG, true);
+    public ACheckConfig(final IWorldData worldData){
+        this.worldData = worldData;
     }
 
-    @Override
-    public boolean getDebug() {
-        return debug;
-    }
-
-    @Override
-    public void setDebug(final boolean debug) {
-        this.debug = debug;
-    }
 
 }

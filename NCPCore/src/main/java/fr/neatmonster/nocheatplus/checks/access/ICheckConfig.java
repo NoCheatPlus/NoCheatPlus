@@ -14,28 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
-
 /**
- * This interface must be implemented by all configuration classes.
+ * TODO: Keep / Remove.
  * 
  * @author asofold
  */
 public interface ICheckConfig {
 
-    /**
-     * Checks if a check is enabled.
-     * 
-     * @param checkType
-     *            the check type
-     * @return true, if the check is enabled
-     */
-    public boolean isEnabled(CheckType checkType);
-
-    /** On the fly debug flags, to be set by commands and similar. */
-    public boolean getDebug();
-
-    /** On the fly debug flags, to be set by commands and similar. */ 
-    public void setDebug(boolean debug);
 
 }

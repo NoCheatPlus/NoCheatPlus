@@ -321,7 +321,7 @@ public class HashMapLOW <K, V> {
         private LHMEntry<K, V> currentEntry = null;
         private K lastReturnedKey = null;
 
-        public LHMIterator(HashMapLOW<K, V> map, LHMBucket<K, V>[] buckets) {
+        LHMIterator(HashMapLOW<K, V> map, LHMBucket<K, V>[] buckets) {
             this.map = map;
             this.buckets = buckets;
             // (Lazily advance.)
@@ -408,6 +408,21 @@ public class HashMapLOW <K, V> {
             }
             map.remove(lastReturnedKey); // TODO: CAN NOT WORK, NEED INVALIDATE ENTRY OTHERWISE
             lastReturnedKey = null;
+        }
+
+    }
+
+    static class LHMIterable<K, V> implements Iterable<Entry<K,V>> {
+
+        private final Iterator<Entry<K, V>> iterator;
+
+        LHMIterable(Iterator<Entry<K, V>> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public Iterator<Entry<K, V>> iterator() {
+            return iterator;
         }
 
     }
@@ -695,6 +710,16 @@ public class HashMapLOW <K, V> {
      */
     public Iterator<Entry<K, V>> iterator() {
         return size == 0 ? new LHMIterator<K, V>(null, null) : new LHMIterator<K, V>(this, buckets);
+    }
+
+    /**
+     * Get an Iterable containing the same iterator, as is returned by
+     * iterator(). See: {@link #iterator()}
+     * 
+     * @return
+     */
+    public Iterable<Entry<K, V>> iterable() {
+        return new LHMIterable<K, V>(iterator());
     }
 
     /**

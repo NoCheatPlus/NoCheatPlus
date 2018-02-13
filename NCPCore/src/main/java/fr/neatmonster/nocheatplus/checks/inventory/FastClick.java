@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -92,7 +92,8 @@ public class FastClick extends Check {
     public boolean check(final Player player, final long now, 
             final InventoryView view, final int slot, final ItemStack cursor, 
             final ItemStack clicked, final boolean isShiftClick, 
-            final InventoryData data, final InventoryConfig cc, final PlayerData pData) {
+            final InventoryData data, final InventoryConfig cc, 
+            final IPlayerData pData) {
         // Take time once.
 
         final float amount;
@@ -149,7 +150,7 @@ public class FastClick extends Check {
             cancel = executeActions(vd).willCancel();
         }
 
-        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+        if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
             player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " | " + data.fastClickFreq.score(1f) + " | cursor=" + cursor + " | clicked=" + clicked);
         }
 

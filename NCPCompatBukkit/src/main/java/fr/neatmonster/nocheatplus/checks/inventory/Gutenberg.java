@@ -23,6 +23,8 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 public class Gutenberg extends Check implements Listener {
 
@@ -42,7 +44,8 @@ public class Gutenberg extends Check implements Listener {
         if (!isEnabled(player)) {
             return;
         }
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
         final BookMeta newMeta = event.getNewBookMeta();
         final int pages = newMeta.getPageCount();
         if (pages <= 50) {

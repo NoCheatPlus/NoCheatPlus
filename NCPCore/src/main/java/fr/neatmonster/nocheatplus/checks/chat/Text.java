@@ -32,7 +32,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -69,9 +69,9 @@ public class Text extends Check implements INotifyReload {
      * @return
      */
     public boolean check(final Player player, final String message, 
-            final ChatConfig cc, final PlayerData pData,
+            final ChatConfig cc, final IPlayerData pData,
             final ICaptcha captcha, boolean isMainThread, final boolean alreadyCancelled) {
-        final ChatData data = ChatData.getData(player);
+        final ChatData data = pData.getGenericInstance(ChatData.class);
 
         synchronized (data) {
             return unsafeCheck(player, message, captcha, cc, data, pData, isMainThread, alreadyCancelled);
@@ -110,7 +110,7 @@ public class Text extends Check implements INotifyReload {
      * @return
      */
     private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
-            final ChatConfig cc, final ChatData data, final PlayerData pData,
+            final ChatConfig cc, final ChatData data, final IPlayerData pData,
             boolean isMainThread, final boolean alreadyCancelled) {
 
         // Test captcha.
@@ -130,7 +130,7 @@ public class Text extends Check implements INotifyReload {
 
         boolean cancel = false;
 
-        boolean debug = data.debug;
+        final boolean debug = pData.isDebugActive(type);
 
         final List<String> debugParts;
         if (debug) {
@@ -180,7 +180,7 @@ public class Text extends Check implements INotifyReload {
             }
         }
 
-        final CombinedData cData = CombinedData.getData(player);
+        final CombinedData cData = pData.getGenericInstance(CombinedData.class);
         final long timeout = 8000; // TODO: maybe set dynamically in data.
         // Repetition of last message.
         if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout) {

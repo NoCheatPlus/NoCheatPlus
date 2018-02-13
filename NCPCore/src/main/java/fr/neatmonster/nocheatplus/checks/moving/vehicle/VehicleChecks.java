@@ -57,13 +57,14 @@ import fr.neatmonster.nocheatplus.components.registry.event.IHandle;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
 
 /**
  * Aggregate vehicle checks (moving, a player is somewhere above in the
@@ -84,6 +85,8 @@ public class VehicleChecks extends CheckListener {
 
     /** The instance of NoCheatPlus. */
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
+
+    private final IWorldDataManager worldDataManager = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
 
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
 
@@ -146,10 +149,11 @@ public class VehicleChecks extends CheckListener {
             return;
         }
         final EntityType vehicleType = vehicle.getType();
-        final MovingData data = MovingData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
         final Location from = event.getFrom();
         final Location to = event.getTo();
-        if (data.debug) {
+        if (pData.isDebugActive(checkType)) {
             outputDebugVehicleMoveEvent(player, from, to);
         }
         if (from == null) {
@@ -178,11 +182,14 @@ public class VehicleChecks extends CheckListener {
             // TODO: Ignore or continue?
         }
         // Process as move.
-        debug(player, "VehicleMoveEvent: legacy handling, potential issue.");
+        final boolean debug = pData.isDebugActive(checkType);
+        if (debug) {
+            debug(player, "VehicleMoveEvent: legacy handling, potential issue.");
+        }
         // TODO: Actually here consistency with past position tracking should be tested.
 
         // TODO: Abstraction creation before calling checkVehicleMove, compare/align with onVehicleUpdate.
-        checkVehicleMove(vehicle, vehicleType, from, to, player, false, data);
+        checkVehicleMove(vehicle, vehicleType, from, to, player, false, data, pData, debug);
     }
 
     private void outputDebugVehicleMoveEvent(final Player player, final Location from, final Location to) {
@@ -201,12 +208,14 @@ public class VehicleChecks extends CheckListener {
      * @param to
      * @param data
      */
-    public Location onPlayerMoveVehicle(final Player player, final Location from, final Location to, final MovingData data) {
+    public Location onPlayerMoveVehicle(final Player player, 
+            final Location from, final Location to, 
+            final MovingData data, final IPlayerData pData) {
         // Workaround for pigs and other (1.5.x and before)!
         // Note that with 1.6 not even PlayerMove fires for horses and pigs.
         // (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
         final Entity vehicle = passengerUtil.getLastNonPlayerVehicle(player);
-        if (data.debug) {
+        if (pData.isDebugActive(checkType)) {
             debug(player, "onPlayerMoveVehicle: vehicle: " + vehicle);
         }
         data.wasInVehicle = true;
@@ -225,14 +234,15 @@ public class VehicleChecks extends CheckListener {
             final EntityType vehicleType = vehicle.getType();
             if (!normalVehicles.contains(vehicleType)) {
                 // Treat like VehicleUpdateEvent.
-                onVehicleUpdate(vehicle, vehicleType, player, true, data);
+                onVehicleUpdate(vehicle, vehicleType, player, true, 
+                        data, pData, pData.isDebugActive(checkType));
                 return null;
             }
             else {
                 final Location vLoc = vehicle.getLocation();
                 data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
                 // TODO: Consider TeleportUtil.forceMount or similar.
-                final MovingConfig cc = MovingConfig.getConfig(player);
+                final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
                 if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
                     if (cc.vehicleEnforceLocation) {
                         // checks.moving.vehicle.enforcelocation
@@ -258,7 +268,7 @@ public class VehicleChecks extends CheckListener {
      * @param event
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void b(final VehicleUpdateEvent event) {
+    public void onVehicleUpdate(final VehicleUpdateEvent event) {
         // TODO: VehicleUpdateEvent. How to track teleporting of the vehicle?
         // TODO: Track just left vehicle/entity positions otherwise (on tick + vehicle update)?
         // TODO: No problem: (?) update 'authorized state' if no player passenger.
@@ -267,7 +277,7 @@ public class VehicleChecks extends CheckListener {
         if (!normalVehicles.contains(vehicleType)) {
             // A little extra sweep to check for debug flags.
             normalVehicles.add(vehicleType);
-            if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug) {
+            if (worldDataManager.getWorldData(vehicle.getWorld()).isDebugActive(checkType)) {
                 debug(null, "VehicleUpdateEvent fired for: " + vehicleType);
             }
         }
@@ -285,14 +295,16 @@ public class VehicleChecks extends CheckListener {
             onPlayerVehicleLeave(player, vehicle);
             return;
         }
-        final MovingData data = MovingData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
         //final MovingConfig cc = MovingConfig.getConfig(player);
-        if (data.debug) {
+        final boolean debug = pData.isDebugActive(checkType);
+        if (debug) {
             final Location loc = vehicle.getLocation(useLoc1);
             debug(player, "VehicleUpdateEvent: " + vehicleType + " " + loc);
             useLoc1.setWorld(null);
         }
-        onVehicleUpdate(vehicle, vehicleType, player, false, data);
+        onVehicleUpdate(vehicle, vehicleType, player, false, data, pData, debug);
     }
 
     /**
@@ -309,19 +321,20 @@ public class VehicleChecks extends CheckListener {
      * @param fake
      *            True, if this is the real VehicleUpdateEvent, false if it's
      *            the PlayerMoveEvent (or other).
+     * @param pData 
      */
     private void onVehicleUpdate(final Entity vehicle, final EntityType vehicleType, final Player player, final boolean fake,
-            final MovingData data) {
+            final MovingData data, final IPlayerData pData, final boolean debug) {
         // TODO: (private or public?)
         // TODO: Might pass last position for reference.
-        if (data.debug) {
+        if (debug) {
             if (lastPosLook != null) {
                 // Retrieve last pos.
                 lastPosLook.getHandle().getPositionAndLook(vehicle, usePos1);
                 debug(player, "Last position is reported as: " + LocUtil.simpleFormat(usePos1));
             }
         }
-        checkVehicleMove(vehicle, vehicleType, null, null, player, true, data);
+        checkVehicleMove(vehicle, vehicleType, null, null, player, true, data, pData, debug);
     }
 
     /**
@@ -337,13 +350,14 @@ public class VehicleChecks extends CheckListener {
      * @param player
      * @param fake
      * @param data
+     * @param pData2 
+     * @param debug 
      */
     private void checkVehicleMove(final Entity vehicle, final EntityType vehicleType, 
             final Location from, final Location to, final Player player, final boolean fake, 
-            final MovingData data) {
+            final MovingData data, final IPlayerData pData, boolean debug) {
         // TODO: Detect teleportation and similar.
-        final PlayerData pData = DataManager.getPlayerData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
         // Exclude certain vehicle types.
         if (cc.ignoredVehicles.contains(vehicleType)) {
             // 100% legit.
@@ -360,9 +374,9 @@ public class VehicleChecks extends CheckListener {
             // Determine the best location to use as past move.
             // TODO: Could also check the set backs for plausible entries, however that would lead to a violation by default. Could use an indicator.
             final Location refLoc = from == null ? vehicleLocation : from;
-            MovingUtil.ensureChunksLoaded(player, refLoc, "vehicle move (no past move)", data, cc);
+            MovingUtil.ensureChunksLoaded(player, refLoc, "vehicle move (no past move)", data, cc, pData);
             aux.resetVehiclePositions(vehicle, refLoc, data, cc);
-            if (data.debug) {
+            if (pData.isDebugActive(checkType)) {
                 // TODO: Might warn instead.
                 debug(player, "Missing past move data, set to: " + firstPastMove.from);
             }
@@ -391,12 +405,13 @@ public class VehicleChecks extends CheckListener {
                 recoverVehicleSetBack(player, vehicle, vehicleLocation, moveInfo, data, cc);
             }
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING_VEHICLE) + "Illegal coordinates on checkVehicleMove: from: " + from + " , to: " + to);
-            setBack(player, vehicle, newTo, data, cc);
+            setBack(player, vehicle, newTo, data, cc, pData);
             aux.returnVehicleMoveInfo(moveInfo);
             return;
         }
         // Ensure chunks are loaded.
-        MovingUtil.ensureChunksLoaded(player, useFrom, useTo, firstPastMove, "vehicle move", data, cc);
+        MovingUtil.ensureChunksLoaded(player, useFrom, useTo, firstPastMove, 
+                "vehicle move", cc, pData);
         // Initialize currentMove.
         final VehicleMoveData thisMove = data.vehicleMoves.getCurrentMove();
         thisMove.set(moveInfo.from, moveInfo.to);
@@ -480,8 +495,9 @@ public class VehicleChecks extends CheckListener {
             final Location vehicleLocation, final World world, 
             final VehicleMoveInfo moveInfo, final VehicleMoveData thisMove, final VehicleMoveData firstPastMove, 
             final Player player, final boolean fake, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData) {
+            final MovingData data, final MovingConfig cc, final IPlayerData pData) {
         // TODO: (private or public?)
+        final boolean debug = pData.isDebugActive(checkType);
 
         data.joinOrRespawn = false;
         data.vehicleConsistency = MoveConsistency.getConsistency(thisMove, player.getLocation(useLoc1));
@@ -506,7 +522,7 @@ public class VehicleChecks extends CheckListener {
             data.clearNoFallData();
         }
 
-        if (data.debug) {
+        if (debug) {
             // Log move.
             outputDebugVehicleMove(player, vehicle, thisMove, fake);
         }
@@ -515,19 +531,19 @@ public class VehicleChecks extends CheckListener {
 
         // Ensure a common set back for now.
         if (!data.vehicleSetBacks.isDefaultEntryValid()) {
-            ensureSetBack(player, thisMove, data);
+            ensureSetBack(player, thisMove, data, pData);
         }
 
         // Moving envelope check(s).
         // TODO: Use set back storage for testing if this is appropriate (use SetBackEntry instead, remove Location retrieval then?).
         if ((newTo == null || data.vehicleSetBacks.getSafeMediumEntry().isValidAndOlderThan(newTo))
-                && vehicleEnvelope.isEnabled(player, cc, pData)) {
+                && pData.isCheckActive(CheckType.MOVING_VEHICLE_ENVELOPE, player)) {
             // Skip if this is the first move after set back, with to=set back.
             if (data.timeSinceSetBack == 0 || thisMove.to.hashCode() == data.lastSetBackHash) {
                 // TODO: This is a hot fix, to prevent a set back loop. Depends on having only the morepackets set back for vehicles.
                 // TODO: Perhaps might want to add || !data.equalsAnyVehicleSetBack(to)
                 thisMove.specialCondition = true;
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Skip envelope check on first move after set back acknowledging the set back with an odd starting point (from).");
                 }
             }
@@ -535,7 +551,8 @@ public class VehicleChecks extends CheckListener {
                 // Set up basic details about what/how to check.
                 vehicleEnvelope.prepareCheckDetails(vehicle, moveInfo, thisMove);
                 // Check.
-                final SetBackEntry tempNewTo  = vehicleEnvelope.check(player, vehicle, thisMove, fake, data, cc);
+                final SetBackEntry tempNewTo  = vehicleEnvelope.check(player, vehicle, 
+                        thisMove, fake, data, cc, pData);
                 if (tempNewTo != null) {
                     newTo = tempNewTo;
                 }
@@ -545,8 +562,9 @@ public class VehicleChecks extends CheckListener {
         // More packets: Sort this in last, to avoid setting the set back early. Always check to adjust set back, for now.
         // TODO: Still always update the frequency part?
         if ((newTo == null || data.vehicleSetBacks.getMidTermEntry().isValidAndOlderThan(newTo))) {
-            if (vehicleMorePackets.isEnabled(player, cc, pData)) {
-                final SetBackEntry tempNewTo = vehicleMorePackets.check(player, thisMove, newTo, data, cc);
+            if (pData.isCheckActive(CheckType.MOVING_VEHICLE_MOREPACKETS, player)) {
+                final SetBackEntry tempNewTo = vehicleMorePackets.check(player, thisMove, newTo, 
+                        data, cc, pData);
                 if (tempNewTo != null) {
                     newTo = tempNewTo;
                 }
@@ -571,7 +589,7 @@ public class VehicleChecks extends CheckListener {
             data.vehicleMoves.finishCurrentMove();
         }
         else {
-            setBack(player, vehicle, newTo, data, cc);
+            setBack(player, vehicle, newTo, data, cc, pData);
         }
         useLoc1.setWorld(null);
     }
@@ -581,7 +599,7 @@ public class VehicleChecks extends CheckListener {
         for (final Entity passenger : passengers) {
             if ((passenger instanceof Player) && !player.equals(passenger)) {
                 final Player otherPlayer = (Player) passenger;
-                final MovingData otherData = MovingData.getData(otherPlayer);
+                final MovingData otherData = DataManager.getGenericInstance(otherPlayer, MovingData.class);
                 otherData.resetVehiclePositions(moveInfo.to);
                 // TODO: Reset all precisely to what there is or this or what not.
                 otherData.vehicleSetBacks.resetAllLazily(data.vehicleSetBacks.getOldestValidEntry());
@@ -599,7 +617,8 @@ public class VehicleChecks extends CheckListener {
      * @param thisMove
      * @param data
      */
-    private void ensureSetBack(final Player player, final VehicleMoveData thisMove, final MovingData data) {
+    private void ensureSetBack(final Player player, final VehicleMoveData thisMove, 
+            final MovingData data, final IPlayerData pData) {
         final IGetLocationWithLook ensureLoc;
         if (!data.vehicleSetBacks.isAnyEntryValid()) {
             ensureLoc = thisMove.from;
@@ -608,20 +627,23 @@ public class VehicleChecks extends CheckListener {
             ensureLoc = data.vehicleSetBacks.getOldestValidEntry();
         }
         data.vehicleSetBacks.setDefaultEntry(ensureLoc);
-        if (data.debug) {
+        if (pData.isDebugActive(checkType)) {
             debug(player, "Ensure vehicle set back: " + ensureLoc);
         }
         //        if (data.vehicleSetBackTaskId != -1) {
         //            // TODO: This is likely the wrong thing to do!
         //            Bukkit.getScheduler().cancelTask(data.vehicleSetBackTaskId);
         //            data.vehicleSetBackTaskId = -1;
-        //            if (data.debug) {
+        //            if (debug) {
         //                debug(player, "Cancel set back task on ensureSetBack.");
         //            }
         //        }
     }
 
-    private void setBack(final Player player, final Entity vehicle, final SetBackEntry newTo, final MovingData data, final MovingConfig cc) {
+    private void setBack(final Player player, final Entity vehicle, 
+            final SetBackEntry newTo, final MovingData data, 
+            final MovingConfig cc, final IPlayerData pData) {
+        final boolean debug = pData.isDebugActive(checkType);
         // TODO: Generic set back manager, preventing all sorts of stuff that might be attempted or just happen before the task is running?
         if (data.vehicleSetBackTaskId == -1) {
             // Schedule a delayed task to teleport back the vehicle with the player.
@@ -632,20 +654,20 @@ public class VehicleChecks extends CheckListener {
             // TODO: Prevent vehicle data resetting due to dismount/mount/teleport.
             // TODO: Force fall type of set back?
             // (Future: Dismount penalty does not need extra handling, both are teleported anyway.)
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Will set back to: " + newTo);
             }
             boolean scheduleSetBack = cc.scheduleVehicleSetBacks;
             // Schedule as task, if set so.
             if (scheduleSetBack) {
                 aux.resetVehiclePositions(vehicle, LocUtil.set(useLoc2, vehicle.getWorld(), newTo), data, cc); // Heavy-ish, though.
-                data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug));
+                data.vehicleSetBackTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBackTask(vehicle, player, newTo.getLocation(vehicle.getWorld()), debug));
 
                 if (data.vehicleSetBackTaskId == -1) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "Failed to schedule vehicle set back task. Player: " + player.getName() + " , set back: " + newTo);
                     scheduleSetBack = false; // Force direct teleport as a fall-back measure.
                 }
-                else if (data.debug) {
+                else if (debug) {
                     debug(player, "Vehicle set back task id: " + data.vehicleSetBackTaskId);
                 }
             }
@@ -658,14 +680,15 @@ public class VehicleChecks extends CheckListener {
                  * resetting and updating the set back (if needed) is done there
                  * (hack, subject to current review).
                  */
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Attempt to set the player back directly.");
                 }
-                passengerUtil.teleportWithPassengers(vehicle, player, newTo.getLocation(vehicle.getWorld()), data.debug);
+                passengerUtil.teleportWithPassengers(vehicle, player, 
+                        newTo.getLocation(vehicle.getWorld()), debug, pData);
             }
 
         }
-        else if (data.debug) {
+        else if (debug) {
             // TODO: Reset positions.
             data.vehicleMoves.invalidate();
             debug(player, "Vehicle set back task already scheduled, skip this time.");
@@ -692,21 +715,23 @@ public class VehicleChecks extends CheckListener {
      * @return True, if an event is to be cancelled.
      */
     public boolean onPlayerVehicleEnter(final Player player,  final Entity vehicle) {
-        final MovingData data = MovingData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final boolean debug = pData.isDebugActive(checkType);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
         if (!data.isVehicleSetBack && MovingUtil.hasScheduledPlayerSetBack(player.getUniqueId(), data)) {
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Vehicle enter: prevent, due to a scheduled set back.");
             }
             return true;
         }
-        if (data.debug) {
+        if (debug) {
             debug(player, "Vehicle enter: first vehicle: " + vehicle.getClass().getName());
         }
         // Check for nested vehicles.
         final Entity lastVehicle = passengerUtil.getLastNonPlayerVehicle(vehicle, true);
         if (lastVehicle == null) {
             data.clearVehicleData();
-            if (data.debug) {
+            if (debug) {
                 debugNestedVehicleEnter(player);
             }
             return false;
@@ -714,14 +739,14 @@ public class VehicleChecks extends CheckListener {
         else if (!lastVehicle.equals(vehicle)) {
             // Nested vehicles.
             // TODO: Should in general skip checking these? Set backs don't yet work with these anyway (either... or ...).
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Vehicle enter: last of nested vehicles: " + lastVehicle.getClass().getName());
             }
-            dataOnVehicleEnter(player, lastVehicle, data);
+            dataOnVehicleEnter(player, lastVehicle, data, pData);
         }
         else {
             // Proceed normally.
-            dataOnVehicleEnter(player, vehicle, data);
+            dataOnVehicleEnter(player, vehicle, data, pData);
         }
         return false;
     }
@@ -745,9 +770,10 @@ public class VehicleChecks extends CheckListener {
      * @param player
      * @param vehicle
      */
-    private void dataOnVehicleEnter(final Player player,  final Entity vehicle, final MovingData data) {
+    private void dataOnVehicleEnter(final Player player,  final Entity vehicle, 
+            final MovingData data, final IPlayerData pData) {
         // Adjust data.
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
         data.joinOrRespawn = false;
         data.removeAllVelocity();
         // Event should have a vehicle, in case check this last.
@@ -764,7 +790,7 @@ public class VehicleChecks extends CheckListener {
             data.vehicleSetBacks.resetAll(vLoc);
         }
         aux.resetVehiclePositions(vehicle, vLoc, data, cc);
-        if (data.debug) {
+        if (pData.isDebugActive(checkType)) {
             debug(player, "Vehicle enter: " + vehicle.getType() + " , player: " + useLoc2 + " c=" + data.vehicleConsistency);
         }
         useLoc1.setWorld(null);
@@ -778,8 +804,9 @@ public class VehicleChecks extends CheckListener {
      * @param data
      * @param cc
      */
-    public void onVehicleLeaveMiss(final Player player, final MovingData data, final MovingConfig cc) {
-        if (data.debug) {
+    public void onVehicleLeaveMiss(final Player player, 
+            final MovingData data, final MovingConfig cc, final IPlayerData pData) {
+        if (pData.isDebugActive(checkType)) {
             StaticLog.logWarning("VehicleExitEvent missing for: " + player.getName());
         }
         onPlayerVehicleLeave(player, null);
@@ -808,11 +835,11 @@ public class VehicleChecks extends CheckListener {
         final Entity attacker = event.getAttacker();
         if (attacker instanceof Player && passengerUtil.isPassenger(attacker, event.getVehicle())) {
             final Player player = (Player) attacker;
-            final MovingConfig cc = MovingConfig.getConfig(player);
+            final IPlayerData pData = DataManager.getPlayerData(player);
+            final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
             if (cc.vehiclePreventDestroyOwn) {
-                final PlayerData pData = DataManager.getPlayerData(player);
-                if (CheckUtils.isEnabled(CheckType.MOVING_SURVIVALFLY, player, cc, pData)
-                        || CheckUtils.isEnabled(CheckType.MOVING_CREATIVEFLY, player, cc, pData)) {
+                if (pData.isCheckActive(CheckType.MOVING_SURVIVALFLY, player)
+                        || pData.isCheckActive(CheckType.MOVING_CREATIVEFLY, player)) {
                 }
                 event.setCancelled(true);
                 // TODO: This message must be configurable.
@@ -836,7 +863,9 @@ public class VehicleChecks extends CheckListener {
      * @param vehicle May be null in case of "not possible to determine".
      */
     private void onPlayerVehicleLeave(final Player player, final Entity vehicle) {
-        final MovingData data = MovingData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
+        final boolean debug = pData.isDebugActive(checkType);
         data.wasInVehicle = false;
         data.joinOrRespawn = false;
         //      if (data.vehicleSetBackTaskId != -1) {
@@ -845,7 +874,7 @@ public class VehicleChecks extends CheckListener {
         //          return;
         //      }
 
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
         // TODO: Loc can be inconsistent, determine which to use ! 
         final Location pLoc = player.getLocation(useLoc1);
         Location loc = pLoc; // The location to use as set back.
@@ -875,7 +904,7 @@ public class VehicleChecks extends CheckListener {
                     }
                 }
             }
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
             }
         }
@@ -885,7 +914,7 @@ public class VehicleChecks extends CheckListener {
             loc.setY(Location.locToBlock(loc.getY()) + 1.25);
         }
 
-        if (data.debug) {
+        if (debug) {
             debug(player, "Vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
         }
         aux.resetPositionsAndMediumProperties(player, loc, data, cc);

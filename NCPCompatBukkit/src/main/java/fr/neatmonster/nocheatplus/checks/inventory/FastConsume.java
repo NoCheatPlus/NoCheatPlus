@@ -27,12 +27,13 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -62,7 +63,9 @@ public class FastConsume extends Check implements Listener, INotifyReload {
 
     private void disableInstantEat() {
         // TODO: Do this kind of thing via registries later on.
-        ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
+        //ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
+        NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().overrideCheckActivation(
+                this.type, AlmostBoolean.NO, OverrideType.PERMANENT, true);
         StaticLog.logInfo("Inventory checks: FastConsume is available, disabled InstantEat.");
     }
 
@@ -75,18 +78,20 @@ public class FastConsume extends Check implements Listener, INotifyReload {
             counters.addPrimaryThread(idCancelDead, 1);
             return;
         }
-        if (!isEnabled(player)) {
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        if (!pData.isCheckActive(type, player)) {
             return;
         }
-        final InventoryData data = InventoryData.getData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
         final long time = System.currentTimeMillis();
-        if (check(player, event.getItem(), time, data)){
+        if (check(player, event.getItem(), time, data, pData)){
             event.setCancelled(true);
             DataManager.getPlayerData(player).requestUpdateInventory();
         }
     }
 
-    private boolean check(final Player player, final ItemStack stack, final long time, final InventoryData data){
+    private boolean check(final Player player, final ItemStack stack, 
+            final long time, final InventoryData data, final IPlayerData pData){
         // Uses the instant-eat data for convenience.
         // Consistency checks...
         if (stack == null){ // || stack.getType() != data.instantEatFood){
@@ -100,7 +105,7 @@ public class FastConsume extends Check implements Listener, INotifyReload {
             return false;
         }
         // Check exceptions.
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
+        final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
         final Material mat = stack == null ? null : stack.getType();
         if (mat != null){
             if (cc.fastConsumeWhitelist){
@@ -144,8 +149,9 @@ public class FastConsume extends Check implements Listener, INotifyReload {
             final ItemStack actualStack = InventoryUtil.getFirstConsumableItemInHand(player);
             data.instantEatFood = actualStack == null ? null : actualStack.getType();
             // TODO: Allows some abuse: 1. try instantly eat (cancelled) 2. consume item directly when needed.
-        } else  {
-            if (data.debug) {
+        }
+        else  {
+            if (pData.isDebugActive(type)) {
                 debug(player, "PlayerItemConsumeEvent, reset fastconsume: " + data.instantEatFood);
             }
             data.instantEatFood = null;

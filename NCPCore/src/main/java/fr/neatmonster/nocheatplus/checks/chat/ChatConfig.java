@@ -14,23 +14,15 @@
  */
 package fr.neatmonster.nocheatplus.checks.chat;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.entity.Player;
-
 import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
-import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.EnginePlayerConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
@@ -38,20 +30,8 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
  */
 public class ChatConfig extends ACheckConfig {
 
-    /** The factory creating configurations. */
-    public static final CheckConfigFactory factory   = new CheckConfigFactory() {
-        @Override
-        public final ICheckConfig getConfig(final Player player) {
-            return ChatConfig.getConfig(player);
-        }
 
-        @Override
-        public void removeAllConfigs() {
-            clear(); // Band-aid.
-        }
-    };
-
-    private static RegisteredPermission[] preferKeepUpdatedPermissions = new RegisteredPermission[]{
+    private static final RegisteredPermission[] preferKeepUpdatedPermissions = new RegisteredPermission[]{
             // Only the permissions needed for async. checking.
             Permissions.CHAT_COLOR,
             Permissions.CHAT_TEXT,
@@ -59,39 +39,10 @@ public class ChatConfig extends ACheckConfig {
             // TODO: COMMANDS, in case of handleascommand?
     };
 
-    /** The map containing the configurations per world. */
-    private static final Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
-
     public static RegisteredPermission[] getPreferKeepUpdatedPermissions() {
         return preferKeepUpdatedPermissions;
     }
 
-    /**
-     * Clear all the configurations.
-     */
-    public static void clear() {
-        synchronized (worldsMap) {
-            worldsMap.clear();
-        }
-    }
-
-    /**
-     * Gets the configuration for a specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the configuration
-     */
-    public static ChatConfig getConfig(final Player player) {
-        synchronized (worldsMap) {
-            if (!worldsMap.containsKey(player.getWorld().getName()))
-                worldsMap.put(player.getWorld().getName(),
-                        new ChatConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
-            return worldsMap.get(player.getWorld().getName());
-        }
-    }
-
-    public final boolean      captchaCheck;
     public final boolean      captchaSkipCommands;
     public final String       captchaCharacters;
     public final int          captchaLength;
@@ -100,16 +51,14 @@ public class ChatConfig extends ACheckConfig {
     public final int          captchaTries;
     public final ActionList   captchaActions;
 
-    public final boolean      colorCheck;
     public final ActionList   colorActions;
 
-    public final boolean      commandsCheck;
     public final double       commandsLevel;
     public final int          commandsShortTermTicks;
     public final double       commandsShortTermLevel;
     public final ActionList   commandsActions;
 
-    public final boolean      textCheck;
+    // TODO: Sub check types ?
     public final boolean      textGlobalCheck;
     public final boolean      textPlayerCheck;
     public final EnginePlayerConfig textEnginePlayerConfig;
@@ -147,7 +96,6 @@ public class ChatConfig extends ACheckConfig {
     public final String       chatWarningMessage;
     public final long         chatWarningTimeout;
 
-    public final boolean      loginsCheck;
     public final boolean      loginsPerWorldCount;
     public final int          loginsSeconds;
     public final int          loginsLimit;
@@ -157,8 +105,6 @@ public class ChatConfig extends ACheckConfig {
     public final boolean      consoleOnlyCheck;
     public final String		  consoleOnlyMessage;
 
-
-    public final boolean      relogCheck;
     public final String       relogKickMessage;
     public final long         relogTimeout;
     public final String       relogWarningMessage;
@@ -172,10 +118,10 @@ public class ChatConfig extends ACheckConfig {
      * @param config
      *            the data
      */
-    public ChatConfig(final ConfigFile config) {
-        super(config, ConfPaths.CHAT);
+    public ChatConfig(final IWorldData worldData) {
+        super(worldData);
+        final ConfigFile config = worldData.getRawConfiguration();
 
-        captchaCheck = config.getBoolean(ConfPaths.CHAT_CAPTCHA_CHECK);
         captchaSkipCommands = config.getBoolean(ConfPaths.CHAT_CAPTCHA_SKIP_COMMANDS);
         captchaCharacters = config.getString(ConfPaths.CHAT_CAPTCHA_CHARACTERS);
         captchaLength = config.getInt(ConfPaths.CHAT_CAPTCHA_LENGTH);
@@ -184,17 +130,13 @@ public class ChatConfig extends ACheckConfig {
         captchaTries = config.getInt(ConfPaths.CHAT_CAPTCHA_TRIES);
         captchaActions = config.getOptimizedActionList(ConfPaths.CHAT_CAPTCHA_ACTIONS, Permissions.CHAT_CAPTCHA);
 
-        colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = config.getOptimizedActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
 
-        commandsCheck = config.getBoolean(ConfPaths.CHAT_COMMANDS_CHECK);
         commandsLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_LEVEL);
         commandsShortTermTicks = config.getInt(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS);
         commandsShortTermLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL);;
         commandsActions = config.getOptimizedActionList(ConfPaths.CHAT_COMMANDS_ACTIONS, Permissions.CHAT_COMMANDS);
 
-
-        textCheck = config.getBoolean(ConfPaths.CHAT_TEXT_CHECK);
         textGlobalCheck = config.getBoolean(ConfPaths.CHAT_TEXT_GL_CHECK, true);
         textPlayerCheck = config.getBoolean(ConfPaths.CHAT_TEXT_PP_CHECK, true);
         textEnginePlayerConfig = new EnginePlayerConfig(config);
@@ -231,14 +173,12 @@ public class ChatConfig extends ACheckConfig {
         chatWarningMessage = config.getString(ConfPaths.CHAT_WARNING_MESSAGE);
         chatWarningTimeout = config.getLong(ConfPaths.CHAT_WARNING_TIMEOUT) * 1000;
 
-        loginsCheck = config.getBoolean(ConfPaths.CHAT_LOGINS_CHECK);
         loginsPerWorldCount = config.getBoolean(ConfPaths.CHAT_LOGINS_PERWORLDCOUNT);
         loginsSeconds = config.getInt(ConfPaths.CHAT_LOGINS_SECONDS);
         loginsLimit = config.getInt(ConfPaths.CHAT_LOGINS_LIMIT);
         loginsKickMessage =  config.getString(ConfPaths.CHAT_LOGINS_KICKMESSAGE);
         loginsStartupDelay = config.getInt(ConfPaths.CHAT_LOGINS_STARTUPDELAY) * 1000;
 
-        relogCheck = config.getBoolean(ConfPaths.CHAT_RELOG_CHECK);
         relogKickMessage = config.getString(ConfPaths.CHAT_RELOG_KICKMESSAGE);
         relogTimeout = config.getLong(ConfPaths.CHAT_RELOG_TIMEOUT);
         relogWarningMessage = config.getString(ConfPaths.CHAT_RELOG_WARNING_MESSAGE);
@@ -251,26 +191,4 @@ public class ChatConfig extends ACheckConfig {
 
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.ICheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
-     */
-    @Override
-    public boolean isEnabled(final CheckType checkType) {
-        switch (checkType) {
-            case CHAT_COLOR:
-                return colorCheck;
-            case CHAT_TEXT:
-                return textCheck;
-            case CHAT_COMMANDS:
-                return commandsCheck;
-            case CHAT_CAPTCHA:
-                return captchaCheck;
-            case CHAT_RELOG:
-                return relogCheck;
-            case CHAT_LOGINS:
-                return loginsCheck;
-            default:
-                return true;
-        }
-    }
 }

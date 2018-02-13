@@ -277,6 +277,38 @@ public class ActionFrequency {
     }
 
     /**
+     * Update and then reduce all given ActionFrequency instances by the given
+     * amount, capped at a maximum of 0 for the resulting first bucket score.
+     * 
+     * @param amount
+     *            The amount to subtract.
+     * @param freqs
+     */
+    public static void reduce(final long time, final float amount, final ActionFrequency... freqs) {
+        for (int i = 0; i < freqs.length; i++) {
+            final ActionFrequency freq = freqs[i];
+            freq.update(time);
+            freq.setBucket(0, Math.max(0f, freq.bucketScore(0) - amount));
+        }
+    }
+
+    /**
+     * Update and then reduce all given ActionFrequency instances by the given
+     * amount, without capping the result.
+     * 
+     * @param amount
+     *            The amount to subtract.
+     * @param freqs
+     */
+    public static void subtract(final long time, final float amount, final ActionFrequency... freqs) {
+        for (int i = 0; i < freqs.length; i++) {
+            final ActionFrequency freq = freqs[i];
+            freq.update(time);
+            freq.setBucket(0, freq.bucketScore(0) - amount);
+        }
+    }
+
+    /**
      * Deserialize from a string.
      * @param line
      * @return

@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -49,9 +49,9 @@ public class InstantBow extends Check {
      */
     public boolean check(final Player player, final float force, final long now) {
 
-        final PlayerData pData = DataManager.getPlayerData(player);
-        final InventoryData data = InventoryData.getData(player);
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
+        final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
 
         boolean cancel = false;
 
@@ -81,7 +81,10 @@ public class InstantBow extends Check {
         else {
             // Account for server side lag.
             // (Do not apply correction to invalid pulling.)
-            final long correctedPullduration = valid ? (cc.lag ? (long) (TickTask.getLag(expectedPullDuration, true) * pullDuration) : pullDuration) : 0;
+            final long correctedPullduration = valid ? 
+                    (pData.getCurrentWorldData().shouldAdjustToLag(type)
+                            ? (long) (TickTask.getLag(expectedPullDuration, true) * pullDuration) 
+                            : pullDuration) : 0;
             if (correctedPullduration < expectedPullDuration) {
                 // TODO: Consider: Allow one time but set yawrate penalty time ?
                 final double difference = (expectedPullDuration - pullDuration) / 100D;
@@ -95,7 +98,7 @@ public class InstantBow extends Check {
             }
         }
 
-        if (data.debug && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
+        if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)) {
             player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
 

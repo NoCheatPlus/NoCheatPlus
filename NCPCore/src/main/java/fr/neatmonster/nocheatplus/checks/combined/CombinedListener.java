@@ -28,6 +28,8 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -65,10 +67,13 @@ public class CombinedListener extends CheckListener {
         // TODO: EventPriority
 
         final Player player = event.getPlayer();
-        final CombinedData data = CombinedData.getData(player);
-        final CombinedConfig cc = CombinedConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
+        final CombinedConfig cc = pData.getGenericInstance(CombinedConfig.class);
 
-        if (cc.invulnerableCheck && (cc.invulnerableTriggerAlways || cc.invulnerableTriggerFallDistance && player.getFallDistance() > 0)){
+        if (cc.invulnerableCheck 
+                && (cc.invulnerableTriggerAlways || cc.invulnerableTriggerFallDistance 
+                        && player.getFallDistance() > 0)){
             // TODO: maybe make a heuristic for small fall distances with ground under feet (prevents future abuse with jumping) ?
             final int invulnerableTicks = mcAccess.getHandle().getInvulnerableTicks(player);
             if (invulnerableTicks == Integer.MAX_VALUE) {
@@ -86,7 +91,8 @@ public class CombinedListener extends CheckListener {
         final Entity entity = event.getEntity();
         if (!(entity instanceof Player)) return;
         final Player  player = (Player) entity;
-        final CombinedConfig cc = CombinedConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final CombinedConfig cc = pData.getGenericInstance(CombinedConfig.class);
         if (!cc.invulnerableCheck) return;
         final DamageCause cause = event.getCause();
         // Ignored causes.
@@ -94,7 +100,7 @@ public class CombinedListener extends CheckListener {
         // Modified invulnerable ticks.
         Integer modifier = cc.invulnerableModifiers.get(cause);
         if (modifier == null) modifier = cc.invulnerableModifierDefault;
-        final CombinedData data = CombinedData.getData(player);
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
         // TODO: account for tick task reset ? [it should not though, due to data resetting too, but API would allow it]
         if (TickTask.getTick() >= data.invulnerableTick + modifier.intValue()) return;
         // Still invulnerable.

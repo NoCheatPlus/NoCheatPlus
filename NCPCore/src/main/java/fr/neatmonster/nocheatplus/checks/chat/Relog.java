@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class Relog extends Check {
@@ -38,12 +39,13 @@ public class Relog extends Check {
      *            the data
      * @return true, if successful
      */
-    public boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
+    public boolean unsafeLoginCheck(final Player player, 
+            final ChatConfig cc, final ChatData data, final IPlayerData pData) {
         boolean cancel = false;
 
         final long now = System.currentTimeMillis();
 
-        final CombinedData cData = CombinedData.getData(player);
+        final CombinedData cData = pData.getGenericInstance(CombinedData.class);
 
         // Enforce the player does not relog too fast.
         if (now - cData.lastLogoutTime < cc.relogTimeout) {

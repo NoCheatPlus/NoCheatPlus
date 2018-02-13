@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * We require that the player moves their arm between block breaks, this is what gets checked here.
@@ -38,7 +39,8 @@ public class NoSwing extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player, final BlockBreakData data) {
+    public boolean check(final Player player, final BlockBreakData data,
+            final IPlayerData pData) {
 
         boolean cancel = false;
 
@@ -54,7 +56,7 @@ public class NoSwing extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.noSwingVL, 1D, BlockBreakConfig.getConfig(player).noSwingActions).willCancel();
+            cancel = executeActions(player, data.noSwingVL, 1D, pData.getGenericInstance(BlockBreakConfig.class).noSwingActions).willCancel();
         }
 
         return cancel;

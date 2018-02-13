@@ -15,21 +15,15 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.DefaultSetBackStorage;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
@@ -47,10 +41,10 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
-import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
@@ -66,84 +60,31 @@ import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
  */
 public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
-    public static final class MovingDataFactory implements CheckDataFactory, ICanHandleTimeRunningBackwards {
-        @Override
-        public final ICheckData getData(final Player player) {
-            return MovingData.getData(player);
-        }
-
-        @Override
-        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
-            return MovingData.playersMap.get(playerName);
-        }
-
-        @Override
-        public ICheckData removeData(final String playerName) {
-            return MovingData.removeData(playerName);
-        }
-
-        @Override
-        public void removeAllData() {
-            MovingData.clear();
-        }
-
-        @Override
-        public void handleTimeRanBackwards() {
-            for (final MovingData data : playersMap.values()) {
-                data.handleTimeRanBackwards();
-            }
-        }
-    }
-
-    /** The factory creating data. */
-    public static final CheckDataFactory factory = new MovingDataFactory();
-
-    private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
-    /** The map containing the data per players. */
-
-    /**
-     * Gets the data of a specified player.
-     * final CheckDataFactory factory = new CheckDataFactory(
-     * @param player
-     *            the player
-     * @return the data
+    /*
+     * TODO: Handle world unload and other by registration (PlayerDataManager) -
+     * might just implement the interfaces and auto-handle at registration.
      */
-    public static MovingData getData(final Player player) {
-        // Note that the trace might be null after just calling this.
-        MovingData data = playersMap.get(player.getName());
-        if (data == null) {
-            data = new MovingData(MovingConfig.getConfig(player));
-            playersMap.put(player.getName(), data);
-        }
-        return data;
-    }
 
-    public static ICheckData removeData(final String playerName) {
-        return playersMap.remove(playerName);
-    }
-
-    public static void clear() {
-        playersMap.clear();
-    }
-
-    /**
-     * Clear data related to the given world.
-     * @param world The world that gets unloaded.
-     */
-    public static void onWorldUnload(final World world) {
-        final String worldName = world.getName();
-        for (final MovingData data : playersMap.values()) {
-            data.onWorldUnload(worldName);
-        }
-    }
-
-    public static void onReload() {
-        final MovingConfig globalCc = MovingConfig.getConfig((String) null);
-        final int tick = TickTask.getTick();
-        for (final MovingData data : playersMap.values()) {
-            data.adjustOnReload(globalCc, tick);
-        }
-    }
+    //    /**
+    //     * Clear data related to the given world.
+    //     * @param world The world that gets unloaded.
+    //     */
+    //    public static void onWorldUnload(final World world) {
+    //        // TODO: Register with check (interfaces or just an event listener).
+    //        final String worldName = world.getName();
+    //        for (final MovingData data : playersMap.values()) {
+    //            data.onWorldUnload(worldName);
+    //        }
+    //    }
+    //
+    //    public static void onReload() {
+    //        // TODO: Register with check (interfaces or just an event listener).
+    //        final MovingConfig globalCc = MovingConfig.getConfig((String) null);
+    //        final int tick = TickTask.getTick();
+    //        for (final MovingData data : playersMap.values()) {
+    //            data.adjustOnReload(globalCc, tick);
+    //        }
+    //    }
 
     // Check specific.
 
@@ -365,8 +306,10 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
     /** Task id of the vehicle set back task. */ 
     public int              vehicleSetBackTaskId = -1;
 
-    public MovingData(final MovingConfig config) {
-        super(config);
+    private final IPlayerData pData;
+
+    public MovingData(final MovingConfig config, final IPlayerData pData) {
+        this.pData = pData;
         morePacketsFreq = new ActionFrequency(config.morePacketsEPSBuckets, 500);
         morePacketsBurstFreq = new ActionFrequency(12, 5000);
 
@@ -675,7 +618,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      * @param amount
      */
     public void reducePlayerMorePacketsData(final float amount) {
-        CheckUtils.reduce(System.currentTimeMillis(), amount, morePacketsFreq, morePacketsBurstFreq);
+        ActionFrequency.reduce(System.currentTimeMillis(), amount, morePacketsFreq, morePacketsBurstFreq);
     }
 
     public void clearVehicleMorePacketsData() {
@@ -916,12 +859,11 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      */
     public void addVelocity(final Player player, final MovingConfig cc, 
             final double vx, final double vy, final double vz, final long flags) {
-
         final int tick = TickTask.getTick();
         // TODO: Slightly odd to call this each time, might switch to a counter-strategy (move - remove). 
         removeInvalidVelocity(tick  - cc.velocityActivationTicks);
 
-        if (debug) {
+        if (pData.isDebugActive(CheckType.MOVING)) {
             CheckUtils.debug(player, CheckType.MOVING, "New velocity: " + vx + ", " + vy + ", " + vz);
         }
 

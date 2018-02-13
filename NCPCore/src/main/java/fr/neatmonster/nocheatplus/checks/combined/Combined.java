@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 
@@ -40,8 +41,9 @@ public class Combined {
      * @return
      */
     public static final boolean checkYawRate(final Player player, final float yaw, final long now, 
-            final String worldName) {
-        return checkYawRate(player, yaw, now, worldName, CombinedData.getData(player));
+            final String worldName, final IPlayerData pData) {
+        return checkYawRate(player, yaw, now, worldName, 
+                pData.getGenericInstance(CombinedData.class), pData);
     }
 
     /**
@@ -52,8 +54,9 @@ public class Combined {
      * @param worldName
      */
     public static final void feedYawRate(final Player player, final float yaw, final long now, 
-            final String worldName) {
-        feedYawRate(player, yaw, now, worldName, CombinedData.getData(player));
+            final String worldName, final IPlayerData pData) {
+        feedYawRate(player, yaw, now, worldName, 
+                pData.getGenericInstance(CombinedData.class), pData);
     }
 
     /**
@@ -68,10 +71,10 @@ public class Combined {
      * @return True, if the player was exempted from yawrate. False otherwise.
      */
     public static final boolean feedYawRate(final Player player, float yaw, final long now, 
-            final String worldName, final CombinedData data) {
+            final String worldName, final CombinedData data, final IPlayerData pData) {
         // Check for exemption (hack, sort of).
         if (NCPExemptionManager.isExempted(player, CheckType.COMBINED_YAWRATE)) {
-            resetYawRate(player, yaw, now, true);
+            resetYawRate(player, yaw, now, true, pData);
             return true;
         }
 
@@ -145,13 +148,14 @@ public class Combined {
      *         otherwise.
      */
     public static final boolean checkYawRate(final Player player, final float yaw, final long now, 
-            final String worldName, final CombinedData data) {
+            final String worldName, final CombinedData data, final IPlayerData pData) {
 
-        if (feedYawRate(player, yaw, now, worldName, data)) {
+        if (feedYawRate(player, yaw, now, worldName, data, pData)) {
             return false;
         }
 
-        final CombinedConfig cc = CombinedConfig.getConfig(player);
+        final CombinedConfig cc = pData.getGenericInstance(CombinedConfig.class);
+        final boolean lag = pData.getCurrentWorldData().shouldAdjustToLag(CheckType.COMBINED_IMPROBABLE);
 
         final float threshold = cc.yawRate;
 
@@ -160,7 +164,7 @@ public class Combined {
         final float stViol;
         if (stScore > threshold) {
             // Account for server side lag.
-            if (!cc.lag || TickTask.getLag(data.yawFreq.bucketDuration(), true) < 1.2) {
+            if (!lag || TickTask.getLag(data.yawFreq.bucketDuration(), true) < 1.2) {
                 stViol = stScore;
             }
             else {
@@ -174,7 +178,7 @@ public class Combined {
         final float fullViol;
         if (fullScore > threshold) {
             // Account for server side lag.
-            if (cc.lag) {
+            if (lag) {
                 fullViol = fullScore / TickTask.getLag(data.yawFreq.bucketDuration() * data.yawFreq.numberOfBuckets(), true);
             }
             else {
@@ -194,7 +198,8 @@ public class Combined {
                     Math.max(cc.yawRatePenaltyFactor * amount ,  cc.yawRatePenaltyMin), 
                     cc.yawRatePenaltyMax));
             // TODO: balance (100 ... 200 ) ?
-            if (cc.yawRateImprobable && Improbable.check(player, amount / 100f, now, "combined.yawrate"))
+            if (cc.yawRateImprobable && Improbable.check(player, amount / 100f, now, "combined.yawrate", 
+                    pData))
                 cancel = true;
         }
         if (data.timeFreeze.isPenalty()) {
@@ -210,14 +215,15 @@ public class Combined {
      * @param time
      * @param clear If to clear yaws.
      */
-    public static final void resetYawRate(final Player player, float yaw, final long time, final boolean clear) {
+    public static final void resetYawRate(final Player player, float yaw, 
+            final long time, final boolean clear, final IPlayerData pData) {
         if (yaw <= -360f) {
             yaw = -((-yaw) % 360f);
         }
         else if (yaw >= 360f) {
             yaw = yaw % 360f;
         }
-        final CombinedData data = CombinedData.getData(player);
+        final CombinedData data = pData.getGenericInstance(CombinedData.class);
         data.lastYaw = yaw;
         data.lastYawTime = time; // TODO: One might set to some past-time to allow any move at first.
         data.sumYaw = 0;
@@ -235,12 +241,13 @@ public class Combined {
      * @param yawRateCheck If to actually check the yaw rate, or just feed.
      * @return
      */
-    public static final boolean checkYawRate(final Player player, final float yaw, final long now, final String worldName, final boolean yawRateCheck) {
+    public static final boolean checkYawRate(final Player player, final float yaw, final long now, 
+            final String worldName, final boolean yawRateCheck, final IPlayerData pData) {
         if (yawRateCheck) {
-            return checkYawRate(player, yaw, now, worldName);
+            return checkYawRate(player, yaw, now, worldName, pData);
         }
         else {
-            feedYawRate(player, yaw, now, worldName);
+            feedYawRate(player, yaw, now, worldName, pData);
             return false;
         }
     }

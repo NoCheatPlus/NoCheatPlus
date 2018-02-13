@@ -59,7 +59,7 @@ import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHand
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -139,18 +139,19 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     private boolean handleNormalDamage(final Player player, final boolean attackerIsFake,
             final Entity damaged, final boolean damagedIsFake,
-            final double originalDamage, final double finalDamage, final int tick, final FightData data) {
+            final double originalDamage, final double finalDamage, 
+            final int tick, final FightData data, final IPlayerData pData) {
 
-        final PlayerData pData = DataManager.getPlayerData(player);
-        final FightConfig cc = FightConfig.getConfig(player);
+        final FightConfig cc = pData.getGenericInstance(FightConfig.class);
 
         // Hotfix attempt for enchanted books.
         // TODO: maybe a generalized version for the future...
         // Illegal enchantments hotfix check.
-        if (Items.checkIllegalEnchantmentsAllHands(player)) {
+        if (Items.checkIllegalEnchantmentsAllHands(player, pData)) {
             return true;
         }
 
+        final boolean debug = pData.isDebugActive(checkType);
         boolean cancelled = false;
 
         final String worldName = player.getWorld().getName();
@@ -181,9 +182,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         else {
             tickAge = tick - data.lastAttackTick;
             // TODO: Maybe use 3d distance if dy(normalized) is too big. 
-            targetMove = TrigUtil.distance(data.lastAttackedX, data.lastAttackedZ, damagedLoc.getX(), damagedLoc.getZ());
+            targetMove = TrigUtil.distance(data.lastAttackedX, data.lastAttackedZ, 
+                    damagedLoc.getX(), damagedLoc.getZ());
             msAge = (long) (50f * TickTask.getLag(50L * tickAge, true) * (float) tickAge);
-            normalizedMove = msAge == 0 ? targetMove : targetMove * Math.min(20.0, 1000.0 / (double) msAge);
+            normalizedMove = msAge == 0 ? targetMove 
+                    : targetMove * Math.min(20.0, 1000.0 / (double) msAge);
         }
         // TODO: calculate factor for dists: ticks * 50 * lag
 
@@ -199,18 +202,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //     			damagedPlayer.getLocation(useLoc2);
             //     		}
             // Log.
-            if (data.debug && DataManager.getPlayerData(damagedPlayer).hasPermission(
+            if (debug && DataManager.getPlayerData(damagedPlayer).hasPermission(
                     Permissions.ADMINISTRATION_DEBUG, damagedPlayer)) {
                 damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getHandle().getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
             }
             // Check for self hit exploits (mind that projectiles are excluded from this.)
-            if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc)) {
+            if (selfHit.isEnabled(player, pData) && selfHit.check(player, damagedPlayer, data, cc)) {
                 cancelled = true;
             }
             // Get+update the damaged players.
             // TODO: Problem with NPCs: data stays (not a big problem).
             // (This is done even if the event has already been cancelled, to keep track, if the player is on a horse.)
-            damagedTrace = MovingData.getData(damagedPlayer).updateTrace(damagedPlayer, damagedLoc, tick, damagedIsFake ? null : mcAccess.getHandle());
+            damagedTrace = DataManager.getPlayerData(damagedPlayer).getGenericInstance(
+                    MovingData.class
+                    ).updateTrace(
+                            damagedPlayer, damagedLoc, tick, 
+                            damagedIsFake ? null : mcAccess.getHandle()
+                            );
         }
         else {
             damagedPlayer = null; // TODO: This is a temporary workaround.
@@ -222,7 +230,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         // Log generic properties of this attack.
-        if (data.debug) {
+        if (debug) {
             debug(player, "Attacks " + (damagedPlayer == null ? ("entity " + damaged.getType()) : ("player" + damagedPlayer.getName())) + " damage=" + (finalDamage == originalDamage ? finalDamage : (originalDamage + "/" + finalDamage)));
         }
 
@@ -246,7 +254,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 if (tick == data.sweepTick && locHashCode == data.sweepLocationHashCode) {
                     // TODO: Might limit the amount of 'too far off' sweep hits, possibly silent cancel for low frequency.
                     // Could further guard by checking equality of loc to last location.
-                    if (data.debug) {
+                    if (debug) {
                         debug(player, "(Assume sweep attack follow up damage.)");
                     }
                     return cancelled;
@@ -273,23 +281,25 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // TODO: Add as real check.
         // TODO: Add something on packet level already.
-        if (wrongTurn.isEnabled(player, cc, pData) && wrongTurn.check(damagedPlayer, loc, data, cc)) {
+        if (pData.isCheckActive(CheckType.FIGHT_WRONGTURN, damagedPlayer) 
+                && wrongTurn.check(damagedPlayer, loc, data, cc)) {
             cancelled = true;
         }
 
         // Run through the main checks.
-        if (!cancelled && speed.isEnabled(player)) {
-            if (speed.check(player, now)) {
+        if (!cancelled && speed.isEnabled(player, pData)) {
+            if (speed.check(player, now, data, cc, pData)) {
                 cancelled = true;
                 // Still feed the improbable.
                 if (data.speedVL > 50) {
-                    Improbable.check(player, 2f, now, "fight.speed");
+                    Improbable.check(player, 2f, now, "fight.speed", pData);
                 }
                 else {
                     Improbable.feed(player, 2f, now);
                 }
             }
-            else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now, "fight.speed")) {
+            else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now, 
+                    "fight.speed", pData)) {
                 // Feed improbable in case of ok-moves too.
                 // TODO: consider only feeding if attacking with higher average speed (!)
                 cancelled = true;
@@ -297,12 +307,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         // TODO: Consider to always check improbable (first?). At least if config.always or speed or net.attackfrequency are enabled.
 
-        if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc, pData)) {
+        if (!cancelled && critical.isEnabled(player, pData) && critical.check(player, loc, data, cc, pData)) {
             // TODO: Check config for settings.
             cancelled = true;
         }
 
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+        if (!cancelled && noSwing.isEnabled(player, pData) && noSwing.check(player, data, cc)) {
             cancelled = true;
         }
 
@@ -313,13 +323,14 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         if (!cancelled) {
-            final boolean reachEnabled = reach.isEnabled(player);
-            final boolean directionEnabled = direction.isEnabled(player);
+            final boolean reachEnabled = reach.isEnabled(player, pData);
+            final boolean directionEnabled = direction.isEnabled(player, pData);
             if (reachEnabled || directionEnabled) {
                 if (damagedTrace != null) {
                     // Checks that use the LocationTrace instance of the attacked entity/player.
                     cancelled = locationTraceChecks(player, loc, data, cc, pData, 
-                            damaged, damagedIsFake, damagedLoc, damagedTrace, tick, now, reachEnabled, directionEnabled);
+                            damaged, damagedIsFake, damagedLoc, damagedTrace, tick, now, debug,
+                            reachEnabled, directionEnabled);
                 }
                 else {
                     // Still use the classic methods for non-players. maybe[]
@@ -337,18 +348,19 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // Check angle with allowed window.
         // TODO: Actual angle needs to be related to the best matching trace element(s) (loop checks).
-        if (angle.isEnabled(player)) {
+        if (angle.isEnabled(player, pData)) {
             // TODO: Revise, use own trace.
             // The "fast turning" checks are checked in any case because they accumulate data.
             // Improbable yaw changing: Moving events might be missing up to a ten degrees change.
-            if (Combined.checkYawRate(player, loc.getYaw(), now, worldName, cc.yawRateCheck)) {
+            if (Combined.checkYawRate(player, loc.getYaw(), now, worldName, 
+                    pData.isCheckActive(CheckType.COMBINED_YAWRATE, player), pData)) {
                 // (Check or just feed).
                 // TODO: Work into this somehow attacking the same aim and/or similar aim position (not cancel then).
                 cancelled = true;
             }
             // Angle check.
             if (angle.check(player, loc, damaged, worldChanged, data, cc)) {
-                if (!cancelled && data.debug) {
+                if (!cancelled && debug) {
                     debug(player, "FIGHT_ANGLE cancel without yawrate cancel.");
                 }
                 cancelled = true;
@@ -370,14 +382,14 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: Confine further with simple pre-conditions.
         // TODO: Evaluate if moving traces can help here.
         if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) < 4.5) {
-            final MovingData mData = MovingData.getData(player);
+            final MovingData mData = pData.getGenericInstance(MovingData.class);
             // Check if fly checks is an issue at all, re-check "real sprinting".
             final PlayerMoveData lastMove = mData.playerMoves.getFirstPastMove();
             if (lastMove.valid && mData.liftOffEnvelope == LiftOffEnvelope.NORMAL) {
                 final double hDist = TrigUtil.xzDistance(loc, lastMove.from);
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
-                    final MovingConfig mCc = MovingConfig.getConfig(player);
+                    final MovingConfig mCc = pData.getGenericInstance(MovingConfig.class);
                     final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                     moveInfo.set(player, loc, null, mCc.yOnGround);
                     if (now <= mData.timeSprinting + mCc.sprintingGrace 
@@ -385,7 +397,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
                         mData.lostSprintCount = 7;
-                        if ((data.debug || mCc.debug) && BuildParameters.debugLevel > 0) {
+                        if ((debug || pData.isDebugActive(CheckType.MOVING)) 
+                                && BuildParameters.debugLevel > 0) {
                             debug(player, "lostsprint: hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
                         }
                     }
@@ -398,7 +411,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // (Cancel after sprinting hacks, because of potential fp).
         if (!cancelled && data.attackPenalty.isPenalty(now)) {
             cancelled = true;
-            if (data.debug) {
+            if (debug) {
                 debug(player, "~ attack penalty.");
             }
         }
@@ -426,10 +439,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @return If to cancel (true) or not (false).
      */
     private boolean locationTraceChecks(final Player player, final Location loc, 
-            final FightData data, final FightConfig cc, final PlayerData pData,
+            final FightData data, final FightConfig cc, final IPlayerData pData,
             final Entity damaged, final boolean damagedIsFake,
             final Location damagedLoc, LocationTrace damagedTrace, 
-            final long tick, final long now,  final boolean reachEnabled, final boolean directionEnabled) {
+            final long tick, final long now, final boolean debug,
+            final boolean reachEnabled, final boolean directionEnabled) {
         // TODO: Order / splitting off generic stuff.
         /*
          * TODO: Abstract: interface with common setup/loop/post routine, only
@@ -501,7 +515,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
         // TODO: Log exact state, probably record min/max latency (individually).
-        if (data.debug && latencyEstimate >= 0) {
+        if (debug && latencyEstimate >= 0) {
             debug(player, "Latency estimate: " + latencyEstimate + " ms."); // FCFS rather, at present.
         }
         return cancelled;
@@ -518,33 +532,44 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         final Entity damaged = event.getEntity();
         final Player damagedPlayer = damaged instanceof Player ? (Player) damaged : null;
-        final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
+        final FightData damagedData;
         final boolean damagedIsDead = damaged.isDead();
         final boolean damagedIsFake = !crossPlugin.getHandle().isNativeEntity(damaged);
-        if (damagedPlayer != null && !damagedIsDead) {
-            // God mode check.
-            // (Do not test the savage.)
-            if (godMode.isEnabled(damagedPlayer)
-                    && godMode.check(damagedPlayer, damagedIsFake, BridgeHealth.getDamage(event), damagedData)) {
-                // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
-                damagedPlayer.setNoDamageTicks(0);
-            }
-            // Adjust buffer for fast heal checks.
-            if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)) {
-                // TODO: Might use the same FightData instance for GodMode.
-                if (damagedData.fastHealBuffer < 0) {
-                    // Reduce negative buffer with each full health.
-                    damagedData.fastHealBuffer /= 2;
+        if (damagedPlayer != null) {
+            final IPlayerData damagedPData = DataManager.getPlayerData(damagedPlayer);
+            damagedData = damagedPData.getGenericInstance(FightData.class);
+            if (!damagedIsDead) {
+                // God mode check.
+                // (Do not test the savage.)
+                if (damagedPData.isCheckActive(CheckType.FIGHT_GODMODE, damagedPlayer)
+                        && godMode.check(damagedPlayer, damagedIsFake, 
+                                BridgeHealth.getDamage(event), damagedData, damagedPData)) {
+                    // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
+                    damagedPlayer.setNoDamageTicks(0);
                 }
-                // Set reference time.
-                damagedData.fastHealRefTime = System.currentTimeMillis();
+                // Adjust buffer for fast heal checks.
+                if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)) {
+                    // TODO: Might use the same FightData instance for GodMode.
+                    if (damagedData.fastHealBuffer < 0) {
+                        // Reduce negative buffer with each full health.
+                        damagedData.fastHealBuffer /= 2;
+                    }
+                    // Set reference time.
+                    damagedData.fastHealRefTime = System.currentTimeMillis();
+                }
+                // TODO: TEST: Check unused velocity for the damaged player. (Needs more efficient pre condition checks.)
+
             }
-            // TODO: TEST: Check unused velocity for the damaged player. (Needs more efficient pre condition checks.)
-            if (damagedData.debug) {
+            if (damagedPData.isDebugActive(checkType)) {
                 // TODO: Pass result to further checks for reference?
-                UnusedVelocity.checkUnusedVelocity(damagedPlayer, CheckType.FIGHT);
+                UnusedVelocity.checkUnusedVelocity(damagedPlayer, CheckType.FIGHT, damagedPData);
             }
         }
+        else {
+            damagedData = null;
+        }
+
+
         // Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             onEntityDamageByEntity(damaged, damagedPlayer, damagedIsDead, damagedIsFake, 
@@ -591,14 +616,16 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
         final FightData attackerData;
+        final IPlayerData attackerPData = attacker == null ? null : DataManager.getPlayerData(attacker);
         if (attacker != null) {
-            attackerData = FightData.getData(attacker);
+
+            attackerData = attackerPData.getGenericInstance(FightData.class);
             // TODO: TEST: Check unused velocity for the attacker. (Needs more efficient pre condition checks.)
-            if (attackerData.debug) {
+            if (attackerPData.isDebugActive(checkType)) {
                 // TODO: Pass result to further checks for reference?
                 // TODO: attackerData.debug flag.
                 // TODO: Fake players likely have unused velocity, just clear unused?
-                UnusedVelocity.checkUnusedVelocity(attacker, CheckType.FIGHT);
+                UnusedVelocity.checkUnusedVelocity(attacker, CheckType.FIGHT, attackerPData);
             }
             // Workaround for subsequent melee damage eventsfor explosions. TODO: Legacy or not, need a KB.
             if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
@@ -621,7 +648,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 }
                 // Prevent attacking if a set back is scheduled.
                 else if (MovingUtil.hasScheduledPlayerSetBack(player)) {
-                    if (attackerData.debug) {
+                    if (attackerPData.isDebugActive(checkType)) {
                         // Use fight data flag for efficiency.
                         debug(attacker, "Prevent melee attack, due to a scheduled set back.");
                     }
@@ -631,7 +658,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 else if (handleNormalDamage(player, !crossPlugin.getHandle().isNativePlayer(player),
                         damaged, damagedIsFake,
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
-                        tick, attackerData)) {
+                        tick, attackerData, attackerPData)) {
                     event.setCancelled(true);
                 }
             }
@@ -643,7 +670,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Entity damaged = event.getEntity();
         if (damaged instanceof Player) {
             final Player damagedPlayer = (Player) damaged;
-            final FightData damagedData = FightData.getData(damagedPlayer);
+            final IPlayerData damagedPData = DataManager.getPlayerData(damagedPlayer);
+            final FightData damagedData = damagedPData.getGenericInstance(FightData.class);
             final int ndt = damagedPlayer.getNoDamageTicks();
             if (damagedData.lastDamageTick == TickTask.getTick() && damagedData.lastNoDamageTicks != ndt) {
                 // Plugin compatibility thing.
@@ -654,9 +682,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 case ENTITY_ATTACK:
                     if (event instanceof EntityDamageByEntityEvent) {
                         final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
-                        if ((entity instanceof Player) && !damagedPlayer.isInsideVehicle() && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
+                        if ((entity instanceof Player) && !damagedPlayer.isInsideVehicle() 
+                                && damagedPData.getGenericInstance(FightConfig.class).knockBackVelocityPvP) {
                             // TODO: Use the velocity event that is sent anyway and replace x/z if 0 (queue max. values).
-                            applyKnockBack((Player) entity, damagedPlayer, damagedData);
+                            applyKnockBack((Player) entity, damagedPlayer, 
+                                    damagedData, damagedPData);
                         }
                     }
                 default:
@@ -671,17 +701,18 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param damagedPlayer
      * @param damagedData
      */
-    private void applyKnockBack(final Player attacker, final Player damagedPlayer, final FightData damagedData) {
+    private void applyKnockBack(final Player attacker, final Player damagedPlayer, 
+            final FightData damagedData, final IPlayerData pData) {
         final double level = getKnockBackLevel(attacker);
-        final MovingData mdata = MovingData.getData(damagedPlayer);
-        final MovingConfig mcc = MovingConfig.getConfig(damagedPlayer);
+        final MovingData mdata = pData.getGenericInstance(MovingData.class);
+        final MovingConfig mcc = pData.getGenericInstance(MovingConfig.class);
         // TODO: How is the direction really calculated?
         // Aim at sqrt(vx * vx + vz * vz, 2), not the exact direction.
         final double vx = level / Math.sqrt(8.0);
         final double vz = vx;
         final double vy = 0.462; // TODO: (0.365) Needs other workarounds, to allow more when moving off ground (vel + GRAVITY_MAX or max jump gain + little?).
         useLoc1.setWorld(null); // Cleanup.
-        if (damagedData.debug || mdata.debug) {
+        if (pData.isDebugActive(checkType) || pData.isDebugActive(CheckType.MOVING)) {
             debug(damagedPlayer, "Received knockback level: " + level);
         }
         mdata.addVelocity(damagedPlayer, mcc,  vx, vy, vz, VelocityFlags.ORIGIN_PVP);
@@ -742,7 +773,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
          * TODO: First one always fails: Packet inversion on 1.12.2? This could
          * be moved to packet level (register either).
          */
-        FightData.getData(event.getPlayer()).noSwingArmSwung = true;
+        DataManager.getGenericInstance(event.getPlayer(), 
+                FightData.class).noSwingArmSwung = true;
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -763,7 +795,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             return;
         }
         // TODO: EATING reason / peaceful difficulty / regen potion - byCaptain SpigotMC
-        if (fastHeal.isEnabled(player) && fastHeal.check(player)) {
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        if (pData.isCheckActive(CheckType.FIGHT_FASTHEAL, player) 
+                && fastHeal.check(player, pData)) {
             // TODO: Can clients force events with 0-re-gain ?
             event.setCancelled(true);
         }
@@ -776,7 +810,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             return;
         }
         final Player player = (Player) entity;
-        final FightData data = FightData.getData(player);
+        final FightData data = DataManager.getGenericInstance(player, FightData.class);
         // Adjust god mode data:
         // Remember the time.
         data.regainHealthTime = System.currentTimeMillis();
@@ -792,21 +826,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
     @Override
     public void playerLeaves(final Player player) {
-        final FightData data = FightData.getData(player);
+        final FightData data = DataManager.getGenericInstance(player, FightData.class);
         data.angleHits.clear();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        FightData.getData(event.getPlayer()).onWorldChange();
+        DataManager.getGenericInstance(event.getPlayer(), 
+                FightData.class).onWorldChange();
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onItemHeld(final PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
-        final long penalty = FightConfig.getConfig(player).toolChangeAttackPenalty;
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final long penalty = pData.getGenericInstance(FightConfig.class).toolChangeAttackPenalty;
         if (penalty > 0 ) {
-            FightData.getData(player).attackPenalty.applyPenalty(penalty);
+            pData.getGenericInstance(FightData.class).attackPenalty.applyPenalty(penalty);
         }
     }
 

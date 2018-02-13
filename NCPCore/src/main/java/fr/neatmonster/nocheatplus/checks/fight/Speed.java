@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -42,10 +43,11 @@ public class Speed extends Check {
      * @param now 
      * @return true, if successful
      */
-    public boolean check(final Player player, final long now) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
+    public boolean check(final Player player, final long now, 
+            final FightData data, final FightConfig cc, 
+            final IPlayerData pData) {
 
+        final boolean lag = pData.getCurrentWorldData().shouldAdjustToLag(type);
         boolean cancel = false;
 
         // Add to frequency.
@@ -53,7 +55,7 @@ public class Speed extends Check {
 
         // Medium term (normalized to one second), account for server side lag.
         final long fullTime = cc.speedBucketDur * cc.speedBuckets;
-        final float fullLag = cc.lag ? TickTask.getLag(fullTime, true) : 1f;
+        final float fullLag = lag ? TickTask.getLag(fullTime, true) : 1f;
         final float total = data.speedBuckets.score(cc.speedBucketFactor) * 1000f / (fullLag * fullTime);
 
         // Short term.
@@ -65,7 +67,7 @@ public class Speed extends Check {
         }
         else if (tick - data.speedShortTermTick < cc.speedShortTermTicks){
             // Account for server side lag.
-            if (!cc.lag || TickTask.getLag(50L * (tick - data.speedShortTermTick), true) < 1.5f){
+            if (!lag || TickTask.getLag(50L * (tick - data.speedShortTermTick), true) < 1.5f){
                 // Within range, add.
                 data.speedShortTermCount ++;
             }

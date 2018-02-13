@@ -92,7 +92,6 @@ public class NetData extends ACheckData {
     public final ActionFrequency packetFrequency;
 
     public NetData(final NetConfig config) {
-        super(config);
         flyingFrequencyAll = new ActionFrequency(config.flyingFrequencySeconds, 1000L);
         flyingFrequencyRedundantFreq = new ActionFrequency(config.flyingFrequencyRedundantSeconds, 1000L);
         if (config.packetFrequencySeconds <= 2) {

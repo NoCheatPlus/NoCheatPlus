@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * This check verifies if the player isn't throwing items too quickly, like eggs or arrows.
@@ -39,8 +40,9 @@ public class Speed extends Check {
      * @param cc 
      * @return true, if successful
      */
-    public boolean check(final Player player, final BlockPlaceConfig cc) {
-        final BlockPlaceData data = BlockPlaceData.getData(player);
+    public boolean check(final Player player, 
+            final BlockPlaceConfig cc, final IPlayerData pData) {
+        final BlockPlaceData data = pData.getGenericInstance(BlockPlaceData.class);
 
         boolean cancel = false;
 

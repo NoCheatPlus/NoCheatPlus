@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueLookBlockChecker;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.collision.CollideRayVsAABB;
 import fr.neatmonster.nocheatplus.utilities.collision.ICollideRayVsAABB;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
@@ -128,7 +129,8 @@ public abstract class AbstractBlockDirectionCheck<D extends ICheckData, C extend
      * @return True, if the check has been failed.
      */
     public boolean check(final Player player, final Location loc, final double eyeHeight, 
-            final Block block, final FlyingQueueHandle flyingHandle, final D data, final C cc) {
+            final Block block, final FlyingQueueHandle flyingHandle, 
+            final D data, final C cc, final IPlayerData pData) {
 
         boolean cancel = false;
         // How far "off" is the player with their aim.
@@ -151,7 +153,7 @@ public abstract class AbstractBlockDirectionCheck<D extends ICheckData, C extend
         // TODO: Consider a protected field with a tolerance value.
         if (distance != Double.MAX_VALUE) {
             distance = Math.sqrt(distance);
-            if (data.getDebug()) {
+            if (pData.isDebugActive(type)) {
                 outputDebugFail(player, boulder, distance);
             }
 

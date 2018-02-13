@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -71,11 +72,14 @@ public class CreativeFly extends Check {
      * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final MovingData data, final MovingConfig cc, final long time, final int tick,
+            final MovingData data, final MovingConfig cc, final IPlayerData pData,
+            final long time, final int tick,
             final boolean useBlockChangeTracker) {
 
         // Reset tags, just in case.
         tags.clear();
+
+        final boolean debug = pData.isDebugActive(type);
 
         // Some edge data for this move.
         final GameMode gameMode = player.getGameMode();
@@ -197,7 +201,7 @@ public class CreativeFly extends Check {
 
         final double result = Math.max(0.0, resultH) + Math.max(0.0, resultV);
 
-        if (data.debug) {
+        if (debug) {
             outpuDebugMove(player, hDistance, limitH, yDistance, limitV, model, tags, data);
         }
 
@@ -228,7 +232,7 @@ public class CreativeFly extends Check {
             // Maximum height check (silent set back).
             if (to.getY() > maximumHeight) {
                 setBack = data.getSetBack(to);
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Maximum height exceeded, silent set-back.");
                 }
             }
@@ -244,7 +248,7 @@ public class CreativeFly extends Check {
             if (setBack.getY() > maximumHeight) {
                 // Correct the y position.
                 setBack.setY(getCorrectedHeight(maximumHeight, setBack.getWorld()));
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Maximum height exceeded by set back, correct to: " + setBack.getY());
                 }
             }

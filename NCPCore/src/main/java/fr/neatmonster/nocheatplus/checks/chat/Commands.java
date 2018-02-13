@@ -18,8 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.players.PlayerData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -34,16 +33,16 @@ public class Commands extends Check {
     }
 
     public boolean check(final Player player, final String message, 
-            final ChatConfig cc, final PlayerData pData, 
+            final ChatConfig cc, final IPlayerData pData, 
             final ICaptcha captcha) {
 
         final long now = System.currentTimeMillis();
         final int tick = TickTask.getTick();
 
-        final ChatData data = ChatData.getData(player);
+        final ChatData data = pData.getGenericInstance(ChatData.class);
 
         final boolean captchaEnabled = !cc.captchaSkipCommands 
-                && CheckUtils.isEnabled(CheckType.CHAT_CAPTCHA, player, cc, pData); 
+                && pData.isCheckActive(CheckType.CHAT_CAPTCHA, player); 
         if (captchaEnabled){
             synchronized (data) {
                 if (captcha.shouldCheckCaptcha(player, cc, data, pData)){
@@ -65,7 +64,8 @@ public class Commands extends Check {
             data.commandsShortTermWeight = 1.0;
         }
         else if (tick - data.commandsShortTermTick < cc.commandsShortTermTicks){
-            if (!cc.lag || TickTask.getLag(50L * (tick - data.commandsShortTermTick), true) < 1.3f){
+            if (!pData.getCurrentWorldData().shouldAdjustToLag(type) 
+                    || TickTask.getLag(50L * (tick - data.commandsShortTermTick), true) < 1.3f){
                 // Add up.
                 data.commandsShortTermWeight += weight;
             }

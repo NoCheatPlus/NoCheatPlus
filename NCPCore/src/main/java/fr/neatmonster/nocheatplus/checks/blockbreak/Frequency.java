@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -33,7 +34,8 @@ public class Frequency extends Check {
     }
 
     public boolean check(final Player player, final int tick, 
-            final BlockBreakConfig cc, final BlockBreakData data){
+            final BlockBreakConfig cc, final BlockBreakData data,
+            final IPlayerData pData){
 
         final float interval = (float) ((player.getGameMode() == GameMode.CREATIVE)?(cc.frequencyIntervalCreative):(cc.frequencyIntervalSurvival));
         data.frequencyBuckets.add(System.currentTimeMillis(), interval);
@@ -41,6 +43,7 @@ public class Frequency extends Check {
         // Full period frequency.
         final float fullScore = data.frequencyBuckets.score(cc.frequencyBucketFactor);
         final long fullTime = cc.frequencyBucketDur * cc.frequencyBuckets;
+        final boolean lag = pData.getCurrentWorldData().shouldAdjustToLag(type);
 
         // Short term arrivals.
         if (tick < data.frequencyShortTermTick){
@@ -50,7 +53,7 @@ public class Frequency extends Check {
         }
         else if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
             // Account for server side lag.
-            final float stLag = cc.lag ? TickTask.getLag(50L * (tick - data.frequencyShortTermTick), true) : 1f;
+            final float stLag = lag ? TickTask.getLag(50L * (tick - data.frequencyShortTermTick), true) : 1f;
             if (stLag < 1.5){
                 // Within range, add.
                 data.frequencyShortTermCount ++;
@@ -67,7 +70,7 @@ public class Frequency extends Check {
         }
 
         // Account for server side lag.
-        final float fullLag = cc.lag ? TickTask.getLag(fullTime, true) : 1f;
+        final float fullLag = lag ? TickTask.getLag(fullTime, true) : 1f;
 
         // Find if one of both or both are violations:
         final float fullViolation = (fullScore > fullTime * fullLag) ? (fullScore - fullTime * fullLag) : 0;

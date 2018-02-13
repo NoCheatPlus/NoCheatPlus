@@ -14,18 +14,11 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.stats.Timings;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -34,53 +27,6 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  * Player specific data for the block break checks.
  */
 public class BlockBreakData extends ACheckData {
-
-    /** The factory creating data. */
-    public static final CheckDataFactory factory = new CheckDataFactory() {
-        @Override
-        public final ICheckData getData(final Player player) {
-            return BlockBreakData.getData(player);
-        }
-
-        @Override
-        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
-            return BlockBreakData.playersMap.get(playerName);
-        }
-
-        @Override
-        public ICheckData removeData(final String playerName) {
-            return BlockBreakData.removeData(playerName);
-        }
-
-        @Override
-        public void removeAllData() {
-            clear();
-        }
-    };
-
-    /** The map containing the data per players. */
-    private static final Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
-
-    /**
-     * Gets the data of a specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the data
-     */
-    public static BlockBreakData getData(final Player player) {
-        if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new BlockBreakData(BlockBreakConfig.getConfig(player)));
-        return playersMap.get(player.getName());
-    }
-
-    public static ICheckData removeData(final String playerName) {
-        return playersMap.remove(playerName);
-    }
-
-    public static void clear(){
-        playersMap.clear();
-    }
 
     // Violation levels.
     public double  directionVL;
@@ -121,26 +67,15 @@ public class BlockBreakData extends ACheckData {
 
 
     public BlockBreakData(final BlockBreakConfig cc) {
-        super(cc);
         setStats();
         fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
         frequencyBuckets = new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur);
         wrongBlockVL = new ActionFrequency(6, 20000);
     }
 
-    @Override
-    public void setDebug(boolean debug) {
-        super.setDebug(debug);
-        setStats();
-    }
-
-    private void setStats() {
-        if (getDebug()) {
-            if (stats == null) {
-                stats = new Timings("NCP/FASTBREAK");
-            }
-        } else {
-            stats = null;
+    void setStats() {
+        if (stats == null) {
+            stats = new Timings("NCP/FASTBREAK");
         }
     }
 

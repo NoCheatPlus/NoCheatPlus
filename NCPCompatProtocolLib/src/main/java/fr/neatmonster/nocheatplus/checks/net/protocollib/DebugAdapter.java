@@ -21,6 +21,9 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketEvent;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+
 public class DebugAdapter extends BaseAdapter {
 
     public DebugAdapter(Plugin plugin) {
@@ -33,7 +36,7 @@ public class DebugAdapter extends BaseAdapter {
     @Override
     public void onPacketReceiving(PacketEvent event) {
         final Player player = event.getPlayer();
-        if (dataFactory.getData(player).debug) {
+        if (DataManager.getPlayerData(player).isDebugActive(CheckType.NET)) {
             debug(player, "packet: " + event.getPacketType());
         }
     }

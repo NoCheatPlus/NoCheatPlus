@@ -27,13 +27,12 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.AttackFrequency;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class UseEntityAdapter extends BaseAdapter {
@@ -100,10 +99,12 @@ public class UseEntityAdapter extends BaseAdapter {
 
     public UseEntityAdapter(Plugin plugin) {
         super(plugin, PacketType.Play.Client.USE_ENTITY);
-
+        this.checkType = CheckType.NET_ATTACKFREQUENCY;
         // Add feature tags for checks.
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE)) {
-            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(AttackFrequency.class.getSimpleName()));
+        if (NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().isActiveAnywhere(
+                CheckType.NET_ATTACKFREQUENCY)) {
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags(
+                    "checks", Arrays.asList(AttackFrequency.class.getSimpleName()));
         }
         attackFrequency = new AttackFrequency();
 
@@ -129,14 +130,14 @@ public class UseEntityAdapter extends BaseAdapter {
             // TODO: Warn once?
             return;
         }
-        final NetConfig cc = configFactory.getConfig(player);
-        final NetData data = dataFactory.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
 
+        final NetData data = pData.getGenericInstance(NetData.class);
         // Always set last received time.
         data.lastKeepAliveTime = time;
 
         // Quick return, if no checks are active.
-        if (!cc.attackFrequencyActive) {
+        if (!pData.isCheckActive(CheckType.NET_ATTACKFREQUENCY, player)) {
             return;
         }
 
@@ -174,8 +175,9 @@ public class UseEntityAdapter extends BaseAdapter {
 
         // AttackFrequency
         if (isAttack) {
-            final PlayerData pData = DataManager.getPlayerData(player);
-            if (attackFrequency.isEnabled(player, cc, pData) && attackFrequency.check(player, time, data, cc)) {
+            final NetConfig cc = pData.getGenericInstance(NetConfig.class);
+            if (attackFrequency.isEnabled(player, pData) 
+                    && attackFrequency.check(player, time, data, cc, pData)) {
                 cancel = true;
             }
         }

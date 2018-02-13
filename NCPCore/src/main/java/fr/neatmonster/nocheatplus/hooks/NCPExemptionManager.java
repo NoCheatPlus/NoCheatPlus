@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * API for exempting players of checks, checked before calculations are done.
@@ -95,7 +95,7 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void exemptPermanently(final UUID id, final CheckType checkType) {
-        final PlayerData data = DataManager.getPlayerData(id);
+        final IPlayerData data = DataManager.getPlayerData(id);
         if (data != null) {
             data.exempt(checkType);
         }
@@ -140,7 +140,7 @@ public class NCPExemptionManager {
      * @return If the entity is exempted from checks right now.
      */
     public static final boolean isExempted(final UUID id, final CheckType checkType) {
-        final PlayerData data = DataManager.getPlayerData(id);
+        final IPlayerData data = DataManager.getPlayerData(id);
         return data != null && data.isExempted(checkType);
     }
 
@@ -192,7 +192,7 @@ public class NCPExemptionManager {
      *            The check type.
      */
     public static final void unexempt(final UUID id,  final CheckType checkType) {
-        final PlayerData data = DataManager.getPlayerData(id);
+        final IPlayerData data = DataManager.getPlayerData(id);
         if (data != null) {
             data.unexempt(checkType);
         }

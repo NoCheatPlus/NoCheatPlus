@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class AttackFrequency extends Check {
@@ -28,7 +29,8 @@ public class AttackFrequency extends Check {
         super(CheckType.NET_ATTACKFREQUENCY);
     }
 
-    public boolean check(final Player player, final long time, final NetData data, final NetConfig cc) {
+    public boolean check(final Player player, final long time, 
+            final NetData data, final NetConfig cc, final IPlayerData pData) {
         // Update frequency.
         data.attackFrequencySeconds.add(time, 1f);
         double maxVL = 0.0;
@@ -84,7 +86,7 @@ public class AttackFrequency extends Check {
         if (maxVL > 0.0) {
             // Trigger a violation.
             final ViolationData vd = new ViolationData(this, player, maxVL, 1.0, cc.attackFrequencyActions);
-            if (data.debug  || vd.needsParameters()) {
+            if (pData.isDebugActive(type) || vd.needsParameters()) {
                 vd.setParameter(ParameterName.PACKETS, Integer.toString((int) sum));
                 vd.setParameter(ParameterName.LIMIT, Integer.toString((int) maxLimit));
                 vd.setParameter(ParameterName.TAGS, tags);

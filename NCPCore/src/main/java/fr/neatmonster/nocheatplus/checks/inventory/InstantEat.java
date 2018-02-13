@@ -20,6 +20,8 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * The InstantEat check will find out if a player eats their food too fast.
@@ -46,7 +48,8 @@ public class InstantEat extends Check {
         // Take time once.
         final long time = System.currentTimeMillis();
 
-        final InventoryData data = InventoryData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
 
         boolean cancel = false;
 
@@ -72,7 +75,8 @@ public class InstantEat extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            final ViolationData vd = new ViolationData(this, player, data.instantEatVL, difference, InventoryConfig.getConfig(player).instantEatActions);
+            final ViolationData vd = new ViolationData(this, player, data.instantEatVL, 
+                    difference, pData.getGenericInstance(InventoryConfig.class).instantEatActions);
             if (data.instantEatFood != null) {
                 vd.setParameter(ParameterName.FOOD, data.instantEatFood.toString());
             }

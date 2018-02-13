@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.SetBackEntry;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
@@ -58,7 +59,8 @@ public class VehicleMorePackets extends Check {
      * @return the location
      */
     public SetBackEntry check(final Player player, final VehicleMoveData thisMove, 
-            final SetBackEntry setBack, final MovingData data, final MovingConfig cc) {
+            final SetBackEntry setBack, final MovingData data, final MovingConfig cc,
+            final IPlayerData pData) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
         final boolean allowSetSetBack = setBack == null && data.vehicleSetBackTaskId == -1;
@@ -74,6 +76,9 @@ public class VehicleMorePackets extends Check {
             return data.vehicleSetBacks.getValidMidTermEntry();
         }
 
+        final boolean debug = pData.isDebugActive(type);
+
+
         // Player used up buffer, they fail the check.
         if (data.vehicleMorePacketsBuffer < 0) {
 
@@ -83,7 +88,7 @@ public class VehicleMorePackets extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             final ViolationData vd = new ViolationData(this, player, data.vehicleMorePacketsVL, -data.vehicleMorePacketsBuffer, cc.vehicleMorePacketsActions);
-            if (data.debug || vd.needsParameters()) {
+            if (debug || vd.needsParameters()) {
                 vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.vehicleMorePacketsBuffer));
             }
             if (executeActions(vd).willCancel()){
@@ -114,11 +119,12 @@ public class VehicleMorePackets extends Check {
             // Set the new set back location.
             if (allowSetSetBack && newTo == null) {
                 data.vehicleSetBacks.setMidTermEntry(thisMove.from);
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Update vehicle morepackets set back: " + thisMove.from);
                 }
             }
-        } else if (data.vehicleMorePacketsLastTime > time) {
+        }
+        else if (data.vehicleMorePacketsLastTime > time) {
             // Security check, maybe system time changed.
             data.vehicleMorePacketsLastTime = time;
         }

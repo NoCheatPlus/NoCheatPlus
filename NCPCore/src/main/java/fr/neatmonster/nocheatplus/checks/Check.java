@@ -23,16 +23,16 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
-import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * The parent class of all checks. Don't let this implement Listener without
@@ -71,6 +71,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * actual check.</li>
  * 
  */
+// TODO: javadocs redo (above)
 public abstract class Check implements IDebugPlayer {
 
     // TODO: Do these get cleaned up ?
@@ -102,6 +103,7 @@ public abstract class Check implements IDebugPlayer {
      * @param type
      *            the type
      */
+    @SuppressWarnings("deprecation")
     public Check(final CheckType type) {
         this.type = type;
         mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
@@ -185,51 +187,38 @@ public abstract class Check implements IDebugPlayer {
     }
 
     /**
-     * Checks both configuration flags and if the player is exempted from this
-     * check (hasBypass). Intended for higher efficiency with multiple calls.
+     * Full activation check (configuration, exemption, permission).
      * 
      * @param player
      * @param data
-     * @param cc
+     * @param worldData
      * @return
      */
-    public boolean isEnabled(final Player player, final ICheckConfig cc, final PlayerData pData) {
-        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, pData);
+    public boolean isEnabled(final Player player, final IPlayerData pData, 
+            final IWorldData worldData) {
+        return pData.isCheckActive(type, player, worldData);
     }
 
     /**
-     * Checks both configuration flags and if the player is exempted from this
-     * check (hasBypass). Intended for higher efficiency with multiple calls.
+     * Full activation check (configuration, exemption, permission).
      * 
      * @param player
-     * @param cc
+     * @param data
      * @return
      */
-    public boolean isEnabled(final Player player, final ICheckConfig cc) {
-        return cc.isEnabled(type) && !CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
+    public boolean isEnabled(final Player player, final IPlayerData pData) {
+        return pData.isCheckActive(type, player);
     }
 
     /**
-     * Checks both configuration flags and if the player is exempted from this
-     * check (hasBypass).
+     * Full activation check (configuration, exemption, permission).
      * 
      * @param player
      *            the player
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
-        return type.isEnabled(player) && !CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
-    }
-
-    /**
-     * Check if the player is exempted by permissions or otherwise.<br>
-     * 
-     * 
-     * @param player
-     * @return
-     */
-    public boolean hasBypass(final Player player) {
-        return CheckUtils.hasBypass(type, player, DataManager.getPlayerData(player));
+        return isEnabled(player, DataManager.getPlayerData(player));
     }
 
     @Override

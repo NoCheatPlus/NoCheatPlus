@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -50,19 +51,20 @@ public class AutoSign extends Check {
         super(CheckType.BLOCKPLACE_AUTOSIGN);
     }
 
-    public boolean check(final Player player, final Block block, final String[] lines) {
+    public boolean check(final Player player, final Block block, final String[] lines,
+            final IPlayerData pData) {
         // TODO: Might want to reset time + hash ?
         final long time = System.currentTimeMillis();
         tags.clear();
-        final BlockPlaceData data = BlockPlaceData.getData(player);
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+        final BlockPlaceData data = pData.getGenericInstance(BlockPlaceData.class);
+        final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
         Material mat = block.getType();
         if (mat == Material.SIGN_POST || mat == Material.WALL_SIGN) {
             mat = Material.SIGN;
         }
         if (data.autoSignPlacedHash != BlockPlaceListener.getBlockPlaceHash(block, mat)){
             tags.add("block_mismatch");
-            return handleViolation(player, maxEditTime, data);
+            return handleViolation(player, maxEditTime, data, cc);
         }
         if (time < data.autoSignPlacedTime){
             data.autoSignPlacedTime = 0;
@@ -80,7 +82,7 @@ public class AutoSign extends Check {
 
         if (expected > editTime){
             tags.add("edit_time");
-            return handleViolation(player, expected - editTime, data);
+            return handleViolation(player, expected - editTime, data, cc);
         }
         return false;
     }
@@ -117,10 +119,12 @@ public class AutoSign extends Check {
      * @param data
      * @return
      */
-    private boolean handleViolation(final Player player, final long violationTime, final BlockPlaceData data) {
+    private boolean handleViolation(final Player player, final long violationTime, 
+            final BlockPlaceData data, final BlockPlaceConfig cc) {
         final double addedVL = 10.0 * Math.min(maxEditTime, violationTime) / maxEditTime;
         data.autoSignVL += addedVL;
-        final ViolationData vd = new ViolationData(this, player, data.autoSignVL, addedVL, BlockPlaceConfig.getConfig(player).autoSignActions);
+        final ViolationData vd = new ViolationData(
+                this, player, data.autoSignVL, addedVL, cc.autoSignActions);
         if (vd.needsParameters()){
             vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
         }

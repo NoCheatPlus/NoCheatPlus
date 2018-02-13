@@ -31,6 +31,8 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
+import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
+import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 public class PluginTests {
 
@@ -44,6 +46,7 @@ public class PluginTests {
      */
     public static class UnitTestNoCheatPlusAPI implements NoCheatPlusAPI {
 
+        private final WorldDataManager worldDataManager = new WorldDataManager();
         private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
         private final PermissionRegistry permissionRegistry = new PermissionRegistry(10000);
 
@@ -179,6 +182,16 @@ public class PluginTests {
         @Override
         public PermissionRegistry getPermissionRegistry() {
             return permissionRegistry;
+        }
+
+        @Override
+        public WorldDataManager getWorldDataManager() {
+            return worldDataManager;
+        }
+
+        @Override
+        public IPlayerDataManager getPlayerDataManager() {
+            throw new UnsupportedOperationException();
         }
 
     }

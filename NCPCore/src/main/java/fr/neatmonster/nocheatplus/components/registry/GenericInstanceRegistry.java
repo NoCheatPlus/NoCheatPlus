@@ -14,7 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.components.registry;
 
-import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.exception.RegistrationLockedException;
 
 /**
@@ -22,11 +21,13 @@ import fr.neatmonster.nocheatplus.components.registry.exception.RegistrationLock
  * Currently there is no specification for what happens with registering for an
  * already registered class, neither if exceptions are thrown, nor if
  * dependencies will use those then.
+ * <hr>
+ * Note getters: {@link IGetGenericInstance}
  * 
  * @author asofold
  *
  */
-public interface GenericInstanceRegistry {
+public interface GenericInstanceRegistry extends IGetGenericInstance, IGetGenericInstanceHandle {
 
     /**
      * Register the instance by its own class. This demands type parameters to
@@ -51,14 +52,6 @@ public interface GenericInstanceRegistry {
     public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance);
 
     /**
-     * Retrieve the instance registered for the given class.
-     * 
-     * @param registeredBy
-     * @return The instance, or null, if none is registered.
-     */
-    public <T> T getGenericInstance(Class<T> registeredFor);
-
-    /**
      * Remove a registration. The registry implementation might specify id
      * removing is allowed.
      * 
@@ -69,14 +62,5 @@ public interface GenericInstanceRegistry {
      *             If the registration of registerFor is locked.
      */
     public <T> T unregisterGenericInstance(Class<T> registeredFor);
-
-    /**
-     * Get a self-updating handle for conveniently getting the currently
-     * registered instance.
-     * 
-     * @param registeredFor
-     * @return
-     */
-    public <T> IGenericInstanceHandle<T> getGenericInstanceHandle(Class<T> registeredFor);
 
 }

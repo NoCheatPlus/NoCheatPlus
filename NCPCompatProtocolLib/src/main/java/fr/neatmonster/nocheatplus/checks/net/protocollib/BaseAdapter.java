@@ -24,8 +24,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
-import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -38,8 +36,6 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 public abstract class BaseAdapter extends PacketAdapter implements IDebugPlayer {
 
     protected final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
-    protected final NetConfigCache configFactory = (NetConfigCache) CheckType.NET.getConfigFactory();
-    protected final NetDataFactory dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
 
     /** Override for specific output on the debug method. */
     protected CheckType checkType = CheckType.NET;

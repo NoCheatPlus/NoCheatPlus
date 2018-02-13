@@ -19,8 +19,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
-import fr.neatmonster.nocheatplus.players.PlayerData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Check frequency of (pos/look/) flying packets, disregarding packet content.
@@ -48,11 +47,10 @@ public class FlyingFrequency extends Check {
      * @return
      */
     public boolean check(final Player player, final DataPacketFlying packetData, final long time, 
-            final NetData data, final NetConfig cc, final PlayerData pData) {
+            final NetData data, final NetConfig cc, final IPlayerData pData) {
         data.flyingFrequencyAll.add(time, 1f);
         final float allScore = data.flyingFrequencyAll.score(1f);
-        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS 
-                && !CheckUtils.hasBypass(CheckType.NET_FLYINGFREQUENCY, player, pData) 
+        if (allScore / cc.flyingFrequencySeconds > cc.flyingFrequencyPPS  
                 && executeActions(player, allScore / cc.flyingFrequencySeconds - cc.flyingFrequencyPPS, 1.0 / cc.flyingFrequencySeconds, cc.flyingFrequencyActions).willCancel()) {
             return true;
         } else {

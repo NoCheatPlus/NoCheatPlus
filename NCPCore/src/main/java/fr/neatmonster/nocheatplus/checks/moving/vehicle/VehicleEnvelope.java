@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.model.VehicleMoveInfo;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -103,16 +104,21 @@ public class VehicleEnvelope extends Check {
         bestHorse = clazz == null ? ReflectionUtil.getClass("org.bukkit.entity.Horse") : clazz;
     }
 
-    public SetBackEntry check(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
+    public SetBackEntry check(final Player player, final Entity vehicle, 
+            final VehicleMoveData thisMove, final boolean isFake, 
+            final MovingData data, final MovingConfig cc, 
+            final IPlayerData pData) {
+        final boolean debug = pData.isDebugActive(type);
         // Delegate to a sub-check.
         tags.clear();
         tags.add("entity." + vehicle.getType());
-        if (data.debug) {
+        if (debug) {
             debugDetails.clear();
             data.ws.setJustUsedIds(debugDetails); // Add just used workaround ids to this list directly, for now.
         }
-        final boolean violation = checkEntity(player, vehicle, thisMove, isFake, data, cc);
-        if (data.debug && !debugDetails.isEmpty()) {
+        final boolean violation = checkEntity(player, vehicle, thisMove, isFake, 
+                data, cc, debug);
+        if (debug && !debugDetails.isEmpty()) {
             debugDetails(player);
             debugDetails.clear();
         }
@@ -157,9 +163,12 @@ public class VehicleEnvelope extends Check {
         }
     }
 
-    private boolean checkEntity(final Player player, final Entity vehicle, final VehicleMoveData thisMove, final boolean isFake, final MovingData data, final MovingConfig cc) {
+    private boolean checkEntity(final Player player, final Entity vehicle, 
+            final VehicleMoveData thisMove, final boolean isFake, 
+            final MovingData data, final MovingConfig cc,
+            final boolean debug) {
         boolean violation = false;
-        if (data.debug) {
+        if (debug) {
             debugDetails.add("inair: " + data.sfJumpPhase);
         }
 
@@ -179,7 +188,7 @@ public class VehicleEnvelope extends Check {
         // TODO: Get extended liquid specs (allow confine to certain flags, here: water). Contains info if water is only flowing down, surface properties (non liquid blocks?), still water.
         if (thisMove.from.inWeb) {
             // TODO: Check anything?
-            if (data.debug) {
+            if (debug) {
                 debugDetails.add("");
             }
             //            if (thisMove.yDistance > 0.0) {
@@ -205,7 +214,7 @@ public class VehicleEnvelope extends Check {
         }
         else if (thisMove.from.inWater && thisMove.to.inWater) {
             // Default in-medium move.
-            if (data.debug) {
+            if (debug) {
                 debugDetails.add("water-water");
             }
             // TODO: Should still cover extreme moves here.
@@ -229,27 +238,27 @@ public class VehicleEnvelope extends Check {
             }
             if (thisMove.from.onIce && thisMove.to.onIce) {
                 // Default on-ice move.
-                if (data.debug) {
+                if (debug) {
                     debugDetails.add("ice-ice");
                 }
                 // TODO: Should still cover extreme moves here.
             }
             else {
                 // (TODO: actually a default on-ground move.)
-                if (data.debug) {
+                if (debug) {
                     debugDetails.add("ground-ground");
                 }
             }
         }
         else if (checkDetails.inAir) {
             // In-air move.
-            if (checkInAir(thisMove, data)) {
+            if (checkInAir(thisMove, data, debug)) {
                 violation = true;
             }
         }
         else {
             // Some transition to probably handle.
-            if (data.debug) {
+            if (debug) {
                 debugDetails.add("?-?");
             }
             // TODO: Lift off speed etc.
@@ -371,11 +380,12 @@ public class VehicleEnvelope extends Check {
      * @param data
      * @return
      */
-    private boolean checkInAir(final VehicleMoveData thisMove, final MovingData data) {
+    private boolean checkInAir(final VehicleMoveData thisMove, final MovingData data,
+            final boolean debug) {
 
         // TODO: Distinguish sfJumpPhase and inAirDescendCount (after reaching the highest point).
 
-        if (data.debug) {
+        if (debug) {
             debugDetails.add("air-air");
         }
 
@@ -422,7 +432,7 @@ public class VehicleEnvelope extends Check {
                 violation = false;
                 checkDetails.checkDescendMuch = checkDetails.checkAscendMuch = false; // (Full envelope has been checked.)
             }
-            if (data.debug) {
+            if (debug) {
                 debugDetails.add("maxDescend: " + maxDescend);
             }
         }

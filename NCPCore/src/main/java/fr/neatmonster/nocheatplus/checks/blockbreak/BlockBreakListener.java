@@ -44,7 +44,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -96,10 +96,11 @@ public class BlockBreakListener extends CheckListener {
     public void onBlockBreak(final BlockBreakEvent event) {
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
+        final IPlayerData pData = DataManager.getPlayerData(player);
 
         // Illegal enchantments hotfix check.
         // TODO: Legacy / encapsulate fully there.
-        if (Items.checkIllegalEnchantmentsAllHands(player)) {
+        if (Items.checkIllegalEnchantmentsAllHands(player, pData)) {
             event.setCancelled(true);
             counters.addPrimaryThread(idCancelDIllegalItem, 1);
         }
@@ -122,10 +123,9 @@ public class BlockBreakListener extends CheckListener {
         // Do the actual checks, if still needed. It's a good idea to make computationally cheap checks first, because
         // it may save us from doing the computationally expensive checks.
 
-        final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
-        final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
-        final BlockBreakData data = BlockBreakData.getData(player);
-        final BlockInteractData bdata = BlockInteractData.getData(player);
+        final BlockBreakConfig cc = pData.getGenericInstance(BlockBreakConfig.class);
+        final BlockBreakData data = pData.getGenericInstance(BlockBreakData.class);
+        final BlockInteractData bdata = pData.getGenericInstance(BlockInteractData.class);
         /*
          * Re-check if this is a block interacted with before. With instantly
          * broken blocks, this may be off by one orthogonally.
@@ -138,30 +138,35 @@ public class BlockBreakListener extends CheckListener {
         final GameMode gameMode = player.getGameMode();
 
         // Has the player broken a block that was not damaged before?
-        final boolean wrongBlockEnabled = wrongBlock.isEnabled(player);
+        final boolean wrongBlockEnabled = wrongBlock.isEnabled(player, pData);
         if (wrongBlockEnabled && wrongBlock.check(player, block, cc, data, pData, isInstaBreak)) {
             cancelled = true;
         }
 
         // Has the player broken more blocks per second than allowed?
-        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, tick, cc, data)) {
+        if (!cancelled && frequency.isEnabled(player, pData) 
+                && frequency.check(player, tick, cc, data, pData)) {
             cancelled = true;
         }
 
         // Has the player broken blocks faster than possible?
         if (!cancelled && gameMode != GameMode.CREATIVE
-                && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data, pData)) {
+                && fastBreak.isEnabled(player, pData) 
+                && fastBreak.check(player, block, isInstaBreak, cc, data, pData)) {
             cancelled = true;
         }
 
         // Did the arm of the player move before breaking this block?
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data)) {
+        if (!cancelled && noSwing.isEnabled(player, pData) 
+                && noSwing.check(player, data, pData)) {
             cancelled = true;
         }
 
         final FlyingQueueHandle flyingHandle;
-        if (cc.reachCheck || cc.directionCheck) {
-            flyingHandle = new FlyingQueueHandle(player);
+        final boolean reachEnabled = reach.isEnabled(player, pData);
+        final boolean directionEnabled = direction.isEnabled(player, pData);
+        if (reachEnabled || directionEnabled) {
+            flyingHandle = new FlyingQueueHandle(pData);
             final Location loc = player.getLocation(useLoc);
             final double eyeHeight = MovingUtil.getEyeHeight(player);
             // Is the block really in reach distance?
@@ -169,7 +174,7 @@ public class BlockBreakListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
                     skippedRedundantChecks ++;
                 }
-                else if (reach.isEnabled(player) && reach.check(player, eyeHeight, block, data)) {
+                else if (reachEnabled && reach.check(player, eyeHeight, block, data, cc)) {
                     cancelled = true;
                 }
             }
@@ -181,8 +186,8 @@ public class BlockBreakListener extends CheckListener {
                         || bdata.isPassedCheck(CheckType.BLOCKINTERACT_VISIBLE))) {
                     skippedRedundantChecks ++;
                 }
-                else if (direction.isEnabled(player) && direction.check(player, loc, eyeHeight, block, 
-                        flyingHandle, data, cc)) {
+                else if (directionEnabled && direction.check(player, loc, eyeHeight, block, 
+                        flyingHandle, data, cc, pData)) {
                     cancelled = true;
                 }
             }
@@ -212,8 +217,9 @@ public class BlockBreakListener extends CheckListener {
             // Invalidate last damage position:
             //        	data.clickedX = Integer.MAX_VALUE;
             // Debug log (only if not cancelled, to avoid spam).
-            if (data.debug) {
-                debugBlockBreakResult(player, block, skippedRedundantChecks, flyingHandle);
+            if (pData.isDebugActive(CheckType.BLOCKBREAK)) {
+                debugBlockBreakResult(player, block, skippedRedundantChecks, 
+                        flyingHandle, pData);
             }
         }
 
@@ -231,10 +237,10 @@ public class BlockBreakListener extends CheckListener {
     }
 
     private void debugBlockBreakResult(final Player player, final Block block, final int skippedRedundantChecks, 
-            final FlyingQueueHandle flyingHandle) {
+            final FlyingQueueHandle flyingHandle, final IPlayerData pData) {
         debug(player, "Block break(" + block.getType() + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
         BlockInteractListener.debugBlockVSBlockInteract(player, checkType, block, "onBlockBreak", 
-                Action.LEFT_CLICK_BLOCK);
+                Action.LEFT_CLICK_BLOCK, pData);
         if (skippedRedundantChecks > 0) {
             debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
         }
@@ -260,7 +266,7 @@ public class BlockBreakListener extends CheckListener {
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Just set a flag to true when the arm was swung.
         // debug(player, "Animation");
-        BlockBreakData.getData(event.getPlayer()).noSwingArmSwung = true;
+        DataManager.getPlayerData(event.getPlayer()).getGenericInstance(BlockBreakData.class).noSwingArmSwung = true;
     }
 
     /**
@@ -317,7 +323,8 @@ public class BlockBreakListener extends CheckListener {
 
     private void checkBlockDamage(final Player player, final Block block, final Cancellable event){
         final long now = System.currentTimeMillis();
-        final BlockBreakData data = BlockBreakData.getData(player); 
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final BlockBreakData data = pData.getGenericInstance(BlockBreakData.class);
 
         //        if (event.isCancelled()){
         //        	// Reset the time, to avoid certain kinds of cheating. => WHICH ?
@@ -351,9 +358,9 @@ public class BlockBreakListener extends CheckListener {
         // Only record first damage:
         data.setClickedBlock(block, tick, now, tool);
         // Compare with BlockInteract data (debug first).
-        if (data.debug) {
-            BlockInteractListener.debugBlockVSBlockInteract(player, this.checkType, block, "checkBlockDamage", 
-                    Action.LEFT_CLICK_BLOCK);
+        if (pData.isDebugActive(CheckType.BLOCKBREAK)) {
+            BlockInteractListener.debugBlockVSBlockInteract(player, this.checkType, 
+                    block, "checkBlockDamage", Action.LEFT_CLICK_BLOCK, pData);
         }
     }
 
@@ -362,7 +369,7 @@ public class BlockBreakListener extends CheckListener {
         // Reset clicked block.
         // TODO: Not for 1.5.2 and before?
         final Player player = event.getPlayer();
-        final BlockBreakData data = BlockBreakData.getData(player);
+        final BlockBreakData data = DataManager.getPlayerData(player).getGenericInstance(BlockBreakData.class);
         if (data.toolChanged(player.getInventory().getItem(event.getNewSlot()))) {
             data.resetClickedBlock();
         }

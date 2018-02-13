@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -44,9 +45,11 @@ public class FastPlace extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Block block, final int tick, 
-            final BlockPlaceData data, final BlockPlaceConfig cc) {
+            final BlockPlaceData data, final BlockPlaceConfig cc, 
+            final IPlayerData pData) {
 
         data.fastPlaceBuckets.add(System.currentTimeMillis(), 1f);
+        final boolean lag = pData.getCurrentWorldData().shouldAdjustToLag(type);
 
         // Full period frequency.
         final float fullScore = data.fastPlaceBuckets.score(1f);
@@ -59,7 +62,7 @@ public class FastPlace extends Check {
         }
         else if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
             // Account for server side lag.
-            if (!cc.lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2f){
+            if (!lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2f){
                 // Within range, add.
                 data.fastPlaceShortTermCount ++;
             }
@@ -78,7 +81,7 @@ public class FastPlace extends Check {
         final float fullViolation;
         if (fullScore > cc.fastPlaceLimit) {
             // Account for server side lag.
-            if (cc.lag) {
+            if (lag) {
                 fullViolation = fullScore / TickTask.getLag(data.fastPlaceBuckets.bucketDuration() * data.fastPlaceBuckets.numberOfBuckets(), true) - cc.fastPlaceLimit;
             }
             else{

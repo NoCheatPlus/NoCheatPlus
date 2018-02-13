@@ -15,16 +15,11 @@
 package fr.neatmonster.nocheatplus.checks.access;
 
 /**
- * ChecData for async checks like chat, actually implementing cached permissions.
- * @author mc_dev
+ * 
+ * @author asofold
+ * @TODO Keep / remove.
  *
  */
 public abstract class AsyncCheckData extends ACheckData {
-    
-    // TODO: Still needed ?
-    
-    public AsyncCheckData(ICheckConfig config) {
-        super(config);
-    }
 
 }

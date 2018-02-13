@@ -27,10 +27,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
-import fr.neatmonster.nocheatplus.checks.net.NetStatic;
 import fr.neatmonster.nocheatplus.checks.net.PacketFrequency;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Pre-1.9.
@@ -74,22 +73,12 @@ public class CatchAllAdapter extends BaseAdapter {
             // TODO: Is this a problem, as the server has the player so it could break a block)?
             return;
         }
-        final NetConfig cc;
-        try {
-            cc = NetStatic.getWorldConfig(player, configFactory, dataFactory);
-        }
-        catch (UnsupportedOperationException e) {
-            // Legacy +-.
-            // TODO: Get from PlayerData, once HashMapLOW is used.
-            return;
-        }
-        if (cc.packetFrequencyActive) {
-            final PlayerData pData = DataManager.getPlayerData(player);
-            if (packetFrequency.isEnabled(player, cc, pData)) {
-                final NetData data = dataFactory.getData(player);
-                if (packetFrequency.check(player, data, cc)) {
-                    event.setCancelled(true);
-                }
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        if (packetFrequency.isEnabled(player, pData)) {
+            final NetConfig cc = pData.getGenericInstance(NetConfig.class);
+            final NetData data = pData.getGenericInstance(NetData.class);
+            if (packetFrequency.check(player, data, cc)) {
+                event.setCancelled(true);
             }
         }
     }

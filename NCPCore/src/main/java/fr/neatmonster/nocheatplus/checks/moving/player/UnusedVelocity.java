@@ -14,15 +14,15 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.player;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
-
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleAxisVelocity;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.UnusedTracker;
 import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 public class UnusedVelocity {
@@ -35,8 +35,13 @@ public class UnusedVelocity {
      * @param player
      * @return If the player has failed the check, whatever that means.
      */
-    public static boolean checkUnusedVelocity(final Player player, final CheckType checkType) {
-        return checkUnusedVelocity(player, checkType, MovingData.getData(player), MovingConfig.getConfig(player));
+    public static boolean checkUnusedVelocity(final Player player, 
+            final CheckType checkType, final IPlayerData pData) {
+        return checkUnusedVelocity(
+                player, checkType, 
+                pData.getGenericInstance(MovingData.class), 
+                pData.getGenericInstance(MovingConfig.class)
+                );
     }
 
 
@@ -48,7 +53,8 @@ public class UnusedVelocity {
      * @param cc
      * @return If the player has failed the check, whatever that means.
      */
-    public static boolean checkUnusedVelocity(final Player player, final CheckType checkType, final MovingData data, final MovingConfig cc) {
+    public static boolean checkUnusedVelocity(final Player player, 
+            final CheckType checkType, final MovingData data, final MovingConfig cc) {
         boolean violation = false;
         final SimpleAxisVelocity verVel = data.getVerticalVelocityTracker();
         violation |= quickCheckDirection(player, verVel.unusedTrackerPos, checkType, "vert/pos", data, cc);

@@ -25,6 +25,8 @@ import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
+import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
 
 
 
@@ -196,6 +198,22 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * 
      * @return
      */
+    // TODO: Remove in favor of per world permission registries (!).
     public PermissionRegistry getPermissionRegistry();
+
+    /**
+     * Get the WorldDataManager, which stores per-world data and configuration.
+     * 
+     * @return
+     */
+    public IWorldDataManager getWorldDataManager();
+
+    /**
+     * Get the PlayerDataManager, which stores per player data and
+     * configuration.
+     * 
+     * @return
+     */
+    public IPlayerDataManager getPlayerDataManager();
 
 }

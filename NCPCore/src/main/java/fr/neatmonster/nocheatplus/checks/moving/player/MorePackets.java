@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.net.NetStatic;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
@@ -62,9 +63,11 @@ public class MorePackets extends Check {
      * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
-            final boolean allowSetSetBack, final MovingData data, final MovingConfig cc) {
+            final boolean allowSetSetBack, final MovingData data, final MovingConfig cc,
+            final IPlayerData pData) {
         // Take time once, first:
         final long time = System.currentTimeMillis();
+        final boolean debug = pData.isDebugActive(type);
 
         //    	if (from.isSamePos(to)) {
         //    		// Ignore moves with "just look" for now.
@@ -94,7 +97,7 @@ public class MorePackets extends Check {
 
             // Violation handling.
             final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, violation, cc.morePacketsActions);
-            if (data.debug || vd.needsParameters()) {
+            if (debug || vd.needsParameters()) {
                 vd.setParameter(ParameterName.PACKETS, Integer.toString(new Double(violation).intValue()));
                 vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             }
@@ -107,7 +110,7 @@ public class MorePackets extends Check {
             // Update the set back location. (CHANGED to only update, if not a violation.)
             // (Might update whenever newTo == null)
             data.setMorePacketsSetBack(from);
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Update set back (morepackets) to from.");
             }
         }

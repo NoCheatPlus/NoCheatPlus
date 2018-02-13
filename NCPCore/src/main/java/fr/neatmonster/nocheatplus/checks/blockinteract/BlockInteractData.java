@@ -16,23 +16,17 @@ package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
@@ -40,53 +34,6 @@ import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
  * Player specific data for the block interact checks.
  */
 public class BlockInteractData extends ACheckData {
-
-    /** The factory creating data. */
-    public static final CheckDataFactory factory = new CheckDataFactory() {
-        @Override
-        public final ICheckData getData(final Player player) {
-            return BlockInteractData.getData(player);
-        }
-
-        @Override
-        public ICheckData getDataIfPresent(UUID playerId, String playerName) {
-            return BlockInteractData.playersMap.get(playerName);
-        }
-
-        @Override
-        public ICheckData removeData(final String playerName) {
-            return BlockInteractData.removeData(playerName);
-        }
-
-        @Override
-        public void removeAllData() {
-            clear();
-        }
-    };
-
-    /** The map containing the data per players. */
-    private static final Map<String, BlockInteractData> playersMap = new HashMap<String, BlockInteractData>();
-
-    /**
-     * Gets the data of a specified player.
-     * 
-     * @param player
-     *            the player
-     * @return the data
-     */
-    public static BlockInteractData getData(final Player player) {
-        if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new BlockInteractData(BlockInteractConfig.getConfig(player)));
-        return playersMap.get(player.getName());
-    }
-
-    public static ICheckData removeData(final String playerName) {
-        return playersMap.remove(playerName);
-    }
-
-    public static void clear(){
-        playersMap.clear();
-    }
 
     // Violation levels.
     public double directionVL	= 0;
@@ -135,10 +82,6 @@ public class BlockInteractData extends ACheckData {
      * (not complete, may contain checks from other check groups).
      */
     private final Set<CheckType> consumedChecks = new HashSet<CheckType>();
-
-    public BlockInteractData(final BlockInteractConfig config) {
-        super(config);
-    }
 
     /**
      * Set last interacted block (coordinates, type, tick). Also resets the

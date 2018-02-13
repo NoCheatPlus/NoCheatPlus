@@ -18,8 +18,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.players.PlayerData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 public class KeepAliveFrequency extends Check {
 
@@ -36,10 +35,10 @@ public class KeepAliveFrequency extends Check {
      * @return If to cancel.
      */
     public boolean check(final Player player, final long time, final NetData data, final NetConfig cc,
-            final PlayerData pData) {
+            final IPlayerData pData) {
         data.keepAliveFreq.add(time, 1f);
         final float first = data.keepAliveFreq.bucketScore(0);
-        if (first > 1f && !CheckUtils.hasBypass(CheckType.NET_KEEPALIVEFREQUENCY, player, pData)) {
+        if (first > 1f) {
             // Trigger a violation.
             final double vl = Math.max(first - 1f, data.keepAliveFreq.score(1f) - data.keepAliveFreq.numberOfBuckets());
             if (executeActions(player, vl, 1.0, cc.keepAliveFrequencyActions).willCancel()) {

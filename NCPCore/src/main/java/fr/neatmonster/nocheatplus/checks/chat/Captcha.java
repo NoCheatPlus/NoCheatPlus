@@ -20,9 +20,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
@@ -91,14 +90,15 @@ public class Captcha extends Check implements ICaptcha{
 
     @Override
     public void resetCaptcha(Player player){
-        ChatData data = ChatData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        ChatData data = pData.getGenericInstance(ChatData.class);
         synchronized (data) {
-            resetCaptcha(player, ChatConfig.getConfig(player), data, DataManager.getPlayerData(player));
+            resetCaptcha(player, pData.getGenericInstance(ChatConfig.class), data, pData);
         }
     }
 
     @Override
-    public void resetCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData){
+    public void resetCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData){
         data.captchTries = 0;
         if (shouldCheckCaptcha(player, cc, data, pData) 
                 || shouldStartCaptcha(player, cc, data, pData)){
@@ -113,12 +113,15 @@ public class Captcha extends Check implements ICaptcha{
     }
 
     @Override
-    public boolean shouldStartCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData) {
-        return cc.captchaCheck && !data.captchaStarted && !pData.hasPermission(Permissions.CHAT_CAPTCHA, player);
+    public boolean shouldStartCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData) {
+        // TODO: Only call if IWorldData.isCheckActive(CHAT_CAPTCHA) has returned true?
+        return !data.captchaStarted && pData.isCheckActive(CheckType.CHAT_CAPTCHA, player);
     }
 
     @Override
-    public boolean shouldCheckCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData) {
-        return cc.captchaCheck && data.captchaStarted  && !pData.hasPermission(Permissions.CHAT_CAPTCHA, player);
+    public boolean shouldCheckCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData) {
+        // TODO: Only call if IWorldData.isCheckActive(CHAT_CAPTCHA) has returned true?
+        return data.captchaStarted  && pData.isCheckActive(CheckType.CHAT_CAPTCHA, player);
     }
+
 }

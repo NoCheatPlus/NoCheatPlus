@@ -49,7 +49,7 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
@@ -153,14 +153,15 @@ public class BlockPlaceListener extends CheckListener {
         }
         boolean cancelled = false;
 
-        final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
-        final BlockPlaceData data = BlockPlaceData.getData(player);
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
-        final BlockInteractData bdata = BlockInteractData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
+        final BlockPlaceData data = pData.getGenericInstance(BlockPlaceData.class);
+        final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
+        final BlockInteractData bdata = pData.getGenericInstance(BlockInteractData.class);
         final int tick = TickTask.getTick();
         // isInteractBlock - the block placed against is the block last interacted with.
         final boolean isInteractBlock = !bdata.getLastIsCancelled() && bdata.matchesLastBlock(tick, blockAgainst);
         int skippedRedundantChecks = 0;
+        final boolean debug = pData.isDebugActive(CheckType.BLOCKPLACE);
 
         final boolean shouldSkipSome;
         if (blockMultiPlaceEvent != null && event.getClass() == blockMultiPlaceEvent) {
@@ -169,7 +170,7 @@ public class BlockPlaceListener extends CheckListener {
                 shouldSkipSome = true;
             }
             else {
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Block place " + event.getClass().getName() + " " + placedMat);
                 }
                 shouldSkipSome = false;
@@ -187,31 +188,33 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Don't run checks, if a set back is scheduled.
-        if (!cancelled && MovingUtil.hasScheduledPlayerSetBack(player)) {
+        if (!cancelled && pData.isPlayerSetBackScheduled()) {
             cancelled = true;
         }
 
         // Fast place check.
-        if (!cancelled && fastPlace.isEnabled(player)) {
-            if (fastPlace.check(player, block, tick, data, cc)) {
+        if (!cancelled && fastPlace.isEnabled(player, pData)) {
+            if (fastPlace.check(player, block, tick, data, cc, pData)) {
                 cancelled = true;
             }
             else {
                 // Feed the improbable.
-                Improbable.feed(player, 0.5f, System.currentTimeMillis());
+                Improbable.feed(player, 0.5f, System.currentTimeMillis(), pData);
             }
         }
 
         // No swing check (player doesn't swing their arm when placing a lily pad).
         if (!cancelled && !cc.noSwingExceptions.contains(placedMat) 
-                && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+                && noSwing.isEnabled(player, pData) && noSwing.check(player, data, cc)) {
             // Consider skipping all insta placables or using simplified version (true or true within time frame).
             cancelled = true;
         }
 
         final FlyingQueueHandle flyingHandle;
-        if (cc.reachCheck || cc.directionCheck) {
-            flyingHandle = new FlyingQueueHandle(player);
+        final boolean reachCheck = pData.isCheckActive(CheckType.BLOCKPLACE_REACH, player);
+        final boolean directionCheck = pData.isCheckActive(CheckType.BLOCKPLACE_DIRECTION, player);
+        if (reachCheck || directionCheck) {
+            flyingHandle = new FlyingQueueHandle(pData);
             final Location loc = player.getLocation(useLoc);
             final double eyeHeight = MovingUtil.getEyeHeight(player);
             // Reach check (distance).
@@ -219,7 +222,7 @@ public class BlockPlaceListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_REACH)) {
                     skippedRedundantChecks ++;
                 }
-                else if (reach.isEnabled(player) && reach.check(player, eyeHeight, block, data, cc)) {
+                else if (reachCheck && reach.check(player, eyeHeight, block, data, cc)) {
                     cancelled = true;
                 }
             }
@@ -229,8 +232,8 @@ public class BlockPlaceListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
                     skippedRedundantChecks ++;
                 }
-                else if (direction.isEnabled(player) && direction.check(player, loc, eyeHeight, block, 
-                        flyingHandle, data, cc)) {
+                else if (directionCheck && direction.check(player, loc, eyeHeight, block, 
+                        flyingHandle, data, cc, pData)) {
                     cancelled = true;
                 }
             }
@@ -241,7 +244,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Surrounding material.
-        if (!cancelled && against.isEnabled(player) && against.check(player, block, placedMat, blockAgainst, 
+        if (!cancelled && against.isEnabled(player, pData) && against.check(player, block, placedMat, blockAgainst, 
                 isInteractBlock, data, cc, pData)) {
             cancelled = true;
         }
@@ -252,8 +255,9 @@ public class BlockPlaceListener extends CheckListener {
         }
         else {
             // Debug log (only if not cancelled, to avoid spam).
-            if (data.debug) {
-                debugBlockPlace(player, placedMat, block, blockAgainst, skippedRedundantChecks, flyingHandle);
+            if (debug) {
+                debugBlockPlace(player, placedMat, block, blockAgainst, 
+                        skippedRedundantChecks, flyingHandle, pData);
             }
         }
         // Cleanup
@@ -262,10 +266,12 @@ public class BlockPlaceListener extends CheckListener {
 
     private void debugBlockPlace(final Player player, final Material placedMat, 
             final Block block, final Block blockAgainst, 
-            final int skippedRedundantChecks, final FlyingQueueHandle flyingHandle) {
+            final int skippedRedundantChecks, final FlyingQueueHandle flyingHandle,
+            final IPlayerData pData) {
         debug(player, "Block place(" + placedMat + "): " + block.getX() + ", " + block.getY() + ", " + block.getZ());
-        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, blockAgainst, "onBlockPlace(blockAgainst)", 
-                Action.RIGHT_CLICK_BLOCK);
+        BlockInteractListener.debugBlockVSBlockInteract(player, checkType, 
+                blockAgainst, "onBlockPlace(blockAgainst)", Action.RIGHT_CLICK_BLOCK,
+                pData);
         if (skippedRedundantChecks > 0) {
             debug(player, "Skipped redundant checks: " + skippedRedundantChecks);
         }
@@ -293,7 +299,8 @@ public class BlockPlaceListener extends CheckListener {
             // Somewhat defensive.
             return;
         }
-        if (autoSign.isEnabled(player) && autoSign.check(player, block, lines)) {
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        if (autoSign.isEnabled(player, pData) && autoSign.check(player, block, lines, pData)) {
             event.setCancelled(true);
         }
     }
@@ -309,7 +316,7 @@ public class BlockPlaceListener extends CheckListener {
             priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Just set a flag to true when the arm was swung.
-        BlockPlaceData.getData(event.getPlayer()).noSwingArmSwung = true;
+        DataManager.getPlayerData(event.getPlayer()).getGenericInstance(BlockPlaceData.class).noSwingArmSwung = true;
     }
 
     /**
@@ -334,11 +341,11 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
         final Material type = stack.getType();
         if (InventoryUtil.isBoat(type)) {
             if (cc.preventBoatsAnywhere) {
-                final PlayerData pData = DataManager.getPlayerData(player); // TODO: Use for data + config getting etc.
                 // TODO: Alter config (activation, allow on top of ground).
                 // TODO: Version/plugin specific alteration for 'default'.
                 checkBoatsAnywhere(player, event, cc, pData);
@@ -346,7 +353,7 @@ public class BlockPlaceListener extends CheckListener {
         }
         else if (type == Material.MONSTER_EGG) {
             // Check blockplace.speed.
-            if (speed.isEnabled(player, cc) && speed.check(player, cc)) {
+            if (speed.isEnabled(player, pData) && speed.check(player, cc, pData)) {
                 // If the check was positive, cancel the event.
                 event.setCancelled(true);
             }
@@ -354,7 +361,7 @@ public class BlockPlaceListener extends CheckListener {
     }
 
     private void checkBoatsAnywhere(final Player player, final PlayerInteractEvent event, 
-            final BlockPlaceConfig cc, final PlayerData pData) {
+            final BlockPlaceConfig cc, final IPlayerData pData) {
         // Check boats-anywhere.
         final Block block = event.getClickedBlock();
         final Material mat = block.getType();
@@ -426,20 +433,21 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // Do the actual check...
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
         boolean cancel = false;
-        if (speed.isEnabled(player)) {
+        if (speed.isEnabled(player, pData)) {
             final long now = System.currentTimeMillis();
             final Location loc = player.getLocation(useLoc);
-            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())) {
+            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName(), pData)) {
                 // Yawrate (checked extra).
                 cancel = true;
             }
-            if (speed.check(player, cc)) {
+            if (speed.check(player, cc, pData)) {
                 // If the check was positive, cancel the event.
                 cancel = true;
             }
-            else if (Improbable.check(player, 0.6f, now, "blockplace.speed")) {
+            else if (Improbable.check(player, 0.6f, now, "blockplace.speed", pData)) {
                 // Combined fighting speed.
                 cancel = true;
             }
@@ -447,7 +455,7 @@ public class BlockPlaceListener extends CheckListener {
 
         // Ender pearl glitch (ab-) use.
         if (!cancel && type == EntityType.ENDER_PEARL) {
-            if (!CombinedConfig.getConfig(player).enderPearlCheck) {
+            if (!pData.getGenericInstance(CombinedConfig.class).enderPearlCheck) {
                 // Do nothing !
                 // TODO: Might have further flags?
             }
@@ -468,7 +476,9 @@ public class BlockPlaceListener extends CheckListener {
                     final long flags = BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE;
                     if (!BlockProperties.isAir(mat) && (BlockProperties.getBlockFlags(mat) & flags) == 0 && !mcAccess.getHandle().hasGravity(mat)) {
                         // Still fails on piston traps etc.
-                        if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)) {
+                        if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) 
+                                && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), 
+                                        pData.getGenericInstance(MovingConfig.class).yOnGround)) {
                             cancel = true;
                         }
                     }

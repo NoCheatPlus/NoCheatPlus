@@ -19,20 +19,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
+import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 /**
  * Central location for everything that's described in the configuration file(s).<br>
@@ -51,9 +58,6 @@ public class ConfigManager {
         }
     };
 
-    /** The map containing the configuration files per world. */
-    private static Map<String, ConfigFile> worldsMap = new LinkedHashMap<String, ConfigFile>();
-
     private static final WorldConfigProvider<ConfigFile> worldConfigProvider = new WorldConfigProvider<ConfigFile>() {
 
         @Override
@@ -68,7 +72,14 @@ public class ConfigManager {
 
         @Override
         public Collection<ConfigFile> getAllConfigs() {
-            return ConfigManager.worldsMap.values();
+            // Avoid duplicates, which typically should exist.
+            final Set<ConfigFile> res = new LinkedHashSet<ConfigFile>();
+            final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+            final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+            while (it.hasNext()) {
+                res.add(it.next().getValue().getRawConfiguration());
+            }
+            return res;
         }
 
     };
@@ -108,9 +119,12 @@ public class ConfigManager {
             };
         }
         // Use lazy resetting.
-        for (final ConfigFile config : worldsMap.values()){
-            config.setActionFactory(null);
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            it.next().getValue().getRawConfiguration().setActionFactory(null);
         }
+        // TODO: Update WorldData is skipped for now.
     }
 
     public static ActionFactoryFactory getActionFactoryFactory(){
@@ -121,9 +135,12 @@ public class ConfigManager {
      * Force setting up all configs action factories.
      */
     public static void setAllActionFactories(){
-        for (final ConfigFile config : worldsMap.values()){
-            config.setActionFactory();
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            it.next().getValue().getRawConfiguration().setActionFactory();
         }
+        // TODO: Update WorldData is skipped for now.
     }
 
     /**
@@ -149,7 +166,7 @@ public class ConfigManager {
      * @return the configuration file
      */
     public static ConfigFile getConfigFile() {
-        return worldsMap.get(null);
+        return NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().getDefaultWorldData().getRawConfiguration();
     }
 
     /**
@@ -170,23 +187,7 @@ public class ConfigManager {
      * @return the configuration file
      */
     public static ConfigFile getConfigFile(final String worldName) {
-        final ConfigFile configFile = worldsMap.get(worldName);
-        if (configFile != null){
-            return configFile;
-        }
-        // Expensive only once per world, for the rest of the runtime the file is returned fast.
-        synchronized(ConfigManager.class){
-            // Need to check again.
-            if (worldsMap.containsKey(worldName)){
-                return worldsMap.get(worldName);
-            }
-            // Copy the whole map with the default configuration set for this world.
-            final Map<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>(ConfigManager.worldsMap);
-            final ConfigFile globalConfig = newWorldsMap.get(null);
-            newWorldsMap.put(worldName, globalConfig);
-            ConfigManager.worldsMap = newWorldsMap;
-            return globalConfig;
-        }
+        return NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().getDefaultWorldData().getRawConfiguration();
     }
 
     /**
@@ -206,7 +207,7 @@ public class ConfigManager {
      * @param plugin
      *            the instance of NoCheatPlus
      */
-    public static synchronized void init(final Plugin plugin) {
+    public static synchronized void init(final Plugin plugin, final WorldDataManager worldDataManager) {
         // (This can lead to minor problems with async checks during reloading.)
         LinkedHashMap<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>();
         // Try to obtain and parse the global configuration file.
@@ -305,7 +306,7 @@ public class ConfigManager {
             worldConfig.options().copyDefaults(true);
             //            worldConfig.setActionFactory();
         }
-        ConfigManager.worldsMap = newWorldsMap;
+        worldDataManager.applyConfiguration(newWorldsMap);
         isInitialized = true;
     }
 
@@ -402,27 +403,38 @@ public class ConfigManager {
     }
 
     /**
-     * Set a property for all configurations. Might use with DataManager.clearConfigs if check-configurations might already be in use.
+     * Set a property for all configurations. Might use with
+     * DataManager.clearConfigs if check-configurations might already be in use.
+     * 
      * @param path
      * @param value
+     * @deprecated For activation flags use the WorldDataManager.
      */
+    @Deprecated
     public static synchronized void setForAllConfigs(String path, Object value){
-        final Map<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>(ConfigManager.worldsMap);
-        for (final ConfigFile cfg : newWorldsMap.values()){
-            cfg.set(path, value);
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()) {
+            it.next().getValue().getRawConfiguration().set(path, value);
         }
-        ConfigManager.worldsMap = newWorldsMap;
+        worldMan.updateAllWorldData();
     }
 
     /**
      * Check if any config has a boolean set to true for the given path.
+     * <hr/>
+     * NOTE: Check activation flags need a query to the WorldDataManager, as
+     * MAYBE typically means to activate, if the parent is active (checks <-
+     * check group <- check (<- sub check)).
      * 
      * @param path
      * @return True if any config has a boolean set to true for the given path.
      */
     public static boolean isTrueForAnyConfig(String path) {
-        for (final ConfigFile cfg : worldsMap.values()){
-            if (cfg.getBoolean(path, false)) {
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            if (it.next().getValue().getRawConfiguration().getBoolean(path, false)) {
                 return true;
             }
         }
@@ -432,6 +444,10 @@ public class ConfigManager {
     /**
      * Check if any config has the path set to true, or to default in case
      * decideOptimistically is set, or not set in case trueForNotSet is set.
+     * <hr/>
+     * NOTE: Check activation flags need a query to the WorldDataManager, as
+     * MAYBE typically means to activate, if the parent is active (checks <-
+     * check group <- check (<- sub check)).
      * 
      * @param path
      * @param decideOptimistically
@@ -439,8 +455,10 @@ public class ConfigManager {
      * @return
      */
     public static boolean isAlmostTrueForAnyConfig(String path, boolean decideOptimistically, boolean trueForNotSet) {
-        for (final ConfigFile cfg : worldsMap.values()){
-            if (cfg.getAlmostBoolean(path, decideOptimistically, trueForNotSet)) {
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            if (it.next().getValue().getRawConfiguration().getAlmostBoolean(path, decideOptimistically, trueForNotSet)) {
                 return true;
             }
         }
@@ -455,8 +473,11 @@ public class ConfigManager {
      * @return Value or null.
      */
     public static Double getMaxNumberForAllConfigs(final String path){
-        Number max = null;  
-        for (final ConfigFile config : worldsMap.values()){
+        Number max = null;
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            final ConfigFile config = it.next().getValue().getRawConfiguration();
             try{
                 final Object obj = config.get(path);
                 if (obj instanceof Number){
@@ -482,7 +503,10 @@ public class ConfigManager {
      */
     public static Double getMinNumberForAllConfigs(final String path){
         Number min = null;  
-        for (final ConfigFile config : worldsMap.values()){
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()){
+            final ConfigFile config = it.next().getValue().getRawConfiguration();
             try{
                 final Object obj = config.get(path);
                 if (obj instanceof Number){

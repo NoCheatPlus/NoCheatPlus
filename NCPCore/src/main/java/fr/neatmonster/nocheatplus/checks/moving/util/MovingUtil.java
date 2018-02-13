@@ -39,11 +39,9 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
@@ -77,17 +75,13 @@ public class MovingUtil {
      * @return
      */
     public static final boolean shouldCheckSurvivalFly(final Player player, final PlayerLocation fromLocation, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData) {
+            final MovingData data, final MovingConfig cc, final IPlayerData pData) {
         final GameMode gameMode = player.getGameMode();
-        /*
-         * TODO: Model rare to check conditions (elytra, ...) on base of one
-         * pre-check and a method to delegate to. Reuse method(s) with
-         * MovingConfig.
-         */
-        return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
+        // (Full activation check - use permission caching for performance rather.)
+        return  pData.isCheckActive(CheckType.MOVING_SURVIVALFLY, player) 
+                && gameMode != BridgeMisc.GAME_MODE_SPECTATOR
                 && (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
                 && (cc.ignoreAllowFlight || !player.getAllowFlight())
-                && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY)
                 && (
                         !Bridge1_9.isGlidingWithElytra(player) 
                         || !isGlidingWithElytraValid(player, fromLocation, data, cc)
@@ -96,7 +90,7 @@ public class MovingUtil {
                         Double.isInfinite(Bridge1_9.getLevitationAmplifier(player)) 
                         || fromLocation.isInLiquid()
                         )
-                && !pData.hasPermission(Permissions.MOVING_SURVIVALFLY, player);
+                ;
     }
 
     /**
@@ -287,10 +281,11 @@ public class MovingUtil {
      * @param loc
      * @return
      */
-    public static boolean shouldCheckUntrackedLocation(final Player player, final Location loc) {
+    public static boolean shouldCheckUntrackedLocation(final Player player, 
+            final Location loc, final IPlayerData pData) {
         return !TrigUtil.isSamePos(loc, loc.getWorld().getSpawnLocation()) 
                 && !BlockProperties.isPassable(loc)
-                && CheckType.MOVING_PASSABLE.isEnabled(player);
+                && pData.isCheckActive(CheckType.MOVING_PASSABLE, player);
     }
 
     /**
@@ -321,7 +316,8 @@ public class MovingUtil {
             // TODO: Exempt other warps -> HASH based exemption (expire by time, keep high count)?
             if (TrigUtil.isSamePos(loc, refLoc) && (entity instanceof Player)) {
                 final Player other = (Player) entity;
-                final MovingData otherData = MovingData.getData(other);
+                final IPlayerData otherPData = DataManager.getPlayerData(other);
+                final MovingData otherData = otherPData.getGenericInstance(MovingData.class);
                 final PlayerMoveData otherLastMove = otherData.playerMoves.getFirstPastMove();
                 if (!otherLastMove.toIsValid) {
                     // Data might have been removed.
@@ -365,8 +361,10 @@ public class MovingUtil {
      * @param data
      * @return
      */
-    public static double getRealisticFallDistance(final Player player, final double fromY, final double toY, final MovingData data) {
-        if (CheckType.MOVING_NOFALL.isEnabled(player)) { // Not optimal
+    public static double getRealisticFallDistance(final Player player, 
+            final double fromY, final double toY, 
+            final MovingData data, final IPlayerData pData) {
+        if (pData.isCheckActive(CheckType.MOVING_NOFALL, player)) {
             // (NoFall will not be checked, if this method is called.)
             if (data.noFallMaxY >= fromY ) {
                 return Math.max(0.0, data.noFallMaxY - toY);
@@ -387,7 +385,8 @@ public class MovingUtil {
      * @param from
      * @param data
      */
-    public static void checkSetBack(final Player player, final PlayerLocation from, final MovingData data, final IDebugPlayer idp) {
+    public static void checkSetBack(final Player player, final PlayerLocation from, 
+            final MovingData data, final IPlayerData pData, final IDebugPlayer idp) {
         if (!data.hasSetBack()) {
             data.setSetBack(from);
         }
@@ -396,7 +395,7 @@ public class MovingUtil {
                 (from.isOnGround() || from.isResetCond())) {
             // TODO: Move most to a method?
             // TODO: Is a margin needed for from.isOnGround()? [bukkitapionly]
-            if (data.debug) {
+            if (pData.isDebugActive(CheckType.MOVING)) {
                 // TODO: Should this be info?
                 idp.debug(player, "Adjust set back after join/respawn: " + from.getLocation());
             }
@@ -446,8 +445,9 @@ public class MovingUtil {
      * @param data
      * @param cc
      */
-    public static void ensureChunksLoaded(final Player player, final Location from, final Location to, final PlayerMoveData lastMove, 
-            final String tag, final MovingData data, final MovingConfig cc) {
+    public static void ensureChunksLoaded(final Player player, 
+            final Location from, final Location to, final PlayerMoveData lastMove, 
+            final String tag, final MovingConfig cc, final IPlayerData pData) {
         // (Worlds must be equal. Ensured in player move handling.)
         final double x0 = from.getX();
         final double z0 = from.getZ();
@@ -489,7 +489,7 @@ public class MovingUtil {
         if (loadTo) {
             loaded += MapUtil.ensureChunksLoaded(to.getWorld(), x1, z1, margin);
         }
-        if (loaded > 0 && data.debug) {
+        if (loaded > 0 && pData.isDebugActive(CheckType.MOVING)) {
             StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + from.getWorld().getName() +  " for player: " + player.getName());
         }
     }
@@ -505,8 +505,10 @@ public class MovingUtil {
      * @param data
      * @param cc
      */
-    public static void ensureChunksLoaded(final Player player, final Location loc, final String tag, 
-            final MovingData data, final MovingConfig cc) {
+    public static void ensureChunksLoaded(final Player player, 
+            final Location loc, final String tag, 
+            final MovingData data, final MovingConfig cc, 
+            final IPlayerData pData) {
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         final double x0 = loc.getX();
         final double z0 = loc.getZ();
@@ -524,7 +526,7 @@ public class MovingUtil {
             }
         }
         int loaded = MapUtil.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), Magic.CHUNK_LOAD_MARGIN_MIN);
-        if (loaded > 0 && data.debug) {
+        if (loaded > 0 && pData.isDebugActive(CheckType.MOVING)) {
             StaticLog.logInfo("Player " + tag + ": Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
         }
     }
@@ -537,7 +539,8 @@ public class MovingUtil {
      * @return
      */
     public static boolean hasScheduledPlayerSetBack(final Player player) {
-        return hasScheduledPlayerSetBack(player.getUniqueId(), MovingData.getData(player));
+        return hasScheduledPlayerSetBack(player.getUniqueId(), 
+                DataManager.getGenericInstance(player, MovingData.class));
     }
 
     /**
@@ -548,8 +551,12 @@ public class MovingUtil {
      * @return
      */
     public static boolean hasScheduledPlayerSetBack(final UUID playerId, final MovingData data) {
-        final PlayerData pd = DataManager.getPlayerData(playerId);
-        return pd != null && data.hasTeleported() && pd.isPlayerSetBackScheduled();
+        return data.hasTeleported() && isPlayersetBackScheduled(playerId);
+    }
+
+    private static boolean isPlayersetBackScheduled(final UUID playerId) {
+        final IPlayerData pd = DataManager.getPlayerData(playerId);
+        return pd != null  && pd.isPlayerSetBackScheduled();
     }
 
     /**
@@ -558,10 +565,12 @@ public class MovingUtil {
      * @param debugMessagePrefix
      * @return True, if the teleport has been successful.
      */
-    public static boolean processStoredSetBack(final Player player, final String debugMessagePrefix) {
-        final MovingData data = MovingData.getData(player);
+    public static boolean processStoredSetBack(final Player player, 
+            final String debugMessagePrefix, final IPlayerData pData) {
+        final MovingData data = pData.getGenericInstance(MovingData.class);
+        final boolean debug = pData.isDebugActive(CheckType.MOVING);
         if (!data.hasTeleported()) {
-            if (data.debug) {
+            if (debug) {
                 CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "No stored location available.");
             }
             return false;
@@ -571,7 +580,7 @@ public class MovingUtil {
         final Location loc = player.getLocation(useLoc);
         if (data.isTeleportedPosition(loc)) {
             // Skip redundant teleport.
-            if (data.debug) {
+            if (debug) {
                 CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, player is there, already.");
             }
             data.resetTeleported(); // Not necessary to keep.
@@ -582,7 +591,7 @@ public class MovingUtil {
         // (player is somewhere else.)
 
         // Post-1.9 packet level workaround.
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
         // TODO: Consider to skip checking for packet level, if not available (plus optimize access).
         // TODO: Consider a config flag, so this can be turned off (set back method).
         final PlayerSetBackMethod method = cc.playerSetBackMethod;
@@ -605,9 +614,9 @@ public class MovingUtil {
              */
             // (CANCEL + UPDATE_FROM mean a certain teleport to the set back, still could be repeated tp.)
             // TODO: Better method, full sync reference?
-            final CountableLocation cl = ((NetData) CheckType.NET.getDataFactory().getData(player)).teleportQueue.getLastAck();
+            final CountableLocation cl = pData.getGenericInstance(NetData.class).teleportQueue.getLastAck();
             if (data.isTeleportedPosition(cl)) {
-                if (data.debug) {
+                if (debug) {
                     CheckUtils.debug(player, CheckType.MOVING, debugMessagePrefix + "Skip teleport, having received an ACK for the teleport on packet level. Player is at: " + LocUtil.simpleFormat(loc));
                 }
                 // Keep teleported in data. Subject to debug logs and/or discussion.
@@ -623,7 +632,7 @@ public class MovingUtil {
             return true;
         }
         else {
-            if (data .debug) {
+            if (debug) {
                 CheckUtils.debug(player, CheckType.MOVING, "Player set back on tick: Teleport failed.");
             }
             return false;

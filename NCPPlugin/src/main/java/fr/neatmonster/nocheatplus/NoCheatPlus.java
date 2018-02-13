@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -44,6 +45,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -120,7 +122,9 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerDataManager;
 import fr.neatmonster.nocheatplus.players.PlayerMessageSender;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
@@ -131,6 +135,8 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
+import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
@@ -170,9 +176,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     //    /** Is a new update available? */
     //    private boolean              updateAvailable = false;
 
+    // TODO: per world permission registry (!).
     private final PermissionRegistry permissionRegistry = new PermissionRegistry(10000);
-    /** Player data. */
-    private final DataManager dataMan = new DataManager(permissionRegistry);
+    /** Per world data. */
+    private final WorldDataManager worldDataManager = new WorldDataManager();
+    /** Player data / general data manager +- soon to be legacy static API. */
+    private final PlayerDataManager pDataMan = new PlayerDataManager(worldDataManager, permissionRegistry);
 
     private int dataManTaskId = -1;
 
@@ -261,6 +270,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     /** Access point for thread safe message queuing. */
+    // TODO: Replace by access point for message sending in general (relay to asynchronous depending on settings).
     private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
 
     private boolean clearExemptionsOnJoin = true;
@@ -383,7 +393,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 if (sender instanceof Player) {
                     // Use the permission caching feature.
                     final Player player = (Player) sender;
-                    final PlayerData data = DataManager.getPlayerData(player);
+                    final IPlayerData data = DataManager.getPlayerData(player);
                     if (data.getNotifyOff() || !data.hasPermission(Permissions.NOTIFY, player)) {
                         continue;
                     }
@@ -838,7 +848,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // Configuration.
         if (!ConfigManager.isInitialized()) {
-            ConfigManager.init(this);
+            ConfigManager.init(this, worldDataManager);
             // Basic setup for exemption (uses CheckType). This is redundant, but should not hurt.
             NCPExemptionManager.setExemptionSettings(new ExemptionSettings(ConfigManager.getConfigFile()));
         }
@@ -891,7 +901,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (Bugs.shouldPvpKnockBackVelocity()) {
             addFeatureTags("defaults", Arrays.asList("pvpKnockBackVelocity"));
         }
-        if (dataMan.storesPlayerInstances()) {
+        if (pDataMan.storesPlayerInstances()) {
             addFeatureTags("defaults", Arrays.asList("storePlayers"));
         }
 
@@ -917,6 +927,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         registerGenericInstance(new Random(System.currentTimeMillis() ^ ((long) this.hashCode() * (long) eventRegistry.hashCode() * (long) logManager.hashCode())));
         addComponent(new BridgeCrossPlugin());
 
+        // World data init (basic).
+        for (final World world : Bukkit.getWorlds()) {
+            onWorldPresent(world);
+        }
+
         // Initialize MCAccess.
         initMCAccess(config);
 
@@ -924,7 +939,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         initBlockProperties(config);
 
         // Initialize data manager.
-        dataMan.onEnable();
+        pDataMan.onEnable();
 
         // Register components. 
         @SetupOrder(priority = - 100)
@@ -941,7 +956,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 getCoreListener(),
                 // Put ReloadListener first, because Checks could also listen to it.
                 new ReloadHook(),
-                dataMan,
+                pDataMan,
                 new AuxMoving(),
         }) {
             addComponent(obj);
@@ -998,13 +1013,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         this.dataManTaskId  = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                dataMan.checkExpiration();
+                pDataMan.checkExpiration();
             }
         }, 1207, 1207);
 
         // Ensure dataMan is first on disableListeners.
-        disableListeners.remove(dataMan);
-        disableListeners.add(0, dataMan);
+        disableListeners.remove(pDataMan);
+        disableListeners.add(0, pDataMan);
 
         // Set up consistency checking.
         scheduleConsistencyCheckers();
@@ -1083,9 +1098,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             logManager.severe(Streams.INIT, "Failed to apply command protection: " + t.getClass().getSimpleName());
             logManager.severe(Streams.INIT, t);
         }
+        // TODO: This should be a registered handler.
         for (final Player player : onlinePlayers) {
+            final IPlayerData pData = DataManager.getPlayerData(player);
             if (player.isSleeping()) {
-                CombinedData.getData(player).wasInBed = true;
+                pData.getGenericInstance(CombinedData.class).wasInBed = true;
             }
         }
         if (onlinePlayers.length > 0) {
@@ -1278,12 +1295,30 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             public void onPlayerQuit(final PlayerQuitEvent event) {
                 onLeave(event.getPlayer());
             }
+
+            @EventHandler(priority = EventPriority.MONITOR)
+            public void onWorldLoad(final WorldLoadEvent event) {
+                NoCheatPlus.this.onWorldLoad(event);
+            }
         };
+    }
+
+    private void onWorldLoad(final WorldLoadEvent event) {
+        onWorldPresent(event.getWorld());
+    }
+
+    /**
+     * Called for all worlds we encounter (onEnable, WorldLoadEvent).
+     * 
+     * @param world
+     */
+    private void onWorldPresent(final World world) {
+        worldDataManager.updateWorldIdentifier(world);
     }
 
     private void onJoinLow(final Player player) {
         final String playerName = player.getName();
-        final PlayerData data = DataManager.getPlayerData(player);
+        final IPlayerData data = DataManager.getPlayerData(player);
         if (data.hasPermission(Permissions.NOTIFY, player)) { // Updates the cache.
             // Login notifications...
             //			// Update available.
@@ -1471,6 +1506,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public PermissionRegistry getPermissionRegistry() {
         return permissionRegistry;
+    }
+
+    @Override
+    public IWorldDataManager getWorldDataManager() {
+        return worldDataManager;
+    }
+
+    @Override
+    public IPlayerDataManager getPlayerDataManager() {
+        return pDataMan;
     }
 
 }

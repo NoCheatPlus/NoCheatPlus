@@ -25,7 +25,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 /**
  * Check if the placing is legitimate in terms of surrounding materials.
@@ -40,16 +40,16 @@ public class Against extends Check {
 
     public boolean check(final Player player, final Block block, final Material placedMat, 
             final Block blockAgainst, final boolean isInteractBlock, 
-            final BlockPlaceData data, final BlockPlaceConfig cc, final PlayerData pData) {
+            final BlockPlaceData data, final BlockPlaceConfig cc, final IPlayerData pData) {
         boolean violation = false;
         // TODO: Make more precise (workarounds like WATER_LILY, general points, such as action?).
         // Workaround for signs on cactus and similar.
-        final BlockInteractData bdata = BlockInteractData.getData(player); // TODO: pass as argument.
+        final BlockInteractData bdata = pData.getGenericInstance(BlockInteractData.class); // TODO: pass as argument.
         final Material againstType = blockAgainst.getType();
         if (bdata.isConsumedCheck(this.type) && !bdata.isPassedCheck(this.type)) {
             // TODO: Awareness of repeated violation probably is to be implemented below somewhere.
             violation = true;
-            if (data.debug) {
+            if (pData.isDebugActive(type)) {
                 debug(player, "Cancel due to block having been consumed by this check.");
             }
         }

@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * The Color check verifies that no color codes are sent in players' messages.
@@ -44,9 +46,10 @@ public class Color extends Check {
      */
     public String check(final Player player, final String message, final boolean isMainThread) {
 
-        final ChatConfig cc = ChatConfig.getConfig(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final ChatConfig cc = pData.getGenericInstance(ChatConfig.class);
+        final ChatData data = pData.getGenericInstance(ChatData.class);
 
-        final ChatData data = ChatData.getData(player);
         // Keep related to ChatData used lock.
         synchronized (data) {
             // If the message contains colors...

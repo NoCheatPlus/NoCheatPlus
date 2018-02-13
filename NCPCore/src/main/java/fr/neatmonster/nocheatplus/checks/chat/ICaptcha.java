@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * Captcha related operations.<br>
@@ -62,7 +62,7 @@ public interface ICaptcha {
      * @param pData
      * @return
      */
-    public boolean shouldCheckCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData);
+    public boolean shouldCheckCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData);
 
     /**
      * Check if captcha should be generated and send to the player.
@@ -73,7 +73,7 @@ public interface ICaptcha {
      * @param pData
      * @return
      */
-    public boolean shouldStartCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData);
+    public boolean shouldStartCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData);
 
     /**
      * Just resets tries, generate new captcha if necessary.
@@ -83,7 +83,7 @@ public interface ICaptcha {
      * @param data
      * @param pData
      */
-    public void resetCaptcha(Player player, ChatConfig cc, ChatData data, PlayerData pData);
+    public void resetCaptcha(Player player, ChatConfig cc, ChatData data, IPlayerData pData);
 
     /**
      * Convenience method. Should synchronize over data of player (!).

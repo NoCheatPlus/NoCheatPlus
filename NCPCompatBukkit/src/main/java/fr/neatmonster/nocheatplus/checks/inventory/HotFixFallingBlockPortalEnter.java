@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.WrapBlockCache;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * Hot fix for 1.9 and 1.10 (possibly later?): falling block duplication via end
@@ -87,7 +88,8 @@ public class HotFixFallingBlockPortalEnter implements Listener {
         if (mat != null) {
             final Location loc = entity.getLocation(useLoc);
             final World world = loc.getWorld();
-            if (InventoryConfig.getConfig(world).hotFixFallingBlockEndPortalActive) {
+            final IWorldData worldData = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().getWorldData(world);
+            if (worldData.getGenericInstance(InventoryConfig.class).hotFixFallingBlockEndPortalActive) {
                 final BlockCache blockCache = wrapBlockCache.getBlockCache();
                 blockCache.setAccess(world);
                 final boolean nearbyPortal = BlockProperties.collidesId(blockCache, loc.getX() - 2.0, loc.getY() - 2.0, loc.getZ() - 2.0, loc.getX() + 3.0, loc.getY() + 3.0, loc.getZ() + 3.0, Material.ENDER_PORTAL);

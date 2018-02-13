@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 public class Items extends Check{
 
@@ -42,12 +43,14 @@ public class Items extends Check{
      * @param player
      * @return True if the check is failed.
      */
-    public static final boolean checkIllegalEnchantmentsAllHands(final Player player) {
+    public static final boolean checkIllegalEnchantmentsAllHands(final Player player,
+            final IPlayerData pData) {
         boolean result = false;
-        if (checkIllegalEnchantments(player, Bridge1_9.getItemInMainHand(player))) {
+        if (checkIllegalEnchantments(player, Bridge1_9.getItemInMainHand(player), pData)) {
             result = true;
         }
-        if (Bridge1_9.hasGetItemInOffHand() && checkIllegalEnchantments(player, Bridge1_9.getItemInOffHand(player))) {
+        if (Bridge1_9.hasGetItemInOffHand() 
+                && checkIllegalEnchantments(player, Bridge1_9.getItemInOffHand(player), pData)) {
             result = true;
         }
         return result;
@@ -61,7 +64,8 @@ public class Items extends Check{
      * @param stack
      * @return True if the check is failed.
      */
-    public static final boolean checkIllegalEnchantments(final Player player, final ItemStack stack){
+    public static final boolean checkIllegalEnchantments(final Player player, 
+            final ItemStack stack, final IPlayerData pData){
         if (stack == null) {
             return false;
         }
@@ -70,7 +74,7 @@ public class Items extends Check{
         // TODO: Make stuff configurable.
         if (type == Material.WRITTEN_BOOK){
             final Map<Enchantment, Integer> enchantments = stack.getEnchantments();
-            if (enchantments != null && !enchantments.isEmpty() && instance.isEnabled(player)){
+            if (enchantments != null && !enchantments.isEmpty() && pData.isCheckActive(instance.type, player)){
                 // TODO: differentiate sub checks maybe or add extra permissions, later.
                 for (final Enchantment ench : new HashSet<Enchantment>(enchantments.keySet())){
                     stack.removeEnchantment(ench);

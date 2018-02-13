@@ -14,8 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.components.registry;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import fr.neatmonster.nocheatplus.components.registry.event.GenericInstanceHandle.ReferenceCountHandle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
@@ -24,7 +28,7 @@ import fr.neatmonster.nocheatplus.components.registry.event.IUnregisterGenericIn
 import fr.neatmonster.nocheatplus.components.registry.exception.RegistrationLockedException;
 import fr.neatmonster.nocheatplus.logging.details.IGetStreamId;
 import fr.neatmonster.nocheatplus.logging.details.ILogString;
-import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
+import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
  * Default/simple implementation. Handles are kept forever once fetched, for
@@ -52,6 +56,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
         // TODO: unique handles + use
 
         private final GenericInstanceRegistry registry;
+        private final Lock lock;
         private final IUnregisterGenericInstanceRegistryListener unregister;
         private final Class<T> registeredFor;
         private T instance = null;
@@ -63,19 +68,28 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
         private final List<IGenericInstanceRegistryListener<T>> listeners = new LinkedList<IGenericInstanceRegistryListener<T>>();
 
         public Registration(Class<T> registeredFor, T instance,
-                GenericInstanceRegistry registry, IUnregisterGenericInstanceRegistryListener unregister) {
+                GenericInstanceRegistry registry, 
+                IUnregisterGenericInstanceRegistryListener unregister,
+                Lock lock) {
             this.registry = registry;
             this.unregister = unregister;
             this.registeredFor = registeredFor;
             this.instance = instance;
+            this.lock = lock;
+        }
+
+        private void setFlag(long flag) {
+            lock.lock();
+            accessFlags |= flag;
+            lock.unlock();
         }
 
         public void denyOverrideInstance() {
-            accessFlags |= DENY_OVERRIDE_INSTANCE;
+            setFlag(DENY_OVERRIDE_INSTANCE);
         }
 
         public void denyRemoveInstance() {
-            accessFlags |= DENY_REMOVE_INSTANCE;
+            setFlag(DENY_REMOVE_INSTANCE);
         }
 
         /**
@@ -85,7 +99,9 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
          * @return The previously registered instance.
          */
         public T unregisterInstance() {
+            lock.lock();
             if ((accessFlags & DENY_REMOVE_INSTANCE) != 0) {
+                lock.unlock();
                 throw new RegistrationLockedException();
             }
             T oldInstance = this.instance;
@@ -95,6 +111,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
                     ((IGenericInstanceRegistryListener<T>) listener).onGenericInstanceRemove(registeredFor, oldInstance);
                 }
             }
+            lock.unlock();
             return oldInstance;
         }
 
@@ -106,7 +123,9 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
          * @return
          */
         public T registerInstance(T instance) {
+            lock.lock();
             if ((accessFlags & DENY_OVERRIDE_INSTANCE) != 0) {
+                lock.unlock();
                 throw new RegistrationLockedException();
             }
             T oldInstance = this.instance;
@@ -123,11 +142,25 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
                     }
                 }
             }
+            lock.unlock();
             return oldInstance;
         }
 
         public IGenericInstanceHandle<T> getHandle() {
-            if (uniqueHandle != null && uniqueHandle.isDisabled()) {
+            lock.lock();
+            if (uniqueHandle == null) {
+                updateUniqueHandle();
+            }
+            IGenericInstanceHandle<T> handle = uniqueHandle.getNewHandle();
+            lock.unlock();
+            return handle;
+        }
+
+        /**
+         * Only call if uniqueHandle is null and under lock.
+         */
+        private void updateUniqueHandle() {
+            if (uniqueHandle.isDisabled()) {
                 unregisterListener(uniqueHandle);
             }
             if (uniqueHandle == null) {
@@ -135,11 +168,11 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
                 this.listeners.add(uniqueHandle);
                 uniqueHandle.getHandle(); // Keep the count up, so this never unregisters automatically.
             }
-            return uniqueHandle.getNewHandle();
         }
 
         public void unregisterListener(IGenericInstanceRegistryListener<T> listener) {
-            IGenericInstanceHandle<T> disable = null; 
+            lock.lock();
+            IGenericInstanceHandle<T> disable = null;
             if (listener == uniqueHandle) {
                 disable = uniqueHandle;
                 uniqueHandle = null;
@@ -148,16 +181,25 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
             if (disable != null) {
                 disable.disableHandle();
             }
+            lock.unlock();
         }
 
         public T getInstance() {
             return (T) instance;
         }
 
-        public boolean canBeRemoved() {
-            return instance == null && uniqueHandle == null && listeners.isEmpty();
+        /**
+         * Must be called under lock.
+         * 
+         * @return
+         */
+        private boolean canBeRemoved() {
+            return instance == null || uniqueHandle == null && listeners.isEmpty();
         }
 
+        /**
+         * Call under lock only.
+         */
         public void clear() {
             instance = null;
             if (uniqueHandle != null) {
@@ -169,13 +211,9 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     }
 
-    /*
-     * TODO: Not sure about thread-safety here. Registration might later contain
-     * lots of objects and we might like to do some kind of opportunistic
-     * skipping of the copying, e.g. if no handles have been fetched yet, OR
-     * change implementation on the fly after 'activating' the registry.
-     */
-    private final LinkedHashMapCOW<Class<?>, Registration<?>> registrations = new LinkedHashMapCOW<Class<?>, Registration<?>>();
+
+    private final Lock lock = new ReentrantLock();
+    private final HashMapLOW<Class<?>, Registration<?>> registrations = new HashMapLOW<Class<?>, Registration<?>>(lock,30);
 
     private ILogString logger = null;
 
@@ -194,18 +232,41 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
         Registration<T> registration = (Registration<T>) registrations.get(registeredFor);
         if (registration == null && create) {
             // Create empty.
-            registration = new Registration<T>(registeredFor, null, this, this);
-            this.registrations.put(registeredFor, registration);
+            return createEmptyRegistration(registeredFor);
         }
+        else {
+            return registration;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Registration<T> createEmptyRegistration(Class<T> registeredFor) {
+        lock.lock();
+        Registration<T> registration = (Registration<T>) registrations.get(registeredFor); // Re-check.
+        if (registration == null) {
+            try {
+                // TODO: Consider individual locks / configuration for it.
+                registration = new Registration<T>(registeredFor, null, this, this, lock);
+                this.registrations.put(registeredFor, registration);
+            }
+            catch (Throwable t) {
+                lock.unlock();
+                throw new IllegalArgumentException(t); // Might document.
+            }
+        }
+        lock.unlock();
         return registration;
     }
 
     @Override
     public <T> void unregisterGenericInstanceRegistryListener(Class<T> registeredFor, IGenericInstanceRegistryListener<T> listener) {
+        lock.lock();
+        // (Include getRegistration, as no object creation is involved.)
         Registration<T> registration = getRegistration(registeredFor, false);
         if (registration != null) {
             registration.unregisterListener(listener);
         }
+        lock.lock();
     }
 
     @SuppressWarnings("unchecked")
@@ -216,18 +277,20 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     @Override
     public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
-        Registration<T> registration = getRegistration(registerFor, true);
+        Registration<T> registration = getRegistration(registerFor, true); // Locks / throws.
         T previouslyRegistered = registration.registerInstance(instance);
-        String msg = previouslyRegistered == null ? "Registered for " : "Registered (override) for ";
-        String registerForName = registerFor.getName();
-        String instanceName = instance.getClass().getName();
-        if (registerForName.equals(instanceName)) {
-            msg += "itself: " + instanceName;
+        if (logger != null) {
+            String msg = previouslyRegistered == null ? "Registered for " : "Registered (override) for ";
+            String registerForName = registerFor.getName();
+            String instanceName = instance.getClass().getName();
+            if (registerForName.equals(instanceName)) {
+                msg += "itself: " + instanceName;
+            }
+            else {
+                msg += registerForName + ": " + instanceName;
+            }
+            logRegistryEvent(msg);
         }
-        else {
-            msg += registerForName + ": " + instanceName;
-        }
-        logRegistryEvent(msg);
         return previouslyRegistered;
     }
 
@@ -239,17 +302,21 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     @Override
     public <T> T unregisterGenericInstance(Class<T> registeredFor) {
+        lock.lock();
         Registration<T> registration = getRegistration(registeredFor, false);
         T registered = registration == null ? null : registration.unregisterInstance();
-        if (registered != null) {
-            logRegistryEvent("Unregister, remove mapping for: " + registeredFor.getName());
-        }
-        else {
-            logRegistryEvent("Unregister, no mapping present for: " + registeredFor.getName());
-        }
         // Repeat getting for removal test.
         if (registrations.containsKey(registeredFor) && getRegistration(registeredFor, false).canBeRemoved()) {
             registrations.remove(registeredFor);
+        }
+        lock.unlock();
+        if (logger != null) {
+            if (registered != null) {
+                logRegistryEvent("Unregister, removed mapping for: " + registeredFor.getName());
+            }
+            else {
+                logRegistryEvent("Unregister, no mapping present for: " + registeredFor.getName());
+            }
         }
         return registered;
     }
@@ -261,11 +328,14 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
     public void clear() {
         // TODO: consider fire unregister or add a removal method ?
-        for (final Registration<?> registration : registrations.values()) {
-            registration.clear();
+        lock.lock();
+        final Iterator<Entry<Class<?>, Registration<?>>> it = registrations.iterator();
+        while (it.hasNext()) {
+            it.next().getValue().clear();
         }
         registrations.clear();
         logRegistryEvent("Registry cleared.");
+        lock.unlock();
     }
 
     /**

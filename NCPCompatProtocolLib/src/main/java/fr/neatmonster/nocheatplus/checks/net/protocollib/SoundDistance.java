@@ -33,8 +33,9 @@ import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
-import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 
 public class SoundDistance extends BaseAdapter {
@@ -92,14 +93,12 @@ public class SoundDistance extends BaseAdapter {
             ));
 
     private final Integer idSoundEffectCancel = counters.registerKey("packet.sound.cancel");
-    private final NetConfigCache configs;
     private final Location useLoc = new Location(null, 0, 0, 0);
     /** Legacy check behavior. */
     private final boolean pre1_9;
 
     public SoundDistance(Plugin plugin) {
         super(plugin, ListenerPriority.LOW, PacketType.Play.Server.NAMED_SOUND_EFFECT);
-        this.configs = (NetConfigCache) CheckType.NET.getConfigFactory(); // TODO: DataManager.getConfig(NetConfigCache.class);
         this.checkType = CheckType.NET_SOUNDDISTANCE;
         pre1_9 = ServerVersion.compareMinecraftVersion("1.9") < 0;
         inflateEffectNames();
@@ -151,8 +150,8 @@ public class SoundDistance extends BaseAdapter {
         }
 
         final Player player = event.getPlayer();
-        final NetConfig cc = configs.getConfig(player.getWorld());
-        if (!cc.soundDistanceActive) {
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        if (!pData.isCheckActive(CheckType.NET_SOUNDDISTANCE, player)) {
             return;
         }
 
@@ -163,6 +162,7 @@ public class SoundDistance extends BaseAdapter {
         //        if (data.debug) {
         //            debug(player, "SoundDistance(" + soundName + "): " + StringUtil.fdec1.format(Math.sqrt(dSq)));
         //        }
+        final NetConfig cc = pData.getGenericInstance(NetConfig.class);
         if (dSq > cc.soundDistanceSq) {
             event.setCancelled(true);
             counters.add(idSoundEffectCancel, 1);

@@ -24,9 +24,12 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.model.CountableLocation;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 public class OutgoingPosition extends BaseAdapter {
 
@@ -37,7 +40,7 @@ public class OutgoingPosition extends BaseAdapter {
     public static final int indexPitch = 1;
 
     private final Integer ID_OUTGOING_POSITION_UNTRACKED = counters.registerKey("packet.outgoing_position.untracked");
-    
+
     private boolean hasTeleportId = true;
 
     public OutgoingPosition(Plugin plugin) {
@@ -55,12 +58,17 @@ public class OutgoingPosition extends BaseAdapter {
         }
         final long time = System.currentTimeMillis();
         final Player player = event.getPlayer();
-        if (configFactory.getConfig(player).flyingFrequencyActive) {
-            interpretPacket(player, event.getPacket(), time, dataFactory.getData(player));
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        // TODO: In future multiple checks might use this (!)
+        if (pData.isCheckActive(CheckType.NET_FLYINGFREQUENCY, player)) {
+            interpretPacket(player, event.getPacket(), time, 
+                    pData.getGenericInstance(NetData.class),
+                    pData.isDebugActive(CheckType.NET_FLYINGFREQUENCY));
         }
     }
 
-    private void interpretPacket(final Player player, final PacketContainer packet, final long time, final NetData data) {
+    private void interpretPacket(final Player player, final PacketContainer packet, 
+            final long time, final NetData data, final boolean debug) {
         final StructureModifier<Double> doubles = packet.getDoubles();
         final StructureModifier<Float> floats = packet.getFloat();
 
@@ -78,7 +86,7 @@ public class OutgoingPosition extends BaseAdapter {
         final float yaw = floats.read(indexYaw);
         final float pitch = floats.read(indexPitch);
         Integer teleportId = Integer.MIN_VALUE;
-        
+
         if (hasTeleportId) {
             try {
                 final StructureModifier<Integer> integers = packet.getIntegers();
@@ -88,7 +96,7 @@ public class OutgoingPosition extends BaseAdapter {
                     if (teleportId == null) {
                         teleportId = Integer.MIN_VALUE;
                     }
-                    if (teleportId != Integer.MIN_VALUE && data.debug) {
+                    if (teleportId != Integer.MIN_VALUE && debug) {
                         debug(player, "Outgoing confirm teleport id: " + teleportId);
                     }
                 }
@@ -108,12 +116,12 @@ public class OutgoingPosition extends BaseAdapter {
             // Add counter for untracked (by Bukkit API) outgoing teleport.
             // TODO: There may be other cases which are indicated by Bukkit API events.
             counters.add(ID_OUTGOING_POSITION_UNTRACKED, 1);
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Untracked outgoing position: " + x + ", " + y + ", " + z + " (yaw=" + yaw + ", pitch=" + pitch + ").");
             }
         }
         else {
-            if (data.debug) {
+            if (debug) {
                 debug(player, "Expect ACK on outgoing position: " + packetData);
             }
         }

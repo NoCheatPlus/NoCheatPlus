@@ -37,6 +37,8 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
@@ -52,8 +54,9 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 public class BlockInteractListener extends CheckListener {
 
     public static void debugBlockVSBlockInteract(final Player player, final CheckType checkType, 
-            final Block block, final String prefix, final Action expectedAction) {
-        final BlockInteractData bdata = BlockInteractData.getData(player);
+            final Block block, final String prefix, final Action expectedAction,
+            final IPlayerData pData) {
+        final BlockInteractData bdata = pData.getGenericInstance(BlockInteractData.class);
         final int manhattan = bdata.manhattanLastBlock(block);
         String msg;
         if (manhattan == Integer.MAX_VALUE) {
@@ -109,7 +112,8 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
-        final BlockInteractData data = BlockInteractData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final BlockInteractData data = pData.getGenericInstance(BlockInteractData.class);
         data.resetLastBlock();
         // Early cancel for interact events with dead players and other.
         final int cancelId;
@@ -168,7 +172,7 @@ public class BlockInteractListener extends CheckListener {
             case RIGHT_CLICK_BLOCK:
                 stack = Bridge1_9.getUsedItem(player, event);
                 if (stack != null && stack.getType() == Material.ENDER_PEARL) {
-                    checkEnderPearlRightClickBlock(player, block, face, event, previousLastTick, data);
+                    checkEnderPearlRightClickBlock(player, block, face, event, previousLastTick, data, pData);
                 }
                 break;
             default:
@@ -189,16 +193,16 @@ public class BlockInteractListener extends CheckListener {
             }
         }
 
-        final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+        final BlockInteractConfig cc = pData.getGenericInstance(BlockInteractConfig.class);
         boolean preventUseItem = false;
 
         final Location loc = player.getLocation(useLoc);
-        final FlyingQueueHandle flyingHandle = new FlyingQueueHandle(player);
+        final FlyingQueueHandle flyingHandle = new FlyingQueueHandle(pData);
 
         // TODO: Always run all checks, also for !isBlock ?
 
         // Interaction speed.
-        if (!cancelled && speed.isEnabled(player) 
+        if (!cancelled && speed.isEnabled(player, pData) 
                 && speed.check(player, data, cc)) {
             cancelled = true;
             preventUseItem = true;
@@ -207,27 +211,30 @@ public class BlockInteractListener extends CheckListener {
         if (blockChecks) {
             final double eyeHeight = MovingUtil.getEyeHeight(player);
             // First the reach check.
-            if (!cancelled && reach.isEnabled(player) 
+            if (!cancelled && reach.isEnabled(player, pData) 
                     && reach.check(player, loc, eyeHeight, block, data, cc)) {
                 cancelled = true;
             }
 
             // Second the direction check
-            if (!cancelled && direction.isEnabled(player) 
-                    && direction.check(player, loc, eyeHeight, block, flyingHandle, data, cc)) {
+            if (!cancelled && direction.isEnabled(player, pData) 
+                    && direction.check(player, loc, eyeHeight, block, flyingHandle, 
+                            data, cc, pData)) {
                 cancelled = true;
             }
 
             // Ray tracing for freecam use etc.
-            if (!cancelled && visible.isEnabled(player) 
-                    && visible.check(player, loc, eyeHeight, block, face, action, flyingHandle, data, cc)) {
+            if (!cancelled && visible.isEnabled(player, pData) 
+                    && visible.check(player, loc, eyeHeight, block, face, action, flyingHandle, 
+                            data, cc, pData)) {
                 cancelled = true;
             }
         }
 
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
-            onCancelInteract(player, block, face, event, previousLastTick, preventUseItem, data, cc);
+            onCancelInteract(player, block, face, event, previousLastTick, preventUseItem, 
+                    data, cc, pData);
         }
         else {
             if (flyingHandle.isFlyingQueueFetched()) {
@@ -241,7 +248,7 @@ public class BlockInteractListener extends CheckListener {
                     cId = idInteractLookFlyingOther;
                 }
                 counters.add(cId, 1);
-                if (data.debug) {
+                if (pData.isDebugActive(CheckType.BLOCKINTERACT)) {
                     // Log which entry was used.
                     logUsedFlyingPacket(player, flyingHandle, flyingIndex);
                 }
@@ -266,11 +273,12 @@ public class BlockInteractListener extends CheckListener {
 
     private void onCancelInteract(final Player player, final Block block, final BlockFace face, 
             final PlayerInteractEvent event, final int previousLastTick, final boolean preventUseItem, 
-            final BlockInteractData data, final BlockInteractConfig cc) {
+            final BlockInteractData data, final BlockInteractConfig cc, final IPlayerData pData) {
+        final boolean debug = pData.isDebugActive(CheckType.BLOCKINTERACT);
         if (event.isCancelled()) {
             // Just prevent using the block.
             event.setUseInteractedBlock(Result.DENY);
-            if (data.debug) {
+            if (debug) {
                 genericDebug(player, block, face, event, "already cancelled: deny use block", previousLastTick, data, cc);
             }
         }
@@ -284,7 +292,7 @@ public class BlockInteractListener extends CheckListener {
                     || !InventoryUtil.isConsumable(Bridge1_9.getUsedItem(player, event))
                     ) {
                 event.setUseItemInHand(Result.DENY);
-                if (data.debug) {
+                if (debug) {
                     genericDebug(player, block, face, event, "deny item use", previousLastTick, data, cc);
                 }
             }
@@ -292,7 +300,7 @@ public class BlockInteractListener extends CheckListener {
                 // Consumable and not prevented otherwise.
                 // TODO: Ender pearl?
                 event.setUseItemInHand(Result.ALLOW);
-                if (data.debug) {
+                if (debug) {
                     genericDebug(player, block, face, event, "allow edible item use", previousLastTick, data, cc);
                 }
             }
@@ -303,7 +311,8 @@ public class BlockInteractListener extends CheckListener {
     public void onPlayerInteractMonitor(final PlayerInteractEvent event) {
         // Set event resolution.
         final Player player = event.getPlayer();
-        final BlockInteractData data = BlockInteractData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final BlockInteractData data = pData.getGenericInstance(BlockInteractData.class);
         data.setPlayerInteractEventResolution(event);
         /*
          * TODO: BlockDamageEvent fires before BlockInteract/MONITOR level,
@@ -332,14 +341,14 @@ public class BlockInteractListener extends CheckListener {
             final ItemStack stack = Bridge1_9.getUsedItem(player, event);
             if (stack != null && BridgeMisc.maybeElytraBoost(player, stack.getType())) {
                 final int power = BridgeMisc.getFireworksPower(stack);
-                final MovingData mData = MovingData.getData(player);
+                final MovingData mData = pData.getGenericInstance(MovingData.class);
                 final int ticks = Math.max((1 + power) * 20, 30);
                 mData.fireworksBoostDuration = ticks;
                 // Expiration tick: not general latency, rather a minimum margin for sudden congestion.
                 mData.fireworksBoostTickExpire = TickTask.getTick() + ticks;
                 // TODO: Invalidation mechanics: by tick/time well ?
                 // TODO: Implement using it in CreativeFly.
-                if (data.debug) {
+                if (pData.isDebugActive(CheckType.MOVING)) {
                     debug(player, "Elytra boost (power " + power + "): " + stack);
                 }
             }
@@ -348,13 +357,14 @@ public class BlockInteractListener extends CheckListener {
 
     private void checkEnderPearlRightClickBlock(final Player player, final Block block, 
             final BlockFace face, final PlayerInteractEvent event, 
-            final int previousLastTick, final BlockInteractData data) {
+            final int previousLastTick, final BlockInteractData data,
+            final IPlayerData pData) {
         if (block == null || !BlockProperties.isPassable(block.getType())) {
-            final CombinedConfig ccc = CombinedConfig.getConfig(player);
+            final CombinedConfig ccc = pData.getGenericInstance(CombinedConfig.class);
             if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock) {
                 event.setUseItemInHand(Result.DENY);
-                if (data.debug) {
-                    final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+                if (pData.isDebugActive(CheckType.BLOCKINTERACT)) {
+                    final BlockInteractConfig cc = pData.getGenericInstance(BlockInteractConfig.class);
                     genericDebug(player, block, face, event, "click block: deny use ender pearl", previousLastTick, data, cc);
                 }
             }

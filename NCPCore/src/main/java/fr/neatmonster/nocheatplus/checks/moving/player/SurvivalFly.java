@@ -49,7 +49,7 @@ import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
@@ -117,12 +117,14 @@ public class SurvivalFly extends Check {
      * @param useBlockChangeTracker
      * @return
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, 
+    public Location check(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
             final int multiMoveCount, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData,
+            final MovingData data, final MovingConfig cc, final IPlayerData pData,
             final int tick, final long now, final boolean useBlockChangeTracker) {
         tags.clear();
-        if (data.debug) {
+        final boolean debug = pData.isDebugActive(type);
+        if (debug) {
             justUsedWorkarounds.clear();
             data.ws.setJustUsedIds(justUsedWorkarounds);
         }
@@ -255,7 +257,7 @@ public class SurvivalFly extends Check {
                     && TrigUtil.isSamePosAndLook(thisMove.from, lastMove.to)) {
                 // Ground somehow appeared out of thin air (block place).
                 data.setSetBack(from);
-                if (data.debug) {
+                if (debug) {
                     debug(player, "Adjust set back on move: from is now on ground.");
                 }
             }
@@ -436,7 +438,7 @@ public class SurvivalFly extends Check {
             vDistanceAboveLimit = res[1];
             if (res[0] == Double.MIN_VALUE && res[1] == Double.MIN_VALUE) {
                 // Silent set back.
-                if (data.debug) {
+                if (debug) {
                     tags.add("silentsbcobweb");
                     outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, 
                             yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo, thisMove);
@@ -486,7 +488,7 @@ public class SurvivalFly extends Check {
 
         // Debug output.
         final int tagsLength;
-        if (data.debug) {
+        if (debug) {
             outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, 
                     yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo, thisMove);
             tagsLength = tags.size();
@@ -660,7 +662,7 @@ public class SurvivalFly extends Check {
         // Update unused velocity tracking.
         // TODO: Hide and seek with API.
         // TODO: Pull down tick / timing data (perhaps add an API object for millis + source + tick + sequence count (+ source of sequence count).
-        if (data.debug) {
+        if (debug) {
             // TODO: Only update, if velocity is queued at all.
             data.getVerticalVelocityTracker().updateBlockedState(tick, 
                     // Assume blocked with being in web/water, despite not entirely correct.
@@ -676,14 +678,16 @@ public class SurvivalFly extends Check {
         data.lastFrictionVertical = data.nextFrictionVertical;
 
         // Log tags added after violation handling.
-        if (data.debug && tags.size() > tagsLength) {
+        if (debug && tags.size() > tagsLength) {
             logPostViolationTags(player);
         }
         return null;
     }
 
-    private boolean toOnGroundPastStates(final PlayerLocation from, final PlayerLocation to, 
-            final PlayerMoveData thisMove, int tick, final MovingData data, final MovingConfig cc) {
+    private boolean toOnGroundPastStates(
+            final PlayerLocation from, final PlayerLocation to, 
+            final PlayerMoveData thisMove, int tick, 
+            final MovingData data, final MovingConfig cc) {
         // TODO: Heuristics / more / which? (too short move, typical step up moves, typical levels, ...)
         if (to.isOnGroundOpportune(cc.yOnGround, 0L, blockChangeTracker, data.blockChangeRef, tick)) {
             tags.add("pastground_to");
@@ -782,7 +786,8 @@ public class SurvivalFly extends Check {
      * @param data
      * @param cc
      */
-    private void setNextFriction(final PlayerMoveData thisMove, final MovingData data, final MovingConfig cc) {
+    private void setNextFriction(final PlayerMoveData thisMove, 
+            final MovingData data, final MovingConfig cc) {
         // NOTE: Other methods might still override nextFriction to 1.0 due to burst/lift-off envelope.
         // TODO: Other media / medium transitions / friction by block.
         final LocationData from = thisMove.from;
@@ -830,7 +835,7 @@ public class SurvivalFly extends Check {
      */
     private double setAllowedhDist(final Player player, final boolean sprinting, 
             final PlayerMoveData thisMove, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData,
+            final MovingData data, final MovingConfig cc, final IPlayerData pData,
             final boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
@@ -1003,9 +1008,10 @@ public class SurvivalFly extends Check {
      */
     private double[] vDistAir(final long now, final Player player, final PlayerLocation from, 
             final boolean fromOnGround, final boolean resetFrom, final PlayerLocation to, 
-            final boolean toOnGround, final boolean resetTo, final double hDistance, final double yDistance, 
+            final boolean toOnGround, final boolean resetTo, 
+            final double hDistance, final double yDistance, 
             final int multiMoveCount, final PlayerMoveData lastMove, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData) {
+            final MovingData data, final MovingConfig cc, final IPlayerData pData) {
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         // Y-distance for normal jumping, like in air.
         double vAllowedDistance = 0.0;
@@ -1327,7 +1333,8 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private double vAllowedDistanceNoData(final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
+    private double vAllowedDistanceNoData(
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
             final double maxJumpGain, final double jumpGainMargin, 
             final MovingData data, final MovingConfig cc) {
         if (lastMove.valid) {
@@ -1425,7 +1432,8 @@ public class SurvivalFly extends Check {
      * @param tag Tag to be added in case of a violation of this sub-check.
      * @return A violation value > 0.001, to be interpreted like a moving violation.
      */
-    private static final double verticalAccounting(final double yDistance, final ActionAccumulator acc, final ArrayList<String> tags, final String tag) {
+    private static final double verticalAccounting(final double yDistance, 
+            final ActionAccumulator acc, final ArrayList<String> tags, final String tag) {
         // TODO: Add air friction and do it per move anyway !?
         final int count0 = acc.bucketCount(0);
         if (count0 > 0) {
@@ -1463,7 +1471,9 @@ public class SurvivalFly extends Check {
      * @param vDistanceAboveLimit
      * @return vDistanceAboveLimit
      */
-    private double yDirChange(final PlayerLocation from, final PlayerLocation to, final double yDistance, double vDistanceAboveLimit, final PlayerMoveData lastMove, final MovingData data) {
+    private double yDirChange(final PlayerLocation from, final PlayerLocation to, 
+            final double yDistance, double vDistanceAboveLimit, 
+            final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Does this account for velocity in a sufficient way?
         if (yDistance > 0) {
             // TODO: Clear active vertical velocity here ?
@@ -1538,10 +1548,11 @@ public class SurvivalFly extends Check {
      * @param skipPermChecks
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
-    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, 
+    private double[] hDistAfterFailure(final Player player, 
+            final PlayerLocation from, final PlayerLocation to, 
             double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, 
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
-            final MovingData data, final MovingConfig cc, final PlayerData pData, 
+            final MovingData data, final MovingConfig cc, final IPlayerData pData, 
             final boolean skipPermChecks) {
 
         // TODO: Still not entirely sure about this checking order.
@@ -1633,7 +1644,10 @@ public class SurvivalFly extends Check {
      * @param data
      * @return hDistanceAboveLimit
      */
-    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data, final MovingConfig cc) {
+    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, 
+            final double hAllowedDistance, double hDistanceAboveLimit, final boolean sprinting, 
+            final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
+            final MovingData data, final MovingConfig cc) {
         // Check "bunny fly" here, to not fall over sprint resetting on the way.
         boolean allowHop = true;
         boolean double_bunny = false;
@@ -1819,7 +1833,9 @@ public class SurvivalFly extends Check {
      * @param data
      * @return vAllowedDistance, vDistanceAboveLimit
      */
-    private double[] vDistLiquid(final PlayerLocation from, final PlayerLocation to, final boolean toOnGround, final double yDistance, final PlayerMoveData lastMove, final MovingData data) {
+    private double[] vDistLiquid(final PlayerLocation from, final PlayerLocation to, 
+            final boolean toOnGround, final double yDistance, final PlayerMoveData lastMove, 
+            final MovingData data) {
         data.sfNoLowJump = true;
 
         // Expected envelopes.
@@ -1879,7 +1895,8 @@ public class SurvivalFly extends Check {
      * @param data
      * @return vDistanceAboveLimit
      */
-    private double vDistClimbable(final Player player, final PlayerLocation from, final PlayerLocation to,
+    private double vDistClimbable(final Player player, 
+            final PlayerLocation from, final PlayerLocation to,
             final boolean fromOnGround, final boolean toOnGround, 
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
             final double yDistance, final MovingData data) {
@@ -1951,7 +1968,9 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return vAllowedDistance, vDistanceAboveLimit
      */
-    private double[] vDistWeb(final Player player, final PlayerMoveData thisMove, final boolean toOnGround, final double hDistanceAboveLimit, final long now, final MovingData data, final MovingConfig cc) {
+    private double[] vDistWeb(final Player player, final PlayerMoveData thisMove, 
+            final boolean toOnGround, final double hDistanceAboveLimit, final long now, 
+            final MovingData data, final MovingConfig cc) {
         final double yDistance = thisMove.yDistance;
         double vAllowedDistance = 0.0;
         double vDistanceAboveLimit = 0.0;
@@ -2000,7 +2019,9 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return
      */
-    private Location handleViolation(final long now, final double result, final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
+    private Location handleViolation(final long now, final double result, 
+            final Player player, final PlayerLocation from, final PlayerLocation to, 
+            final MovingData data, final MovingConfig cc)
     {
         // Increment violation level.
         data.survivalFlyVL += result;
@@ -2032,7 +2053,8 @@ public class SurvivalFly extends Check {
      * @param cc
      * @param data
      */
-    public final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
+    public final void handleHoverViolation(final Player player, final Location loc, 
+            final MovingConfig cc, final MovingData data) {
         data.survivalFlyVL += cc.sfHoverViolation;
 
         // TODO: Extra options for set back / kick, like vl?
@@ -2125,7 +2147,8 @@ public class SurvivalFly extends Check {
             final MovingData data, final MovingConfig cc, 
             final double hDistance, final double hAllowedDistance, final double hFreedom, 
             final double yDistance, final double vAllowedDistance,
-            final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo,
+            final boolean fromOnGround, final boolean resetFrom, 
+            final boolean toOnGround, final boolean resetTo,
             final PlayerMoveData thisMove) {
         // TODO: Show player name once (!)
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();

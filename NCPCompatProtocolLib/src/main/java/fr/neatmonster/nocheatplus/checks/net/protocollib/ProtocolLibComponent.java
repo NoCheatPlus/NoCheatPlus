@@ -37,10 +37,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.net.NetConfig;
-import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
-import fr.neatmonster.nocheatplus.checks.net.NetDataFactory;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
@@ -50,8 +47,11 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
 
 /**
  * Quick and dirty ProtocolLib setup.
@@ -89,15 +89,17 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
 
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
-    protected final NetConfigCache configFactory = (NetConfigCache) CheckType.NET.getConfigFactory();
-    protected final NetDataFactory dataFactory = (NetDataFactory) CheckType.NET.getDataFactory();
-
     public ProtocolLibComponent(Plugin plugin) {
         register(plugin);
+        /*
+         * TODO: Register listeners iff any check is enabled - unregister from
+         * EventRegistry with unregister.
+         */
     }
 
     private void register(Plugin plugin) {
         StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
         //Special purpose.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET + ConfPaths.SUB_DEBUG) || ConfigManager.isTrueForAnyConfig(ConfPaths.CHECKS_DEBUG) ) {
             // (Debug logging. Only activates if debug is set for checks or checks.net, not on the fly.)
@@ -108,25 +110,29 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
             // Don't use this listener.
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, "Disable EntityUseAdapter due to incompatibilities. Use fight.speed instead of net.attackfrequency.");
         }
-        else if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_ATTACKFREQUENCY_ACTIVE)) {
+        else if (worldMan.isActiveAnywhere(CheckType.NET_ATTACKFREQUENCY)) {
             // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.UseEntityAdapter", plugin);
         }
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
+        if (worldMan.isActiveAnywhere(CheckType.NET_FLYINGFREQUENCY)) {
             // (Also sets lastKeepAliveTime, if enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.MovingFlying", plugin);
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.OutgoingPosition", plugin);
         }
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE) || ConfigManager.isTrueForAnyConfig(ConfPaths.FIGHT_GODMODE_CHECK)) {
+        if (worldMan.isActiveAnywhere(CheckType.NET_KEEPALIVEFREQUENCY) 
+                || worldMan.isActiveAnywhere(CheckType.FIGHT_GODMODE)) {
             // (Set lastKeepAlive if this or fight.godmode is enabled.)
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveAdapter", plugin);
         }
-        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
+        if (worldMan.isActiveAnywhere(CheckType.NET_SOUNDDISTANCE)) {
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.SoundDistance", plugin);
         }
-        if (ConfigManager.isAlmostTrueForAnyConfig(ConfPaths.NET_PACKETFREQUENCY_ACTIVE, ServerVersion.compareMinecraftVersion("1.9") < 0, false)) {
-            register("fr.neatmonster.nocheatplus.checks.net.protocollib.CatchAllAdapter", plugin);
+        if (ServerVersion.compareMinecraftVersion("1.9") < 0) {
+            if (worldMan.isActiveAnywhere(CheckType.NET_PACKETFREQUENCY)) {
+                register("fr.neatmonster.nocheatplus.checks.net.protocollib.CatchAllAdapter", plugin);
+            }
         }
+
         if (!registeredPacketAdapters.isEmpty()) {
             List<String> names = new ArrayList<String>(registeredPacketAdapters.size());
             for (PacketAdapter adapter : registeredPacketAdapters) {
@@ -178,8 +184,8 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
     @Override
     public void onReload() {
         unregister();
-        CheckType.NET.getDataFactory().removeAllData(); // Currently needed for FlyingFrequency.
-        register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // Store instead ?
+        NCPAPIProvider.getNoCheatPlusAPI().getPlayerDataManager().removeGenericInstance(NetData.class); // Currently needed for FlyingFrequency.
+        register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // TODO: static plugin getter?
     }
 
     private void unregister() {
@@ -200,14 +206,14 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
     @Override
     public void playerJoins(final Player player) {
         if (!registeredPacketAdapters.isEmpty()) {
-            dataFactory.getData(player).onJoin(player);
+            DataManager.getGenericInstance(player, NetData.class).onJoin(player);
         }
     }
 
     @Override
     public void playerLeaves(final Player player) {
         if (!registeredPacketAdapters.isEmpty()) {
-            dataFactory.getData(player).onLeave(player);
+            DataManager.getGenericInstance(player, NetData.class).onLeave(player);
         }
     }
 
@@ -215,7 +221,7 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
         if (!registeredPacketAdapters.isEmpty()) {
             final Player player = event.getPlayer();
-            final NetData data = dataFactory.getData(player);
+            final NetData data = DataManager.getGenericInstance(player, NetData.class);
             data.onJoin(player);
             final Location loc = event.getRespawnLocation();
             data.teleportQueue.onTeleportEvent(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
@@ -232,9 +238,9 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
                 return;
             }
             final Player player = event.getPlayer();
-            final NetConfig cc = configFactory.getConfig(player);
-            final NetData data = dataFactory.getData(player);
-            if (cc.flyingFrequencyActive) {
+            final IPlayerData pData = DataManager.getPlayerData(player);
+            final NetData data = pData.getGenericInstance(NetData.class);
+            if (pData.isCheckActive(CheckType.NET_FLYINGFREQUENCY, player)) {
                 // Register expected location for comparison with outgoing packets.
                 data.teleportQueue.onTeleportEvent(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
             }

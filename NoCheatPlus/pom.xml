@@ -8,7 +8,7 @@
 	<name>NoCheatPlus</name>
 	<version>3.16.1-SNAPSHOT</version>
 	<description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
-	<url>https://dev.bukkit.org/server-mods/nocheatplus</url>
+	<url>https://dev.bukkit.org/projects/nocheatplus</url>
 
 	<packaging>jar</packaging>
 

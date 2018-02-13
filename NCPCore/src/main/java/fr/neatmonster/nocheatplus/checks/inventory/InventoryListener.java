@@ -56,7 +56,7 @@ import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
@@ -110,14 +110,16 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         // Only if a player shot the arrow.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
-            if (instantBow.isEnabled(player)) {
+            final IPlayerData pData = DataManager.getPlayerData(player);
+            if (instantBow.isEnabled(player, pData)) {
                 final long now = System.currentTimeMillis();
                 final Location loc = player.getLocation(useLoc);
-                if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())) {
+                if (Combined.checkYawRate(player, loc.getYaw(), now, 
+                        loc.getWorld().getName(), pData)) {
                     // No else if with this, could be cancelled due to other checks feeding, does not have actions.
                     event.setCancelled(true);
                 }
-                final InventoryConfig cc = InventoryConfig.getConfig(player);
+                final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
                 // Still check instantBow, whatever yawrate says.
                 if (instantBow.check(player, event.getForce(), now)) {
                     // The check requested the event to be cancelled.
@@ -127,7 +129,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                     if (cc.instantBowImprobableFeedOnly) {
                         Improbable.feed(player, cc.instantBowImprobableWeight, now);
                     }
-                    else if (Improbable.check(player, cc.instantBowImprobableWeight, now, "inventory.instantbow")) {
+                    else if (Improbable.check(player, cc.instantBowImprobableWeight, 
+                            now, "inventory.instantbow", pData)) {
                         // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                         event.setCancelled(true);
                     }
@@ -150,7 +153,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         // Only if a player ate food.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
-            if (instantEat.isEnabled(player) && instantEat.check(player, event.getFoodLevel())) {
+            final IPlayerData pData = DataManager.getPlayerData(player);
+            if (instantEat.isEnabled(player, pData) 
+                    && instantEat.check(player, event.getFoodLevel())) {
                 event.setCancelled(true);
             }
             else if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
@@ -179,9 +184,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             return;
         }
         final Player player = (Player) entity;
-        final InventoryData data = InventoryData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
         final int slot = event.getSlot();
-        if (data.debug) {
+        if (pData.isDebugActive(checkType)) {
             outputDebugInventoryClick(player, slot, event, data);
         }
         if (slot == InventoryView.OUTSIDE || slot < 0) {
@@ -194,14 +200,14 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         boolean cancel = false;
         // Illegal enchantment checks.
         try{
-            if (!cancel && Items.checkIllegalEnchantments(player, clicked)) {
+            if (!cancel && Items.checkIllegalEnchantments(player, clicked, pData)) {
                 cancel = true;
                 counters.addPrimaryThread(idIllegalItem, 1);
             }
         }
         catch(final ArrayIndexOutOfBoundsException e) {} // Hotfix (CB)
         try{
-            if (!cancel && Items.checkIllegalEnchantments(player, cursor)) {
+            if (!cancel && Items.checkIllegalEnchantments(player, cursor, pData)) {
                 cancel = true;
                 counters.addPrimaryThread(idIllegalItem, 1);
             }
@@ -209,10 +215,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         catch(final ArrayIndexOutOfBoundsException e) {} // Hotfix (CB)
 
         // Fast inventory manipulation check.
-        if (fastClick.isEnabled(player)) {
-            final InventoryConfig cc = InventoryConfig.getConfig(player);
+        if (fastClick.isEnabled(player, pData)) {
+            final InventoryConfig cc = pData.getGenericInstance(InventoryConfig.class);
             if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative) {
-                final PlayerData pData = DataManager.getPlayerData(player);
                 if (fastClick.check(player, now, 
                         event.getView(), slot, cursor, clicked, event.isShiftClick(), 
                         data, cc, pData)) {
@@ -301,20 +306,21 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     public void onPlayerDropItem(final PlayerDropItemEvent event) {
 
         final Player player = event.getPlayer();
+        final IPlayerData pData = DataManager.getPlayerData(player);
 
         // Illegal enchantments hotfix check.
         final Item item = event.getItemDrop();
         if (item != null) {
             // No cancel here.
-            Items.checkIllegalEnchantments(player, item.getItemStack());
+            Items.checkIllegalEnchantments(player, item.getItemStack(), pData);
         }
 
         // If the player died, all their items are dropped so ignore them.
         if (event.getPlayer().isDead())
             return;
 
-        if (drop.isEnabled(event.getPlayer())) {
-            if (drop.check(event.getPlayer())) {
+        if (pData.isCheckActive(CheckType.INVENTORY_DROP, player)) {
+            if (drop.check(player)) {
                 // TODO: Is the following command still correct? If so, adapt actions.
                 /*
                  * Cancelling drop events is not save (in certain circumstances
@@ -341,7 +347,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             return;
 
         final Player player = event.getPlayer();
-        final InventoryData data = InventoryData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
 
         boolean resetAll = false;
 
@@ -366,7 +373,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             } else resetAll = true;
 
             // Illegal enchantments hotfix check.
-            if (Items.checkIllegalEnchantments(player, item)) {
+            if (Items.checkIllegalEnchantments(player, item, pData)) {
                 event.setCancelled(true);
                 counters.addPrimaryThread(idIllegalItem, 1);
             }
@@ -377,7 +384,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
         if (resetAll) {
             // Nothing that we are interested in, reset data.
-            if (data.debug && data.instantEatFood != null) {
+            if (pData.isDebugActive(CheckType.INVENTORY_INSTANTEAT) 
+                    && data.instantEatFood != null) {
                 debug(player, "PlayerInteractEvent, reset fastconsume (legacy: instanteat).");
             }
             data.instantBowInteract = 0;
@@ -407,7 +415,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         Entity entity = event.getRightClicked();
         if (stack != null && stack.getType() == Material.MONSTER_EGG
                 && (entity == null || entity instanceof LivingEntity  || entity instanceof ComplexEntityPart)
-                && items.isEnabled(player)) {
+                && items.isEnabled(player, DataManager.getPlayerData(player))) {
             event.setCancelled(true);
             counters.addPrimaryThread(idEggOnEntity, 1);
             return;
@@ -428,8 +436,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     @EventHandler(priority = EventPriority.MONITOR)
     public void onItemHeldChange(final PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
-        final InventoryData data = InventoryData.getData(player);
-        if (data.debug && data.instantEatFood != null) {
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final InventoryData data = pData.getGenericInstance(InventoryData.class);
+        if (pData.isDebugActive(checkType) && data.instantEatFood != null) {
             debug(player, "PlayerItemHeldEvent, reset fastconsume (legacy: instanteat).");
         }
         data.instantBowInteract = 0;
@@ -438,8 +447,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
         // Illegal enchantments hotfix check.
         final PlayerInventory inv = player.getInventory();
-        Items.checkIllegalEnchantments(player, inv.getItem(event.getNewSlot()));
-        Items.checkIllegalEnchantments(player, inv.getItem(event.getPreviousSlot()));
+        Items.checkIllegalEnchantments(player, inv.getItem(event.getNewSlot()), pData);
+        Items.checkIllegalEnchantments(player, inv.getItem(event.getPreviousSlot()), pData);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

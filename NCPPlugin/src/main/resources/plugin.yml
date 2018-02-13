@@ -104,6 +104,8 @@ permissions:
         default: false
     nocheatplus.checks.fight.speed.silent:
         default: false
+    nocheatplus.checks.fight.wrongturn.silent:
+        default: false
     nocheatplus.checks.inventory.drop.silent:
         default: false
     nocheatplus.checks.inventory.fastclick.silent:
@@ -248,6 +250,8 @@ permissions:
                         description: Allow the player to bypass the SelfHit check.
                     nocheatplus.checks.fight.speed:
                         description: Allow the player to bypass the Speed check.
+                    nocheatplus.checks.fight.wrongturn:
+                        description: Allow the player to bypass the WrongTurn check.
             nocheatplus.checks.inventory:
                 description: Allow the player to bypass all Inventory checks.
                 children:

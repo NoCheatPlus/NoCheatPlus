@@ -17,7 +17,7 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 
 /**
  * JourneyMap + VoxelMap mod.
@@ -27,7 +27,7 @@ import fr.neatmonster.nocheatplus.players.PlayerData;
 public class JourneyMapMOTD extends ClientMOTD {
 
     @Override
-    public String onPlayerJoin(final String message, final Player player, final PlayerData data, final boolean allowAll) {
+    public String onPlayerJoin(final String message, final Player player, final IPlayerData data, final boolean allowAll) {
 
         if (allowAll) {
             return message;

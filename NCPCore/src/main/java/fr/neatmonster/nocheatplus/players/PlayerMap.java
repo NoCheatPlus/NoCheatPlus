@@ -238,9 +238,9 @@ public final class PlayerMap {
             return Bukkit.getPlayer(id);
         } else {
             // HACKS
-            final PlayerData pData = DataManager.getPlayerData(id);
-            if (pData != null && pData.playerName != null) {
-                return getPlayer(pData.playerName);
+            final IPlayerData pData = DataManager.getPlayerData(id);
+            if (pData != null) {
+                return getPlayer(pData.getPlayerName());
             }
             else {
                 // Backwards compatibility.

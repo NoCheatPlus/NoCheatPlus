@@ -1,0 +1,144 @@
+/*
+ * This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package fr.neatmonster.nocheatplus.players;
+
+import java.util.UUID;
+
+import org.bukkit.entity.Player;
+
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
+
+/**
+ * Player data specific operations.
+ * <hr>
+ * ComponentRegistry:
+ * <li>Supported: IRemoveData</li>
+ * 
+ * @author asofold
+ *
+ */
+public interface IPlayerDataManager extends ComponentRegistry<IRemoveData> {
+
+    // TODO: Complete (...)
+
+    /**
+     * Fetch a PlayerData instance. If none is present and create is set, a new
+     * instance will be created.
+     * 
+     * @param player
+     * @param create
+     * @return
+     */
+    public IPlayerData getPlayerData(final Player player, boolean create);
+
+    /**
+     * Get a PlayerData instance in any case - always creates a PlayerData
+     * instance, if none is present. This method should be preferred, as it
+     * hides details.
+     * 
+     * @param player
+     * @return
+     */
+    public IPlayerData getPlayerData(final Player player);
+
+    /**
+     * Get the player data, if present.
+     * 
+     * @param playerId
+     * @return The PlayerData instance if present, null otherwise.
+     */
+    public IPlayerData getPlayerData(final UUID playerId);
+
+    /**
+     * Get the player data, if present.
+     * 
+     * @param playerName
+     * @return The PlayerData instance if present, null otherwise.
+     */
+    public IPlayerData getPlayerData(final String playerName);
+
+    /**
+     * This gets an online player by exact player name or lower-case player name
+     * only [subject to change].
+     * 
+     * @param playerName
+     * @return
+     */
+    public Player getPlayerExact(final String playerName);
+
+    /**
+     * Retrieve the UUID for a given input (name or UUID string of with or
+     * without '-'). Might later also query a cache, if appropriate. Convenience
+     * method for use with commands.
+     * 
+     * @param input
+     * @return
+     */
+    public UUID getUUID(final String input);
+
+    /**
+     * Get the exact player name, stored internally.
+     * 
+     * @param playerId
+     */
+    public String getPlayerName(final UUID playerId);
+
+    /**
+     * Get an online player by UUID.
+     * 
+     * @param id
+     * @return
+     */
+    public Player getPlayer(final UUID id);
+
+    /**
+     * This gets the online player with the exact name, but transforms the input
+     * to lower case.
+     * 
+     * @param playerName
+     * @return
+     */
+    public Player getPlayer(final String playerName);
+
+    /**
+     * Restore the default debug flags within player data, as given in
+     * corresponding configurations. This only yields the correct result, if the
+     * the data uses the same configuration for initialization which is
+     * registered under the same check type.
+     */
+    public void restoreDefaultDebugFlags();
+
+    /**
+     * Remove an instance from the PlayerData-local generic instance storage,
+     * for all stored PlayerData instances. Factories and proxy-registries are
+     * not touched.
+     * 
+     * @param registeredFor
+     */
+    public <T> void removeGenericInstance(Class<T> registeredFor);
+
+    public void clearAllExemptions();
+
+    /**
+     * Remove data and history of all players for the given check type and sub
+     * checks.
+     * 
+     * @param checkType
+     */
+    public void clearData(final CheckType checkType);
+
+}

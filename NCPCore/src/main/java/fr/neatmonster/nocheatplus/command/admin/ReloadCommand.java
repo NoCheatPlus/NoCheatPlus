@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 public class ReloadCommand extends BaseCommand {
 
@@ -69,7 +70,9 @@ public class ReloadCommand extends BaseCommand {
 
         // Do the actual reload.
         ConfigManager.cleanup();
-        ConfigManager.init(access);
+        // (Magic/TODO)
+        ConfigManager.init(access, 
+                (WorldDataManager) NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager());
         if (logManager instanceof INotifyReload) { // TODO: This is a band-aid.
             ((INotifyReload) logManager).onReload();
         }

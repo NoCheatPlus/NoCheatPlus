@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.checks.net.FlyingQueueLookBlockChecker;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.collision.InteractRayTracing;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
@@ -113,7 +114,8 @@ public class Visible extends Check {
 
     public boolean check(final Player player, final Location loc, final double eyeHeight, final Block block, 
             final BlockFace face, final Action action, final FlyingQueueHandle flyingHandle, 
-            final BlockInteractData data, final BlockInteractConfig cc) {
+            final BlockInteractData data, final BlockInteractConfig cc,
+            final IPlayerData pData) {
         // TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
         // TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
         boolean collides;
@@ -123,6 +125,8 @@ public class Visible extends Check {
         final double eyeX = loc.getX();
         final double eyeY = loc.getY() + eyeHeight;
         final double eyeZ = loc.getZ();
+
+        final boolean debug = pData.isDebugActive(type);
 
         tags.clear();
         if (TrigUtil.isSameBlock(blockX, blockY, blockZ, eyeX, eyeY, eyeZ)) {
@@ -137,7 +141,7 @@ public class Visible extends Check {
             blockCache.setAccess(loc.getWorld());
             rayTracing.setBlockCache(blockCache);
             collides = !checker.checkFlyingQueue(eyeX, eyeY, eyeZ, loc.getYaw(), loc.getPitch(), 
-                    blockX, blockY, blockZ, flyingHandle, face, tags, data.debug, player);
+                    blockX, blockY, blockZ, flyingHandle, face, tags, debug, player);
             checker.cleanup();
             useLoc.setWorld(null);
             // Cleanup.
@@ -161,7 +165,7 @@ public class Visible extends Check {
         else {
             data.visibleVL *= 0.99;
             data.addPassedCheck(this.type);
-            if (data.debug) {
+            if (debug) {
                 debug(player, "pitch=" + loc.getPitch() + ",yaw=" + loc.getYaw() + " tags=" + StringUtil.join(tags, "+"));
             }
         }

@@ -38,6 +38,7 @@ public class RemovePlayerCommand extends BaseCommand {
         });
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onCommand(CommandSender sender, Command command,
             String label, String[] args) {

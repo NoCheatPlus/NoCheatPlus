@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 
 /**
@@ -57,11 +59,12 @@ public class VehicleSetBackTask implements Runnable{
 
     @Override
     public void run() {
-        final MovingData data = MovingData.getData(player);
+        final IPlayerData pData = DataManager.getPlayerData(player);
+        final MovingData data = pData.getGenericInstance(MovingData.class);
         data.vehicleSetBackTaskId = -1;
         try{
             NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(PassengerUtil.class).teleportWithPassengers(
-                    vehicle, player, location, debug, passengers, true);
+                    vehicle, player, location, debug, passengers, true, pData);
         }
         catch(Throwable t){
             StaticLog.logSevere(t);

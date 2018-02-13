@@ -29,9 +29,7 @@ import fr.neatmonster.nocheatplus.checks.moving.magic.Magic;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 
 /**
@@ -71,7 +69,8 @@ public class NoFall extends Check {
      *            Double.NEGATIVE_INFINITY.
      */
     private void handleOnGround(final Player player, final double y, final double previousSetBackY,
-            final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
+            final boolean reallyOnGround, final MovingData data, final MovingConfig cc,
+            final IPlayerData pData) {
         // Damage to be dealt.
         final float fallDist = (float) getApplicableFallHeight(player, y, previousSetBackY, data);
         final double maxD = getDamage(fallDist);
@@ -85,7 +84,7 @@ public class NoFall extends Check {
             }
             else {
                 // TODO: more effects like sounds, maybe use custom event with violation added.
-                if (data.debug) {
+                if (pData.isDebugActive(type)) {
                     debug(player, "NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
                 }
                 // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
@@ -209,8 +208,9 @@ public class NoFall extends Check {
      */
     public void check(final Player player, final PlayerLocation pFrom, final PlayerLocation pTo, 
             final double previousSetBackY,
-            final MovingData data, final MovingConfig cc) {
+            final MovingData data, final MovingConfig cc, final IPlayerData pData) {
 
+        final boolean debug = pData.isDebugActive(type);
         final PlayerMoveData thisMove = data.playerMoves.getCurrentMove();
         final LocationData from = thisMove.from;
         final LocationData to = thisMove.to;
@@ -260,7 +260,7 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || !toOnGround && thisMove.touchedGround) {
             // Check if to deal damage (fall back damage check).
-            touchDown(player, minY, previousSetBackY, data, cc); // Includes the current y-distance on descend!
+            touchDown(player, minY, previousSetBackY, data, cc, pData); // Includes the current y-distance on descend!
             // Ensure very big/strange moves don't yield violations.
             if (toY - fromY <= -Magic.FALL_DAMAGE_DIST) {
                 data.noFallSkipAirCheck = true;
@@ -276,7 +276,7 @@ public class NoFall extends Check {
                 // In this case the player has traveled further: add the difference.
                 data.noFallFallDistance -= yDiff;
             }
-            touchDown(player, minY, previousSetBackY, data, cc);
+            touchDown(player, minY, previousSetBackY, data, cc, pData);
         }
         else {
             // Ensure fall distance is correct, or "anyway"?
@@ -301,7 +301,7 @@ public class NoFall extends Check {
         else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || thisMove.touchedGround) && yDiff >= 0)) {
             final double max = Math.max(data.noFallFallDistance, mcFallDistance);
             if (max > 0.0 && max < 0.75) { // (Ensure this does not conflict with deal-damage set to false.) 
-                if (data.debug) {
+                if (debug) {
                     debug(player, "NoFall: Reset fall distance (anticriticals): mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance);
                 }
                 if (data.noFallFallDistance > 0) {
@@ -313,7 +313,7 @@ public class NoFall extends Check {
             }
         }
 
-        if (data.debug) {
+        if (debug) {
             debug(player, "NoFall: mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance + (oldNFDist < data.noFallFallDistance ? " (+" + (data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + data.noFallMaxY);
         }
 
@@ -331,9 +331,9 @@ public class NoFall extends Check {
      * @param cc
      */
     private void touchDown(final Player player, final double minY, final double previousSetBackY,
-            final MovingData data, final MovingConfig cc) {
+            final MovingData data, final MovingConfig cc, IPlayerData pData) {
         if (cc.noFallDealDamage) {
-            handleOnGround(player, minY, previousSetBackY, true, data, cc);
+            handleOnGround(player, minY, previousSetBackY, true, data, cc, pData);
         }
         else {
             adjustFallDistance(player, minY, true, data, cc);
@@ -359,15 +359,16 @@ public class NoFall extends Check {
      * Quit or kick: adjust fall distance if necessary.
      * @param player
      */
-    public void onLeave(final Player player) {
-        final MovingData data = MovingData.getData(player);
+    public void onLeave(final Player player, final MovingData data, 
+            final IPlayerData pData) {
         final float fallDistance = player.getFallDistance();
         // TODO: Might also detect too high mc fall dist.
         if (data.noFallFallDistance > fallDistance) {
             final double playerY = player.getLocation(useLoc).getY();
             useLoc.setWorld(null);
             if (player.isFlying() || player.getGameMode() == GameMode.CREATIVE
-                    || player.getAllowFlight() && MovingConfig.getConfig(player).noFallSkipAllowFlight) {
+                    || player.getAllowFlight() 
+                    && pData.getGenericInstance(MovingConfig.class).noFallSkipAllowFlight) {
                 // Forestall potential issues with flying plugins.
                 player.setFallDistance(0f);
                 data.noFallFallDistance = 0f;
@@ -387,22 +388,12 @@ public class NoFall extends Check {
      * @param player
      * @param data
      */
-    public void checkDamage(final Player player, final MovingData data, final double y) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
+    public void checkDamage(final Player player,  final double y, 
+            final MovingData data, final IPlayerData pData) {
+        final MovingConfig cc = pData.getGenericInstance(MovingConfig.class);
         // Deal damage.
         handleOnGround(player, y, data.hasSetBack() ? data.getSetBackY() : Double.NEGATIVE_INFINITY, 
-                false, data, cc);
-    }
-
-    /**
-     * Convenience method bypassing the factories.
-     * @param player
-     * @param cc
-     * @return
-     */
-    public boolean isEnabled(final Player player , final MovingConfig cc, final PlayerData pData) {
-        return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) 
-                && !pData.hasPermission(Permissions.MOVING_NOFALL, player);
+                false, data, cc, pData);
     }
 
 }

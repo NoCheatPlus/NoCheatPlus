@@ -155,7 +155,8 @@ public class TickTask implements Runnable {
             for (final Entry<UUID, ImprobableUpdateEntry> entry : updateMap.entrySet()) {
                 final Player player = DataManager.getPlayer(entry.getKey());
                 if (player != null) {
-                    Improbable.feed(player, entry.getValue().addLevel, System.currentTimeMillis());
+                    Improbable.feed(player, entry.getValue().addLevel, 
+                            System.currentTimeMillis(), DataManager.getPlayerData(player));
                 }
                 // TODO: else: offline update or warn?
             }

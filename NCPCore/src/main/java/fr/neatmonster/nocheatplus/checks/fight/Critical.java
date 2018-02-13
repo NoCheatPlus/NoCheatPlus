@@ -32,7 +32,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveInfo;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
-import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
@@ -58,13 +58,14 @@ public class Critical extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location loc, 
-            final FightData data, final FightConfig cc, final PlayerData pData) {
+            final FightData data, final FightConfig cc, 
+            final IPlayerData pData) {
         boolean cancel = false;
 
         final double mcFallDistance = (double) player.getFallDistance();
-        final MovingConfig mCc = MovingConfig.getConfig(player);
+        final MovingConfig mCc = pData.getGenericInstance(MovingConfig.class);
 
-        if (data.debug) {
+        if (pData.isDebugActive(type)) {
             debug(player, "y=" + loc.getY() + " mcfalldist=" + mcFallDistance);
         }
 
@@ -72,13 +73,17 @@ public class Critical extends Check {
         //  not in liquid, not in vehicle, and without blindness effect).
         if (mcFallDistance > 0.0 && !player.isInsideVehicle() && !player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
             // Might be a violation.
-            final MovingData dataM = MovingData.getData(player);
+            final MovingData dataM = pData.getGenericInstance(MovingData.class);
+            /*
+             * TODO: NoFall data max y. (past moves too perhaps - low jump,
+             * number split moves without reason)
+             */
 
             // TODO: Skip near the highest jump height (needs check if head collided with something solid, which also detects low jump).
             if (!dataM.isVelocityJumpPhase() && 
                     (dataM.sfLowJump && !dataM.sfNoLowJump && dataM.liftOffEnvelope == LiftOffEnvelope.NORMAL
                     || mcFallDistance < cc.criticalFallDistance && !BlockProperties.isResetCond(player, loc, mCc.yOnGround))) {
-                final MovingConfig ccM = MovingConfig.getConfig(player);
+                final MovingConfig ccM = pData.getGenericInstance(MovingConfig.class);
                 // TODO: Use past move tracking to check for SurvivalFly and the like?
                 final PlayerMoveInfo moveInfo = auxMoving.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, ccM.yOnGround);
