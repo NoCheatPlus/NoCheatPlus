@@ -26,7 +26,8 @@ public class SelfHit extends Check {
     }
 
     public boolean check(final Player damager, final Player damaged, final FightData data, final FightConfig cc){
-        if (!damager.getName().equals(damaged.getName())) return false;
+        // Check if the Entity Id's are Equals
+        if (damager.getEntityId() != damaged.getEntityId()) return false;
 
         boolean cancel = false;
         // Treat self hitting as instant violation.
