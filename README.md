@@ -42,7 +42,7 @@ Links
 
 ###### Related Plugins
 * [ProtocolLib at BukkitDev](https://dev.bukkit.org/bukkit-plugins/protocollib)
-* [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
+* [CompatNoCheatPlus at BukkitDev](https://dev.bukkit.org/projects/compatnocheatplus-cncp)
 
 ###### Obtain a build of Spigot
 * [Get the latest BuildTools.jar](https://hub.spigotmc.org/jenkins/job/BuildTools/)
