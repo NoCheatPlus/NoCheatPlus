@@ -748,6 +748,10 @@ public abstract class ConfPaths {
     private static final String NET_SUPERSEDED_FLYING                       = NET_SUPERSEDED + "flying.";
     public static final String  NET_SUPERSEDED_FLYING_CANCELWAITING         = NET_SUPERSEDED_FLYING + "cancelwaiting";
 
+    private static final String NET_EQALSROTATE                             = NET + "equalsrotate.";
+    public static final String  NET_EQALSROTATE_ACTIVE                      = NET_EQALSROTATE + "active";
+    public static final String  NET_EQALSROTATE_ACTIONS                     = NET_EQALSROTATE + "actions";
+
     public static final String  STRINGS                                     = "strings";
 
     // Compatibility section (possibly temporary).

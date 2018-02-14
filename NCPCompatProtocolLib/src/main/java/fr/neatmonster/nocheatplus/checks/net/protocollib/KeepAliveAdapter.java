@@ -63,6 +63,7 @@ public class KeepAliveAdapter extends BaseAdapter {
             event.setCancelled(true);
             return;
         }
+
         // Always update last received time.
         final PlayerData pData = DataManager.getPlayerData(player);
         final NetData data = dataFactory.getData(player);
