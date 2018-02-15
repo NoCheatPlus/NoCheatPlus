@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.checks.net.NetListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -961,6 +962,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 new FightListener(),
                 new InventoryListener(),
                 new MovingListener(),
+                new NetListener(),
         }) {
             addComponent(obj);
             // Register sub-components (allow later added to use registries, if any).

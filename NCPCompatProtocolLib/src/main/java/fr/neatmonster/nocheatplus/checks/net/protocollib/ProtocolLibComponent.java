@@ -125,10 +125,10 @@ public class ProtocolLibComponent implements IDisableListener, INotifyReload, Jo
             register("fr.neatmonster.nocheatplus.checks.net.protocollib.SoundDistance", plugin);
         }
         if (ConfigManager.isAlmostTrueForAnyConfig(ConfPaths.NET_PACKETFREQUENCY_ACTIVE, ServerVersion.compareMinecraftVersion("1.9") < 0, false)) {
-            register("fr.neatmonster.nocheatplus.checks.net.protocollib.KeepAliveAdapter", plugin);
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.CatchAllAdapter", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_EQALSROTATE_ACTIVE)) {
-            register("fr.neatmonster.nocheatplus.checks.net.protocollib.CatchAllAdapter", plugin);
+            register("fr.neatmonster.nocheatplus.checks.net.protocollib.EqualsRotateAdapter", plugin);
         }
         if (!registeredPacketAdapters.isEmpty()) {
             List<String> names = new ArrayList<String>(registeredPacketAdapters.size());

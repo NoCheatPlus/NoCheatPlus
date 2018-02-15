@@ -29,6 +29,7 @@ public class EqualsRotateAdapter extends BaseAdapter {
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
+        final long time = System.currentTimeMillis();
         final Player player = event.getPlayer();
         if(player == null)return;
         final NetData netData = dataFactory.getData(player);
@@ -36,7 +37,7 @@ public class EqualsRotateAdapter extends BaseAdapter {
         final StructureModifier<Float> floats = event.getPacket().getFloat();
         final float yaw = floats.read(0);
         final float pitch = floats.read(1);
-        if(cc.equalsRotateActive && EQUALSROTATE.check(player, netData, cc, yaw, pitch)){
+        if(cc.equalsRotateActive && EQUALSROTATE.check(time, player, netData, cc, yaw, pitch)){
             event.setCancelled(true);
         }
     }

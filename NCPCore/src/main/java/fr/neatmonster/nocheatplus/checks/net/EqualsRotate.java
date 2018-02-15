@@ -12,13 +12,24 @@ public class EqualsRotate extends Check {
         super(CheckType.NET_EQUALSROTATE);
     }
 
-    public boolean check(final Player player, final NetData data, final NetConfig cc, float yaw, float pitch) {
+    public boolean check(final long time, final Player player, final NetData data, final NetConfig cc, float yaw, float pitch) {
         if (yaw == data.lastYaw && pitch == data.lastPitch && !CheckUtils.hasBypass(CheckType.NET_KEEPALIVEFREQUENCY, player, DataManager.getPlayerData(player))) {
+            //Check for Teleports
+            final long teleportDelay = time-data.lastTeleport;
+            if(!data.teleportUsed && teleportDelay < 5000){
+                data.teleportUsed = true;
+                return false;
+            }
             data.equalsRotateVio++;
             if (executeActions(player, data.equalsRotateVio, 1, cc.equalsRotateActions).willCancel())
                 return true;
         }
         data.equalsRotateVio = Math.max(0, data.equalsRotateVio-0.02);
         return false;
+    }
+
+    public void handleTeleport(long time, NetData data){
+        data.teleportUsed = false;
+        data.lastTeleport = time;
     }
 }

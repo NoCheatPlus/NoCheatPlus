@@ -65,7 +65,7 @@ import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
  * 
  * @see InventoryEvent
  */
-public class InventoryListener  extends CheckListener implements JoinLeaveListener{
+public class InventoryListener extends CheckListener implements JoinLeaveListener{
 
     /** The drop check. */
     private final Drop       drop       = addCheck(new Drop());
