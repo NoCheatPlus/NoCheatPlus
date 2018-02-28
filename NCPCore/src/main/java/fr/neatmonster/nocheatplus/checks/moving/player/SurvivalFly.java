@@ -509,14 +509,16 @@ public class SurvivalFly extends Check {
         }
         else {
             // Slowly reduce the level with each event, if violations have not recently happened.
-            if (now - data.sfVLTime > cc.survivalFlyVLFreeze) {
+            // TODO: Switch to move count instead of time (!).
+            if (now - data.sfVLTime > cc.survivalFlyVLFreeze 
+                && (!cc.survivalFlyVLFreezeInAir || !Magic.inAir(thisMove))) {
+                // Relax VL.
                 data.survivalFlyVL *= 0.95D;
-            }
-
-            // Finally check horizontal buffer regain.
-            if (hDistanceAboveLimit < 0.0  && result <= 0.0 && !isSamePos && data.sfHorizontalBuffer < cc.hBufMax) {
-                // TODO: max min other conditions ?
-                hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data, cc);
+                // Finally check horizontal buffer regain.
+                if (hDistanceAboveLimit < 0.0  && result <= 0.0 && !isSamePos && data.sfHorizontalBuffer < cc.hBufMax) {
+                    // TODO: max min other conditions ?
+                    hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data, cc);
+                }
             }
         }
 
