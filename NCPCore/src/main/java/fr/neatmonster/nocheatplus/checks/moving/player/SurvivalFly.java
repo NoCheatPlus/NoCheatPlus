@@ -502,9 +502,13 @@ public class SurvivalFly extends Check {
         // Handle violations.
         ///////////////////////
 
+        final boolean inAir = Magic.inAir(thisMove);
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
         if (result > 0D) {
             final Location vLoc = handleViolation(now, result, player, from, to, data, cc);
+            if (inAir) {
+                data.sfVLInAir = true;
+            }
             if (vLoc != null) {
                 return vLoc;
             }
@@ -512,10 +516,16 @@ public class SurvivalFly extends Check {
         else {
             // Slowly reduce the level with each event, if violations have not recently happened.
             // TODO: Switch to move count instead of time (!).
-            if (now - data.sfVLTime > cc.survivalFlyVLFreeze 
-                && (!cc.survivalFlyVLFreezeInAir || !Magic.inAir(thisMove))) {
+            if (data.getPlayerMoveCount() - data.sfVLTime > cc.survivalFlyVLFreezeCount 
+                    && (!cc.survivalFlyVLFreezeInAir || !inAir
+                            // Favor bunny-hopping slightly: clean descend.
+                            || !data.sfVLInAir
+                            && data.liftOffEnvelope == LiftOffEnvelope.NORMAL
+                            && lastMove.toIsValid 
+                            && lastMove.yDistance < -Magic.GRAVITY_MIN
+                            && thisMove.yDistance - lastMove.yDistance < -Magic.GRAVITY_MIN)) {
                 // Relax VL.
-                data.survivalFlyVL *= 0.95D;
+                data.survivalFlyVL *= 0.95;
                 // Finally check horizontal buffer regain.
                 if (hDistanceAboveLimit < 0.0  && result <= 0.0 
                         && !isSamePos && data.sfHorizontalBuffer < cc.hBufMax) {
@@ -596,7 +606,6 @@ public class SurvivalFly extends Check {
         }
 
         // Apply reset conditions.
-        boolean inAir = false; // Hack.
         if (resetTo) {
             // The player has moved onto ground.
             if (toOnGround) {
@@ -637,7 +646,6 @@ public class SurvivalFly extends Check {
             if (to.getY() < 0.0 && cc.sfSetBackPolicyVoid) {
                 data.setSetBack(to);
             }
-            inAir = true;
         }
 
         if (inAir) {
@@ -652,6 +660,7 @@ public class SurvivalFly extends Check {
         else {
             data.sfZeroVdistRepeat = 0;
             data.ws.resetConditions(WRPT.G_RESET_NOTINAIR);
+            data.sfVLInAir = false;
         }
 
         // Horizontal velocity invalidation.
@@ -2028,7 +2037,7 @@ public class SurvivalFly extends Check {
     {
         // Increment violation level.
         data.survivalFlyVL += result;
-        data.sfVLTime = now;
+        data.sfVLTime = data.getPlayerMoveCount();
         final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
         if (vd.needsParameters()) {
             vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
@@ -2042,6 +2051,7 @@ public class SurvivalFly extends Check {
             return data.getSetBack(to);
         }
         else {
+            // TODO: Evaluate how data resetting can be done minimal (skip certain things flags)?
             data.clearAccounting();
             data.sfJumpPhase = 0;
             // Cancelled by other plugin, or no cancel set by configuration.
@@ -2061,7 +2071,8 @@ public class SurvivalFly extends Check {
         data.survivalFlyVL += cc.sfHoverViolation;
 
         // TODO: Extra options for set back / kick, like vl?
-        data.sfVLTime = System.currentTimeMillis();
+        data.sfVLTime = data.getPlayerMoveCount();
+        data.sfVLInAir = true;
         final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, cc.sfHoverViolation, cc.survivalFlyActions);
         if (vd.needsParameters()) {
             vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", loc.getX(), loc.getY(), loc.getZ()));

@@ -641,7 +641,7 @@ public abstract class ConfPaths {
     public static final String MOVING_SURVIVALFLY_EXTENDED_VACC             = MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
     private static final String MOVING_SURVIVALFLY_LENIENCY                 = MOVING_SURVIVALFLY + "leniency.";
     public static final String  MOVING_SURVIVALFLY_LENIENCY_HBUFMAX         = MOVING_SURVIVALFLY_LENIENCY + "hbufmax";
-    public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZETIME      = MOVING_SURVIVALFLY_LENIENCY + "freezetime";
+    public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZECOUNT     = MOVING_SURVIVALFLY_LENIENCY + "freezecount";
     public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR     = MOVING_SURVIVALFLY_LENIENCY + "freezeinair";
     private static final String MOVING_SURVIVALFLY_SETBACKPOLICY            = MOVING_SURVIVALFLY + "setbackpolicy.";
     public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE  = MOVING_SURVIVALFLY_SETBACKPOLICY + "falldamage";
@@ -832,8 +832,6 @@ public abstract class ConfPaths {
     public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS        = "checks.moving.morepacketsvehicle.actions";
     @Moved(newPath=MOVING_SURVIVALFLY_LENIENCY_HBUFMAX)
     public static final String MOVING_SURVIVALFLY_HBUFMAX                = "checks.moving.survivalfly.hbufmax";
-    @Moved(newPath=MOVING_SURVIVALFLY_LENIENCY_FREEZETIME)
-    public static final String MOVING_SURVIVALFLY_VLFREEZE               = "checks.moving.survivalfly.vlfreeze";
     // Deprecated paths (just removed).
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
@@ -883,6 +881,10 @@ public abstract class ConfPaths {
     public static final String  LOGGING_USESUBSCRIPTIONS                 = "logging.usesubscriptions";
     @Deprecated
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = "logging.backend.ingamechat.subscriptions";
+    @Deprecated
+    public static final String MOVING_SURVIVALFLY_VLFREEZE               = "checks.moving.survivalfly.vlfreeze";
+    @Deprecated
+    public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZETIME      = "checks.moving.survivalfly.leniency.freezetime";
 
     /**
      * Get moved paths for which an annotation doesn't work.

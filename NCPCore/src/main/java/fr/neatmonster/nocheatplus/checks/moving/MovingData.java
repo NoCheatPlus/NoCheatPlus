@@ -131,6 +131,8 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     /** Count set back (re-) setting. */
     private int playerMoveCount = 0;
+    /** playerMoveCount at the time of the last sf violation. */
+    public int sfVLTime = 0;
     /**
      * setBackResetCount (incremented) at the time of (re-) setting the ordinary
      * set back.
@@ -248,7 +250,8 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
     public int          sfOnIce = 0; // TODO: Replace by allowed speed + friction.
     public long         sfCobwebTime = 0;
     public double       sfCobwebVL = 0;
-    public long         sfVLTime = 0;
+    /** Fake in air flag: set with any violation, reset once on ground. */
+    public boolean       sfVLInAir = false;
 
 
     // Accounting info.
@@ -1308,7 +1311,6 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         timeSprinting = Math.min(timeSprinting, time);
         vehicleMorePacketsLastTime = Math.min(vehicleMorePacketsLastTime, time);
         sfCobwebTime = Math.min(sfCobwebTime, time);
-        sfVLTime = Math.min(sfVLTime, time);
         clearAccounting(); // Not sure: adding up might not be nice.
         removeAllPlayerSpeedModifiers(); // TODO: This likely leads to problems.
         // (ActionFrequency can handle this.)
@@ -1339,6 +1341,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         playerMoveCount++;
         if (playerMoveCount == Integer.MAX_VALUE) {
             playerMoveCount = 0;
+            sfVLTime = 0;
             morePacketsSetBackResetTime = 0;
             setBackResetTime = 0;
         }

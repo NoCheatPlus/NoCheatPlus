@@ -123,7 +123,7 @@ public class MovingConfig extends ACheckConfig {
     // Leniency settings.
     /** Horizontal buffer (rather sf), after failure leniency. */
     public final double hBufMax;
-    public final long       survivalFlyVLFreeze; // TODO: Rename to FreezeTime.
+    public final long       survivalFlyVLFreezeCount;
     public final boolean    survivalFlyVLFreezeInAir;
     // Set back policy.
     public final boolean    sfSetBackPolicyVoid;
@@ -266,7 +266,7 @@ public class MovingConfig extends ACheckConfig {
             this.sfStepHeight = sfStepHeight;
         }
         hBufMax = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_HBUFMAX);
-        survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZETIME);
+        survivalFlyVLFreezeCount = config.getInt(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZECOUNT);
         survivalFlyVLFreezeInAir = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR);
         survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
 
