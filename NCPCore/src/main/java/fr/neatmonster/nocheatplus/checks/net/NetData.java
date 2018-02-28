@@ -88,6 +88,16 @@ public class NetData extends ACheckData {
      */
     private long maxSequence = 0;
 
+    /*
+     * For the EqualsRotation check
+     * Last Yaw and Pitch
+     * Updated when a POSITION_LOOK or LOOK packet comes in
+     */
+    public float lastYaw = -1, lastPitch = -1;
+    public double equalsRotateVio = 0;
+    public long lastTeleport = 0;
+    public boolean teleportUsed = true;
+
     /** Overall packet frequency. */
     public final ActionFrequency packetFrequency;
 

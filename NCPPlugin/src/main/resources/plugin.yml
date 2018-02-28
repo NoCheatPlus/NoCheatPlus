@@ -315,6 +315,8 @@ permissions:
                   description: Bypass the KeepAliveFrequency check (keep alive packet spam).
                 nocheatplus.checks.net.packetfrequency:
                   description: Bypass the PacketFrequency check (overall packet spam).
+                nocheatplus.checks.net.equalsrotate:
+                                  description: Bypass the EqualsRotate check (illegal rotations).
     
     nocheatplus.mods:
         description: Allow the player to use all the client mods.

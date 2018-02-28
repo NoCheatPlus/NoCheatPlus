@@ -160,6 +160,8 @@ public class Permissions {
     public static final RegisteredPermission  NET_FLYINGFREQUENCY          = add(NET + ".flyingfrequency");
     public static final RegisteredPermission  NET_KEEPALIVEFREQUENCY       = add(NET + ".keepalivefrequency");
     public static final RegisteredPermission  NET_PACKETFREQUENCY          = add(NET + ".packetfrequency");
+    public static final RegisteredPermission  NET_EQUALSROTATE          = add(NET + ".equalsrotate");
+
 
     public static final RegisteredPermission  MOVING                       = add(CHECKS + ".moving");
     public static final RegisteredPermission  MOVING_CREATIVEFLY           = add(MOVING + ".creativefly");

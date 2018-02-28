@@ -36,6 +36,7 @@ public class NetConfig extends ACheckConfig {
             Permissions.NET_FLYINGFREQUENCY, 
             Permissions.NET_KEEPALIVEFREQUENCY,
             Permissions.NET_PACKETFREQUENCY,
+            Permissions.NET_EQUALSROTATE
     };
 
     public static RegisteredPermission[] getPreferKeepUpdatedPermissions() {
@@ -77,6 +78,9 @@ public class NetConfig extends ACheckConfig {
 
     public final boolean supersededFlyingCancelWaiting;
 
+    public final boolean equalsRotateActive;
+    public final ActionList equalsRotateActions;
+
     public NetConfig(final ConfigFile config) {
         // TODO: These permissions should have default policies.
         super(config, ConfPaths.NET);
@@ -114,6 +118,8 @@ public class NetConfig extends ACheckConfig {
 
         supersededFlyingCancelWaiting = config.getBoolean(ConfPaths.NET_SUPERSEDED_FLYING_CANCELWAITING);
 
+        equalsRotateActive = config.getBoolean(ConfPaths.NET_EQALSROTATE_ACTIVE);
+        equalsRotateActions = config.getOptimizedActionList(ConfPaths.NET_EQALSROTATE_ACTIONS, Permissions.NET_EQUALSROTATE);
     }
 
     @Override
@@ -129,6 +135,8 @@ public class NetConfig extends ACheckConfig {
                 return soundDistanceActive;
             case NET_KEEPALIVEFREQUENCY:
                 return keepAliveFrequencyActive;
+            case NET_EQUALSROTATE:
+                return equalsRotateActive;
             default:
                 return true;
         }
