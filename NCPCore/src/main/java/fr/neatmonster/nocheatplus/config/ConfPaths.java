@@ -634,20 +634,22 @@ public abstract class ConfPaths {
     public static final String MOVING_SURVIVALFLY_COBWEBHACK                = MOVING_SURVIVALFLY + "cobwebhack";
     public static final String MOVING_SURVIVALFLY_SLOWNESSSPRINTHACK        = MOVING_SURVIVALFLY + "slownesssprinthack";
     public static final String MOVING_SURVIVALFLY_GROUNDHOP                 = MOVING_SURVIVALFLY + "groundhop";
+    public static final String MOVING_SURVIVALFLY_STEPHEIGHT                = MOVING_SURVIVALFLY + "stepheight";
     private static final String MOVING_SURVIVALFLY_EXTENDED                 = MOVING_SURVIVALFLY + "extended.";
     public static final String MOVING_SURVIVALFLY_EXTENDED_HACC             = MOVING_SURVIVALFLY_EXTENDED + "horizontal-accounting";
     public static final String MOVING_SURVIVALFLY_EXTENDED_VACC             = MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
+    private static final String MOVING_SURVIVALFLY_LENIENCY                 = MOVING_SURVIVALFLY + "leniency.";
+    public static final String  MOVING_SURVIVALFLY_LENIENCY_HBUFMAX         = MOVING_SURVIVALFLY_LENIENCY + "hbufmax";
+    public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZETIME      = MOVING_SURVIVALFLY_LENIENCY + "freezetime";
+    public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR     = MOVING_SURVIVALFLY_LENIENCY + "freezeinair";
     private static final String MOVING_SURVIVALFLY_SETBACKPOLICY            = MOVING_SURVIVALFLY + "setbackpolicy.";
     public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE  = MOVING_SURVIVALFLY_SETBACKPOLICY + "falldamage";
     public static final String MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID  = MOVING_SURVIVALFLY_SETBACKPOLICY + "voidtovoid";
-    public static final String MOVING_SURVIVALFLY_STEPHEIGHT                = MOVING_SURVIVALFLY + "stepheight";
-    public static final String MOVING_SURVIVALFLY_HBUFMAX                   = MOVING_SURVIVALFLY + "hbufmax";
-    public static final String MOVING_SURVIVALFLY_VLFREEZE                  = MOVING_SURVIVALFLY + "vlfreeze";
     public static final String MOVING_SURVIVALFLY_ACTIONS                   = MOVING_SURVIVALFLY + "actions";
 
-    private static final String MOVING_SURVIVALFLY_HOVER                    = MOVING_SURVIVALFLY + "hover.";
-    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK              = MOVING_SURVIVALFLY_HOVER + "active";
     @GlobalConfig
+    public static final String  MOVING_SURVIVALFLY_HOVER                    = MOVING_SURVIVALFLY + "hover.";
+    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK              = MOVING_SURVIVALFLY_HOVER + "active";
     public static final String  MOVING_SURVIVALFLY_HOVER_STEP               = MOVING_SURVIVALFLY_HOVER + "step";
     public static final String  MOVING_SURVIVALFLY_HOVER_TICKS              = MOVING_SURVIVALFLY_HOVER + "ticks";
     public static final String  MOVING_SURVIVALFLY_HOVER_LOGINTICKS         = MOVING_SURVIVALFLY_HOVER + "loginticks";
@@ -685,6 +687,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_TRACE_MAXAGE                         = MOVING_TRACE + "maxage";
     public static final String  MOVING_TRACE_MAXSIZE                        = MOVING_TRACE + "maxsize";
 
+    // Vehicles.
     private static final String MOVING_VEHICLE                              = MOVING + "vehicle.";
     public static final String  MOVING_VEHICLE_ENFORCELOCATION              = MOVING_VEHICLE + "enforcelocation";
     public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN            = MOVING_VEHICLE + "preventdestroyown";
@@ -695,7 +698,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS          = MOVING_VEHICLE_MOREPACKETS + "actions";
     private static final String MOVING_VEHICLE_ENVELOPE                     = MOVING_VEHICLE + "envelope.";
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIVE              = MOVING_VEHICLE_ENVELOPE + "active";
-    public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP              = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
+    public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP           = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIONS             = MOVING_VEHICLE_ENVELOPE + "actions";
 
     private static final String MOVING_MESSAGE                              = MOVING + "message.";
@@ -826,6 +829,10 @@ public abstract class ConfPaths {
     public static final String  MOVING_MOREPACKETSVEHICLE_CHECK          = "checks.moving.morepacketsvehicle.active";
     @Moved(newPath=MOVING_VEHICLE_MOREPACKETS_ACTIONS)
     public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS        = "checks.moving.morepacketsvehicle.actions";
+    @Moved(newPath=MOVING_SURVIVALFLY_LENIENCY_HBUFMAX)
+    public static final String MOVING_SURVIVALFLY_HBUFMAX                = "checks.moving.survivalfly.hbufmax";
+    @Moved(newPath=MOVING_SURVIVALFLY_LENIENCY_FREEZETIME)
+    public static final String MOVING_SURVIVALFLY_VLFREEZE               = "checks.moving.survivalfly.vlfreeze";
     // Deprecated paths (just removed).
     @Deprecated
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
