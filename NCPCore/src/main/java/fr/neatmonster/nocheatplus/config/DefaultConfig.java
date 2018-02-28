@@ -454,9 +454,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES, Arrays.asList("sethome", "home set", "setwarp", "warp set", "setback", "set back", "back set"), 785);
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true, 785);
-        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true, 785);
         set(ConfPaths.MOVING_SURVIVALFLY_STEPHEIGHT, "default", 785);
-        set(ConfPaths.MOVING_SURVIVALFLY_HBUFMAX, 1.0, 785);
+        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true, 785);
+        set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_HBUFMAX, 1.0, 1143);
+        set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZETIME, 2000, 1143);
+        set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR, true, 1143);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, true, 785);
         set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_VOIDTOVOID, true, 785);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, 

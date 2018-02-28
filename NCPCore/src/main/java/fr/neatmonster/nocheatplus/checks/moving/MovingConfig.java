@@ -117,12 +117,17 @@ public class MovingConfig extends ACheckConfig {
      * normal speed on 1.6.4 and probably below.
      */
     public final boolean    sfGroundHop;
+    public final double     sfStepHeight;
     public final boolean    survivalFlyAccountingH;
     public final boolean    survivalFlyAccountingV;
+    // Leniency settings.
+    /** Horizontal buffer (rather sf), after failure leniency. */
+    public final double hBufMax;
+    public final long       survivalFlyVLFreeze; // TODO: Rename to FreezeTime.
+    public final boolean    survivalFlyVLFreezeInAir;
+    // Set back policy.
     public final boolean    sfSetBackPolicyVoid;
     public final boolean    sfSetBackPolicyFallDamage;
-    public final double     sfStepHeight;
-    public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
 
     public final boolean 	sfHoverCheck; // TODO: Sub check ?
@@ -132,8 +137,6 @@ public class MovingConfig extends ACheckConfig {
     public final double		sfHoverViolation;
 
     // Special tolerance values:
-    /** Horizontal buffer (rather sf), after failure leniency. */
-    public final double hBufMax;
     /**
      * Number of moving packets until which a velocity entry must be activated,
      * in order to not be removed.
@@ -262,7 +265,9 @@ public class MovingConfig extends ACheckConfig {
         } else {
             this.sfStepHeight = sfStepHeight;
         }
-        survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
+        hBufMax = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_HBUFMAX);
+        survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZETIME);
+        survivalFlyVLFreezeInAir = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR);
         survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
 
         sfHoverCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK);
@@ -271,7 +276,6 @@ public class MovingConfig extends ACheckConfig {
         sfHoverFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
         sfHoverViolation = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
 
-        hBufMax = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_HBUFMAX);
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
         velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
