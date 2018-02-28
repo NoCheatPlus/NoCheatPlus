@@ -645,9 +645,9 @@ public abstract class ConfPaths {
     public static final String MOVING_SURVIVALFLY_VLFREEZE                  = MOVING_SURVIVALFLY + "vlfreeze";
     public static final String MOVING_SURVIVALFLY_ACTIONS                   = MOVING_SURVIVALFLY + "actions";
 
-    private static final String MOVING_SURVIVALFLY_HOVER                    = MOVING_SURVIVALFLY + "hover.";
-    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK              = MOVING_SURVIVALFLY_HOVER + "active";
     @GlobalConfig
+    public static final String  MOVING_SURVIVALFLY_HOVER                    = MOVING_SURVIVALFLY + "hover.";
+    public static final String  MOVING_SURVIVALFLY_HOVER_CHECK              = MOVING_SURVIVALFLY_HOVER + "active";
     public static final String  MOVING_SURVIVALFLY_HOVER_STEP               = MOVING_SURVIVALFLY_HOVER + "step";
     public static final String  MOVING_SURVIVALFLY_HOVER_TICKS              = MOVING_SURVIVALFLY_HOVER + "ticks";
     public static final String  MOVING_SURVIVALFLY_HOVER_LOGINTICKS         = MOVING_SURVIVALFLY_HOVER + "loginticks";
@@ -685,6 +685,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_TRACE_MAXAGE                         = MOVING_TRACE + "maxage";
     public static final String  MOVING_TRACE_MAXSIZE                        = MOVING_TRACE + "maxsize";
 
+    // Vehicles.
     private static final String MOVING_VEHICLE                              = MOVING + "vehicle.";
     public static final String  MOVING_VEHICLE_ENFORCELOCATION              = MOVING_VEHICLE + "enforcelocation";
     public static final String  MOVING_VEHICLE_PREVENTDESTROYOWN            = MOVING_VEHICLE + "preventdestroyown";
@@ -695,7 +696,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_VEHICLE_MOREPACKETS_ACTIONS          = MOVING_VEHICLE_MOREPACKETS + "actions";
     private static final String MOVING_VEHICLE_ENVELOPE                     = MOVING_VEHICLE + "envelope.";
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIVE              = MOVING_VEHICLE_ENVELOPE + "active";
-    public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP              = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
+    public static final String  MOVING_VEHICLE_ENVELOPE_HSPEEDCAP           = MOVING_VEHICLE_ENVELOPE + "hdistcap"; // Section.
     public static final String  MOVING_VEHICLE_ENVELOPE_ACTIONS             = MOVING_VEHICLE_ENVELOPE + "actions";
 
     private static final String MOVING_MESSAGE                              = MOVING + "message.";
