@@ -38,6 +38,7 @@ import fr.neatmonster.nocheatplus.checks.moving.model.LiftOffEnvelope;
 import fr.neatmonster.nocheatplus.checks.moving.model.LocationData;
 import fr.neatmonster.nocheatplus.checks.moving.model.PlayerMoveData;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
+import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -55,6 +56,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -444,7 +446,8 @@ public class SurvivalFly extends Check {
                             yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo, thisMove);
                     data.ws.setJustUsedIds(null);
                 }
-                return data.getSetBack(to);
+                // (No need for MovingUtil.getApplicableSetBackLocation.)
+                return data.getSetBack(to); // (OK)
             }
         }
         else if (from.isOnClimbable()) {
@@ -2048,7 +2051,9 @@ public class SurvivalFly extends Check {
         // Some resetting is done in MovingListener.
         if (executeActions(vd).willCancel()) {
             // Set back + view direction of to (more smooth).
-            return data.getSetBack(to);
+            return MovingUtil.getApplicableSetBackLocation(player, 
+                    to.getYaw(), to.getPitch(), to.getBlockCache(), 
+                    data, cc);
         }
         else {
             // TODO: Evaluate how data resetting can be done minimal (skip certain things flags)?
@@ -2063,10 +2068,12 @@ public class SurvivalFly extends Check {
      * Hover violations have to be handled in this check, because they are handled as SurvivalFly violations (needs executeActions).
      * @param player
      * @param loc
+     * @param blockCache 
      * @param cc
      * @param data
      */
-    public final void handleHoverViolation(final Player player, final Location loc, 
+    public final void handleHoverViolation(final Player player, 
+            final Location loc, final BlockCache blockCache, 
             final MovingConfig cc, final MovingData data) {
         data.survivalFlyVL += cc.sfHoverViolation;
 
@@ -2082,8 +2089,9 @@ public class SurvivalFly extends Check {
         }
         if (executeActions(vd).willCancel()) {
             // Set back or kick.
-            if (data.hasSetBack()) {
-                final Location newTo = data.getSetBack(loc);
+            final Location newTo = MovingUtil.getApplicableSetBackLocation(player, 
+                    loc.getYaw(), loc.getPitch(), blockCache, data, cc);
+            if (newTo != null) {
                 data.prepareSetBack(newTo);
                 player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);
             }

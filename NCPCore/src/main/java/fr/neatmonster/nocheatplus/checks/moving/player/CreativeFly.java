@@ -225,13 +225,13 @@ public class CreativeFly extends Check {
             if (executeActions(vd).willCancel()) {
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                 // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                setBack = data.getSetBack(to);
+                setBack = data.getSetBack(to); // (OK)
             }
         }
         else {
             // Maximum height check (silent set back).
             if (to.getY() > maximumHeight) {
-                setBack = data.getSetBack(to);
+                setBack = data.getSetBack(to); // (OK)
                 if (debug) {
                     debug(player, "Maximum height exceeded, silent set-back.");
                 }

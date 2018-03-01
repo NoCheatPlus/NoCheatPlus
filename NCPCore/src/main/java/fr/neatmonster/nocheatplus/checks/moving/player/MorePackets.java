@@ -79,7 +79,7 @@ public class MorePackets extends Check {
         if (allowSetSetBack && !data.hasMorePacketsSetBack()){
             // TODO: Check if other set back is appropriate or if to set/reset on other events.
             if (data.hasSetBack()) {
-                data.setMorePacketsSetBack(data.getSetBack(to));
+                data.setMorePacketsSetBackFromSurvivalfly();
             }
             else {
                 data.setMorePacketsSetBack(from);
@@ -103,7 +103,11 @@ public class MorePackets extends Check {
             }
             if (executeActions(vd).willCancel()) {
                 // Set to cancel the move.
-                return data.hasMorePacketsSetBack() ? data.getMorePacketsSetBack() : data.getSetBack(to);
+                /*
+                 * TODO: Harmonize with MovingUtil.getApplicableSetBackLocation
+                 * (somehow include the desired set back type / loc / context).
+                 */
+                return data.hasMorePacketsSetBack() ? data.getMorePacketsSetBack() : data.getSetBack(to); // TODO
             }
         } 
         else if (allowSetSetBack && data.getMorePacketsSetBackAge() > cc.morePacketsSetBackAge) {

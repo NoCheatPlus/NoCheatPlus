@@ -115,6 +115,7 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
@@ -284,7 +285,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc, pData);
             aux.returnPlayerMoveInfo(moveInfo);
             if (sfCheck) {
-                target = data.getSetBack(loc);
+                target = MovingUtil.getApplicableSetBackLocation(player, 
+                        loc.getYaw(), loc.getPitch(), moveInfo.from.getBlockCache(), 
+                        data, cc);
             }
             if (target == null) {
                 // TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
@@ -707,7 +710,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 if (!TrigUtil.isSamePosAndLook(pFrom, pTo) // Safety check.
                         && TrigUtil.isSamePosAndLook(pTo, data.crossWorldFrom)) {
                     // Assume to (and possibly the player location) to be set to the location the player teleported from within the other world.
-                    newTo = data.getSetBack(from);
+                    newTo = data.getSetBack(from); // (OK, cross-world)
                     checkNf = false;
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, CheckUtils.getLogMessagePrefix(player, CheckType.MOVING) + " Player move end point seems to be set wrongly.");
                 }
@@ -1291,7 +1294,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Some resetting is done in MovingListener.
             if (check.executeActions(vd).willCancel()) {
                 // Set back + view direction of to (more smooth).
-                return data.getSetBack(to);
+                return MovingUtil.getApplicableSetBackLocation(player, 
+                        to.getYaw(), to.getPitch(), from.getBlockCache(), 
+                        data, cc);
             }
         }
         // No cancel intended.
@@ -2613,7 +2618,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (data.hasSetBack()) {
                 // Might have to re-check all context with playerJoins and keeping old set backs...
                 // Could use a flexible set back policy (switch to in-air on login). 
-                return data.getSetBack(loc);
+                return data.getSetBack(loc); // (OK? ~ legacy)
             }
             else {
                 return new Location(player.getWorld(), lastMove.to.getX(), lastMove.to.getY(), lastMove.to.getZ(), loc.getYaw(), loc.getPitch());
@@ -2655,8 +2660,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Re-Check if survivalfly can apply at all.
                 final PlayerMoveInfo moveInfo = aux.usePlayerMoveInfo();
                 moveInfo.set(player, loc, null, cc.yOnGround);
-                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, data, cc, pData)) {
-                    handleHoverViolation(player, loc, cc, data, pData);
+                if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, 
+                        data, cc, pData)) {
+                    handleHoverViolation(player, loc, moveInfo.from.getBlockCache(), 
+                            cc, data, pData);
                     // Assume the player might still be hovering.
                     res = false;
                     data.sfHoverTicks = 0;
@@ -2676,7 +2683,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         return res;
     }
 
-    private void handleHoverViolation(final Player player, final Location loc, 
+    private void handleHoverViolation(final Player player, 
+            final Location loc, final BlockCache blockCache, 
             final MovingConfig cc, final MovingData data, final IPlayerData pData) {
         // Check nofall damage (!).
         if (cc.sfHoverFallDamage && noFall.isEnabled(player, pData)) {
@@ -2684,7 +2692,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             noFall.checkDamage(player, loc.getY(), data, pData);
         }
         // Delegate violation handling.
-        survivalFly.handleHoverViolation(player, loc, cc, data);
+        survivalFly.handleHoverViolation(player, loc, blockCache, cc, data);
     }
 
     @Override

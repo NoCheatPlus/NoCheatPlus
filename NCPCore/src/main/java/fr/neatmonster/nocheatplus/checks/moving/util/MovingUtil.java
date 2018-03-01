@@ -47,6 +47,7 @@ import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
@@ -231,7 +232,11 @@ public class MovingUtil {
         // (Mind that we don't set the block cache here).
         final Location loc = player.getLocation();
         if (!restored && data.hasSetBack()) {
-            final Location setBack = data.getSetBack(loc); 
+            /*
+             * TODO: Harmonize with MovingUtil.getApplicableSetBackLocation
+             * (somehow include the desired set back type / loc / context).
+             */
+            final Location setBack = data.getSetBack(loc); // TODO
             pLoc.set(setBack, player);
             if (!pLoc.hasIllegalCoords() && (cc.ignoreStance || !pLoc.hasIllegalStance())) {
                 event.setFrom(setBack);
@@ -637,6 +642,48 @@ public class MovingUtil {
             }
             return false;
         }
+    }
+
+    /**
+     * Get the applicable set-back location at this moment.
+     * <hr>
+     * <ul>
+     * <li>The idea is that this method call remains side effect free.</li>
+     * <li>Because set-back policies may need scanning for ground down to the
+     * void, calling this method can have an impact on performance, if called
+     * excessively.</li>
+     * </ul>
+     * 
+     * @param player
+     * @param refYaw
+     * @param refPitch
+     * @param blockCache
+     * @param data
+     * @param cc
+     * @return The applicable set back location
+     */
+    public static Location getApplicableSetBackLocation(final Player player,
+            final float refYaw, final float refPitch, final BlockCache blockCache, 
+            final MovingData data, final MovingConfig cc) {
+        /*
+         * TODO: Signature adjust for best reuse with both hover and ordinary sf
+         * violations. Also consider returning more context.
+         */
+        /*
+         * TODO: Might generalize and move elsewhere (MovingListener, MovingUtil,
+         * generic: ISetBackHelper).
+         */
+        /*
+         * TODO: May need more context information, e.g. PlayerLocation from+to
+         * - to is null, if not applicable (hover) or illegal (illegal to but
+         * legal from).
+         */
+        // TODO: Set back policies.
+        if (data.hasSetBack()) {
+            return data.getSetBack(refYaw, refPitch); // (OK)
+        }
+        // Nothing appropriate found.
+        return null;
     }
 
 }

@@ -216,7 +216,11 @@ public class Passable extends Check {
 
         // Prefer the set back location from the data.
         if (data.hasSetBack()) {
-            setBackLoc = data.getSetBack(to);
+            /*
+             * TODO: Harmonize with MovingUtil.getApplicableSetBackLocation
+             * (somehow include the desired set back type / loc / context).
+             */
+            setBackLoc = data.getSetBack(to); // TODO
             if (debug) {
                 debug(player, "Using set back location for passable.");
             }

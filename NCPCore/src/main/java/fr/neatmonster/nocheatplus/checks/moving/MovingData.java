@@ -657,6 +657,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     /**
      * Convenience method.
+     * 
      * @param loc
      */
     public void setSetBack(final Location loc) {
@@ -671,6 +672,7 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     /**
      * Get the set back location with yaw and pitch set form ref.
+     * 
      * @param ref
      * @return
      */
@@ -680,11 +682,24 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     /**
      * Get the set back location with yaw and pitch set from ref.
+     * 
      * @param ref
      * @return
      */
     public Location getSetBack(final PlayerLocation ref) {
         return LocUtil.clone(setBack, ref);
+    }
+
+    /**
+     * Get the set back location with yaw and pitch set from the given
+     * arguments.
+     * 
+     * @param refYaw
+     * @param refPitch
+     * @return
+     */
+    public Location getSetBack(final float yaw, final float pitch) {
+        return LocUtil.clone(setBack, yaw, pitch);
     }
 
     public boolean hasSetBack() {
@@ -796,6 +811,10 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      */
     public boolean isMorePacketsSetBackOldest() {
         return morePacketsSetBackResetTime < setBackResetTime;
+    }
+
+    public void setMorePacketsSetBackFromSurvivalfly() {
+        setMorePacketsSetBack(setBack);
     }
 
     public final void setMorePacketsSetBack(final PlayerLocation loc) {
