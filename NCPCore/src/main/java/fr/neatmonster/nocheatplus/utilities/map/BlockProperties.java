@@ -796,6 +796,9 @@ public class BlockProperties {
 
     /** CARPET. **/
     public static final long F_CARPET                  = 0x100000000L;
+    
+    /** Cobweb like blocks (adhesive). */
+    public static final long F_COBWEB                  = 0x200000000L;
 
     // TODO: Convenience constants combining all height / minheight flags.
 
@@ -1141,6 +1144,8 @@ public class BlockProperties {
             setBlock(mat, leafType);
         }
         setFlag(Material.LEAVES, F_LEAVES);
+        // Cobweb
+        setFlag(Material.WEB, F_COBWEB);
         // Huge mushroom type (...)
         for (Material mat : new Material[]{ 
                 Material.HUGE_MUSHROOM_1, Material.HUGE_MUSHROOM_2,

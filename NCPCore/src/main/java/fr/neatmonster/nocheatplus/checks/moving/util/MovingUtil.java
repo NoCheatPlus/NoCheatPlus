@@ -47,13 +47,12 @@ import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.RichBoundsLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
-import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
 
 /**
  * Static utility methods.
- * @author dev1mc
+ * @author asofold
  *
  */
 public class MovingUtil {
@@ -62,6 +61,12 @@ public class MovingUtil {
      * Always set world to null after use, careful with nested methods. Main thread only.
      */
     private static final Location useLoc = new Location(null, 0, 0, 0);
+    //    /** Fast scan flags for 'mostly air'. */
+    //    private static final long FLAGS_SCAN_FOR_GROUND_OR_RESETCOND = 
+    //            BlockProperties.F_SOLID | BlockProperties.F_GROUND
+    //            | BlockProperties.F_LIQUID | BlockProperties.F_COBWEB
+    //            | BlockProperties.F_CLIMBABLE
+    //            ;
 
     /**
      * Check if the player is to be checked by the survivalfly check.<br>
@@ -144,9 +149,10 @@ public class MovingUtil {
          */
 
         // Only the web can stop a player who isn't propelled by a rocket.
-        return data.fireworksBoostDuration > 0 || !BlockProperties.collidesId(fromLocation.getBlockCache(), 
+        return data.fireworksBoostDuration > 0 || !BlockProperties.collides(fromLocation.getBlockCache(), 
                 fromLocation.getMinX(), fromLocation.getMinY(), fromLocation.getMinZ(), 
-                fromLocation.getMaxX(), fromLocation.getMinY() + 0.6, fromLocation.getMaxZ(), Material.WEB);
+                fromLocation.getMaxX(), fromLocation.getMinY() + 0.6, fromLocation.getMaxZ(),
+                BlockProperties.F_COBWEB);
     }
 
     /**
@@ -657,33 +663,102 @@ public class MovingUtil {
      * @param player
      * @param refYaw
      * @param refPitch
-     * @param blockCache
+     * @param from
+     *            Safe reference location, for scanning for ground/void.
+     *            Typically a move start point. Not used for a return value
+     *            directly.
      * @param data
      * @param cc
      * @return The applicable set back location
      */
     public static Location getApplicableSetBackLocation(final Player player,
-            final float refYaw, final float refPitch, final BlockCache blockCache, 
+            final float refYaw, final float refPitch, final PlayerLocation from,
             final MovingData data, final MovingConfig cc) {
         /*
-         * TODO: Signature adjust for best reuse with both hover and ordinary sf
-         * violations. Also consider returning more context.
+         * TODO: Consider returning a context object (include if to deal fall
+         * damage, otherwise / if possible use a utility method checking the
+         * config and ground properties).
          */
-        /*
-         * TODO: Might generalize and move elsewhere (MovingListener, MovingUtil,
-         * generic: ISetBackHelper).
-         */
-        /*
-         * TODO: May need more context information, e.g. PlayerLocation from+to
-         * - to is null, if not applicable (hover) or illegal (illegal to but
-         * legal from).
-         */
-        // TODO: Set back policies.
+
+        // TODO: Implement down-to-ground.
+        boolean scanForVoid = false; // If set, scan for void and teleport there (dedo).
+        // Void to void.
+        if (cc.sfSetBackPolicyVoid) {
+            if (from.getY() < 0.0) {
+                // Set back into the void.
+                // TODO: Assume realistic falling speed somehow?
+                return new Location(from.getWorld(),
+                        from.getX(), 
+                        from.getY() - Magic.GRAVITY_MAX, // Safer than sorry.
+                        from.getZ(), 
+                        from.getYaw(), from.getPitch());
+            }
+            else {
+                scanForVoid = true;
+            }
+        }
+
+        if (scanForVoid) { // || scanForGround
+            // TODO: Chunk section scanning?
+            // TODO: Rather precise scanForGround method for down-to-ground policy.
+            final double[] groundSpec = scanForGroundOrResetCond(player, from);
+            if (groundSpec == null) {
+                // Teleport to void
+                return new Location(from.getWorld(),
+                        from.getX(), 
+                        - 2.0, // Safer than sorry.
+                        from.getZ(), 
+                        from.getYaw(), from.getPitch());
+            }
+            // TODO: else if (scanForGround) { // Teleport there, ensure fall damage (MovingListener/override). 
+        }
+
+        // Ordinary handling.
         if (data.hasSetBack()) {
             return data.getSetBack(refYaw, refPitch); // (OK)
         }
+
         // Nothing appropriate found.
+        // (If no set back is set, should be checked before the actual check is run.)
         return null;
+    }
+
+    /**
+     * 
+     * @param player
+     * @param from
+     * @return {rough position of ground or -1.0 if none, maximum error}
+     */
+    private static final double[] scanForGroundOrResetCond(final Player player, 
+            final PlayerLocation from) {
+        // Re-check for ground - who knows where this will get called from.
+        if (from.isOnGroundOrResetCond()) {
+            // TODO: + inside blocks?
+            return new double[] {0.0, from.getyOnGround()};
+        }
+        // TODO: Actually scan for ground (BlockProperties).
+        // TODO: standsOnEntity is not covered yet (idk flying boats etc).
+        final double distToVoid = from.getY();
+        if (distToVoid <= 0.0) {
+            return null;
+        }
+        // TODO: Strictness flags and/or 
+        // collectFlagsSimple: Just allow air - more safe concerning false positives.
+        // collides: Scan for stuff that can be stood on.
+        if (BlockProperties.collectFlagsSimple(from.getBlockCache(), 
+                from.getMinX(), 0.0, from.getMinZ(), 
+                from.getMaxX(), from.getMinY(), from.getMaxZ()) != 0L
+                // (... & FLAGS_SCAN_FOR_GROUND_OR_RESETCOND) != 0L // Allow blocks one can't stand on.
+                ) {
+            //        if (BlockProperties.collides(from.getBlockCache(), 
+            //                from.getMinX(), 0.0, from.getMinZ(), 
+            //                from.getMaxX(), from.getMinY(), from.getMaxZ(), 
+            //                FLAGS_SCAN_FOR_GROUND_OR_RESETCOND)) {
+            return new double[] {0.0, distToVoid};
+        }
+        else {
+            return null;
+        }
     }
 
 }

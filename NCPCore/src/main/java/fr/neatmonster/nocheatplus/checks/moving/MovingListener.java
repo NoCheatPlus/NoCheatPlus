@@ -286,7 +286,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             aux.returnPlayerMoveInfo(moveInfo);
             if (sfCheck) {
                 target = MovingUtil.getApplicableSetBackLocation(player, 
-                        loc.getYaw(), loc.getPitch(), moveInfo.from.getBlockCache(), 
+                        loc.getYaw(), loc.getPitch(), moveInfo.from, 
                         data, cc);
             }
             if (target == null) {
@@ -1295,8 +1295,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (check.executeActions(vd).willCancel()) {
                 // Set back + view direction of to (more smooth).
                 return MovingUtil.getApplicableSetBackLocation(player, 
-                        to.getYaw(), to.getPitch(), from.getBlockCache(), 
-                        data, cc);
+                        to.getYaw(), to.getPitch(), from, data, cc);
             }
         }
         // No cancel intended.
@@ -2662,7 +2661,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 moveInfo.set(player, loc, null, cc.yOnGround);
                 if (MovingUtil.shouldCheckSurvivalFly(player, moveInfo.from, 
                         data, cc, pData)) {
-                    handleHoverViolation(player, loc, moveInfo.from.getBlockCache(), 
+                    handleHoverViolation(player, moveInfo.from, 
                             cc, data, pData);
                     // Assume the player might still be hovering.
                     res = false;
@@ -2684,15 +2683,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     private void handleHoverViolation(final Player player, 
-            final Location loc, final BlockCache blockCache, 
-            final MovingConfig cc, final MovingData data, final IPlayerData pData) {
+            final PlayerLocation loc, final MovingConfig cc, final MovingData data, final IPlayerData pData) {
         // Check nofall damage (!).
         if (cc.sfHoverFallDamage && noFall.isEnabled(player, pData)) {
             // Consider adding 3/3.5 to fall distance if fall distance > 0?
             noFall.checkDamage(player, loc.getY(), data, pData);
         }
         // Delegate violation handling.
-        survivalFly.handleHoverViolation(player, loc, blockCache, cc, data);
+        survivalFly.handleHoverViolation(player, loc, cc, data);
     }
 
     @Override

@@ -56,7 +56,6 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
-import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
@@ -2052,7 +2051,7 @@ public class SurvivalFly extends Check {
         if (executeActions(vd).willCancel()) {
             // Set back + view direction of to (more smooth).
             return MovingUtil.getApplicableSetBackLocation(player, 
-                    to.getYaw(), to.getPitch(), to.getBlockCache(), 
+                    to.getYaw(), to.getPitch(), to, 
                     data, cc);
         }
         else {
@@ -2073,8 +2072,7 @@ public class SurvivalFly extends Check {
      * @param data
      */
     public final void handleHoverViolation(final Player player, 
-            final Location loc, final BlockCache blockCache, 
-            final MovingConfig cc, final MovingData data) {
+            final PlayerLocation loc, final MovingConfig cc, final MovingData data) {
         data.survivalFlyVL += cc.sfHoverViolation;
 
         // TODO: Extra options for set back / kick, like vl?
@@ -2090,7 +2088,7 @@ public class SurvivalFly extends Check {
         if (executeActions(vd).willCancel()) {
             // Set back or kick.
             final Location newTo = MovingUtil.getApplicableSetBackLocation(player, 
-                    loc.getYaw(), loc.getPitch(), blockCache, data, cc);
+                    loc.getYaw(), loc.getPitch(), loc, data, cc);
             if (newTo != null) {
                 data.prepareSetBack(newTo);
                 player.teleport(newTo, BridgeMisc.TELEPORT_CAUSE_CORRECTION_OF_POSITION);

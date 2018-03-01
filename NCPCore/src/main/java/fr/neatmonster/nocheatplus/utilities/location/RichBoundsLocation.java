@@ -739,9 +739,16 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
      */
     public boolean isInWeb() {
         if (inWeb == null) {
-            // TODO: inset still needed ?
-            final double inset = 0.001d;
-            inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB);
+            if (blockFlags == null || (blockFlags & BlockProperties.F_COBWEB) != 0L ) {
+                // TODO: inset still needed / configurable?
+                final double inset = 0.001d;
+                inWeb = BlockProperties.collides(blockCache, minX + inset, minY + inset, minZ + inset, 
+                        maxX - inset, maxY - inset, maxZ - inset, 
+                        BlockProperties.F_COBWEB);
+            }
+            else {
+                inWeb = false;
+            }
         }
         return inWeb;
     }
