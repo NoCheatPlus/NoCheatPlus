@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.players;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
 import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.components.data.checktype.IBaseDataAccess;
 import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstance;
 import fr.neatmonster.nocheatplus.hooks.ExemptionContext;
@@ -268,6 +270,23 @@ public interface IPlayerData extends IData, IBaseDataAccess, IGetGenericInstance
      * @param registeredFor
      */
     public <T> void removeGenericInstance(Class<T> registeredFor);
+
+    /**
+     * Remove all generic instances from cache, which are contained in the given
+     * collection.
+     * 
+     * @param types
+     */
+    public void removeAllGenericInstances(Collection<Class<?>> types);
+
+    /**
+     * Call dataOnRemoveSubCheckData(...).
+     * 
+     * @param subCheckRemoval
+     */
+    public void removeSubCheckData(
+            Collection<Class<? extends IDataOnRemoveSubCheckData>> subCheckRemoval,
+            Collection<CheckType> checkTypes);
 
     /**
      * Check if notifications are turned off, this does not bypass permission

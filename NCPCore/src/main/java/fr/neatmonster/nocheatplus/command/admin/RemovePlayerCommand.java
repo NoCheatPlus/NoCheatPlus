@@ -66,28 +66,28 @@ public class RemovePlayerCommand extends BaseCommand {
         if (player != null) playerName = player.getName();
 
         ViolationHistory hist = ViolationHistory.getHistory(playerName, false);
-        boolean histRemoved = false;
+        boolean somethingFound = false;
         if (hist != null){
-            histRemoved = hist.remove(checkType);
+            somethingFound = hist.remove(checkType);
             if (checkType == CheckType.ALL){
-                histRemoved = true;
+                somethingFound = true;
                 ViolationHistory.removeHistory(playerName);
             }
         }
 
-        if (DataManager.removeExecutionHistory(checkType, playerName)) histRemoved = true;
+        if (DataManager.removeExecutionHistory(checkType, playerName)) {
+            somethingFound = true;
+        }
 
-        final boolean dataRemoved = DataManager.removeData(playerName, checkType);
+        if (DataManager.removeData(playerName, checkType)) {
+            somethingFound = true;
+        }
 
-        if (dataRemoved || histRemoved){
-            String which;
-            if (dataRemoved && histRemoved) which = "data and history";
-            else if (dataRemoved) which = "data";
-            else which = "history";
-            sender.sendMessage(TAG + "Removed " + which + " (" + checkType + "): " + playerName);
+        if (somethingFound){
+            sender.sendMessage(TAG + "Issued history and data removal (" + checkType + "): " + playerName);
         }
         else
-            sender.sendMessage(TAG + "Nothing found (" + checkType + ", exact spelling): " + playerName);
+            sender.sendMessage(TAG + "Nothing found (" + checkType + "): " + playerName + " (spelled correctly?)");
         return true;
     }
 

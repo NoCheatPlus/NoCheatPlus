@@ -230,7 +230,12 @@ public class PlayerCheckTypeTree extends CheckTypeTree<PlayerCheckTypeTreeNode>{
          */
         @SuppressWarnings("unchecked")
         void updateDebug(ConfigFile rawConfiguration) {
-            configFlagUpdate(rawConfiguration, true, accessDebug);
+            update(rawConfiguration, true, accessDebug);
+        }
+
+        @SuppressWarnings("unchecked")
+        void updateDebug() {
+            update(true, accessDebug);
         }
 
         /**
@@ -258,10 +263,10 @@ public class PlayerCheckTypeTree extends CheckTypeTree<PlayerCheckTypeTreeNode>{
         }
 
         @SuppressWarnings("unchecked")
-        void overrideDebug(final ConfigFile rawConfiguration,
+        void overrideDebug(
                 final CheckType checkType, final AlmostBoolean active, 
                 final OverrideType overrideType, final boolean overrideChildren) {
-            configFlagOverride(rawConfiguration, active, overrideType, overrideChildren, accessDebug);
+            override(active, overrideType, overrideChildren, accessDebug);
         }
 
     }

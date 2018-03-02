@@ -12,9 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
-
-import fr.neatmonster.nocheatplus.components.data.IData;
+package fr.neatmonster.nocheatplus.components.data;
 
 /**
  * This is for future purposes. Might remove...<br>
@@ -27,6 +25,6 @@ import fr.neatmonster.nocheatplus.components.data.IData;
  * @author asofold
  * @TODO Keep/Remove
  */
-public interface ICheckData extends IData{
+public interface ICheckData extends IData {
 
 }

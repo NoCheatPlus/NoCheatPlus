@@ -19,12 +19,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterEventsWithOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Support for registering multiple event-handler methods at once.<br>
@@ -54,6 +58,73 @@ import fr.neatmonster.nocheatplus.logging.Streams;
  */
 public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<EB, P> {
 
+    protected class AutoListener<E> implements MiniListenerWithOrder<E>, ComponentWithName {
+
+        private final Class<E> eventClass;
+        private final Object listener;
+        private final Method method;
+        private final RegistrationOrder order;
+        private final P basePriority;
+
+        private AutoListener(final Class<E> eventClass, 
+                final Object listener, final Method method, 
+                final RegistrationOrder order, final P basePriority) {
+            this.eventClass = eventClass;
+            this.listener = listener;
+            this.method = method;
+            this.order = order;
+            this.basePriority = basePriority;
+        }
+
+        @Override
+        public void onEvent(final E event) {
+            try {
+                method.invoke(listener, event);
+            }
+            catch (InvocationTargetException e) {
+                onException(event, e);
+            }
+            catch (IllegalArgumentException e) {
+                onException(event, e);
+            }
+            catch (IllegalAccessException e) {
+                onException(event, e);
+            }
+        }
+
+        private void onException(final E event, final Throwable t) {
+            final StringBuilder builder = new StringBuilder(1024);
+            builder.append("Exception:\n");
+            builder.append(StringUtil.throwableToString(t));
+            Throwable cause = t.getCause();
+            while (cause != null) {
+                builder.append("caused by:\n");
+                builder.append(StringUtil.throwableToString(t.getCause()));
+                cause = cause.getCause();
+            }
+            StaticLog.logOnce(Level.SEVERE, 
+                    "Exception with " + getComponentName() + ", processing " + event.getClass().getName() + ": " + t.getClass().getSimpleName(), 
+                    builder.toString());
+        }
+
+
+        @Override
+        public RegistrationOrder getRegistrationOrder() {
+            /*
+             * Return the given instance of RegistrationOrder, assuming
+             * it'll be copied upon registration. Typically the registry
+             * can't and shouldn't distinguish if this comes from an
+             * external source anyway.
+             */
+            return order;
+        }
+
+        @Override
+        public String getComponentName() {
+            return "AutoListener(" + listener.getClass().getName() +"." + method.getName() + "/" + eventClass.getName() + "/" + basePriority + ")";
+        }
+    }
+
     /**
      * 
      * @param method
@@ -75,7 +146,7 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
         if (order == null) {
             order = defaultOrder;
         }
-        MiniListener<E> miniListener = getMiniListener(listener, method, order);
+        MiniListener<E> miniListener = getMiniListener(listener, method, order, basePriority);
         if (listener == null) {
             // TODO: Throw rather.
             return null;
@@ -91,36 +162,11 @@ public abstract class MultiListenerRegistry<EB, P> extends MiniListenerRegistry<
      * @param method
      * @return
      */
+    @SuppressWarnings("unchecked")
     protected <E extends EB> MiniListener<E> getMiniListener(final Object listener, 
-            final Method method, final RegistrationOrder order) {
-        @SuppressWarnings({ "unchecked", "unused" })
-        Class<E> eventClass = (Class<E>) method.getParameterTypes()[0];
-        MiniListener<E> miniListener = new MiniListenerWithOrder<E>() {
-            @Override
-            public void onEvent(E event) {
-                try {
-                    method.invoke(listener, event);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public RegistrationOrder getRegistrationOrder() {
-                /*
-                 * Return the given instance of RegistrationOrder, assuming
-                 * it'll be copied upon registration. Typically the registry
-                 * can't and shouldn't distinguish if this comes from an
-                 * external source anyway.
-                 */
-                return order;
-            }
-        };
-        return miniListener;
+            final Method method, final RegistrationOrder order, final P basePriority) {
+        return new AutoListener<E>((Class<E>) method.getParameterTypes()[0], 
+                listener, method, order, basePriority);
     }
 
     protected boolean check_and_prepare_method(final Method method) {

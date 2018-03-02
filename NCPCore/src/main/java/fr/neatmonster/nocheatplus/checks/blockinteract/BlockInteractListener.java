@@ -37,14 +37,20 @@ import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the block interact checks.
@@ -99,8 +105,33 @@ public class BlockInteractListener extends CheckListener {
     private final int idInteractLookFlyingFirst = counters.registerKey("block.interact.look.flying.first");
     private final int idInteractLookFlyingOther = counters.registerKey("block.interact.look.flying.other");
 
+    @SuppressWarnings("unchecked")
     public BlockInteractListener() {
         super(CheckType.BLOCKINTERACT);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext() //
+                // BlockInteractConfig
+                .registerConfigWorld(BlockInteractConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, BlockInteractConfig>() {
+                    @Override
+                    public BlockInteractConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new BlockInteractConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer(CheckType.BLOCKINTERACT, true)
+                .context() //
+                // BlockinteractData
+                .registerDataPlayer(BlockInteractData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, BlockInteractData>() {
+                    @Override
+                    public BlockInteractData getNewInstance(
+                            PlayerFactoryArgument arg) {
+                        return new BlockInteractData();
+                    }
+                })
+                .addToGroups(CheckType.BLOCKINTERACT, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
     /**

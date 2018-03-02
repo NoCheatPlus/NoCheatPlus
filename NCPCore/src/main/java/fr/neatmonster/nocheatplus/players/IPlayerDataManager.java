@@ -20,18 +20,44 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
+import fr.neatmonster.nocheatplus.components.registry.factory.IRichFactoryRegistry;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
 
 /**
  * Player data specific operations.
- * <hr>
+ * <hr/>
  * ComponentRegistry:
  * <li>Supported: IRemoveData</li>
+ * <hr/>
+ * <b>Preset groups and automatic registration.</b><br/>
+ * All of the types mentioned in the lists below are preset for grouping. <br/>
+ * However only those item types for which a factory gets registered here will
+ * be automatically put into existing groups. External types like configuration
+ * instances fetched from IWorldData need to be registered explicitly. <br/>
+ * <br/>
+ * Automatic data type grouping with call support (return value controls removal
+ * of the entire data object):
+ * <ul>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnReload}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnWorldUnload}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnJoin}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnLeave}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnWorldChange}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData}</li></li>
+ * </ul>
+ * <br/>
+ * Automatic data type grouping for direct removal (API/reload/commands):
+ * <ul>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IData}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.config.IConfig}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.ICheckData}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.config.ICheckConfig}</li>
+ * </ul>
  * 
  * @author asofold
  *
  */
-public interface IPlayerDataManager extends ComponentRegistry<IRemoveData> {
+public interface IPlayerDataManager extends ComponentRegistry<IRemoveData>, IRichFactoryRegistry<PlayerFactoryArgument> {
 
     // TODO: Complete (...)
 
@@ -139,6 +165,12 @@ public interface IPlayerDataManager extends ComponentRegistry<IRemoveData> {
      * 
      * @param checkType
      */
-    public void clearData(final CheckType checkType);
+    public void clearData(CheckType checkType);
+
+    /**
+     * Convenience method to remove cached types that implement IConfig for all
+     * players. Types need to be registered (player data factory or explicitly).
+     */
+    public void removeCachedConfigs();
 
 }

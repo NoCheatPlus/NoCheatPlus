@@ -14,6 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+
 /**
  * Abstract implementation to do nothing.
  * 

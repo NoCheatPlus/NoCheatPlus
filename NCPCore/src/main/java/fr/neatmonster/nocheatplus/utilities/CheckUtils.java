@@ -157,9 +157,22 @@ public class CheckUtils {
      * @return the log message prefix
      */
     public static String getLogMessagePrefix(final Player player, final CheckType checkType) {
+        return getLogMessagePrefix(player == null ? null : player.getName(), checkType);
+    }
+
+    /**
+     * Get the standard log message prefix with a trailing space.
+     *
+     * @param playerName
+     *            May be null.
+     * @param checkType
+     *            the check type
+     * @return the log message prefix
+     */
+    public static String getLogMessagePrefix(final String playerName, final CheckType checkType) {
         String base = "[" + checkType + "] ";
-        if (player != null) {
-            base += "[" + player.getName() + "] ";
+        if (playerName != null) {
+            base += "[" + playerName + "] ";
         }
         return base;
     }

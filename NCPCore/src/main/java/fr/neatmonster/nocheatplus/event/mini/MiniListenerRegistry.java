@@ -77,7 +77,7 @@ public abstract class MiniListenerRegistry<EB, P> {
     protected NodeFactory<EB, P> nodeFactory = new NodeFactory<EB, P>() {
         @Override
         public <E extends EB> MiniListenerNode<E, P> newNode(Class<E> eventClass, P basePriority) {
-            return new MiniListenerNode<E, P>(basePriority);
+            return new MiniListenerNode<E, P>(eventClass, basePriority);
         }
     };
 

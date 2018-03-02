@@ -41,13 +41,19 @@ import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the block break checks.
@@ -82,8 +88,36 @@ public class BlockBreakListener extends CheckListener {
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
 
+    @SuppressWarnings("unchecked")
     public BlockBreakListener(){
         super(CheckType.BLOCKBREAK);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        // Register config and data.
+        api.register(api.newRegistrationContext()
+                // BlockBreakConfig
+                .registerConfigWorld(BlockBreakConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, BlockBreakConfig>() {
+                    @Override
+                    public BlockBreakConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new BlockBreakConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer(CheckType.BLOCKBREAK, true)
+                .context() //
+                // BlockBreakData
+                .registerDataPlayer(BlockBreakData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, BlockBreakData>() {
+                    @Override
+                    public BlockBreakData getNewInstance(
+                            PlayerFactoryArgument arg) {
+                        return new BlockBreakData(
+                                arg.playerData.getGenericInstance(BlockBreakConfig.class));
+                    }
+                })
+                // (Complete data removal for now.)
+                .addToGroups(CheckType.BLOCKBREAK, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
     /**

@@ -52,13 +52,19 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessVehicle;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the inventory checks.
@@ -94,8 +100,34 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     private final IGenericInstanceHandle<IEntityAccessVehicle> handleVehicles = 
             NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IEntityAccessVehicle.class);
 
+    @SuppressWarnings("unchecked")
     public InventoryListener() {
         super(CheckType.INVENTORY);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                // InventoryConfig
+                .registerConfigWorld(InventoryConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, InventoryConfig>() {
+                    @Override
+                    public InventoryConfig getNewInstance(
+                            WorldFactoryArgument arg) {
+                        return new InventoryConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                // InventoryData
+                .registerDataPlayer(InventoryData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, InventoryData>() {
+                    @Override
+                    public InventoryData getNewInstance(
+                            PlayerFactoryArgument arg) {
+                        return new InventoryData();
+                    }
+                })
+                .addToGroups(CheckType.INVENTORY, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
     /**

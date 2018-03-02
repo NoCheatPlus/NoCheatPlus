@@ -681,5 +681,14 @@ public class RegistrationOrder {
                 && (afterTag == null ? other.getAfterTag() == null : afterTag.equals(other.getAfterTag()));
     }
 
+    @Override
+    public String toString() {
+        return "RegistrationOrder(p=" + basePriority 
+                + (tag == null ? "" : " t='" + tag + "'") 
+                + (beforeTag == null ? "" : " bt='" + beforeTag + "'") 
+                + (afterTag == null ? "" : "at='" + afterTag + "'")
+                + ")";
+    }
+
 }
 

@@ -16,8 +16,16 @@ package fr.neatmonster.nocheatplus.checks.net;
 
 import java.util.List;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Static method utility for networking related stuff.
@@ -161,6 +169,33 @@ public class NetStatic {
             }
         }
         return Math.max(0.0, violation);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void registerTypes() {
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                // NetConfig
+                .registerConfigWorld(NetConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, NetConfig>() {
+                    @Override
+                    public NetConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new NetConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                // NetData
+                .registerDataPlayer(NetData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, NetData>() {
+                    @Override
+                    public NetData getNewInstance(PlayerFactoryArgument arg) {
+                        return new NetData(arg.playerData.getGenericInstance(NetConfig.class));
+                    }
+                })
+                .addToGroups(CheckType.NET, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
 }

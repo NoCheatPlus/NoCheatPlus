@@ -201,7 +201,7 @@ public enum CheckType {
     }
 
     private String guessConfigPathRoot() {
-        return name().toLowerCase().replace('_', '.') + ".";
+        return "checks." + name().toLowerCase().replace('_', '.') + ".";
     }
 
     public CheckTypeType getType() {

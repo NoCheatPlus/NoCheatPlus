@@ -30,7 +30,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -55,17 +54,23 @@ import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.IBridgeCrossPlugin;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the fight checks.<br>
@@ -119,8 +124,33 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     // Assume it to stay the same all time.
     private final IGenericInstanceHandle<IBridgeCrossPlugin> crossPlugin = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(IBridgeCrossPlugin.class);
 
+    @SuppressWarnings("unchecked")
     public FightListener() {
         super(CheckType.FIGHT);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                // FightConfig
+                .registerConfigWorld(FightConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, FightConfig>() {
+                    @Override
+                    public FightConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new FightConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                // FightData
+                .registerDataPlayer(FightData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, FightData>() {
+                    @Override
+                    public FightData getNewInstance(PlayerFactoryArgument arg) {
+                        return new FightData(arg.playerData.getGenericInstance(FightConfig.class));
+                    }
+                })
+                .addToGroups(CheckType.FIGHT, false, IData.class, ICheckData.class)
+                .removeSubCheckData(CheckType.FIGHT, true)
+                .context() //
+                );
     }
 
     /**
@@ -281,8 +311,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // TODO: Add as real check.
         // TODO: Add something on packet level already.
-        if (pData.isCheckActive(CheckType.FIGHT_WRONGTURN, damagedPlayer) 
-                && wrongTurn.check(damagedPlayer, loc, data, cc)) {
+        if (pData.isCheckActive(CheckType.FIGHT_WRONGTURN, player) 
+                && wrongTurn.check(player, loc, data, cc)) {
             cancelled = true;
         }
 
@@ -828,12 +858,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     public void playerLeaves(final Player player) {
         final FightData data = DataManager.getGenericInstance(player, FightData.class);
         data.angleHits.clear();
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event) {
-        DataManager.getGenericInstance(event.getPlayer(), 
-                FightData.class).onWorldChange();
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)

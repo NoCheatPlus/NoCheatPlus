@@ -15,8 +15,8 @@
 package fr.neatmonster.nocheatplus.players;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -37,21 +37,31 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
-import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
 import fr.neatmonster.nocheatplus.compat.versions.GenericVersion;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.config.ICheckConfig;
+import fr.neatmonster.nocheatplus.components.config.IConfig;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
-import fr.neatmonster.nocheatplus.components.registry.FactoryOneRegistry;
-import fr.neatmonster.nocheatplus.components.registry.TypeSetRegistry;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnJoin;
+import fr.neatmonster.nocheatplus.components.data.IDataOnLeave;
+import fr.neatmonster.nocheatplus.components.data.IDataOnReload;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldChange;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldUnload;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
+import fr.neatmonster.nocheatplus.components.registry.factory.RichFactoryRegistry;
+import fr.neatmonster.nocheatplus.components.registry.factory.RichFactoryRegistry.CheckRemovalSpec;
 import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.feature.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.registry.feature.IDisableListener;
@@ -90,6 +100,7 @@ import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
  *
  */
 // TODO: RegisterWithOrder still relevant ?
+// TODO: Tag utility (common stuff).
 @RegisterWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = "(^feature.*)", basePriority = "-80")
 public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName, INeedConfig, ConsistencyChecker, IDisableListener {
 
@@ -163,14 +174,7 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
 
     private final Lock lock = new ReentrantLock();
     // TODO: Consider same lock for some registry parts (deadlocking possibilities with exposed API).
-    private final FactoryOneRegistry<PlayerFactoryArgument> factoryRegistry = new FactoryOneRegistry<PlayerFactoryArgument>(
-            lock, CheckUtils.primaryServerThreadContextTester);
-    /**
-     * Grouped types to have a faster way of iterating data types stored in the
-     * PlayerData cache.
-     */
-    private final TypeSetRegistry groupedTypes = new TypeSetRegistry(lock);
-
+    private final RichFactoryRegistry<PlayerFactoryArgument> factoryRegistry = new RichFactoryRegistry<PlayerFactoryArgument>(lock);
     private final TickListener tickListener = new TickListener() {
 
         private int delayRareTasks = 0;
@@ -198,16 +202,19 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
          * nocheatplus.system.data.player...). (RegistryTags for other?).
          */
         new MiniListener<PlayerQuitEvent>() {
-            @Override
             @EventHandler(priority = EventPriority.MONITOR)
             @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            @Override
             public void onEvent(final PlayerQuitEvent event) {
                 playerLeaves(event.getPlayer());
             }
         },
         new MiniListener<PlayerKickEvent>() {
+            // TODO: ignoreCancelled !?
+            // TODO: afterTag !?
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = "feature.*")
+            @Override
             public void onEvent(final PlayerKickEvent event) {
                 playerLeaves(event.getPlayer());
             }
@@ -215,23 +222,34 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         new MiniListener<PlayerJoinEvent>() {
             @EventHandler(priority = EventPriority.LOWEST)
             @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            @Override
             public void onEvent(final PlayerJoinEvent event) {
                 playerJoins(event);
             }
         },
         new MiniListener<PlayerChangedWorldEvent>() {
             @EventHandler(priority = EventPriority.LOWEST)
-            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", afterTag = ".*")
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            @Override
             public void onEvent(final PlayerChangedWorldEvent event) {
                 playerChangedWorld(event);
+            }
+        },
+        new MiniListener<WorldUnloadEvent>() {
+            @EventHandler(priority = EventPriority.LOWEST)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            @Override
+            public void onEvent(final WorldUnloadEvent event) {
+                onWorldUnload(event);
             }
         },
     };
 
 
     /**
-     * Sets the static instance reference.
-     * @param worldDataManager 
+     * 
+     * @param worldDataManager
+     * @param permissionRegistry
      */
     public PlayerDataManager(final WorldDataManager worldDataManager, final PermissionRegistry permissionRegistry) {
         DataManager.instance = this; // TODO: Let NoCheatPlus do this, DataManager returns an ILockable.
@@ -248,8 +266,20 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
             // Likely an older version without efficient mapping.
             playerMap = new PlayerMap(true);
         }
-        this.permissionRegistry = permissionRegistry;
+        this.permissionRegistry = permissionRegistry; // TODO: World specific.
         this.worldDataManager = worldDataManager;
+        // (Call support.) 
+        factoryRegistry.createAutoGroup(IDataOnReload.class);
+        factoryRegistry.createAutoGroup(IDataOnWorldUnload.class);
+        factoryRegistry.createAutoGroup(IDataOnJoin.class);
+        factoryRegistry.createAutoGroup(IDataOnLeave.class);
+        factoryRegistry.createAutoGroup(IDataOnWorldChange.class);
+        factoryRegistry.createAutoGroup(IDataOnRemoveSubCheckData.class);
+        // Data/config removal.
+        factoryRegistry.createAutoGroup(IData.class);
+        factoryRegistry.createAutoGroup(IConfig.class);
+        factoryRegistry.createAutoGroup(ICheckData.class);
+        factoryRegistry.createAutoGroup(ICheckConfig.class);
     }
 
     /**
@@ -262,18 +292,18 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
             return;
         }
         final long now = System.currentTimeMillis();
-        final Set<CheckDataFactory> factories = new LinkedHashSet<CheckDataFactory>();
         final Set<Entry<UUID, Long>> entries = lastLogout.entrySet();
         final Iterator<Entry<UUID, Long>> iterator = entries.iterator();
         while (iterator.hasNext()) {
             final Entry<UUID, Long> entry = iterator.next();
+            // TODO: Multi stage expiration.
             final long ts = entry.getValue();
             if (now - ts <= durExpireData) {
                 break;
             }
             final UUID playerId = entry.getKey();
             // TODO: LEGACY handling: switch to UUIDs here for sure.
-            legacyPlayerDataExpirationRemovalByName(playerId, factories, deleteData);
+            legacyPlayerDataExpirationRemovalByName(playerId, deleteData);
             bulkPlayerDataRemoval.add(playerId); // For bulk removal.
             iterator.remove();
         }
@@ -284,7 +314,7 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
     }
 
     private final void legacyPlayerDataExpirationRemovalByName(final UUID playerId, 
-            final Set<CheckDataFactory> factories, final boolean deleteData) {
+            final boolean deleteData) {
         final String playerName = DataManager.getPlayerName(playerId);
         if (playerName == null) {
             // TODO: WARN
@@ -292,15 +322,9 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         }
         // TODO: Validity of name?
         if (deleteData) {
-            factories.clear();
-            for (final CheckType type : CheckType.values()) {
-                final CheckDataFactory factory = type.getDataFactory();
-                if (factory != null) {
-                    factories.add(factory);
-                }
-            }
-            for (final CheckDataFactory factory : factories) {
-                factory.removeData(playerName);
+            final PlayerData pData = playerData.get(playerId);
+            if (pData != null) {
+                pData.removeData(false); // TODO: staged ...
             }
             clearComponentData(CheckType.ALL, playerName);
         }
@@ -382,107 +406,70 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
     }
 
     /**
-     * Remove the player data for a given player and a given check type.
-     * CheckType.ALL and null will be interpreted as removing all data.<br>
+     * Remove data instances from the cache for a given player and a given check
+     * type. CheckType.ALL and null will be interpreted as removing all data.
+     * <hr/>
+     * Does not touch the execution history.
+     * <hr/>
      * 
      * @param playerName
      *            Exact player name.
      * @param checkType
      *            Check type to remove data for, null is regarded as ALL.
-     * @return If any data was present.
+     * @return If any data was present (not strict).
      */
     public boolean removeData(final String playerName, CheckType checkType) {
 
-        final PlayerData pd = getPlayerData(playerName);
+        PlayerData pData = getPlayerData(playerName);
         // TODO: Once working, use the most correct name from PlayerData.
-        final UUID playerId = pd == null ? getUUID(playerName) : pd.getPlayerId();
+        final UUID playerId = pData == null ? getUUID(playerName) : pData.getPlayerId();
+        if (pData == null && playerId != null) {
+            pData = playerData.get(playerId);
+        }
+        boolean somethingFound = pData != null || playerId != null;
+
+        // TODO: Method signature with UUID / (I)PlayerData ?
 
         if (checkType == null) {
             checkType = CheckType.ALL;
         }
-        boolean had = false;
 
         // Check extended registered components.
-        // TODO: "System data" might not be wise to erase for online players.
-        if (clearComponentData(checkType, playerName)) {
-            had = true;
-        }
+        /*
+         *  TODO: "System data" might not be wise to erase for online players.
+         *  ICheckData vs IData (...), except if registered for per check 
+         *  type removal.
+         */
+        somethingFound |= clearComponentData(checkType, playerName);
 
-        // Collect factories.
-        final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-        for (CheckType otherType : CheckTypeUtil.getWithDescendants(checkType)) {
-            final CheckDataFactory otherFactory = otherType.getDataFactory();
-            if (otherFactory != null) {
-                factories.add(otherFactory);
-            }
-        }
-        // Remove data.
-        for (final CheckDataFactory factory : factories) {
-            if (removeDataPrecisely(playerId, playerName, checkType, factory)) {
-                had = true;
-            }
-        }
-
-        // TODO: Multi stage removal, other API
-        // TODO: Maintain a shouldBeOnline flag for fast skipping?
-        if (pd != null && checkType == CheckType.ALL) {
-            // TODO: Fetch/use UUID early, and check validity of name.
-            if (playerId != null) {
-                bulkPlayerDataRemoval.add(playerId);
-            }
-        }
-
-        return had;
-    }
-
-    /**
-     * Attempt to only remove the data, relevant to the given CheckType.
-     * 
-     * @param playerId
-     * @param playerName
-     * @param checkType
-     * @param factory
-     * @return If any data has been removed.
-     */
-    private boolean removeDataPrecisely(final UUID playerId, final String playerName, 
-            final CheckType checkType, final CheckDataFactory factory) {
-        // TODO: Use PlayerData if present.
-        final ICheckData data = factory.getDataIfPresent(playerId, playerName);
-        if (data == null) {
-            return false;
-        }
-        else {
-            // Attempt precise removal.
-            final boolean debug = data.getDebug();
-            String debugText = debug ? "[" + checkType + "] [" + playerName + "] Data removal: " : null;
-            boolean res = false;
-            if (data instanceof IRemoveSubCheckData 
-                    && ((IRemoveSubCheckData) data).removeSubCheckData(checkType)) {
-                if (debug) {
-                    debugText += "Removed (sub) check data, keeping the data object.";
+        if (pData != null) {
+            final CheckRemovalSpec removalSpec = new CheckRemovalSpec(checkType, true, this);
+            final boolean hasComplete = !removalSpec.completeRemoval.isEmpty();
+            final boolean hasSub = !removalSpec.subCheckRemoval.isEmpty();
+            if (hasComplete || hasSub) {
+                if (hasComplete) {
+                    pData.removeAllGenericInstances(removalSpec.completeRemoval);
                 }
-                res = true;
-            }
-            else {
-                // Just remove.
-                if (factory.removeData(playerName) == null) {
-                    // Is this even possible?
-                    if (debug) {
-                        debugText += "Could not remove data, despite present!";
-                    }
+                if (hasSub) {
+                    pData.removeSubCheckData(removalSpec.subCheckRemoval, removalSpec.checkTypes);
                 }
-                else {
-                    if (debug) {
-                        debugText += "Removed the entire data object.";
-                    }
-                    res = true;
+                // TODO: Remove the PlayerData instance, if necessary?
+            }
+            // TODO: Maintain a shouldBeOnline flag for fast skipping?
+            if (checkType == CheckType.ALL) {
+                // TODO: Fetch/use UUID early, and check validity of name.
+                if (playerId != null) {
+                    bulkPlayerDataRemoval.add(playerId);
                 }
             }
-            if (debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, debugText);
+            if (pData.isDebugActive(checkType)) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(
+                        Streams.TRACE_FILE, 
+                        CheckUtils.getLogMessagePrefix(playerName, checkType)
+                        + "Removed data.");
             }
-            return res;
         }
+        return somethingFound;
     }
 
     /**
@@ -534,7 +521,6 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         clearData(CheckType.ALL);
         playerData.clear(); // Also clear for online players.
         iRemoveData.clear();
-        DataManager.clearConfigs(); // TODO: Cleaning up the WorldDataManager is up to the WorldDataManager.
         lastLogout.clear();
         executionHistories.clear();
         playerMap.clear();
@@ -542,6 +528,13 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         if (foundInconsistencies > 0) {
             StaticLog.logWarning("DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
             foundInconsistencies = 0;
+        }
+    }
+
+    public void onWorldUnload(final WorldUnloadEvent event) {
+        final Collection<Class<? extends IDataOnWorldUnload>> types = factoryRegistry.getGroupedTypes(IDataOnWorldUnload.class);
+        for (final Entry<UUID, PlayerData> entry : playerData.iterable()) {
+            entry.getValue().onWorldUnload(event.getWorld(), types);
         }
     }
 
@@ -575,7 +568,8 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
          * TODO: Now we update the world already with getPlayerData, in case
          * it's just been created...
          */
-        pData.onPlayerJoin(player.getWorld(), timeNow, worldDataManager);
+        final Collection<Class<? extends IDataOnJoin>> types = factoryRegistry.getGroupedTypes(IDataOnJoin.class);
+        pData.onPlayerJoin(player, player.getWorld(), timeNow, worldDataManager, types);
         pData.getGenericInstance(CombinedData.class).lastJoinTime = timeNow; 
     }
 
@@ -589,17 +583,22 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         lastLogout.put(playerId, timeNow);
         final PlayerData pData = playerData.get(playerId);
         if (pData != null) {
-            pData.onPlayerLeave(timeNow);
+            final Collection<Class<? extends IDataOnLeave>> types = factoryRegistry.getGroupedTypes(IDataOnLeave.class);
+            pData.onPlayerLeave(player, timeNow, types);
+            pData.getGenericInstance(CombinedData.class).lastLogoutTime = timeNow;
         }
-        // TODO: put lastLogoutTime to PlayerData !
-        pData.getGenericInstance(CombinedData.class).lastLogoutTime = timeNow;
+        else {
+            // TODO: put lastLogoutTime to OfflinePlayerData ?
+        }
         removeOnlinePlayer(player);
     }
 
     private void playerChangedWorld(final PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
         final PlayerData pData = getPlayerData(player, true);
-        pData.onPlayerChangedWorld(event.getFrom(), player.getWorld(), worldDataManager);
+        final Collection<Class<? extends IDataOnWorldChange>> types = factoryRegistry.getGroupedTypes(IDataOnWorldChange.class);
+        pData.onPlayerChangedWorld(player, event.getFrom(), player.getWorld(), 
+                worldDataManager, types);
     }
 
     /**
@@ -633,6 +632,10 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
     public void onReload() {
         // present.
         adjustSettings();
+        final Collection<Class<? extends IDataOnReload>> types = factoryRegistry.getGroupedTypes(IDataOnReload.class);
+        for (final Entry<UUID, PlayerData> entry : playerData.iterable()) {
+            entry.getValue().onReload(types);
+        }
     }
 
     @Override
@@ -748,24 +751,12 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
      * which implement this.
      */
     public void handleSystemTimeRanBackwards() {
+        // TODO: WorldDataManager should have an extra method and be called before this.
         // Collect data factories and clear execution history.
-        final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
         for (final CheckType type : CheckTypeUtil.getWithDescendants(CheckType.ALL)) {
             final Map<String, ExecutionHistory> map = executionHistories.get(type);
             if (map != null) {
                 map.clear();
-            }
-            final CheckDataFactory factory = type.getDataFactory();
-            if (factory != null) {
-                factories.add(factory);
-            }
-        }
-        for (final CheckDataFactory factory : factories) {
-            if (factory instanceof ICanHandleTimeRunningBackwards) {
-                ((ICanHandleTimeRunningBackwards) factory).handleTimeRanBackwards();
-            }
-            else {
-                factory.removeAllData();
             }
         }
         for (final IRemoveData rmd : iRemoveData) {
@@ -778,8 +769,10 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         }
         ViolationHistory.clear(CheckType.ALL);
         // PlayerData
+        // TODO: Register explicitly (adding IDataOnTimeRanBackwards)?
+        Collection<Class<? extends IData>> dataTypes = factoryRegistry.getGroupedTypes(IData.class);
         for (final Entry<UUID, PlayerData> entry : playerData.iterable()){
-            entry.getValue().handleTimeRanBackwards();
+            entry.getValue().handleTimeRanBackwards(dataTypes);
         }
     }
 
@@ -905,22 +898,22 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
 
     @Override
     public void clearData(final CheckType checkType) {
-        // TODO: WorldDataManager: clear player related data there (registered in PlayerDataManager!?). 
-        final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-        for (final CheckType type : CheckTypeUtil.getWithDescendants(checkType)) {
-            final Map<String, ExecutionHistory> map = executionHistories.get(type);
-            if (map != null) {
-                map.clear();
-            }
-            final CheckDataFactory factory = type.getDataFactory();
-            if (factory != null) {
-                factories.add(factory);
+        final CheckRemovalSpec removalSpec = new CheckRemovalSpec(checkType, true, this);
+        final boolean hasComplete = !removalSpec.completeRemoval.isEmpty();
+        final boolean hasSub = !removalSpec.subCheckRemoval.isEmpty();
+        if (hasComplete || hasSub) {
+            for (final Entry<UUID, PlayerData> entry : playerData.iterable()) {
+                final IPlayerData pData = entry.getValue();
+                if (hasComplete) {
+                    pData.removeAllGenericInstances(removalSpec.completeRemoval);
+                }
+                if (hasSub) {
+                    pData.removeSubCheckData(removalSpec.subCheckRemoval, removalSpec.checkTypes);
+                }
+                // TODO: Remove the PlayerData instance, if suitable?
             }
         }
-        for (final CheckDataFactory factory : factories) {
-            // TODO: Support precise removal ?
-            factory.removeAllData();
-        }
+        // TODO: IRemoveData - why register here at all ?
         for (final IRemoveData rmd : iRemoveData) {
             if (checkType == CheckType.ALL) {
                 // Not sure this is really good, though.
@@ -933,7 +926,14 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
                 }
             }
         }
+        for (final CheckType type : removalSpec.checkTypes) {
+            final Map<String, ExecutionHistory> map = executionHistories.get(type);
+            if (map != null) {
+                map.clear();
+            }
+        }
         ViolationHistory.clear(checkType);
+        // TODO: PlayerData removal should have other mechanisms (stages).
         if (checkType == CheckType.ALL) {
             bulkPlayerDataRemoval.addAll(playerData.getKeys());
             doBulkPlayerDataRemoval(); // Only removes offline player data.
@@ -987,6 +987,85 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
             }
         }
         return removed;
+    }
+
+    @Override
+    public <T> void registerFactory(final Class<T> registerFor,
+            final IFactoryOne<PlayerFactoryArgument, T> factory) {
+        factoryRegistry.registerFactory(registerFor, factory);
+    }
+
+    @Override
+    public <T> Collection<Class<? extends T>> getGroupedTypes(final Class<T> groupType) {
+        return factoryRegistry.getGroupedTypes(groupType);
+    }
+
+    @Override
+    public <T> Collection<Class<? extends T>> getGroupedTypes(final Class<T> groupType,
+            final CheckType checkType) {
+        return factoryRegistry.getGroupedTypes(groupType, checkType);
+    }
+
+    @Override
+    public <I> void addToGroups(final Class<I> itemType, 
+            final Class<? super I>... groupTypes) {
+        factoryRegistry.addToGroups(itemType, groupTypes);
+    }
+
+    @Override
+    public <I> void addToGroups(CheckType checkType, Class<I> itemType,
+            Class<? super I>... groupTypes) {
+        factoryRegistry.addToGroups(checkType, itemType, groupTypes);
+    }
+
+    @Override
+    public void addToExistingGroups(Class<?> itemType) {
+        factoryRegistry.addToExistingGroups(itemType);
+    }
+
+    @Override
+    public <I> void addToExistingGroups(final CheckType checkType,
+            final Class<I> itemType) {
+        factoryRegistry.addToExistingGroups(checkType, itemType);
+    }
+
+    @Override
+    public <G> void createGroup(final Class<G> groupType) {
+        factoryRegistry.createGroup(groupType);
+    }
+
+    @Override
+    public <G> void createAutoGroup(final Class<G> groupType) {
+        factoryRegistry.createAutoGroup(groupType);
+    }
+
+    @Override
+    public <I> void addToGroups(final Collection<CheckType> checkTypes,
+            final Class<I> itemType, final Class<? super I>... groupTypes) {
+        factoryRegistry.addToGroups(checkTypes, itemType, groupTypes);
+    }
+
+    @Override
+    public <I> void addToExistingGroups(final Collection<CheckType> checkTypes,
+            final Class<I> itemType) {
+        factoryRegistry.addToExistingGroups(checkTypes, itemType);
+    }
+
+    @Override
+    public <T> T getNewInstance(final Class<T> registeredFor,
+            final PlayerFactoryArgument arg) {
+        return factoryRegistry.getNewInstance(registeredFor, arg);
+    }
+
+    @Override
+    public void removeCachedConfigs() {
+        final Collection<Class<?>> types = new LinkedHashSet<Class<?>>(
+                factoryRegistry.getGroupedTypes(IConfig.class));
+        if (!types.isEmpty()) {
+            for (final Entry<UUID, PlayerData> entry : playerData.iterable()) {
+                entry.getValue().removeAllGenericInstances(types);
+            }
+        }
     }
 
 }

@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.worlds.WorldData;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**
  * Configurations specific for the "inventory" checks. Every world gets one of
@@ -70,7 +70,7 @@ public class InventoryConfig extends ACheckConfig {
      * @param data
      *            the data
      */
-    public InventoryConfig(final WorldData worldData) {
+    public InventoryConfig(final IWorldData worldData) {
         super(worldData);
         final ConfigFile data = worldData.getRawConfiguration();
         dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);

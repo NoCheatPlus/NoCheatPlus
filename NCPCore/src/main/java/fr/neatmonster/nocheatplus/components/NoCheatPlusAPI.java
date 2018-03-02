@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
 import fr.neatmonster.nocheatplus.components.registry.GenericInstanceRegistry;
+import fr.neatmonster.nocheatplus.components.registry.setup.RegistrationContext;
 import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
@@ -215,5 +216,21 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * @return
      */
     public IPlayerDataManager getPlayerDataManager();
+
+    /**
+     * Get a new registration context instance for registration with
+     * {@link NoCheatPlusAPI#register(RegistrationContext)}.
+     * 
+     * @return
+     */
+    public RegistrationContext newRegistrationContext();
+
+    /**
+     * Do use {@link NoCheatPlusAPI#newRegistrationContext()} for future
+     * compatibility.
+     * 
+     * @param context
+     */
+    public void register(RegistrationContext context);
 
 }

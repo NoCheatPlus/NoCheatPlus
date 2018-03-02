@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Misc {
@@ -34,6 +35,13 @@ public class Misc {
             res = String.format("%dd %02d:%02d:%02d", days, hours, minutes, seconds);
         }
         return res;
+    }
+
+    public static <T> void putFirst(T item, List<T> list) {
+        if (list.contains(item)) {
+            list.remove(item);
+        }
+        list.add(0, item);
     }
 
 }

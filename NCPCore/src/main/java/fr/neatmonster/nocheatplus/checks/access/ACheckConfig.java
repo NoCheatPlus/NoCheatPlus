@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.access;
 
+import fr.neatmonster.nocheatplus.components.config.ICheckConfig;
 import fr.neatmonster.nocheatplus.worlds.IWorldData;
 
 /**

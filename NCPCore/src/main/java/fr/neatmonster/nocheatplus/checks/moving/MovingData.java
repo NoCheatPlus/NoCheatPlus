@@ -18,13 +18,13 @@ import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.checks.moving.location.setback.DefaultSetBackStorage;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
@@ -41,9 +41,13 @@ import fr.neatmonster.nocheatplus.checks.moving.velocity.SimpleEntry;
 import fr.neatmonster.nocheatplus.checks.moving.velocity.VelocityFlags;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeReference;
+import fr.neatmonster.nocheatplus.components.data.IDataOnReload;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldUnload;
 import fr.neatmonster.nocheatplus.components.entity.IEntityAccessDimensions;
 import fr.neatmonster.nocheatplus.components.location.IGetPosition;
 import fr.neatmonster.nocheatplus.components.location.IPositionWithLook;
+import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstance;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -58,33 +62,7 @@ import fr.neatmonster.nocheatplus.workaround.IWorkaroundRegistry.WorkaroundSet;
 /**
  * Player specific data for the moving checks.
  */
-public class MovingData extends ACheckData implements IRemoveSubCheckData {
-
-    /*
-     * TODO: Handle world unload and other by registration (PlayerDataManager) -
-     * might just implement the interfaces and auto-handle at registration.
-     */
-
-    //    /**
-    //     * Clear data related to the given world.
-    //     * @param world The world that gets unloaded.
-    //     */
-    //    public static void onWorldUnload(final World world) {
-    //        // TODO: Register with check (interfaces or just an event listener).
-    //        final String worldName = world.getName();
-    //        for (final MovingData data : playersMap.values()) {
-    //            data.onWorldUnload(worldName);
-    //        }
-    //    }
-    //
-    //    public static void onReload() {
-    //        // TODO: Register with check (interfaces or just an event listener).
-    //        final MovingConfig globalCc = MovingConfig.getConfig((String) null);
-    //        final int tick = TickTask.getTick();
-    //        for (final MovingData data : playersMap.values()) {
-    //            data.adjustOnReload(globalCc, tick);
-    //        }
-    //    }
+public class MovingData extends ACheckData implements IDataOnRemoveSubCheckData, IDataOnReload, IDataOnWorldUnload {
 
     // Check specific.
 
@@ -324,59 +302,6 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
 
     }
 
-    @Override
-    public boolean removeSubCheckData(final CheckType checkType) {
-        // TODO: LocationTrace stays (leniency for other players!).
-        // TODO: Likely more fields left to change.
-        switch (checkType) {
-            /*
-             * TODO: case MOVING: // Remove all in-place (future: data might
-             * stay as long as the player is online).
-             */
-            case MOVING_SURVIVALFLY:
-                survivalFlyVL = 0;
-                clearFlyData();
-                resetSetBack(); // TODO: Not sure this is really best for compatibility.
-                // TODO: other?
-                return true;
-            case MOVING_CREATIVEFLY:
-                creativeFlyVL = 0;
-                clearFlyData();
-                resetSetBack(); // TODO: Not sure this is really best for compatibility.
-                // TODO: other?
-                return true;
-            case MOVING_NOFALL:
-                noFallVL = 0;
-                clearNoFallData();
-                return true;
-            case MOVING_MOREPACKETS:
-                morePacketsVL = 0;
-                clearPlayerMorePacketsData();
-                morePacketsSetback = null;
-                morePacketsSetBackResetTime = 0;
-                return true;
-            case MOVING_PASSABLE:
-                passableVL = 0;
-                return true;
-            case MOVING_VEHICLE:
-                vehicleEnvelopeVL = 0;
-                vehicleMorePacketsVL = 0;
-                clearVehicleData();
-                return true;
-            case MOVING_VEHICLE_ENVELOPE:
-                vehicleEnvelopeVL = 0;
-                vehicleMoves.invalidate();
-                vehicleSetBacks.invalidateAll(); // Also invalidates morepackets set back.
-                return true;
-            case MOVING_VEHICLE_MOREPACKETS:
-                vehicleMorePacketsVL = 0;
-                clearVehicleMorePacketsData();
-                return true;
-            default:
-                return false;
-        }
-    }
-
     /**
      * Clear fly and more packets check data for both vehicles and players.
      */
@@ -520,26 +445,6 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
         trace.reset();
         playerMoves.invalidate();
         vehicleMoves.invalidate();
-    }
-
-    /**
-     * Clean up data related to worlds with the given name (not case-sensitive).
-     * @param worldName
-     */
-    public void onWorldUnload(final String worldName) {
-        // TODO: Unlink world references.
-        if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())) {
-            resetTeleported();
-        }
-        if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
-            clearFlyData();
-        }
-        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName())) {
-            clearPlayerMorePacketsData();
-            clearNoFallData(); // just in case.
-        }
-        // (Assume vehicle data needn't really reset here.)
-        vehicleSetBacks.resetByWorldName(worldName);
     }
 
     /**
@@ -1244,13 +1149,6 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
     }
 
     /**
-     * Adjust to new parameters.
-     */
-    protected void adjustOnReload(final MovingConfig cc, final int tick) {
-        trace.adjustSettings(cc.traceMaxAge, cc.traceMaxSize, tick);
-    }
-
-    /**
      * Test if velocity has affected the in-air jumping phase. Keeps set until
      * reset on-ground or otherwise. Use clearActiveVerVel to force end velocity
      * jump phase. Use hasAnyVerVel() to test if active or queued vertical
@@ -1380,6 +1278,93 @@ public class MovingData extends ACheckData implements IRemoveSubCheckData {
      */
     public void removeLeadingQueuedVerticalVelocityByFlag(final long flag) {
         verVel.removeLeadingQueuedVerticalVelocityByFlag(flag);
+    }
+
+    @Override
+    public boolean dataOnRemoveSubCheckData(Collection<CheckType> checkTypes) {
+        // TODO: Detect if it is ok to remove data.
+        // TODO: LocationTrace stays (leniency for other players!).
+        // TODO: Likely more fields left to change.
+        for (final CheckType checkType : checkTypes) {
+            switch (checkType) {
+                /*
+                 * TODO: case MOVING: // Remove all in-place (future: data might
+                 * stay as long as the player is online).
+                 */
+                case MOVING_SURVIVALFLY:
+                    survivalFlyVL = 0;
+                    clearFlyData(); // TODO: ...
+                    resetSetBack(); // TODO: Not sure this is really best for compatibility.
+                    // TODO: other?
+                    break;
+                case MOVING_CREATIVEFLY:
+                    creativeFlyVL = 0;
+                    clearFlyData(); // TODO: ...
+                    resetSetBack(); // TODO: Not sure this is really best for compatibility.
+                    // TODO: other?
+                    break;
+                case MOVING_NOFALL:
+                    noFallVL = 0;
+                    clearNoFallData();
+                    break;
+                case MOVING_MOREPACKETS:
+                    morePacketsVL = 0;
+                    clearPlayerMorePacketsData();
+                    morePacketsSetback = null;
+                    morePacketsSetBackResetTime = 0;
+                    break;
+                case MOVING_PASSABLE:
+                    passableVL = 0;
+                    break;
+                case MOVING_VEHICLE:
+                    vehicleEnvelopeVL = 0;
+                    vehicleMorePacketsVL = 0;
+                    clearVehicleData();
+                    break;
+                case MOVING_VEHICLE_ENVELOPE:
+                    vehicleEnvelopeVL = 0;
+                    vehicleMoves.invalidate();
+                    vehicleSetBacks.invalidateAll(); // Also invalidates morepackets set back.
+                    break;
+                case MOVING_VEHICLE_MOREPACKETS:
+                    vehicleMorePacketsVL = 0;
+                    clearVehicleMorePacketsData();
+                    break;
+                case MOVING:
+                    clearMostMovingCheckData(); // Just in case.
+                    return true;
+                default:
+                    break;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean dataOnWorldUnload(final World world, 
+            final IGetGenericInstance dataAccess) {
+        // TODO: Unlink world references.
+        final String worldName = world.getName();
+        if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())) {
+            resetTeleported();
+        }
+        if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
+            clearFlyData();
+        }
+        if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName())) {
+            clearPlayerMorePacketsData();
+            clearNoFallData(); // just in case.
+        }
+        // (Assume vehicle data needn't really reset here.)
+        vehicleSetBacks.resetByWorldName(worldName);
+        return false;
+    }
+
+    @Override
+    public boolean dataOnReload(final IGetGenericInstance dataAccess) {
+        final MovingConfig cc = dataAccess.getGenericInstance(MovingConfig.class);
+        trace.adjustSettings(cc.traceMaxAge, cc.traceMaxSize, TickTask.getTick());
+        return false;
     }
 
 }

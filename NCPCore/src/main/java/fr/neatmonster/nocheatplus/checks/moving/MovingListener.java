@@ -48,7 +48,6 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffectType;
@@ -90,10 +89,13 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.BlockChangeEntry;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker.Direction;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
 import fr.neatmonster.nocheatplus.components.data.IData;
 import fr.neatmonster.nocheatplus.components.location.SimplePositionWithLook;
 import fr.neatmonster.nocheatplus.components.modifier.IAttributeAccess;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.components.registry.feature.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.registry.feature.INeedConfig;
 import fr.neatmonster.nocheatplus.components.registry.feature.IRemoveData;
@@ -106,6 +108,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.logging.debug.DebugUtil;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -115,9 +118,9 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.location.LocUtil;
 import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
-import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MapUtil;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the moving checks.
@@ -204,10 +207,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private final int idMoveEvent = counters.registerKey("event.player.move");
 
 
+    @SuppressWarnings("unchecked")
     public MovingListener() {
         super(CheckType.MOVING);
         // Register vehicleChecks.
-        NCPAPIProvider.getNoCheatPlusAPI().addComponent(vehicleChecks);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.addComponent(vehicleChecks);
         blockChangeTracker = NCPAPIProvider.getNoCheatPlusAPI().getBlockChangeTracker();
         if (Bridge1_9.hasEntityToggleGlideEvent()) {
             queuedComponents.add(new Listener() {
@@ -219,6 +224,35 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             });
         }
+
+        // Register config and data.
+        // TODO: Should register before creating Check instances ?
+        api.register(api.newRegistrationContext()
+                // MovingConfig
+                .registerConfigWorld(MovingConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, MovingConfig>() {
+                    @Override
+                    public MovingConfig getNewInstance(
+                            final WorldFactoryArgument arg) {
+                        return new MovingConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer(CheckType.MOVING, true)
+                .context() //
+                // MovingData
+                .registerDataPlayer(MovingData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, MovingData>() {
+                    @Override
+                    public MovingData getNewInstance(
+                            final PlayerFactoryArgument arg) {
+                        return new MovingData(arg.worldData.getGenericInstance(
+                                MovingConfig.class), arg.playerData);
+                    }
+                })
+                .addToGroups(CheckType.MOVING, false, IData.class, ICheckData.class)
+                .removeSubCheckData(CheckType.MOVING, true)
+                .context() //
+                );
     }
 
     /**
@@ -2464,12 +2498,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldunload(final WorldUnloadEvent event) {
-        // TODO: Consider removing the world-related data anyway (even if the event is cancelled).
-        MovingData.onWorldUnload(event.getWorld());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerToggleSneak(final PlayerToggleSneakEvent event) {
         survivalFly.setReallySneaking(event.getPlayer(), event.isSneaking());
     }
@@ -2696,6 +2724,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     @Override
     public CheckType getCheckType() {
         // TODO: this is for the hover check only...
+        // TODO: ugly.
         return CheckType.MOVING_SURVIVALFLY;
     }
 
@@ -2717,7 +2746,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onReload() {
         aux.clear();
         hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
-        MovingData.onReload();
     }
 
     /**

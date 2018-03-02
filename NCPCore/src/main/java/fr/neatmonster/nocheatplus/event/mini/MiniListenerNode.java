@@ -15,10 +15,13 @@
 package fr.neatmonster.nocheatplus.event.mini;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
+import fr.neatmonster.nocheatplus.components.registry.feature.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.registry.order.IGetRegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.AbstractRegistrationOrderSort;
@@ -79,12 +82,14 @@ public class MiniListenerNode<E, P> {
     @SuppressWarnings("unchecked")
     protected ListenerEntry<E>[] sortedListeners = new ListenerEntry[0];
 
+    protected final Class<E> baseType;
     /**
      * Stored for the case of exceptions.
      */
     protected final P basePriority;
 
-    public MiniListenerNode(P basePriority) {
+    public MiniListenerNode(Class<E> baseType, P basePriority) {
+        this.baseType = baseType;
         this.basePriority = basePriority;
     }
 
@@ -159,12 +164,37 @@ public class MiniListenerNode<E, P> {
         }
     }
 
-    private void logListenerException(final ListenerEntry<E> entry, final int index, final int length, final E event, final Throwable t) {
+    private void logListenerException(final ListenerEntry<E> entry, 
+            final int index, final int length, 
+            final E event, final Throwable t) {
         // Log long part once, to keep spam slightly down.
+        // TODO: Add more info (ORDER with tags, class/wrapped class).
+        final StringBuilder builder = new StringBuilder(1024);
+        builder.append(" Details:");
+        builder.append(" listenerType=" + entry.listener.getClass().getName());
+        builder.append(" listenerOrder=" + entry.order);
+        builder.append(" listenerIndex=" + index + "/" + length);
+        if (entry.listener instanceof ComponentWithName) {
+            builder.append(" listenerName=");
+            builder.append(((ComponentWithName) entry.listener).getComponentName());
+        }
+        builder.append("\n exception:\n");
+        builder.append(StringUtil.throwableToString(t));
+        final Set<Throwable> done = new HashSet<Throwable>();
+        done.add(t);
+        Throwable cause = t.getCause();
+        while (cause != null && !done.contains(cause)) {
+            done.add(cause);
+            builder.append("\n caused by:\n");
+            builder.append(StringUtil.throwableToString(cause));
+            cause = t.getCause();
+        }
+        // TODO: Add id information to compare to registry log (later).
         StaticLog.logOnce(Streams.STATUS, Level.SEVERE, 
-                "Listener exception: event=" + event.getClass().getName() + " priority=" + this.basePriority + " index=" + index + " n=" + length
-                // TODO: Add id information to compare to registry log (later).
-                , StringUtil.throwableToString(t));
+                "Listener exception: baseType=" + baseType.getName() 
+                + " basePriority=" + this.basePriority
+                + " eventType=" + event.getClass().getName(),
+                builder.toString());
     }
 
 }

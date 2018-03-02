@@ -28,10 +28,16 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Class to combine some things, make available for other checks, or just because they don't fit into another section.<br>
@@ -50,8 +56,34 @@ public class CombinedListener extends CheckListener {
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idFakeInvulnerable = counters.registerKey("fakeinvulnerable");
 
+    @SuppressWarnings("unchecked")
     public CombinedListener(){
         super(CheckType.COMBINED);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                // CombinedConfig
+                .registerConfigWorld(CombinedConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, CombinedConfig>() {
+                    @Override
+                    public CombinedConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new CombinedConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                // CombinedData
+                .registerDataPlayer(CombinedData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, CombinedData>() {
+                    @Override
+                    public CombinedData getNewInstance(
+                            PlayerFactoryArgument arg) {
+                        return new CombinedData();
+                    }
+                })
+                .addToGroups(CheckType.MOVING, false, IData.class, ICheckData.class)
+                .removeSubCheckData(CheckType.COMBINED, true)
+                .context() //
+                );
     }
 
     /**

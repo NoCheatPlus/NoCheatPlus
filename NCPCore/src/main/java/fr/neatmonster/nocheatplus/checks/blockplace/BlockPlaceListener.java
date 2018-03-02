@@ -47,14 +47,20 @@ import fr.neatmonster.nocheatplus.checks.net.FlyingQueueHandle;
 import fr.neatmonster.nocheatplus.checks.net.model.DataPacketFlying;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the block place checks.
@@ -115,8 +121,33 @@ public class BlockPlaceListener extends CheckListener {
     private final Class<?> blockMultiPlaceEvent = ReflectionUtil.getClass("org.bukkit.event.block.BlockMultiPlaceEvent");
     private final boolean hasGetReplacedState = ReflectionUtil.getMethodNoArgs(BlockPlaceEvent.class, "getReplacedState", BlockState.class) != null;
 
+    @SuppressWarnings("unchecked")
     public BlockPlaceListener() {
         super(CheckType.BLOCKPLACE);
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                // BlockPlaceConfig
+                .registerConfigWorld(BlockPlaceConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, BlockPlaceConfig>() {
+                    @Override
+                    public BlockPlaceConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new BlockPlaceConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                // BlockPlaceData
+                .registerDataPlayer(BlockPlaceData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, BlockPlaceData>() {
+                    @Override
+                    public BlockPlaceData getNewInstance(
+                            PlayerFactoryArgument arg) {
+                        return new BlockPlaceData();
+                    }
+                })
+                .addToGroups(CheckType.BLOCKPLACE, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
     /**

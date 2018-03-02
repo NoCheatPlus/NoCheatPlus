@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.test;
 
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 public class TestWorldDataManager {
@@ -55,9 +57,30 @@ public class TestWorldDataManager {
         cfg.set(key, value);
     }
 
+    /**
+     * Set for all.
+     * 
+     * @param map
+     * @param key
+     * @param value
+     */
+    void set(Map<String, ConfigFile> map, String key, Object value) {
+        for (String worldName : map.keySet()) {
+            set(map, worldName, key, value);
+        }
+    }
+
+    void setup(Map<String, ConfigFile> map, String... worldNames) {
+        for (String worldName : worldNames) {
+            set(map, worldName, "dummy", true);
+        }
+    }
+
     @Test
     public void BasicTests() {
 
+        //PluginTests.setUnitTestNoCheatPlusAPI(false);
+        StaticLog.setUseLogManager(false);
 
         WorldDataManager worldMan = getWorldDataManager();
 
@@ -66,7 +89,9 @@ public class TestWorldDataManager {
         // (Implicitly create configurations via set).
         // Default.
         set(rawWorldConfigs, null, ConfPaths.COMBINED + ConfPaths.SUB_ACTIVE, "yes");
-        set(rawWorldConfigs, null, ConfPaths.COMBINED_MUNCHHAUSEN_CHECK, "default");
+        // All existing.
+        setup(rawWorldConfigs, null, "Exist1", "Exist2");
+        set(rawWorldConfigs, ConfPaths.COMBINED_MUNCHHAUSEN_CHECK, "default");
 
         // Exist1
         set(rawWorldConfigs, "Exist1", ConfPaths.COMBINED + ConfPaths.SUB_ACTIVE, "no");
@@ -76,7 +101,17 @@ public class TestWorldDataManager {
 
         // (Might set some particularly interesting values here.)
 
+
+        /////////////////////////
+        // Apply configuration
+        /////////////////////////
         worldMan.applyConfiguration(rawWorldConfigs);
+
+        for (String worldName : Arrays.asList("Exist1", "Exist2")) {
+            if (rawWorldConfigs.get(worldName) != worldMan.getWorldData(worldName).getRawConfiguration()) {
+                fail("Raw configuration set wrongly: " + worldName);
+            }
+        }
 
         if (!worldMan.getWorldData("notExist1").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
             fail("Inherited from default: COMBINED_MUNCHHAUSEN should be active (-> COMBINED is)");
@@ -94,6 +129,15 @@ public class TestWorldDataManager {
             fail("Specific: COMBINED_MUNCHHAUSEN should not be active (directly set)");
         }
 
+        if (!worldMan.getWorldData("notExist2").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
+            fail("Inherited from default: COMBINED_MUNCHHAUSEN should be active (-> COMBINED is)");
+        }
+
+
+        ////////////////
+        // Override
+        ////////////////
+
         // Override via config "reload":
         set(rawWorldConfigs, "Exist2", ConfPaths.COMBINED_MUNCHHAUSEN_CHECK, true);
         worldMan.applyConfiguration(rawWorldConfigs);
@@ -101,31 +145,56 @@ public class TestWorldDataManager {
             fail("Specific: COMBINED_MUNCHHAUSEN should be active (directly set)");
         }
 
-        // Specific override (mild / reset with reload).
+        // Specific override (mild).
+        worldMan.overrideCheckActivation(CheckType.COMBINED, AlmostBoolean.NO, 
+                OverrideType.SPECIFIC, false);
+        if (worldMan.getWorldData("notExist2").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
+            fail("Overridden (inherited from default): COMBINED_MUNCHHAUSEN should not be active (-> COMBINED is not)");
+        }
         worldMan.overrideCheckActivation(CheckType.COMBINED, AlmostBoolean.NO, 
                 OverrideType.SPECIFIC, true);
         if (worldMan.getWorldData("notExist2").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
-            fail("Overridden (inherited from default): COMBINED_MUNCHHAUSEN should not be active (-> COMBINED is)");
+            fail("Overridden (inherited from default): COMBINED_MUNCHHAUSEN should not be active (overrideChildren from COMBINED should explicitly set this)");
         }
+
+
+        ///////////////////
+        // Fake reload 1
+        ///////////////////
+        /*
+         * NOTE: With this testing scenario, ConfigFile instances within
+         * rawWorldConfigs stay identical, which would not be the case with a
+         * ConfigManager based reload.
+         */
         worldMan.applyConfiguration(rawWorldConfigs);
+
+        if (!worldMan.getWorldData("notExist2").isCheckActive(CheckType.COMBINED)) {
+            fail("Inherited from default: COMBINED should be active after reload.");
+        }
         if (!worldMan.getWorldData("notExist2").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
             fail("Inherited from default: COMBINED_MUNCHHAUSEN should be active (-> COMBINED is)");
         }
+
+
+        ////////////////
+        // Override 2
+        ////////////////
 
         worldMan.getWorldData("NotExist3").overrideCheckActivation(CheckType.COMBINED_MUNCHHAUSEN, 
                 AlmostBoolean.NO, OverrideType.SPECIFIC, false);
         if (worldMan.getWorldData("notExist3").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
             fail("Overridden (SPECIFIC): COMBINED_MUNCHHAUSEN should not be active (-directly set)");
         }
+
+
+        ///////////////////
+        // Fake reload 2
+        ///////////////////
         worldMan.applyConfiguration(rawWorldConfigs);
-        if (worldMan.getWorldData("notExist3").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
-            fail("Overridden (SPECIFIC): COMBINED_MUNCHHAUSEN should not be active after reload (directly set)");
+
+        if (!worldMan.getWorldData("notExist3").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
+            fail("Overridden (SPECIFIC): COMBINED_MUNCHHAUSEN should be active after reload (COMBINED is)");
         }
-
-        // TODO: "Reload with special cases"
-        // TODO: overriding
-
-
 
     }
 

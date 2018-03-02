@@ -23,7 +23,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand.NCPReloadEvent;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
@@ -71,22 +70,14 @@ public class ReloadCommand extends BaseCommand {
         // Do the actual reload.
         ConfigManager.cleanup();
         // (Magic/TODO)
-        ConfigManager.init(access, 
-                (WorldDataManager) NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager());
+        final WorldDataManager worldDataManager = (WorldDataManager) NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        ConfigManager.init(access, worldDataManager);
         if (logManager instanceof INotifyReload) { // TODO: This is a band-aid.
             ((INotifyReload) logManager).onReload();
         }
 
-        // Remove all cached configs.
-        DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
-
-        // Remove some checks data.
-        // TODO: Better concept (INotifyReload).
-        for (final CheckType checkType : new CheckType[]{
-                CheckType.BLOCKBREAK, CheckType.FIGHT,
-        }){
-            DataManager.clearData(checkType);
-        }
+        // Remove all cached configs from data.
+        NCPAPIProvider.getNoCheatPlusAPI().getPlayerDataManager().removeCachedConfigs();
 
         // Reset debug flags to default (temp, heavy).
         DataManager.restoreDefaultDebugFlags();

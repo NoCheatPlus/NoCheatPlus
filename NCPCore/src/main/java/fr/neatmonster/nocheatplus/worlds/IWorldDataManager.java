@@ -23,8 +23,36 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
+import fr.neatmonster.nocheatplus.components.registry.factory.IRichFactoryRegistry;
 
-public interface IWorldDataManager {
+/**
+ * 
+ * <hr/>
+ * <b>Preset groups and automatic registration.</b><br/>
+ * All of the types mentioned in the lists below are preset for grouping. <br/>
+ * However only those item types for which a factory gets registered here will
+ * be automatically put into existing groups. External types like configuration
+ * instances fetched from IWorldData need to be registered explicitly. <br/>
+ * <br/>
+ * Automatic data type grouping with call support (return value controls removal
+ * of the entire data object):
+ * <ul>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnReload}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IDataOnWorldUnload}</li>
+ * </ul>
+ * <br/>
+ * Automatic data type grouping for direct removal (API/reload/commands):
+ * <ul>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.IData}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.config.IConfig}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.data.ICheckData}</li>
+ * <li>{@link fr.neatmonster.nocheatplus.components.config.ICheckConfig}</li>
+ * </ul>
+ * 
+ * @author asofold
+ *
+ */
+public interface IWorldDataManager extends IRichFactoryRegistry<WorldFactoryArgument> {
 
     /**
      * Get the default world data, which applies for all worlds for which no
@@ -139,5 +167,19 @@ public interface IWorldDataManager {
      * @return
      */
     public IWorldData getWorldDataSafe(Player player);
+
+    /**
+     * Remove data for all worlds for the given check type and sub checks.
+     * 
+     * @param checkType
+     */
+    public void clearData(CheckType checkType);
+
+    /**
+     * Convenience method to remove cached types that implement IConfig for all
+     * worlds. Types need to be registered (world data factory or explicitly).
+     */
+    public void removeCachedConfigs();
+
 
 }

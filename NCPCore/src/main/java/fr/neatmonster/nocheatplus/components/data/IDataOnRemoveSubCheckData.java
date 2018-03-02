@@ -12,29 +12,29 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
+package fr.neatmonster.nocheatplus.components.data;
+
+import java.util.Collection;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /**
- * Extension for CheckData, enabling disable spell checking removal of sub check
- * data.
+ * Check type specific data removal: Data storage specific listener for explicit
+ * registration with the appropriate registry.
  * 
  * @author asofold
  *
  */
-public interface IRemoveSubCheckData {
+public interface IDataOnRemoveSubCheckData {
 
     /**
-     * Remove the sub check data of the given CheckType.
+     * Pinpoint per check type data removal (with the option to keep the
+     * containing data instance).
      * 
-     * @param checkType
-     * @return True, if the sub check type has been contained <i>and the
-     *         implementation is capable of removing it in general.</i> False,
-     *         if the implementation is not capable of removing that type of
-     *         data, or if the check type doesn't qualify for a sub check at
-     *         all. If false is returned, the entire check group data (or super
-     *         check data) might get removed, in order to ensure data removal.
+     * @param checkTypes
+     * @return Return true to remove the data instance from the cache in
+     *         question, false otherwise.
      */
-    public boolean removeSubCheckData(CheckType checkType);
+    public boolean dataOnRemoveSubCheckData(final Collection<CheckType> checkTypes);
+
 }

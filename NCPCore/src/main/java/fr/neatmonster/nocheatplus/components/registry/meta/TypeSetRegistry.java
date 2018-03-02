@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components.registry;
+package fr.neatmonster.nocheatplus.components.registry.meta;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -69,6 +69,10 @@ public class TypeSetRegistry {
             return group;
         }
 
+        void createGroup(TypeSetRegistry extReg) {
+            extReg.createGroup(this.groupType);
+        }
+
     }
 
     ////////////////////////77
@@ -110,6 +114,19 @@ public class TypeSetRegistry {
         lock.unlock();
     }
 
+    /**
+     * Create if not existent.
+     * 
+     * @param itemTypes
+     */
+    public <G> void createGroup(final Class<G> groupType) {
+        lock.lock();
+        if (!groupedTypes.containsKey(groupType)) {
+            newGroupNode(groupType);
+        }
+        lock.unlock();
+    }
+
     private <G> GroupNode<G> newGroupNode(Class<G> groupType) {
         final GroupNode<G> node =  new GroupNode<G>(groupType);
         groupedTypes.put(groupType, node);
@@ -145,6 +162,21 @@ public class TypeSetRegistry {
     public <G> Collection<Class<? extends G>> getGroupedTypes(Class<G> groupType) {
         final GroupNode<G> group = (GroupNode<G>) groupedTypes.get(groupType);
         return group == null ? Collections.EMPTY_LIST : group.getItems();
+    }
+
+    /**
+     * Ensure all groups exist (items are not copied).
+     * 
+     * @param refReg
+     */
+    public void updateGroupTypes(TypeSetRegistry refReg) {
+        lock.lock(); // Ensure no interruption - iterator is not using lock, thus no dead locks.
+        for (final Entry<Class<?>, GroupNode<?>> entry : refReg.groupedTypes.iterable()) {
+            if (!this.groupedTypes.containsKey(entry.getKey())) {
+                entry.getValue().createGroup(this);
+            }
+        }
+        lock.unlock();
     }
 
 }

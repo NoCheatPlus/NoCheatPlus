@@ -65,7 +65,8 @@ public class FastConsume extends Check implements Listener, INotifyReload {
         // TODO: Do this kind of thing via registries later on.
         //ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
         NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().overrideCheckActivation(
-                this.type, AlmostBoolean.NO, OverrideType.PERMANENT, true);
+                CheckType.INVENTORY_INSTANTEAT, AlmostBoolean.NO, 
+                OverrideType.PERMANENT, true);
         StaticLog.logInfo("Inventory checks: FastConsume is available, disabled InstantEat.");
     }
 

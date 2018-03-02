@@ -14,10 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.worlds;
 
+import java.util.Collection;
+
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.components.data.checktype.IConfigDataAccess;
 import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstance;
-import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstanceHandle;
 
 /**
  * Public access interface for per-world data.
@@ -25,7 +27,7 @@ import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstanceHandle;
  * @author asofold
  *
  */
-public interface IWorldData extends IConfigDataAccess, IGetGenericInstance, IGetGenericInstanceHandle {
+public interface IWorldData extends IConfigDataAccess, IGetGenericInstance {
 
 
     /**
@@ -59,7 +61,30 @@ public interface IWorldData extends IConfigDataAccess, IGetGenericInstance, IGet
      */
     public boolean shouldAdjustToLag(CheckType checkType);
 
-    // TODO: Generic data (includes config) storage.
+    /**
+     * Remove data from the cache (not from underlying factories, nor from per
+     * world storage.
+     * 
+     * @param registeredFor
+     */
+    public <T> void removeGenericInstance(Class<T> registeredFor);
+
+    /**
+     * Remove all generic instances from cache, which are contained in the given
+     * collection.
+     * 
+     * @param types
+     */
+    public void removeAllGenericInstances(Collection<Class<?>> types);
+
+    /**
+     * Call dataOnRemoveSubCheckData(...).
+     * 
+     * @param subCheckRemoval
+     */
+    public void removeSubCheckData(
+            Collection<Class<? extends IDataOnRemoveSubCheckData>> subCheckRemoval,
+            Collection<CheckType> checkTypes);
 
     // TODO: isDebugActive(CheckType checkType);
 

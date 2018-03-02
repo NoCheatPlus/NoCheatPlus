@@ -160,7 +160,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
          * Only call if uniqueHandle is null and under lock.
          */
         private void updateUniqueHandle() {
-            if (uniqueHandle.isDisabled()) {
+            if (uniqueHandle != null && uniqueHandle.isDisabled()) {
                 unregisterListener(uniqueHandle);
             }
             if (uniqueHandle == null) {

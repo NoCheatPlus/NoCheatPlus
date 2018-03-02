@@ -19,6 +19,8 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnReload;
+import fr.neatmonster.nocheatplus.components.registry.IGetGenericInstance;
 import fr.neatmonster.nocheatplus.stats.Timings;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -26,7 +28,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 /**
  * Player specific data for the block break checks.
  */
-public class BlockBreakData extends ACheckData {
+public class BlockBreakData extends ACheckData implements IDataOnReload {
 
     // Violation levels.
     public double  directionVL;
@@ -116,6 +118,12 @@ public class BlockBreakData extends ACheckData {
         } else {
             return clickedTool != mat;
         }
+    }
+
+    @Override
+    public boolean dataOnReload(IGetGenericInstance dataAccess) {
+        // Remove on reload for now.
+        return true;
     }
 
 }

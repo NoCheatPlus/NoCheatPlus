@@ -14,13 +14,15 @@
  */
 package fr.neatmonster.nocheatplus.checks.combined;
 
+import java.util.Collection;
+
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
-public class CombinedData extends ACheckData implements IRemoveSubCheckData {
+public class CombinedData extends ACheckData implements IDataOnRemoveSubCheckData {
 
     // VLs
     public double bedLeaveVL = 0;
@@ -54,27 +56,32 @@ public class CombinedData extends ACheckData implements IRemoveSubCheckData {
     public long lastMoveTime;
 
     @Override
-    public boolean removeSubCheckData(final CheckType checkType) {
-        switch(checkType) {
-            // TODO: case COMBINED:
-            case COMBINED_IMPROBABLE:
-                improbableVL = 0;
-                improbableCount.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
-                return true;
-            case COMBINED_YAWRATE:
-                yawFreq.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
-                return true;
-            case COMBINED_BEDLEAVE:
-                bedLeaveVL = 0;
-                wasInBed = false; // wasInBed is probably better kept?
-                return true;
-            case COMBINED_MUNCHHAUSEN:
-                munchHausenVL = 0;
-                return true;
-
-            default:
-                return false;
+    public boolean dataOnRemoveSubCheckData(Collection<CheckType> checkTypes) {
+        for (final CheckType checkType : checkTypes)
+        {
+            switch(checkType) {
+                // TODO: case COMBINED:
+                case COMBINED_IMPROBABLE:
+                    improbableVL = 0;
+                    improbableCount.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
+                    break;
+                case COMBINED_YAWRATE:
+                    yawFreq.clear(System.currentTimeMillis()); // TODO: Document there, which to use.
+                    break;
+                case COMBINED_BEDLEAVE:
+                    bedLeaveVL = 0;
+                    wasInBed = false; // wasInBed is probably better kept?
+                    break;
+                case COMBINED_MUNCHHAUSEN:
+                    munchHausenVL = 0;
+                    break;
+                case COMBINED:
+                    return true;
+                default:
+                    break;
+            }
         }
+        return false;
     }
 
 }

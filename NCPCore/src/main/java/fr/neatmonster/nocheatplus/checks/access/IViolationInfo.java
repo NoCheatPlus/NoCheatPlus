@@ -24,6 +24,8 @@ import fr.neatmonster.nocheatplus.actions.ParameterHolder;
  */
 public interface IViolationInfo extends ParameterHolder {
 
+    // TODO: Move to components or to the appropriate API location (next iteration(s)).
+
     /**
      * Get the violation level just added by this violation.
      * 

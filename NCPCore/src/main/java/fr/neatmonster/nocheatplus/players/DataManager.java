@@ -14,13 +14,12 @@
  */
 package fr.neatmonster.nocheatplus.players;
 
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
 
@@ -40,26 +39,7 @@ public class DataManager {
      */
     // TODO: Should/can some data structures share the same lock?
 
-    private static PlayerDataManager instance = null;
-
-    /**
-     * Clear all cached CheckConfig instances.<br>
-     * This does not cleanup ConfigManager, i.e. stored yml-versions.
-     */
-    public static void clearConfigs() {
-        // TODO: general DataManager thing, otherwise it's now a WorldDataManager thing.
-        final Set<CheckConfigFactory> factories = new LinkedHashSet<CheckConfigFactory>();
-        for (final CheckType checkType : CheckType.values()) {
-            final CheckConfigFactory factory = checkType.getConfigFactory();
-            if (factory != null) {
-                factories.add(factory);
-            }
-        }
-        for (final CheckConfigFactory factory : factories) {
-            factory.removeAllConfigs();
-        }
-    }
-
+    static PlayerDataManager instance = null;
 
     /**
      * Get the exact player name, stored internally.
@@ -108,11 +88,12 @@ public class DataManager {
 
     /**
      * Remove data and history of all players for the given check type and sub
-     * checks.
+     * checks. Also removes check related data from the world manager.
      * 
      * @param checkType
      */
     public static void clearData(final CheckType checkType) {
+        NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().clearData(checkType);
         instance.clearData(checkType);
     }
 
@@ -147,7 +128,7 @@ public class DataManager {
      *            Exact player name.
      * @param checkType
      *            Check type to remove data for, null is regarded as ALL.
-     * @return If any data was present.
+     * @return If any data was present (not strict).
      */
     public static boolean removeData(final String playerName, CheckType checkType) {
         return instance.removeData(playerName, checkType);
@@ -271,6 +252,11 @@ public class DataManager {
      */
     public static <T> T getGenericInstance(final Player player, final Class<T> registeredFor) {
         return instance.getPlayerData(player).getGenericInstance(registeredFor);
+    }
+
+    static <T> T getFromFactory(final Class<T> registeredFor, 
+            final PlayerFactoryArgument arg) {
+        return instance.getNewInstance(registeredFor, arg);
     }
 
 }

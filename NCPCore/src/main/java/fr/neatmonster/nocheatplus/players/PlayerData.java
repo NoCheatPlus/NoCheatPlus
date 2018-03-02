@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,13 @@ import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.components.config.value.OverrideType;
 import fr.neatmonster.nocheatplus.components.data.ICanHandleTimeRunningBackwards;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnJoin;
+import fr.neatmonster.nocheatplus.components.data.IDataOnLeave;
+import fr.neatmonster.nocheatplus.components.data.IDataOnReload;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldChange;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldUnload;
 import fr.neatmonster.nocheatplus.hooks.ExemptionContext;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.PermissionInfo;
@@ -45,6 +53,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.DualSet;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
+import fr.neatmonster.nocheatplus.utilities.ds.map.InstanceMapLOW;
 import fr.neatmonster.nocheatplus.worlds.IWorldData;
 import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 import fr.neatmonster.nocheatplus.worlds.WorldIdentifier;
@@ -85,7 +94,7 @@ import fr.neatmonster.nocheatplus.worlds.WorldIdentifier;
  * @author asofold
  *
  */
-public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
+public class PlayerData implements IPlayerData {
 
     // TODO: IPlayerData for the more official API.
 
@@ -153,6 +162,8 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
 
     /** Permission cache. */
     private final HashMapLOW<Integer, PermissionNode> permissions = new HashMapLOW<Integer, PermissionNode>(lock, 35);
+    // TODO: a per entry typed variant (key - value relation)?
+    private final InstanceMapLOW dataCache = new InstanceMapLOW(lock, 24);
 
     private boolean requestUpdateInventory = false;
     private boolean requestPlayerSetBack = false;
@@ -370,8 +381,8 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
         }
     }
 
-    @Override
-    public void handleTimeRanBackwards() {
+    public void handleTimeRanBackwards(final Collection<Class<? extends IData>> dataTypes) {
+        // Permissions.
         final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
         final long timeNow = System.currentTimeMillis();
         while (it.hasNext()) {
@@ -380,12 +391,18 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
                 case INTERVAL:
                     node.invalidate();
                     break;
-                case ONCE:
-                    node.setState(node.getLastState(), timeNow);
-                    break;
                 default:
-                    // Ignore.
+                    if (node.getLastFetch() > timeNow) {
+                        node.setState(node.getLastState(), timeNow);
+                    }
                     break;
+            }
+        }
+        // TODO: Register explicitly or not? (+ auto register?)...
+        for (final Class<? extends IData> type : dataTypes) {
+            final IData obj = dataCache.get(type);
+            if (obj != null && obj instanceof ICanHandleTimeRunningBackwards) {
+                ((ICanHandleTimeRunningBackwards) obj).handleTimeRanBackwards();
             }
         }
     }
@@ -421,7 +438,16 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
         registerFrequentPlayerTaskAsynchronous();
     }
 
-    void onPlayerLeave(final long timeNow) {
+    void onPlayerLeave(final Player player, final long timeNow, 
+            Collection<Class<? extends IDataOnLeave>> types) {
+        // (Might collect to be removed types first.)
+        for (final Class<? extends IDataOnLeave> type : types) {
+            final IDataOnLeave instance = dataCache.get(type);
+            if (instance != null && instance.dataOnLeave(player, this)) {
+                dataCache.remove(type);
+            }
+        }
+        // (Somewhat reversed order of invalidation.)
         invalidateOffline();
     }
 
@@ -430,12 +456,20 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
      * 
      * @param world
      * @param timeNow
+     * @param types 
      */
-    void onPlayerJoin(final World world, final long timeNow,
-            final WorldDataManager worldDataManager) {
+    void onPlayerJoin(final Player player, final World world, 
+            final long timeNow, final WorldDataManager worldDataManager, 
+            final Collection<Class<? extends IDataOnJoin>> types) {
         // Only update world if the data hasn't just been created.
         updateCurrentWorld(world, worldDataManager);
         invalidateOffline();
+        for (final Class<? extends IDataOnJoin> type : types) {
+            final IDataOnJoin instance = dataCache.get(type);
+            if (instance != null && instance.dataOnJoin(player, this)) {
+                dataCache.remove(type);
+            }
+        }
         requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedOffline());
         lastJoinTime = timeNow;
     }
@@ -481,9 +515,12 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
      * 
      * @param oldWorld
      * @param newWorld
+     * @param types 
      */
-    void onPlayerChangedWorld(final World oldWorld, final World newWorld,
-            final WorldDataManager worldDataManager) {
+    void onPlayerChangedWorld(final Player player, 
+            final World oldWorld, final World newWorld,
+            final WorldDataManager worldDataManager, 
+            final Collection<Class<? extends IDataOnWorldChange>> types) {
         updateCurrentWorld(newWorld, worldDataManager);
         // TODO: Double-invalidation (previous policy and target world policy)
         final Iterator<Entry<Integer, PermissionNode>> it = permissions.iterator();
@@ -496,18 +533,10 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
             }
         }
         requestLazyPermissionUpdate(permissionRegistry.getPreferKeepUpdatedWorld());
-    }
-
-    /**
-     * Called with adjusting to the configuration (enable / config reload).
-     * @param changedPermissions 
-     */
-    public void adjustSettings(final Set<RegisteredPermission> changedPermissions) {
-        final Iterator<RegisteredPermission> it = changedPermissions.iterator();
-        while (it.hasNext()) {
-            final PermissionNode node = permissions.get(it.next().getId());
-            if (node != null) {
-                node.invalidate();
+        for (final Class<? extends IDataOnWorldChange> type : types) {
+            final IDataOnWorldChange instance = dataCache.get(type);
+            if (instance != null && instance.dataOnWorldChange(player, this, oldWorld, newWorld)) {
+                dataCache.remove(type);
             }
         }
     }
@@ -588,6 +617,7 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
         permissions.clear(); // Might keep login-related permissions. Implement a 'retain-xy' or 'essential' flag?
         updatePermissions.clearPrimaryThread();
         updatePermissionsLazy.clearPrimaryThread();
+        dataCache.clear();
     }
 
     @Override
@@ -733,7 +763,6 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
     public void overrideDebug(final CheckType checkType, final AlmostBoolean active, 
             final OverrideType overrideType, final boolean overrideChildren) {
         this.checkTypeTree.getNode(CheckType.ALL).overrideDebug(
-                getCurrentWorldDataSafe().getRawConfiguration(),
                 checkType, active, overrideType, overrideChildren);
     }
 
@@ -818,19 +847,112 @@ public class PlayerData implements IPlayerData, ICanHandleTimeRunningBackwards {
                 && (frequentPlayerTaskShouldBeScheduled || isFrequentPlayerTaskScheduled());
     }
 
+    /**
+     * Get a data/config instance (1.local cache, 2. player related factory, 3.
+     * world registry).
+     */
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T getGenericInstance(Class<T> registeredFor) {
-        // TODO: 1. Check for cache (local).
-        // TODO: 2. Check for registered factory (local)
+    public <T> T getGenericInstance(final Class<T> registeredFor) {
+        // 1. Check for cache (local).
+        final Object res = dataCache.get(registeredFor);
+        if (res == null) {
+            /*
+             * TODO: Consider storing null and check containsKey(registeredFor)
+             * here. On the other hand it's not intended to query non existent
+             * data (just yet).
+             */
+            return cacheMissGenericInstance(registeredFor);
+        }
+        else {
+            return (T) res;
+        }
+    }
+
+    private <T> T cacheMissGenericInstance(final Class<T> registeredFor) {
+        // 2. Check for registered factory (local)
+        // TODO: Might store PlayerDataManager here.
+        T res = DataManager.getFromFactory(registeredFor, 
+                new PlayerFactoryArgument(this, getCurrentWorldDataSafe()));
+        if (res != null) {
+            return  putDataCache(registeredFor, res);
+        }
         // 3. Check proxy registry.
-        // TODO: Explicit registration for proxy registry needed (PlayerDataManager).
-        // TODO: Store these in the local cache too (override/replace on world change etc registered too).
-        return getCurrentWorldDataSafe().getGenericInstance(registeredFor);
+        res = getCurrentWorldDataSafe().getGenericInstance(registeredFor);
+        return res == null ? null : putDataCache(registeredFor, res);
+    }
+
+    private <T> T putDataCache(final Class<T> registeredFor, final T instance) {
+        final T previousInstance = (T) dataCache.putIfAbsent(registeredFor, instance); // Under lock.
+        return previousInstance == null ? instance : previousInstance;
+    }
+
+    /**
+     * Remove from cache.
+     */
+    @Override
+    public <T> void removeGenericInstance(final Class<T> type) {
+        dataCache.remove(type);
     }
 
     @Override
-    public <T> void removeGenericInstance(Class<T> registeredFor) {
-        // TODO: implement
+    public void removeAllGenericInstances(final Collection<Class<?>> types) {
+        if (dataCache.isEmpty()) {
+            return;
+        }
+        dataCache.remove(types);
+    }
+
+    @Override
+    public void removeSubCheckData(
+            final Collection<Class<? extends IDataOnRemoveSubCheckData>> types,
+            final Collection<CheckType> checkTypes
+            ) {
+        final Collection<Class<?>> removeTypes = new LinkedList<Class<?>>();
+        for (final Class<? extends IDataOnRemoveSubCheckData> type : types) {
+            final IDataOnRemoveSubCheckData impl = (IDataOnRemoveSubCheckData) dataCache.get(type);
+            if (impl != null) {
+                if (impl.dataOnRemoveSubCheckData(checkTypes)) {
+                    removeTypes.add(type);
+                }
+            }
+        }
+        if (!removeTypes.isEmpty()) {
+            dataCache.remove(removeTypes);
+        }
+    }
+
+    /**
+     * Called with adjusting to the configuration (enable / config reload).
+     * @param changedPermissions 
+     */
+    public void adjustSettings(final Set<RegisteredPermission> changedPermissions) {
+        final Iterator<RegisteredPermission> it = changedPermissions.iterator();
+        while (it.hasNext()) {
+            final PermissionNode node = permissions.get(it.next().getId());
+            if (node != null) {
+                node.invalidate();
+            }
+        }
+    }
+
+    public void onWorldUnload(final World world, 
+            final Collection<Class<? extends IDataOnWorldUnload>> types) {
+        for (final Class<? extends IDataOnWorldUnload> type : types) {
+            final IDataOnWorldUnload instance = dataCache.get(type);
+            if (instance != null && instance.dataOnWorldUnload(world, this)) {
+                dataCache.remove(type);
+            }
+        }
+    }
+
+    public void onReload(final Collection<Class<? extends IDataOnReload>> types) {
+        for (final Class<? extends IDataOnReload> type : types) {
+            final IDataOnReload instance = dataCache.get(type);
+            if (instance != null && instance.dataOnReload(this)) {
+                dataCache.remove(type);
+            }
+        }
     }
 
 }

@@ -12,14 +12,14 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.checks.access;
+package fr.neatmonster.nocheatplus.components.config;
 
 /**
  * TODO: Keep / Remove.
  * 
  * @author asofold
  */
-public interface ICheckConfig {
+public interface ICheckConfig extends IConfig {
 
 
 }

@@ -34,6 +34,10 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.data.ICheckData;
+import fr.neatmonster.nocheatplus.components.data.IData;
+import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.components.registry.feature.INotifyReload;
 import fr.neatmonster.nocheatplus.components.registry.feature.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -42,8 +46,10 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
  * Central location to listen to events that are relevant for the chat checks.
@@ -86,11 +92,33 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     /** Set world to null after use, primary thread only. */
     private final Location useLoc = new Location(null, 0, 0, 0);
 
+    @SuppressWarnings("unchecked")
     public ChatListener() {
         super(CheckType.CHAT);
         ConfigFile config = ConfigManager.getConfigFile();
         initFilters(config);
         // (text inits in constructor.)
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        api.register(api.newRegistrationContext()
+                .registerConfigWorld(ChatConfig.class)
+                .factory(new IFactoryOne<WorldFactoryArgument, ChatConfig>() {
+                    @Override
+                    public ChatConfig getNewInstance(WorldFactoryArgument arg) {
+                        return new ChatConfig(arg.worldData);
+                    }
+                })
+                .registerConfigTypesPlayer()
+                .context() //
+                .registerDataPlayer(ChatData.class)
+                .factory(new IFactoryOne<PlayerFactoryArgument, ChatData>() {
+                    @Override
+                    public ChatData getNewInstance(PlayerFactoryArgument arg) {
+                        return new ChatData();
+                    }
+                })
+                .addToGroups(CheckType.CHAT, true, IData.class, ICheckData.class)
+                .context() //
+                );
     }
 
     private void initFilters(ConfigFile config) {

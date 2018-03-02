@@ -65,6 +65,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.checks.moving.location.tracking.LocationTrace.TraceEntryPool;
 import fr.neatmonster.nocheatplus.checks.moving.util.AuxMoving;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetStatic;
 import fr.neatmonster.nocheatplus.checks.workaround.WRPT;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
@@ -100,6 +101,7 @@ import fr.neatmonster.nocheatplus.components.registry.feature.TickListener;
 import fr.neatmonster.nocheatplus.components.registry.lockable.BasicLockable;
 import fr.neatmonster.nocheatplus.components.registry.lockable.ILockable;
 import fr.neatmonster.nocheatplus.components.registry.order.SetupOrder;
+import fr.neatmonster.nocheatplus.components.registry.setup.RegistrationContext;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -122,12 +124,13 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
 import fr.neatmonster.nocheatplus.players.PlayerDataManager;
 import fr.neatmonster.nocheatplus.players.PlayerMessageSender;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
+import fr.neatmonster.nocheatplus.utilities.Misc;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -268,6 +271,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
     }
+
+    @SetupOrder(priority = - 100)
+    private class ReloadHook implements INotifyReload{
+        @Override
+        public void onReload() {
+            // Only for reloading, not INeedConfig.
+            processReload();
+        }
+    }
+
+    private INotifyReload reloadHook = new ReloadHook();
 
     /** Access point for thread safe message queuing. */
     // TODO: Replace by access point for message sending in general (relay to asynchronous depending on settings).
@@ -939,23 +953,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         initBlockProperties(config);
 
         // Initialize data manager.
+        worldDataManager.onEnable();
         pDataMan.onEnable();
 
         // Register components. 
-        @SetupOrder(priority = - 100)
-        class ReloadHook implements INotifyReload{
-            @Override
-            public void onReload() {
-                // Only for reloading, not INeedConfig.
-                processReload();
-            }
-        }
 
         // Add the "low level" system components first.
         for (final Object obj : new Object[]{
                 getCoreListener(),
-                // Put ReloadListener first, because Checks could also listen to it.
-                new ReloadHook(),
+                reloadHook,
                 pDataMan,
                 new AuxMoving(),
         }) {
@@ -981,6 +987,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             // Register sub-components (allow later added to use registries, if any).
             processQueuedSubComponentHolders();
         }
+        // Ensure net types are registered.
+        NetStatic.registerTypes();
 
         // Register optional default components.
         final DefaultComponentFactory dcf = new DefaultComponentFactory();
@@ -1018,8 +1026,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }, 1207, 1207);
 
         // Ensure dataMan is first on disableListeners.
-        disableListeners.remove(pDataMan);
-        disableListeners.add(0, pDataMan);
+        // TODO: Why first ?
+        Misc.putFirst(pDataMan, disableListeners);
+        Misc.putFirst(pDataMan, notifyReload);
+        Misc.putFirst(worldDataManager, notifyReload);
+        // Put ReloadListener first, because Checks could also listen to it.
+        Misc.putFirst(reloadHook, notifyReload);
 
         // Set up consistency checking.
         scheduleConsistencyCheckers();
@@ -1516,6 +1528,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public IPlayerDataManager getPlayerDataManager() {
         return pDataMan;
+    }
+
+    @Override
+    public void register(RegistrationContext context) {
+        context.doRegister(); // TODO: ...
+    }
+
+    @Override
+    public RegistrationContext newRegistrationContext() {
+        return new RegistrationContext();
     }
 
 }

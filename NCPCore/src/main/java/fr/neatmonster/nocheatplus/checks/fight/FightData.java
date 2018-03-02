@@ -14,18 +14,24 @@
  */
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import java.util.Collection;
 import java.util.LinkedList;
+
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
-import fr.neatmonster.nocheatplus.checks.access.IRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnRemoveSubCheckData;
+import fr.neatmonster.nocheatplus.components.data.IDataOnWorldChange;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
 
 /**
  * Player specific data for the fight checks.
  */
-public class FightData extends ACheckData implements IRemoveSubCheckData {
+public class FightData extends ACheckData implements IDataOnRemoveSubCheckData, IDataOnWorldChange {
 
     // Violation levels.
     public double                  angleVL;
@@ -115,61 +121,70 @@ public class FightData extends ACheckData implements IRemoveSubCheckData {
     }
 
     @Override
-    public boolean removeSubCheckData(final CheckType checkType) {
-        switch(checkType) {
-            // TODO: case FIGHT: ...
-            case FIGHT_DIRECTION:
-                directionVL = 0;
-                return true;
-            case FIGHT_REACH:
-                reachVL = 0;
-                reachMod = 1.0;
-                return true;
-            case FIGHT_ANGLE:
-                angleVL = 0;
-                angleHits.clear();
-                return true;
-            case FIGHT_SPEED:
-                speedVL = 0;
-                speedBuckets.clear(System.currentTimeMillis());
-                speedShortTermCount = 0;
-                speedShortTermTick = 0;
-                return true;
-            case FIGHT_FASTHEAL:
-                fastHealVL = 0;
-                fastHealRefTime = 0;
-                fastHealBuffer = 0;
-                regainHealthTime = 0;
-                return true;
-            case FIGHT_GODMODE:
-                godModeVL = 0;
-                godModeBuffer = 0;
-                godModeAcc = 0;
-                godModeLastTime = 0;
-                godModeLastAge = 0;
-                lastNoDamageTicks = 0; // Not sure here, possibly a shared thing.
-                // godModeHealth / ...
-                return true;
-            case FIGHT_CRITICAL:
-                criticalVL = 0;
-                return true;
-            case FIGHT_NOSWING:
-                noSwingVL = 0;
-                // Not reset time, for leniency rather.
-                return true;
-            case FIGHT_SELFHIT:
-                selfHitVL.clear(System.currentTimeMillis());
-                return true;
-            default:
-                return false;
+    public boolean dataOnRemoveSubCheckData(
+            final Collection<CheckType> checkTypes) {
+        for (final CheckType checkType : checkTypes) {
+            switch(checkType) {
+                // TODO: case FIGHT: ...
+                case FIGHT_DIRECTION:
+                    directionVL = 0;
+                    break;
+                case FIGHT_REACH:
+                    reachVL = 0;
+                    reachMod = 1.0;
+                    break;
+                case FIGHT_ANGLE:
+                    angleVL = 0;
+                    angleHits.clear();
+                    break;
+                case FIGHT_SPEED:
+                    speedVL = 0;
+                    speedBuckets.clear(System.currentTimeMillis());
+                    speedShortTermCount = 0;
+                    speedShortTermTick = 0;
+                    break;
+                case FIGHT_FASTHEAL:
+                    fastHealVL = 0;
+                    fastHealRefTime = 0;
+                    fastHealBuffer = 0;
+                    regainHealthTime = 0;
+                    break;
+                case FIGHT_GODMODE:
+                    godModeVL = 0;
+                    godModeBuffer = 0;
+                    godModeAcc = 0;
+                    godModeLastTime = 0;
+                    godModeLastAge = 0;
+                    lastNoDamageTicks = 0; // Not sure here, possibly a shared thing.
+                    // godModeHealth / ...
+                    break;
+                case FIGHT_CRITICAL:
+                    criticalVL = 0;
+                    break;
+                case FIGHT_NOSWING:
+                    noSwingVL = 0;
+                    // Not reset time, for leniency rather.
+                    break;
+                case FIGHT_SELFHIT:
+                    selfHitVL.clear(System.currentTimeMillis());
+                    break;
+                case FIGHT:
+                    return true;
+                default:
+                    break;
+            }
         }
+        return false;
     }
 
-    public void onWorldChange() {
+    @Override
+    public boolean dataOnWorldChange(Player player, IPlayerData pData,
+            World previousWorld, World newWorld) {
         angleHits.clear();
         lastAttackedX = Double.MAX_VALUE;
         lastAttackTick = 0;
         lastWorld = "";
+        return false;
     }
 
 }

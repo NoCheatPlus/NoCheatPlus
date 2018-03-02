@@ -705,6 +705,8 @@ public class HashMapLOW <K, V> {
      * Get an iterator reflecting this 'stage of resetting'. During iteration,
      * entries may get removed or added, values changed. Concurrent modification
      * will not let the iteration fail.
+     * <hr>
+     * This operation does not use locking.
      * 
      * @return
      */

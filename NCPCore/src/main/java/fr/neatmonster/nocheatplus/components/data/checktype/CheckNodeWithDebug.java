@@ -78,16 +78,26 @@ public abstract class CheckNodeWithDebug<N extends CheckNodeWithDebug<N>> extend
 
     // TODO: @Override
     @SuppressWarnings("unchecked")
-    protected void overrideDebug(final ConfigFile rawConfiguration, 
-            final AlmostBoolean active, final OverrideType overrideType,
+    protected void overrideDebug(
+            final AlmostBoolean active, 
+            final OverrideType overrideType, 
             final boolean overrideChildren) {
-        configFlagOverride(rawConfiguration, active, overrideType, overrideChildren, accessDebug);
+        override(active, overrideType, overrideChildren, accessDebug);
     }
 
     // TODO: @Override
     @SuppressWarnings("unchecked")
-    protected void updateDebug(final ConfigFile rawConfiguration, final boolean forceUpdateChildren) {
-        configFlagUpdate(rawConfiguration, forceUpdateChildren, accessDebug);
+    protected void updateDebug(
+            final ConfigFile rawConfiguration, 
+            final boolean forceUpdateChildren) {
+        update(rawConfiguration, forceUpdateChildren, accessDebug);
+    }
+
+    // TODO: @Override
+    @SuppressWarnings("unchecked")
+    protected void updateDebug(
+            final boolean forceUpdateChildren) {
+        update(forceUpdateChildren, accessDebug);
     }
 
     // TODO: resetDebug(...) 

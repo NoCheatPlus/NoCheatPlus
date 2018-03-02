@@ -32,6 +32,8 @@ package fr.neatmonster.nocheatplus.components.data;
  */
 public interface ICanHandleTimeRunningBackwards {
 
+    // TODO: IDataOn ? Applicable data access (IGetGenericInstance) as argument?
+
     /**
      * Adjust to system time having run backwards (just "a second ago").
      */

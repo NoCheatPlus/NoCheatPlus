@@ -68,8 +68,8 @@ public class EventRegistryBukkit extends MultiListenerRegistry<Event, EventPrior
      */
     protected static class CancellableNodeBukkit<E> extends MiniListenerNode<E, EventPriority> {
 
-        public CancellableNodeBukkit(EventPriority basePriority) {
-            super(basePriority);
+        public CancellableNodeBukkit(Class<E> baseType, EventPriority basePriority) {
+            super(baseType, basePriority);
         }
 
         // TODO: Future java: E extends Cancellable ?
@@ -95,9 +95,9 @@ public class EventRegistryBukkit extends MultiListenerRegistry<Event, EventPrior
                 if (Cancellable.class.isAssignableFrom(eventClass)) {
                     // TODO: Check if order is right (eventClass extends Cancellable).
                     // TODO: Future java (see above) ?
-                    return new CancellableNodeBukkit<E>(basePriority);
+                    return new CancellableNodeBukkit<E>(eventClass, basePriority);
                 } else {
-                    return new MiniListenerNode<E, EventPriority>(basePriority);
+                    return new MiniListenerNode<E, EventPriority>(eventClass, basePriority);
                 }
             }
         };

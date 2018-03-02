@@ -12,12 +12,11 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.components.registry;
+package fr.neatmonster.nocheatplus.components.registry.factory;
 
 import java.util.concurrent.locks.Lock;
 
 import fr.neatmonster.nocheatplus.components.concurrent.IPrimaryThreadContextTester;
-import fr.neatmonster.nocheatplus.components.registry.factory.IFactoryOne;
 import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
 
 /**
@@ -31,7 +30,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.map.HashMapLOW;
  * @param <A>
  *            Argument type for IFactoryOne instances.
  */
-public class FactoryOneRegistry<A> {
+public class FactoryOneRegistry<A> implements IFactoryOneRegistry<A> {
 
     private final Lock lock;
     private final IPrimaryThreadContextTester primaryThreadContextTester;
@@ -45,13 +44,8 @@ public class FactoryOneRegistry<A> {
         factories = new HashMapLOW<Class<?>, IFactoryOne<A,?>>(lock, 30);
     }
 
-    /**
-     * Note that types are automatically sorted into registered groups.
-     * 
-     * @param registerFor
-     * @param factory
-     */
-    public <I, T extends I> void registerFactory(final Class<T> registerFor, 
+    @Override
+    public <T> void registerFactory(final Class<T> registerFor, 
             final IFactoryOne<A, T> factory) {
         if (!primaryThreadContextTester.isPrimaryThread()) {
             outsideThreadContext("register factory");
@@ -65,16 +59,7 @@ public class FactoryOneRegistry<A> {
         throw new IllegalStateException("Can't call off the primary thread context: " + tag);
     }
 
-    /**
-     * Fetch a new instance from a registered factory.
-     * 
-     * @param registeredFor
-     * @param arg
-     * @return
-     * @throws A
-     *             RuntimeException (might get changed to a registry type of
-     *             exception), in case a factory throws something-
-     */
+    @Override
     public <T> T getNewInstance(final Class<T> registeredFor, final A arg) {
         @SuppressWarnings("unchecked")
         final IFactoryOne<A, T> factory = (IFactoryOne<A, T>) factories.get(registeredFor);

@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +26,9 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.DefaultGenericInstanceRegistry;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
+import fr.neatmonster.nocheatplus.components.registry.setup.RegistrationContext;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.event.mini.EventRegistryBukkit;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -51,10 +55,14 @@ public class PluginTests {
         private final PermissionRegistry permissionRegistry = new PermissionRegistry(10000);
 
         public UnitTestNoCheatPlusAPI() {
+            StaticLog.setUseLogManager(false); // Ensure either this instance provides it or it's unset.
             genericInstanceRegistry.registerGenericInstance(MCAccess.class, new MCAccessBukkit());
             for (RegisteredPermission rp : Permissions.getPermissions()) {
                 permissionRegistry.addRegisteredPermission(rp);
             }
+            Map<String, ConfigFile> rawConfigs = new HashMap<String, ConfigFile>();
+            rawConfigs.put(null, new DefaultConfig());
+            worldDataManager.applyConfiguration((rawConfigs));
         }
 
         @Override
@@ -191,6 +199,16 @@ public class PluginTests {
 
         @Override
         public IPlayerDataManager getPlayerDataManager() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public RegistrationContext newRegistrationContext() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void register(RegistrationContext context) {
             throw new UnsupportedOperationException();
         }
 
