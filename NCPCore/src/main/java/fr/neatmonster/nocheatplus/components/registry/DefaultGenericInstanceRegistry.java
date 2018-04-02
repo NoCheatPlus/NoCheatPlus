@@ -148,7 +148,7 @@ public class DefaultGenericInstanceRegistry implements GenericInstanceRegistry, 
 
         public IGenericInstanceHandle<T> getHandle() {
             lock.lock();
-            if (uniqueHandle == null) {
+            if (uniqueHandle == null || uniqueHandle.isDisabled()) {
                 updateUniqueHandle();
             }
             IGenericInstanceHandle<T> handle = uniqueHandle.getNewHandle();
