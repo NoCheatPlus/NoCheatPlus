@@ -358,7 +358,7 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         final Iterator<UUID> it = frequentPlayerTasks.iteratorPrimaryThread();
         while (it.hasNext()) {
             final PlayerData pData = getPlayerData(it.next(), null, false, null);
-            if (pData.processTickFrequent(tick, timeLast)) {
+            if (pData == null || pData.processTickFrequent(tick, timeLast)) {
                 it.remove();
             }
         }
