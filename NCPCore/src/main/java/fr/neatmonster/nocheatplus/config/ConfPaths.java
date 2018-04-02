@@ -169,9 +169,12 @@ public abstract class ConfPaths {
     // Checks!
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
+    public static final  String CHECKS_ACTIVE                            = CHECKS + SUB_ACTIVE;
+    public static final  String CHECKS_LAG                               = CHECKS + SUB_LAG;
     public static final  String CHECKS_DEBUG                             = CHECKS + SUB_DEBUG;
     public static final String  BLOCKBREAK                               = CHECKS + "blockbreak.";
 
+    public static final String  BLOCKBREAK_ACTIVE                        = BLOCKBREAK + SUB_ACTIVE;
     public static final String  BLOCKBREAK_DEBUG                         = BLOCKBREAK + "debug";
 
 
@@ -223,6 +226,7 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_WRONGBLOCK_ACTIONS            = BLOCKBREAK_WRONGBLOCK + "actions";
 
     public static final String BLOCKINTERACT                             = CHECKS + "blockinteract.";
+    public static final String BLOCKINTERACT_ACTIVE                      = BLOCKINTERACT + SUB_ACTIVE;
 
     private static final String BLOCKINTERACT_DIRECTION                  = BLOCKINTERACT + "direction.";
     public static final String  BLOCKINTERACT_DIRECTION_CHECK            = BLOCKINTERACT_DIRECTION + SUB_ACTIVE;
@@ -244,6 +248,7 @@ public abstract class ConfPaths {
 
     // BLOCKPLACE
     public static final String  BLOCKPLACE                               = CHECKS + "blockplace.";
+    public static final String  BLOCKPLACE_ACTIVE                        = BLOCKPLACE + SUB_ACTIVE;
 
     private static final String BLOCKPLACE_AGAINST                       = BLOCKPLACE + "against.";
     public static final String  BLOCKPLACE_AGAINST_CHECK                 = BLOCKPLACE_AGAINST + SUB_ACTIVE;
@@ -284,6 +289,7 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_PREVENTMISC_BOATSANYWHERE     = BLOCKPLACE_PREVENTMISC + "boatsanywhere";
 
     public static final String  CHAT                                     = CHECKS + "chat.";
+    public static final String  CHAT_ACTIVE                              = CHAT + SUB_ACTIVE;
 
     private static final String CHAT_CAPTCHA                             = CHAT + "captcha.";
     public static final String  CHAT_CAPTCHA_CHECK                       = CHAT_CAPTCHA + SUB_ACTIVE;
@@ -405,6 +411,7 @@ public abstract class ConfPaths {
      * Combined !
      */
     public static final String  COMBINED                                 = CHECKS + "combined.";
+    public static final String  COMBINED_ACTIVE                          = COMBINED + SUB_ACTIVE;
 
     private static final String COMBINED_BEDLEAVE                        = COMBINED + "bedleave.";
     public static final String  COMBINED_BEDLEAVE_CHECK                  = COMBINED_BEDLEAVE + SUB_ACTIVE;
@@ -446,6 +453,7 @@ public abstract class ConfPaths {
     public static final String  COMBINED_YAWRATE_PENALTY_MAX             = COMBINED_YAWRATE_PENALTY + "maximum";
 
     public static final String  FIGHT                                    = CHECKS + "fight.";
+    public static final String  FIGHT_ACTIVE                             = FIGHT + SUB_ACTIVE;
 
     public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
     public static final String  FIGHT_TOOLCHANGEPENALTY                  = FIGHT + "toolchangepenalty";
@@ -525,6 +533,7 @@ public abstract class ConfPaths {
     public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + SUB_ACTIVE;
 
     public static final String  INVENTORY                                = CHECKS + "inventory.";
+    public static final String  INVENTORY_ACTIVE                         = INVENTORY + SUB_ACTIVE;
 
     private static final String INVENTORY_DROP                           = INVENTORY + "drop.";
     public static final String  INVENTORY_DROP_CHECK                     = INVENTORY_DROP + SUB_ACTIVE;
@@ -581,6 +590,7 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_HOTFIX_DUPE_FALLINGBLOCKENDPORTAL = INVENTORY_HOTFIX_DUPE + "fallingblockendportal";
 
     public static final String  MOVING                                   = CHECKS + "moving.";
+    public static final String  MOVING_ACTIVE                            = MOVING + SUB_ACTIVE;
 
     private static final String MOVING_CREATIVEFLY                       = MOVING + "creativefly.";
     public static final String  MOVING_CREATIVEFLY_CHECK                 = MOVING_CREATIVEFLY + SUB_ACTIVE;
@@ -707,6 +717,7 @@ public abstract class ConfPaths {
     public static final  String MOVING_MESSAGE_ILLEGALVEHICLEMOVE           = MOVING_MESSAGE + "illegalvehiclemove";
 
     public static final String  NET                                         = CHECKS + "net.";
+    public static final String  NET_ACTIVE                                  = NET + SUB_ACTIVE;
 
     private static final String NET_ATTACKFREQUENCY                         = NET + "attackfrequency.";
     public static final String  NET_ATTACKFREQUENCY_ACTIVE                  = NET_ATTACKFREQUENCY + SUB_ACTIVE;

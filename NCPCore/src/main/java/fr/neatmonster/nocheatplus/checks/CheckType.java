@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
  * permission).
  */
 public enum CheckType {
-    ALL(Permissions.CHECKS),
+    ALL(CheckTypeType.SPECIAL, null, Permissions.CHECKS, ConfPaths.CHECKS_ACTIVE),
 
     BLOCKBREAK(CheckTypeType.GROUP, CheckType.ALL, Permissions.BLOCKBREAK),
     /**
@@ -136,16 +136,6 @@ public enum CheckType {
 
     /** Configuration path for the lag flag. */
     private final String configPathLag;
-
-    /**
-     * Special purpose for grouping (ALL).
-     * 
-     * @param permission
-     */
-    private CheckType(final RegisteredPermission permission){
-        // TODO: Might as well interpret as GROUP.
-        this(CheckTypeType.SPECIAL, null, permission);
-    }
 
     /**
      * Constructor for checks or groups grouped under another check type,
