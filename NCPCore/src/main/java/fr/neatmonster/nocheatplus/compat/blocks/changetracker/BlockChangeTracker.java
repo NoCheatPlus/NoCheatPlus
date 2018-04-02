@@ -1135,10 +1135,13 @@ public class BlockChangeTracker {
     }
 
     public void updateBlockCacheHandle() {
-        if (this.blockCacheHandle != null) {
+        final IGenericInstanceHandle<BlockCache> newHandle = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(BlockCache.class);
+        // TODO: Doesn't make much sense to disable, until reference counting is fixed/implemented.
+        if (this.blockCacheHandle != null 
+                && this.blockCacheHandle != newHandle) {
             this.blockCacheHandle.disableHandle();
         }
-        this.blockCacheHandle = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(BlockCache.class);
+        this.blockCacheHandle = newHandle;
     }
 
     /**
