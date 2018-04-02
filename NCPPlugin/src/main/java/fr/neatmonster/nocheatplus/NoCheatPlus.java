@@ -1185,7 +1185,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 && config.getBoolean(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS)) {
             if (blockChangeListener == null) {
                 blockChangeListener = new BlockChangeListener(blockChangeTracker);
-                this.addComponent(blockChangeListener);
+                blockChangeListener.register();
             }
             blockChangeListener.setEnabled(true);
         }

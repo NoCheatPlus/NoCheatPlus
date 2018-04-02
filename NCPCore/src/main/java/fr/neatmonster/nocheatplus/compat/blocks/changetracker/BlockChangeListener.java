@@ -15,26 +15,30 @@
 package fr.neatmonster.nocheatplus.compat.blocks.changetracker;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.Directional;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder;
+import fr.neatmonster.nocheatplus.event.mini.MiniListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -52,7 +56,66 @@ public class BlockChangeListener implements Listener {
     private final BlockChangeTracker tracker;
     private final boolean retractHasBlocks;
     private boolean enabled = true;
-    private final Set<Material> redstoneMaterials = new HashSet<Material>();
+
+    /** Default tag for listeners. */
+    private final String defaultTag = "system.nocheatplus.blockchangetracker";
+
+    /**
+     * NOTE: Using MiniListenerWithOrder (and @Override before @EventHandler)
+     * would make the registry attempt to register with Bukkit for 'Object'.
+     */
+    private final MiniListener<?>[] miniListeners = new MiniListener<?>[] {
+        new MiniListener<BlockRedstoneEvent>() {
+            @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(BlockRedstoneEvent event) {
+                if (enabled) {
+                    onBlockRedstone(event);
+                }
+            }
+        },
+        new MiniListener<EntityChangeBlockEvent>() {
+            @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(EntityChangeBlockEvent event) {
+                if (enabled) {
+                    onEntityChangeBlock(event);
+                }
+            }
+        },
+        new MiniListener<BlockPistonExtendEvent>() {
+            @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(BlockPistonExtendEvent event) {
+                if (enabled) {
+                    onPistonExtend(event);
+                }
+            }
+        },
+        new MiniListener<BlockPistonRetractEvent>() {
+            @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(BlockPistonRetractEvent event) {
+                if (enabled) {
+                    onPistonRetract(event);
+                }
+            }
+        },
+        new MiniListener<PlayerInteractEvent>() {
+            @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(PlayerInteractEvent event) {
+                if (enabled) {
+                    onPlayerInteract(event);
+                }
+            }
+        }
+    };
 
     public BlockChangeListener(final BlockChangeTracker tracker) {
         this.tracker = tracker;
@@ -63,14 +126,16 @@ public class BlockChangeListener implements Listener {
         else {
             retractHasBlocks = true;
         }
-        // TODO: Make an access method to test this/such in BlockProperties!
-        for (Material material : Material.values()) {
-            if (material.isBlock()) {
-                final String name = material.name().toLowerCase();
-                if (name.indexOf("door") >= 0 || name.indexOf("gate") >= 0) {
-                    redstoneMaterials.add(material);
-                }
-            }
+    }
+
+    /**
+     * Register actual listener(s).
+     */
+    public void register() {
+        // TODO: Replace 'if (enabled)' by actually unregistering the listeners.
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        for (final MiniListener<?> listener : miniListeners) {
+            api.addComponent(listener);
         }
     }
 
@@ -111,21 +176,13 @@ public class BlockChangeListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onPistonExtend(final BlockPistonExtendEvent event) {
-        if (!enabled) {
-            return;
-        }
+    private void onPistonExtend(final BlockPistonExtendEvent event) {
         final BlockFace direction = event.getDirection();
         //DebugUtil.debug("EXTEND event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()));
         tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onPistonRetract(final BlockPistonRetractEvent event) {
-        if (!enabled) {
-            return;
-        }
+    private void onPistonRetract(final BlockPistonRetractEvent event) {
         final List<Block> blocks;
         if (retractHasBlocks) {
             blocks = event.getBlocks();
@@ -170,11 +227,7 @@ public class BlockChangeListener implements Listener {
     //            DebugUtil.debug("BlockPhysics: " + block); // TODO: REMOVE
     //        }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onBlockRedstone(final BlockRedstoneEvent event) {
-        if (!enabled) {
-            return;
-        }
+    private void onBlockRedstone(final BlockRedstoneEvent event) {
         final int oldCurrent = event.getOldCurrent();
         final int newCurrent = event.getNewCurrent();
         if (oldCurrent == newCurrent || oldCurrent > 0 && newCurrent > 0) {
@@ -183,31 +236,15 @@ public class BlockChangeListener implements Listener {
         // TODO: Fine grained enabling state (pistons, doors, other).
         final Block block = event.getBlock();
         // TODO: Abstract method for a block and a set of materials (redstone, interact, ...).
-        if (block == null || !redstoneMaterials.contains(block.getType())) {
+        if (block == null 
+                || (BlockProperties.getBlockFlags(block.getType()) | BlockProperties.F_VARIABLE_REDSTONE) == 0) {
             return;
         }
         addRedstoneBlock(block);
     }
 
     private void addRedstoneBlock(final Block block) {
-        final MaterialData materialData = block.getState().getData();
-        if (materialData instanceof Door) {
-            final Door door = (Door) materialData;
-            final Block otherBlock = block.getRelative(door.isTopHalf() ? BlockFace.DOWN : BlockFace.UP);
-            /*
-             * TODO: Double doors... detect those too? Is it still more
-             * efficient than using BlockPhysics with lazy delayed updating
-             * (TickListener...). Hinge corner... possibilities?
-             */
-            if (redstoneMaterials.contains(otherBlock.getType())) {
-                tracker.addBlocks(block, otherBlock);
-                // DebugUtil.debug("BlockRedstone door: " + block + " / " + otherBlock); // TODO: REMOVE
-                return;
-            }
-        }
-        // Only the single block remains.
-        tracker.addBlocks(block);
-        // DebugUtil.debug("BlockRedstone: " + block); // TODO: REMOVE
+        addSimpleBlock(block, BlockProperties.F_VARIABLE_REDSTONE);
     }
 
     //    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -223,17 +260,57 @@ public class BlockChangeListener implements Listener {
     //        }
     //    }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onEntityChangeBlock(final EntityChangeBlockEvent event) {
-        if (!enabled) {
-            return;
-        }
+    private void onEntityChangeBlock(final EntityChangeBlockEvent event) {
         final Block block = event.getBlock();
         if (block != null) {
             // TODO: Filters?
             tracker.addBlocks(block); // E.g. falling blocks like sand.
             //DebugUtil.debug("EntityChangeBlock: " + block); // TODO: REMOVE
         }
+    }
+
+    private void onPlayerInteract(final PlayerInteractEvent event) {
+        // Check preconditions.
+        final Result result = event.useInteractedBlock();
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && (result == Result.ALLOW 
+                || !event.isCancelled() && result == Result.DEFAULT)) {
+            final Block block = event.getClickedBlock();
+            if (block != null) {
+                final Material type = block.getType();
+                if ((BlockProperties.getBlockFlags(type) | BlockProperties.F_VARIABLE_USE) != 0L) {
+                    addSimpleBlock(block, BlockProperties.F_VARIABLE_USE);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add a past state for this block, extending for the other block in case of
+     * doors.
+     * 
+     * @param block
+     * @param relevantFlags
+     */
+    private void addSimpleBlock(final Block block, final long relevantFlags) {
+        final MaterialData materialData = block.getState().getData();
+        if (materialData instanceof Door) {
+            final Door door = (Door) materialData;
+            final Block otherBlock = block.getRelative(door.isTopHalf() ? BlockFace.DOWN : BlockFace.UP);
+            /*
+             * TODO: In case of redstone: Double doors... detect those too? Is it still more
+             * efficient than using BlockPhysics with lazy delayed updating
+             * (TickListener...). Hinge corner... possibilities?
+             */
+            if (otherBlock != null // Top of the map / special case.
+                    && (BlockProperties.getBlockFlags(otherBlock.getType()) 
+                            | relevantFlags) == 0) {
+                tracker.addBlocks(block, otherBlock);
+                return;
+            }
+        }
+        // Only the single block remains.
+        tracker.addBlocks(block);
     }
 
 }
