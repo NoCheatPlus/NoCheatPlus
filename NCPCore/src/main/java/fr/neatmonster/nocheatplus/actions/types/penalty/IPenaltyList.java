@@ -21,6 +21,8 @@ package fr.neatmonster.nocheatplus.actions.types.penalty;
  *
  */
 public interface IPenaltyList {
+    // TODO: Typed ? + typed per input getter (mapped lists)
+    
     /**
      * Add an input-specific penalty.
      * @param penalty

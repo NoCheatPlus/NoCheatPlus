@@ -101,6 +101,8 @@ public class Critical extends Check {
                         vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
                     }
                     cancel = executeActions(vd).willCancel();
+                    // TODO: Introduce penalty instead of cancel.
+                    
                 }
                 auxMoving.returnPlayerMoveInfo(moveInfo);
             }

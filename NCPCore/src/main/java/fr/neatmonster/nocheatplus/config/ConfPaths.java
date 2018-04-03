@@ -467,9 +467,6 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_CRITICAL                           = FIGHT + "critical.";
     public static final String  FIGHT_CRITICAL_CHECK                     = FIGHT_CRITICAL + SUB_ACTIVE;
-    private static final String FIGHT_CRITICAL_CANCEL                    = FIGHT_CRITICAL + "cancel.";
-    public static final String  FIGHT_CRITICAL_CANCEL_CANCEL             = FIGHT_CRITICAL_CANCEL + "cancel";
-    public static final String  FIGHT_CRITICAL_CANCEL_DIVIDEDAMAGE       = FIGHT_CRITICAL_CANCEL + "dividedamage";
     // TODO: Deprecate or rename (->falldistancemin)?
     public static final String  FIGHT_CRITICAL_FALLDISTANCE              = FIGHT_CRITICAL + "falldistance";
     public static final String  FIGHT_CRITICAL_ACTIONS                   = FIGHT_CRITICAL + "actions";
@@ -896,6 +893,10 @@ public abstract class ConfPaths {
     public static final String MOVING_SURVIVALFLY_VLFREEZE               = "checks.moving.survivalfly.vlfreeze";
     @Deprecated
     public static final String  MOVING_SURVIVALFLY_LENIENCY_FREEZETIME      = "checks.moving.survivalfly.leniency.freezetime";
+    @Deprecated
+    public static final String  FIGHT_CRITICAL_CANCEL_CANCEL             = "checks.fight.critical.cancel.cancel";
+    @Deprecated
+    public static final String  FIGHT_CRITICAL_CANCEL_DIVIDEDAMAGE       = "checks.fight.critical.cancel.dividedamage";
 
     /**
      * Get moved paths for which an annotation doesn't work.
