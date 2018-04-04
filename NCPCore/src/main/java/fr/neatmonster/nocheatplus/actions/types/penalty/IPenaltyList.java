@@ -22,10 +22,27 @@ package fr.neatmonster.nocheatplus.actions.types.penalty;
  */
 public interface IPenaltyList {
     // TODO: Typed ? + typed per input getter (mapped lists)
-    
+
     /**
      * Add an input-specific penalty.
      * @param penalty
      */
     public void addInputSpecificPenalty(InputSpecificPenalty penalty);
+
+    /**
+     * Apply input specific penalties registered exactly for the given type,
+     * using the given input.
+     * 
+     * @param input
+     */
+    public <RI, I extends RI> void applyInputSpecificPenaltiesPrecisely(Class<RI> type, I input);
+
+    /**
+     * Apply all penalties registered for the type and all super types of the
+     * given input.
+     * 
+     * @param input
+     */
+    public <I> void applyAllApplicableInputSpecificPenalties(I input);
+
 }

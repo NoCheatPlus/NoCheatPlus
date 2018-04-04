@@ -19,13 +19,19 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractGenericPenalty;
 
 /**
- * Fight penalties usually use EntityDamageByEntityEvent.
+ * Specifically target damage done by entities to entities.
+ * 
  * @author asofold
  *
  */
-public abstract class FightPenaltyEDE extends AbstractGenericPenalty<EntityDamageByEntityEvent> {
+public abstract class FightPenaltyEntityDamageByEntity extends AbstractGenericPenalty<EntityDamageByEntityEvent> {
 
-    public FightPenaltyEDE() {
+    /*
+     * TODO: Implement PvP penalties too (!) - use a special argument created
+     * within fight listener (Player attacker, Player damaged, further).
+     */
+
+    public FightPenaltyEntityDamageByEntity() {
         super(EntityDamageByEntityEvent.class);
     }
 

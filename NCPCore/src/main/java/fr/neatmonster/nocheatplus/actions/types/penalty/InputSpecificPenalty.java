@@ -22,10 +22,8 @@ public interface InputSpecificPenalty extends Penalty {
      * 
      * @param input
      *            May be of unexpected type.
-     * @param registeredInput
      */
-    // TODO: Typed input (generics)?
     // TODO: Consider boolean result for "the input type was accepted", in order to detect if an input is not accepted by any generic penalty.
-    public void apply(Object input);
+    public <I> void apply(I input);
 
 }

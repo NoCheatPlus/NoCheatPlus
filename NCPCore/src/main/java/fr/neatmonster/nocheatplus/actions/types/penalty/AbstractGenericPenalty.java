@@ -68,7 +68,7 @@ public abstract class AbstractGenericPenalty<RI> implements GenericPenalty<RI> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void apply(Object input) {
+    public <T> void apply(T input) {
         if (registeredInput.isAssignableFrom(input.getClass())) {
             applyGenericEffects((RI) input);
         }
@@ -79,6 +79,6 @@ public abstract class AbstractGenericPenalty<RI> implements GenericPenalty<RI> {
      * 
      * @param input
      */
-    abstract void applyGenericEffects(RI input);
+    protected abstract void applyGenericEffects(RI input);
 
 }
