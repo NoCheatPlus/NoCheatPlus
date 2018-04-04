@@ -43,6 +43,12 @@ public abstract class BaseCheckNode<N extends BaseCheckNode<N>> extends CheckTyp
         public void setState(N node, boolean state);
         public String getConfigPath(N node);
 
+        /**
+         * The flag state to use, if a node doesn't have a parent and it's
+         * config state is MAYBE.
+         */
+        public boolean getMissingParentState();
+
     }
 
     public BaseCheckNode(CheckType checkType, N parent,
@@ -107,7 +113,7 @@ public abstract class BaseCheckNode<N extends BaseCheckNode<N>> extends CheckTyp
             if (newActive == AlmostBoolean.MAYBE) {
                 N parent = getParent();
                 if (parent == null) {
-                    access.setState(thisNode, true);
+                    access.setState(thisNode, access.getMissingParentState());
                 }
                 else {
                     // Assume top-down updating always.

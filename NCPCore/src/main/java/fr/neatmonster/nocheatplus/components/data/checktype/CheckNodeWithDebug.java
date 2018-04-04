@@ -52,6 +52,11 @@ public abstract class CheckNodeWithDebug<N extends CheckNodeWithDebug<N>> extend
             return node.getCheckType().getConfigPathDebug();
         }
 
+        @Override
+        public boolean getMissingParentState() {
+            return false; // Only allow explicit activation.
+        }
+
     };
 
     @SuppressWarnings("rawtypes")

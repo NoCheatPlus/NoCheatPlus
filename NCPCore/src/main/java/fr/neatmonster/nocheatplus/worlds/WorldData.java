@@ -68,6 +68,11 @@ public class WorldData implements IWorldData {
                 return node.getCheckType().getConfigPathActive();
             }
 
+            @Override
+            public boolean getMissingParentState() {
+                return true;
+            }
+
         };
 
         private static class AccessLag<WorldTypeCheckTreeNode> implements IConfigFlagAccess<WorldCheckTypeTreeNode> {
@@ -90,6 +95,11 @@ public class WorldData implements IWorldData {
             @Override
             public String getConfigPath(WorldCheckTypeTreeNode node) {
                 return node.getCheckType().getConfigPathLag();
+            }
+
+            @Override
+            public boolean getMissingParentState() {
+                return true;
             }
 
         };
