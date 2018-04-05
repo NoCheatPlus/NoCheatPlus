@@ -183,7 +183,7 @@ public class NoFall extends Check {
             if (!event.isCancelled()) {
                 // TODO: account for no damage ticks etc.
                 player.setLastDamageCause(event);
-                mcAccess.getHandle().dealFallDamage(player, BridgeHealth.getDamage(event));
+                mcAccess.getHandle().dealFallDamage(player, BridgeHealth.getRawDamage(event));
             }
         }
 

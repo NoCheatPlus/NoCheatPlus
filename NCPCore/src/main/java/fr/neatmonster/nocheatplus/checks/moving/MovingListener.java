@@ -2162,7 +2162,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean allowReset = true;
         float fallDistance = player.getFallDistance();
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
-        final double damage = BridgeHealth.getDamage(event);
+        final double damage = BridgeHealth.getRawDamage(event); // Raw damage.
+        // TODO: Account for modifiers.
         if (debug) {
             debug(player, "Damage(FALL/PRE): " + damage + " / mc=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
@@ -2219,7 +2220,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                             debug(player, "NoFall/Damage: override player fall distance and damage (" + fallDistance + " -> " + dataDist + ").");
                         }
                         fallDistance = dataDist;
-                        BridgeHealth.setDamage(event, dataDamage);
+                        BridgeHealth.setRawDamage(event, dataDamage);
                     }
                 }
             }
@@ -2249,7 +2250,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 : NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : Magic.FALL_DAMAGE_DIST);
         if (maxD > damage) {
             // TODO: respect dealDamage ?
-            BridgeHealth.setDamage(event, maxD);
+            BridgeHealth.setRawDamage(event, maxD);
             if (debug) {
                 debug(player, "Adjust fall damage to: " + maxD);
             }

@@ -21,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -40,6 +41,7 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
  * @author asofold
  *
  */
+@SuppressWarnings("deprecation")
 public class BridgeHealth {
 
     // TODO: Move to (smaller?) IGenericInstanceHandle instances.
@@ -73,21 +75,23 @@ public class BridgeHealth {
      *            incompatibility".
      * @return
      */
-    public static final double getDoubleOrInt(final Object obj, final String methodName, final Throwable reason){
-        if (reason != null){
+    public static final double getDoubleOrInt(final Object obj, 
+            final String methodName, final Throwable reason) {
+        if (reason != null) {
             final String tag = obj.getClass().getName() + "." + methodName;
-            if (failures.add(tag)){
+            if (failures.add(tag)) {
                 // New entry.
                 checkLogEntry(tag);
             }
         }
-        final Object o1 = ReflectionUtil.invokeMethodNoArgs(obj, methodName, double.class, int.class);
-        if (o1 instanceof Number){
+        final Object o1 = ReflectionUtil.invokeMethodNoArgs(obj, methodName, 
+                double.class, int.class);
+        if (o1 instanceof Number) {
             return ((Number) o1).doubleValue();
         }
         else{
             String message = "Expect method " + methodName + " in " + obj.getClass() + " with return type double or int, returned instead: " + ((o1 == null ? "null" : o1.getClass().getName()));
-            if (reason == null){
+            if (reason == null) {
                 throw new RuntimeException(message);
             }
             else{
@@ -105,18 +109,18 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static double getAmount(final EntityRegainHealthEvent event){
+    public static double getAmount(final EntityRegainHealthEvent event) {
         try{
             return event.getAmount();
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             return getDoubleOrInt(event, "getAmount", e);
         }
     }
 
     /**
-     * Get the damage from an EntityDamageEvent (damage before applying
-     * modifiers).
+     * Get the original/raw damage from an EntityDamageEvent (damage before
+     * applying modifiers).
      * 
      * @param event
      * @return
@@ -124,13 +128,18 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static double getDamage(final EntityDamageEvent event){
+    public static double getRawDamage(final EntityDamageEvent event) {
         try{
             return event.getDamage();
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             return getDoubleOrInt(event, "getDamage", e);
         }
+    }
+
+    @Deprecated
+    public static double getDamage(final EntityDamageEvent event) {
+        return getRawDamage(event);
     }
 
     /**
@@ -144,12 +153,13 @@ public class BridgeHealth {
             return event.getFinalDamage();
         }
         catch (Throwable t) {
-            return getDamage(event);
+            return getRawDamage(event);
         }
     }
 
     /**
-     * Damage amount before applying modifiers.
+     * Original/raw damage amount before applying modifiers. This might return
+     * the final damage, in case getting the raw damage isn't implemented.
      * 
      * @param event
      * @return
@@ -159,22 +169,13 @@ public class BridgeHealth {
             return event.getDamage();
         }
         catch (Throwable t) {
-            return getDamage(event);
+            return getRawDamage(event);
         }
     }
 
     /**
-     * Set the damage from an EntityDamageEvent.    @SuppressWarnings("deprecation")
-    public static double getMaxHealth(final LivingEntity entity){
-        try{
-            // TODO: Attribute.GENERIC_MAX_HEALTH for latest.
-            return entity.getMaxHealth();
-        }
-        catch(IncompatibleClassChangeError e){
-            return getDoubleOrInt(entity, "getMaxHealth", e);
-        }
-    }
-
+     * Set the final damage for an EntityDamageEvent. This means damage after
+     * applying modifiers.
      * 
      * @param event
      * @param damage
@@ -183,12 +184,56 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static void setDamage(final EntityDamageEvent event, final double damage){
+    public static void setFinalDamage(final EntityDamageEvent event, 
+            final double damage) {
         try{
             event.setDamage(damage);
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             invokeVoid(event, "setDamage", (int) Math.round(damage), e);
+        }
+    }
+
+    /**
+     * Set the original/raw damage for an EntityDamageEvent. This means damage before
+     * applying modifiers.
+     * 
+     * @param event
+     * @param damage
+     * @return
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
+     */
+    public static void setRawDamage(final EntityDamageEvent event, 
+            final double damage) {
+        try {
+            event.setDamage(DamageModifier.BASE, damage);
+        }
+        catch (Throwable t) {
+            setFinalDamage(event, damage);
+        }
+    }
+
+    /**
+     * Multiply the final damage for an EntityDamageEvent. This might alter the
+     * raw damage and/or alter existing modifiers.
+     * 
+     * @param event
+     * @param multiplier
+     * @return
+     * @throws RuntimeException,
+     *             in case of an IncompatibleClassChangeError without success on
+     *             recovery attempts.
+     */
+    public static void multiplyFinalDamage(final EntityDamageEvent event, 
+            final double multiplier) {
+        try {
+            // TODO: Better recalculate modifiers, as this scales them.
+            setFinalDamage(event, event.getFinalDamage() * multiplier);
+        }
+        catch (Throwable e) {
+            setFinalDamage(event, getRawDamage(event) * multiplier);
         }
     }
 
@@ -201,11 +246,11 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static double getHealth(final LivingEntity entity){
+    public static double getHealth(final LivingEntity entity) {
         try{
             return entity.getHealth();
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             return getDoubleOrInt(entity, "getHealth", e);
         }
     }
@@ -219,13 +264,12 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    @SuppressWarnings("deprecation")
-    public static double getMaxHealth(final LivingEntity entity){
+    public static double getMaxHealth(final LivingEntity entity) {
         try{
             // TODO: Attribute.GENERIC_MAX_HEALTH for latest.
             return entity.getMaxHealth();
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             return getDoubleOrInt(entity, "getMaxHealth", e);
         }
     }
@@ -239,11 +283,11 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static double getLastDamage(final LivingEntity entity){
+    public static double getLastDamage(final LivingEntity entity) {
         try{
             return entity.getLastDamage();
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             return getDoubleOrInt(entity, "getLastDamage", e);
         }
     }
@@ -258,11 +302,12 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static void setHealth(final LivingEntity entity, final double health){
+    public static void setHealth(final LivingEntity entity, 
+            final double health) {
         try{
             entity.setHealth(health);
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             invokeVoid(entity, "setHealth", (int) Math.round(health), e);
         }
     }
@@ -276,22 +321,24 @@ public class BridgeHealth {
      *             in case of an IncompatibleClassChangeError without success on
      *             recovery attempts.
      */
-    public static void damage(final LivingEntity entity, final double damage){
+    public static void damage(final LivingEntity entity, 
+            final double damage) {
         try{
             entity.damage(damage);
         }
-        catch(IncompatibleClassChangeError e){
+        catch(IncompatibleClassChangeError e) {
             invokeVoid(entity, "damage", (int) Math.round(damage), e);
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public static EntityDamageEvent getEntityDamageEvent(final Entity entity, final DamageCause damageCause, final double damage){
+    public static EntityDamageEvent getEntityDamageEvent(final Entity entity, 
+            final DamageCause damageCause, final double damage) {
         try{
             return new EntityDamageEvent(entity, damageCause, damage);
         }
-        catch(IncompatibleClassChangeError e){
-            return new EntityDamageEvent(entity, damageCause, (int) Math.round(damage));
+        catch(IncompatibleClassChangeError e) {
+            return new EntityDamageEvent(entity, damageCause, 
+                    (int) Math.round(damage));
         }
     }
 
@@ -303,10 +350,11 @@ public class BridgeHealth {
      * @param methodName
      * @param value
      */
-    public static void invokeVoid(final Object obj, final String methodName, final int value, final Throwable reason){
-        if (reason != null){
+    public static void invokeVoid(final Object obj, final String methodName, 
+            final int value, final Throwable reason) {
+        if (reason != null) {
             final String tag = obj.getClass().getName() + "." + methodName;
-            if (failures.add(tag)){
+            if (failures.add(tag)) {
                 checkLogEntry(tag);
             }
         }
@@ -319,7 +367,7 @@ public class BridgeHealth {
 
     private static void checkLogEntry(final String tag) {
         // New entry.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)){
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS)) {
             StaticLog.logInfo("Try old health API: " + tag);
         }
     }

@@ -581,7 +581,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                         penaltyList = new DefaultPenaltyList();
                     }
                     if (godMode.check(damagedPlayer, damagedIsFake, 
-                            BridgeHealth.getDamage(event), damagedData, damagedPData)) {
+                            BridgeHealth.getRawDamage(event), damagedData, damagedPData)) {
                         // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
                         damagedPlayer.setNoDamageTicks(0);
                     }
