@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
@@ -59,7 +60,7 @@ public class Critical extends Check {
      */
     public boolean check(final Player player, final Location loc, 
             final FightData data, final FightConfig cc, 
-            final IPlayerData pData) {
+            final IPlayerData pData, final IPenaltyList penaltyList) {
         boolean cancel = false;
 
         final double mcFallDistance = (double) player.getFallDistance();

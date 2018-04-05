@@ -19,6 +19,15 @@ public interface InputSpecificPenalty extends Penalty {
     /**
      * Apply the input-specific effects of a penalty, for other input than
      * Player.
+     * <hr/>
+     * Applying input specific penalties might only be possible within the
+     * surrounding context of creation of ViolationData, i.e. during the event
+     * handling. Input-specific effects will not apply within
+     * ViolationData.executeActions, be it within the TickTask
+     * (requestActionsExecution) or during handling a primary-thread check
+     * failure. Instead input specific penalties are executed within the context
+     * that provides the input, e.g. after handling a damage event.
+     * <hr/>
      * 
      * @param input
      *            May be of unexpected type.

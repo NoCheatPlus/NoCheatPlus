@@ -34,6 +34,8 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.actions.types.penalty.DefaultPenaltyList;
+import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
@@ -170,7 +172,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     private boolean handleNormalDamage(final Player player, final boolean attackerIsFake,
             final Entity damaged, final boolean damagedIsFake,
             final double originalDamage, final double finalDamage, 
-            final int tick, final FightData data, final IPlayerData pData) {
+            final int tick, final FightData data, final IPlayerData pData,
+            final IPenaltyList penaltyList) {
 
         final FightConfig cc = pData.getGenericInstance(FightConfig.class);
 
@@ -337,7 +340,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         // TODO: Consider to always check improbable (first?). At least if config.always or speed or net.attackfrequency are enabled.
 
-        if (!cancelled && critical.isEnabled(player, pData) && critical.check(player, loc, data, cc, pData)) {
+        if (!cancelled && critical.isEnabled(player, pData) 
+                && critical.check(player, loc, data, cc, pData, penaltyList)) {
             // TODO: Check config for settings.
             cancelled = true;
         }
@@ -565,17 +569,22 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final FightData damagedData;
         final boolean damagedIsDead = damaged.isDead();
         final boolean damagedIsFake = !crossPlugin.getHandle().isNativeEntity(damaged);
+        IPenaltyList penaltyList = null;
         if (damagedPlayer != null) {
             final IPlayerData damagedPData = DataManager.getPlayerData(damagedPlayer);
             damagedData = damagedPData.getGenericInstance(FightData.class);
             if (!damagedIsDead) {
                 // God mode check.
                 // (Do not test the savage.)
-                if (damagedPData.isCheckActive(CheckType.FIGHT_GODMODE, damagedPlayer)
-                        && godMode.check(damagedPlayer, damagedIsFake, 
-                                BridgeHealth.getDamage(event), damagedData, damagedPData)) {
-                    // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
-                    damagedPlayer.setNoDamageTicks(0);
+                if (damagedPData.isCheckActive(CheckType.FIGHT_GODMODE, damagedPlayer)) {
+                    if (penaltyList == null) {
+                        penaltyList = new DefaultPenaltyList();
+                    }
+                    if (godMode.check(damagedPlayer, damagedIsFake, 
+                            BridgeHealth.getDamage(event), damagedData, damagedPData)) {
+                        // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
+                        damagedPlayer.setNoDamageTicks(0);
+                    }
                 }
                 // Adjust buffer for fast heal checks.
                 if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)) {
@@ -602,9 +611,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         // Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
+            if (penaltyList == null) {
+                penaltyList = new DefaultPenaltyList();
+            }
             onEntityDamageByEntity(damaged, damagedPlayer, damagedIsDead, damagedIsFake, 
-                    damagedData, (EntityDamageByEntityEvent) event);
+                    damagedData, (EntityDamageByEntityEvent) event,
+                    penaltyList);
         }
+
+        if (penaltyList != null && !penaltyList.isEmpty()) {
+            if (penaltyList.hasGenericPenalties()) {
+                penaltyList.applyAllApplicableGenericPenalties(event);
+            }
+            if (penaltyList.hasNonGenericPenalties()) {
+                penaltyList.applyNonGenericPenalties(event);
+            }
+        }
+
     }
 
     /**
@@ -618,7 +641,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     private void onEntityDamageByEntity(final Entity damaged, final Player damagedPlayer, 
             final boolean damagedIsDead, final boolean damagedIsFake, 
-            final FightData damagedData, final EntityDamageByEntityEvent event) {
+            final FightData damagedData, final EntityDamageByEntityEvent event,
+            final IPenaltyList penaltyList) {
         final Entity damager = event.getDamager();
         final int tick = TickTask.getTick();
         if (damagedPlayer != null && !damagedIsDead) {
@@ -658,7 +682,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 UnusedVelocity.checkUnusedVelocity(attacker, CheckType.FIGHT, attackerPData);
             }
             // Workaround for subsequent melee damage eventsfor explosions. TODO: Legacy or not, need a KB.
-            if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
+            if (damageCause == DamageCause.BLOCK_EXPLOSION 
+                    || damageCause == DamageCause.ENTITY_EXPLOSION) {
                 // NOTE: Pigs don't have data.
                 attackerData.lastExplosionEntityId = damaged.getEntityId();
                 attackerData.lastExplosionDamageTick = tick;
@@ -688,7 +713,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 else if (handleNormalDamage(player, !crossPlugin.getHandle().isNativePlayer(player),
                         damaged, damagedIsFake,
                         BridgeHealth.getOriginalDamage(event), BridgeHealth.getFinalDamage(event), 
-                        tick, attackerData, attackerPData)) {
+                        tick, attackerData, attackerPData, penaltyList)) {
                     event.setCancelled(true);
                 }
             }

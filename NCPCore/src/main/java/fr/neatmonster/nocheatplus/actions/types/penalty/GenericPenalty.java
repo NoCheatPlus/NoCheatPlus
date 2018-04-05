@@ -30,4 +30,21 @@ public interface GenericPenalty<RI> extends InputSpecificPenalty {
      */
     public Class<RI> getRegisteredInput();
 
+    /**
+     * Internal convenience method to get around some of generics.
+     * <hr>
+     * <b>This method must not call
+     * {@link IPenaltyList#addInputSpecificPenalty(InputSpecificPenalty)}</b>
+     * 
+     * @param penaltyList
+     */
+    public void addToPenaltyList(IPenaltyList penaltyList);
+
+    /**
+     * Alternative to {@link #apply(Object)}, just typed.
+     * 
+     * @param input
+     */
+    public void applyPrecisely(RI input);
+
 }

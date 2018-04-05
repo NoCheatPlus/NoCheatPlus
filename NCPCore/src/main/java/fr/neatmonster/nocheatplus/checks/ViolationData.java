@@ -79,7 +79,7 @@ public class ViolationData implements IViolationInfo, ActionData {
     private final IPenaltyList penaltyList;
 
     /**
-     * Instantiates a new violation data without syupport for input-specific penalties..
+     * Instantiates a new violation data without support for input-specific penalties..
      * <hr>
      * This constructor must be thread-safe for checks that might be executed
      * outside of the primary thread.

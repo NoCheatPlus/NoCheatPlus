@@ -35,14 +35,18 @@ public interface Penalty {
     /**
      * Test if there are input-specific effects, other than with Player instance
      * input.
+     * <hr/>
+     * Applying input specific penalties might only be possible within the
+     * surrounding context of creation of ViolationData, i.e. during the event
+     * handling. Input-specific effects will not apply within
+     * ViolationData.executeActions, be it within the TickTask
+     * (requestActionsExecution) or during handling a primary-thread check
+     * failure. Instead input specific penalties are executed within the context
+     * that provides the input, e.g. after handling a damage event.
+     * <hr/>
      * 
      * @return If true, this instance must implement InputSpecificPenalty as
-     *         well. Applying input specific penalties might only be possible
-     *         within the surrounding context of creation of ViolationData, i.e.
-     *         during the event handling. Input-specific effects will not apply
-     *         within ViolationData.executeActions, be it within the TickTask
-     *         (requestActionsExecution) or during handling a primary-thread
-     *         check failure.
+     *         well.
      */
     public boolean hasInputSpecificEffects();
 

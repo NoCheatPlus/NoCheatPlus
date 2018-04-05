@@ -74,6 +74,16 @@ public abstract class AbstractGenericPenalty<RI> implements GenericPenalty<RI> {
         }
     }
 
+    @Override
+    public  void applyPrecisely(final RI input) {
+        applyGenericEffects(input);
+    }
+
+    @Override
+    public void addToPenaltyList(final IPenaltyList penaltyList) {
+        penaltyList.addGenericPenalty(registeredInput, this);
+    }
+
     /**
      * Override for implementation of input-specific effects.
      * 
