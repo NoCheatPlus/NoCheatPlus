@@ -33,7 +33,6 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -46,17 +45,6 @@ import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
  * The synchronized methods are to ensure that changing the configurations won't lead to trouble for the asynchronous checks.
  */
 public class ConfigManager {
-
-    public static interface ActionFactoryFactory{
-        public ActionFactory newActionFactory(Map<String, Object> library);
-    }
-
-    private static ActionFactoryFactory actionFactoryFactory = new ActionFactoryFactory() {
-        @Override
-        public final ActionFactory newActionFactory(final Map<String, Object> library) {
-            return new ActionFactory(library);
-        }
-    };
 
     private static final WorldConfigProvider<ConfigFile> worldConfigProvider = new WorldConfigProvider<ConfigFile>() {
 
@@ -87,63 +75,6 @@ public class ConfigManager {
     private static boolean isInitialized = false;
 
     /**
-     * Factory method.
-     * @param library
-     * @return
-     */
-    public static ActionFactory getActionFactory(final Map<String, Object> library){
-        return actionFactoryFactory.newActionFactory(library);
-    }
-
-    /**
-     * Set the factory to get actions from.
-     * This will reset all ActionFactories to null (lazy initialization),
-     *  call setAllActionFactories to ensure action factories are ready. 
-     *  To be on the safe side also call DataManager.clearConfigs().
-     *  <hr>
-     *  To Hook into NCP for setting the factories, you should register a INotifyReload instance
-     *  with the NoCheatPlusAPI using the annotation SetupOrder with a higher negative value (-1000, see INotifyReload javadoc).
-     * @param factory
-     */
-    // TODO: Register at GenericInstanceRegistry instead, store a handle at best (get rid of 'the other' static registries).
-    public static void setActionFactoryFactory(ActionFactoryFactory factory){
-        if (factory != null){
-            actionFactoryFactory = factory;
-        }
-        else{
-            actionFactoryFactory = new ActionFactoryFactory() {
-                @Override
-                public final ActionFactory newActionFactory(final Map<String, Object> library) {
-                    return new ActionFactory(library);
-                }
-            };
-        }
-        // Use lazy resetting.
-        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
-        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
-        while (it.hasNext()){
-            it.next().getValue().getRawConfiguration().setActionFactory(null);
-        }
-        // TODO: Update WorldData is skipped for now.
-    }
-
-    public static ActionFactoryFactory getActionFactoryFactory(){
-        return actionFactoryFactory;
-    }
-
-    /**
-     * Force setting up all configs action factories.
-     */
-    public static void setAllActionFactories(){
-        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
-        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
-        while (it.hasNext()){
-            it.next().getValue().getRawConfiguration().setActionFactory();
-        }
-        // TODO: Update WorldData is skipped for now.
-    }
-
-    /**
      * Get the WorldConfigProvider in use.
      * @return
      */
@@ -156,8 +87,6 @@ public class ConfigManager {
      */
     public static void cleanup() {
         isInitialized = false;
-        setActionFactoryFactory(null);
-        // TODO: Remove references of config files ?
     }
 
     /**
@@ -466,10 +395,13 @@ public class ConfigManager {
     }
 
     /**
-     * Get the maximally found number for the given config path. This does not throw errors. It will return null, if nothing is found or all lookups failed otherwise.
-     * <br>
+     * Get the maximally found number for the given config path. This does not
+     * throw errors. It will return null, if nothing is found or all lookups
+     * failed otherwise. <br>
      * Note: What happens with things like NaN is unspecified.
-     * @param path Config path.
+     * 
+     * @param path
+     *            Config path.
      * @return Value or null.
      */
     public static Double getMaxNumberForAllConfigs(final String path){

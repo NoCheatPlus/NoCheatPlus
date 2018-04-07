@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.actions.ActionFactoryFactory;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.registry.ComponentRegistryProvider;
@@ -232,5 +233,40 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
      * @param context
      */
     public void register(RegistrationContext context);
+
+    /**
+     * Get the registered factory for retrieving config-dependent ActionFactory
+     * instances.
+     * 
+     * @return
+     */
+    public ActionFactoryFactory getActionFactoryFactory();
+
+    /**
+     * Register a factory for retrieving config-dependent ActionFactory
+     * instances. The given instance will be the one returned by
+     * {@link #getActionFactoryFactory()}. Pass null to reset to default.
+     * <hr/>
+     * For all stored raw configurations,
+     * {@link fr.neatmonster.nocheatplus.config.ConfigFile#setActionFactory(ActionFactoryFactory)})
+     * will be called.<br/>
+     * To ensure that configurations are newly created with altered actions, you
+     * should first call
+     * {@link fr.neatmonster.nocheatplus.worlds.IWorldDataManager#removeCachedConfigs()}
+     * and finally
+     * {@link fr.neatmonster.nocheatplus.players.IPlayerDataManager#removeCachedConfigs()}
+     * <hr/>
+     * To Hook into NCP for setting the factories, you could register a
+     * INotifyReload instance with the NoCheatPlusAPI using the annotation
+     * SetupOrder (to be deprecated, later: RegisterWithOrder) with a larger
+     * negative value (-1000, see INotifyReload javadoc).
+     * <hr/>
+     * 
+     * @param actionFactoryFactory
+     *            The instance to set. Pass null to reset to the default
+     *            factory.
+     * @return The previously registered instance.
+     */
+    public ActionFactoryFactory setActionFactoryFactory(final ActionFactoryFactory actionFactoryFactory);
 
 }

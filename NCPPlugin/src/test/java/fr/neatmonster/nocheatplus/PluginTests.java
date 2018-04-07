@@ -16,9 +16,13 @@ package fr.neatmonster.nocheatplus;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import fr.neatmonster.nocheatplus.actions.ActionFactory;
+import fr.neatmonster.nocheatplus.actions.ActionFactoryFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
@@ -36,6 +40,8 @@ import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 import fr.neatmonster.nocheatplus.players.IPlayerDataManager;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
+import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
 import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 public class PluginTests {
@@ -49,6 +55,12 @@ public class PluginTests {
      *
      */
     public static class UnitTestNoCheatPlusAPI implements NoCheatPlusAPI {
+
+        /*
+         * TODO: Mix-in style base functionality, common for testing API and
+         * live plugin. ALT: DefaultNoCheatPlusAPI class and a common base class
+         * (plugin would no further implement that API).
+         */
 
         private final WorldDataManager worldDataManager = new WorldDataManager();
         private final DefaultGenericInstanceRegistry genericInstanceRegistry = new DefaultGenericInstanceRegistry();
@@ -210,6 +222,41 @@ public class PluginTests {
         @Override
         public void register(RegistrationContext context) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ActionFactoryFactory getActionFactoryFactory() {
+            ActionFactoryFactory factory = getGenericInstance(ActionFactoryFactory.class);
+            if (factory == null) {
+                setActionFactoryFactory(null);
+                factory = getGenericInstance(ActionFactoryFactory.class);
+            }
+            return factory;
+        }
+
+        @Override
+        public ActionFactoryFactory setActionFactoryFactory(
+                ActionFactoryFactory actionFactoryFactory) {
+            if (actionFactoryFactory == null) {
+                actionFactoryFactory = new ActionFactoryFactory() {
+                    @Override
+                    public final ActionFactory newActionFactory(
+                            final Map<String, Object> library) {
+                        return new ActionFactory(library);
+                    }
+                };
+            }
+            final ActionFactoryFactory previous = registerGenericInstance(
+                    ActionFactoryFactory.class, actionFactoryFactory);
+            // Use lazy resetting.
+            final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+            final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+            while (it.hasNext()) {
+                final ConfigFile config = it.next().getValue().getRawConfiguration();
+                config.setActionFactory(actionFactoryFactory);
+            }
+            // (Removing cached configurations and update are to be called externally.)
+            return previous;
         }
 
     }

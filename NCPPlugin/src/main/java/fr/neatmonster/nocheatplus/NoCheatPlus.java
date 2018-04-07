@@ -52,6 +52,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import fr.neatmonster.nocheatplus.actions.ActionFactory;
+import fr.neatmonster.nocheatplus.actions.ActionFactoryFactory;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
@@ -138,6 +140,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.entity.PassengerUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 import fr.neatmonster.nocheatplus.worlds.IWorldDataManager;
 import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
@@ -860,6 +863,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (ServerVersion.getMinecraftVersion() == GenericVersion.UNKNOWN_VERSION) {
             BukkitVersion.init();
         }
+        // Pre config setup.
+        if (getGenericInstance(ActionFactoryFactory.class) == null) {
+            setActionFactoryFactory(null); // Set to default.
+        }
         // Configuration.
         if (!ConfigManager.isInitialized()) {
             ConfigManager.init(this, worldDataManager);
@@ -1538,6 +1545,41 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public RegistrationContext newRegistrationContext() {
         return new RegistrationContext();
+    }
+
+    @Override
+    public ActionFactoryFactory getActionFactoryFactory() {
+        ActionFactoryFactory factory = getGenericInstance(ActionFactoryFactory.class);
+        if (factory == null) {
+            setActionFactoryFactory(null);
+            factory = getGenericInstance(ActionFactoryFactory.class);
+        }
+        return factory;
+    }
+
+    @Override
+    public ActionFactoryFactory setActionFactoryFactory(
+            ActionFactoryFactory actionFactoryFactory) {
+        if (actionFactoryFactory == null) {
+            actionFactoryFactory = new ActionFactoryFactory() {
+                @Override
+                public final ActionFactory newActionFactory(
+                        final Map<String, Object> library) {
+                    return new ActionFactory(library);
+                }
+            };
+        }
+        final ActionFactoryFactory previous = registerGenericInstance(
+                ActionFactoryFactory.class, actionFactoryFactory);
+        // Use lazy resetting.
+        final IWorldDataManager worldMan = NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
+        final Iterator<Entry<String, IWorldData>> it = worldMan.getWorldDataIterator();
+        while (it.hasNext()) {
+            final ConfigFile config = it.next().getValue().getRawConfiguration();
+            config.setActionFactory(actionFactoryFactory);
+        }
+        // (Removing cached configurations and update are to be called externally.)
+        return previous;
     }
 
 }
