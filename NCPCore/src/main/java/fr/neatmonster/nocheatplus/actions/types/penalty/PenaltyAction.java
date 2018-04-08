@@ -14,8 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
-import java.util.Collection;
-
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionData;
@@ -65,7 +63,7 @@ public class PenaltyAction<D extends ActionData, L extends AbstractActionList<D,
      * 
      * @param results
      */
-    public void evaluate(final Collection<Penalty> results) {
+    public void evaluate(final IPenaltyList results) {
         if (this.rootNode != null) {
             this.rootNode.evaluate(results);
         }

@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.actions.types.penalty.fight;
 
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractGenericPenalty;
+import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractPenalty;
 
 /**
  * Specifically target damage done by entities to entities.
@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractGenericPenalty;
  * @author asofold
  *
  */
-public abstract class FightPenaltyEntityDamageByEntity extends AbstractGenericPenalty<EntityDamageByEntityEvent> {
+public abstract class FightPenaltyEntityDamageByEntity extends AbstractPenalty<EntityDamageByEntityEvent> {
 
     /*
      * TODO: Implement PvP penalties too (!) - use a special argument created

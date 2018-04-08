@@ -14,7 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.checks;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,12 +23,9 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionData;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.GenericLogAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
+import fr.neatmonster.nocheatplus.actions.types.penalty.DefaultPenaltyList;
 import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
-import fr.neatmonster.nocheatplus.actions.types.penalty.InputSpecificPenalty;
-import fr.neatmonster.nocheatplus.actions.types.penalty.Penalty;
 import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
@@ -73,9 +69,7 @@ public class ViolationData implements IViolationInfo, ActionData {
 
     private boolean willCancel;
 
-    /** hasPlayerEffects returned true. */
-    private ArrayList<Penalty> playerPenalties = null;
-    /** hasInputSpecificEffects returned true. */
+    /** Group penalties by input type. */
     private final IPenaltyList penaltyList;
 
     /**
@@ -118,7 +112,8 @@ public class ViolationData implements IViolationInfo, ActionData {
      * @param actions
      *            the actions
      * @param penaltyList
-     *            IPenaltyList instances for filling in, or null to skip.
+     *            IPenaltyList instances for filling in, or null to skip, in
+     *            which case a list is created internally.
      */
     public ViolationData(final Check check, final Player player, 
             final double vL, final double addedVL, 
@@ -129,59 +124,23 @@ public class ViolationData implements IViolationInfo, ActionData {
         this.addedVL = addedVL;
         this.actions = actions;
         this.applicableActions = actions.getActions(vL); // TODO: Consider storing applicableActions only if history wants it.
-        this.penaltyList = penaltyList;
+        this.penaltyList = penaltyList == null ? new DefaultPenaltyList() : penaltyList;
         boolean needsParameters = false;
 
-        final ArrayList<Penalty> applicablePenalties = new ArrayList<Penalty>();
         for (int i = 0; i < applicableActions.length; i++) {
             final Action<ViolationData, ActionList> action = applicableActions[i];
             if (!needsParameters && action.needsParameters()) {
                 needsParameters = true;
             }
             if (action instanceof PenaltyAction) {
-                if (action instanceof CancelAction) {
-                    // Shortcut for 100%cancel, no other effects are allowed with this one.
-                    willCancel = true;
-                }
-                else {
-                    // Add applicable penalties for this action.
-                    ((PenaltyAction<ViolationData, ActionList>) action).evaluate(applicablePenalties);
-                }
+                ((PenaltyAction<ViolationData, ActionList>) action).evaluate(this.penaltyList);
             }
+        }
+        if (this.penaltyList.willCancel()) {
+            // Note: IPenaltyList.isEmpty() might return true, despite willCancel set.
+            willCancel = true;
         }
         this.needsParameters = needsParameters;
-        // Evaluate applicablePenalties, if any.
-        if (!applicablePenalties.isEmpty()) {
-            evaluateApplicablePenalties(applicablePenalties);
-        }
-    }
-
-    /**
-     * Evaluate applicable penalties for cancel and types of penalties.
-     * 
-     * @param applicablePenalties
-     */
-    private void evaluateApplicablePenalties(final ArrayList<Penalty> applicablePenalties) {
-        for (int i = 0; i < applicablePenalties.size(); i++) {
-            final Penalty penalty = applicablePenalties.get(i);
-            if (penalty instanceof CancelPenalty) {
-                // Other effects are not evaluated.
-                // TODO: Might go for a static thing and ==. 
-                willCancel = true;
-            }
-            else {
-                // Add to the appropriate lists.
-                if (penalty.hasPlayerEffects()) {
-                    if (playerPenalties == null) {
-                        playerPenalties = new ArrayList<Penalty>();
-                    }
-                    playerPenalties.add(penalty);
-                }
-                if (penaltyList != null && penalty.hasInputSpecificEffects()) {
-                    penaltyList.addInputSpecificPenalty((InputSpecificPenalty) penalty);
-                }
-            }
-        }
     }
 
     @Override
@@ -230,11 +189,9 @@ public class ViolationData implements IViolationInfo, ActionData {
                     action.execute(this); // TODO: Add history as argument rather.
                 }
             }
-            // Apply player penalties.
-            if (playerPenalties != null) {
-                for (int i = 0; i < playerPenalties.size(); i++) {
-                    playerPenalties.get(i).apply(player);
-                }
+            // Apply player penalties here (and remove applied penalties).
+            if (!penaltyList.isEmpty()) {
+                penaltyList.applyAllApplicablePenalties(player, true);
             }
         } catch (final Exception e) {
             StaticLog.logSevere(e);

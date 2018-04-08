@@ -17,7 +17,6 @@ package fr.neatmonster.nocheatplus.actions.types;
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.ActionData;
 import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
-import fr.neatmonster.nocheatplus.actions.types.penalty.Penalty;
 import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
 import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
 
@@ -32,11 +31,10 @@ import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
  * </ul>
  */
 public class CancelAction<D extends ActionData, L extends AbstractActionList<D, L>> extends PenaltyAction<D, L> {
-    
+
     // TODO: Deprecate this (let it extend penalty.CancelAction)?
-    
-    private static final Penalty cancelPenalty = new CancelPenalty();
-    private static final PenaltyNode node = new PenaltyNode(null, cancelPenalty);
+
+    private static final PenaltyNode node = new PenaltyNode(null, CancelPenalty.CANCEL);
 
     /**
      * Default cancel action.

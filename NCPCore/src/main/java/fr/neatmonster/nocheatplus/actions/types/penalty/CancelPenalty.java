@@ -14,8 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
-import org.bukkit.entity.Player;
-
 /**
  * This penalty does nothing. It's presence solely indicates that an action is
  * to be canceled or rolled back.
@@ -23,22 +21,30 @@ import org.bukkit.entity.Player;
  * @author asofold
  *
  */
-public final class CancelPenalty implements Penalty {
+public final class CancelPenalty implements Penalty<CancelPenalty> {
+
+    public static final CancelPenalty CANCEL = new CancelPenalty();
     
-    // TODO: Consider putting a static instance somewhere instead (check with ==).
-
-    @Override
-    public final boolean hasPlayerEffects() {
-        return false;
+    public CancelPenalty() {
+        super(); // Magic.
+        if (this != CANCEL) {
+            throw new IllegalStateException("CancelPenalty.CANCEL is supposed to be the unique instance.");
+        }
     }
 
     @Override
-    public final boolean hasInputSpecificEffects() {
-        return false;
+    public Class<CancelPenalty> getRegisteredInput() {
+        return CancelPenalty.class;
     }
 
     @Override
-    public final void apply(Player player) {
+    public void addToPenaltyList(IPenaltyList penaltyList) {
+        penaltyList.addPenalty(getRegisteredInput(), this);
+    }
+
+    @Override
+    public boolean apply(CancelPenalty input) {
+        return true; // Always remove.
     }
 
 }

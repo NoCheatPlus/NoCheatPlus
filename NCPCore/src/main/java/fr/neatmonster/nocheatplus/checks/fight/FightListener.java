@@ -620,12 +620,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         if (penaltyList != null && !penaltyList.isEmpty()) {
-            if (penaltyList.hasGenericPenalties()) {
-                penaltyList.applyAllApplicableGenericPenalties(event);
-            }
-            if (penaltyList.hasNonGenericPenalties()) {
-                penaltyList.applyNonGenericPenalties(event);
-            }
+            penaltyList.applyAllApplicablePenalties(event, true);
         }
 
     }

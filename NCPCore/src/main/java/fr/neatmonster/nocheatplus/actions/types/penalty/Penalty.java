@@ -14,50 +14,40 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
-import org.bukkit.entity.Player;
-
 /**
- * A simple static penalty. If this penalty applies must be determined
- * externally (PenaltyAction).
+ * Penalty for one type of input.
  * 
  * @author asofold
  *
+ * @param <RI>
  */
-public interface Penalty {
+public interface Penalty<RI> {
 
     /**
-     * Effects that apply only to a player. Usually executed on
+     * Get the class that determines the accepted input type.
      * 
      * @return
      */
-    public boolean hasPlayerEffects();
+    public Class<RI> getRegisteredInput();
 
     /**
-     * Test if there are input-specific effects, other than with Player instance
-     * input.
-     * <hr/>
-     * Applying input specific penalties might only be possible within the
-     * surrounding context of creation of ViolationData, i.e. during the event
-     * handling. Input-specific effects will not apply within
-     * ViolationData.executeActions, be it within the TickTask
-     * (requestActionsExecution) or during handling a primary-thread check
-     * failure. Instead input specific penalties are executed within the context
-     * that provides the input, e.g. after handling a damage event.
-     * <hr/>
+     * Internal convenience method to get around some of generics.
+     * <hr>
+     * <b>This method must not call
+     * {@link IPenaltyList#addInputSpecificPenalty(InputSpecificPenalty)}</b>
      * 
-     * @return If true, this instance must implement InputSpecificPenalty as
-     *         well.
+     * @param penaltyList
      */
-    public boolean hasInputSpecificEffects();
+    public void addToPenaltyList(IPenaltyList penaltyList);
 
     /**
-     * Apply player-specific effects. Executed within
-     * ViolationData.executeActions, extra to input-specific effects (likely
-     * before those, if within the primary thread, or within the TickTask for
-     * off-primary-thread checks).
+     * Apply the penalty using an appropriate input.
      * 
-     * @param player
+     * @param input
+     * @return If the input was processed. Return true, in order to prevent
+     *         double processing in case of the penalty applying for multiple
+     *         (specific) types. Return false, to keep it in a list.
      */
-    public void apply(Player player);
+    public boolean apply(RI input);
 
 }

@@ -15,36 +15,16 @@
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
 /**
- * Penalty for one type of input.
+ * A reference to a penalty by id. Concept-wise this is meant for an early
+ * configuration processing state to provide place holders. Might get replaced
+ * by a generic placeholder for actions and penalties alike or implemented by a
+ * throw-on-apply penalty implementation.
  * 
  * @author asofold
  *
- * @param <RI>
  */
-public interface GenericPenalty<RI> extends InputSpecificPenalty {
+public interface IPenaltyReference {
 
-    /**
-     * Get the class that determines the accepted input type.
-     * 
-     * @return
-     */
-    public Class<RI> getRegisteredInput();
-
-    /**
-     * Internal convenience method to get around some of generics.
-     * <hr>
-     * <b>This method must not call
-     * {@link IPenaltyList#addInputSpecificPenalty(InputSpecificPenalty)}</b>
-     * 
-     * @param penaltyList
-     */
-    public void addToPenaltyList(IPenaltyList penaltyList);
-
-    /**
-     * Alternative to {@link #apply(Object)}, just typed.
-     * 
-     * @param input
-     */
-    public void applyPrecisely(RI input);
+    public String getReferencedPenaltyId();
 
 }

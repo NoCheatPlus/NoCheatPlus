@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,92 +31,83 @@ public class DefaultPenaltyList implements IPenaltyList {
      * @param <RI>
      */
     private static class GenericNode<RI> {
-        private final List<GenericPenalty<RI>> penalties = new LinkedList<GenericPenalty<RI>>();
+        private final List<Penalty<RI>> penalties = new LinkedList<Penalty<RI>>();
 
-        private void apply(final RI input) {
-            for (final GenericPenalty<RI> penalty : penalties) {
-                penalty.applyPrecisely(input);
+        /**
+         * 
+         * @param input
+         * @param removeAppliedPenalties
+         *            See {@link Penalty#apply(Object)}.
+         * @return True if the list has been emptied, false otherwise.
+         */
+        private boolean apply(final RI input, final boolean removeAppliedPenalties) {
+            final Iterator<Penalty<RI>> it = penalties.iterator();
+            while (it.hasNext()) {
+                if (it.next().apply(input) && removeAppliedPenalties) {
+                    it.remove();
+                }
             }
+            return penalties.isEmpty();
         }
     }
 
-    private boolean isEmpty = true;
-    private boolean hasGeneric = false;
-    private boolean hasNonGeneric= false;
-    private final Map<Class<?>, GenericNode<?>> genericPenalties = new LinkedHashMap<Class<?>, GenericNode<?>>();
-    private final List<InputSpecificPenalty> inputSpecificPenalties = new LinkedList<InputSpecificPenalty>();
+    private boolean willCancel = false;
+    private final Map<Class<?>, GenericNode<?>> penaltyMap = new LinkedHashMap<Class<?>, GenericNode<?>>();
 
     @Override
-    public void addInputSpecificPenalty(final InputSpecificPenalty penalty) {
-        if (penalty == null) {
-            // Until decided how parsing / optimized lists are done.
-            return;
-        }
-        if (penalty instanceof GenericPenalty) {
-            ((GenericPenalty<?>) penalty).addToPenaltyList(this);
+    public <RI> void addPenalty(final Class<RI> registeredInput, 
+            final Penalty<RI> penalty) {
+        if (penalty == CancelPenalty.CANCEL) {
+            willCancel = true;
         }
         else {
-            inputSpecificPenalties.add(penalty);
-            isEmpty = false;
-            hasNonGeneric = true;
+            @SuppressWarnings("unchecked")
+            GenericNode<RI> node = (GenericNode<RI>) penaltyMap.get(registeredInput);
+            if (node == null) {
+                node = new GenericNode<RI>();
+                penaltyMap.put(registeredInput, node);
+            }
+            node.penalties.add(penalty);
         }
     }
 
     @Override
-    public <RI> void addGenericPenalty(final Class<RI> registeredInput, 
-            final GenericPenalty<RI> penalty) {
+    public <RI, I extends RI> void applyPenaltiesPrecisely(
+            final Class<RI> type, final I input, 
+            final boolean removeAppliedPenalties) {
         @SuppressWarnings("unchecked")
-        GenericNode<RI> node = (GenericNode<RI>) genericPenalties.get(registeredInput);
-        if (node == null) {
-            node = new GenericNode<RI>();
-            genericPenalties.put(registeredInput, node);
-        }
-        node.penalties.add(penalty);
-        isEmpty = false;
-        hasGeneric = true;
-    }
-
-    @Override
-    public <RI, I extends RI> void applyGenericPenaltiesPrecisely(
-            final Class<RI> type, final I input) {
-        @SuppressWarnings("unchecked")
-        final GenericNode<RI> node = (GenericNode<RI>) genericPenalties.get(type);
-        if (node != null) {
-            node.apply(input);
+        final GenericNode<RI> node = (GenericNode<RI>) penaltyMap.get(type);
+        if (node != null && node.apply(input, removeAppliedPenalties)
+                && removeAppliedPenalties) {
+            penaltyMap.remove(type);
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I> void applyAllApplicableGenericPenalties(final I input) {
+    public <I> void applyAllApplicablePenalties(final I input, 
+            final boolean removeAppliedPenalties) {
         final Class<?> inputClass = input.getClass();
-        for (final Entry<Class<?>, GenericNode<?>> entry : genericPenalties.entrySet()) {
-            if (entry.getKey().isAssignableFrom(inputClass)) {
-                ((GenericNode<? super I>) entry.getValue()).apply(input);
+        final Iterator<Entry<Class<?>, GenericNode<?>>> it = penaltyMap.entrySet().iterator();
+        while (it.hasNext()) {
+            final Entry<Class<?>, GenericNode<?>> entry = it.next();
+            if (entry.getKey().isAssignableFrom(inputClass) && 
+                    ((GenericNode<? super I>) entry.getValue()).apply(input, removeAppliedPenalties)
+                    && removeAppliedPenalties) {
+                it.remove();
             }
         }
     }
 
-    @Override
-    public void applyNonGenericPenalties(Object input) {
-        for (final InputSpecificPenalty penalty : inputSpecificPenalties) {
-            penalty.apply(input);
-        }
-    }
 
     @Override
     public boolean isEmpty() {
-        return isEmpty;
+        return penaltyMap.isEmpty();
     }
 
     @Override
-    public boolean hasGenericPenalties() {
-        return hasGeneric;
-    }
-
-    @Override
-    public boolean hasNonGenericPenalties() {
-        return hasNonGeneric;
+    public boolean willCancel() {
+        return willCancel;
     }
 
 }

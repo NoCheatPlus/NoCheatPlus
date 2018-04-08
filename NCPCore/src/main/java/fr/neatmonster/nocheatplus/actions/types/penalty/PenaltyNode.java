@@ -36,7 +36,7 @@ public class PenaltyNode {
     /** The probability for this node to apply. */
     public final double probability;
     /** Penalty to apply when this node applies. */
-    private final Penalty penalty;
+    private final Penalty<?> penalty;
     /** Child nodes to test when this node applies. */
     private final PenaltyNode[] childNodes;
     /** Indicate that the result is set with the first child node that applies. */
@@ -48,7 +48,7 @@ public class PenaltyNode {
      * @param probability
      * @param penalty
      */
-    public PenaltyNode(Random random, Penalty penalty) {
+    public PenaltyNode(Random random, Penalty<?> penalty) {
         this(random, 1.0, penalty, null, false);
     }
 
@@ -58,7 +58,7 @@ public class PenaltyNode {
      * @param probability
      * @param penalty
      */
-    public PenaltyNode(Random random, double probability, Penalty penalty) {
+    public PenaltyNode(Random random, double probability, Penalty<?> penalty) {
         this(random, probability, penalty, null, false);
     }
 
@@ -71,7 +71,7 @@ public class PenaltyNode {
      *            May be null.
      * @param abortOnApply
      */
-    public PenaltyNode(Random random, double probability, Penalty penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
+    public PenaltyNode(Random random, double probability, Penalty<?> penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
         this.random = random;
         this.probability = probability;
         this.penalty = penalty;
@@ -87,13 +87,13 @@ public class PenaltyNode {
      * @return If this node applies (, which does not necessarily mean that
      *         anything has been appended to results).
      */
-    public boolean evaluate(final Collection<Penalty> results) {
+    public boolean evaluate(final IPenaltyList results) {
         if (probability < 1.0 && random.nextDouble() > probability) {
             // This node does not apply
             return false;
         }
         if (penalty != null) {
-            results.add(penalty);
+            penalty.addToPenaltyList(results);
         }
         for (int i = 0 ; i < childNodes.length; i++) {
             if (childNodes[i].evaluate(results) && abortOnApply) {

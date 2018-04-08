@@ -14,28 +14,17 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
+import org.bukkit.entity.Player;
+
 /**
  * Minimal abstract implementation for player-specific effects.
  * @author asofold
  *
  */
-public abstract class AbstractPlayerPenalty implements Penalty {
+public abstract class AbstractPlayerPenalty extends AbstractPenalty<Player> {
 
-    /**
-     * Always has player-specific effects.
-     */
-    @Override
-    public boolean hasPlayerEffects() {
-        return true;
-    }
-
-    /**
-     * (Override to implement input-specific effects. Should prefer
-     * AbstractGenericPenalty instead, though.)
-     */
-    @Override
-    public boolean hasInputSpecificEffects() {
-        return false;
+    public AbstractPlayerPenalty() {
+        super(Player.class);
     }
 
 }

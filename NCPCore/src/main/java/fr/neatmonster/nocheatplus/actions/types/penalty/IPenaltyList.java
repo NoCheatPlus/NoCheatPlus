@@ -36,54 +36,48 @@ public interface IPenaltyList {
     // TODO: Typed ? + typed per input getter (mapped lists)
 
     /**
-     * Add an input-specific penalty. Generic penalties are stored extra for
-     * more efficient processing.
-     * 
-     * @param penalty
-     */
-    public void addInputSpecificPenalty(InputSpecificPenalty penalty);
-
-    /**
      * Generic method to let the JVM deal with generics.
      * 
      * @param registeredInput
      * @param penalty
      */
-    public <RI> void addGenericPenalty(Class<RI> registeredInput, GenericPenalty<RI> penalty);
+    public <RI> void addPenalty(Class<RI> registeredInput, Penalty<RI> penalty);
 
     /**
      * Apply generic penalties registered exactly for the given type, using the
      * given input.
      * 
+     * @param type
      * @param input
      */
-    public <RI, I extends RI> void applyGenericPenaltiesPrecisely(Class<RI> type, I input);
+    public <RI, I extends RI> void applyPenaltiesPrecisely(Class<RI> type, 
+            I input, boolean removeAppliedPenalties);
 
     /**
      * Apply all generic penalties registered for the type and all super types
      * of the given input
      * 
      * @param input
+     * @param removeAppliedPenalties
+     *            If set to true, penalties that return true for
+     *            {@link Penalty#apply(Object)} will be removed from the list.
      */
-    public <I> void applyAllApplicableGenericPenalties(I input);
+    public <I> void applyAllApplicablePenalties(I input, 
+            boolean removeAppliedPenalties);
 
     /**
-     * Specifically apply non-generic penalties.
      * 
-     * @param input
+     * @return If any penalties are contained. Note: IPenaltyList.isEmpty()
+     *         might return true, despite willCancel set.
      */
-    public void applyNonGenericPenalties(Object input);
-
     public boolean isEmpty();
 
-    public boolean hasGenericPenalties();
-
     /**
-     * Test for InputSpecificPenalty instances that are not GenericPenalty
-     * instances.
+     * Definitive cancel contained.<br/>
+     * Note: IPenaltyList.isEmpty() might return true, despite willCancel set.
      * 
      * @return
      */
-    public boolean hasNonGenericPenalties();
+    public boolean willCancel();
 
 }

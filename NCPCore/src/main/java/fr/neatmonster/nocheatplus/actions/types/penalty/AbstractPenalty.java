@@ -14,8 +14,6 @@
  */
 package fr.neatmonster.nocheatplus.actions.types.penalty;
 
-import org.bukkit.entity.Player;
-
 /**
  * Convenience implementation for input-specific effects (other than Player).
  * 
@@ -24,21 +22,13 @@ import org.bukkit.entity.Player;
  * @param <RI>
  *            The input type accepted by this penalty.
  */
-public abstract class AbstractGenericPenalty<RI> implements GenericPenalty<RI> {
+public abstract class AbstractPenalty<RI> implements Penalty<RI> {
 
     /** The input type accepted by this penalty. */
     private final Class<RI> registeredInput;
 
-    public AbstractGenericPenalty(Class<RI> registeredInput) {
+    public AbstractPenalty(Class<RI> registeredInput) {
         this.registeredInput = registeredInput;
-    }
-
-    /**
-     * Always has input-specific effects.
-     */
-    @Override
-    public boolean hasInputSpecificEffects() {
-        return true;
     }
 
     @Override
@@ -46,49 +36,22 @@ public abstract class AbstractGenericPenalty<RI> implements GenericPenalty<RI> {
         return registeredInput;
     }
 
-    /**
-     * (Override to use player-specific effects. Consider using
-     * AbstractPlayerPenalty instead, for simple player-specific-only
-     * penalties.)
-     */
     @Override
-    public boolean hasPlayerEffects() {
-        return false;
-    }
-
-    /**
-     * Override to use player-specific effects.
-     */
-    @Override
-    public void apply(Player player) {
-    }
-
-    /**
-     * Implements isAssignableFrom test, to delegate to applyGenericEffects(RI).
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> void apply(T input) {
-        if (registeredInput.isAssignableFrom(input.getClass())) {
-            applyGenericEffects((RI) input);
-        }
-    }
-
-    @Override
-    public  void applyPrecisely(final RI input) {
-        applyGenericEffects(input);
+    public boolean apply(final RI input) {
+        return applyGenericEffects(input);
     }
 
     @Override
     public void addToPenaltyList(final IPenaltyList penaltyList) {
-        penaltyList.addGenericPenalty(registeredInput, this);
+        penaltyList.addPenalty(registeredInput, this);
     }
 
     /**
      * Override for implementation of input-specific effects.
      * 
      * @param input
+     * @return See: {@link AbstractPenalty#apply(Object)}
      */
-    protected abstract void applyGenericEffects(RI input);
+    protected abstract boolean applyGenericEffects(RI input);
 
 }

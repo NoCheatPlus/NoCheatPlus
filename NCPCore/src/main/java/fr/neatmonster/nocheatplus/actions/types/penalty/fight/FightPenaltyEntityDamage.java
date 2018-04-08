@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.actions.types.penalty.fight;
 
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractGenericPenalty;
+import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractPenalty;
 
 /**
  * Basic fight specific penalty.
@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractGenericPenalty;
  * @author asofold
  *
  */
-public abstract class FightPenaltyEntityDamage extends AbstractGenericPenalty<EntityDamageEvent> {
+public abstract class FightPenaltyEntityDamage extends AbstractPenalty<EntityDamageEvent> {
 
     public FightPenaltyEntityDamage() {
         super(EntityDamageEvent.class);
