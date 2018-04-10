@@ -24,11 +24,17 @@ package fr.neatmonster.nocheatplus.actions.types.penalty;
 public final class CancelPenalty implements Penalty<CancelPenalty> {
 
     public static final CancelPenalty CANCEL = new CancelPenalty();
-    
+    private static boolean locked = false;
+
     public CancelPenalty() {
         super(); // Magic.
-        if (this != CANCEL) {
-            throw new IllegalStateException("CancelPenalty.CANCEL is supposed to be the unique instance.");
+        synchronized(CancelPenalty.class) {
+            if (CancelPenalty.locked) {
+                throw new IllegalStateException("CancelPenalty.CANCEL is supposed to be the unique instance.");
+            }
+            else {
+                CancelPenalty.locked = true;
+            }
         }
     }
 

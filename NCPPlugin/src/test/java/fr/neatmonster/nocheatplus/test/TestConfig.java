@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.config.PathUtils;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -97,6 +98,12 @@ public class TestConfig {
         if (val != 3.0) {
             fail("Expect 3.0 (not set), got instead: " + val);
         }
+    }
+
+    @Test
+    public void testActionLists() {
+        ConfigFile config = new DefaultConfig();
+        config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, null);
     }
 
 }
