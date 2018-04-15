@@ -64,6 +64,7 @@ import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
@@ -88,6 +89,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     protected final Items items 		= addCheck(new Items());
 
     private final Open open 			= addCheck(new Open());
+
+    private final boolean hasInventoryAction;
 
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
@@ -128,6 +131,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                 .addToGroups(CheckType.INVENTORY, true, IData.class, ICheckData.class)
                 .context() //
                 );
+        hasInventoryAction = ReflectionUtil.getClass("org.bukkit.event.inventory.InventoryAction") != null;
     }
 
     /**
@@ -219,8 +223,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         final IPlayerData pData = DataManager.getPlayerData(player);
         final InventoryData data = pData.getGenericInstance(InventoryData.class);
         final int slot = event.getSlot();
+        final String inventoryAction = hasInventoryAction ? event.getAction().name() : null;
         if (pData.isDebugActive(checkType)) {
-            outputDebugInventoryClick(player, slot, event, data);
+            outputDebugInventoryClick(player, slot, event, inventoryAction, data);
         }
         if (slot == InventoryView.OUTSIDE || slot < 0) {
             data.lastClickTime = now;
@@ -252,12 +257,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative) {
                 if (fastClick.check(player, now, 
                         event.getView(), slot, cursor, clicked, event.isShiftClick(), 
-                        data, cc, pData)) {
+                        inventoryAction, data, cc, pData)) {
                     // The check requested the event to be cancelled.
                     cancel = true;
                 }
-                // Feed the improbable.
-                Improbable.feed(player, 0.7f, System.currentTimeMillis());
             }
         }
         data.lastClickTime = now;
@@ -275,7 +278,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
      * @param event
      * @param data
      */
-    private void outputDebugInventoryClick(final Player player, final int slot, final InventoryClickEvent event, 
+    private void outputDebugInventoryClick(final Player player, 
+            final int slot, final InventoryClickEvent event, 
+            final String action,
             final InventoryData data) {
         // TODO: Check if this breaks legacy compat (disable there perhaps).
         // TODO: Consider only logging where different from expected (CraftXY, more/other viewer than player). 
@@ -302,6 +307,11 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
         // Top inventory.
         addInventory(player, view.getBottomInventory(), " , Top: ", builder);
+        
+        if (action != null) {
+            builder.append(" , Action: ");
+            builder.append(action);
+        }
 
         // Event class.
         builder.append(" , Event: ");

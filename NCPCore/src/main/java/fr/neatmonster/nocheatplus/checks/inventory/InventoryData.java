@@ -15,6 +15,7 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.InventoryView;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.utilities.ds.count.ActionFrequency;
@@ -40,8 +41,9 @@ public class InventoryData extends ACheckData {
     // Data of the fast click check.
     //    public boolean  fastClickLastCancelled;
     public final ActionFrequency fastClickFreq = new ActionFrequency(5, 200L);
-    public Material fastClickLastCursor = null;
     public Material fastClickLastClicked = null;
+    public int fastClickLastSlot = InventoryView.OUTSIDE;
+    public Material fastClickLastCursor = null;
     public int fastClickLastCursorAmount = 0;
 
     // Data of the instant bow check.
