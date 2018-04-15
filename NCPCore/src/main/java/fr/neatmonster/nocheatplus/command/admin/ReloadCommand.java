@@ -72,6 +72,7 @@ public class ReloadCommand extends BaseCommand {
         // (Magic/TODO)
         final WorldDataManager worldDataManager = (WorldDataManager) NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager();
         ConfigManager.init(access, worldDataManager);
+        worldDataManager.removeCachedConfigs();
         if (logManager instanceof INotifyReload) { // TODO: This is a band-aid.
             ((INotifyReload) logManager).onReload();
         }
