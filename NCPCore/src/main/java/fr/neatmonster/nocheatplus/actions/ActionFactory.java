@@ -18,8 +18,12 @@ import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
+import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
+import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
+import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
  * Helps with creating Actions out of text string definitions.
@@ -47,6 +51,27 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
         actionDefinition = actionDefinition.toLowerCase();
 
         if (actionDefinition.equals("cancel")) {
+            return new CancelAction<ViolationData, ActionList>();
+        }
+
+        if (actionDefinition.endsWith("%cancel")) {
+            try {
+                Double probability = Double.parseDouble(actionDefinition.substring(
+                        0, actionDefinition.length() - 7));
+                if (!Double.isInfinite(probability) 
+                        && !Double.isNaN(probability) 
+                        && probability > 0.0) {
+                    // TODO: parsing via factory, store implicit penalties there too.
+                    return new PenaltyAction<ViolationData, ActionList>(
+                            "imp_" + actionDefinition, new PenaltyNode(
+                                    CheckUtils.getRandom(), // TODO: store earlier once.
+                                    probability / 100.0, 
+                                    CancelPenalty.CANCEL));
+                }
+            }
+            catch (NumberFormatException e) {
+            }
+            StaticLog.logWarning("Bad probability definition for cancel action: '" + actionDefinition + "', relay to always cancelling.");
             return new CancelAction<ViolationData, ActionList>();
         }
 

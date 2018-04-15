@@ -22,6 +22,8 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.PluginTests;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
+import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
+import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -38,10 +40,36 @@ public class TestActions {
         config.set("actions", "log:dummy:0:0:icf");
         config.set("strings.dummy", "dummy");
         config.set(ConfPaths.LOGGING_ACTIVE, false);
-        ActionList actionList = config.getOptimizedActionList("actions", pReg.getOrRegisterPermission("dummy")) ;
+        ActionList actionList = config.getOptimizedActionList("actions", 
+                pReg.getOrRegisterPermission("dummy")) ;
         Action<ViolationData, ActionList>[] actions = actionList.getActions(0.0);
         if (actions.length != 0) {
             fail("Wrong number of actions.");
+        }
+    }
+
+    @Test
+    public void testCancelWithProbability() {
+        PluginTests.setUnitTestNoCheatPlusAPI(false);
+        PermissionRegistry pReg = NCPAPIProvider.getNoCheatPlusAPI().getPermissionRegistry();
+        final ConfigFile config = new DefaultConfig();
+        config.set("actions", "25%cancel");
+        ActionList actionList = config.getOptimizedActionList("actions", 
+                pReg.getOrRegisterPermission("dummy")) ;
+        Action<ViolationData, ActionList>[] actions = actionList.getActions(0.0);
+        if (actions.length != 1) {
+            fail("Wrong number of actions.");
+        }
+        Action<?, ?> action = actions[0];
+        if (action instanceof PenaltyAction) {
+            PenaltyAction<?, ?> penaltyAction = (PenaltyAction<?, ?>) action;
+            PenaltyNode node = penaltyAction.getPenaltyNode();
+            if (node.probability != (25.0 / 100.0)) {
+                fail("Expect 0.25 probability, got instead: " + node.probability);
+            }
+        }
+        else {
+            fail("Expect a penalty action here.");
         }
     }
 

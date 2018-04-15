@@ -44,6 +44,8 @@ public class PenaltyAction<D extends ActionData, L extends AbstractActionList<D,
     private final PenaltyNode rootNode;
     private final String penaltyId;
 
+    // TODO: executesAlways +- making sense.
+
     /**
      * 
      * @param penaltyId
@@ -77,6 +79,10 @@ public class PenaltyAction<D extends ActionData, L extends AbstractActionList<D,
     @Override
     public String toString() {
         return "penalty:" + penaltyId;
+    }
+
+    public PenaltyNode getPenaltyNode() {
+        return rootNode;
     }
 
 }

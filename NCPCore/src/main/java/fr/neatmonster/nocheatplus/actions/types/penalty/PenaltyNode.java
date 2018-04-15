@@ -45,7 +45,6 @@ public class PenaltyNode {
     /**
      * Convenience: Simple penalty that always applies with no child nodes.
      * @param random
-     * @param probability
      * @param penalty
      */
     public PenaltyNode(Random random, Penalty<?> penalty) {
@@ -70,6 +69,7 @@ public class PenaltyNode {
      * @param childNodes
      *            May be null.
      * @param abortOnApply
+     *            Evaluating child nodes: abort as soon as a child node applies.
      */
     public PenaltyNode(Random random, double probability, Penalty<?> penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
         this.random = random;
