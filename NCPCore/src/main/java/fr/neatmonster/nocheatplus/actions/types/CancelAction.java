@@ -16,9 +16,8 @@ package fr.neatmonster.nocheatplus.actions.types;
 
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.ActionData;
-import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
+import fr.neatmonster.nocheatplus.penalties.CancelPenalty;
+import fr.neatmonster.nocheatplus.penalties.PenaltyNode;
 
 /**
  * Sole purpose is to indicate that an action is to be cancelled 100% (as

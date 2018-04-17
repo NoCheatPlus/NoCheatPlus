@@ -22,12 +22,12 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.PluginTests;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
+import fr.neatmonster.nocheatplus.actions.types.PenaltyAction;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
+import fr.neatmonster.nocheatplus.penalties.PenaltyNode;
 import fr.neatmonster.nocheatplus.permissions.PermissionRegistry;
 
 public class TestActions {

@@ -12,22 +12,27 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty.fight;
+package fr.neatmonster.nocheatplus.penalties.fight;
 
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import fr.neatmonster.nocheatplus.actions.types.penalty.AbstractPenalty;
+import fr.neatmonster.nocheatplus.penalties.AbstractPenalty;
 
 /**
- * Basic fight specific penalty.
+ * Specifically target damage done by entities to entities.
  * 
  * @author asofold
  *
  */
-public abstract class FightPenaltyEntityDamage extends AbstractPenalty<EntityDamageEvent> {
+public abstract class FightPenaltyEntityDamageByEntity extends AbstractPenalty<EntityDamageByEntityEvent> {
 
-    public FightPenaltyEntityDamage() {
-        super(EntityDamageEvent.class);
+    /*
+     * TODO: Implement PvP penalties too (!) - use a special argument created
+     * within fight listener (Player attacker, Player damaged, further).
+     */
+
+    public FightPenaltyEntityDamageByEntity() {
+        super(EntityDamageByEntityEvent.class);
     }
 
 }

@@ -22,11 +22,11 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
-import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.debug.IDebugPlayer;
 import fr.neatmonster.nocheatplus.components.registry.event.IGenericInstanceHandle;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
+import fr.neatmonster.nocheatplus.penalties.IPenaltyList;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.players.IPlayerData;

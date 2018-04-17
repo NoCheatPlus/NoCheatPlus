@@ -12,19 +12,27 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty;
+package fr.neatmonster.nocheatplus.penalties;
+
+import org.bukkit.configuration.MemorySection;
+
+import fr.neatmonster.nocheatplus.actions.ActionFactory;
 
 /**
- * A reference to a penalty by id. Concept-wise this is meant for an early
- * configuration processing state to provide place holders. Might get replaced
- * by a generic placeholder for actions and penalties alike or implemented by a
- * throw-on-apply penalty implementation.
+ * Get config-dependent IPenaltyFactory instances
  * 
  * @author asofold
  *
  */
-public interface IPenaltyReference {
+public interface IPenaltyFactoryFactory {
 
-    public String getReferencedPenaltyId();
+    /**
+     * 
+     * 
+     * @param library
+     * @param actionFactory
+     * @return
+     */
+    public IPenaltyFactory newPenaltyFactory(MemorySection library, ActionFactory actionFactory);
 
 }

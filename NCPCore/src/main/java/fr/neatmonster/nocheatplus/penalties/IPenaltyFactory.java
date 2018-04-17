@@ -12,27 +12,10 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty;
+package fr.neatmonster.nocheatplus.penalties;
 
-import org.bukkit.configuration.MemorySection;
+public interface IPenaltyFactory {
 
-import fr.neatmonster.nocheatplus.actions.ActionFactory;
-
-/**
- * Get config-dependent IPenaltyFactory instances
- * 
- * @author asofold
- *
- */
-public interface IPenaltyFactoryFactory {
-
-    /**
-     * 
-     * 
-     * @param library
-     * @param actionFactory
-     * @return
-     */
-    public IPenaltyFactory newPenaltyFactory(MemorySection library, ActionFactory actionFactory);
+    // TODO: Needs a factory ? Or rather have a
 
 }

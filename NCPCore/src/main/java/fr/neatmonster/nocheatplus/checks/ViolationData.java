@@ -24,13 +24,13 @@ import fr.neatmonster.nocheatplus.actions.ActionData;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.GenericLogAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.DefaultPenaltyList;
-import fr.neatmonster.nocheatplus.actions.types.penalty.IPenaltyList;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
+import fr.neatmonster.nocheatplus.actions.types.PenaltyAction;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.StreamID;
+import fr.neatmonster.nocheatplus.penalties.DefaultPenaltyList;
+import fr.neatmonster.nocheatplus.penalties.IPenaltyList;
 import fr.neatmonster.nocheatplus.permissions.RegisteredPermission;
 
 /**
@@ -193,6 +193,10 @@ public class ViolationData implements IViolationInfo, ActionData {
             if (!penaltyList.isEmpty()) {
                 penaltyList.applyAllApplicablePenalties(player, true);
             }
+            /*
+             * TODO: Concept for penalties running actions. E.g.
+             * penaltyList.applyAllApplicablePenalties(ViolationData, true);
+             */
         } catch (final Exception e) {
             StaticLog.logSevere(e);
             // On exceptions cancel events.

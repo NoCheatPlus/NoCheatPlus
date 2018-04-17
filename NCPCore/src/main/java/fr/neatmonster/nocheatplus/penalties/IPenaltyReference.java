@@ -12,31 +12,19 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty.fight;
-
-import org.bukkit.event.entity.EntityDamageEvent;
-
-import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+package fr.neatmonster.nocheatplus.penalties;
 
 /**
- * Multiply the final damage by a set amount.
+ * A reference to a penalty by id. Concept-wise this is meant for an early
+ * configuration processing state to provide place holders. Might get replaced
+ * by a generic placeholder for actions and penalties alike or implemented by a
+ * throw-on-apply penalty implementation.
  * 
  * @author asofold
  *
  */
-public class FightPenaltyMultiplyDamage extends FightPenaltyEntityDamage {
+public interface IPenaltyReference {
 
-    private final double multiplier;
-
-    public FightPenaltyMultiplyDamage(final double multiplier) {
-        super();
-        this.multiplier = multiplier;
-    }
-
-    @Override
-    protected boolean applyGenericEffects(final EntityDamageEvent event) {
-        BridgeHealth.multiplyFinalDamage(event, multiplier);
-        return true;
-    }
+    public String getReferencedPenaltyId();
 
 }

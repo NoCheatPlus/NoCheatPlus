@@ -12,11 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty;
+package fr.neatmonster.nocheatplus.actions.types;
 
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionData;
+import fr.neatmonster.nocheatplus.penalties.IPenaltyList;
+import fr.neatmonster.nocheatplus.penalties.PenaltyNode;
 
 /**
  * Penalty action, referencing a certain penalty defined elsewhere. <br>

@@ -18,11 +18,11 @@ import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.CancelPenalty;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyAction;
-import fr.neatmonster.nocheatplus.actions.types.penalty.PenaltyNode;
+import fr.neatmonster.nocheatplus.actions.types.PenaltyAction;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.penalties.CancelPenalty;
+import fr.neatmonster.nocheatplus.penalties.PenaltyNode;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**

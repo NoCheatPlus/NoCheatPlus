@@ -12,7 +12,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.neatmonster.nocheatplus.actions.types.penalty;
+package fr.neatmonster.nocheatplus.penalties;
 
 /**
  * Contain applicable penalty types that need to be handled outside of
