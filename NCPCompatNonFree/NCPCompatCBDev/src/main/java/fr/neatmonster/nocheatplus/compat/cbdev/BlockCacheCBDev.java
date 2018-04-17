@@ -28,41 +28,11 @@ import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.EntityBoat;
 import net.minecraft.server.v1_12_R1.EntityShulker;
-import net.minecraft.server.v1_12_R1.EnumDirection;
-import net.minecraft.server.v1_12_R1.IBlockAccess;
-import net.minecraft.server.v1_12_R1.IBlockData;
-import net.minecraft.server.v1_12_R1.TileEntity;
 
 public class BlockCacheCBDev extends BlockCache {
 
     protected net.minecraft.server.v1_12_R1.World world;
     protected World bukkitWorld;
-
-    private final IBlockAccess iBlockAccess = new IBlockAccess() {
-
-        @Override
-        public int getBlockPower(BlockPosition pos, EnumDirection dir) {
-            return world.getBlockPower(pos, dir);
-        }
-
-        @Override
-        public TileEntity getTileEntity(BlockPosition pos) {
-            return world.getTileEntity(pos);
-        }
-
-        @Override
-        public IBlockData getType(BlockPosition pos) {
-            // TODO: Can this be cached ?
-            return world.getType(pos);
-        }
-
-        @Override
-        public boolean isEmpty(BlockPosition pos) {
-            // TODO: Can (and should) this be cached ?
-            return world.isEmpty(pos);
-        }
-
-    };
 
     public BlockCacheCBDev(World world) {
         setAccess(world);
@@ -104,7 +74,7 @@ public class BlockCacheCBDev extends BlockCache {
         final BlockPosition pos = new BlockPosition(x, y, z);
         // TODO: Deprecation warning below (reason / substitute?).
         @SuppressWarnings("deprecation")
-        final AxisAlignedBB bb = block.b(iBlockAccess.getType(pos), iBlockAccess, pos);
+        final AxisAlignedBB bb = block.b(world.getType(pos), world, pos);
         if (bb == null) {
             return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0}; // Special case.
             //return null;
