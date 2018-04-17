@@ -133,6 +133,7 @@ public class ViolationData implements IViolationInfo, ActionData {
                 needsParameters = true;
             }
             if (action instanceof PenaltyAction) {
+                // Note that penalty:action:... or action:penalty:... should be forbidden.
                 ((PenaltyAction<ViolationData, ActionList>) action).evaluate(this.penaltyList);
             }
         }
@@ -146,6 +147,13 @@ public class ViolationData implements IViolationInfo, ActionData {
     @Override
     public boolean willCancel() {
         return willCancel;
+    }
+
+    /**
+     * For penalty evaluation.
+     */
+    public void forceCancel() {
+        willCancel = true;
     }
 
     /**
@@ -193,11 +201,34 @@ public class ViolationData implements IViolationInfo, ActionData {
             if (!penaltyList.isEmpty()) {
                 penaltyList.applyAllApplicablePenalties(player, true);
             }
-            /*
-             * TODO: Concept for penalties running actions. E.g.
-             * penaltyList.applyAllApplicablePenalties(ViolationData, true);
-             */
+            // PenaltyAction instances.
+            if (!penaltyList.isEmpty()) {
+                penaltyList.applyPenaltiesPrecisely(ViolationData.class, this, true);
+            }
         } catch (final Exception e) {
+            StaticLog.logSevere(e);
+            // On exceptions cancel events.
+            willCancel = true;
+        }
+    }
+
+    /**
+     * Execute a single action with try-catch and cancel-on-exception. Intended
+     * for interoperability with penalties.
+     * 
+     * @param action
+     */
+    public void executeAction(final Action<ViolationData, ActionList> action) {
+        try {
+            // Statistics.
+            ViolationHistory.getHistory(player).log(check.getClass().getName(), addedVL);
+            final long time = System.currentTimeMillis() / 1000L;
+            // Execute actions, if history wants it. TODO: Consider storing applicableActions only if history wants it.
+            if (Check.getHistory(player).executeAction(this, action, time)) {
+                action.execute(this);
+            }
+        }
+        catch (final Exception e) {
             StaticLog.logSevere(e);
             // On exceptions cancel events.
             willCancel = true;
