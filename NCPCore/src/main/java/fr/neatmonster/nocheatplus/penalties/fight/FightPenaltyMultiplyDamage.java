@@ -34,7 +34,7 @@ public class FightPenaltyMultiplyDamage extends FightPenaltyEntityDamage {
     }
 
     @Override
-    protected boolean applyGenericEffects(final EntityDamageEvent event) {
+    public boolean apply(final EntityDamageEvent event) {
         BridgeHealth.multiplyFinalDamage(event, multiplier);
         return true;
     }

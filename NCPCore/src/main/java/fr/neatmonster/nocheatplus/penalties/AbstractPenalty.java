@@ -37,21 +37,8 @@ public abstract class AbstractPenalty<RI> implements Penalty<RI> {
     }
 
     @Override
-    public boolean apply(final RI input) {
-        return applyGenericEffects(input);
-    }
-
-    @Override
     public void addToPenaltyList(final IPenaltyList penaltyList) {
         penaltyList.addPenalty(registeredInput, this);
     }
-
-    /**
-     * Override for implementation of input-specific effects.
-     * 
-     * @param input
-     * @return See: {@link AbstractPenalty#apply(Object)}
-     */
-    protected abstract boolean applyGenericEffects(RI input);
 
 }
