@@ -21,7 +21,7 @@ package fr.neatmonster.nocheatplus.penalties;
  * @author asofold
  *
  */
-public final class CancelPenalty implements Penalty<CancelPenalty> {
+public final class CancelPenalty implements IPenalty<CancelPenalty> {
 
     public static final CancelPenalty CANCEL = new CancelPenalty();
     private static boolean locked = false;

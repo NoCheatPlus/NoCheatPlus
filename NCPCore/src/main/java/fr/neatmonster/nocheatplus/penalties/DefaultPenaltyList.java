@@ -31,17 +31,17 @@ public class DefaultPenaltyList implements IPenaltyList {
      * @param <RI>
      */
     private static class GenericNode<RI> {
-        private final List<Penalty<RI>> penalties = new LinkedList<Penalty<RI>>();
+        private final List<IPenalty<RI>> penalties = new LinkedList<IPenalty<RI>>();
 
         /**
          * 
          * @param input
          * @param removeAppliedPenalties
-         *            See {@link Penalty#apply(Object)}.
+         *            See {@link IPenalty#apply(Object)}.
          * @return True if the list has been emptied, false otherwise.
          */
         private boolean apply(final RI input, final boolean removeAppliedPenalties) {
-            final Iterator<Penalty<RI>> it = penalties.iterator();
+            final Iterator<IPenalty<RI>> it = penalties.iterator();
             while (it.hasNext()) {
                 if (it.next().apply(input) && removeAppliedPenalties) {
                     it.remove();
@@ -56,7 +56,7 @@ public class DefaultPenaltyList implements IPenaltyList {
 
     @Override
     public <RI> void addPenalty(final Class<RI> registeredInput, 
-            final Penalty<RI> penalty) {
+            final IPenalty<RI> penalty) {
         if (penalty == CancelPenalty.CANCEL) {
             willCancel = true;
         }

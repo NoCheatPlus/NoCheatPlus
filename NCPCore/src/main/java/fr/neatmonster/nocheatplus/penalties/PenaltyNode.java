@@ -36,7 +36,7 @@ public class PenaltyNode {
     /** The probability for this node to apply. */
     public final double probability;
     /** Penalty to apply when this node applies. */
-    private final Penalty<?> penalty;
+    private final IPenalty<?> penalty;
     /** Child nodes to test when this node applies. */
     private final PenaltyNode[] childNodes;
     /** Indicate that the result is set with the first child node that applies. */
@@ -47,7 +47,7 @@ public class PenaltyNode {
      * @param random
      * @param penalty
      */
-    public PenaltyNode(Random random, Penalty<?> penalty) {
+    public PenaltyNode(Random random, IPenalty<?> penalty) {
         this(random, 1.0, penalty, null, false);
     }
 
@@ -57,7 +57,7 @@ public class PenaltyNode {
      * @param probability
      * @param penalty
      */
-    public PenaltyNode(Random random, double probability, Penalty<?> penalty) {
+    public PenaltyNode(Random random, double probability, IPenalty<?> penalty) {
         this(random, probability, penalty, null, false);
     }
 
@@ -71,7 +71,7 @@ public class PenaltyNode {
      * @param abortOnApply
      *            Evaluating child nodes: abort as soon as a child node applies.
      */
-    public PenaltyNode(Random random, double probability, Penalty<?> penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
+    public PenaltyNode(Random random, double probability, IPenalty<?> penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
         this.random = random;
         this.probability = probability;
         this.penalty = penalty;

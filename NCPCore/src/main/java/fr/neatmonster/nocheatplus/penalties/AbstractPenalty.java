@@ -22,7 +22,7 @@ package fr.neatmonster.nocheatplus.penalties;
  * @param <RI>
  *            The input type accepted by this penalty.
  */
-public abstract class AbstractPenalty<RI> implements Penalty<RI> {
+public abstract class AbstractPenalty<RI> implements IPenalty<RI> {
 
     /** The input type accepted by this penalty. */
     private final Class<RI> registeredInput;

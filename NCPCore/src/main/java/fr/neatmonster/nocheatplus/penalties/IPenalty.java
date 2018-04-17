@@ -21,7 +21,7 @@ package fr.neatmonster.nocheatplus.penalties;
  *
  * @param <RI>
  */
-public interface Penalty<RI> {
+public interface IPenalty<RI> {
 
     /**
      * Get the class that determines the accepted input type.

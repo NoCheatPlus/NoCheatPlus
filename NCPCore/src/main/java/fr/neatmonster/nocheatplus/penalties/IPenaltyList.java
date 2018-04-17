@@ -41,7 +41,7 @@ public interface IPenaltyList {
      * @param registeredInput
      * @param penalty
      */
-    public <RI> void addPenalty(Class<RI> registeredInput, Penalty<RI> penalty);
+    public <RI> void addPenalty(Class<RI> registeredInput, IPenalty<RI> penalty);
 
     /**
      * Apply generic penalties registered exactly for the given type, using the
@@ -60,7 +60,7 @@ public interface IPenaltyList {
      * @param input
      * @param removeAppliedPenalties
      *            If set to true, penalties that return true for
-     *            {@link Penalty#apply(Object)} will be removed from the list.
+     *            {@link IPenalty#apply(Object)} will be removed from the list.
      */
     public <I> void applyAllApplicablePenalties(I input, 
             boolean removeAppliedPenalties);
