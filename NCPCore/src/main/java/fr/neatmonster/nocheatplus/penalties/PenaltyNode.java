@@ -39,7 +39,9 @@ public class PenaltyNode {
     private final IPenalty<?> penalty;
     /** Child nodes to test when this node applies. */
     private final PenaltyNode[] childNodes;
-    /** Indicate that the result is set with the first child node that applies. */
+    /**
+     * Indicate that the result is set with the first child node that applies.
+     */
     private final boolean abortOnApply;
 
     /**
@@ -66,12 +68,15 @@ public class PenaltyNode {
      * @param random
      * @param probability
      * @param penalty
+     *            Note that child penalties are still evaluated, if penalty is
+     *            not null and abortOnApply is set.
      * @param childNodes
-     *            May be null.
+     *            May be null. No scaling/normalizing is applied here.
      * @param abortOnApply
      *            Evaluating child nodes: abort as soon as a child node applies.
      */
-    public PenaltyNode(Random random, double probability, IPenalty<?> penalty, Collection<PenaltyNode> childNodes, boolean abortOnApply) {
+    public PenaltyNode(Random random, double probability, IPenalty<?> penalty,
+            Collection<PenaltyNode> childNodes, boolean abortOnApply) {
         this.random = random;
         this.probability = probability;
         this.penalty = penalty;
@@ -87,20 +92,69 @@ public class PenaltyNode {
      * @return If this node applies (, which does not necessarily mean that
      *         anything has been appended to results).
      */
-    public boolean evaluate(final IPenaltyList results) {
+    public final boolean evaluate(final IPenaltyList results) {
+        // (Set final to ensure return behavior.)
         if (probability < 1.0 && random.nextDouble() > probability) {
             // This node does not apply
             return false;
         }
+        add(results);
+        return true;
+    }
+
+    /**
+     * Add this node and evaluate children (add applicable ancestor-penalties to
+     * the list).
+     * 
+     * @param results
+     */
+    protected void add(final IPenaltyList results) {
         if (penalty != null) {
+            /*
+             * TODO: Consider abortOnApply taking effect here (typically this is
+             * a leaf, if penalty is not null, but that isn't enforced yet).
+             */
             penalty.addToPenaltyList(results);
         }
-        for (int i = 0 ; i < childNodes.length; i++) {
-            if (childNodes[i].evaluate(results) && abortOnApply) {
-                break;
+        if (childNodes.length > 0) {
+            if (abortOnApply) {
+                evaluateChildrenFCFS(results);
+            }
+            else {
+                evaluateAllChildren(results);
             }
         }
-        return true;
+    }
+
+    /**
+     * For choice of children one random 
+     * @param results
+     */
+    protected void evaluateChildrenFCFS(final IPenaltyList results) {
+        final double ref = random.nextDouble(); // No scale contained yet.
+        double floor = 0.0;
+        for (int i = 0 ; i < childNodes.length; i++) {
+            final PenaltyNode childNode = childNodes[i];
+            final double nextFloor = floor + childNode.probability;
+            // TODO: Configurable catch-all amount.
+            if (nextFloor >= ref || nextFloor >= 0.999) {
+                childNode.add(results);
+                return;
+            }
+            floor = nextFloor;
+        }
+    }
+
+    /**
+     * Each of children can apply, which means for each child at least one
+     * further random number is generated.
+     * 
+     * @param results
+     */
+    protected void evaluateAllChildren(final IPenaltyList results) {
+        for (int i = 0 ; i < childNodes.length; i++) {
+            childNodes[i].evaluate(results);
+        }
     }
 
 }
