@@ -112,7 +112,10 @@ public class PlayerData implements IPlayerData {
     private static float heavyLoad = 500000f / (float) ticksMonitored;
 
     // Default tags.
+    // TODO: Move elsewhere (API?)
     public static final String TAG_NOTIFY_OFF = "notify_off";
+    /** Optimistic player data creation. */
+    public static final String TAG_OPTIMISTIC_CREATE = "optimistic_create";
 
     private static final short frequentTaskLazyDefaultDelay = 10;
     private static final short frequentTaskUnregisterDefaultDelay = 2;
@@ -142,9 +145,9 @@ public class PlayerData implements IPlayerData {
 
     // TODO: Names could/should get updated. (In which case?)
     /** Exact case name of the player. */
-    private final String playerName;
+    private String playerName;
     /** Lower case name of the player. */
-    private final String lcName;
+    private String playerNameLowerCase;
 
     private long lastJoinTime = 0;
 
@@ -195,8 +198,13 @@ public class PlayerData implements IPlayerData {
             final PermissionRegistry permissionRegistry) {
         this.playerId = playerId;
         this.playerName = playerName;
-        this.lcName = playerName.toLowerCase();
+        this.playerNameLowerCase = playerName.toLowerCase();
         this.permissionRegistry = permissionRegistry;
+    }
+
+    void updatePlayerName(final String exactPlayerName) {
+        this.playerName = exactPlayerName;
+        this.playerNameLowerCase = exactPlayerName.toLowerCase();
     }
 
     /**
@@ -486,8 +494,10 @@ public class PlayerData implements IPlayerData {
      */
     void updateCurrentWorld(final IWorldData worldData) {
         // TODO: Consider storing last world too.
-        currentWorldData = worldData;
-        checkTypeTree.getNode(CheckType.ALL).updateDebug(worldData);
+        if (currentWorldData != worldData) {
+            currentWorldData = worldData;
+            checkTypeTree.getNode(CheckType.ALL).updateDebug(worldData);
+        }
     }
 
     private void invalidateOffline() {
@@ -627,7 +637,7 @@ public class PlayerData implements IPlayerData {
 
     @Override
     public String getPlayerNameLowerCase() {
-        return lcName;
+        return playerNameLowerCase;
     }
 
     @Override

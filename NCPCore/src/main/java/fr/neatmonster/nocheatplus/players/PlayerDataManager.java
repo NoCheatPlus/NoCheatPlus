@@ -33,9 +33,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
@@ -217,6 +219,31 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
             @Override
             public void onEvent(final PlayerKickEvent event) {
                 playerLeaves(event.getPlayer());
+            }
+        },
+        new MiniListener<AsyncPlayerPreLoginEvent>() {
+            @EventHandler(priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            @Override
+            public void onEvent(final AsyncPlayerPreLoginEvent event) {
+                // TODO: Maintain a flag for precondition (e.g. ProtocolLib present).
+                if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+                    onAsyncPlayerPreLogin(event);
+                }
+            }
+        },
+        new MiniListener<PlayerLoginEvent>() {
+            @EventHandler(priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = "system.nocheatplus.datamanager", beforeTag = ".*")
+            @Override
+            public void onEvent(final PlayerLoginEvent event) {
+                // TODO: Maintain a flag for precondition (e.g. ProtocolLib present).
+                if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+                    onPlayerLogin(event);
+                }
+                else {
+                    onPlayerLoginDenied(event);
+                }
             }
         },
         new MiniListener<PlayerJoinEvent>() {
@@ -555,6 +582,70 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         playerMap.remove(player);
     }
 
+    /**
+     * Ensure a PlayerData instance exists for later use.
+     * 
+     * @param event
+     */
+    private void onAsyncPlayerPreLogin(final AsyncPlayerPreLoginEvent event) {
+        final UUID playerId = event.getUniqueId(); // Treat carefully :).
+        if (playerData.containsKey(playerId)) {
+            // Skip if a PlayerData instance already exists.
+            return;
+        }
+        else {
+            // Create with default world data.
+            getPlayerData(playerId, event.getName(), true, worldDataManager.getDefaultWorldData()).addTag(PlayerData.TAG_OPTIMISTIC_CREATE);
+        }
+    }
+
+    private void onPlayerLoginDenied(final PlayerLoginEvent event) {
+        // Consistency check existing data.
+        final UUID playerId = event.getPlayer().getUniqueId();
+        final PlayerData pData = getPlayerData(playerId);
+        if (pData != null && pData.hasTag(PlayerData.TAG_OPTIMISTIC_CREATE)) {
+            bulkPlayerDataRemoval.add(playerId);
+        }
+    }
+
+    /**
+     * Just update the world data for later use.
+     * 
+     * @param event
+     */
+    private void onPlayerLogin(final PlayerLoginEvent event) {
+        // Consistency check existing data.
+        final Player player = event.getPlayer();
+        final UUID playerId = player.getUniqueId();
+        final PlayerData pData = getPlayerData(playerId);
+        if (pData == null) {
+            // Create an instance.
+            // TODO: Legacy server compatibility with world getting?
+            getPlayerData(player);
+        }
+        else {
+            // Consistency check.
+            final String playerName = pData.getPlayerName();
+            if (!playerName.equals(player.getName())) {
+                updatePlayerName(playerId, playerName, pData, "login");
+            }
+            // Update world.
+            pData.updateCurrentWorld(worldDataManager.getWorldData(player.getWorld()));
+        }
+        pData.removeTag(PlayerData.TAG_OPTIMISTIC_CREATE);
+    }
+
+    private void updatePlayerName(final UUID playerId, final String playerName,
+            final PlayerData pData, String tag) {
+        // Name change.
+        pData.updatePlayerName(playerName);
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.STATUS, 
+                CheckUtils.getLogMessagePrefix(playerName, null) 
+                + " Update player name for id " + playerId + ": " + playerName 
+                + "(" + tag + (pData.hasTag(PlayerData.TAG_OPTIMISTIC_CREATE) ? 
+                        ", optimistically created data" : "") + ")");
+    }
+
     private void playerJoins(final PlayerJoinEvent event) {
         final long timeNow = System.currentTimeMillis();
         final Player player = event.getPlayer();
@@ -564,10 +655,12 @@ public class PlayerDataManager  implements IPlayerDataManager, ComponentWithName
         addOnlinePlayer(player);
         //
         final PlayerData pData = getPlayerData(player, true);
-        /*
-         * TODO: Now we update the world already with getPlayerData, in case
-         * it's just been created...
-         */
+        // Consistency check.
+        final String playerName = pData.getPlayerName();
+        if (!playerName.equals(player.getName())) {
+            updatePlayerName(playerId, playerName, pData, "login");
+        }
+        // Data stuff.
         final Collection<Class<? extends IDataOnJoin>> types = factoryRegistry.getGroupedTypes(IDataOnJoin.class);
         pData.onPlayerJoin(player, player.getWorld(), timeNow, worldDataManager, types);
         pData.getGenericInstance(CombinedData.class).lastJoinTime = timeNow; 

@@ -1278,7 +1278,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 }
                 final Player player = event.getPlayer();
                 // Check if login is denied (plus expiration check).
-                // TODO: Store by id + HashMapLOW.
+                // TODO: Store by id + HashMapLOW + AsyncPlayerPreLogin.
                 if (checkDenyLoginsNames(player.getName())) {
                     if (DataManager.getPlayerData(player).hasPermission(Permissions.BYPASS_DENY_LOGIN, player)) {
                         return;
