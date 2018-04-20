@@ -158,7 +158,7 @@ public class MovingFlying extends BaseAdapter {
             return;
         }
         final Player player = event.getPlayer();
-        final IPlayerData pData = DataManager.getPlayerData(player);
+        final IPlayerData pData = DataManager.getPlayerDataSafe(player);
         final NetData data = pData.getGenericInstance(NetData.class);
         final AlmostBoolean matched = data.teleportQueue.processAck(teleportId);
         if (matched.decideOptimistically()) {
@@ -195,7 +195,7 @@ public class MovingFlying extends BaseAdapter {
             return;
         }
 
-        final IPlayerData pData = DataManager.getPlayerData(player);
+        final IPlayerData pData = DataManager.getPlayerDataSafe(player);
         // Always update last received time.
         final NetData data = pData.getGenericInstance(NetData.class);
         data.lastKeepAliveTime = time; // Update without much of a contract.

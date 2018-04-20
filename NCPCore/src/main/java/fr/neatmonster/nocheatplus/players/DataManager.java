@@ -259,4 +259,28 @@ public class DataManager {
         return instance.getNewInstance(registeredFor, arg);
     }
 
+    /**
+     * Attempt to get or create an IPlayerData instance. Creation will only be
+     * done, if the player name, UUID and world can be fetched.
+     * 
+     * @param player
+     * @return null in case of failures.
+     */
+    public static IPlayerData getPlayerDataSafe(final Player player) {
+        try {
+            return getPlayerData(player);
+        } 
+        catch (UnsupportedOperationException e) {}
+        try {
+            return getPlayerData(player.getUniqueId());
+        } 
+        catch (UnsupportedOperationException e) {}
+        try {
+            return getPlayerData(player.getName());
+        } 
+        catch (UnsupportedOperationException e) {}
+        // Failure.
+        return null;
+    }
+
 }

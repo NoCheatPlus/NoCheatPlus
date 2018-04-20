@@ -65,7 +65,7 @@ public class KeepAliveAdapter extends BaseAdapter {
             return;
         }
         // Always update last received time.
-        final IPlayerData pData = DataManager.getPlayerData(player);
+        final IPlayerData pData = DataManager.getPlayerDataSafe(player);
         final NetData data = pData.getGenericInstance(NetData.class);
         data.lastKeepAliveTime = time;
         final NetConfig cc = pData.getGenericInstance(NetConfig.class);

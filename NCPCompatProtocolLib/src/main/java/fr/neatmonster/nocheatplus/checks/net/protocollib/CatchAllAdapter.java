@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.net.NetConfig;
 import fr.neatmonster.nocheatplus.checks.net.NetData;
 import fr.neatmonster.nocheatplus.checks.net.PacketFrequency;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 
@@ -73,7 +74,11 @@ public class CatchAllAdapter extends BaseAdapter {
             // TODO: Is this a problem, as the server has the player so it could break a block)?
             return;
         }
-        final IPlayerData pData = DataManager.getPlayerData(player);
+        final IPlayerData pData = DataManager.getPlayerDataSafe(player);
+        if (pData == null) {
+            StaticLog.logWarning("Failed to fetch player data with " + event.getPacketType() + " for: " + player.toString());
+            return;
+        }
         if (packetFrequency.isEnabled(player, pData)) {
             final NetConfig cc = pData.getGenericInstance(NetConfig.class);
             final NetData data = pData.getGenericInstance(NetData.class);
