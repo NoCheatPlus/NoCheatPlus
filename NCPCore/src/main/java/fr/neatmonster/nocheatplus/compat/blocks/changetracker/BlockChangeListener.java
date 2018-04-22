@@ -25,7 +25,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -106,6 +106,7 @@ public class BlockChangeListener implements Listener {
             }
         },
         new MiniListener<PlayerInteractEvent>() {
+            // Include cancelled events, due to the use-block part.
             @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
             @RegisterMethodWithOrder(tag = defaultTag)
             @Override
@@ -114,7 +115,31 @@ public class BlockChangeListener implements Listener {
                     onPlayerInteract(event);
                 }
             }
+        },
+        new MiniListener<BlockFormEvent>() {
+            @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+            @RegisterMethodWithOrder(tag = defaultTag)
+            @Override
+            public void onEvent(BlockFormEvent event) {
+                if (enabled) {
+                    onBlockForm(event);
+                }
+            }
         }
+        //        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+        //        public void onBlockPhysics (final BlockPhysicsEvent event) {
+        //            if (!enabled) {
+        //                return;
+        //            }
+        //            // TODO: Fine grained enabling state (pistons, doors, other).
+        //            final Block block = event.getBlock();
+        //            if (block == null || !physicsMaterials.contains(block.getType())) {
+        //                return;
+        //            }
+        //            // TODO: MaterialData -> Door, upper/lower half needed ?
+        //            tracker.addBlocks(block); // TODO: Skip too fast changing states?
+        //            DebugUtil.debug("BlockPhysics: " + block); // TODO: REMOVE
+        //        }
     };
 
     public BlockChangeListener(final BlockChangeTracker tracker) {
@@ -178,7 +203,6 @@ public class BlockChangeListener implements Listener {
 
     private void onPistonExtend(final BlockPistonExtendEvent event) {
         final BlockFace direction = event.getDirection();
-        //DebugUtil.debug("EXTEND event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()));
         tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
     }
 
@@ -208,24 +232,8 @@ public class BlockChangeListener implements Listener {
         // TODO: Special cases (don't push upwards on retract, with the resulting location being a solid block).
         final Block pistonBlock = event.getBlock();
         final BlockFace direction = getRetractDirection(pistonBlock, event.getDirection());
-        //DebugUtil.debug("RETRACT event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()) + " decide=" + getRetractDirection(event.getBlock(),  event.getDirection()));
         tracker.addPistonBlocks(pistonBlock.getRelative(direction.getOppositeFace()), direction, blocks);
     }
-
-    //        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    //        public void onBlockPhysics (final BlockPhysicsEvent event) {
-    //            if (!enabled) {
-    //                return;
-    //            }
-    //            // TODO: Fine grained enabling state (pistons, doors, other).
-    //            final Block block = event.getBlock();
-    //            if (block == null || !physicsMaterials.contains(block.getType())) {
-    //                return;
-    //            }
-    //            // TODO: MaterialData -> Door, upper/lower half needed ?
-    //            tracker.addBlocks(block); // TODO: Skip too fast changing states?
-    //            DebugUtil.debug("BlockPhysics: " + block); // TODO: REMOVE
-    //        }
 
     private void onBlockRedstone(final BlockRedstoneEvent event) {
         final int oldCurrent = event.getOldCurrent();
@@ -244,55 +252,71 @@ public class BlockChangeListener implements Listener {
     }
 
     private void addRedstoneBlock(final Block block) {
-        addSimpleBlock(block, BlockProperties.F_VARIABLE_REDSTONE);
+        addBlockWithAttachedPotential(block, BlockProperties.F_VARIABLE_REDSTONE);
     }
-
-    //    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    //    public void onEntityFormBlock(final EntityBlockFormEvent event) {
-    //        if (!enabled) {
-    //            return;
-    //        }
-    //        final Block block = event.getBlock();
-    //        if (block != null) {
-    //            // TODO: Filters?
-    //            tracker.addBlocks(block);
-    //            DebugUtil.debug("EntityFormBlock: " + block); // TODO: REMOVE
-    //        }
-    //    }
 
     private void onEntityChangeBlock(final EntityChangeBlockEvent event) {
         final Block block = event.getBlock();
         if (block != null) {
-            // TODO: Filters?
             tracker.addBlocks(block); // E.g. falling blocks like sand.
-            //DebugUtil.debug("EntityChangeBlock: " + block); // TODO: REMOVE
         }
     }
 
     private void onPlayerInteract(final PlayerInteractEvent event) {
         // Check preconditions.
+        final org.bukkit.event.block.Action action = event.getAction();
+        if (action == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
+            onRightClickBlock(event);
+        }
+        else if (!event.isCancelled()) {
+            if (action == org.bukkit.event.block.Action.PHYSICAL) {
+                onInteractPhysical(event);
+            }
+        }
+    }
+
+    private void onInteractPhysical(final PlayerInteractEvent event) {
+        final Block block = event.getClickedBlock();
+        if (block != null) {
+            final Material type = block.getType();
+            // TODO: Consider a flag.
+            if (type == Material.SOIL) {
+                tracker.addBlocks(block);
+            }
+        }
+    }
+
+    private void onRightClickBlock(final PlayerInteractEvent event) {
         final Result result = event.useInteractedBlock();
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK
-                && (result == Result.ALLOW 
-                || !event.isCancelled() && result == Result.DEFAULT)) {
+        if ((result == Result.ALLOW 
+                || result == Result.DEFAULT && !event.isCancelled())) {
             final Block block = event.getClickedBlock();
             if (block != null) {
                 final Material type = block.getType();
+                // TODO: Dirt/Grass (/Podzol+-spelling) -> flag. Add, if a hoe is used.
                 if ((BlockProperties.getBlockFlags(type) | BlockProperties.F_VARIABLE_USE) != 0L) {
-                    addSimpleBlock(block, BlockProperties.F_VARIABLE_USE);
+                    addBlockWithAttachedPotential(block, BlockProperties.F_VARIABLE_USE);
                 }
             }
         }
     }
 
+    private void onBlockForm(final BlockFormEvent event) {
+        final Block block = event.getBlock();
+        if (block != null) {
+            // TODO: Filter by player activity.
+            tracker.addBlocks(block);
+        }
+    }
+
     /**
      * Add a past state for this block, extending for the other block in case of
-     * doors.
+     * doors. This is for the case of interaction or redstone level change.
      * 
      * @param block
      * @param relevantFlags
      */
-    private void addSimpleBlock(final Block block, final long relevantFlags) {
+    private void addBlockWithAttachedPotential(final Block block, final long relevantFlags) {
         final MaterialData materialData = block.getState().getData();
         if (materialData instanceof Door) {
             final Door door = (Door) materialData;
@@ -309,7 +333,7 @@ public class BlockChangeListener implements Listener {
                 return;
             }
         }
-        // Only the single block remains.
+        // Only add the block in question itself.
         tracker.addBlocks(block);
     }
 
