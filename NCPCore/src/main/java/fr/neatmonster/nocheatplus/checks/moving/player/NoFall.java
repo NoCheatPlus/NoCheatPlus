@@ -37,6 +37,17 @@ import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
  */
 public class NoFall extends Check {
 
+    /*
+     * TODO: Due to soil not converting back to dirt with the current
+     * implementation: Implement packet sync with moving events. Then alter
+     * packet on-ground and mc fall distance for a new default concept. As a
+     * fall back either the old method, or an adaption with scheduled/later fall
+     * damage dealing could be considered, detecting the actual cheat with a
+     * slight delay. Packet sync will need a better tracking than the last n
+     * packets, e.g. include the latest/oldest significant packet for (...) and
+     * if a packet has already been related to a Bukkit event.
+     */
+
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
     private final Location useLoc = new Location(null, 0, 0, 0);
 
@@ -377,6 +388,7 @@ public class NoFall extends Check {
                 // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
                 // Might consider triggering violations here as well.
                 final float yDiff = (float) (data.noFallMaxY - playerY);
+                // TODO: Consider to only use one accounting method (maxY). 
                 final float maxDist = Math.max(yDiff, data.noFallFallDistance);
                 player.setFallDistance(maxDist);
             }
