@@ -31,6 +31,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.worlds.IWorldData;
 import fr.neatmonster.nocheatplus.worlds.WorldDataManager;
 
 public class TestWorldDataManager {
@@ -84,7 +85,7 @@ public class TestWorldDataManager {
 
         WorldDataManager worldMan = getWorldDataManager();
 
-        final Map<String, ConfigFile> rawWorldConfigs = new LinkedHashMap<String, ConfigFile>();
+        Map<String, ConfigFile> rawWorldConfigs = new LinkedHashMap<String, ConfigFile>();
 
         // (Implicitly create configurations via set).
         // Default.
@@ -194,6 +195,44 @@ public class TestWorldDataManager {
 
         if (!worldMan.getWorldData("notExist3").isCheckActive(CheckType.COMBINED_MUNCHHAUSEN)) {
             fail("Overridden (SPECIFIC): COMBINED_MUNCHHAUSEN should be active after reload (COMBINED is)");
+        }
+
+        //////////////////////////////////////////////////////////////////////
+
+        ///////////////////
+        // Reset
+        ///////////////////
+
+        worldMan = getWorldDataManager();
+        rawWorldConfigs = new LinkedHashMap<String, ConfigFile>();
+        set(rawWorldConfigs, null, "dummy", "dummy");
+        worldMan.applyConfiguration(rawWorldConfigs);
+
+        IWorldData defaultWorldData = worldMan.getDefaultWorldData();
+
+        // Set all to NO.
+        defaultWorldData.overrideCheckActivation(CheckType.ALL, AlmostBoolean.NO, 
+                OverrideType.VOLATILE, true);
+        for (CheckType checkType : CheckType.values()) {
+            if (defaultWorldData.isCheckActive(checkType)) {
+                fail("Expect check not to be active: " + checkType);
+            }
+        }
+
+        // Set all to YES.
+        defaultWorldData.overrideCheckActivation(CheckType.ALL, AlmostBoolean.YES, 
+                OverrideType.VOLATILE, true);
+        for (CheckType checkType : CheckType.values()) {
+            if (!defaultWorldData.isCheckActive(checkType)) {
+                fail("Expect check to be active: " + checkType);
+            }
+        }
+
+        // Set FastHeal to NO
+        defaultWorldData.overrideCheckActivation(CheckType.FIGHT_FASTHEAL, AlmostBoolean.NO, 
+                OverrideType.VOLATILE, true);
+        if (defaultWorldData.isCheckActive(CheckType.FIGHT_FASTHEAL)) {
+            fail("Expect FIGHT_FASTHEAL not to be active.");
         }
 
     }
