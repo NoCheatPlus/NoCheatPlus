@@ -107,19 +107,18 @@ public class UseEntityAdapter extends BaseAdapter {
                     "checks", Arrays.asList(AttackFrequency.class.getSimpleName()));
         }
         attackFrequency = new AttackFrequency();
+        NCPAPIProvider.getNoCheatPlusAPI().addComponent(attackFrequency);
+        this.legacySet = getLegacyReflectionSet();
+    }
 
-        LegacyReflectionSet set = null;
+    private LegacyReflectionSet getLegacyReflectionSet() {
         for (String versionDetail : new String[] {"v1_7_R4", "v1_7_R1"}) {
             try {
-                set = new LegacyReflectionSet(versionDetail);
-                if (set != null) {
-                    break;
-                }
+                return new LegacyReflectionSet(versionDetail);
             }
             catch (RuntimeException e) {} // +-
         }
-        this.legacySet = set;
-        NCPAPIProvider.getNoCheatPlusAPI().addComponent(attackFrequency);
+        return null;
     }
 
     @Override
@@ -158,11 +157,18 @@ public class UseEntityAdapter extends BaseAdapter {
         }
         if (!packetInterpreted) {
             // Handle as if latest.
-            final StructureModifier<EntityUseAction> actions;
-            actions = packet.getEntityUseActions();
-            if (actions.size() == 1 && actions.read(0) == EntityUseAction.ATTACK) {
-                isAttack = true;
-                packetInterpreted = true;
+            try {
+                final StructureModifier<EntityUseAction> actions = packet.getEntityUseActions();
+                if (actions.size() == 1 && actions.read(0) == EntityUseAction.ATTACK) {
+                    isAttack = true;
+                    packetInterpreted = true;
+                }
+            }
+            catch (NullPointerException e) {
+                /*
+                 * TODO: Observed somewhere on 1_7_R4, probably a custom build -
+                 * why doesn't the LegacyReflectionSet work here?
+                 */
             }
         }
         if (!packetInterpreted) {
