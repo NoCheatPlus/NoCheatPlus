@@ -123,7 +123,7 @@ public class SoundDistance extends BaseAdapter {
     private boolean isSoundMonitoredLatest(final PacketContainer packetContainer) {
         StructureModifier<Sound> sounds = packetContainer.getSoundEffects();
         for (final Sound sound : sounds.getValues()) {
-            if (effectNames.contains(sound.name())) {
+            if (sound != null && effectNames.contains(sound.name())) {
                 //debug(null, "MONITOR SOUND: " + sound);
                 return true;
             }
