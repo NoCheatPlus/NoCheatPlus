@@ -52,6 +52,16 @@ public class LocationTrace {
 
         public long getTime();
 
+        /**
+         * Convenience method.
+         * 
+         * @param x
+         * @param y
+         * @param z
+         * @return
+         */
+        public boolean isInside(double x, double y, double z);
+
     }
 
     public static class TraceEntry implements ITraceEntry {
@@ -60,7 +70,10 @@ public class LocationTrace {
 
         /** We keep it open, if ticks or ms are used. */
         private long time;
-        /** Coordinates. */
+        /**
+         * Coordinates, box bottom center position with margins to the sides and
+         * to top.
+         */
         private double x, y, z, boxMarginHorizontal, boxMarginVertical;
 
         /** Older/next. */
@@ -112,6 +125,13 @@ public class LocationTrace {
         @Override
         public long getTime() {
             return time;
+        }
+
+        @Override
+        public boolean isInside(final double x, final double y, final double z) {
+            return y >= this.y && y <= this.y + this.boxMarginVertical
+                    && Math.abs(x - this.x) <= this.boxMarginHorizontal
+                    && Math.abs(z - this.z) <= this.boxMarginHorizontal;
         }
 
     }
