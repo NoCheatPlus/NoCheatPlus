@@ -145,7 +145,10 @@ public class Direction extends Check {
      * @param cc
      * @return
      */
-    public boolean loopCheck(final Player player, final Location loc, final Entity damaged, final ITraceEntry dLoc, final DirectionContext context, final FightData data, final FightConfig cc) {
+    public boolean loopCheck(final Player player, final Location loc, 
+            final Entity damaged, final ITraceEntry dLoc, 
+            final DirectionContext context, 
+            final FightData data, final FightConfig cc) {
 
         // Ignore complex entities for the moment.
         if (context.damagedComplex) {
@@ -166,17 +169,29 @@ public class Direction extends Check {
         }
         else{
             // Also take into account the angle.
-            off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.getX(), dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, TrigUtil.DIRECTION_LOOP_PRECISION);
+            off = CollisionUtil.directionCheck(loc, player.getEyeHeight(), 
+                    context.direction, dLoc.getX(), 
+                    dLoc.getY() + damagedBoxMarginVertical / 2D, dLoc.getZ(), 
+                    damagedBoxMarginHorizontal * 2.0, damagedBoxMarginVertical, 
+                    TrigUtil.DIRECTION_LOOP_PRECISION);
         }
 
-        if (off > 0.11) {
-            // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
-            final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + damagedBoxMarginVertical / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
-            final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
-            context.minViolation = Math.min(context.minViolation, distance);
-            cancel = true;
+        if (off > 0.0) {
+            if (dLoc.isInside(loc.getX(), loc.getY() + player.getEyeHeight(), 
+                    loc.getZ())) { // Inside box.
+                context.minResult = 0.0;
+            }
+            else {
+                if (off > 0.11) {
+                    // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
+                    final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + damagedBoxMarginVertical / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
+                    final double distance = blockEyes.crossProduct(context.direction).length() / context.lengthDirection;
+                    context.minViolation = Math.min(context.minViolation, distance);
+                    cancel = true;
+                }
+                context.minResult = Math.min(context.minResult, off);
+            }
         }
-        context.minResult = Math.min(context.minResult, off);
 
         return cancel;
     }
