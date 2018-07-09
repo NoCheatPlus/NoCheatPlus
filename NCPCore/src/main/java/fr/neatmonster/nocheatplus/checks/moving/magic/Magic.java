@@ -281,7 +281,17 @@ public class Magic {
      */
     public static boolean skipPaper(final PlayerMoveData thisMove, final PlayerMoveData lastMove, final MovingData data) {
         // TODO: Confine to from at block level (offset 0)?
-        final double setBackYDistance = thisMove.to.getY() - data.getSetBackY();
+        final double setBackYDistance;
+        if (data.hasSetBack()) {
+            setBackYDistance = thisMove.to.getY() - data.getSetBackY();
+        }
+        // Skip being all too forgiving here.
+        //        else if (thisMove.touchedGround) {
+        //            setBackYDistance = 0.0;
+        //        }
+        else {
+            return false;
+        }
         return !lastMove.toIsValid && data.sfJumpPhase == 0 && thisMove.multiMoveCount > 0
                 && setBackYDistance > 0.0 && setBackYDistance < PAPER_DIST 
                 && thisMove.yDistance > 0.0 && thisMove.yDistance < PAPER_DIST && inAir(thisMove);
