@@ -49,7 +49,6 @@
             <id>nonfree_build</id>
             <modules>
                 <module>NCPCompatNonFree</module>
-                <module>NCPCompatNonFreeJar</module>
             </modules>
         </profile>
     </profiles>
@@ -132,6 +131,7 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.2</version>
                 <configuration>
+                    <!-- Don't deploy by default -->
                     <skip>true</skip>
                 </configuration>
             </plugin>
