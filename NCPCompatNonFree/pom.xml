@@ -73,14 +73,12 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <!--
                 <module>NCPCompatSpigotCB1_8_R1</module>
                 <module>NCPCompatSpigotCB1_8_R2</module>
                 <module>NCPCompatSpigotCB1_8_R3</module>
                 <module>NCPCompatSpigotCB1_9_R1</module>
                 <module>NCPCompatSpigotCB1_9_R2</module>
                 <module>NCPCompatSpigotCB1_10_R1</module>
-                -->
                 <module>NCPCompatSpigotCB1_11_R1</module>
                 <module>NCPCompatCBDev</module>
             </modules>

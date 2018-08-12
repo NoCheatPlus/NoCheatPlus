@@ -15,14 +15,6 @@
     <name>NCPCompatCBDev</name>
     <description>
         Compatibility for the development version (latest of the supported Minecraft versions).
-
-        To add a new compat module the pom.xml file within NCPCompatNonFree has to be modified:
-        - Add as module within the profile with id 'all'.
-        - Add as dependency within the profile with id 'all'.
-        - (Add a new profile with both the module and dependency set.)
-
-        The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, EntityAccessFactory,
-        AttributeAccessFactory).
     </description>
 
     <dependencies>

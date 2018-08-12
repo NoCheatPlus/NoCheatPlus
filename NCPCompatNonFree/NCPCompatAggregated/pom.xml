@@ -35,7 +35,6 @@
                     <artifactId>ncpcompatspigotcb1_11_r1</artifactId>
                     <version>${project.version}</version>
                 </dependency>
-                <!--
                 <dependency>
                     <groupId>fr.neatmonster</groupId>
                     <artifactId>ncpcompatspigotcb1_10_r1</artifactId>
@@ -66,7 +65,6 @@
                     <artifactId>ncpcompatspigotcb1_8_r1</artifactId>
                     <version>${project.version}</version>
                 </dependency>
-                -->
             </dependencies>
         </profile>
 
