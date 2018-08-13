@@ -47,10 +47,10 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
             if (!mat.isBlock()) {
                 continue;
             }
-            if (fullBlocks.contains(mat)) {
+            else if (fullBlocks.contains(mat)) {
                 continue;
             }
-            if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()) {
+            else if (guessItchyBlock(mat)) {
                 // Uncertain bounding-box, allow passing through.
                 long flags = BlockProperties.F_IGN_PASSABLE;
                 if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {

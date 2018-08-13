@@ -40,14 +40,26 @@ public class MCAccessBukkitBase implements MCAccess {
     // private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
     protected final boolean bukkitHasGetHeightAndGetWidth;
 
+    private boolean guessItchyBlockPre1_13(final Material mat) {
+        return !mat.isOccluding() || !mat.isSolid() || mat.isTransparent();
+    }
+
+    protected boolean guessItchyBlock(final Material mat) {
+        // TODO: Use working route.
+        return guessItchyBlockPre1_13(mat);
+    }
+
+    private void testItchyBlock() {
+        // TODO: Route to what works.
+        guessItchyBlockPre1_13(Material.AIR);
+    }
+
     /**
      * Constructor to let it fail.
      */
     public MCAccessBukkitBase() {
         // TODO: Add more that might fail if not supported ?
-        Material.AIR.isSolid();
-        Material.AIR.isOccluding();
-        Material.AIR.isTransparent();
+        testItchyBlock();
         // TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
         // TODO: Move getHeight and the like to EntityAccessXY.
         bukkitHasGetHeightAndGetWidth = ReflectionUtil.getMethodNoArgs(Entity.class, "getHeight", double.class) != null
