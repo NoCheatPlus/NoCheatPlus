@@ -1,45 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>fr.neatmonster</groupId>
-	<artifactId>ncpcore</artifactId>
-	<packaging>jar</packaging>
-	<name>NCPCore</name>
-	<version>1.1-SNAPSHOT</version>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.neatmonster</groupId>
-		<artifactId>nocheatplus-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>nocheatplus-parent</artifactId>
+        <version>3.16.1-SNAPSHOT</version>
+    </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.9-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.neatmonster</groupId>
-			<artifactId>ncpcommons</artifactId>
-			<version>1.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+    <artifactId>ncpcore</artifactId>
+    <version>3.16.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level.
-</description>
+    <name>NCPCore</name>
+    <description>
+        Core components and checks implementations. This contains about everything, just not the
+        component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use
+        check-specific classes to be added in the factories on NCPPlugin level.
+    </description>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.api-version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.neatmonster</groupId>
+            <artifactId>ncpcommons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -1,52 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>fr.neatmonster</groupId>
-	<artifactId>ncpcompatspigotcb1_11_r1</artifactId>
-	<packaging>jar</packaging>
-	<name>NCPCompatSpigotCB1_11_R1</name>
-	<version>1.1-SNAPSHOT</version>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.neatmonster</groupId>
-		<artifactId>nocheatplus-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>ncpcompatnonfree</artifactId>
+        <version>3.16.1-SNAPSHOT</version>
+    </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>fr.neatmonster</groupId>
-			<artifactId>ncpcore</artifactId>
-			<version>1.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<version>1.11.2-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+    <artifactId>ncpcompatspigotcb1_11_r1</artifactId>
+    <version>3.16.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<description>Compatibility for SpigotCB1_11_R1.
+    <name>NCPCompatSpigotCB1_11_R1</name>
+    <description>
+        Compatibility for SpigotCB1_11_R1.
+    </description>
 
-To add a new compat module the pom.xml file within NCPCompatNonFree has to be modified:
-- Add as module within the profile with id 'all'.
-- Add as dependency within the profile with id 'all'.
-- (Add a new profile with both the module and dependency set.)
-
-The NCPPlugin sub-project contains the relevant factories (MCAccessFactory, EntityAccessFactory, AttributeAccessFactory).</description>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.11.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
