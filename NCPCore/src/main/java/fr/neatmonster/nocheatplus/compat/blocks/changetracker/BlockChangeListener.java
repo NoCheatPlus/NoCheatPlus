@@ -36,6 +36,7 @@ import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.registry.order.RegistrationOrder.RegisterMethodWithOrder;
 import fr.neatmonster.nocheatplus.event.mini.MiniListener;
@@ -280,7 +281,7 @@ public class BlockChangeListener implements Listener {
         if (block != null) {
             final Material type = block.getType();
             // TODO: Consider a flag.
-            if (type == Material.SOIL) {
+            if (type == BridgeMaterial.FARMLAND) {
                 tracker.addBlocks(block);
             }
         }

@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -47,29 +48,42 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 
         // 147 Weighted Pressure Plate (Light)
         //		BlockFlags.addFlags(147, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("GOLD_PLATE", Material.STONE_PLATE);
+        BlockInit.setAs(BridgeMaterial.LIGHT_WEIGHTED_PRESSURE_PLATE, 
+                BridgeMaterial.STONE_PRESSURE_PLATE);
 
         // 148 Weighted Pressure Plate (Heavy)
         //		BlockFlags.addFlags(148, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("IRON_PLATE", Material.STONE_PLATE);
+        BlockInit.setAs(BridgeMaterial.HEAVY_WEIGHTED_PRESSURE_PLATE, 
+                BridgeMaterial.STONE_PRESSURE_PLATE);
 
-        // 149 Redstone Comparator (inactive)
-        //		BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("REDSTONE_COMPARATOR_OFF", Material.DIODE_BLOCK_OFF);
+        // HACK 1.13
+        Material comparator = BridgeMaterial.get("comparator");
+        if (comparator == null) {
+            // LEGACY
 
-        // 150 Redstone Comparator (active)
-        //		BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("REDSTONE_COMPARATOR_ON", Material.DIODE_BLOCK_ON);
+            // 149 Redstone Comparator (inactive)
+            //      BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+            BlockInit.setAs("REDSTONE_COMPARATOR_OFF", Material.DIODE_BLOCK_OFF);
+
+            // 150 Redstone Comparator (active)
+            //      BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+            BlockInit.setAs("REDSTONE_COMPARATOR_ON", Material.DIODE_BLOCK_ON);
+        }
+        else {
+            // 1.13
+
+            BlockInit.setAs("COMPARATOR", BridgeMaterial.REPEATER);
+        }
 
         // 151 Daylight Sensor
         //		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("DAYLIGHT_DETECTOR", Material.HUGE_MUSHROOM_1);
+        BlockInit.setAs("DAYLIGHT_DETECTOR", Material.VINE);
 
         // 152 Block of Redstone
-        BlockInit.setAs("REDSTONE_BLOCK", Material.ENCHANTMENT_TABLE);
+        BlockInit.setAs("REDSTONE_BLOCK", BridgeMaterial.ENCHANTING_TABLE);
 
         // 153 Nether Quartz Ore
-        BlockInit.setAs("QUARTZ_ORE", Material.COAL_ORE);
+        BlockInit.setAs(BridgeMaterial.NETHER_QUARTZ_ORE, Material.COAL_ORE);
 
         // 154 Hopper
         BlockInit.setAs("HOPPER", Material.COAL_ORE);

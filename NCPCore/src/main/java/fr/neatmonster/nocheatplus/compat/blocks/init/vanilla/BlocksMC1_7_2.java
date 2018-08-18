@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -28,7 +29,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 public class BlocksMC1_7_2 implements BlockPropertiesSetup{
 
     public BlocksMC1_7_2() {
-        BlockInit.assertMaterialExists("STAINED_GLASS");
+        BlockInit.assertMaterialExists("DARK_OAK_STAIRS");
         BlockInit.assertMaterialExists("PACKED_ICE");
     }
 
@@ -37,21 +38,21 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
         // Block shapes.
 
         // Stained glass
-        BlockInit.setAs("STAINED_GLASS", Material.GLASS);
+        BlockInit.setAsIfExists("STAINED_GLASS", Material.GLASS);
         // Stained glass pane
-        BlockInit.setAs("STAINED_GLASS_PANE", "THIN_GLASS");
+        // Collected otherwise: BlockInit.setAsIfExists("STAINED_GLASS_PANE", "THIN_GLASS");
         // Leaves 2
-        BlockInit.setAs("LEAVES_2", Material.LEAVES);
+        BlockInit.setAsIfExists("LEAVES_2", "LEAVES");
         // Log 2
-        BlockInit.setAs("LOG_2", Material.LOG);
+        BlockInit.setAsIfExists("LOG_2", "LOG");
         // Acacia wood stairs
-        BlockInit.setAs("ACACIA_STAIRS", Material.WOOD_STAIRS);
-        // Oak wood stairs
-        BlockInit.setAs("DARK_OAK_STAIRS", Material.WOOD_STAIRS);
+        //        BlockInit.setAsIfExists("ACACIA_STAIRS", "WOOD_STAIRS");
+        //        // Oak wood stairs
+        //        BlockInit.setAsIfExists("DARK_OAK_STAIRS", "WOOD_STAIRS");
         // Packed ice
-        BlockInit.setAs("PACKED_ICE", Material.ICE);
+        BlockInit.setAsIfExists("PACKED_ICE", Material.ICE);
         // Large flowers
-        BlockInit.setAs("DOUBLE_PLANT", Material.YELLOW_FLOWER);
+        BlockInit.setAsIfExists("DOUBLE_PLANT", BridgeMaterial.DANDELION);
 
         // Block breaking.
         final long[] ironTimes = BlockProperties.secToMs(15, 7.5, 1.15, 0.75, 0.56, 1.25);
@@ -64,10 +65,12 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
         final long[] diamondTimes = BlockProperties.secToMs(15, 7.5, 3.75, 0.75, 0.56, 1.25);
         final BlockProps diamondType = new BlockProps(BlockProperties.woodPickaxe, 3, diamondTimes);
         for (Material mat : new Material[]{
-                Material.REDSTONE_ORE, Material.GLOWING_REDSTONE_ORE,
+                Material.REDSTONE_ORE, BridgeMaterial.get("glowing_redstone_ore"),
                 Material.EMERALD_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
         }) {
-            BlockProperties.setBlockProps(mat, diamondType);
+            if (mat != null) {
+                BlockProperties.setBlockProps(mat, diamondType);
+            }
         }
 
         StaticLog.logInfo("Added block-info for Minecraft 1.7.2 blocks.");

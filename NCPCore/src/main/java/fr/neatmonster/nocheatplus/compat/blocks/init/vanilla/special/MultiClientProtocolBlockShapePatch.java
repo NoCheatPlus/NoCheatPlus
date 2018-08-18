@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.activation.ActivationUtil;
 import fr.neatmonster.nocheatplus.compat.blocks.AbstractBlockPropertiesPatch;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -28,7 +29,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
- * WATER_LILY for multi client protocol support between 1.7.x - 1.11.x.
+ * Multi client protocol support between 1.7.x - 1.13.x.
  * 
  * @author asofold
  *
@@ -38,7 +39,7 @@ public class MultiClientProtocolBlockShapePatch extends AbstractBlockPropertiesP
 
     public MultiClientProtocolBlockShapePatch() {
         activation
-        .neutralDescription("Block shape patch for multi client protocol support around 1.7.x - 1.12.x.")
+        .neutralDescription("Block shape patch for multi client protocol support around 1.7.x - 1.13.x.")
         .advertise(true)
         .setConditionsAND()
         .notUnitTest()
@@ -52,24 +53,24 @@ public class MultiClientProtocolBlockShapePatch extends AbstractBlockPropertiesP
 
         final List<String> done = new LinkedList<String>();
 
-        BlockFlags.addFlags(Material.WATER_LILY, 
+        BlockFlags.addFlags(BridgeMaterial.LILY_PAD, 
                 BlockProperties.F_GROUND 
                 | BlockProperties.F_HEIGHT8_1 
                 | BlockProperties.F_GROUND_HEIGHT);
-        done.add("WATER_LILY");
+        done.add("water_lily");
 
-        BlockFlags.addFlags(Material.SOIL, 
+        BlockFlags.addFlags(BridgeMaterial.FARMLAND, 
                 BlockProperties.F_MIN_HEIGHT16_15 
                 | BlockProperties.F_HEIGHT100 
                 | BlockProperties.F_GROUND_HEIGHT);
-        done.add("SOIL");
+        done.add("soil");
 
         try {
             BlockFlags.addFlags(Material.GRASS_PATH, 
                     BlockProperties.F_MIN_HEIGHT16_15 
                     | BlockProperties.F_HEIGHT100 
                     | BlockProperties.F_GROUND_HEIGHT);
-            done.add("GRASS_PATH");
+            done.add("grass_path");
         }
         catch (Throwable t) {
             // TODO: What throws for enum not there.

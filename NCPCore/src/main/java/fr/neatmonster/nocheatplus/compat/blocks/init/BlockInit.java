@@ -16,12 +16,13 @@ package fr.neatmonster.nocheatplus.compat.blocks.init;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 /**
  * Auxiliary methods for block initialization.
- * @author mc_dev
+ * @author asofold
  *
  */
 public class BlockInit {
@@ -48,6 +49,17 @@ public class BlockInit {
     }
 
     /**
+     * Set the block breaking properties of newMat to the same as are present
+     * for mat.
+     * 
+     * @param newMat
+     * @param mat
+     */
+    public static void setPropsAs(Material newMat, Material mat) {
+        BlockProperties.setBlockProps(newMat, BlockProperties.getBlockProps(mat));
+    }
+
+    /**
      * Set block breaking properties same as the block of the given material.
      * @param newId
      * @param mat
@@ -63,6 +75,11 @@ public class BlockInit {
      */
     public static void setPropsAs(String newId, String otherId) {
         BlockProperties.setBlockProps(newId, BlockProperties.getBlockProps(otherId));
+    }
+
+    public static void setAs(Material newMat, Material mat) {
+        BlockFlags.setFlagsAs(newMat, mat);
+        setPropsAs(newMat, mat);
     }
 
     /**
@@ -93,5 +110,27 @@ public class BlockInit {
         BlockFlags.setFlagsAs(newId, Material.AIR);
         BlockProperties.setBlockProps(newId, BlockProperties.instantType);
     }
+
+    /**
+     * Set like air, plus instantly breakable.
+     * @param newId
+     */
+    public static void setInstantAir(Material newId) {
+        BlockFlags.setFlagsAs(newId, Material.AIR);
+        BlockProperties.setBlockProps(newId, BlockProperties.instantType);
+    }
+
+    public static void setAsIfExists(String newName, Material mat) {
+        if (BridgeMaterial.has(newName)) {
+            setAs(newName, mat);
+        }
+    }
+
+    public static void setAsIfExists(String newName, String otherName) {
+        if (BridgeMaterial.has(newName)) {
+            setAs(newName, otherName);
+        }
+    }
+
 
 }

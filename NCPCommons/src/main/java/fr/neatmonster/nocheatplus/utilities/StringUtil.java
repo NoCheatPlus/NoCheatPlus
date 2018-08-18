@@ -430,4 +430,8 @@ public class StringUtil {
         return false;
     }
 
+    public static String reverse(final String input) {
+        return new StringBuilder(input).reverse().toString();
+    }
+
 }

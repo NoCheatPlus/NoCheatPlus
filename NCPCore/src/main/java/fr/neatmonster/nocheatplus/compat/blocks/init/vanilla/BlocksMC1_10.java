@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -30,7 +31,9 @@ import fr.neatmonster.nocheatplus.logging.StaticLog;
 public class BlocksMC1_10 implements BlockPropertiesSetup {
 
     public BlocksMC1_10() {
-        BlockInit.assertMaterialExists("MAGMA");
+        if (BridgeMaterial.MAGMA_BLOCK == null) {
+            throw new RuntimeException("Not suitable.");
+        }
         BlockInit.assertMaterialExists("BONE_BLOCK");
         BlockInit.assertMaterialExists("STRUCTURE_VOID");
     }
@@ -38,11 +41,11 @@ public class BlocksMC1_10 implements BlockPropertiesSetup {
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
         // 213 MAGMA
-        BlockInit.setAs("MAGMA", Material.STONE_PLATE);
+        BlockInit.setAs(BridgeMaterial.MAGMA_BLOCK, BridgeMaterial.STONE_PRESSURE_PLATE);
         // 214 NETHER_WART_BLOCK
-        BlockInit.setAs("NETHER_WART_BLOCK", Material.SKULL);
+        BlockInit.setAs("NETHER_WART_BLOCK", BridgeMaterial.SKELETON_SKULL);
         // 215 RED_NETHER_BRICK
-        BlockInit.setAs("RED_NETHER_BRICK", Material.NETHER_BRICK);
+        BlockInit.setAs(BridgeMaterial.RED_NETHER_BRICKS, BridgeMaterial.NETHER_BRICKS);
         // 216 BONE_BLOCK
         BlockInit.setAs("BONE_BLOCK", Material.COBBLESTONE);
         // 217 STRUCTURE_VOID

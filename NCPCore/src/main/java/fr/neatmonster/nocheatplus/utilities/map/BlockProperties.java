@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.util.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
@@ -611,32 +612,53 @@ public class BlockProperties {
     /** The Constant instantMat. */
     protected static final Material[] instantMat = new Material[]{
             // Named in wiki.
-            Material.CROPS,
+            BridgeMaterial.WHEAT_CROPS,
             Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
             Material.TORCH,
             Material.TNT,
-            Material.SUGAR_CANE_BLOCK,
-            Material.SAPLING,
-            Material.RED_ROSE, Material.YELLOW_FLOWER,
+            BridgeMaterial.SUGAR_CANE,
+            BridgeMaterial.get("red_rose"), BridgeMaterial.DANDELION,
+            BridgeMaterial.get("blue_orchid"),
             Material.REDSTONE_WIRE, 
-            Material.REDSTONE_TORCH_ON, Material.REDSTONE_TORCH_OFF,
-            Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+            BridgeMaterial.get("REDSTONE_TORCH_ON"), 
+            BridgeMaterial.get("REDSTONE_TORCH_OFF"),
+            BridgeMaterial.get("DIODE_BLOCK_ON"), BridgeMaterial.get("DIODE_BLOCK_OFF"),
+            BridgeMaterial.get("repeater"),
             Material.PUMPKIN_STEM,
-            Material.NETHER_WARTS,
+            BridgeMaterial.getBlock("NETHER_WART"),
+            BridgeMaterial.getBlock("NETHER_WARTS"), // TODO: Bug or very old?
             Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
             Material.MELON_STEM,
-            Material.WATER_LILY,
-            Material.LONG_GRASS,
+            BridgeMaterial.LILY_PAD,
+            BridgeMaterial.TALL_GRASS,
+            BridgeMaterial.GRASS,
             Material.FIRE,
-            Material.DEAD_BUSH,
             //
-            Material.CROPS,
+            BridgeMaterial.WHEAT_CROPS,
 
             // 1.4
-            Material.COMMAND,
-            Material.FLOWER_POT,
-            Material.CARROT,
-            Material.POTATO,
+            BridgeMaterial.COMMAND_BLOCK,
+            BridgeMaterial.CARROTS,
+            BridgeMaterial.POTATOES,
+
+            // 1.13 /...
+            BridgeMaterial.get("allium"),
+            BridgeMaterial.get("azure_bluet"),
+            BridgeMaterial.get("dandelion"),
+            BridgeMaterial.getBlock("dandelion_yellow"),
+            BridgeMaterial.get("kelp_plant"),
+            BridgeMaterial.get("large_fern"),
+            BridgeMaterial.get("lilac"),
+            BridgeMaterial.get("oxeye_daisy"),
+            BridgeMaterial.get("peony"),
+            BridgeMaterial.get("poppy"),
+            BridgeMaterial.get("redstone_torch"),
+            BridgeMaterial.get("redstone_wall_torch"),
+            BridgeMaterial.getBlock("rose_red"),
+            BridgeMaterial.get("seagrass"),
+            BridgeMaterial.get("sea_pickle"),
+            BridgeMaterial.get("sunflower"),
+            BridgeMaterial.get("tall_seagrass"),
     };
 
     /** The rt ray. */
@@ -808,7 +830,7 @@ public class BlockProperties {
      * Block change tracking: block redstone events can change the shape.
      */
     public static final long F_VARIABLE_REDSTONE            = 0x800000000L;
-    
+
     /**
      * Indicator to start recoding towards multiple flag types (shape, moving,
      * interaction, block-type/special, ...).
@@ -917,43 +939,55 @@ public class BlockProperties {
      */
     private static void initTools(final IHandle<MCAccess> mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         tools.clear();
-        tools.put(Material.WOOD_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
-        tools.put(Material.WOOD_SPADE, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
-        tools.put(Material.WOOD_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.WOOD));
-        tools.put(Material.WOOD_AXE, new ToolProps(ToolType.AXE, MaterialBase.WOOD));
+        tools.put(BridgeMaterial.WOODEN_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
+        tools.put(BridgeMaterial.WOODEN_SHOVEL, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
+        tools.put(BridgeMaterial.WOODEN_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.WOOD));
+        tools.put(BridgeMaterial.WOODEN_AXE, new ToolProps(ToolType.AXE, MaterialBase.WOOD));
 
         tools.put(Material.STONE_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.STONE));
-        tools.put(Material.STONE_SPADE, new ToolProps(ToolType.SPADE, MaterialBase.STONE));
+        tools.put(BridgeMaterial.STONE_SHOVEL, new ToolProps(ToolType.SPADE, MaterialBase.STONE));
         tools.put(Material.STONE_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.STONE));
         tools.put(Material.STONE_AXE, new ToolProps(ToolType.AXE, MaterialBase.STONE));
 
         tools.put(Material.IRON_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.IRON));
-        tools.put(Material.IRON_SPADE, new ToolProps(ToolType.SPADE, MaterialBase.IRON));
+        tools.put(BridgeMaterial.IRON_SHOVEL, new ToolProps(ToolType.SPADE, MaterialBase.IRON));
         tools.put(Material.IRON_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.IRON));
         tools.put(Material.IRON_AXE, new ToolProps(ToolType.AXE, MaterialBase.IRON));
 
         tools.put(Material.DIAMOND_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.DIAMOND));
-        tools.put(Material.DIAMOND_SPADE, new ToolProps(ToolType.SPADE, MaterialBase.DIAMOND));
+        tools.put(BridgeMaterial.DIAMOND_SHOVEL, new ToolProps(ToolType.SPADE, MaterialBase.DIAMOND));
         tools.put(Material.DIAMOND_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.DIAMOND));
         tools.put(Material.DIAMOND_AXE, new ToolProps(ToolType.AXE, MaterialBase.DIAMOND));
 
-        tools.put(Material.GOLD_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.GOLD));
-        tools.put(Material.GOLD_SPADE, new ToolProps(ToolType.SPADE, MaterialBase.GOLD));
-        tools.put(Material.GOLD_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.GOLD));
-        tools.put(Material.GOLD_AXE, new ToolProps(ToolType.AXE, MaterialBase.GOLD));
+        tools.put(BridgeMaterial.GOLDEN_SWORD, new ToolProps(ToolType.SWORD, MaterialBase.GOLD));
+        tools.put(BridgeMaterial.GOLDEN_SHOVEL, new ToolProps(ToolType.SPADE, MaterialBase.GOLD));
+        tools.put(BridgeMaterial.GOLDEN_PICKAXE, new ToolProps(ToolType.PICKAXE, MaterialBase.GOLD));
+        tools.put(BridgeMaterial.GOLDEN_AXE, new ToolProps(ToolType.AXE, MaterialBase.GOLD));
 
         tools.put(Material.SHEARS, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
     }
 
     private static void setFlag(Material material, long addFlag) {
+        if (!material.isBlock()) {
+            // Let's not fail hard here.
+            StaticLog.logWarning("Attempt to set flag for a non-block: " + material);
+        }
         blockFlags.put(material, blockFlags.get(material) | addFlag);
     }
 
     private static void maskFlag(Material material, long addFlag) {
+        if (!material.isBlock()) {
+            // Let's not fail hard here.
+            StaticLog.logWarning("Attempt to mask flag for a non-block: " + material);
+        }
         blockFlags.put(material, blockFlags.get(material) & addFlag);
     }
 
     private static void setBlock(Material material, BlockProps props) {
+        if (!material.isBlock()) {
+            // Let's not fail hard here.
+            StaticLog.logWarning("Attempt to set block breaking properties for a non-block: " + material);
+        }
         blocks.put(material, props);
     }
 
@@ -985,38 +1019,44 @@ public class BlockProperties {
 
         }
 
+        BlockProps props;
+
         // Stairs.
-        for (final Material mat : new Material[] { Material.NETHER_BRICK_STAIRS, Material.COBBLESTONE_STAIRS, 
-                Material.SMOOTH_STAIRS, Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, Material.WOOD_STAIRS, 
-                Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS }) {
-            setFlag(mat, F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND | F_GROUND_HEIGHT); // Set ground too, to be sure.
+        final long stairFlags = F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND | F_GROUND_HEIGHT;
+        for (final Material mat : new Material[] { 
+                Material.NETHER_BRICK_STAIRS, Material.COBBLESTONE_STAIRS, 
+                BridgeMaterial.STONE_BRICK_STAIRS, 
+                Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, 
+        }) {
+            setFlag(mat, stairFlags);
+        }
+        for (final Material mat : MaterialUtil.WOODEN_STAIRS) {
+            setFlag(mat, stairFlags);
         }
 
         // Step (ground + full width).
+        final long stepFlags = F_GROUND | F_XZ100;
         for (final Material mat : new Material[]{
-                Material.STEP, Material.WOOD_STEP,
+                BridgeMaterial.STONE_SLAB,
         }) {
-            setFlag(mat, F_GROUND | F_XZ100);
+            setFlag(mat, stepFlags);
+        }
+        for (final Material mat : MaterialUtil.WOODEN_SLABS) {
+            setFlag(mat, stepFlags);
         }
 
         // Rails
-        for (final Material mat : new Material[] { 
-                Material.RAILS, Material.DETECTOR_RAIL, Material.POWERED_RAIL,
-        }) {
+        for (final Material mat : MaterialUtil.RAILS) {
             setFlag(mat, F_RAILS);
         }
 
         // WATER.
-        for (final Material mat : new Material[]{
-                Material.STATIONARY_WATER, Material.WATER,
-        }) {
+        for (final Material mat : MaterialUtil.WATER) {
             setFlag(mat, F_LIQUID | F_HEIGHT_8SIM_DEC | F_WATER | F_FALLDIST_ZERO);
         }
 
         // LAVA.
-        for (final Material mat : new Material[]{
-                Material.LAVA, Material.STATIONARY_LAVA,
-        }) {
+        for (final Material mat : MaterialUtil.LAVA) {
             setFlag(mat, F_LIQUID | F_HEIGHT_8SIM_DEC | F_LAVA | F_FALLDIST_HALF);
         }
 
@@ -1033,29 +1073,32 @@ public class BlockProperties {
         // Workarounds.
         // Ground (can stand on).
         for (final Material mat : new Material[]{
-                Material.WATER_LILY, Material.LADDER,
-                Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
+                BridgeMaterial.LILY_PAD, Material.LADDER,
+                BridgeMaterial.get("DIODE_BLOCK_OFF"), 
+                BridgeMaterial.get("DIODE_BLOCK_ON"),
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
-                Material.PISTON_MOVING_PIECE, Material.PISTON_EXTENSION,
-                Material.STEP, Material.WOOD_STEP,
+                BridgeMaterial.MOVING_PISTON, BridgeMaterial.PISTON_HEAD,
+                BridgeMaterial.STONE_SLAB,
         }) {
-            setFlag(mat, F_GROUND);
+            if (mat != null) {
+                setFlag(mat, F_GROUND);
+            }
         }
 
         // Full block height.
         for (final Material mat : new Material[]{
-                //        		Material.ENDER_PORTAL_FRAME,
+                //        		BridgeMaterial.END_PORTAL_FRAME,
                 Material.BREWING_STAND,
-                Material.PISTON_EXTENSION,
-                Material.SOIL, // Server reports the visible shape 0.9375, client moves on full block height.
+                BridgeMaterial.PISTON_HEAD,
+                BridgeMaterial.FARMLAND, // Server reports the visible shape 0.9375, client moves on full block height.
         }) {
             setFlag(mat, F_HEIGHT100);
         }
 
         // Full width/xz-bounds.
         for (final Material mat : new Material[]{
-                Material.PISTON_EXTENSION,
-                Material.ENDER_PORTAL_FRAME
+                BridgeMaterial.PISTON_HEAD,
+                BridgeMaterial.END_PORTAL_FRAME
         }) {
             setFlag(mat, F_XZ100);
         }
@@ -1065,7 +1108,7 @@ public class BlockProperties {
 
         // Not ground (!).
         for (final Material mat : new Material[]{
-                Material.WALL_SIGN, Material.SIGN_POST,
+                Material.WALL_SIGN, BridgeMaterial.SIGN,
         }) {
             // TODO: Might keep solid since it is meant to be related to block shapes rather ("original mc value").
             maskFlag(mat, ~(F_GROUND | F_SOLID));
@@ -1074,40 +1117,53 @@ public class BlockProperties {
         // Ignore for passable.
         for (final Material mat : new Material[]{
                 // More strictly needed.
-                Material.WOOD_PLATE, Material.STONE_PLATE, 
-                Material.WALL_SIGN, Material.SIGN_POST,
-                Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+                BridgeMaterial.STONE_PRESSURE_PLATE, 
+                Material.WALL_SIGN, BridgeMaterial.SIGN,
+                BridgeMaterial.get("DIODE_BLOCK_ON"), 
+                BridgeMaterial.get("DIODE_BLOCK_OFF"),
                 Material.BREWING_STAND,
                 // Compatibility.
                 Material.LADDER, 
                 // Somewhat needed (xz-bounds vary, not critical to pass through).
-                Material.CAKE_BLOCK,
+                BridgeMaterial.CAKE,
                 // Workarounds.
                 //				Material.COCOA,
         }) {
+            if (mat != null) {
+                setFlag(mat, F_IGN_PASSABLE);
+            }
+        }
+        for (final Material mat : MaterialUtil.WOODEN_PRESSURE_PLATES) {
             setFlag(mat, F_IGN_PASSABLE);
         }
 
         // ? Extra flag for COCOA, ANVIL: depends on data value (other issue)
 
         // Fences, 1.5 block high.
+        final long flags150 = F_HEIGHT150 | F_VARIABLE | F_THICK_FENCE;
         for (final Material mat : new Material[]{
-                Material.FENCE, Material.FENCE_GATE,
-                Material.NETHER_FENCE, Material.COBBLE_WALL,
+                BridgeMaterial.NETHER_BRICK_FENCE, 
+                BridgeMaterial.COBBLESTONE_WALL,
         }) {
-            setFlag(mat, F_HEIGHT150 | F_VARIABLE | F_THICK_FENCE);
+            setFlag(mat, flags150);
+        }
+        for (final Material mat : MaterialUtil.WOODEN_FENCES) {
+            setFlag(mat, flags150);
+        }for (final Material mat : MaterialUtil.WOODEN_FENCE_GATES) {
+            setFlag(mat, flags150);
         }
 
         // F_PASSABLE_X4
-        for (final Material mat : new Material[] {
-                Material.FENCE_GATE,
-                Material.TRAP_DOOR, // TODO: Players can stand on - still passable past 1.9?
-        }) {
-            // TODO: PASSABLE_X4 is abused for other checks, need another one?
+        // TODO: PASSABLE_X4 is abused for other checks, need another one?
+        for (final Material mat : MaterialUtil.WOODEN_FENCE_GATES) {
+            setFlag(mat, F_PASSABLE_X4);
+        }
+        for (final Material mat : MaterialUtil.WOODEN_TRAP_DOORS) {
             setFlag(mat, F_PASSABLE_X4);
         }
 
         // F_VARIABLE_REDSTONE, F_VARIABLE_USE
+        // TODO: Use collections.
         for (Material material : Material.values()) {
             if (material.isBlock()) {
                 final String name = material.name().toLowerCase();
@@ -1130,141 +1186,198 @@ public class BlockProperties {
         }
 
         // F_FACING_LOW2_SNEW
-        for (final Material mat : new Material[]{
-                Material.TRAP_DOOR,
-        }) {
+        for (final Material mat : MaterialUtil.WOODEN_TRAP_DOORS) {
             setFlag(mat, F_ATTACHED_LOW2_SNEW);
         }
 
         // Thin fences (iron fence, glass panes).
+        final long paneFlags = F_THIN_FENCE | F_VARIABLE;
         for (final Material mat : new Material[]{
-                Material.IRON_FENCE, Material.THIN_GLASS,
+                BridgeMaterial.IRON_BARS,
         }) {
-            setFlag(mat, F_THIN_FENCE | F_VARIABLE);
+            setFlag(mat, paneFlags);
+        }
+        for (final Material mat : MaterialUtil.GLASS_PANES) {
+            setFlag(mat, paneFlags);
         }
 
         // Flexible ground (height):
         for (final Material mat : new Material[]{
                 // Strictly needed (multiple boxes otherwise).
-                Material.PISTON_EXTENSION,
+                BridgeMaterial.PISTON_HEAD,
                 Material.BREWING_STAND,
-                Material.ENDER_PORTAL_FRAME,
+                BridgeMaterial.END_PORTAL_FRAME,
                 // XZ-bounds issues.
-                Material.CAKE_BLOCK,
+                BridgeMaterial.CAKE,
                 // Already worked around with isPassableWorkaround (kept for dev-reference).
                 //				Material.ANVIL,
                 //				Material.SKULL, Material.FLOWER_POT,
                 //				Material.DRAGON_EGG,
                 //				Material.COCOA,
-                // Issues standing on with F_PASSABLE_X4.
-                Material.TRAP_DOOR,
                 // 1.10.2 +- client uses the reported height.
-                Material.SOIL,
+                BridgeMaterial.FARMLAND,
         }) {
+            setFlag(mat, F_GROUND_HEIGHT);
+        }
+        // Issues standing on with F_PASSABLE_X4. Note getGroundMinHeight.
+        for (Material mat : MaterialUtil.WOODEN_TRAP_DOORS) {
             setFlag(mat, F_GROUND_HEIGHT);
         }
         // Set block break properties.
         // Instantly breakable.
         for (final Material mat : instantMat) {
-            setBlock(mat, instantType);
+            if (mat != null) {
+                setBlock(mat, instantType);
+            }
         }
-        // TODO: Bed is special.
+        @SuppressWarnings("unchecked")
+        List<Set<Material>> instantSets = Arrays.asList(
+                MaterialUtil.BUSHES, MaterialUtil.TULIPS, 
+                MaterialUtil.SAPLINGS, MaterialUtil.FLOWER_POTS
+                );
+        for (final Set<Material> set : instantSets) {
+            for (final Material mat : set) {
+                setBlock(mat, instantType);
+            }
+        }
+
         // Leaf type
-        for (Material mat : new Material[]{ 
-                Material.LEAVES, Material.BED_BLOCK}) {
+        for (final Material mat : MaterialUtil.LEAVES) {
+            setBlock(mat, leafType);
+            setFlag(mat, F_LEAVES);
+        }
+        for (Material mat : MaterialUtil.BEDS) { // TODO: Beds are special.
             setBlock(mat, leafType);
         }
-        setFlag(Material.LEAVES, F_LEAVES);
+
         // Cobweb
-        setFlag(Material.WEB, F_COBWEB);
+        setFlag(BridgeMaterial.COBWEB, F_COBWEB);
         // Huge mushroom type (...)
         for (Material mat : new Material[]{ 
-                Material.HUGE_MUSHROOM_1, Material.HUGE_MUSHROOM_2,
                 Material.VINE, Material.COCOA}) {
             setBlock(mat, hugeMushroomType);
         }
+        for (Material mat : MaterialUtil.MUSHROOM_BLOCKS) {
+            setBlock(mat, hugeMushroomType);
+        }
 
-        setBlock(Material.SNOW, new BlockProps(getToolProps(Material.WOOD_SPADE), 0.1f, secToMs(0.5, 0.1, 0.05, 0.05, 0.05, 0.05)));
-        setBlock(Material.SNOW_BLOCK, new BlockProps(getToolProps(Material.WOOD_SPADE), 0.1f, secToMs(1, 0.15, 0.1, 0.05, 0.05, 0.05)));
+        setBlock(Material.SNOW, new BlockProps(getToolProps(BridgeMaterial.WOODEN_SHOVEL), 0.1f, secToMs(0.5, 0.1, 0.05, 0.05, 0.05, 0.05)));
+        setBlock(Material.SNOW_BLOCK, new BlockProps(getToolProps(BridgeMaterial.WOODEN_SHOVEL), 0.1f, secToMs(1, 0.15, 0.1, 0.05, 0.05, 0.05)));
         for (Material mat : new Material[]{ 
-                Material.REDSTONE_LAMP_ON, Material.REDSTONE_LAMP_OFF,
-                Material.GLOWSTONE, Material.GLASS,
+                BridgeMaterial.get("REDSTONE_LAMP_ON"), 
+                BridgeMaterial.get("REDSTONE_LAMP_OFF"),
+                BridgeMaterial.get("REDSTONE_LAMP"),
+                Material.GLOWSTONE,
         }) {
+            if (mat != null) {
+                setBlock(mat, glassType);
+            }
+        }
+        for (final Material mat : MaterialUtil.GLASS_BLOCKS) {
             setBlock(mat, glassType);
         }
-        setBlock(Material.THIN_GLASS, glassType);
+        for (final Material mat : MaterialUtil.GLASS_PANES) {
+            setBlock(mat, glassType);
+        }
         setBlock(Material.NETHERRACK, new BlockProps(woodPickaxe, 0.4f, secToMs(2, 0.3, 0.15, 0.1, 0.1, 0.05)));
         setBlock(Material.LADDER, new BlockProps(noTool, 0.4f, secToMs(0.6), 2.5f));
         setBlock(Material.CACTUS, new BlockProps(noTool, 0.4f, secToMs(0.6)));
-        setBlock(Material.WOOD_PLATE, new BlockProps(woodAxe, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1)));
-        setBlock(Material.STONE_PLATE, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.07)));
+        for (Material mat : MaterialUtil.WOODEN_PRESSURE_PLATES) {
+            setBlock(mat, new BlockProps(woodAxe, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1)));
+        }
+        setBlock(BridgeMaterial.STONE_PRESSURE_PLATE, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.07)));
         setBlock(Material.SAND, sandType);
         setBlock(Material.SOUL_SAND, sandType);
-        for (Material mat: new Material[]{Material.LEVER, Material.PISTON_BASE, 
-                Material.PISTON_EXTENSION, Material.PISTON_STICKY_BASE,
-                Material.STONE_BUTTON, Material.PISTON_MOVING_PIECE}) {
+        for (Material mat: new Material[]{Material.LEVER, BridgeMaterial.PISTON, 
+                BridgeMaterial.PISTON_HEAD, BridgeMaterial.STICKY_PISTON,
+                Material.STONE_BUTTON, BridgeMaterial.MOVING_PISTON}) {
             setBlock(mat, leverType);
         }
         //		setBlock(Material.ICE, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.1)));
         setBlock(Material.ICE, new BlockProps(woodPickaxe, 0.5f, secToMs(0.7, 0.35, 0.18, 0.12, 0.09, 0.06 )));
         setBlock(Material.DIRT, sandType);
-        setBlock(Material.CAKE_BLOCK, leverType);
+        setBlock(BridgeMaterial.CAKE, leverType);
         setBlock(Material.BREWING_STAND, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.1)));
         setBlock(Material.SPONGE, new BlockProps(noTool, 0.6f, secToMs(0.9)));
         for (Material mat : new Material[]{
-                Material.MYCEL, Material.GRAVEL, Material.GRASS, Material.SOIL,
+                BridgeMaterial.MYCELIUM, BridgeMaterial.FARMLAND,
+                Material.GRAVEL, BridgeMaterial.GRASS_BLOCK, 
                 Material.CLAY,
         }) {
             setBlock(mat, gravelType);
         }
-        for (Material mat : new Material[]{
-                Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL,
-        }) {
+        for (Material mat : MaterialUtil.RAILS) {
             setBlock(mat, new BlockProps(woodPickaxe, 0.7f, railsTimes));
         }
-        setBlock(Material.MONSTER_EGGS, new BlockProps(noTool, 0.75f, secToMs(1.15))); 
-        setBlock(Material.WOOL, new BlockProps(noTool, 0.8f, secToMs(1.2), 3f));
+        for (Material mat : MaterialUtil.INFESTED_BLOCKS) {
+            setBlock(mat, new BlockProps(noTool, 0.75f, secToMs(1.15)));
+        }
+        for (Material mat : MaterialUtil.WOOD_BLOCKS) {
+            setBlock(mat, new BlockProps(noTool, 0.8f, secToMs(1.2), 3f));
+        }
         setBlock(Material.SANDSTONE, sandStoneType);
         setBlock(Material.SANDSTONE_STAIRS, sandStoneType);
         for (Material mat : new Material[]{
-                Material.STONE, Material.SMOOTH_BRICK, Material.SMOOTH_STAIRS,
+                Material.STONE, BridgeMaterial.STONE_BRICKS, 
+                BridgeMaterial.STONE_BRICK_STAIRS,
         }) {
             setBlock(mat,  stoneType);
         }
         setBlock(Material.NOTE_BLOCK, new BlockProps(woodAxe, 0.8f, secToMs(1.2, 0.6, 0.3, 0.2, 0.15, 0.1)));
         final BlockProps pumpkinType = new BlockProps(woodAxe, 1, secToMs(1.5, 0.75, 0.4, 0.25, 0.2, 0.15));
         setBlock(Material.WALL_SIGN, pumpkinType);
-        setBlock(Material.SIGN_POST, pumpkinType);
+        setBlock(BridgeMaterial.SIGN, pumpkinType);
         setBlock(Material.PUMPKIN, pumpkinType);
         setBlock(Material.JACK_O_LANTERN, pumpkinType);
-        setBlock(Material.MELON_BLOCK, new BlockProps(noTool, 1, secToMs(1.45), 3));
+        setBlock(BridgeMaterial.MELON, new BlockProps(noTool, 1, secToMs(1.45), 3));
         setBlock(Material.BOOKSHELF, new BlockProps(woodAxe, 1.5f, secToMs(2.25, 1.15, 0.6, 0.4, 0.3, 0.2)));
         for (Material mat : new Material[]{
-                Material.WOOD_STAIRS, Material.WOOD, Material.WOOD_STEP, Material.LOG,
-                Material.FENCE, Material.FENCE_GATE, Material.JUKEBOX,
-                Material.JUNGLE_WOOD_STAIRS, Material.SPRUCE_WOOD_STAIRS,
-                Material.BIRCH_WOOD_STAIRS, 
-                Material.WOOD_DOUBLE_STEP, // ?
+                Material.JUKEBOX, 
+                BridgeMaterial.get("wood_double_step"),
                 // double slabs ?
         }) {
-            setBlock(mat,  woodType);
+            if (mat != null) {
+                setBlock(mat,  woodType);
+            }
         }
-        for (Material mat : new Material[]{
+        @SuppressWarnings("unchecked")
+        final List<Set<Material>> woodTypes = Arrays.asList(
+                MaterialUtil.WOODEN_FENCE_GATES, MaterialUtil.WOODEN_FENCES,
+                MaterialUtil.WOODEN_STAIRS, MaterialUtil.WOODEN_SLABS,
+                MaterialUtil.LOGS, MaterialUtil.WOOD_BLOCKS,
+                MaterialUtil.PLANKS
+                );
+        for (final Set<Material> set : woodTypes) {
+            for (final Material mat : set) {
+                setBlock(mat,  woodType);
+            }
+        }
+        for (Material mat : new Material[] {
+                Material.CAULDRON, 
                 Material.COBBLESTONE_STAIRS, Material.COBBLESTONE, 
-                Material.NETHER_BRICK, Material.NETHER_BRICK_STAIRS, Material.NETHER_FENCE,
-                Material.CAULDRON, Material.BRICK, Material.BRICK_STAIRS,
-                Material.MOSSY_COBBLESTONE, Material.BRICK, Material.BRICK_STAIRS,
-                Material.STEP, Material.DOUBLE_STEP, // ?
+                BridgeMaterial.NETHER_BRICKS, Material.NETHER_BRICK_STAIRS, 
+                BridgeMaterial.NETHER_BRICK_FENCE,
+                Material.MOSSY_COBBLESTONE, 
+                BridgeMaterial.BRICKS, Material.BRICK_STAIRS, 
+                Material.BRICK_STAIRS, BridgeMaterial.BRICK_SLAB,
+                BridgeMaterial.STONE_SLAB, 
+                BridgeMaterial.get("double_step"), // ?
 
         }) {
-            setBlock(mat,  brickType);
+            if (mat != null) {
+                setBlock(mat,  brickType);
+            }
         }
-        setBlock(Material.WORKBENCH, chestType);
+        setBlock(BridgeMaterial.CRAFTING_TABLE, chestType);
         setBlock(Material.CHEST, chestType);
-        setBlock(Material.WOODEN_DOOR, woodDoorType);
-        setBlock(Material.TRAP_DOOR, woodDoorType);
+        for (Material mat : MaterialUtil.WOODEN_DOORS) {
+            setBlock(mat, woodDoorType);
+        }
+        for (Material mat : MaterialUtil.WOODEN_TRAP_DOORS) {
+            setBlock(mat, woodDoorType);
+        }
         for (Material mat : new Material[]{
-                Material.ENDER_STONE, Material.COAL_ORE,
+                BridgeMaterial.END_STONE, Material.COAL_ORE,
 
         }) {
             setBlock(mat,  coalType);
@@ -1280,20 +1393,24 @@ public class BlockProperties {
         final long[] diamondTimes = secToMs(15, 15, 15, 0.75, 0.6, 15);
         final BlockProps diamondType = new BlockProps(ironPickaxe, 3, diamondTimes);
         for (Material mat : new Material[]{
-                Material.REDSTONE_ORE, Material.GLOWING_REDSTONE_ORE,
+                Material.REDSTONE_ORE, BridgeMaterial.get("glowing_redstone_ore"),
                 Material.EMERALD_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
         }) {
-            setBlock(mat,  diamondType);
+            if (mat != null) {
+                setBlock(mat,  diamondType);
+            }
         }
         setBlock(Material.GOLD_BLOCK,  goldBlockType);
         setBlock(Material.FURNACE, dispenserType);
-        setBlock(Material.BURNING_FURNACE, dispenserType);
+        if (BridgeMaterial.has("burning_furnace")) {
+            setBlock(BridgeMaterial.get("burning_furnace"), dispenserType);
+        }
         setBlock(Material.DISPENSER, dispenserType);
-        setBlock(Material.WEB, new BlockProps(woodSword, 4, secToMs(20, 0.4, 0.4, 0.4, 0.4, 0.4)));
+        setBlock(BridgeMaterial.COBWEB, new BlockProps(woodSword, 4, secToMs(20, 0.4, 0.4, 0.4, 0.4, 0.4)));
 
         for (Material mat : new Material[]{
-                Material.MOB_SPAWNER, Material.IRON_DOOR_BLOCK,
-                Material.IRON_FENCE, Material.ENCHANTMENT_TABLE, 
+                BridgeMaterial.SPAWNER, BridgeMaterial.IRON_DOOR,
+                BridgeMaterial.IRON_BARS, BridgeMaterial.ENCHANTING_TABLE, 
                 Material.EMERALD_BLOCK,
         }) {
             setBlock(mat, ironDoorType);
@@ -1309,30 +1426,130 @@ public class BlockProperties {
         // More 1.4 (not insta).
         // TODO: Either move all to an extra setup class, or integrate above.
         setBlock(Material.BEACON, new BlockProps(noTool, 25f, secToMs(4.45))); // TODO
-        setBlock(Material.COBBLE_WALL, brickType);
-        setFlag(Material.COBBLE_WALL, F_HEIGHT150);
-        setBlock(Material.WOOD_BUTTON, leverType);
-        setBlock(Material.SKULL, new BlockProps(noTool, 8.5f, secToMs(1.45))); // TODO
-        setFlag(Material.SKULL, F_GROUND);
+        setBlock(BridgeMaterial.COBBLESTONE_WALL, brickType);
+        setFlag(BridgeMaterial.COBBLESTONE_WALL, F_HEIGHT150);
+        for (Material mat : MaterialUtil.WOODEN_BUTTONS) {
+            setBlock(mat, leverType);
+        }
+        props = new BlockProps(noTool, 8.5f, secToMs(1.45));
+        for (Material mat : MaterialUtil.HEADS_GROUND) {
+            setBlock(mat, props);
+            setFlag(mat, F_GROUND);
+        }
+        for (Material mat : MaterialUtil.HEADS_GROUND) {
+            setBlock(mat, props);
+            setFlag(mat, F_GROUND); // TODO: Test !
+        }
         setBlock(Material.ANVIL, new BlockProps(woodPickaxe, 5f)); // TODO
         setFlag(Material.FLOWER_POT, F_GROUND);
 
         // Indestructible.
         for (Material mat : new Material[]{
-                Material.AIR, Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME,
-                Material.PORTAL, Material.LAVA, Material.WATER, Material.BEDROCK,
-                Material.STATIONARY_LAVA, Material.STATIONARY_WATER,
+                Material.AIR, BridgeMaterial.END_PORTAL, BridgeMaterial.END_PORTAL_FRAME,
+                BridgeMaterial.NETHER_PORTAL, Material.BEDROCK,
+                BridgeMaterial.get("void_air")
         }) {
-            setBlock(mat, indestructibleType); 
+            if (mat != null) {
+                setBlock(mat, indestructibleType); 
+            }
+        }
+        @SuppressWarnings("unchecked")
+        final List<Set<Material>> indestructible = new LinkedList<Set<Material>>(Arrays.asList(
+                MaterialUtil.LAVA,
+                MaterialUtil.WATER
+                ));
+        for (Set<Material> set : indestructible) {
+            for (Material mat : set) {
+                setBlock(mat, indestructibleType); 
+            }
         }
         // 95 Locked chest
         // blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
-        Material mat = BlockInit.getMaterial("LOCKED_CHEST");
-        if (mat != null) {
-            BlockFlags.setFlagsAs(mat.name(), Material.CHEST);
+        if (BridgeMaterial.has("locked_chest")) {
+            BlockFlags.setFlagsAs("locked_chest", Material.CHEST);
             // Breaks like chest later on.
-            setBlockProps(mat.name(), BlockProperties.instantType);
+            setBlockProps("locked_chest", BlockProperties.instantType);
         }
+
+        // Terracotta (hard_clay).
+        props = new BlockProps(BlockProperties.woodPickaxe, 1.25f, 
+                BlockProperties.secToMs(6.25, 0.95, 0.5, 0.35, 0.25, 0.2));
+        for (final Material mat : MaterialUtil.TERRACOTTA_BLOCKS) {
+            BlockProperties.setBlockProps(mat, props);
+            BlockFlags.setFlagsAs(mat, Material.STONE);
+        }
+
+        // Glazed Terracotta
+        props = new BlockProps(BlockProperties.woodPickaxe, 1.4f, 
+                BlockProperties.secToMs(7.0, 1.05, 0.55, 0.35, 0.3, 0.2));
+        for (final Material mat : MaterialUtil.GLAZED_TERRACOTTA_BLOCKS) {
+            BlockProperties.setBlockProps(mat, props);
+            BlockFlags.setFlagsAs(mat, BridgeMaterial.TERRACOTTA);
+        }
+
+        // Carpets.
+        final BlockProps carpetProps = new BlockProps(BlockProperties.noTool, 0.1f, 
+                BlockProperties.secToMs(0.15));
+        final long carpetFlags = BlockProperties.F_GROUND | BlockProperties.F_IGN_PASSABLE 
+                | BlockProperties.F_GROUND_HEIGHT | BlockProperties.F_CARPET;
+        for (final Material mat : MaterialUtil.CARPETS) {
+            BlockProperties.setBlockProps(mat, carpetProps);
+            setBlockFlags(mat, carpetFlags);
+        }
+
+        // Banners.
+        props = new BlockProps(BlockProperties.woodAxe, 0.4f, BlockProperties.secToMs(1.5, 0.75, 0.4, 0.25, 0.2, 0.15));
+        for (Material mat : MaterialUtil.BANNERS) {
+            BlockProperties.setBlockFlags(mat, 0L);
+            setBlockProps(mat, props);
+        }
+
+        // Wall banners.
+        for (Material mat : MaterialUtil.WALL_BANNERS) {
+            BlockInit.setInstantAir(mat);
+        }
+
+        // Shulker boxes
+        for (Material mat : MaterialUtil.SHULKER_BOXES) {
+            // Wiki (16-11-25): 9, 4.5, 2.25, 1.5, 1.15, 0.75
+            BlockProperties.setBlockProps(mat, new BlockProps(BlockProperties.woodPickaxe, 6,
+                    BlockProperties.secToMs(10.0, 1.45, 0.7, 0.5, 0.35, 0.2)));
+            BlockProperties.setBlockFlags(mat, BlockProperties.F_SOLID | BlockProperties.F_GROUND);
+        }
+
+        // Concrete
+        props = new BlockProps(BlockProperties.woodPickaxe, 1.8f,
+                // TODO: 2.7 with bare hands seems unlikely.
+                BlockProperties.secToMs(2.7, 1.35, 0.7, 0.45, 0.35, 0.25));
+        for (Material mat : MaterialUtil.CONCRETE_BLOCKS) {
+            setBlockProps(mat, props);
+            BlockFlags.setFlagsAs(mat, Material.COBBLESTONE);
+        }
+
+        // Concrete powder
+        for (Material mat : MaterialUtil.CONCRETE_POWDER_BLOCKS) {
+            BlockInit.setAs(mat, Material.DIRT);
+        }
+
+        // Stripped logs.
+        for (Material mat : MaterialUtil.STRIPPED_LOGS) {
+            BlockInit.setAs(mat, BridgeMaterial.OAK_LOG);
+        }
+
+        // Stripped wood blocks.
+        for (Material mat : MaterialUtil.STRIPPED_WOOD_BLOCKS) {
+            BlockInit.setAs(mat, BridgeMaterial.OAK_WOOD);
+        }
+
+        // Wool blocks.
+        props = new BlockProps(tools.get(Material.SHEARS), 0.8f, 
+                secToMs(1.25, 1.25, 1.25, 1.25, 1.25, 1.25));
+        for (Material mat : MaterialUtil.WOOL_BLOCKS) {
+            BlockFlags.setFlagsAs(mat, Material.STONE);
+            setBlockProps(mat, props);
+            // TODO: Model shears directly somehow (per-block list).
+        }
+
     }
 
     /**
@@ -1357,6 +1574,16 @@ public class BlockProperties {
      *            the all
      */
     public static void dumpBlocks(boolean all) {
+        // Dump name-based setup.
+        //StaticLog.logDebug("All non-legacy Material found: " + StringUtil.join(BridgeMaterial.getKeySet(), ", "));
+        //StaticLog.logDebug("Dump Material collections:");
+        //MaterialUtil.dumpStaticSets(MaterialUtil.class, Level.FINE);
+
+        // Check for initialized block breaking data.
+        /*
+         * TODO: Possibly switch to a class per block, to see what/if-anything
+         * is initialized, including flags.
+         */
         final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
         List<String> missing = new LinkedList<String>();
         List<String> allBlocks = new LinkedList<String>();
@@ -1852,11 +2079,11 @@ public class BlockProperties {
         if (toolProps.toolType == ToolType.SHEARS) {
             // (Note: shears are not in the block props, anywhere)
             // Treat these extra (partly experimental):
-            if (blockId == Material.WEB) {
+            if (blockId == BridgeMaterial.COBWEB) {
                 duration = 400;
                 isValidTool = true;
             }
-            else if (blockId == Material.WOOL) {
+            else if (MaterialUtil.WOOL_BLOCKS.contains(blockId)) {
                 duration = 240;
                 isValidTool = true;
             }
@@ -1889,7 +2116,8 @@ public class BlockProperties {
             // Efficiency level.
             if (efficiency > 0) {
                 // Workarounds ...
-                if (blockId == Material.WOODEN_DOOR && toolProps.toolType != ToolType.AXE) {
+                if (toolProps.toolType != ToolType.AXE 
+                        && MaterialUtil.WOODEN_DOORS.contains(blockId)) {
                     // Heck [Cleanup pending]...
                     switch (efficiency) {
                         case 1:
@@ -1945,7 +2173,7 @@ public class BlockProperties {
         }
         // Post/legacy workarounds for efficiency tools ("improper").
         if (efficiency > 0 && !isValidTool) {
-            if (!isValidTool && blockId == Material.MELON_BLOCK) {
+            if (!isValidTool && blockId == BridgeMaterial.MELON) {
                 // Fall back to pre-1.8 behavior.
                 // 450, 200 , 100 , 50 , 0
                 duration = Math.min(duration, 450 / (long) Math.pow(2, efficiency - 1)); 
@@ -1990,10 +2218,10 @@ public class BlockProperties {
             if (blockId == Material.SNOW) {
                 return toolProps.toolType == ToolType.SPADE;
             }
-            if (blockId == Material.WOOL) {
+            if (MaterialUtil.WOOL_BLOCKS.contains(blockId)) {
                 return true;
             }
-            if (blockId == Material.WOODEN_DOOR) {
+            if (MaterialUtil.WOODEN_DOORS.contains(blockId)) {
                 return true;
             }
             if (blockProps.hardness <= 2 
@@ -2003,7 +2231,7 @@ public class BlockProperties {
                             && (blockId != Material.NETHERRACK 
                             && blockId != Material.SNOW 
                             && blockId != Material.SNOW_BLOCK 
-                            && blockId != Material.STONE_PLATE)))) {
+                            && blockId != BridgeMaterial.STONE_PRESSURE_PLATE)))) {
                 // Also roughly.
                 return true;
             }
@@ -2058,7 +2286,7 @@ public class BlockProperties {
         }
         blockProps.validate();
 
-        blocks.put(blockId, blockProps);
+        setBlock(blockId, blockProps);
     }
 
     /**
@@ -2264,6 +2492,10 @@ public class BlockProperties {
      *            the flags
      */
     public static final void setBlockFlags(final Material blockType, final long flags) {
+        if (!blockType.isBlock()) {
+            // Let's not fail hard here.
+            StaticLog.logWarning("Attempt to set flags for a non-block: " + blockType);
+        }
         blockFlags.put(blockType, flags);
     }
 
@@ -2448,7 +2680,12 @@ public class BlockProperties {
      * @return true, if is air
      */
     public static final boolean isAir(Material type) {
-        return type == null || type == Material.AIR;
+        // TODO: Flags rather?
+        return type == null || type == Material.AIR
+                // Assume the compiler throws away further null values.
+                || type == BridgeMaterial.VOID_AIR
+                || type == BridgeMaterial.CAVE_AIR
+                ;
     }
 
     /**
@@ -2812,7 +3049,7 @@ public class BlockProperties {
                 return true;
             }
         }
-        else if (id == Material.CAKE_BLOCK) {
+        else if (id == BridgeMaterial.CAKE) {
             if (Math.min(fy, fy + dY * dT) >= 0.4375) {
                 return true; // 0.0625 = 0.125 / 2
             }
@@ -2830,7 +3067,7 @@ public class BlockProperties {
             }
             return !collidesCenter(fx, fz, dX, dZ, dT, 0.0625);
         }
-        else if (id == Material.PISTON_EXTENSION) {
+        else if (id == BridgeMaterial.PISTON_HEAD) {
             if (Math.min(fy, fy + dY * dT) >= 0.625) {
                 return true;
             }
@@ -3019,7 +3256,7 @@ public class BlockProperties {
         else if (id == Material.SOUL_SAND) {
             return 0.875;
         }
-        //		else if (id == Material.CAKE_BLOCK.getId()) {
+        //		else if (id == BridgeMaterial.CAKE.getId()) {
         //			return 0.4375;
         //		}
         else if (id == Material.CAULDRON) {
@@ -3029,10 +3266,10 @@ public class BlockProperties {
         else if (id == Material.CACTUS) {
             return 0.9375;
         }
-        else if (id == Material.PISTON_EXTENSION) {
+        else if (id == BridgeMaterial.PISTON_HEAD) {
             return 0.625;
         }
-        else if (id == Material.ENDER_PORTAL_FRAME) {
+        else if (id == BridgeMaterial.END_PORTAL_FRAME) {
             // Allow moving as if no eye was inserted.
             return 0.8125;
         }
@@ -3050,7 +3287,7 @@ public class BlockProperties {
                 return 0.9375;
             }
             // Default height is used.
-            if (id == Material.SOIL) {
+            if (id == BridgeMaterial.FARMLAND) {
                 return bounds[4];
             }
             // Assume open gates/trapdoors/things to only allow standing on to, if at all.
@@ -3653,7 +3890,7 @@ public class BlockProperties {
                 bminY = 0.0;
                 bmaxY = 0.125;
             }
-            else if (node.getType() == Material.ENDER_PORTAL_FRAME) {
+            else if (node.getType() == BridgeMaterial.END_PORTAL_FRAME) {
                 // TODO: Test
                 // TODO: Other concepts ...
                 bminY = 0;

@@ -21,10 +21,8 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
-import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 
-@SuppressWarnings("deprecation")
+
 public class BlocksMC1_6_1 implements BlockPropertiesSetup{
 
     public BlocksMC1_6_1(){
@@ -37,20 +35,13 @@ public class BlocksMC1_6_1 implements BlockPropertiesSetup{
         // Block of Coal: like block of redstone.
         BlockInit.setAs("COAL_BLOCK", "REDSTONE_BLOCK");
 
-        // Hardened Clay
-        BlockProperties.setBlockProps("HARD_CLAY", new BlockProps(BlockProperties.woodPickaxe, 1.25f, BlockProperties.secToMs(6.25, 0.95, 0.5, 0.35, 0.25, 0.2)));
-        BlockFlags.setFlagsAs("HARD_CLAY", Material.STONE); // TODO: Assumption (!).
-
-        // Stained Clay: Set as hardened clay.
-        BlockInit.setAs("STAINED_CLAY", "HARD_CLAY");
+        // (hard_clay and stained clay via generic setup.)
 
         // Hay Bale
         BlockInit.setPropsAs("HAY_BLOCK", Material.STONE_BUTTON);
         BlockFlags.setFlagsAs("HAY_BLOCK", Material.STONE); // TODO: Assumption (!).
 
-        // Carpet
-        BlockProperties.setBlockProps("CARPET", new BlockProps(BlockProperties.noTool, 0.1f, BlockProperties.secToMs(0.15)));
-        BlockProperties.setBlockFlags("CARPET", BlockProperties.F_GROUND|BlockProperties.F_IGN_PASSABLE|BlockProperties.F_GROUND_HEIGHT|BlockProperties.F_CARPET);
+        // (Carpet via generic setup.)
 
         StaticLog.logInfo("Added block-info for Minecraft 1.6.1 blocks.");
     }

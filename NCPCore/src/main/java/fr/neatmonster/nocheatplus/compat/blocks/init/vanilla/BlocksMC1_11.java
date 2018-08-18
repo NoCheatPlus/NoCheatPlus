@@ -24,30 +24,9 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 @SuppressWarnings("deprecation")
 public class BlocksMC1_11 implements BlockPropertiesSetup {
 
-    private static final String[] shulker_boxes = new String[]{
-        "WHITE_SHULKER_BOX",
-        "ORANGE_SHULKER_BOX",
-        "MAGENTA_SHULKER_BOX",
-        "LIGHT_BLUE_SHULKER_BOX",
-        "YELLOW_SHULKER_BOX",
-        "LIME_SHULKER_BOX",
-        "PINK_SHULKER_BOX",
-        "GRAY_SHULKER_BOX",
-        "SILVER_SHULKER_BOX",
-        "CYAN_SHULKER_BOX",
-        "PURPLE_SHULKER_BOX",
-        "BLUE_SHULKER_BOX",
-        "BROWN_SHULKER_BOX",
-        "GREEN_SHULKER_BOX",
-        "RED_SHULKER_BOX",
-        "BLACK_SHULKER_BOX"
-    };
-
     public BlocksMC1_11() {
         BlockInit.assertMaterialExists("OBSERVER");
-        for (String box : shulker_boxes) {
-            BlockInit.assertMaterialExists(box);
-        }
+        BlockInit.assertMaterialExists("BLACK_SHULKER_BOX");
     }
 
     @Override
@@ -59,12 +38,7 @@ public class BlocksMC1_11 implements BlockPropertiesSetup {
                 BlockProperties.secToMs(15.0, 2.2, 1.1, 0.7, 0.55, 0.45)));
         BlockProperties.setBlockFlags("OBSERVER", solidFlags);
         // ALL SORTS OF SHULKER BOXES
-        for (String box : shulker_boxes) {
-            // Wiki (16-11-25): 9, 4.5, 2.25, 1.5, 1.15, 0.75
-            BlockProperties.setBlockProps(box, new BlockProps(BlockProperties.woodPickaxe, 6,
-                    BlockProperties.secToMs(10.0, 1.45, 0.7, 0.5, 0.35, 0.2)));
-            BlockProperties.setBlockFlags(box, solidFlags);
-        }
+        
         StaticLog.logInfo("Added block-info for Minecraft 1.11 blocks.");
     }
 

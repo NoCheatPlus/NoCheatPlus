@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import org.bukkit.Material;
 import org.junit.Test;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
@@ -39,9 +40,11 @@ public class TestConfig {
     @Test
     public void testReadMaterial() {
         // Some really needed parts first.
-        testReadMaterial("water lily", Material.WATER_LILY);
-        testReadMaterial("water-lily", Material.WATER_LILY);
-        testReadMaterial("watEr_lily", Material.WATER_LILY);
+        Material lily = BridgeMaterial.LILY_PAD;
+        String lilys = lily.name();
+        testReadMaterial(lilys.replaceAll("_", " "), lily);
+        testReadMaterial(lilys.replaceAll("_", "-"), lily);
+        testReadMaterial(lilys.replaceAll("e", "E"), lily);
 
         testReadMaterial("flint and steel", Material.FLINT_AND_STEEL);
         testReadMaterial("259", Material.FLINT_AND_STEEL);

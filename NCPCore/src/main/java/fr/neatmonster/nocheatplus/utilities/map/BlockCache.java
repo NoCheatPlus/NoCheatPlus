@@ -311,7 +311,7 @@ public abstract class BlockCache {
         }
         final Material id = (y < 0 || y > maxBlockY) ? Material.AIR : fetchTypeId(x, y, z);
         // (Later: Static id-node map from config.)
-        if (id == Material.AIR) {
+        if (BlockProperties.isAir(id)) {
             return airNode;
         }
         else {

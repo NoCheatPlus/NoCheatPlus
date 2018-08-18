@@ -1925,6 +1925,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Always keep fall damage.
                 player.setFallDistance((float) fallDistance);
                 data.noFallFallDistance = (float) fallDistance;
+                
+                // TEST: Detect jumping on a just placed fence.
+                // 1. Detect the low correction teleport.
+                // 2. Detect the fence.
+                // 3. Verify the past move.
+                // (4. Check for a block change entry or last placed block.)
+                // TODO: REMOVE TEST
             }
             else if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0) {
                 // Reset fall distance if set so in the config.
@@ -2817,10 +2824,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (from.getBlockFlags() != 0) {
                 builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
             }
-            if (from.getTypeId() != Material.AIR) {
+            if (!BlockProperties.isAir(from.getTypeId())) {
                 DebugUtil.addBlockInfo(builder, from, "\nfrom");
             }
-            if (from.getTypeIdBelow() != Material.AIR) {
+            if (!BlockProperties.isAir(from.getTypeIdBelow())) {
                 DebugUtil.addBlockBelowInfo(builder, from, "\nfrom");
             }
             if (!from.isOnGround() && from.isOnGround(0.5)) {
@@ -2830,10 +2837,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             if (to.getBlockFlags() != 0) {
                 builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
             }
-            if (to.getTypeId() != Material.AIR) {
+            if (!BlockProperties.isAir(to.getTypeId())) {
                 DebugUtil.addBlockInfo(builder, to, "\nto");
             }
-            if (to.getTypeIdBelow() != Material.AIR) {
+            if (!BlockProperties.isAir(to.getTypeIdBelow())) {
                 DebugUtil.addBlockBelowInfo(builder, to, "\nto");
             }
             if (!to.isOnGround() && to.isOnGround(0.5)) {

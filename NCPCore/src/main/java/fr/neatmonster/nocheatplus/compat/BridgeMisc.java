@@ -50,8 +50,6 @@ public class BridgeMisc {
 
     private static final Method Bukkit_getOnlinePlayers = ReflectionUtil.getMethodNoArgs(Bukkit.class, "getOnlinePlayers");
 
-    public static final Material FIREWORK = Material.getMaterial("FIREWORK");
-
     /**
      * Correction of position: Used for ordinary setting back. <br>
      * NOTE: Currently it's not distinguished, if we do it as a proactive
@@ -130,7 +128,8 @@ public class BridgeMisc {
     public static boolean maybeElytraBoost(final Player player, final Material materialInHand) {
         // TODO: Account for MC version (needs configuration override or auto adapt to protocol support).
         // TODO: Non-static due to version checks (...).
-        return FIREWORK != null && materialInHand == FIREWORK && Bridge1_9.isGlidingWithElytra(player);
+        return BridgeMaterial.FIREWORK_ROCKET != null 
+                && materialInHand == BridgeMaterial.FIREWORK_ROCKET && Bridge1_9.isGlidingWithElytra(player);
     }
 
     /**
@@ -142,7 +141,7 @@ public class BridgeMisc {
      *         the item is null or can't be judged, -1 is returned.
      */
     public static int getFireworksPower(final ItemStack item) {
-        if (item == null || item.getType() != FIREWORK) {
+        if (item == null || item.getType() != BridgeMaterial.FIREWORK_ROCKET) {
             return 0;
         }
         final ItemMeta meta = item.getItemMeta();

@@ -386,7 +386,7 @@ public class FakeBlockCache extends BlockCache {
             final int y = entry.getY();
             final int z = entry.getZ();
             final Material id = entry.getValue();
-            if (id == Material.AIR) {
+            if (BlockProperties.isAir(id)) {
                 builder.append(fbcName + ".set(" + x + ", " + y + ", " + z + ", " + id + ");");
             }
             else {

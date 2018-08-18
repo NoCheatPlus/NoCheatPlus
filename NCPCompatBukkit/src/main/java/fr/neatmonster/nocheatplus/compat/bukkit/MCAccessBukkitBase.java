@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.MaterialUtil;
 
 public class MCAccessBukkitBase implements MCAccess {
 
@@ -239,15 +240,14 @@ public class MCAccessBukkitBase implements MCAccess {
 
     @Override
     public AlmostBoolean isBlockLiquid(final Material mat) {
-        if (mat == null) return AlmostBoolean.MAYBE;
-        switch (mat) {
-            case STATIONARY_LAVA:
-            case STATIONARY_WATER:
-            case WATER:
-            case LAVA:
-                return AlmostBoolean.YES;
-            default:
-                return AlmostBoolean.NO;
+        if (mat == null) {
+            return AlmostBoolean.MAYBE;
+        }
+        else if (MaterialUtil.WATER.contains(mat) || MaterialUtil.LAVA.contains(mat)) {
+            return AlmostBoolean.YES;
+        }
+        else {
+            return AlmostBoolean.NO;
         }
     }
 

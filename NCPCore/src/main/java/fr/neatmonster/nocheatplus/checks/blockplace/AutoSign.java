@@ -27,6 +27,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -59,8 +60,8 @@ public class AutoSign extends Check {
         final BlockPlaceData data = pData.getGenericInstance(BlockPlaceData.class);
         final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
         Material mat = block.getType();
-        if (mat == Material.SIGN_POST || mat == Material.WALL_SIGN) {
-            mat = Material.SIGN;
+        if (mat == BridgeMaterial.SIGN || mat == Material.WALL_SIGN) {
+            mat = Material.SIGN; // ITEM
         }
         if (data.autoSignPlacedHash != BlockPlaceListener.getBlockPlaceHash(block, mat)){
             tags.add("block_mismatch");

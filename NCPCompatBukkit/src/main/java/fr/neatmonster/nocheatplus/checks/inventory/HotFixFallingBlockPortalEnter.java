@@ -26,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
@@ -92,7 +93,10 @@ public class HotFixFallingBlockPortalEnter implements Listener {
             if (worldData.getGenericInstance(InventoryConfig.class).hotFixFallingBlockEndPortalActive) {
                 final BlockCache blockCache = wrapBlockCache.getBlockCache();
                 blockCache.setAccess(world);
-                final boolean nearbyPortal = BlockProperties.collidesId(blockCache, loc.getX() - 2.0, loc.getY() - 2.0, loc.getZ() - 2.0, loc.getX() + 3.0, loc.getY() + 3.0, loc.getZ() + 3.0, Material.ENDER_PORTAL);
+                final boolean nearbyPortal = BlockProperties.collidesId(blockCache, 
+                        loc.getX() - 2.0, loc.getY() - 2.0, loc.getZ() - 2.0, 
+                        loc.getX() + 3.0, loc.getY() + 3.0, loc.getZ() + 3.0, 
+                        BridgeMaterial.END_PORTAL);
                 blockCache.cleanup();
                 if (nearbyPortal) {
                     // Likely spigot currently removes entities entering portals anyway (cross-world teleport issues).

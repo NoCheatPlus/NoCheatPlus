@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -52,39 +53,43 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         BlockProperties.setBlockProps("CHORUS_FLOWER", instant);
 
         // 201(PURPUR_BLOCK / SOLID+GROUND) 
-        BlockInit.setAs("PURPUR_BLOCK", Material.SMOOTH_BRICK);
+        BlockInit.setAs("PURPUR_BLOCK", BridgeMaterial.STONE_BRICKS);
 
         // 202(PURPUR_PILLAR / SOLID+GROUND) 
-        BlockInit.setAs("PURPUR_PILLAR", Material.SMOOTH_BRICK); // Rough.
+        BlockInit.setAs("PURPUR_PILLAR", BridgeMaterial.STONE_BRICKS); // Rough.
 
         // 203(PURPUR_STAIRS / SOLID+GROUND) 
-        BlockInit.setAs("PURPUR_STAIRS", Material.SMOOTH_STAIRS); // Rough.
+        BlockInit.setAs("PURPUR_STAIRS", BridgeMaterial.STONE_BRICK_STAIRS); // Rough.
 
         // 204(PURPUR_DOUBLE_SLAB / SOLID+GROUND) 
-        BlockInit.setAs("PURPUR_DOUBLE_SLAB", Material.DOUBLE_STEP);
+        if (BridgeMaterial.has("PURPUR_DOUBLE_SLAB")) {
+            if (BridgeMaterial.has("PURPUR_DOUBLE_SLAB")) {
+                BlockInit.setAs("PURPUR_DOUBLE_SLAB", Material.DOUBLE_STEP);
+            }
+        }
 
         // 205(PURPUR_SLAB / SOLID+GROUND) 
-        BlockInit.setAs("PURPUR_SLAB", Material.STEP);
+        BlockInit.setAs("PURPUR_SLAB", BridgeMaterial.STONE_SLAB);
 
         // 206(END_BRICKS / SOLID+GROUND) 
-        BlockInit.setAs("END_BRICKS", Material.SANDSTONE);
+        BlockInit.setAs(BridgeMaterial.END_STONE_BRICKS, Material.SANDSTONE);
 
         // 207(BEETROOT_BLOCK) 
-        BlockFlags.addFlags("BEETROOT_BLOCK", ground);
-        BlockProperties.setBlockProps("BEETROOT_BLOCK", instant);
+        BlockFlags.addFlags(BridgeMaterial.BEETROOTS, ground);
+        BlockProperties.setBlockProps(BridgeMaterial.BEETROOTS, instant);
 
         // 208(GRASS_PATH / SOLID+GROUND) 
-        BlockInit.setAs("GRASS_PATH", Material.GRASS);
+        BlockInit.setAs("GRASS_PATH", BridgeMaterial.GRASS_BLOCK); // Later it'll be lower!
 
         // 209(END_GATEWAY) 
         // -> Leave flags as is (like air).
         BlockProperties.setBlockProps("END_GATEWAY", BlockProperties.indestructibleType);
 
         // 210(COMMAND_REPEATING / SOLID+GROUND) 
-        BlockInit.setAs("COMMAND_REPEATING", "COMMAND"); // Like command block.
+        BlockInit.setAs(BridgeMaterial.REPEATING_COMMAND_BLOCK, BridgeMaterial.COMMAND_BLOCK);
 
         // 211(COMMAND_CHAIN / SOLID+GROUND) 
-        BlockInit.setAs("COMMAND_CHAIN", "COMMAND"); // Like command block.
+        BlockInit.setAs(BridgeMaterial.CHAIN_COMMAND_BLOCK, BridgeMaterial.COMMAND_BLOCK);
 
         // 212(FROSTED_ICE / SOLID+GROUND) 
         BlockInit.setAs("FROSTED_ICE", Material.ICE);

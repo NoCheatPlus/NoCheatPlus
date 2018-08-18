@@ -8,6 +8,7 @@ website: ${project.url}
 dev-url: ${project.url}
 
 main: ${project.groupId}.${project.artifactId}.${project.name}
+api-version: 1.13
 
 softdepend:
 - ProtocolLib

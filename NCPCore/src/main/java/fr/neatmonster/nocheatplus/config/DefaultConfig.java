@@ -188,7 +188,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, unifiedBlockReachActions, 785);
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, "default", 785);
-        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList(Material.WATER_LILY.toString(), Material.FLINT_AND_STEEL.toString()), 785);
+        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList("WATER_LILY", "LILY_PAD", Material.FLINT_AND_STEEL.toString()), 785);
         set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel", 785);
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, "default", 785);
@@ -675,10 +675,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>(), 785);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + Material.SNOW.name().toLowerCase(), "default", 785);
         // Make blocks ign_passable+ground_height.
-        for (final Material mat : Arrays.asList(
-                Material.PISTON_MOVING_PIECE
+        for (final String name : Arrays.asList(
+                // TODO: 
+                "piston_moving_piece",
+                "moving_piston"
                 )) {
-            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + mat.name().toLowerCase(), "default+ign_passable+ground_height", 785);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + name, "default+ign_passable+ground_height", 785);
         }
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, true, 1036); // With lastChangedBuildNumber.
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true, 785);

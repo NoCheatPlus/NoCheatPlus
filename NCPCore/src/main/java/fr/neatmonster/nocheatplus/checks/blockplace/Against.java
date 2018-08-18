@@ -24,6 +24,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
@@ -42,7 +43,10 @@ public class Against extends Check {
             final Block blockAgainst, final boolean isInteractBlock, 
             final BlockPlaceData data, final BlockPlaceConfig cc, final IPlayerData pData) {
         boolean violation = false;
-        // TODO: Make more precise (workarounds like WATER_LILY, general points, such as action?).
+        /*
+         * TODO: Make more precise (workarounds like BridgeMisc.LILY_PAD,
+         * general points, such as action?).
+         */
         // Workaround for signs on cactus and similar.
         final BlockInteractData bdata = pData.getGenericInstance(BlockInteractData.class); // TODO: pass as argument.
         final Material againstType = blockAgainst.getType();
@@ -65,7 +69,7 @@ public class Against extends Check {
         }
         else if (BlockProperties.isLiquid(againstType)) {
             // TODO: F_PLACE_AGAINST_WATER|LIQUID...
-            if ((placedMat != Material.WATER_LILY 
+            if ((placedMat != BridgeMaterial.LILY_PAD
                     || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  
                     && !pData.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS, player)) {
                 violation = true;

@@ -14,10 +14,8 @@
  */
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,14 +34,6 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
  *
  */
 public class InventoryUtil {
-
-    // TODO: Better location for the boat/item stuff than InventoryUtil.
-    private static final Set<Material> boats = new HashSet<Material>();
-
-    static {
-        boats.add(Material.BOAT);
-        boats.addAll(collectItemsByPrefix("BOAT_")); // Oops: prefix.
-    }
 
     /**
      * Collect non-block items by suffix of their Material name (case insensitive).
@@ -75,10 +65,6 @@ public class InventoryUtil {
             }
         }
         return res;
-    }
-
-    public static boolean isBoat(final Material mat) {
-        return boats.contains(mat);
     }
 
     /**

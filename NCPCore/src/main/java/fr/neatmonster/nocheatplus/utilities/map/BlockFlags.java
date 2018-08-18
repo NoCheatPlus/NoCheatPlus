@@ -52,6 +52,16 @@ public class BlockFlags {
     }
 
     /**
+     * Set the same flags for newMat as are present for mat.
+     * 
+     * @param newMat
+     * @param mat
+     */
+    public static void setFlagsAs(Material newMat, Material mat) {
+        BlockProperties.setBlockFlags(newMat, BlockProperties.getBlockFlags(mat));
+    }
+
+    /**
      * Add flags to existent flags. (Uses BlockProperties.)
      *
      * @param id

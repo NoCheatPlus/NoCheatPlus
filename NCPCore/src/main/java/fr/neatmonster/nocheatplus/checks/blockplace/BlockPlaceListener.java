@@ -56,10 +56,10 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.players.PlayerFactoryArgument;
 import fr.neatmonster.nocheatplus.stats.Counters;
-import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.map.MaterialUtil;
 import fr.neatmonster.nocheatplus.worlds.WorldFactoryArgument;
 
 /**
@@ -375,14 +375,14 @@ public class BlockPlaceListener extends CheckListener {
         final IPlayerData pData = DataManager.getPlayerData(player);
         final BlockPlaceConfig cc = pData.getGenericInstance(BlockPlaceConfig.class);
         final Material type = stack.getType();
-        if (InventoryUtil.isBoat(type)) {
+        if (MaterialUtil.isBoat(type)) {
             if (cc.preventBoatsAnywhere) {
                 // TODO: Alter config (activation, allow on top of ground).
                 // TODO: Version/plugin specific alteration for 'default'.
                 checkBoatsAnywhere(player, event, cc, pData);
             }
         }
-        else if (type == Material.MONSTER_EGG) {
+        else if (MaterialUtil.isSpawnEgg(type)) {
             // Check blockplace.speed.
             if (speed.isEnabled(player, pData) && speed.check(player, cc, pData)) {
                 // If the check was positive, cancel the event.

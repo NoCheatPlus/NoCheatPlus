@@ -95,7 +95,7 @@ public class BlockBreakData extends ACheckData implements IDataOnReload {
         clickedY = block.getY();
         clickedZ = block.getZ();
         clickedTick = tick;
-        clickedTool = tool == Material.AIR ? null : tool;
+        clickedTool = BlockProperties.isAir(tool) ? null : tool;
     }
 
     /**

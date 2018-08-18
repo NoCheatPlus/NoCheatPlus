@@ -38,7 +38,7 @@ import fr.neatmonster.nocheatplus.utilities.location.PlayerLocation;
 public class NoFall extends Check {
 
     /*
-     * TODO: Due to soil not converting back to dirt with the current
+     * TODO: Due to farmland/soil not converting back to dirt with the current
      * implementation: Implement packet sync with moving events. Then alter
      * packet on-ground and mc fall distance for a new default concept. As a
      * fall back either the old method, or an adaption with scheduled/later fall
