@@ -34,6 +34,8 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
+import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.MaterialUtil;
 
 public class MCAccessBukkitBase implements MCAccess {
@@ -46,6 +48,40 @@ public class MCAccessBukkitBase implements MCAccess {
     }
 
     protected boolean guessItchyBlock(final Material mat) {
+        // General considerations first.
+        if (BlockProperties.isAir(mat) || BlockProperties.isLiquid(mat)) {
+            return false;
+        }
+        // Fully solid/ground blocks.
+        final long flags = BlockProperties.getBlockFlags(mat);
+        /*
+         * Skip fully passable blocks (partially passable blocks may be itchy,
+         * though slabs will be easy to handle).
+         */
+        if (BlockFlags.hasAnyFlag(flags,BlockProperties.F_IGN_PASSABLE)) {
+            // TODO: Blocks with min_height may actually be ok, if xz100 and some height are set.
+            if (BlockFlags.hasNoFlags(flags, 
+                    BlockProperties.F_GROUND_HEIGHT 
+                    | BlockProperties.F_GROUND
+                    | BlockProperties.F_SOLID)) {
+                // Explicitly passable.
+                return false;
+            }
+            else {
+                // Potentially itchy.
+                return true;
+            }
+        }
+        long testFlags = (BlockProperties.F_SOLID | BlockProperties.F_XZ100 
+                | BlockProperties.F_HEIGHT100);
+        if (BlockFlags.hasAllFlags(flags, testFlags)) {
+            // Fully solid block!
+            return false;
+        }
+
+        // TODO: Directional stairs / slabs (wall heads, ...)
+        // TODO: Ground heads/skulls.
+
         // TODO: Use working route.
         return guessItchyBlockPre1_13(mat);
     }

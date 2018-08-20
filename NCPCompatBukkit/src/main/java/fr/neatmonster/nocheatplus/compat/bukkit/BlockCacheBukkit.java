@@ -58,6 +58,19 @@ public class BlockCacheBukkit extends BlockCache {
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
         // minX, minY, minZ, maxX, maxY, maxZ
+
+
+        /*
+         * TODO: Since whenever available: use bukkit methods to do the
+         * (somewhat) obvious shapes. Might introduce block models and for now
+         * trigger with flags (stairs, half_blocks), then get the precise shape
+         * via evaluating directional/whatnot. Reliably detect full blocks.
+         * Attempt to initialize more smart (don't override flags for anything
+         * known otherwise, ModelBlock with a
+         * directional/soandso-bukklit-interface based shape building with
+         * parameter(s).)
+         */
+
         // TODO: Want to maintain a list with manual entries or at least half / full blocks ?
         // Always return full bounds, needs extra adaption to BlockProperties (!).
         return new double[]{0D, 0D, 0D, 1D, 1D, 1D};

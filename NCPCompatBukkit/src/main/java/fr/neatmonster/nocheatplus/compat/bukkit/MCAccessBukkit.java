@@ -15,18 +15,11 @@
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.bukkit.Material;
 
-import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.map.MaterialUtil;
 
 public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertiesSetup{
 
@@ -38,32 +31,8 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
     public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
         // Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
         // TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
-        final Set<Material> fullBlocks = new HashSet<Material>();
-        for (final Material mat : new Material[]{
-                // TODO: Ice !? / Packed ice !?
-                Material.GLASS, Material.GLOWSTONE, Material.ICE,
-                BridgeMaterial.COMMAND_BLOCK, Material.BEACON,
-                BridgeMaterial.PISTON,
-        }) {
-            fullBlocks.add(mat);
-        }
-        @SuppressWarnings("unchecked")
-        final List<Set<Material>> fullBlockSets = Arrays.asList(
-                // TODO: GLASS_TYPES, ICE_TYPES, 
-                MaterialUtil.LEAVES,
-                BridgeMaterial.getAll(
-                        "repeating_command_block", "chain_command_block"
-                        ));
-        for (final Set<Material> set : fullBlockSets) {
-            for (final Material mat : set) {
-                fullBlocks.add(mat);
-            }
-        }
         for (final Material mat : Material.values()) {
             if (!mat.isBlock()) {
-                continue;
-            }
-            else if (fullBlocks.contains(mat)) {
                 continue;
             }
             else if (guessItchyBlock(mat)) {
@@ -80,6 +49,7 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
         for (final Material mat : new Material[]{
                 Material.ENDER_PORTAL_FRAME,
         }) {
+            // TODO: Add BlockFlags.FULL_BOUNDS?
             final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
             BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
         }

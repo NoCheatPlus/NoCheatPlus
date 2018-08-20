@@ -143,6 +143,17 @@ public class BridgeMaterial {
         return res;
     }
 
+    public static Set<Material> getAllBlocks(String... names) {
+        final LinkedHashSet<Material> res = new LinkedHashSet<Material>();
+        for (final String name : names) {
+            final Material mat = get(name);
+            if (mat != null && mat.isBlock()) {
+                res.add(mat);
+            }
+        }
+        return res;
+    }
+
     public static boolean has(String name) {
         return all.containsKey(name.toLowerCase());
     }

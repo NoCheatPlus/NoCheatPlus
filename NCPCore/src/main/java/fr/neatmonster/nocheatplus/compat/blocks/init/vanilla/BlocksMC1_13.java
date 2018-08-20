@@ -80,7 +80,7 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         BlockInit.setInstantAir("WALL_TORCH");
 
         // Stone types.
-        for (Material mat : BridgeMaterial.getAll("andesite", "diorite", "granite", 
+        for (Material mat : BridgeMaterial.getAllBlocks("andesite", "diorite", "granite", 
                 "polished_andesite", "polished_diorite", "polished_granite",
                 "smooth_stone")) {
             BlockInit.setAs(mat, Material.STONE);

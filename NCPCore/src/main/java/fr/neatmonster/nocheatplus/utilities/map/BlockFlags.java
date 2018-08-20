@@ -25,6 +25,9 @@ import org.bukkit.Material;
  */
 public class BlockFlags {
 
+    /** Explicitly set full bounds. */
+    public static final long FULL_BOUNDS = BlockProperties.F_XZ100 | BlockProperties.F_HEIGHT100;
+
     /**
      * Set flags of id same as already set with flags for the given material.
      * (Uses BlockProperties.)
@@ -95,6 +98,39 @@ public class BlockFlags {
      */
     public static void removeFlags(String id, long flags) {
         BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
+    }
+
+    /**
+     * Test if any flags within testFlags are contained.
+     * 
+     * @param flags
+     * @param testFlags
+     * @return
+     */
+    public static boolean hasAnyFlag(long flags, long testFlags) {
+        return (flags & testFlags) != 0L;
+    }
+
+    /**
+     * Test if all flags within testFlags are contained.
+     * 
+     * @param flags
+     * @param testFlags
+     * @return
+     */
+    public static boolean hasAllFlags(long flags, long testFlags) {
+        return (flags & testFlags) == testFlags;
+    }
+
+    /**
+     * Test if no flags within testFlags are contained.
+     * 
+     * @param flags
+     * @param testFlags
+     * @return
+     */
+    public static boolean hasNoFlags(long flags, long testFlags) {
+        return (flags & testFlags) == 0L;
     }
 
 }

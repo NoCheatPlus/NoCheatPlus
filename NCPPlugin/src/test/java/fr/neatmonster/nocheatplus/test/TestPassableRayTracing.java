@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.test;
 import org.bukkit.Material;
 import org.junit.Test;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.collision.PassableRayTracing;
@@ -152,8 +153,7 @@ public class TestPassableRayTracing {
         final double[] stepBounds = new double[]{0.0, 0.0, 0.0, 1.0, 0.5, 1.0};
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                // STONE = HACK (CompatBukkit block-flags problem).
-                bc.set(x, 65, z, Material.STONE, stepBounds);
+                bc.set(x, 65, z, BridgeMaterial.STONE_SLAB, stepBounds);
             }
         }
         PassableRayTracing rt = new PassableRayTracing();

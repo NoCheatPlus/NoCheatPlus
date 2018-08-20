@@ -1550,6 +1550,19 @@ public class BlockProperties {
             // TODO: Model shears directly somehow (per-block list).
         }
 
+        // Fully solid blocks (shape / passable) - simplifies MCAccessBukkit setup, aim at 1.13+.
+        for (Material mat : MaterialUtil.FULLY_SOLID_BLOCKS) {
+            BlockFlags.addFlags(mat, 
+                    // Full bounds for sure.
+                    BlockFlags.FULL_BOUNDS 
+                    /*
+                     * Ensure solid is set (slight abuse/ambiguity
+                     * with ground, and potential future use of
+                     * Material#isSolid.
+                     */
+                    | BlockProperties.F_SOLID);
+        }
+
     }
 
     /**
