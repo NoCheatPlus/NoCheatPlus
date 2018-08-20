@@ -22,6 +22,7 @@ import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
+import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkitModern;
 import fr.neatmonster.nocheatplus.compat.cbreflect.MCAccessCBReflect;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
@@ -64,6 +65,14 @@ public class MCAccessFactory {
             catch (Throwable t) {
                 throwables.add(t);
             }
+        }
+
+        // Bukkit API only: 1.13 (and possibly later).
+        try {
+            return new MCAccessBukkitModern();
+        }
+        catch(Throwable t) {
+            throwables.add(t);
         }
 
         // Try to set up api-only access (since 1.4.6).

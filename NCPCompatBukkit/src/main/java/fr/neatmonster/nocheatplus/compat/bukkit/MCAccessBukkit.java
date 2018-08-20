@@ -17,11 +17,13 @@ package fr.neatmonster.nocheatplus.compat.bukkit;
 
 import org.bukkit.Material;
 
+import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
-public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertiesSetup{
+public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertiesSetup {
 
     public MCAccessBukkit() {
         super();
@@ -37,21 +39,24 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
             }
             else if (guessItchyBlock(mat)) {
                 // Uncertain bounding-box, allow passing through.
+                StaticLog.logDebug("Itchy: " + mat);
                 long flags = BlockProperties.F_IGN_PASSABLE;
-                if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {
+                if ((BlockProperties.isSolid(mat) 
+                        || BlockProperties.isGround(mat))) {
                     // Block can be ground, so allow standing on any height.
-                    flags |= BlockProperties.F_GROUND_HEIGHT;
+                    flags |= BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT;
                 }
                 BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
             }
         }
         // Blocks that are reported to be full and solid, but which are not.
+        final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
         for (final Material mat : new Material[]{
-                Material.ENDER_PORTAL_FRAME,
+                BridgeMaterial.END_PORTAL_FRAME,
         }) {
-            // TODO: Add BlockFlags.FULL_BOUNDS?
-            final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
-            BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+            if (!processedBlocks.contains(mat)) {
+                BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+            }
         }
     }
 

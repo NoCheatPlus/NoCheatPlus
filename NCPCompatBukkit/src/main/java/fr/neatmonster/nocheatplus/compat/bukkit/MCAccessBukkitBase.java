@@ -14,6 +14,9 @@
  */
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -43,13 +46,19 @@ public class MCAccessBukkitBase implements MCAccess {
     // private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
     protected final boolean bukkitHasGetHeightAndGetWidth;
 
+    /**
+     * Fill in already initialized blocks, to return false for guessItchyBlock.
+     */
+    protected final Set<Material> processedBlocks = new LinkedHashSet<Material>();
+
     private boolean guessItchyBlockPre1_13(final Material mat) {
         return !mat.isOccluding() || !mat.isSolid() || mat.isTransparent();
     }
 
     protected boolean guessItchyBlock(final Material mat) {
         // General considerations first.
-        if (BlockProperties.isAir(mat) || BlockProperties.isLiquid(mat)) {
+        if (processedBlocks.contains(mat)
+                || BlockProperties.isAir(mat) || BlockProperties.isLiquid(mat)) {
             return false;
         }
         // Fully solid/ground blocks.
@@ -58,7 +67,7 @@ public class MCAccessBukkitBase implements MCAccess {
          * Skip fully passable blocks (partially passable blocks may be itchy,
          * though slabs will be easy to handle).
          */
-        if (BlockFlags.hasAnyFlag(flags,BlockProperties.F_IGN_PASSABLE)) {
+        if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_IGN_PASSABLE)) {
             // TODO: Blocks with min_height may actually be ok, if xz100 and some height are set.
             if (BlockFlags.hasNoFlags(flags, 
                     BlockProperties.F_GROUND_HEIGHT 
@@ -75,7 +84,7 @@ public class MCAccessBukkitBase implements MCAccess {
         long testFlags = (BlockProperties.F_SOLID | BlockProperties.F_XZ100 
                 | BlockProperties.F_HEIGHT100);
         if (BlockFlags.hasAllFlags(flags, testFlags)) {
-            // Fully solid block!
+            // Fully solid block.
             return false;
         }
 
