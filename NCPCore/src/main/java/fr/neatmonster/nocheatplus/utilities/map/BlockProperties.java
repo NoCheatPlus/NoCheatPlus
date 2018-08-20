@@ -676,40 +676,60 @@ public class BlockProperties {
     /** The Constant blockFlags. */
     protected static final Map<Material, Long> blockFlags = new HashMap<Material, Long>();
 
+    /**
+     * Map flag to names.
+     */
+    private static final Map<Long, String> flagNameMap = new LinkedHashMap<Long, String>();
+
+    /**
+     * Map flag name to flag, both names starting with F_... and the name
+     * without F_.
+     */
+    private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
+
+    private static long f_next = 1;
+    private static long f_flag() {
+        if (f_next <= 0L) {
+            throw new IllegalStateException("No more flags available.");
+        }
+        final long flag = f_next;
+        f_next *= 2L;
+        return flag;
+    }
     /** Flag position for stairs. */
-    public static final long F_STAIRS                       = 0x1L;
+    public static final long F_STAIRS                       = f_flag();
 
     /** The Constant F_LIQUID. */
-    public static final long F_LIQUID                       = 0x2L;
+    public static final long F_LIQUID                       = f_flag();
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
-    public static final long F_SOLID                        = 0x4L;
+    public static final long F_SOLID                        = f_flag();
     /** Compatibility flag: regard this block as passable always. */
-    public static final long F_IGN_PASSABLE                 = 0x8L;
+    public static final long F_IGN_PASSABLE                 = f_flag();
 
     /** The Constant F_WATER. */
-    public static final long F_WATER                        = 0x10L;
+    public static final long F_WATER                        = f_flag();
 
     /** The Constant F_LAVA. */
-    public static final long F_LAVA                         = 0x20L;
+    public static final long F_LAVA                         = f_flag();
     /** Override bounding box: 1.5 blocks high, like fences.<br>
      *  NOTE: This might have relevance for passable later.
      */
-    public static final long F_HEIGHT150                    = 0x40L;
+    public static final long F_HEIGHT150                    = f_flag();
     /** The player can stand on these, sneaking or not. */
-    public static final long F_GROUND                       = 0x80L; // TODO: 
+    public static final long F_GROUND                       = f_flag(); // TODO: 
     /** Override bounding box: 1 block height.<br>
      * NOTE: This should later be ignored by passable, rather.
      */
-    public static final long F_HEIGHT100                    = 0x100L;
+    public static final long F_HEIGHT100                    = f_flag();
     /** Climbable like ladder and vine (allow to land on without taking damage). */
-    public static final long F_CLIMBABLE                    = 0x200L;
+    public static final long F_CLIMBABLE                    = f_flag();
     /** The block can change shape. This is most likely not 100% accurate... */
-    public static final long F_VARIABLE                     = 0x400L;
+    public static final long F_VARIABLE                     = f_flag();
     //    /** The block has full bounds (0..1), inaccurate! */
     //    public static final int F_FULL   		= 0x800;
     /** Block has full xz-bounds. */
-    public static final long F_XZ100                        = 0x800L;
+    public static final long F_XZ100                        = f_flag();
 
     /**
      * This flag indicates that everything between the minimum ground height and
@@ -720,122 +740,122 @@ public class BlockProperties {
      * otherwise colliding blocks
      * ({@link #isPassableWorkaround(BlockCache, int, int, int, double, double, double, IBlockCacheNode, double, double, double, double)}).
      */
-    public static final long F_GROUND_HEIGHT                = 0x1000L;
+    public static final long F_GROUND_HEIGHT                = f_flag();
 
     /** 
      * The height is assumed to decrease from 1.0 with increasing data value from 0 to 0x7, with 0x7 being the lowest.
      * (repeating till 0x15)). 0x8 means falling/full block. This is meant to model flowing water/lava. <br>
      * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only.
      */
-    public static final long F_HEIGHT_8SIM_DEC              = 0x2000L;
+    public static final long F_HEIGHT_8SIM_DEC              = f_flag();
 
     /**
      * The height is assumed to increase with data value up to 0x7, repeating up to 0x15.<br>
      * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only,<br>
      * as with the 1.4.x snow levels.
      */
-    public static final long F_HEIGHT_8SIM_INC              = 0x4000L;
+    public static final long F_HEIGHT_8SIM_INC              = f_flag();
 
 
     /**
      * The height increases with data value (8 heights).<br>
      * This is for MC 1.5 snow levels.
      */
-    public static final long F_HEIGHT_8_INC                 = 0x8000L;
+    public static final long F_HEIGHT_8_INC                 = f_flag();
 
     /** All rail types a minecart can move on. */
-    public static final long F_RAILS                        = 0x10000L;
+    public static final long F_RAILS                        = f_flag();
 
     /** ICE. */
-    public static final long F_ICE                          = 0x20000L;
+    public static final long F_ICE                          = f_flag();
 
     /** LEAVES. */
-    public static final long F_LEAVES                       = 0x40000L;
+    public static final long F_LEAVES                       = f_flag();
 
     /** THIN FENCE (glass panes, iron fence). */
-    public static final long F_THIN_FENCE                   = 0x80000L;
+    public static final long F_THIN_FENCE                   = f_flag();
 
     /** Meta-flag to indicate that the (max.-) edges should mean a collision, can be passed to collidesBlock. */
-    public static final long F_COLLIDE_EDGES                = 0x100000L;
+    public static final long F_COLLIDE_EDGES                = f_flag();
 
     /** Thick fence (default wooden fence). */
-    public static final long F_THICK_FENCE                  = 0x200000L;
+    public static final long F_THICK_FENCE                  = f_flag();
 
     /** Fence gate style with 0x04 being fully passable. */
-    public static final long F_PASSABLE_X4                  = 0x400000L;
+    public static final long F_PASSABLE_X4                  = f_flag();
 
     // TODO: Separate no fall damage flag ? [-> on ground could return "dominating" flags, or extra flags]
     /** Like slime block: bounce back 25% of fall height without taking fall damage [TODO: Check/adjust]. */
-    public static final long F_BOUNCE25                     = 0x800000L;
+    public static final long F_BOUNCE25                     = f_flag();
 
     /**
      * The facing direction is described by the lower 3 data bits in order of
      * NSWE, starting at and defaulting to 2, which includes invalid states.
      * Main purpose is ladders, no guarantees on defaults for other blocks yet.
      */
-    public static final long F_FACING_LOW3D2_NSWE           = 0x1000000L;
+    public static final long F_FACING_LOW3D2_NSWE           = f_flag();
 
     /**
      * The direction the block is attached to is described by the lower 2 bits
      * in order of SNEW.
      */
-    public static final long F_ATTACHED_LOW2_SNEW           = 0x2000000L;
+    public static final long F_ATTACHED_LOW2_SNEW           = f_flag();
 
     /**
      * The hacky way to force sfNoLowJump when the block at from has this flag.
      */
-    public static final long F_ALLOW_LOWJUMP                = 0x4000000L;
+    public static final long F_ALLOW_LOWJUMP                = f_flag();
 
     /** One eighth block height (0.125). */
-    public static final long F_HEIGHT8_1                    = 0x8000000L;
+    public static final long F_HEIGHT8_1                    = f_flag();
 
     /**
      * Fall distance is divided by 2, if a move goes through this medium
      * (currently only supports liquid).
      */
-    public static final long F_FALLDIST_HALF                = 0x10000000L;
+    public static final long F_FALLDIST_HALF                = f_flag();
 
     /**
      * Fall distance is set to zero, if a move goes through this medium
      * (currently only supports liquid).
      */
-    public static final long F_FALLDIST_ZERO                = 0x20000000L;
+    public static final long F_FALLDIST_ZERO                = f_flag();
 
     /**
      * Minimum height 15/16 (0.9375 = 1 - 0.0625). <br>
      * Only applies with F_GROUND_HEIGHT set.
      */
-    public static final long F_MIN_HEIGHT16_15              = 0x40000000L;
+    public static final long F_MIN_HEIGHT16_15              = f_flag();
 
     /**
      * Minimum height 1/16 (0.0625). <br>
      * Only applies with F_GROUND_HEIGHT set.
      */
     // TODO: Lily pad min height of MC versions?
-    public static final long F_MIN_HEIGHT16_1               = 0x80000000L;
+    public static final long F_MIN_HEIGHT16_1               = f_flag();
 
     /** CARPET. **/
-    public static final long F_CARPET                       = 0x100000000L;
+    public static final long F_CARPET                       = f_flag();
 
     /** Cobweb like blocks (adhesive). */
-    public static final long F_COBWEB                       = 0x200000000L;
+    public static final long F_COBWEB                       = f_flag();
 
     /**
      * Block change tracking: ordinary right click interaction (use) can change
      * the shape.
      */
-    public static final long F_VARIABLE_USE                 = 0x400000000L;
+    public static final long F_VARIABLE_USE                 = f_flag();
 
     /**
      * Block change tracking: block redstone events can change the shape.
      */
-    public static final long F_VARIABLE_REDSTONE            = 0x800000000L;
+    public static final long F_VARIABLE_REDSTONE            = f_flag();
 
     /**
      * Indicator to start recoding towards multiple flag types (shape, moving,
      * interaction, block-type/special, ...).
      */
-    public static final long F_MAX_FLAG                     = 0x80000000000000L;
+    public static final long F_MAX_FLAG                     = f_flag();
 
     // TODO: Convenience constants combining all height / minheight flags.
 
@@ -844,16 +864,6 @@ public class BlockProperties {
     // Special case activation flags.
     /** Trap door is climbable with ladder underneath, both facing distinct. */
     private static boolean specialCaseTrapDoorAboveLadder = false;
-
-    /**
-     * Map flag to names.
-     */
-    private static final Map<Long, String> flagNameMap = new LinkedHashMap<Long, String>();
-    /**
-     * Map flag name to flag, both names starting with F_... and the name
-     * without F_.
-     */
-    private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
 
     /** The Constant useLoc. */
     private static final Location useLoc = new Location(null, 0, 0, 0);
@@ -891,7 +901,8 @@ public class BlockProperties {
      * @param worldConfigProvider
      *            the world config provider
      */
-    public static void init(final IHandle<MCAccess> mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+    public static void init(final IHandle<MCAccess> mcAccess, 
+            final WorldConfigProvider<?> worldConfigProvider) {
         wrapBlockCache = new WrapBlockCache();
         rtRay = new PassableRayTracing();
         rtAxis = new PassableAxisTracing();
@@ -910,13 +921,14 @@ public class BlockProperties {
                 StaticLog.logSevere(t);
             }
             // Allow mcAccess to setup block properties.
-            if (mcAccess instanceof BlockPropertiesSetup) {
+            final MCAccess handle = mcAccess.getHandle();
+            if (handle instanceof BlockPropertiesSetup) {
                 try{
-                    ((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
-                    blocksFeatures.add(mcAccess.getClass().getSimpleName());
+                    ((BlockPropertiesSetup) handle).setupBlockProperties(worldConfigProvider);
+                    blocksFeatures.add(handle.getClass().getSimpleName());
                 }
                 catch(Throwable t) {
-                    StaticLog.logSevere("McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                    StaticLog.logSevere("McAccess.setupBlockProperties (" + handle.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
                     StaticLog.logSevere(t);
                 }
             }
@@ -1077,13 +1089,17 @@ public class BlockProperties {
                 BridgeMaterial.get("DIODE_BLOCK_OFF"), 
                 BridgeMaterial.get("DIODE_BLOCK_ON"),
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
-                BridgeMaterial.MOVING_PISTON, BridgeMaterial.PISTON_HEAD,
+                BridgeMaterial.PISTON_HEAD,
                 BridgeMaterial.STONE_SLAB,
         }) {
             if (mat != null) {
                 setFlag(mat, F_GROUND);
             }
         }
+
+        setBlockProps(BridgeMaterial.MOVING_PISTON, indestructibleType); // TODO: really?
+        setFlag(BridgeMaterial.MOVING_PISTON, F_IGN_PASSABLE | F_GROUND | F_GROUND_HEIGHT 
+                | BlockFlags.FULL_BOUNDS);
 
         // Full block height.
         for (final Material mat : new Material[]{
@@ -1233,7 +1249,7 @@ public class BlockProperties {
         @SuppressWarnings("unchecked")
         List<Set<Material>> instantSets = Arrays.asList(
                 MaterialUtil.BUSHES, MaterialUtil.TULIPS, 
-                MaterialUtil.SAPLINGS, MaterialUtil.FLOWER_POTS
+                MaterialUtil.SAPLINGS
                 );
         for (final Set<Material> set : instantSets) {
             for (final Material mat : set) {
@@ -1290,7 +1306,7 @@ public class BlockProperties {
         setBlock(Material.SOUL_SAND, sandType);
         for (Material mat: new Material[]{Material.LEVER, BridgeMaterial.PISTON, 
                 BridgeMaterial.PISTON_HEAD, BridgeMaterial.STICKY_PISTON,
-                Material.STONE_BUTTON, BridgeMaterial.MOVING_PISTON}) {
+                Material.STONE_BUTTON, BridgeMaterial.PISTON}) {
             setBlock(mat, leverType);
         }
         //		setBlock(Material.ICE, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.1)));
@@ -1434,14 +1450,13 @@ public class BlockProperties {
         props = new BlockProps(noTool, 8.5f, secToMs(1.45));
         for (Material mat : MaterialUtil.HEADS_GROUND) {
             setBlock(mat, props);
-            setFlag(mat, F_GROUND);
-        }
-        for (Material mat : MaterialUtil.HEADS_GROUND) {
-            setBlock(mat, props);
-            setFlag(mat, F_GROUND); // TODO: Test !
+            setFlag(mat, F_SOLID | F_GROUND);
         }
         setBlock(Material.ANVIL, new BlockProps(woodPickaxe, 5f)); // TODO
-        setFlag(Material.FLOWER_POT, F_GROUND);
+        for (final Material mat : MaterialUtil.FLOWER_POTS) {
+            BlockFlags.addFlags(mat, F_SOLID | F_GROUND);
+            setBlockProps(mat, instantType);
+        }
 
         // Indestructible.
         for (Material mat : new Material[]{
@@ -1601,7 +1616,7 @@ public class BlockProperties {
         List<String> missing = new LinkedList<String>();
         List<String> allBlocks = new LinkedList<String>();
         if (all) {
-            allBlocks.add("Dump block properties for fastbreak check:");
+            allBlocks.add("Dump block properties:");
             allBlocks.add("--- Present entries -------------------------------");
         }
         List<String> tags = new ArrayList<String>();
@@ -1623,9 +1638,12 @@ public class BlockProperties {
                 if (mat.equals("?")) {
                     continue;
                 }
-                missing.add("* MISSING (" + mat + tagsJoined + ") ");
+                missing.add("* BLOCK BREAKING (" + mat + tagsJoined + ") ");
             }
             else {
+                if (getBlockFlags(temp) == 0L && !isAir(temp)) {
+                    missing.add("* FLAGS (" + mat + tagsJoined + ") " + getBlockProps(temp).toString());
+                }
                 if (all) {
                     allBlocks.add(": (" + mat + tagsJoined + ") " + getBlockProps(temp).toString());
                 }

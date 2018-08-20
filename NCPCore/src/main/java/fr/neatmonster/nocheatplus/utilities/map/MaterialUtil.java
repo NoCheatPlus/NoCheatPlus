@@ -310,11 +310,13 @@ public class MaterialUtil {
                     Arrays.asList(
                             "_bricks", "_ore", "prismarine", 
                             "andesite", "diorite", "granite",
+                            "sandstone",
                             "command_block"
                             ),
                     AlmostBoolean.YES, "legacy"),
             "observer", "structure_block",
-            "note_block", "piston", "piston_base", "tnt", 
+            "note_block", "tnt", 
+            "piston", "sticky_piston", "piston_base", "piston_sticky_base",
             "dispenser", "dropper", "furnace",
             "pumpkin", "melon_block", "hay_block", "bone_block",
             "nether_wart_block", "cobweb", "web",
@@ -323,7 +325,7 @@ public class MaterialUtil {
             "emerald_block", "lapis_block", "redstone_block", 
             "purpur_block", "smooth_stone", "smooth_quartz", "quartz_block",
             "sand", "stone", "gravel", "dirt", "grass_block", "grass",
-            "sea_lantern", "redstone_lamp"
+            "sea_lantern", "redstone_lamp", "sponge", "wet_sponge"
             ));
 
     public static final Set<Material> WALL_BANNERS = Collections.unmodifiableSet(addBlocks(

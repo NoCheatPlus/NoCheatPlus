@@ -36,7 +36,11 @@ public class WrapBlockCache implements IWrapBlockCache {
     private BlockCache blockCache;
 
     public WrapBlockCache() {
-        mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
+        this(NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class));
+    }
+
+    public WrapBlockCache(IGenericInstanceHandle<MCAccess> mcAccess) {
+        this.mcAccess = mcAccess;
         lastMCAccess = mcAccess == null ? null : mcAccess.getHandle();
         blockCache = mcAccess == null ? null : lastMCAccess.getBlockCache();
     }
