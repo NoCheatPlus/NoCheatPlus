@@ -94,12 +94,6 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         // Blue ice.
         BlockInit.setAs("BLUE_ICE", Material.ICE);
 
-        // Grass path.
-        // TODO: HEIGHT16_15 instead.
-        BlockFlags.addFlags(Material.GRASS_PATH, BlockProperties.F_MIN_HEIGHT16_15 
-                | BlockProperties.F_HEIGHT100 
-                | BlockProperties.F_GROUND_HEIGHT);
-
         // Wet sponge.
         BlockInit.setAs("WET_SPONGE", Material.SPONGE);
 
@@ -176,6 +170,11 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         BlockProperties.setBlockProps("TURTLE_EGG", new BlockProps(
                 BlockProperties.noTool, 0.5f, BlockProperties.secToMs(0.7)));
 
+        // Grass path.
+        // TODO: HEIGHT16_15 instead.
+        BlockFlags.removeFlags(Material.GRASS_PATH, BlockProperties.F_HEIGHT100);
+        BlockFlags.addFlags(Material.GRASS_PATH, 
+                BlockProperties.F_XZ100 | BlockProperties.F_HEIGHT16_15);
 
         StaticLog.logInfo("Added block-info for Minecraft 1.13 blocks.");
     }

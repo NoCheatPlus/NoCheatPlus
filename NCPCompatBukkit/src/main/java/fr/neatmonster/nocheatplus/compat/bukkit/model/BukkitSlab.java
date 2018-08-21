@@ -28,10 +28,15 @@ public class BukkitSlab implements BukkitShapeModel {
                     break;
                 default:
                     break;
-
             }
         }
         return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
+    }
+
+    @Override
+    public int getFakeData(final BlockCache blockCache, 
+            final World world, final int x, final int y, final int z) {
+        return 0;
     }
 
 }

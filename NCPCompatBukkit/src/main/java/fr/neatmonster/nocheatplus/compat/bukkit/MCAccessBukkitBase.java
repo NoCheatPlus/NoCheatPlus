@@ -51,6 +51,19 @@ public class MCAccessBukkitBase implements MCAccess {
      */
     protected final Set<Material> processedBlocks = new LinkedHashSet<Material>();
 
+    /**
+     * Constructor to let it fail.
+     */
+    public MCAccessBukkitBase() {
+        // TODO: Add more that might fail if not supported ?
+        testItchyBlock();
+        // TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
+        // TODO: Move getHeight and the like to EntityAccessXY.
+        bukkitHasGetHeightAndGetWidth = ReflectionUtil.getMethodNoArgs(Entity.class, "getHeight", double.class) != null
+                && ReflectionUtil.getMethodNoArgs(Entity.class, "getWidth", double.class) != null;
+    }
+
+    @SuppressWarnings("deprecation")
     private boolean guessItchyBlockPre1_13(final Material mat) {
         return !mat.isOccluding() || !mat.isSolid() || mat.isTransparent();
     }
@@ -81,10 +94,12 @@ public class MCAccessBukkitBase implements MCAccess {
                 return true;
             }
         }
-        long testFlags = (BlockProperties.F_SOLID | BlockProperties.F_XZ100 
-                | BlockProperties.F_HEIGHT100);
-        if (BlockFlags.hasAllFlags(flags, testFlags)) {
-            // Fully solid block.
+        long testFlags1 = (BlockProperties.F_SOLID | BlockProperties.F_XZ100);
+        long testFlags2 = (BlockProperties.F_HEIGHT100 
+                | BlockProperties.F_HEIGHT16_15);
+        if (BlockFlags.hasAllFlags(flags, testFlags1)
+                && BlockFlags.hasAnyFlag(flags, testFlags2)) {
+            // Solid blocks with explicitly set bounds.
             return false;
         }
 
@@ -95,18 +110,6 @@ public class MCAccessBukkitBase implements MCAccess {
     private void testItchyBlock() {
         // TODO: Route to what works.
         guessItchyBlockPre1_13(Material.AIR);
-    }
-
-    /**
-     * Constructor to let it fail.
-     */
-    public MCAccessBukkitBase() {
-        // TODO: Add more that might fail if not supported ?
-        testItchyBlock();
-        // TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
-        // TODO: Move getHeight and the like to EntityAccessXY.
-        bukkitHasGetHeightAndGetWidth = ReflectionUtil.getMethodNoArgs(Entity.class, "getHeight", double.class) != null
-                && ReflectionUtil.getMethodNoArgs(Entity.class, "getWidth", double.class) != null;
     }
 
     @Override

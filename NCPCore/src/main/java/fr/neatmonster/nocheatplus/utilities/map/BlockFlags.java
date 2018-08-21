@@ -106,6 +106,10 @@ public class BlockFlags {
         BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
     }
 
+    public static void removeFlags(Material mat, long flags) {
+        BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) & ~flags);
+    }
+
     /**
      * Test if any flags within testFlags are contained.
      * 

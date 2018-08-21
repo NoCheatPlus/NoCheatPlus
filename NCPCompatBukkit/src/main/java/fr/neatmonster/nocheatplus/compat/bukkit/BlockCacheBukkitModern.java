@@ -29,7 +29,15 @@ public class BlockCacheBukkitModern extends BlockCacheBukkit {
 
     @Override
     public int fetchData(int x, int y, int z) {
-        // TODO: Might fake here too.
+        Material mat = getType(x, y, z);
+
+        final BukkitShapeModel shapeModel = shapeModels.get(mat);
+        if (shapeModel != null) {
+            final int data = shapeModel.getFakeData(this, world, x, y, z);
+            if (data != Integer.MAX_VALUE) {
+                return data;
+            }
+        }
         return super.fetchData(x, y, z);
     }
 

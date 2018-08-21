@@ -860,6 +860,9 @@ public class BlockProperties {
      */
     public static final long F_MODEL_SLAB                   = f_flag();
 
+    /** Height 15/16 (0.9375 = 1 - 0.0625). */
+    public static final long F_HEIGHT16_15                  = f_flag();
+
     // TODO: Convenience constants combining all height / minheight flags.
 
     // TODO: When flags are out, switch to per-block classes :p.
@@ -3903,6 +3906,10 @@ public class BlockProperties {
             else if ((flags & F_HEIGHT100) != 0) {
                 bminY = 0;
                 bmaxY = 1.0;
+            }
+            else if ((flags & F_HEIGHT16_15) != 0) {
+                bminY = 0;
+                bmaxY = 0.9375;
             }
             else if ((flags & F_HEIGHT_8SIM_DEC) != 0) {
                 bminY = 0;
