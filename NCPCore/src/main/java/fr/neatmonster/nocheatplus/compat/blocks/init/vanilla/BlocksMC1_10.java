@@ -21,6 +21,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
 
 /**
  * Blocks for Minecraft 1.10.
@@ -49,7 +50,10 @@ public class BlocksMC1_10 implements BlockPropertiesSetup {
         // 216 BONE_BLOCK
         BlockInit.setAs("BONE_BLOCK", Material.COBBLESTONE);
         // 217 STRUCTURE_VOID
-        BlockInit.setAs("STRUCTURE_VOID", "STRUCTURE_BLOCK"); // Like STRUCTURE_BLOCK.
+        BlockInit.setInstantAir("STRUCTURE_VOID");
+
+        // Not sure when: structure block is solid.
+        BlockFlags.setFullySolidFlags("STRUCTURE_BLOCK");
 
         StaticLog.logInfo("Added block-info for Minecraft 1.10 blocks.");
     }

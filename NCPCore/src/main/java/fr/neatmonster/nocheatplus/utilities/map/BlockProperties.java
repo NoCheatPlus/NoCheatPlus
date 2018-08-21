@@ -689,11 +689,14 @@ public class BlockProperties {
 
     private static long f_next = 1;
     private static long f_flag() {
-        if (f_next <= 0L) {
-            throw new IllegalStateException("No more flags available.");
+        final long flag;
+        synchronized(BlockProperties.class) {
+            if (f_next <= 0L) {
+                throw new IllegalStateException("No more flags available.");
+            }
+            flag = f_next;
+            f_next *= 2L;
         }
-        final long flag = f_next;
-        f_next *= 2L;
         return flag;
     }
     /** Flag position for stairs. */
@@ -852,10 +855,10 @@ public class BlockProperties {
     public static final long F_VARIABLE_REDSTONE            = f_flag();
 
     /**
-     * Indicator to start recoding towards multiple flag types (shape, moving,
-     * interaction, block-type/special, ...).
+     * BukkitModern model flag, set by MCAccessBukkitModern for routing, iff
+     * available.
      */
-    public static final long F_MAX_FLAG                     = f_flag();
+    public static final long F_MODEL_SLAB                   = f_flag();
 
     // TODO: Convenience constants combining all height / minheight flags.
 
@@ -870,16 +873,21 @@ public class BlockProperties {
 
     static{
         // Use reflection to get a flag -> name mapping and vice versa.
-        for (Field field : BlockProperties.class.getDeclaredFields()) {
-            String name = field.getName();
-            if (name.startsWith("F_")) {
-                try {
-                    Long value = field.getLong(BlockProperties.class);
-                    flagNameMap.put(value, name.substring(2));
-                    nameFlagMap.put(name, value);
-                    nameFlagMap.put(name.substring(2), value);
-                } catch (IllegalArgumentException e) {
-                } catch (IllegalAccessException e) {
+        synchronized(BlockProperties.class) {
+            for (Field field : BlockProperties.class.getDeclaredFields()) {
+                String name = field.getName();
+                if (name.startsWith("F_")) {
+                    try {
+                        Long value = field.getLong(BlockProperties.class);
+                        if (flagNameMap.containsKey(value)) {
+                            throw new IllegalStateException("Same value for flag names: " + name + " + " + flagNameMap.get(value));
+                        }
+                        flagNameMap.put(value, name.substring(2));
+                        nameFlagMap.put(name, value);
+                        nameFlagMap.put(name.substring(2), value);
+                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalAccessException e) {
+                    }
                 }
             }
         }
@@ -2184,7 +2192,7 @@ public class BlockProperties {
                             duration = (long) (duration / 1.5 - (efficiency - 1) * 100);
                         }
                     }
-                    else if (blockId == Material.LOG) {
+                    else if (MaterialUtil.isLog(blockId)) {
                         duration -= efficiency >= 4 ? 250 : 400;
                     }
                     else if (blockProps.tool.toolType == toolProps.toolType) {
@@ -2196,7 +2204,7 @@ public class BlockProperties {
 
                 }
                 else if (toolProps.materialBase == MaterialBase.STONE) {
-                    if (blockId == Material.LOG) {
+                    if (MaterialUtil.isLog(blockId)) {
                         duration -= 100;
                     }
                 }

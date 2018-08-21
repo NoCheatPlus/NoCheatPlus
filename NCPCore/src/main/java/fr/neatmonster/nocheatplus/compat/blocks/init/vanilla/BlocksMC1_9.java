@@ -64,7 +64,7 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         // 204(PURPUR_DOUBLE_SLAB / SOLID+GROUND) 
         if (BridgeMaterial.has("PURPUR_DOUBLE_SLAB")) {
             if (BridgeMaterial.has("PURPUR_DOUBLE_SLAB")) {
-                BlockInit.setAs("PURPUR_DOUBLE_SLAB", Material.DOUBLE_STEP);
+                BlockInit.setAs("PURPUR_DOUBLE_SLAB", "DOUBLE_STEP");
             }
         }
 

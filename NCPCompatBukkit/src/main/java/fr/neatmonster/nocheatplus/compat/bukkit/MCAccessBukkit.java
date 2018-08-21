@@ -15,12 +15,17 @@
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertiesSetup {
@@ -31,22 +36,24 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
 
     @Override
     public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
-        // Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
-        // TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
+        final Set<Material> itchyBlocks = new LinkedHashSet<Material>();
         for (final Material mat : Material.values()) {
             if (!mat.isBlock()) {
                 continue;
             }
             else if (guessItchyBlock(mat)) {
                 // Uncertain bounding-box, allow passing through.
-                StaticLog.logDebug("Itchy: " + mat);
                 long flags = BlockProperties.F_IGN_PASSABLE;
-                if ((BlockProperties.isSolid(mat) 
-                        || BlockProperties.isGround(mat))) {
+                if ((BlockFlags.hasAnyFlag(flags, BlockFlags.SOLID_GROUND))) {
                     // Block can be ground, so allow standing on any height.
                     flags |= BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT;
                 }
-                BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+                /*
+                 * TODO: Might have to set all blocks to ground here, rather
+                 * catch flowers and the like with MaterialUtil.
+                 */
+                BlockFlags.addFlags(mat, flags);
+                itchyBlocks.add(mat);
             }
         }
         // Blocks that are reported to be full and solid, but which are not.
@@ -56,7 +63,11 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
         }) {
             if (!processedBlocks.contains(mat)) {
                 BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+                itchyBlocks.add(mat);
             }
+        }
+        if (!itchyBlocks.isEmpty()) {
+            StaticLog.logDebug("The following blocks can not be modeled correctly: " + StringUtil.join(itchyBlocks, ", "));
         }
     }
 

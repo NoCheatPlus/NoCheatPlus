@@ -88,9 +88,6 @@ public class MCAccessBukkitBase implements MCAccess {
             return false;
         }
 
-        // TODO: Directional stairs / slabs (wall heads, ...)
-        // TODO: Ground heads/skulls.
-
         // TODO: Use working route.
         return guessItchyBlockPre1_13(mat);
     }

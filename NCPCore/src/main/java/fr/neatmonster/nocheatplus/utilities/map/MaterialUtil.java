@@ -270,6 +270,10 @@ public class MaterialUtil {
     public static final Set<Material> SHULKER_BOXES = Collections.unmodifiableSet(
             BridgeMaterial.getBySuffix("shulker_box", AlmostBoolean.YES, "legacy"));
 
+    public static final Set<Material> SLABS = Collections.unmodifiableSet(addBlocks(
+            BridgeMaterial.getBySuffix(Arrays.asList("_slab", "_step"), 
+                    AlmostBoolean.YES, "legacy"), "step"));
+
     public static final Set<Material> SPAWN_EGGS = Collections.unmodifiableSet(add(
             BridgeMaterial.getBySuffix("_spawn_egg", AlmostBoolean.YES, "legacy"),
             "monster_egg"
@@ -472,6 +476,10 @@ public class MaterialUtil {
      */
     public static boolean isSpawnEgg(final Material mat) {
         return SPAWN_EGGS.contains(mat);
+    }
+
+    public static boolean isLog(final Material mat) {
+        return LOGS.contains(mat);
     }
 
 }

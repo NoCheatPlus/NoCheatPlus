@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
 public final class BridgeEnchant {
 
+    @SuppressWarnings("deprecation")
     private static final Enchantment parseEnchantment(final String name) {
         try {
             return Enchantment.getByName(name);

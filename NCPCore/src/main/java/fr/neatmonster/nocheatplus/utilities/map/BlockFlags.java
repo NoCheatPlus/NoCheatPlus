@@ -16,7 +16,6 @@ package fr.neatmonster.nocheatplus.utilities.map;
 
 import org.bukkit.Material;
 
-// TODO: Auto-generated Javadoc
 /**
  * Utilities for block-flags.<br>
  * Later the flag constant definitions and parsing might be moved here.
@@ -25,8 +24,15 @@ import org.bukkit.Material;
  */
 public class BlockFlags {
 
+    //////////////////
+    // Summary flags
+    //////////////////
+
     /** Explicitly set full bounds. */
     public static final long FULL_BOUNDS = BlockProperties.F_XZ100 | BlockProperties.F_HEIGHT100;
+
+    /** SOLID and GROUND set. Treatment of SOLID/GROUND may be changed later. */
+    public static final long SOLID_GROUND = BlockProperties.F_SOLID | BlockProperties.F_GROUND;
 
     /**
      * Set flags of id same as already set with flags for the given material.
@@ -131,6 +137,11 @@ public class BlockFlags {
      */
     public static boolean hasNoFlags(long flags, long testFlags) {
         return (flags & testFlags) == 0L;
+    }
+
+    /** Override flags to a fully solid block (set explicitly). */
+    public static void setFullySolidFlags(String blockId) {
+        BlockProperties.setBlockFlags(blockId, FULL_BOUNDS | SOLID_GROUND);
     }
 
 }

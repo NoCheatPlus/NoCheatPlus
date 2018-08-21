@@ -44,6 +44,7 @@ import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 
+
 public class BlockChangeListener implements Listener {
 
     // TODO: Fine grained configurability (also switch flag in MovingListener to a sub-config).
@@ -174,6 +175,7 @@ public class BlockChangeListener implements Listener {
     }
 
     private BlockFace getDirection(final Block pistonBlock) {
+        // TODO: Register/store a fetcher thing (DirectionalFromBlock)
         final MaterialData data = pistonBlock.getState().getData();
         if (data instanceof Directional) {
             Directional directional = (Directional) data;

@@ -63,11 +63,11 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 
             // 149 Redstone Comparator (inactive)
             //      BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-            BlockInit.setAs("REDSTONE_COMPARATOR_OFF", Material.DIODE_BLOCK_OFF);
+            BlockInit.setAs("REDSTONE_COMPARATOR_OFF", "DIODE_BLOCK_OFF");
 
             // 150 Redstone Comparator (active)
             //      BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-            BlockInit.setAs("REDSTONE_COMPARATOR_ON", Material.DIODE_BLOCK_ON);
+            BlockInit.setAs("REDSTONE_COMPARATOR_ON", "DIODE_BLOCK_ON");
         }
         else {
             // 1.13
