@@ -74,13 +74,37 @@ public class MaterialUtil {
      * @param names
      * @return
      */
-    private static Set<Material> addBlocks(Set<Material> set, String... names) {
+    public static Set<Material> addBlocks(Set<Material> set, String... names) {
         final LinkedHashSet<Material> res = new LinkedHashSet<Material>(set);
         res.addAll(BridgeMaterial.getAllBlocks(names));
         return res;
     }
 
-    private static Set<Material> join(final Set<Material>...sets ) {
+    /**
+     * Get a new set containing the given set, as well as all non-null Material entries.
+     * 
+     * @param set Set is not checked.
+     * @param materials
+     * @return
+     */
+    public static Set<Material> addBlocks(final Set<Material> set, final Material... materials) {
+        final LinkedHashSet<Material> res = new LinkedHashSet<Material>(set);
+        for (final Material mat : materials) {
+            if (mat != null && mat.isBlock()) {
+                res.add(mat);
+            }
+        }
+        return res;
+    }
+
+
+    /**
+     * Get a new set containing all elements of the given sets.
+     * 
+     * @param sets
+     * @return
+     */
+    public static Set<Material> join(final Set<Material>...sets ) {
         final Set<Material> res = new LinkedHashSet<Material>();
         for (final Set<Material> set : sets) {
             res.addAll(set);

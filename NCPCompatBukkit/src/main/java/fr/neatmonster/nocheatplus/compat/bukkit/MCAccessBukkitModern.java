@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitSlab;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitStairs;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
@@ -22,6 +23,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
 
     private static final BukkitShapeModel MODEL_SLAB = new BukkitSlab();
     private static final BukkitShapeModel MODEL_STAIRS= new BukkitStairs();
+    private static final BukkitShapeModel MODEL_THIN_FENCE = new BukkitFence(
+            0.1375 + 0.3, 0.8625 - 0.3, 1.0);
 
     public MCAccessBukkitModern() {
         super();
@@ -50,23 +53,24 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             processedBlocks.add(mat);
         }
 
-        // Pre-process for flags.
         // TODO: Also consider removing flags (passable_x4 etc).
-        for (final Material mat : Material.values()) {
-            if (MaterialUtil.SLABS.contains(mat)) {
-                BlockFlags.addFlags(mat, BlockProperties.F_MODEL_SLAB);
-            }
+
+        // Thin fence: Glass panes, iron bars.
+        for (final Material mat : MaterialUtil.addBlocks(
+                MaterialUtil.GLASS_PANES, BridgeMaterial.IRON_BARS)) {
+            processedBlocks.add(mat);
+            shapeModels.put(mat, MODEL_THIN_FENCE);
+        }
+
+        // Slabs
+        for (final Material mat : MaterialUtil.SLABS) {
+            processedBlocks.add(mat);
+            shapeModels.put(mat, MODEL_SLAB);
         }
 
         // Sort to processed by flags.
         for (final Material mat : Material.values()) {
             final long flags = BlockProperties.getBlockFlags(mat);
-            // Step.
-            if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_MODEL_SLAB)) {
-                // TODO: Should scrap the flag and just register the shape model.
-                processedBlocks.add(mat);
-                shapeModels.put(mat, MODEL_SLAB);
-            }
             // Stairs.
             if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_STAIRS)) {
                 processedBlocks.add(mat);

@@ -854,12 +854,6 @@ public class BlockProperties {
      */
     public static final long F_VARIABLE_REDSTONE            = f_flag();
 
-    /**
-     * BukkitModern model flag, set by MCAccessBukkitModern for routing, iff
-     * available.
-     */
-    public static final long F_MODEL_SLAB                   = f_flag();
-
     /** Height 15/16 (0.9375 = 1 - 0.0625). */
     public static final long F_HEIGHT16_15                  = f_flag();
 
