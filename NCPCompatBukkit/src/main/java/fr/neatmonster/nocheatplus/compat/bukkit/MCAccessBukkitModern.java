@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitGate;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShulkerBox;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitSlab;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitStairs;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -30,6 +31,7 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             0.075 + 0.3, 0.925  - 0.3, 1.5);
     private static final BukkitShapeModel MODEL_GATE = new BukkitGate(
             0.075 + 0.3, 0.925  - 0.3, 1.5);
+    private static final BukkitShapeModel MODEL_SHULKER_BOX = new BukkitShulkerBox(); 
 
     public MCAccessBukkitModern() {
         super();
@@ -53,7 +55,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
 
         // Directly keep blocks as is.
         for (final Material mat : new Material[] {
-                BridgeMaterial.MOVING_PISTON
+                BridgeMaterial.MOVING_PISTON,
+                Material.SNOW
         }) {
             processedBlocks.add(mat);
         }
@@ -71,6 +74,12 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
         for (final Material mat : MaterialUtil.SLABS) {
             processedBlocks.add(mat);
             shapeModels.put(mat, MODEL_SLAB);
+        }
+
+        // Shulker boxes.
+        for (final Material mat : MaterialUtil.SHULKER_BOXES) {
+            processedBlocks.add(mat);
+            shapeModels.put(mat, MODEL_SHULKER_BOX);
         }
 
         // Sort to processed by flags.
@@ -92,7 +101,7 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
                     shapeModels.put(mat, MODEL_THICK_FENCE);
                 }
             }
-            // ... (heads, chests, static, shulker box ...)
+            // ... (chests, snow, heads, static)
         }
 
         super.setupBlockProperties(worldConfigProvider);

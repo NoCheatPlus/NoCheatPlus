@@ -79,6 +79,11 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         // Wall torch
         BlockInit.setInstantAir("WALL_TORCH");
 
+        // Shulker boxes.
+        for (Material mat : MaterialUtil.SHULKER_BOXES) {
+            BlockFlags.addFlags(mat, BlockProperties.F_XZ100 | BlockFlags.SOLID_GROUND);
+        }
+
         // Stone types.
         for (Material mat : BridgeMaterial.getAllBlocks("andesite", "diorite", "granite", 
                 "polished_andesite", "polished_diorite", "polished_granite",
