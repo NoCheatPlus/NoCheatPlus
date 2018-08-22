@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.block.data.type.Gate;
 
 import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitGate;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitSlab;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitStairs;
-import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
@@ -27,6 +27,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
     private static final BukkitShapeModel MODEL_THIN_FENCE = new BukkitFence(
             0.1375 + 0.3, 0.8625 - 0.3, 1.0);
     private static final BukkitShapeModel MODEL_THICK_FENCE = new BukkitFence(
+            0.075 + 0.3, 0.925  - 0.3, 1.5);
+    private static final BukkitShapeModel MODEL_GATE = new BukkitGate(
             0.075 + 0.3, 0.925  - 0.3, 1.5);
 
     public MCAccessBukkitModern() {
@@ -81,11 +83,12 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             }
             // Fences, cobblestone wall.
             if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_THICK_FENCE)) {
+                processedBlocks.add(mat);
                 if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_PASSABLE_X4)) {
                     // TODO: Perhaps another model flag.
+                    shapeModels.put(mat, MODEL_GATE);
                 }
                 else {
-                    processedBlocks.add(mat);
                     shapeModels.put(mat, MODEL_THICK_FENCE);
                 }
             }
