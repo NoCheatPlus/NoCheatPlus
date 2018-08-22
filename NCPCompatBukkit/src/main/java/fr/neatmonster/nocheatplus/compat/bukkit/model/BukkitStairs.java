@@ -3,9 +3,9 @@ package fr.neatmonster.nocheatplus.compat.bukkit.model;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Stairs;
 
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
@@ -46,8 +46,8 @@ public class BukkitStairs implements BukkitShapeModel {
         final BlockState state = block.getState();
         final BlockData blockData = state.getBlockData();
 
-        if (blockData instanceof Stairs) {
-            final Stairs stairs = (Stairs) blockData;
+        if (blockData instanceof Bisected) {
+            final Bisected stairs = (Bisected) blockData;
             final Half half = stairs.getHalf();
             //final Shape shape = stairs.getShape();
             // TODO: Refine later, with sub shapes.
