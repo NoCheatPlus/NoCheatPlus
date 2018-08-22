@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.block.data.type.Gate;
 
 import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
@@ -25,6 +26,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
     private static final BukkitShapeModel MODEL_STAIRS= new BukkitStairs();
     private static final BukkitShapeModel MODEL_THIN_FENCE = new BukkitFence(
             0.1375 + 0.3, 0.8625 - 0.3, 1.0);
+    private static final BukkitShapeModel MODEL_THICK_FENCE = new BukkitFence(
+            0.075 + 0.3, 0.925  - 0.3, 1.5);
 
     public MCAccessBukkitModern() {
         super();
@@ -76,8 +79,16 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
                 processedBlocks.add(mat);
                 shapeModels.put(mat, MODEL_STAIRS);
             }
-            // Fences. // TODO: May need specialized models for edge cases?
-            // Thin fences.
+            // Fences, cobblestone wall.
+            if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_THICK_FENCE)) {
+                if (BlockFlags.hasAnyFlag(flags, BlockProperties.F_PASSABLE_X4)) {
+                    // TODO: Perhaps another model flag.
+                }
+                else {
+                    processedBlocks.add(mat);
+                    shapeModels.put(mat, MODEL_THICK_FENCE);
+                }
+            }
             // ... (heads, chests, static, shulker box ...)
         }
 

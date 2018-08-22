@@ -1170,7 +1170,8 @@ public class BlockProperties {
         }
         for (final Material mat : MaterialUtil.WOODEN_FENCES) {
             setFlag(mat, flags150);
-        }for (final Material mat : MaterialUtil.WOODEN_FENCE_GATES) {
+        }
+        for (final Material mat : MaterialUtil.WOODEN_FENCE_GATES) {
             setFlag(mat, flags150);
         }
 
