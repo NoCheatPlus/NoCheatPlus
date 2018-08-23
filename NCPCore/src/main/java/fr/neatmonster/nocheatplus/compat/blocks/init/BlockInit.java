@@ -107,7 +107,7 @@ public class BlockInit {
      * @param newId
      */
     public static void setInstantAir(String newId) {
-        BlockFlags.setFlagsAs(newId, Material.AIR);
+        BlockFlags.setFlagsAs(newId, Material.AIR); // TODO: Problematic, should be F_IGN_PASSABLE
         BlockProperties.setBlockProps(newId, BlockProperties.instantType);
     }
 

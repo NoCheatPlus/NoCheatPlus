@@ -52,9 +52,6 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         }
 
         // Passable (alive) coral parts.
-        for (Material mat : MaterialUtil.PASSABLE_CORAL_PARTS) {
-            BlockInit.setInstantAir(mat);
-        }
 
         // Dead coral parts (solid + ground already set).
         for (Material mat : MaterialUtil.DEAD_CORAL_PARTS) {
@@ -63,18 +60,14 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         }
 
         // Kelp.
-        BlockInit.setInstantAir("KELP");
 
         // Fern.
-        BlockInit.setInstantAir("FERN");
 
         // Bubble column.
         // TODO: Drag down effect: probably not using velocity.
         BlockInit.setAs("BUBBLE_COLUMN", Material.WATER);
 
         // Further melon/pumpkin stems.
-        BlockInit.setInstantAir("ATTACHED_MELON_STEM");
-        BlockInit.setInstantAir("ATTACHED_PUMPKIN_STEM");
 
         // Wall torch
         BlockInit.setInstantAir("WALL_TORCH");
@@ -87,7 +80,7 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         // Stone types.
         for (Material mat : BridgeMaterial.getAllBlocks("andesite", "diorite", "granite", 
                 "polished_andesite", "polished_diorite", "polished_granite",
-                "smooth_stone")) {
+                "smooth_stone", "nether_wart", "nether_warts")) {
             BlockInit.setAs(mat, Material.STONE);
         }
 
@@ -176,7 +169,6 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
                 BlockProperties.noTool, 0.5f, BlockProperties.secToMs(0.7)));
 
         // Grass path.
-        // TODO: HEIGHT16_15 instead.
         BlockFlags.removeFlags(Material.GRASS_PATH, BlockProperties.F_HEIGHT100);
         BlockFlags.addFlags(Material.GRASS_PATH, 
                 BlockProperties.F_XZ100 | BlockProperties.F_HEIGHT16_15);

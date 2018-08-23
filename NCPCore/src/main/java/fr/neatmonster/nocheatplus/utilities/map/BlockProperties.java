@@ -609,58 +609,6 @@ public class BlockProperties {
     /** Returned if unknown. */
     private static BlockProps defaultBlockProps = instantType;
 
-    /** The Constant instantMat. */
-    protected static final Material[] instantMat = new Material[]{
-            // Named in wiki.
-            BridgeMaterial.WHEAT_CROPS,
-            Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
-            Material.TORCH,
-            Material.TNT,
-            BridgeMaterial.SUGAR_CANE,
-            BridgeMaterial.get("red_rose"), BridgeMaterial.DANDELION,
-            BridgeMaterial.get("blue_orchid"),
-            Material.REDSTONE_WIRE, 
-            BridgeMaterial.get("REDSTONE_TORCH_ON"), 
-            BridgeMaterial.get("REDSTONE_TORCH_OFF"),
-            BridgeMaterial.get("DIODE_BLOCK_ON"), BridgeMaterial.get("DIODE_BLOCK_OFF"),
-            BridgeMaterial.get("repeater"),
-            Material.PUMPKIN_STEM,
-            BridgeMaterial.getBlock("NETHER_WART"),
-            BridgeMaterial.getBlock("NETHER_WARTS"), // TODO: Bug or very old?
-            Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
-            Material.MELON_STEM,
-            BridgeMaterial.LILY_PAD,
-            BridgeMaterial.TALL_GRASS,
-            BridgeMaterial.GRASS,
-            Material.FIRE,
-            //
-            BridgeMaterial.WHEAT_CROPS,
-
-            // 1.4
-            BridgeMaterial.COMMAND_BLOCK,
-            BridgeMaterial.CARROTS,
-            BridgeMaterial.POTATOES,
-
-            // 1.13 /...
-            BridgeMaterial.get("allium"),
-            BridgeMaterial.get("azure_bluet"),
-            BridgeMaterial.get("dandelion"),
-            BridgeMaterial.getBlock("dandelion_yellow"),
-            BridgeMaterial.get("kelp_plant"),
-            BridgeMaterial.get("large_fern"),
-            BridgeMaterial.get("lilac"),
-            BridgeMaterial.get("oxeye_daisy"),
-            BridgeMaterial.get("peony"),
-            BridgeMaterial.get("poppy"),
-            BridgeMaterial.get("redstone_torch"),
-            BridgeMaterial.get("redstone_wall_torch"),
-            BridgeMaterial.getBlock("rose_red"),
-            BridgeMaterial.get("seagrass"),
-            BridgeMaterial.get("sea_pickle"),
-            BridgeMaterial.get("sunflower"),
-            BridgeMaterial.get("tall_seagrass"),
-    };
-
     /** The rt ray. */
     private static ICollidePassable rtRay = null;
 
@@ -1154,9 +1102,6 @@ public class BlockProperties {
                 setFlag(mat, F_IGN_PASSABLE);
             }
         }
-        for (final Material mat : MaterialUtil.WOODEN_PRESSURE_PLATES) {
-            setFlag(mat, F_IGN_PASSABLE);
-        }
 
         // ? Extra flag for COCOA, ANVIL: depends on data value (other issue)
 
@@ -1247,20 +1192,34 @@ public class BlockProperties {
         }
         // Set block break properties.
         // Instantly breakable.
-        for (final Material mat : instantMat) {
+        for (final Material mat : new Material[]{
+                Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
+                Material.TORCH,
+                Material.TNT,
+                Material.REDSTONE_WIRE, 
+                BridgeMaterial.get("REDSTONE_TORCH_ON"), 
+                BridgeMaterial.get("REDSTONE_TORCH_OFF"),
+                BridgeMaterial.get("DIODE_BLOCK_ON"), BridgeMaterial.get("DIODE_BLOCK_OFF"),
+                BridgeMaterial.get("repeater"),
+                BridgeMaterial.LILY_PAD,
+                Material.FIRE,
+                BridgeMaterial.COMMAND_BLOCK,
+                BridgeMaterial.get("sea_pickle"),
+        }) {
             if (mat != null) {
                 setBlock(mat, instantType);
             }
         }
-        @SuppressWarnings("unchecked")
-        List<Set<Material>> instantSets = Arrays.asList(
-                MaterialUtil.BUSHES, MaterialUtil.TULIPS, 
-                MaterialUtil.SAPLINGS
-                );
-        for (final Set<Material> set : instantSets) {
-            for (final Material mat : set) {
-                setBlock(mat, instantType);
+        for (final Material mat : MaterialUtil.INSTANT_PLANTS) {
+            setBlock(mat, instantType);
             }
+        // Instant break and fully passable.
+        for (Material mat : new Material[] {
+                BridgeMaterial.get("redstone_torch"),
+                BridgeMaterial.get("redstone_wall_torch"),
+        }) {
+            setBlock(mat, instantType);
+            BlockFlags.addFlags(mat, F_IGN_PASSABLE);
         }
 
         // Leaf type
@@ -1305,7 +1264,7 @@ public class BlockProperties {
         setBlock(Material.LADDER, new BlockProps(noTool, 0.4f, secToMs(0.6), 2.5f));
         setBlock(Material.CACTUS, new BlockProps(noTool, 0.4f, secToMs(0.6)));
         for (Material mat : MaterialUtil.WOODEN_PRESSURE_PLATES) {
-            setBlock(mat, new BlockProps(woodAxe, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1)));
+            setBlockProps(mat, new BlockProps(woodAxe, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1)));
         }
         setBlock(BridgeMaterial.STONE_PRESSURE_PLATE, new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.07)));
         setBlock(Material.SAND, sandType);
@@ -1582,6 +1541,12 @@ public class BlockProperties {
                      * Material#isSolid.
                      */
                     | BlockProperties.F_SOLID);
+        }
+
+        // Fully passable blocks.
+        for (Material mat : MaterialUtil.FULLY_PASSABLE_BLOCKS) {
+            BlockFlags.addFlags(mat, F_IGN_PASSABLE);
+            BlockFlags.removeFlags(mat, F_SOLID | F_GROUND);
         }
 
     }

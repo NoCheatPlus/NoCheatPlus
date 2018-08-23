@@ -145,6 +145,12 @@ public class MaterialUtil {
     // (May not always have all aspects in common.)
     /////////////////////////////////////////////////
 
+    public static final Set<Material> ALL_BUTTONS = Collections.unmodifiableSet(
+            BridgeMaterial.getBySuffix("_button", AlmostBoolean.YES, "legacy"));
+
+    public static final Set<Material> ALL_PRESSURE_PLATES = Collections.unmodifiableSet(
+            BridgeMaterial.getBySuffix("_pressure_plate", AlmostBoolean.YES, "legacy"));
+
     public static final Set<Material> BANNERS = Collections.unmodifiableSet(addBlocks(
             BridgeMaterial.getByPrefixAndSuffix(
                     null, 
@@ -167,10 +173,6 @@ public class MaterialUtil {
         temp.addAll(InventoryUtil.collectItemsBySuffix("_BOAT"));
         BOATS = Collections.unmodifiableSet(temp);
     }
-
-    /** Bushes (block). */
-    public static final Set<Material> BUSHES = Collections.unmodifiableSet(
-            BridgeMaterial.getBySuffix("bush", AlmostBoolean.YES, "legacy", "potted"));
 
     public static final Set<Material> CARPETS = Collections.unmodifiableSet(addBlocks(
             BridgeMaterial.getBySuffix("_carpet", AlmostBoolean.YES, "legacy"), 
@@ -248,7 +250,7 @@ public class MaterialUtil {
     public static final Set<Material> LEAVES = Collections.unmodifiableSet(addBlocks(
             BridgeMaterial.getByPrefixAndSuffix(
                     woodTypes, 
-                    Arrays.asList("_leaves"), // Strictly _pressure_plate for 1.13.
+                    Arrays.asList("_leaves"),
                     AlmostBoolean.YES
                     // , ...
                     ), "leaves", "leaves_2"));
@@ -270,15 +272,6 @@ public class MaterialUtil {
                     "legacy"
                     ), "mushroom_stem" , "huge_mushroom_1", "huge_mushroom_2"));
 
-    /** Coral parts that are passable when alive, but become solid when dead. */
-    public static final Set<Material> PASSABLE_CORAL_PARTS = Collections.unmodifiableSet(
-            BridgeMaterial.getByPrefixAndSuffix(
-                    null,
-                    Arrays.asList("coral_fan", "coral_wall_fan", "coral"),
-                    AlmostBoolean.YES, 
-                    "dead", "legacy"
-                    ));
-
     public static final Set<Material> PLANKS = Collections.unmodifiableSet(addBlocks(
             BridgeMaterial.getBySuffix("_planks", AlmostBoolean.YES, "legacy"),
             "wood"));
@@ -286,10 +279,6 @@ public class MaterialUtil {
     /** All rail types. */
     public static final Set<Material> RAILS = Collections.unmodifiableSet(
             BridgeMaterial.getBySuffix(Arrays.asList("rail", "rails"), AlmostBoolean.YES, "legacy"));
-
-    /** Places saplings (block). */
-    public static final Set<Material> SAPLINGS = Collections.unmodifiableSet(
-            BridgeMaterial.getBySuffix("sapling", AlmostBoolean.YES, "legacy", "potted"));
 
     public static final Set<Material> SHULKER_BOXES = Collections.unmodifiableSet(
             BridgeMaterial.getBySuffix("shulker_box", AlmostBoolean.YES, "legacy"));
@@ -325,10 +314,6 @@ public class MaterialUtil {
             "terracotta", "hard_clay", "stained_clay"
             ));
 
-    /** Tulips (block). */
-    public static final Set<Material> TULIPS = Collections.unmodifiableSet(
-            BridgeMaterial.getBySuffix("tulip", AlmostBoolean.YES, "legacy", "potted"));
-
     /**
      * Collect fully solid blocks, that are not contained in other collections
      * (of blocks that are fully solid too).
@@ -340,8 +325,7 @@ public class MaterialUtil {
                             "andesite", "diorite", "granite",
                             "sandstone",
                             "command_block"
-                            ),
-                    AlmostBoolean.YES, "legacy"),
+                            ), AlmostBoolean.YES, "legacy"),
             "observer", "structure_block",
             "note_block", "tnt", 
             "piston", "sticky_piston", "piston_base", "piston_sticky_base",
@@ -353,7 +337,7 @@ public class MaterialUtil {
             "emerald_block", "lapis_block", "redstone_block", 
             "purpur_block", "smooth_stone", "smooth_quartz", "quartz_block",
             "sand", "stone", "gravel", "dirt", "grass_block", "grass",
-            "sea_lantern", "redstone_lamp", "sponge", "wet_sponge"
+            "sea_lantern", "redstone_lamp", "glowstone", "sponge", "wet_sponge"
             ));
 
     public static final Set<Material> WALL_BANNERS = Collections.unmodifiableSet(addBlocks(
@@ -454,6 +438,31 @@ public class MaterialUtil {
     // Collections of collections
     ///////////////////////////////
 
+    /** Instantly breakable, fully passable. */
+    @SuppressWarnings("unchecked")
+    public static final Set<Material> INSTANT_PLANTS = Collections.unmodifiableSet(join(
+            BridgeMaterial.getBySuffix(Arrays.asList(
+                    "bush", "sapling", "tulip", "orchid", "mushroom", "bluet"), 
+                    AlmostBoolean.YES, "legacy", "potted"),
+            BridgeMaterial.getByPrefixAndSuffix(
+                    null,
+                    Arrays.asList("coral_fan", "coral_wall_fan", "coral"),
+                    AlmostBoolean.YES, "dead", "legacy"),
+            BridgeMaterial.getAllBlocks("attached_melon_stem", "attached_pumpkin_stem",
+                    "allium", "dandelion", 
+                    "dandelion_yellow", "fern", "kelp", "kelp_plant", 
+                    "large_fern", "lilac", "melon_stem", "oxeye_daisy", 
+                    "peony", "poppy", "red_rose", "rose_red", "seagrass", 
+                    "sunflower", "tall_seagrass"
+                    // TODO: Ground or not: "beetroots", "beetroot_block"
+                    ),
+            new HashSet<Material>(Arrays.asList(BridgeMaterial.TALL_GRASS, 
+                    BridgeMaterial.WHEAT_CROPS, BridgeMaterial.CARROTS, 
+                    BridgeMaterial.POTATOES, BridgeMaterial.GRASS,
+                    Material.PUMPKIN_STEM, Material.MELON_STEM,
+                    Material.SUGAR_CANE))
+            ));
+
     /**
      * Sets of fully solid blocks (in terms of: can walk on, can't pass through,
      * full bounds - not necessarily 'solid' officially).
@@ -476,6 +485,20 @@ public class MaterialUtil {
             VARIOUS_FULLY_SOLID,
             WOOD_BLOCKS,
             WOOL_BLOCKS
+            ));
+
+    /**
+     * Collections of blocks that are fully passable.
+     */
+    @SuppressWarnings("unchecked")
+    public static final Set<Material> FULLY_PASSABLE_BLOCKS = Collections.unmodifiableSet(join(
+            ALL_BUTTONS,
+            ALL_PRESSURE_PLATES,
+            BANNERS,
+            RAILS,
+            WALL_BANNERS,
+            INSTANT_PLANTS,
+            BridgeMaterial.getAllBlocks("lever")
             ));
 
     ////////////////////
