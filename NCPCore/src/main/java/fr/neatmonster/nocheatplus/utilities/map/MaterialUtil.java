@@ -449,10 +449,9 @@ public class MaterialUtil {
                     Arrays.asList("coral_fan", "coral_wall_fan", "coral"),
                     AlmostBoolean.YES, "dead", "legacy"),
             BridgeMaterial.getAllBlocks("attached_melon_stem", "attached_pumpkin_stem",
-                    "allium", "dandelion", 
-                    "dandelion_yellow", "fern", "kelp", "kelp_plant", 
-                    "large_fern", "lilac", "melon_stem", "oxeye_daisy", 
-                    "peony", "poppy", "red_rose", "rose_red", "seagrass", 
+                    "allium", "dandelion", "dandelion_yellow", "fern", "kelp", "kelp_plant", 
+                    "large_fern", "lilac", "melon_stem", "nether_wart", "nether_warts",
+                    "oxeye_daisy", "peony", "poppy", "red_rose", "rose_red", "seagrass", 
                     "sunflower", "tall_seagrass"
                     // TODO: Ground or not: "beetroots", "beetroot_block"
                     ),

@@ -80,7 +80,7 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         // Stone types.
         for (Material mat : BridgeMaterial.getAllBlocks("andesite", "diorite", "granite", 
                 "polished_andesite", "polished_diorite", "polished_granite",
-                "smooth_stone", "nether_wart", "nether_warts")) {
+                "smooth_stone")) {
             BlockInit.setAs(mat, Material.STONE);
         }
 
