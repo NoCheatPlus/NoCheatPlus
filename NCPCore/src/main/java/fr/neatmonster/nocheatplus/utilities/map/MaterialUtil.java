@@ -331,11 +331,12 @@ public class MaterialUtil {
             "piston", "sticky_piston", "piston_base", "piston_sticky_base",
             "dispenser", "dropper", "furnace",
             "pumpkin", "melon_block", "hay_block", "bone_block",
-            "nether_wart_block", "cobweb", "web",
+            "nether_wart_block",
             "snow_block", "ice", "magma_block",
             "diamond_block", "gold_block", "iron_block", "coal_block", 
             "emerald_block", "lapis_block", "redstone_block", 
             "purpur_block", "smooth_stone", "smooth_quartz", "quartz_block",
+            "quartz_pillar",
             "sand", "stone", "gravel", "dirt", "grass_block", "grass",
             "sea_lantern", "redstone_lamp", "glowstone", "sponge", "wet_sponge"
             ));

@@ -1044,6 +1044,9 @@ public class BlockProperties {
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
                 BridgeMaterial.PISTON_HEAD,
                 BridgeMaterial.STONE_SLAB,
+                BridgeMaterial.REPEATER,
+                BridgeMaterial.getBlock("comparator"),
+                BridgeMaterial.getBlock("daylight_detector")
         }) {
             if (mat != null) {
                 setFlag(mat, F_GROUND);
@@ -1232,7 +1235,9 @@ public class BlockProperties {
         }
 
         // Cobweb
-        setFlag(BridgeMaterial.COBWEB, F_COBWEB);
+        setFlag(BridgeMaterial.COBWEB, F_COBWEB | BlockFlags.FULL_BOUNDS 
+                | F_IGN_PASSABLE);
+
         // Huge mushroom type (...)
         for (Material mat : new Material[]{ 
                 Material.VINE, Material.COCOA}) {

@@ -77,7 +77,9 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 
         // 151 Daylight Sensor
         //		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-        BlockInit.setAs("DAYLIGHT_DETECTOR", Material.VINE);
+        BlockInit.setPropsAs("DAYLIGHT_DETECTOR", Material.VINE);
+        BlockProperties.setBlockFlags("DAYLIGHT_DETECTOR", BlockFlags.SOLID_GROUND 
+                | BlockProperties.F_XZ100);
 
         // 152 Block of Redstone
         BlockInit.setAs("REDSTONE_BLOCK", BridgeMaterial.ENCHANTING_TABLE);

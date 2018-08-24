@@ -29,6 +29,10 @@ public class BukkitGate implements BukkitShapeModel {
     private final double maxXZ;
     private final double height;
 
+    public BukkitGate(double inset, double height) {
+        this(inset, 1.0 - inset, height);
+    }
+
     public BukkitGate(double minXZ, double maxXZ, double height) {
         this.minXZ = minXZ;
         this.maxXZ = maxXZ;
