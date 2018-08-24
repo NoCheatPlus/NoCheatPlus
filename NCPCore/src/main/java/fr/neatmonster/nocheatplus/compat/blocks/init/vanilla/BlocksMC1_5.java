@@ -82,7 +82,9 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
                 | BlockProperties.F_XZ100);
 
         // 152 Block of Redstone
-        BlockInit.setAs("REDSTONE_BLOCK", BridgeMaterial.ENCHANTING_TABLE);
+        BlockInit.setPropsAs("REDSTONE_BLOCK", BridgeMaterial.ENCHANTING_TABLE);
+        BlockProperties.setBlockFlags("REDSTONE_BLOCK", 
+                BlockFlags.FULLY_SOLID_BOUNDS);
 
         // 153 Nether Quartz Ore
         BlockInit.setAs(BridgeMaterial.NETHER_QUARTZ_ORE, Material.COAL_ORE);

@@ -21,8 +21,10 @@ import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitDoor;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitGate;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitTrapDoor;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShulkerBox;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitSlab;
@@ -39,6 +41,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
     protected final Map<Material, BukkitShapeModel> shapeModels = new HashMap<Material, BukkitShapeModel>();
 
     // Blocks that change shape based on interaction or redstone.
+    private static final BukkitShapeModel MODEL_DOOR = new BukkitDoor();
+    private static final BukkitShapeModel MODEL_TRAP_DOOR = new BukkitTrapDoor();
     private static final BukkitShapeModel MODEL_GATE = new BukkitGate(
             0.375, 1.5);
     private static final BukkitShapeModel MODEL_SHULKER_BOX = new BukkitShulkerBox();
@@ -55,29 +59,42 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             0.375, 1.5);
 
 
-    // Static blocks.
+    // Static blocks (random heights).
     private static final BukkitShapeModel MODEL_FLOWER_POT = new BukkitStatic(
             0.33, 0.375); // TODO: XZ really?
     private static final BukkitShapeModel MODEL_GROUND_HEAD= new BukkitStatic(
             0.25, 0.5); // TODO: XZ-really? 275 ?
     private static final BukkitShapeModel MODEL_SINGLE_CHEST = new BukkitStatic(
-            0.062, .875);
+            0.062, .875); // TODO: 0.0625?
+    private static final BukkitShapeModel MODEL_CACTUS = new BukkitStatic(
+            0.0625, 1.0);
+    private static final BukkitShapeModel MODEL_LILY_PAD = new BukkitStatic(
+            0.09375);
+
+    // Static blocks with full xz-bounds sorted by height.
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_1 = new BukkitStatic(
             0.0625);
-    private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_9 = new BukkitStatic(
-            0.5625);
-    private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_15 = new BukkitStatic(
-            0.9375);
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT8_1 = new BukkitStatic(
             0.125);
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT8_3 = new BukkitStatic(
             0.375);
+    private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_9 = new BukkitStatic(
+            0.5625);
+    private static final BukkitShapeModel MODEL_XZ100_HEIGHT4_3 = new BukkitStatic(
+            0.75);
+    private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_15 = new BukkitStatic(
+            0.9375);
 
-    // TODO: enchanting table
-    // TODO: doors, trap doors
-    // TODO: Portals, end portal frame, ...
+    /*
+     * TODO:
+     * BREWING_STAND, CAULDRON, CONDUIT, HOPPER, END_PORTAL_FRAME,
+     * CHORUS_FLOWER, CHORUS_PLANT, COCOA, 
+     * DRAGON_EGG, TURTLE_EGG, SEA_PICKLE, 
+     * VINE, LADDER,
+     * CAKE,
+     */
+    // TODO: anvils, dead coral fans
     // TODO: END_ROD:  0.075 + 0.3, 0.925 - 0.3 / 1.0 -> BukkitCenteredFacing +-
-    // TODO: wall heads, chorus flower, other static, CAKE?
 
     public MCAccessBukkitModern() {
         super();
@@ -115,12 +132,11 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             processedBlocks.add(mat);
         }
 
-        // 16/15 height, full xz bounds.
-        for (Material mat : new Material[] {
-                Material.GRASS_PATH, BridgeMaterial.FARMLAND
-        }) {
-            addModel(mat, MODEL_XZ100_HEIGHT16_15);
-        }
+        // Cactus.
+        addModel(Material.CACTUS, MODEL_CACTUS);
+
+        // Lily pad
+        addModel(BridgeMaterial.LILY_PAD, MODEL_LILY_PAD);
 
         // 1/8 height.
         for (Material mat : new Material[] {
@@ -135,6 +151,20 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
                 Material.DAYLIGHT_DETECTOR
         }) {
             addModel(mat, MODEL_XZ100_HEIGHT8_3);
+        }
+
+        // 3/4 height.
+        for (Material mat : new Material[] {
+                BridgeMaterial.ENCHANTING_TABLE
+        }) {
+            addModel(mat, MODEL_XZ100_HEIGHT4_3);
+        }
+
+        // 16/15 height, full xz bounds.
+        for (Material mat : new Material[] {
+                Material.GRASS_PATH, BridgeMaterial.FARMLAND
+        }) {
+            addModel(mat, MODEL_XZ100_HEIGHT16_15);
         }
 
         // Thin fence: Glass panes, iron bars.
@@ -172,7 +202,7 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             addModel(mat, MODEL_FLOWER_POT);
         }
 
-        // Carpets
+        // Carpets.
         for (final Material mat : MaterialUtil.CARPETS) {
             addModel(mat, MODEL_XZ100_HEIGHT16_1);
         }
@@ -180,6 +210,16 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
         // Ground heads.
         for (final Material mat : MaterialUtil.HEADS_GROUND) {
             addModel(mat, MODEL_GROUND_HEAD);
+        }
+
+        // Doors.
+        for (final Material mat : MaterialUtil.ALL_DOORS) {
+            addModel(mat, MODEL_DOOR);
+        }
+
+        // Trapdoors.
+        for (final Material mat : MaterialUtil.ALL_TRAP_DOORS) {
+            addModel(mat, MODEL_TRAP_DOOR);
         }
 
         // Sort to processed by flags.

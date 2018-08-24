@@ -148,6 +148,18 @@ public class MaterialUtil {
     public static final Set<Material> ALL_BUTTONS = Collections.unmodifiableSet(
             BridgeMaterial.getBySuffix("_button", AlmostBoolean.YES, "legacy"));
 
+    public static final Set<Material> ALL_DOORS = Collections.unmodifiableSet(
+            BridgeMaterial.getByPrefixAndSuffix(
+                    null, Arrays.asList("_door"), AlmostBoolean.YES,
+                    "trap", "legacy")
+            );
+
+    public static final Set<Material> ALL_TRAP_DOORS = Collections.unmodifiableSet(
+            BridgeMaterial.getByPrefixAndSuffix(
+                    null, Arrays.asList("trapdoor", "trap_door"), AlmostBoolean.YES,
+                    "legacy")
+            );
+
     public static final Set<Material> ALL_PRESSURE_PLATES = Collections.unmodifiableSet(
             BridgeMaterial.getBySuffix("_pressure_plate", AlmostBoolean.YES, "legacy"));
 
@@ -326,17 +338,17 @@ public class MaterialUtil {
                             "sandstone",
                             "command_block"
                             ), AlmostBoolean.YES, "legacy"),
-            "observer", "structure_block",
-            "note_block", "tnt", 
+            "barrier", "structure_block",
+            "note_block", "tnt",
             "piston", "sticky_piston", "piston_base", "piston_sticky_base",
-            "dispenser", "dropper", "furnace",
+            "dispenser", "dropper", "furnace", "observer", 
             "pumpkin", "melon_block", "hay_block", "bone_block",
             "nether_wart_block",
             "snow_block", "ice", "magma_block",
             "diamond_block", "gold_block", "iron_block", "coal_block", 
             "emerald_block", "lapis_block", "redstone_block", 
             "purpur_block", "smooth_stone", "smooth_quartz", "quartz_block",
-            "quartz_pillar",
+            "quartz_pillar", "bookshelf",
             "sand", "stone", "gravel", "dirt", "grass_block", "grass",
             "sea_lantern", "redstone_lamp", "glowstone", "sponge", "wet_sponge"
             ));
@@ -450,18 +462,17 @@ public class MaterialUtil {
                     Arrays.asList("coral_fan", "coral_wall_fan", "coral"),
                     AlmostBoolean.YES, "dead", "legacy"),
             BridgeMaterial.getAllBlocks("attached_melon_stem", "attached_pumpkin_stem",
-                    "allium", "dandelion", "dandelion_yellow", "double_plant", "fern", 
-                    "kelp", "kelp_plant", "large_fern", "lilac", "melon_stem", 
-                    "nether_wart", "nether_warts", "oxeye_daisy", "peony", "poppy", 
-                    "red_rose", "rose_red", "seagrass", "sunflower", "tall_seagrass", 
-                    "yellow_flower"
-                    // TODO: Ground or not: "beetroots", "beetroot_block"
+                    "allium", "dandelion", "dandelion_yellow", 
+                    "double_plant", "fern", "kelp", "kelp_plant", "large_fern", 
+                    "lilac", "melon_stem", "nether_wart", "nether_warts", 
+                    "oxeye_daisy", "peony", "poppy", "red_rose", "rose_red", 
+                    "seagrass", "sunflower", "tall_seagrass", "yellow_flower"
                     ),
             new HashSet<Material>(Arrays.asList(BridgeMaterial.TALL_GRASS, 
                     BridgeMaterial.WHEAT_CROPS, BridgeMaterial.CARROTS, 
                     BridgeMaterial.POTATOES, BridgeMaterial.GRASS,
                     Material.PUMPKIN_STEM, Material.MELON_STEM,
-                    BridgeMaterial.SUGAR_CANE))
+                    BridgeMaterial.SUGAR_CANE, BridgeMaterial.BEETROOTS))
             ));
 
     /**

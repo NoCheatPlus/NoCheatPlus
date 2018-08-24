@@ -34,6 +34,9 @@ public class BlockFlags {
     /** SOLID and GROUND set. Treatment of SOLID/GROUND may be changed later. */
     public static final long SOLID_GROUND = BlockProperties.F_SOLID | BlockProperties.F_GROUND;
 
+    /** Full bounds and solid (+ground). */
+    public static final long FULLY_SOLID_BOUNDS = FULL_BOUNDS | SOLID_GROUND;
+
     /**
      * Set flags of id same as already set with flags for the given material.
      * (Uses BlockProperties.)

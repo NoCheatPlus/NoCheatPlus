@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.BlockProps;
 
@@ -31,14 +32,15 @@ public class BlocksMC1_11 implements BlockPropertiesSetup {
 
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
-        long solidFlags = BlockProperties.F_SOLID | BlockProperties.F_GROUND;
         // 218 OBSERVER
         // Wiki (16-11-25): 17.5, 2.65, 1.32, 0.9, 0.7, 0.45
-        BlockProperties.setBlockProps("OBSERVER", new BlockProps(BlockProperties.woodPickaxe, 6,
-                BlockProperties.secToMs(15.0, 2.2, 1.1, 0.7, 0.55, 0.45)));
-        BlockProperties.setBlockFlags("OBSERVER", solidFlags);
+        BlockProperties.setBlockProps("OBSERVER", 
+                new BlockProps(BlockProperties.woodPickaxe, 6,
+                        BlockProperties.secToMs(15.0, 2.2, 1.1, 0.7, 0.55, 0.45)));
+        BlockProperties.setBlockFlags("OBSERVER", 
+                BlockFlags.FULLY_SOLID_BOUNDS);
         // ALL SORTS OF SHULKER BOXES
-        
+
         StaticLog.logInfo("Added block-info for Minecraft 1.11 blocks.");
     }
 

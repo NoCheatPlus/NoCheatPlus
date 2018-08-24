@@ -1451,6 +1451,9 @@ public class BlockProperties {
                 setBlock(mat, indestructibleType); 
             }
         }
+
+        setBlockFlags(Material.BEDROCK, BlockFlags.FULLY_SOLID_BOUNDS);
+
         // 95 Locked chest
         // blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
         if (BridgeMaterial.has("locked_chest")) {
