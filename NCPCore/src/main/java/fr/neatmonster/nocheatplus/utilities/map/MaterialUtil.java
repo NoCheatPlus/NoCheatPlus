@@ -450,17 +450,18 @@ public class MaterialUtil {
                     Arrays.asList("coral_fan", "coral_wall_fan", "coral"),
                     AlmostBoolean.YES, "dead", "legacy"),
             BridgeMaterial.getAllBlocks("attached_melon_stem", "attached_pumpkin_stem",
-                    "allium", "dandelion", "dandelion_yellow", "fern", "kelp", "kelp_plant", 
-                    "large_fern", "lilac", "melon_stem", "nether_wart", "nether_warts",
-                    "oxeye_daisy", "peony", "poppy", "red_rose", "rose_red", "seagrass", 
-                    "sunflower", "tall_seagrass"
+                    "allium", "dandelion", "dandelion_yellow", "double_plant", "fern", 
+                    "kelp", "kelp_plant", "large_fern", "lilac", "melon_stem", 
+                    "nether_wart", "nether_warts", "oxeye_daisy", "peony", "poppy", 
+                    "red_rose", "rose_red", "seagrass", "sunflower", "tall_seagrass", 
+                    "yellow_flower"
                     // TODO: Ground or not: "beetroots", "beetroot_block"
                     ),
             new HashSet<Material>(Arrays.asList(BridgeMaterial.TALL_GRASS, 
                     BridgeMaterial.WHEAT_CROPS, BridgeMaterial.CARROTS, 
                     BridgeMaterial.POTATOES, BridgeMaterial.GRASS,
                     Material.PUMPKIN_STEM, Material.MELON_STEM,
-                    Material.SUGAR_CANE))
+                    BridgeMaterial.SUGAR_CANE))
             ));
 
     /**
@@ -498,7 +499,11 @@ public class MaterialUtil {
             RAILS,
             WALL_BANNERS,
             INSTANT_PLANTS,
-            BridgeMaterial.getAllBlocks("lever")
+            BridgeMaterial.getAllBlocks("structure_void", "end_gateway"),
+            new HashSet<Material>(Arrays.asList(
+                    Material.LEVER,
+                    BridgeMaterial.END_PORTAL,
+                    BridgeMaterial.NETHER_PORTAL))
             ));
 
     ////////////////////

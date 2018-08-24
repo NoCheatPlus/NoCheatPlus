@@ -70,7 +70,7 @@ public class BlocksMC1_13 implements BlockPropertiesSetup {
         // Further melon/pumpkin stems.
 
         // Wall torch
-        BlockInit.setInstantAir("WALL_TORCH");
+        BlockInit.setInstantPassable("WALL_TORCH");
 
         // Shulker boxes.
         for (Material mat : MaterialUtil.SHULKER_BOXES) {

@@ -106,8 +106,9 @@ public class BlockInit {
      * Set like air, plus instantly breakable.
      * @param newId
      */
-    public static void setInstantAir(String newId) {
-        BlockFlags.setFlagsAs(newId, Material.AIR); // TODO: Problematic, should be F_IGN_PASSABLE
+    public static void setInstantPassable(String newId) {
+
+        BlockProperties.setBlockFlags(newId, BlockProperties.F_IGN_PASSABLE);
         BlockProperties.setBlockProps(newId, BlockProperties.instantType);
     }
 
@@ -115,8 +116,8 @@ public class BlockInit {
      * Set like air, plus instantly breakable.
      * @param newId
      */
-    public static void setInstantAir(Material newId) {
-        BlockFlags.setFlagsAs(newId, Material.AIR);
+    public static void setInstantPassable(Material newId) {
+        BlockProperties.setBlockFlags(newId, BlockProperties.F_IGN_PASSABLE);
         BlockProperties.setBlockProps(newId, BlockProperties.instantType);
     }
 

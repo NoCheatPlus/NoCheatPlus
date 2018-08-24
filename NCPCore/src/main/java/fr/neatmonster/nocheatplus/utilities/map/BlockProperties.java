@@ -1196,16 +1196,10 @@ public class BlockProperties {
         // Set block break properties.
         // Instantly breakable.
         for (final Material mat : new Material[]{
-                Material.TRIPWIRE_HOOK, Material.TRIPWIRE,
-                Material.TORCH,
                 Material.TNT,
-                Material.REDSTONE_WIRE, 
-                BridgeMaterial.get("REDSTONE_TORCH_ON"), 
-                BridgeMaterial.get("REDSTONE_TORCH_OFF"),
                 BridgeMaterial.get("DIODE_BLOCK_ON"), BridgeMaterial.get("DIODE_BLOCK_OFF"),
                 BridgeMaterial.get("repeater"),
                 BridgeMaterial.LILY_PAD,
-                Material.FIRE,
                 BridgeMaterial.COMMAND_BLOCK,
                 BridgeMaterial.get("sea_pickle"),
         }) {
@@ -1215,14 +1209,23 @@ public class BlockProperties {
         }
         for (final Material mat : MaterialUtil.INSTANT_PLANTS) {
             setBlock(mat, instantType);
-            }
+        }
         // Instant break and fully passable.
         for (Material mat : new Material[] {
+                Material.REDSTONE_WIRE, 
+                BridgeMaterial.get("REDSTONE_TORCH_ON"), 
+                BridgeMaterial.get("REDSTONE_TORCH_OFF"),
                 BridgeMaterial.get("redstone_torch"),
                 BridgeMaterial.get("redstone_wall_torch"),
+                Material.TRIPWIRE,
+                Material.TRIPWIRE_HOOK,
+                Material.TORCH,
+                Material.FIRE,
         }) {
-            setBlock(mat, instantType);
-            BlockFlags.addFlags(mat, F_IGN_PASSABLE);
+            if (mat != null) {
+                setBlock(mat, instantType);
+                BlockFlags.addFlags(mat, F_IGN_PASSABLE);
+            }
         }
 
         // Leaf type
@@ -1491,7 +1494,7 @@ public class BlockProperties {
 
         // Wall banners.
         for (Material mat : MaterialUtil.WALL_BANNERS) {
-            BlockInit.setInstantAir(mat);
+            BlockInit.setInstantPassable(mat);
         }
 
         // Shulker boxes
@@ -1630,7 +1633,7 @@ public class BlockProperties {
         }
         if (!missing.isEmpty()) {
             missing.add(0, "--- Missing entries -------------------------------");
-            missing.add(0, "The block breaking data is incomplete, default to allow instant breaking:");
+            missing.add(0, "The block data is incomplete:");
             logManager.warning(Streams.INIT, StringUtil.join(missing,  "\n"));
         }
     }

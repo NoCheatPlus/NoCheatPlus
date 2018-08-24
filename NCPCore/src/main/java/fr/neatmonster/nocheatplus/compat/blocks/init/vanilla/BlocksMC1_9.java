@@ -95,7 +95,7 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
         BlockInit.setAs("FROSTED_ICE", Material.ICE);
 
         // 255(STRUCTURE_BLOCK / SOLID+GROUND) 
-        BlockInit.setInstantAir("STRUCTURE_BLOCK");
+        BlockInit.setInstantPassable("STRUCTURE_BLOCK");
 
         // Special case activation.
         // TODO: Is this the right place?

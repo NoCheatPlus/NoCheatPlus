@@ -50,7 +50,7 @@ public class BlocksMC1_10 implements BlockPropertiesSetup {
         // 216 BONE_BLOCK
         BlockInit.setAs("BONE_BLOCK", Material.COBBLESTONE);
         // 217 STRUCTURE_VOID
-        BlockInit.setInstantAir("STRUCTURE_VOID");
+        BlockInit.setInstantPassable("STRUCTURE_VOID");
 
         // Not sure when: structure block is solid.
         BlockFlags.setFullySolidFlags("STRUCTURE_BLOCK");
