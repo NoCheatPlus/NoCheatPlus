@@ -19,33 +19,26 @@ import org.bukkit.World;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 
 /**
- * Bottom center cuboid.
+ * Somehow attached to a block face, centered cuboid.
  * 
  * @author asofold
  *
  */
-public class BukkitBottomCentered implements BukkitShapeModel {
-
-    private final double minXZ;
-    private final double maxXZ;
-    private final double height;
+public class BukkitAttachedCentered implements BukkitShapeModel {
 
     // TODO: Add modifications (shape alteration interface).
 
-    public BukkitBottomCentered(double inset, double height) {
-        this(inset, 1.0 - inset, height);
-    }
-
-    public BukkitBottomCentered(double minXZ, double maxXZ, double height) {
-        this.minXZ = minXZ;
-        this.maxXZ = maxXZ;
-        this.height = height;
+    public BukkitAttachedCentered(double inset, double length, 
+            boolean invertFace) {
+        // TODO: Might add a signature to specify minY and maxY (attach NWSE only).
+        // TODO: Implement.
     }
 
     @Override
     public double[] getShape(final BlockCache blockCache, 
             final World world, final int x, final int y, final int z) {
-        return new double[] {minXZ, 0.0, minXZ, maxXZ, height, maxXZ};
+        // TODO: Implement (attached face via ... directional and/or facing etc.).
+        return new double[] {0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
     }
 
     @Override
