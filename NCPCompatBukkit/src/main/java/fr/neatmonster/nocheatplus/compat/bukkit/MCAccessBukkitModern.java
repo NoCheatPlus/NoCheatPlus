@@ -21,15 +21,16 @@ import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitDirectionalCentered;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitDoor;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitGate;
-import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitTrapDoor;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShulkerBox;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitSlab;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitStairs;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitStatic;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitTrapDoor;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.map.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.map.BlockFlags;
@@ -51,6 +52,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
     // Blocks that have a different shape, based on how they have been placed.
     private static final BukkitShapeModel MODEL_SLAB = new BukkitSlab();
     private static final BukkitShapeModel MODEL_STAIRS= new BukkitStairs();
+    private static final BukkitShapeModel MODEL_END_ROD = new BukkitDirectionalCentered(
+            0.375, 1.0, false);
 
     // Blocks that have a different shape with neighbor blocks (bukkit takes care though).
     private static final BukkitShapeModel MODEL_THIN_FENCE = new BukkitFence(
@@ -94,7 +97,7 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
      * CAKE,
      */
     // TODO: anvils, dead coral fans
-    // TODO: END_ROD:  0.075 + 0.3, 0.925 - 0.3 / 1.0 -> BukkitCenteredFacing +-
+    // TODO: Liquid (all leveled).
 
     public MCAccessBukkitModern() {
         super();
@@ -137,6 +140,9 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
 
         // Lily pad
         addModel(BridgeMaterial.LILY_PAD, MODEL_LILY_PAD);
+
+        // End rod.
+        addModel(Material.END_ROD, MODEL_END_ROD);
 
         // 1/8 height.
         for (Material mat : new Material[] {
