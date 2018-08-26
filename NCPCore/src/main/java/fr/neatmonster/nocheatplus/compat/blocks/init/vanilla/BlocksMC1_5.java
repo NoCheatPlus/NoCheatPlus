@@ -91,8 +91,8 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 
         // 154 Hopper
         BlockInit.setAs("HOPPER", Material.COAL_ORE);
-        // TODO: Needs workaround. [workaround-flag + different purpose flag sets ?]
-        BlockFlags.addFlags("HOPPER", BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
+        BlockFlags.addFlags("HOPPER", BlockProperties.F_GROUND_HEIGHT
+                | BlockProperties.F_MIN_HEIGHT16_11);
 
         // 155 Block of Quartz
         BlockInit.setAs("QUARTZ_BLOCK", Material.SANDSTONE);

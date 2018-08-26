@@ -779,10 +779,33 @@ public class BlockProperties {
     public static final long F_MIN_HEIGHT16_15              = f_flag();
 
     /**
+     * Minimum height 13/16 (8125). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
+    public static final long F_MIN_HEIGHT16_13              = f_flag();
+
+    /**
+     * Minimum height 11/16 (0.6875). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
+    public static final long F_MIN_HEIGHT16_11              = f_flag();
+
+    /**
+     * Minimum height 5/16 (0.3125). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
+    public static final long F_MIN_HEIGHT16_5               = f_flag();
+
+    /**
+     * Minimum height 1/4 (0.25). <br>
+     * Only applies with F_GROUND_HEIGHT set.
+     */
+    public static final long F_MIN_HEIGHT4_1               = f_flag();
+
+    /**
      * Minimum height 1/16 (0.0625). <br>
      * Only applies with F_GROUND_HEIGHT set.
      */
-    // TODO: Lily pad min height of MC versions?
     public static final long F_MIN_HEIGHT16_1               = f_flag();
 
     /** CARPET. **/
@@ -1189,6 +1212,7 @@ public class BlockProperties {
         }) {
             setFlag(mat, F_GROUND_HEIGHT);
         }
+        setFlag(BridgeMaterial.END_PORTAL_FRAME, F_MIN_HEIGHT16_13);
         // Issues standing on with F_PASSABLE_X4. Note getGroundMinHeight.
         for (Material mat : MaterialUtil.WOODEN_TRAP_DOORS) {
             setFlag(mat, F_GROUND_HEIGHT);
@@ -1357,6 +1381,8 @@ public class BlockProperties {
                 setBlock(mat,  brickType);
             }
         }
+        setBlockFlags(Material.CAULDRON, BlockFlags.SOLID_GROUND 
+                | F_GROUND_HEIGHT | F_MIN_HEIGHT16_5); // LEGACY
         setBlock(BridgeMaterial.CRAFTING_TABLE, chestType);
         setBlock(Material.CHEST, chestType);
         for (Material mat : MaterialUtil.WOODEN_DOORS) {
@@ -3068,7 +3094,8 @@ public class BlockProperties {
             }
         }
         else if (id == Material.CAULDRON) {
-            if (Math.min(fy, fy + dY * dT) >= 0.3125) {
+            if (Math.min(fy, fy + dY * dT) >= getGroundMinHeight(
+                    access, bx, by, bz, node, flags)) {
                 // Check for moving through walls or floor.
                 // TODO: Maybe this is too exact...
                 return isInsideCenter(fx, fz, dX, dZ, dT, 0.125);
@@ -3272,19 +3299,11 @@ public class BlockProperties {
         //		else if (id == BridgeMaterial.CAKE.getId()) {
         //			return 0.4375;
         //		}
-        else if (id == Material.CAULDRON) {
-            // TODO: slightly over 0.
-            return 0.3125;
-        }
         else if (id == Material.CACTUS) {
             return 0.9375;
         }
         else if (id == BridgeMaterial.PISTON_HEAD) {
             return 0.625;
-        }
-        else if (id == BridgeMaterial.END_PORTAL_FRAME) {
-            // Allow moving as if no eye was inserted.
-            return 0.8125;
         }
         else if (bounds == null) {
             return 0.0;
@@ -3294,6 +3313,22 @@ public class BlockProperties {
             if ((flags & F_MIN_HEIGHT16_1) != 0) {
                 // 1/16
                 return 0.0625;
+            }
+            if ((flags & F_MIN_HEIGHT4_1) != 0) {
+                // 1/4
+                return 0.25;
+            }
+            if ((flags & F_MIN_HEIGHT16_5) != 0) {
+                // 5/16
+                return 0.3125;
+            }
+            if ((flags & F_MIN_HEIGHT16_11) != 0) {
+                // 11/16
+                return 0.6875;
+            }
+            if ((flags & F_MIN_HEIGHT16_13) != 0) {
+                // 13/16
+                return 0.8125;
             }
             if ((flags & F_MIN_HEIGHT16_15) != 0) {
                 // 15/16

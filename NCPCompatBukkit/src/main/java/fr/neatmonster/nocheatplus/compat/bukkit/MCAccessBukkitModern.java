@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitDirectionalCentered;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitDoor;
+import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitEndPortalFrame;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitFence;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitGate;
 import fr.neatmonster.nocheatplus.compat.bukkit.model.BukkitShapeModel;
@@ -48,6 +49,8 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             0.375, 1.5);
     private static final BukkitShapeModel MODEL_SHULKER_BOX = new BukkitShulkerBox();
 
+    // Blocks with different heights based on whatever.
+    private static final BukkitShapeModel MODEL_END_PORTAL_FRAME = new BukkitEndPortalFrame();
 
     // Blocks that have a different shape, based on how they have been placed.
     private static final BukkitShapeModel MODEL_SLAB = new BukkitSlab();
@@ -88,15 +91,18 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             0.5625);
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT4_3 = new BukkitStatic(
             0.75);
+    private static final BukkitShapeModel MODEL_XZ100_HEIGHT8_7 = new BukkitStatic(
+            0.875);
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_15 = new BukkitStatic(
             0.9375);
 
     /*
      * TODO:
-     * BREWING_STAND, CAULDRON, CONDUIT, HOPPER, END_PORTAL_FRAME,
+     * LADDER,
+     * CONDUIT, 
      * CHORUS_FLOWER, CHORUS_PLANT, COCOA, 
      * TURTLE_EGG, SEA_PICKLE, 
-     * VINE, LADDER,
+     * VINE, 
      * CAKE,
      */
     // TODO: anvils, dead coral fans
@@ -129,17 +135,27 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
 
         // TODO: Also consider removing flags (passable_x4 etc).
 
+        // Adjust flags for individual blocks.
+        BlockProperties.setBlockFlags(Material.CAULDRON, 
+                BlockFlags.SOLID_GROUND | BlockProperties.F_GROUND_HEIGHT 
+                | BlockProperties.F_MIN_HEIGHT4_1);
+
         // Directly keep blocks as is.
         for (final Material mat : new Material[] {
+                Material.CAULDRON,
+                BridgeMaterial.COBWEB,
+                Material.HOPPER,
                 BridgeMaterial.MOVING_PISTON,
-                Material.SNOW,
-                BridgeMaterial.COBWEB
+                Material.SNOW
         }) {
             processedBlocks.add(mat);
         }
 
         // Lily pad
         addModel(BridgeMaterial.LILY_PAD, MODEL_LILY_PAD);
+
+        // End portal frame.
+        addModel(BridgeMaterial.END_PORTAL_FRAME, MODEL_END_PORTAL_FRAME);
 
         // End rod.
         addModel(Material.END_ROD, MODEL_END_ROD);
@@ -172,6 +188,13 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
                 BridgeMaterial.ENCHANTING_TABLE
         }) {
             addModel(mat, MODEL_XZ100_HEIGHT4_3);
+        }
+
+        // 7/8 height.
+        for (Material mat : new Material[] {
+                Material.BREWING_STAND // TODO: base is 1/8, center 0.875 - needs multi-cuboid.
+        }) {
+            addModel(mat, MODEL_XZ100_HEIGHT8_7);
         }
 
         // 16/15 height, full xz bounds.

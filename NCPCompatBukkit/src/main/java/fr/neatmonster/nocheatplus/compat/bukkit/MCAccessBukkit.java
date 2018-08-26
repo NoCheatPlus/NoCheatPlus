@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.bukkit.Material;
 
-import fr.neatmonster.nocheatplus.compat.BridgeMaterial;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -53,16 +52,6 @@ public class MCAccessBukkit extends MCAccessBukkitBase implements BlockPropertie
                  * catch flowers and the like with MaterialUtil.
                  */
                 BlockFlags.addFlags(mat, flags);
-                itchyBlocks.add(mat);
-            }
-        }
-        // Blocks that are reported to be full and solid, but which are not.
-        final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
-        for (final Material mat : new Material[]{
-                BridgeMaterial.END_PORTAL_FRAME,
-        }) {
-            if (!processedBlocks.contains(mat)) {
-                BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
                 itchyBlocks.add(mat);
             }
         }
