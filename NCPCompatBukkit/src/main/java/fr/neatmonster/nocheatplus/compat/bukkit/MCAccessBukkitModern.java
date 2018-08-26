@@ -62,17 +62,20 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             0.375, 1.5);
 
 
-    // Static blocks (random heights).
+    // Static blocks (various height and inset values).
+    private static final BukkitShapeModel MODEL_LILY_PAD = new BukkitStatic(
+            0.09375);
     private static final BukkitShapeModel MODEL_FLOWER_POT = new BukkitStatic(
             0.33, 0.375); // TODO: XZ really?
     private static final BukkitShapeModel MODEL_GROUND_HEAD= new BukkitStatic(
             0.25, 0.5); // TODO: XZ-really? 275 ?
     private static final BukkitShapeModel MODEL_SINGLE_CHEST = new BukkitStatic(
             0.062, .875); // TODO: 0.0625?
-    private static final BukkitShapeModel MODEL_CACTUS = new BukkitStatic(
+
+    // Static blocks with full height sorted by inset.
+    private static final BukkitShapeModel MODEL_INSET16_1_HEIGHT100 = new BukkitStatic(
             0.0625, 1.0);
-    private static final BukkitShapeModel MODEL_LILY_PAD = new BukkitStatic(
-            0.09375);
+
 
     // Static blocks with full xz-bounds sorted by height.
     private static final BukkitShapeModel MODEL_XZ100_HEIGHT16_1 = new BukkitStatic(
@@ -92,7 +95,7 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
      * TODO:
      * BREWING_STAND, CAULDRON, CONDUIT, HOPPER, END_PORTAL_FRAME,
      * CHORUS_FLOWER, CHORUS_PLANT, COCOA, 
-     * DRAGON_EGG, TURTLE_EGG, SEA_PICKLE, 
+     * TURTLE_EGG, SEA_PICKLE, 
      * VINE, LADDER,
      * CAKE,
      */
@@ -135,14 +138,19 @@ public class MCAccessBukkitModern extends MCAccessBukkit {
             processedBlocks.add(mat);
         }
 
-        // Cactus.
-        addModel(Material.CACTUS, MODEL_CACTUS);
-
         // Lily pad
         addModel(BridgeMaterial.LILY_PAD, MODEL_LILY_PAD);
 
         // End rod.
         addModel(Material.END_ROD, MODEL_END_ROD);
+
+        // 1/16 inset at full height.
+        for (Material mat : new Material[] {
+                Material.CACTUS,
+                Material.DRAGON_EGG
+        }) {
+            addModel(mat, MODEL_INSET16_1_HEIGHT100);
+        }
 
         // 1/8 height.
         for (Material mat : new Material[] {
