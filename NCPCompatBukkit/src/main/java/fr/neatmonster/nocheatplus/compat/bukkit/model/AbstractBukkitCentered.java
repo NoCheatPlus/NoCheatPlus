@@ -59,16 +59,16 @@ public abstract class AbstractBukkitCentered implements BukkitShapeModel {
                 // TODO: Evaluate if (some) faces need to be inverted.
                 // End rod facing: the direction it points to.
                 switch (facing) {
-                    case NORTH:
+                    case EAST:
                         return new double[] {0.0, minDist, minDist, 
                                 length, maxDist, maxDist};
-                    case SOUTH:
+                    case WEST:
                         return new double[] {1.0 - length, minDist, minDist, 
                                 1.0, maxDist, maxDist};
-                    case WEST:
+                    case SOUTH:
                         return new double[] {minDist, minDist, 0.0, 
                                 maxDist, maxDist, length};
-                    case EAST:
+                    case NORTH:
                         return new double[] {minDist, minDist, 1.0 - length, 
                                 maxDist, maxDist, 1.0};
                     case DOWN:

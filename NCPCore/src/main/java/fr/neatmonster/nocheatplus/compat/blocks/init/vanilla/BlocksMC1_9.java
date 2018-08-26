@@ -37,7 +37,7 @@ public class BlocksMC1_9 implements BlockPropertiesSetup {
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
 
-        final long ground = BlockProperties.F_GROUND;
+        final long ground = BlockFlags.SOLID_GROUND; // BlockProperties.F_GROUND;
         final BlockProps instant = BlockProperties.instantType;
 
         // 198(END_ROD)
