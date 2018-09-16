@@ -17,6 +17,7 @@ package fr.neatmonster.nocheatplus.checks.net.protocollib;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import fr.neatmonster.nocheatplus.checks.net.AttackMotion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -94,6 +95,7 @@ public class UseEntityAdapter extends BaseAdapter {
     private static final int ATTACK = 0x02;
 
     private final AttackFrequency attackFrequency;
+    private final AttackMotion attackMotion;
 
     private final LegacyReflectionSet legacySet;
 
@@ -107,6 +109,8 @@ public class UseEntityAdapter extends BaseAdapter {
                     "checks", Arrays.asList(AttackFrequency.class.getSimpleName()));
         }
         attackFrequency = new AttackFrequency();
+
+        attackMotion = new AttackMotion();
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(attackFrequency);
         this.legacySet = getLegacyReflectionSet();
     }
@@ -181,11 +185,15 @@ public class UseEntityAdapter extends BaseAdapter {
 
         // AttackFrequency
         if (isAttack) {
+
+            data.lastUseEntityTime = System.currentTimeMillis();
             final NetConfig cc = pData.getGenericInstance(NetConfig.class);
-            if (attackFrequency.isEnabled(player, pData) 
-                    && attackFrequency.check(player, time, data, cc, pData)) {
-                cancel = true;
-            }
+
+            cancel = (attackMotion.isEnabled(player, pData) &&
+                    attackMotion.check(player, time, data, cc, pData)) ||
+
+                    (attackFrequency.isEnabled(player, pData)
+                    && attackFrequency.check(player, time, data, cc, pData));
         }
 
         if (cancel) {

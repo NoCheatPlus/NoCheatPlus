@@ -289,6 +289,7 @@ public class MovingFlying extends BaseAdapter {
         //        }
 
         // Process cancel and debug log.
+        data.lastFlyingTime = System.currentTimeMillis();
         if (cancel) {
             event.setCancelled(true);
         }

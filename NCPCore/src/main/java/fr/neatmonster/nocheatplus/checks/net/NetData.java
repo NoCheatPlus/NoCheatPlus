@@ -41,6 +41,9 @@ public class NetData extends ACheckData {
     // AttackFrequency
     public ActionFrequency attackFrequencySeconds = new ActionFrequency(16, 500);
 
+    // AttackMotion
+    public ActionFrequency attackMotionSeconds = new ActionFrequency(20, 500);
+
     // FlyingFrequency
     /** All flying packets, use System.currentTimeMillis() for time. */
     public final ActionFrequency flyingFrequencyAll;
@@ -66,6 +69,11 @@ public class NetData extends ACheckData {
      * maintained for fight.godmode.
      */
     public long lastKeepAliveTime = 0L;
+
+    public long lastUseEntityTime = 0L;
+    public int attackMotVL;
+
+    public long lastFlyingTime = 0L;
 
     /**
      * Detect teleport-ACK packets, consistency check to only use outgoing

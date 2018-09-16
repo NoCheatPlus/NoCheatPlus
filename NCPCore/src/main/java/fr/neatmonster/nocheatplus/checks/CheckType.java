@@ -108,6 +108,8 @@ public enum CheckType {
     NET_PACKETFREQUENCY(CheckTypeType.CHECK, NET, Permissions.NET_PACKETFREQUENCY),
     NET_SOUNDDISTANCE(CheckTypeType.CHECK, NET), // Can not exempt players from this one.
 
+    NET_ATTACKMOTION(CheckTypeType.CHECK, NET),
+
     ;
 
     public static enum CheckTypeType {

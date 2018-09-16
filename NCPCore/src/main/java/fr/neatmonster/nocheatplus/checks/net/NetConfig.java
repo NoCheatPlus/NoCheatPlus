@@ -57,6 +57,9 @@ public class NetConfig extends ACheckConfig {
     public final float attackFrequencyLimitSecondsEight;
     public final ActionList attackFrequencyActions;
 
+    public final ActionList attackMotionActions;
+    public final long attackMotionTimeDiff;
+
     public final int flyingFrequencySeconds;
     public final double flyingFrequencyPPS;
     public final ActionList flyingFrequencyActions;
@@ -88,6 +91,9 @@ public class NetConfig extends ACheckConfig {
         attackFrequencyLimitSecondsFour= config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_FOUR);
         attackFrequencyLimitSecondsEight = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_EIGHT);
         attackFrequencyActions = config.getOptimizedActionList(ConfPaths.NET_ATTACKFREQUENCY_ACTIONS, Permissions.NET_ATTACKFREQUENCY);
+
+        attackMotionTimeDiff = config.getInt(ConfPaths.NET_ATTACKMOTION_TIME);
+        attackMotionActions = config.getOptimizedActionList(ConfPaths.NET_ATTACKMOTION_ACTIONS, Permissions.NET_ATTACKMOTION);
 
         flyingFrequencySeconds = Math.max(1, globalConfig.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
         flyingFrequencyPPS = Math.max(1.0, globalConfig.getDouble(ConfPaths.NET_FLYINGFREQUENCY_PACKETSPERSECOND));
