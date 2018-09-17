@@ -101,13 +101,20 @@ public class UseEntityAdapter extends BaseAdapter {
 
     public UseEntityAdapter(Plugin plugin) {
         super(plugin, PacketType.Play.Client.USE_ENTITY);
-        this.checkType = CheckType.NET_ATTACKFREQUENCY;
+        this.checkType = CheckType.NET;
         // Add feature tags for checks.
         if (NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().isActiveAnywhere(
                 CheckType.NET_ATTACKFREQUENCY)) {
             NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags(
                     "checks", Arrays.asList(AttackFrequency.class.getSimpleName()));
         }
+
+        if (NCPAPIProvider.getNoCheatPlusAPI().getWorldDataManager().isActiveAnywhere(
+                CheckType.NET_ATTACKMOTION)) {
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags(
+                    "checks", Arrays.asList(AttackMotion.class.getSimpleName()));
+        }
+
         attackFrequency = new AttackFrequency();
 
         attackMotion = new AttackMotion();

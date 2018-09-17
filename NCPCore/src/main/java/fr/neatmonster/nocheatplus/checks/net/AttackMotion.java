@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.IPlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class AttackMotion extends Check {
@@ -40,10 +41,11 @@ public class AttackMotion extends Check {
 
             if (data.attackMotVL > 120) {
                 // Trigger a violation.
-                final ViolationData vd = new ViolationData(this, player, data.attackMotVL / 20.0, 1.0, cc.attackMotionActions);
+                final ViolationData vd = new ViolationData(this, player, data.attackMotVL / 12.0, 1.0, cc.attackMotionActions);
                 if (pData.isDebugActive(type) || vd.needsParameters()) {
                     vd.setParameter(ParameterName.VIOLATIONS, Integer.toString(data.attackMotVL));
                 }
+
                 if (executeActions(vd).willCancel()) {
                     cancel = true;
                 }
@@ -53,7 +55,7 @@ public class AttackMotion extends Check {
         } else {
             // Attack didnt come after motion updates
             // Decrease their vl
-            data.attackMotVL *= 0.5;
+            data.attackMotVL *= 0.95;
         }
 
         return cancel;

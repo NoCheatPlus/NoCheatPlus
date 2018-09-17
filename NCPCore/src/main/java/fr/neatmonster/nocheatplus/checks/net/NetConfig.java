@@ -92,7 +92,7 @@ public class NetConfig extends ACheckConfig {
         attackFrequencyLimitSecondsEight = config.getInt(ConfPaths.NET_ATTACKFREQUENCY_SECONDS_EIGHT);
         attackFrequencyActions = config.getOptimizedActionList(ConfPaths.NET_ATTACKFREQUENCY_ACTIONS, Permissions.NET_ATTACKFREQUENCY);
 
-        attackMotionTimeDiff = config.getInt(ConfPaths.NET_ATTACKMOTION_TIME);
+        attackMotionTimeDiff = Math.max(0, config.getInt(ConfPaths.NET_ATTACKMOTION_TIME));
         attackMotionActions = config.getOptimizedActionList(ConfPaths.NET_ATTACKMOTION_ACTIONS, Permissions.NET_ATTACKMOTION);
 
         flyingFrequencySeconds = Math.max(1, globalConfig.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
