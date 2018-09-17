@@ -112,6 +112,7 @@ public class UseEntityAdapter extends BaseAdapter {
 
         attackMotion = new AttackMotion();
         NCPAPIProvider.getNoCheatPlusAPI().addComponent(attackFrequency);
+        NCPAPIProvider.getNoCheatPlusAPI().addComponent(attackMotion);
         this.legacySet = getLegacyReflectionSet();
     }
 
