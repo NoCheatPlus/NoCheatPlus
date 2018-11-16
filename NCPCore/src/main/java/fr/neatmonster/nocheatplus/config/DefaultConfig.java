@@ -579,6 +579,9 @@ public class DefaultConfig extends ConfigFile {
         // Superseded
         set(ConfPaths.NET_SUPERSEDED_FLYING_CANCELWAITING, true, 1090);
 
+        // AttackMotion
+        set(ConfPaths.NET_ATTACKMOTION_TIME, 25, 1144);
+        set(ConfPaths.NET_ATTACKMOTION_ACTIONS, "cancel vl>2 cancel log:attackmotion:0:3:if", 1144);
 
         // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";
@@ -659,6 +662,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!", 785);
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!", 785);
         set(ConfPaths.STRINGS + ".vehicleenvelope", start + "moved a vehicle too fast ([tags])" + end, 785);
+        set(ConfPaths.STRINGS + ".attackmotion", start + "attacked at the same tick as motion updates" + end, 1144);
 
         // Compatibility settings.
         set(ConfPaths.COMPATIBILITY_EXEMPTIONS_WILDCARD_DEFAULT_METADATA_ACTIVE, true, 785);

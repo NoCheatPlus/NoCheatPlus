@@ -43,8 +43,6 @@ permissions:
         default: false
     nocheatplus.checks.blockbreak.noswing.silent:
         default: false
-    nocheatplus.checks.blockbreak.reach.silent:
-        default: false
     nocheatplus.checks.blockbreak.wrongblock.silent:
         default: false
     nocheatplus.checks.blockinteract.direction.silent:
@@ -320,7 +318,9 @@ permissions:
                   description: Bypass the KeepAliveFrequency check (keep alive packet spam).
                 nocheatplus.checks.net.packetfrequency:
                   description: Bypass the PacketFrequency check (overall packet spam).
-    
+                nocheatplus.checks.net.attackmotion:
+                    description: Bypass the AttackMotion check (attacking in the same tick as motion updated).
+
     nocheatplus.mods:
         description: Allow the player to use all the client mods.
         children:
@@ -412,7 +412,6 @@ permissions:
                 description: Allow toggling notifications.
                 children:
                     nocheatplus.notify: true
-            nocheatplus.filter.command.nocheatplus: true
             nocheatplus.command.reload:
                 description: Allow the player to reload NoCheatPlus configuration.
                 children:

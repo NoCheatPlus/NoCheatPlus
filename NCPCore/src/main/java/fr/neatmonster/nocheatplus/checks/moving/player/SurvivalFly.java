@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -383,9 +384,10 @@ public class SurvivalFly extends Check {
             // Prevent players from walking on a liquid in a too simple way.
             // TODO: Find something more effective against more smart methods (limitjump helps already).
             // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
+            // TODO: 0D = 0.0
             // TODO: Complete re-modeling.
-            if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && !toOnGround && !fromOnGround 
-                    && lastMove.toIsValid && lastMove.yDistance == 0D 
+            if (hDistanceAboveLimit <= 0.0 && hDistance > 0.1 && yDistance == 0.0 && !toOnGround && !fromOnGround
+                    && lastMove.toIsValid && lastMove.yDistance == 0.0
                     && BlockProperties.isLiquid(to.getTypeId()) && BlockProperties.isLiquid(from.getTypeId())
                     && !from.isHeadObstructed() && !to.isHeadObstructed() // TODO: Might decrease margin here.
                     ) {
@@ -393,6 +395,16 @@ public class SurvivalFly extends Check {
                 // TODO: Might check actual bounds (collidesBlock). Might implement + use BlockProperties.getCorrectedBounds or getSomeHeight.
                 hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
                 tags.add("waterwalk");
+            }
+
+            // Prevent players from walking on water or in air with a very low delta between y distances
+            if (hDistanceAboveLimit <= 0D && hDistance > 0.22 && !toOnGround && !fromOnGround
+                    && lastMove.toIsValid && (yDistance > 0.0 && yDistance < 0.03 || lastMove.yDistance > 0.0 && lastMove.yDistance < 0.03)
+                    && BlockProperties.isLiquid(from.getTypeId())
+                    && !from.isHeadObstructed() && !to.isHeadObstructed()) {
+
+                hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+                tags.add("badwalk");
             }
 
             // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
