@@ -109,6 +109,7 @@ public enum CheckType {
     NET_SOUNDDISTANCE(CheckTypeType.CHECK, NET), // Can not exempt players from this one.
 
     NET_ATTACKMOTION(CheckTypeType.CHECK, NET),
+    NET_POSITIONUPDATE(CheckTypeType.CHECK, NET),
 
     ;
 

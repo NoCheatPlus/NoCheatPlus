@@ -41,15 +41,13 @@ public class NetData extends ACheckData {
     // AttackFrequency
     public ActionFrequency attackFrequencySeconds = new ActionFrequency(16, 500);
 
-    // AttackMotion
-    public ActionFrequency attackMotionSeconds = new ActionFrequency(20, 500);
-
     // FlyingFrequency
     /** All flying packets, use System.currentTimeMillis() for time. */
     public final ActionFrequency flyingFrequencyAll;
     public boolean flyingFrequencyOnGround = false;
     public long flyingFrequencyTimeOnGround = 0L;
     public long flyingFrequencyTimeNotOnGround = 0L;
+    public int flyingMoves;
     /**
      * Monitors redundant packets, when more than 20 packets per second are
      * sent. Use System.currentTimeMillis() for time.
@@ -71,6 +69,8 @@ public class NetData extends ACheckData {
     public long lastKeepAliveTime = 0L;
 
     public long lastUseEntityTime = 0L;
+
+    //
     public int attackMotVL;
 
     public long lastFlyingTime = 0L;
