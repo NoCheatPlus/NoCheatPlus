@@ -879,7 +879,11 @@ public class SurvivalFly extends Check {
                     hAllowedDistance *= Magic.modDepthStrider[level];
                     // Modifiers: Most speed seems to be reached on ground, but couldn't nail down.
                     useBaseModifiers = true;
-                }
+                } else if (player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+                    // TODO: Allow for faster swimming above water with Dolhphins Grace
+				    hAllowedDistance *= Magic.modDolphinsGrace;
+					useBaseModifiers = true;
+            }
             }
             // (Friction is used as is.)
         }
