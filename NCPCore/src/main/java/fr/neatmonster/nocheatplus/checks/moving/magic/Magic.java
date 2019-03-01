@@ -40,7 +40,7 @@ public class Magic {
     // Friction factor by medium (move inside of).
     public static final double FRICTION_MEDIUM_AIR = 0.98;
     /** Friction for water (default). */
-    public static final double FRICTION_MEDIUM_WATER = 0.89;
+    public static final double FRICTION_MEDIUM_WATER = 0.98;
     /** Friction for lava. */
     public static final double FRICTION_MEDIUM_LAVA = 0.535;
 
@@ -49,7 +49,7 @@ public class Magic {
     public static final double modSneak             = 0.13D / WALK_SPEED;
     //    public static final double modSprint            = 0.29 / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
     public static final double modBlock             = 0.16D / WALK_SPEED;
-    public static final double modSwim              = 0.115D / WALK_SPEED;
+    public static final double modSwim              = 0.3D / WALK_SPEED;
     public static final double[] modDepthStrider    = new double[] {
             1.0,
             0.1645 / modSwim / WALK_SPEED,
@@ -124,7 +124,7 @@ public class Magic {
      */
     public static double swimBaseSpeedV() {
         // TODO: Does this have to be the dynamic walk speed (refactoring)?
-        return WALK_SPEED * modSwim + 0.02;
+        return WALK_SPEED * modSwim + 0.1;
     }
 
     /**
