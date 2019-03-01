@@ -1253,11 +1253,12 @@ public class SurvivalFly extends Check {
 
         // Absolute y-distance to set back.
         if (yDistance > 0.0 && !data.isVelocityJumpPhase()) {
+            // TODO: Only allow higher violation when only in water (1.13 Swimming)
             // TODO: Maintain a value in data, adjusting to velocity?
             // TODO: LIMIT_JUMP
             final double vAllowedAbsoluteDistance = data.liftOffEnvelope.getMaxJumpHeight(data.jumpAmplifier);
             final double totalVDistViolation =  to.getY() - data.getSetBackY() - vAllowedAbsoluteDistance;
-            if (totalVDistViolation > 0.0) {
+            if (totalVDistViolation > 2) {
                 // Skip actually stepping up.
                 if ((fromOnGround || thisMove.touchedGroundWorkaround || lastMove.touchedGround) 
                         && toOnGround && yDistance <= cc.sfStepHeight) {
@@ -1317,9 +1318,10 @@ public class SurvivalFly extends Check {
 
         // Air-stay-time.
         // TODO: max-phase only when from is not reset !?
+        // TODO: Only allow higher yDistance when in water (1.13 swimming)
         final int maxJumpPhase = data.liftOffEnvelope.getMaxJumpPhase(data.jumpAmplifier);
         if (!envelopeHack && data.sfJumpPhase > maxJumpPhase && !data.isVelocityJumpPhase()) {
-            if (yDistance < 0) {
+            if (yDistance < 0.5) {
                 // Ignore falling, and let accounting deal with it.
             }
             else if (resetFrom) {
