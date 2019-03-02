@@ -1,0 +1,672 @@
+# Custom NoCheatPlus Config
+# Version 3.2
+# Type: Auto-Kick
+# Config Developed by Captain_Obvious
+# Config support can be found here: https://goo.gl/Du4BpY
+# Reminder: You must be using the latest build of NoCheatPlus in order to run the config. Link: https://ci.md-5.net/job/NoCheatPlus/
+savebackconfig: true
+configversion: 
+  notify: false 
+  notifymaxpaths: 5
+  created: 1104
+  saved: 1104
+logging:
+  active: true
+  maxqueuesize: 5000
+  extended:
+    status: false
+    commands:
+      actions: false
+    allviolations:
+      debug: true
+      debugonly: false
+      backend:
+        trace: false
+        notify: false
+  backend:
+    console:
+      active: true
+      asynchronous: true
+    file:
+      active: false
+      prefix: ''
+      filename: nocheatplus.log
+    ingamechat:
+      active: true
+      prefix: '&c&lNCP &7»&r ' # This is the NCP prefix used for all notify messages
+      subscriptions: false
+data:
+  expiration:
+    active: true
+    duration: 75
+    history: false
+  consistencychecks:
+    active: true
+    interval: 10
+    maxtime: 2
+    suppresswarnings: false
+protection:
+  plugins:
+    hide:
+      active: true
+      nopermission:
+        message: '&c&lNCP &7» &rYou do not have permission to run this command.'
+        commands: # These commands below will be blocked if the player is not opped and will display the message above
+        - '?'
+        - plugins
+        - version
+        - icanhasbukkit
+        - bukkit:help
+        - bukkit:?
+        - about
+      unknowncommand:
+        message: '&c&lNCP &7» &rThe server currently runs a custom &cNoCheatPlus Config &rVersion &c3.2'
+        commands: # This outputs the message above when users attempt to run the command(s) below
+        - ncp
+  commands:
+    consoleonly:
+      active: true
+      message: '&c&lNCP &7» &rThis command could cause problems. Please execute in console if you wish to continue.'
+      commands: # Blocks all users from using these commands and will display the message above
+      - restart
+      - stop
+      - rl
+      - reload
+  clients:
+    motd:
+      active: true
+      allowall: false
+checks:
+  blockbreak:
+    direction: # This will check if they are looking at the block when breaking
+      active: true
+      actions: cancel vl>10 log:bdirection:0:8:i cancel
+    fastbreak: # This checks to see if a player broke a block too fast
+      active: true
+      strict: true
+      delay: 95
+      intervalsurvival: 100
+      grace: 2000
+      actions: cancel vl>2 log:fastbreak:1:10:i cancel vl>65 cmd:cccheatkick:0:2 cancel vl>75 cmd:cheatkick:0:2 cancel vl>85 cmd:ccheatkick:0:2 cancel vl>1000 cancel log:highvlerror:0:5:ic
+    frequency: # This checks how many a player broke in a certain amount of time
+      active: true
+      intervalcreative: 95
+      intervalsurvival: 49 
+      shortterm: # 20 ticks is one second, so in 1/4 of a second a player is maxed to 6 blocks
+        ticks: 5 
+        limit: 6
+      actions: cancel vl>12 log:bbfrequency:1:7:i cancel vl>18 cmd:cccheatkick:0:2 cancel vl>24 cancel cmd:kickfrequency:0:2 vl>31 cmd:ccheatkick:0:2 cancel 
+    noswing: # This check was disabled, caused too many problems with blocks coming back
+      active: false
+      actions: vl>20 log:noswing:0:12:i
+    reach: # This checks to see if a player broke a block that they could reach
+      active: true
+      actions: cancel vl>5 log:breach:0:10:i cancel
+    wrongblock: # This checks if a player broke the block they first interacted with/clicked
+      active: true
+      level: 10
+      actions: cancel vl>10 log:bwrong:0:8:i cancel vl>16 cmd:cccheatkick:0:2 cancel vl>25 cancel cmd:cheatkick:0:2 vl>35 cmd:ccheatkick:0:2 cancel 
+  blockinteract:
+    direction: # This checks if a player was looking at a block they interacted with/clicked
+      active: true
+      actions: vl>6 cancel vl>24 log:bdirection:0:7:i cancel
+    reach: # This checks if a player could interact/click the block in reach
+      active: true
+      actions: cancel vl>5 log:breach:0:8:i cancel
+    speed: # This checks if a player is interacting with too many blocks
+      active: true
+      interval: 2000
+      limit: 52
+      actions: cancel vl>200 log:bspeed:0:8:i cancel vl>2000 cmd:cccheatkick:0:2 cancel vl>3250 cmd:cheatkick:0:2 cancel vl>4000 cmd:ccheatkick:0:2 cancel 
+    visible: # This checks if a block was in sight before the player interacted with it
+      active: true
+      actions: vl>4 cancel vl>50 log:bvisible:0:10:i cancel
+  blockplace:
+    against: # This checks to see if a player places a block on a surface they couldn't, such as water
+      active: true
+      actions: cancel
+    autosign: # Checks if a player is placing a sign too quickly 
+      active: true
+      skipempty: false
+      actions: cancel vl>5 log:bautosign:0:6:i cancel vl>8 cmd:cccheatkick:0:2 cancel vl>10 cmd:cheatkick:0:2 cancel vl>12 cmd:ccheatkick:0:2 cancel 
+    direction: # This checks if a player was looking at where they placed the block
+      active: true
+      actions: cancel vl>10 log:bdirection:0:8:i cancel
+    fastplace: # This checks to see if a player places too many blocks. The limit stands for 2 seconds, so 14 blocks in two seconds is allowed. The shortterm works the same as the frequency check
+      active: true
+      limit: 14
+      shortterm:
+        ticks: 12
+        limit: 5
+      actions: cancel vl>15 log:fastplace:1:8:i cancel vl>155 cmd:cccheatkick:0:2 cancel vl>200 cmd:cheatkick:0:2 cancel vl>250 cmd:ccheatkick:0:2 cancel 
+    reach: # This checks to see if a player placed a block that they could reach
+      active: true
+      actions: cancel vl>5 log:breach:0:7:i cancel
+    noswing: # Check disabled, caused too many issues when placing blocks
+      active: false
+      exceptions:
+      - WATER_LILY
+      - FLINT_AND_STEEL
+      actions: cancel vl>10 log:noswing:0:7:i cancel
+    speed: # This checks the amount of throwable obejects thrown. The interval is the time allowed between each throw (In MS)
+      active: true
+      interval: 70
+      actions: cancel vl>150 log:bpspeed:3:5:i cancel vl>400 cmd:cccheatkick:0:2 cancel vl>500 cmd:cheatkick:0:2 cancel vl>600 cmd:ccheatkick:0:2 cancel 
+    preventmisc:
+      boatsanywhere: true
+  chat:
+    captcha:
+      active: true
+      skip:
+        commands: false
+      characters: abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789
+      length: 4
+      question: '&c&lNCP &7» &cPlease type ''&6[captcha]&c'' to continue sending messages/commands.'
+      success: '&c&lNCP &7» &aYou can keep on chatting now'
+      tries: 3
+      actions: cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha:0:2:i
+    color:
+      active: false
+      actions: log:color:0:6:i cancel
+    commands:
+      active: true
+      exclusions: []
+      handleaschat:
+      - /me
+      - /msg
+      - /emsg
+      - /r
+      - /reply
+      - /pm
+      - /epm
+      - /whisper
+      - /tell
+      - /etell
+      level: 8
+      shortterm:
+        ticks: 19
+        level: 3
+      actions: log:commands:0:5:cf cancel cmd:kickcommands:0:2 vl>20 log:commands:0:5:cf cancel cmd:tempkick1:0:2:i
+    text: # Advanced chat checks, adjusting may cause problems
+      active: true
+      allowvlreset: true
+      frequency:
+        normal:
+          minimum: 0.0
+          factor: 0.9
+          weight: 6
+          level: 135
+          actions: cancel cmd:tellchatnormal vl>7 log:chatnormal:0:5:c cancel cmd:tellchatnormal:0:2 vl>20 log:chatnormal:0:5:cf cancel cmd:kickchatnormal:0:2 vl>40 log:chatnormal:0:5:cf cancel cmd:kickchat5:0:2
+        shortterm:
+          minimum: 2.0
+          factor: 0.7
+          weight: 3.0
+          level: 18.0
+          actions: log:chatfast:0:5:cf cancel cmd:kickchatfast:0:6 vl>20 log:chatfast:0:5:cf cancel cmd:kickchat1:0:2 vl>40 log:chatfast:0:5:cf cancel cmd:kickchat5:0:2
+      message:
+        lettercount: 1.0
+        partition: 1.0
+        uppercase: 1.2
+        afterjoin: 1.5
+        nomoving: 1.5
+        repeatviolation: 1.2
+        repeatglobal: 1.0
+        repeatself: 1.5
+        words:
+          lengthav: 1.0
+          lengthmsg: 1.0
+          noletter: 0.0
+      global:
+        active: true
+        weight: 1.0
+        words:
+          active: false
+        prefixes:
+          active: false
+        similarity:
+          active: false
+      player:
+        active: true
+        words:
+          active: false
+        prefixes:
+          active: false
+        similarity:
+          active: false
+    warning:
+      active: true
+      level: 70
+      message: '&c&lNCP &7» &cSlow down in chat!'
+      timeout: 10
+    relog: # This checks the amount of time between a quit and a join
+      active: true
+      timeout: 3250
+      warning:
+        message: '&c&lNCP &7» &cYou relogged too fast!'
+        number: 1
+        timeout: 60000
+      kickmessage: Too fast re-login, try with a little delay.
+      actions: log:relog:0:15:cf cancel vl>15 log:relog:0:10:cf cancel cmd:tempkick5:0:2
+    logins: # A simple Anti-Bot defense. Allows 7 players to join in 10 seconds. Adjust to your server size
+      active: true
+      startupdelay: 600
+      perworldcount: false
+      seconds: 10
+      limit: 7
+      kickmessage: Too many players are logging in at a time! Try again later.
+  combined:
+    bedleave: # Prevents players from using BedLeave packets to fly or use god mode
+      active: true
+      actions: cancel log:bedleave:0:7:i cmd:kickbedleave:0:2 vl>2 cmd:ccheatkick:0:2 cancel 
+    enderpearl: # Prevents players from glitching through areas using enderpearls
+      active: true
+      preventclickblock: true
+    improbable: # Advanced all around server checks. Can be used most commonly to detect KillAura. Works best in groups.
+      active: true
+      level: 198
+      actions: cancel vl>4 log:improbable:0:6:i cancel vl>425 cmd:cccheatkick:0:2 cancel vl>550 cmd:cheatkick:0:2 cancel vl>640 cmd:ccheatkick:0:2 cancel vl>12000 log:highvlerror:0:5:ci cancel
+    invulnerable: # These values alter the invulnerablity on login
+      active: true
+      triggers:
+        always: false
+        falldistance: true
+      initialticks:
+        join: -1
+      ignore:
+      - FALL
+      modifiers:
+        all: 0
+    munchhausen: # Future proof: Prevents players from abusing knockback from fishing rods to fly
+      active: false
+      actions: cancel vl>100 cancel log:munchhausen:0:60:i
+    yawrate: # This checks if a player turns (rate) amount degrees
+      rate: 105
+      penalty:
+        factor: 1.0
+        minimum: 250
+        maximum: 2000
+      improbable: true
+  fight:
+    canceldead: true
+    toolchangepenalty: 150
+    pvp:
+      knockbackvelocity: default
+    yawrate:
+      active: true
+    angle: # This checks if a player is hitting 2 or more entities at a time.
+      active: true
+      threshold: 55
+      actions: cancel vl>160 log:angle:0:6:i cancel vl>260 cmd:cccheatkick:0:2 cancel vl>300 cmd:cheatkick:0:4 cancel vl>330 cmd:ccheatkick:0:2 cancel 
+    critical: # This prevents players from faking critical hits
+      active: true
+      cancel: # FallDistance checks if a player hit another player under that distance
+        cancel: 125
+        dividedamage: 0.08
+      falldistance: 0.075
+      actions: vl>2 cancel vl>17 log:critical:0:6:i cancel vl>20 cmd:cccheatkick:0:2 cancel vl>28 cmd:cheatkick:0:2 cancel vl>35 cmd:ccheatkick:0:2 cancel 
+    direction: # Checks to make sure a player is looking at the entity before hitting. Some false positives
+      active: true
+      strict: true
+      penalty: 160
+      actions: vl>1 cancel vl>6 log:fdirection:0:6:i cancel vl>24 cmd:cccheatkick:0:2 cancel vl>31 cmd:cheatkick:0:2 cancel vl>39 cmd:ccheatkick:0:2 cancel 
+    fastheal: # Prevents players from healing too fast
+      active: true
+      interval: 4000
+      buffer: 1000
+      actions: cancel vl>10 cancel log:fastheal:0:10:i vl>30 cancel log:fastheal:0:10:i
+    godmode: # Prevents players from canceling any damage dealt to them
+      active: true
+      minage: 1100
+      maxage: 5000
+      actions: log:godmode:1:8:i cancel vl>60 log:godmode:1:8:i cancel
+    noswing: # Prevents players from using the NoSwing cheat, some false positives
+      active: true
+      actions: vl>1 cancel vl>7 log:noswing:0:8:i cancel
+    reach: # Prevents players from hitting an entity out of reach. Lower survival distance for a stricter check, raise for a more leinent check.
+      active: true
+      survivaldistance: 4.2
+      penalty: 250
+      reduce: true
+      reducedistance: 0.9
+      reducestep: 0.15
+      actions: vl>1 cancel vl>4 log:freach:0:6:i cancel vl>15 cmd:cccheatkick:0:2 cancel vl>22 cmd:cheatkick:0:2 cancel vl>30 cmd:ccheatkick:0:2 cancel 
+    selfhit: # Prevents players from hitting themselves 
+      active: true
+      actions: log:fselfhit:1:8:i cancel vl>10 cancel cmd:cheatkick:0:2 vl>18 cmd:ccheatkick:0:5 cancel
+    speed: # Prevents players from hitting too fast
+      active: true
+      limit: 13
+      actions: cancel vl>5 log:fspeed:0:6:i cancel vl>25 cmd:cccheatkick:0:2 cancel vl>30 cmd:cheatkick:0:2 cancel vl>45 cmd:ccheatkick:0:2 cancel 
+      shortterm:
+        ticks: 8
+        limit: 6
+  inventory:
+    drop: # Prevents players from dropping too many things in a time frame
+      active: true
+      limit: 4
+      timeframe: 15
+      actions: log:drop:0:6:i cancel vl>6 cancel cmd:cheatkick:0:2 
+    fastclick: # Prevents players from clicking too fast in their inventory
+      active: true
+      sparecreative: true
+      tweaks1_5: true
+      limit:
+        shortterm: 3
+        normal: 9
+      actions: vl>3 cancel vl>80 log:fastclick:1:7:i cancel
+    instantbow: # Prevents players from ignoring the bow dragback
+      active: true
+      strict: true
+      delay: 129
+      improbable:
+        feedonly: false
+        weight: 0.6
+      actions: cancel vl>15 log:instantbow:2:6:i cancel
+    instanteat: # Prevents players from eating food instantly
+      active: true
+      actions: log:instanteat:2:5:i cancel
+    fastconsume: # Prevents players from eating food too fast
+      active: true
+      duration: 0.67
+      whitelist: false
+      items: []
+      actions: log:fastconsume:2:8:i cancel
+    gutenberg: # Old Minecraft exploit allowed crashing of the server by creating a book with tons of pages. 
+      active: true
+      actions: cancel log:gutenberg:0:10:i cmd:kickinvaliddata:0:2 
+    items:
+      active: true
+    open:
+      active: true
+      close: true
+      cancelother: true
+    hotfix:
+      duplication:
+        fallingblockendportal: true
+  moving:
+    creativefly: # Prevents players from moving too fast than allowed
+      active: true
+      ignoreallowflight: true
+      ignorecreative: true
+      model:
+        creative:
+          horizontal:
+            speed: 114
+          vertical:
+            ascend:
+              speed: 97
+            maxheight: 128
+        spectator:
+          horizontal:
+            speed: 450
+          vertical:
+            ascend:
+              speed: 170
+            maxheight: 128
+          gravity: false
+          ground: false
+        levitation:
+          horizontal:
+            speed: 50
+          vertical:
+            ascend:
+              speed: 10
+            maxheight: 128
+            gravity: false
+          modifiers: false
+          gravity: false
+          ground: false
+        elytra:
+          horizontal:
+            speed: 345
+            modsprint: 1.0
+          vertical:
+            ascend:
+              speed: 0
+            maxheight: 128
+          modifiers: false
+      actions: vl>6 cancel vl>180 cmdc:flyshort:0:6 cancel vl>3000 log:flylong:0:4:i cancel vl>4250 cmd:cccheatkick:0:2 cancel vl>5000 cmd:cheatkick:0:5 cancel vl>6500 cmd:ccheatkick:0:2 cancel 
+    morepackets: # Checks if a player is spamming packets or sending too many packets
+      active: true
+      seconds: 6
+      epsideal: 20
+      epsmax: 22
+      burst:
+        packets: 20
+        directviolation: 30
+        epmviolation: 60
+      setbackage: 40
+      actions: cancel vl>30 log:morepackets:2:7:i cancel vl>80 cmd:cccheatkick:0:2 cancel vl>100 cmd:kickpackets:0:2 cancel vl>160 cmd:ccheatkick:0:2 cancel 
+    nofall: # Prevents players from ignoring fall damage
+      active: true
+      dealdamage: true
+      skipallowflight: true
+      resetonviolation: false
+      resetonteleport: false
+      resetonvehicle: true
+      anticriticals: true
+      actions: log:nofall:0:7:i cancel vl>4 cancel cmd:cccheatkick:0:2 vl>8 cmd:cheatkick:0:2 cancel vl>12 cmd:ccheatkick:0:5 cancel
+    passable: # Prevents players from glitching through blocks
+      active: true
+      actions: vl>2 cancel vl>30 log:passable:1:7:i cancel vl>170 cmd:cccheatkick:0:2 cancel vl>190 log:passable:0:7:i cancel cmd:cheatkick:0:2  vl>200 cmd:ccheatkick:0:2 cancel 
+      untracked:
+        teleport:
+          active: true
+        command:
+          active: true
+          tryteleport: true
+          prefixes:
+          - sethome
+          - home set
+          - setwarp
+          - warp set
+          - setback
+          - set back
+          - back set
+          - spawn
+          - hub
+          - tpaccept
+          - tphere
+          - tpaccept
+          - home
+          - wild
+          - randomtp
+          - wildtp
+    survivalfly: # Prevents players from moving too fast/attempting to fly
+      active: true
+      extended:
+        vertical-accounting: true
+      stepheight: default
+      hbufmax: 1.0
+      setbackpolicy:
+        falldamage: true
+        voidtovoid: true
+      actions: vl>45 cancel vl>175 cmdc:flyshort:1:7 cancel vl>1750 log:flylong:0:6:i cancel vl>5500 cmd:cccheatkick:0:2 cancel vl>7000 cmd:cheatkick:0:5 cancel vl>8000 cmd:ccheatkick:0:2 cancel vl>25000 cancel log:highvlerror:0:2:ic
+      hover:
+        active: true
+        step: 5
+        ticks: 85
+        loginticks: 100
+        falldamage: true
+        sfviolation: 350
+    velocity:
+      activationcounter: 80
+      activationticks: 140
+      strictinvalidation: true
+    splitmoves: default
+    ignorestance: default
+    tempkickillegal: true
+    loadchunks:
+      join: true
+      move: true
+      teleport: true
+      worldchange: true
+    sprintinggrace: 2.0
+    assumesprint: true
+    speedgrace: 4.0
+    enforcelocation: default
+    setback:
+      method: default
+    vehicle:
+      preventdestroyown: true
+      enforcelocation: default
+      schedulesetbacks: default
+      morepackets:
+        active: true
+        actions: cancel vl>10 log:morepackets:0:8:i cancel
+      envelope:
+        active: default
+        actions: cancel vl>100 cancel log:vehicleenvelope:0:15:i
+    message:
+      illegalplayermove: Illegal move.
+      illegalvehiclemove: Illegal vehicle move.
+  net: # Relies on ProtocolLib to work
+    attackfrequency: # Checks if a player is sending too many attack packets
+      active: true
+      limitforseconds:
+        half: 9
+        one: 14
+        two: 39
+        four: 55
+        eight: 100
+      actions: cancel vl>15 cancel log:attackfrequency:0:7:i vl>40 cmd:cccheatkick:0:2 cancel vl>55 cancel cmd:cheatkick:0:2 vl>70 cmd:ccheatkick:0:2 cancel 
+    flyingfrequency: # Checks if a player is spamming packets
+      active: true
+      seconds: 5
+      packetspersecond: 60
+      actions: cancel
+      reduceredundant:
+        active: true
+        seconds: 3
+        actions: cancel vl>2500 cmd:kickinvaliddata:0:2 cancel 
+    keepalivefrequency: # Checks if a player is using spamming packets to use regen or godmode, some false positives on join
+      active: true
+      actions: cancel vl>10 cancel log:keepalive:0:10:i vl>100 cancel cmd:kickalive:0:2 
+    packetfrequency: # Checks if a player is spamming packets
+      active: default
+      limitpersecond: 200
+      seconds: 4
+      actions: cancel cmd:kickpacketfrequency:0:2 vl>4 cmd:ccheatkick:0:5 cancel
+    sounddistance: # Prevents players from abusing an exploit to use render hacks to see far away players during storms
+      active: true
+      maxdistance: 150
+    superseded:
+      flying:
+        cancelwaiting: true
+strings: # Anything used in the actions of any checks can be defined here
+  angle: '&c[player] &7could be using &6KillAura &7VL &c[violations] &7(Combat Hacks)'
+  attackfrequency: '&c[player] &7could be using &6MultiAura &7VL &c[violations] &7(Combat Hacks)'
+  ban: ban [player]
+  ban-ip: ban-ip [ip]
+  bautosign: '&c[player] &7could be using &6Auto Sign &7VL &c[violations]'
+  bbfrequency: '&c[player] &7could be using &6Nuker &7VL &c[violations]'
+  bdirection: '&c[player] &7failed &6Impossible Interact &7VL &c[violations]'
+  bedleave: '&c[player] &7failed &6Bed Leave &7VL &c[violations]'
+  bpspeed: '&c[player] &7could be using &6Fast Throw &7VL &c[violations]'
+  breach: '&c[player] &7could be using &6Block Reach &7VL &c[violations]'
+  bspeed: '&c[player] &7could be using &6Fast Interact &7VL &c[violations]'
+  bvisible: '&c[player] &7could be using &6Block Cheats &7VL &c[violations] &7(Block out of reach)'
+  bwrong: '&c[player] &7could be using &6Block Cheats &7VL &c[violations] &(Broke a different block than clicked)'
+  captcha: '&c[player] &7could be using &6Spam Bots &7VL &c[violations]'
+  chatnormal: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  color: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  commands: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  combspeed: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  critical: '&c[player] &7could be using &6Criticals &7VL &c[violations] &7(Combat Hacks)'
+  drop: '&c[player] &7could be using &6Fast Drop &7VL &c[violations]'
+  dropkick: ccmd [player] unless -time_online-<30 do /0/ kick [player] &cNCP &7» &cYou dropped too many items!
+  fastbreak: '&c[player] &7could be using &6Fast Break &7VL &c[violations]'
+  fastclick: '&c[player] &7could be using &6Fast Click &7VL &c[violations]'
+  fastconsume: '&c[player] &7could be using &6Fast Eat &7VL &c[violations]'
+  fastheal: '&c[player] &7could be using &6Regen &7VL &c[violations]'
+  fastplace: '&c[player] &7could be using &6Fast Place &7VL &c[violations]'
+  fdirection: '&c[player] &7could be using &6AimBot &7VL &c[violations] &7(Combat Hacks)'
+  flyshort: ccmd [player] unless -time_online-<30|-uptime-<80 do ncp log stream notify &c[player] &7could be &6Speeding &7VL &c[violations]
+  flylong: '&c[player] &7could be &6Flying &7VL &c[violations]'
+  flyfile: '[player] failed [check]: tried to move: [locationfrom] -> [locationto], d=[distance] ([tags]). &7VL [violations].'
+  freach: '&c[player] &7could be using &6Reach &7VL &c[violations]&7 (Combat Hacks)'
+  fselfhit: '&c[player] &7could be using &6Self Hit &7VL &c[violations]&7 (Combat Hacks)'
+  fspeed: '&c[player] &7could be using a &6Macro &7VL &c[violations]&7 (13+ CPS)'
+  gutenberg: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  godmode: '&c[player] &7could be using &6God Mode &7VL &c[violations]'
+  improbable: '&c[player] &7could be using &6KillAura&7 &7VL &c[violations] &7(Suspicious Activity)'
+  instantbow: '&c[player] &7could be using &6Instant Bow &7VL &c[violations]'
+  instanteat: '&c[player] &7could be using &6Instant Eat &7VL &c[violations]'
+  keepalive: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  kick: kick [player]
+  kickalive: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &cSent too many packets! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickattackfrequency: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickbedleave:  kick [player] &cNCP &7» &cAbnormal Packets! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping & TPS Not checked)
+  kickbspeed: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickcaptcha: kick [player] &cNCP &7» &cPlease enter the captcha
+  kickchat1: ncp tempkick [player] 1 &cNCP &7» You're not allowed to spam!
+  kickchat5: ncp tempkick [player] 5 &cNCP &7» You're not allowed to spam!
+  kickchatfast: kick [player] &cNCP &7» &cYou're not allowed to spam!
+  kickchatnormal: kick [player] &cNCP &7» &cYou sent too many messages!
+  kickcommands: ncp tempkick [player] 1 &cNCP &7» You sent too many commands!
+  kickfly: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30-time_online-<5 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickfrequency: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickgod: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickinvaliddata: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &cAbnormal Packets! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickpacketfrequency: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &cAbnormal Packets! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickpackets: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &cAbnormal Packets! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickselfhit: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  kickwb: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  knockback: '&c[player] &7could be using &6[check] &7VL &c[violations]&7.'
+  morepackets: '&c[player] &7could be using &6Timer &7VL &c[violations]&7 (Too many packets)'
+  msgtempdenylogin: You are temporarily denied to join this server.
+  munchhausen: '&c[player] &7could be using &6[check] &7VL &c[violations]&7.'
+  nofall: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  chatfast: c[player] &7could be using &6[check] &7VL &c[violations]&7.
+  noswing: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  passable: '&c[player] &7could be using &6Phase &7VL &c[violations]'
+  relog: '&c[player] &7relogged too fast &7VL &c[violations]&7.'
+  tellchatnormal: ncp tell [player] Slow down in chat!
+  tempkick1: ncp tempkick [player] Please wait 1 minute before logging in
+  tempkick5: ncp tempkick [player] Please wait 5 minutes before logging in
+  vehicleenvelope: '&c[player] &7could be using &6[check] &7VL &c[violations]'
+  cheatkick: ccmd [player] unless -ping->151|-tps-<19.2|-time_online-<30|-uptime-<80 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 151 - TPS > 19.2)
+  ccheatkick: ccmd [player] unless -time_online-<30|-uptime-<80 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - High VL - Skipped Ping & TPS Check)
+  cccheatkick: ccmd [player] unless -ping->90|-tps-<19.5|-time_online-<30|-uptime-<80 do /0/ kick [player] &cNCP &7» &rSuspicious Server Activity! /5/ ncp log stream notify?c+console?nc &c&lAUTOKICK:&r &7The player &c[player] &7has been kicked due to &6[check] &7(&7VL &c[violations]&7 - Ping < 90 - TPS > 19.5)
+  highvlerror: '&7The player &c[player] &7caused the check &c[check] &7to go up very high to &6[violations]&7. Please investigate this issue.'
+compatibility: 
+  managelisteners: false
+  exemptions:
+    wildcard:
+      default:
+        metadata:
+          active: true
+          keys:
+          - nocheat.exempt
+      npc:
+        active: true
+        bukkitnpc: true
+        metadata:
+          active: true
+          keys:
+          - NPC
+          - NCPConfigTracking
+    remove:
+      join: true
+      leave: true
+  server:
+    cbdedicated:
+      enable: true
+    cbreflect:
+      enable: true
+  blocks: # Allows you to change the block check size to prevent glitching/false positives 
+    allowinstantbreak:
+    - LONG_GRASS
+    overrideflags:
+      snow: default
+      piston_moving_piece: default+ign_passable+ground_height
+      WATER_LILY: default+ign_passable+ground_height+height8_1
+      '60': default+ign_passable+ground_height+height8_1
+      '208': solid+ground+height100+ground_height
+      STEP: solid+ground+xz100+height100+ground_height+ign_passable
+    changetracker:
+      active: true
+      pistons: true
+      maxageticks: 80
+      perworld:
+        maxentries: 1000
