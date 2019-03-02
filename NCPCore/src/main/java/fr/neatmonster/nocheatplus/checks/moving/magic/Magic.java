@@ -50,7 +50,7 @@ public class Magic {
     //    public static final double modSprint            = 0.29 / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
     public static final double modBlock             = 0.16D / WALK_SPEED;
     public static final double modSwim              = 0.3D / WALK_SPEED;
-    public static final double modDolphinsGrace     = 3.0D; // TODO: Adjust value to be more stricter and closer to actual movement speed
+    public static final double modDolphinsGrace     = 5.0D; // TODO: Adjust value to be more stricter and closer to actual movement speed, and use different value from in water vs above water
     public static final double[] modDepthStrider    = new double[] {
             1.0,
             0.1645 / modSwim / WALK_SPEED,
