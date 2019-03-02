@@ -872,21 +872,26 @@ public class SurvivalFly extends Check {
             // TODO: Test how to go with only checking from (less dolphins).
             // TODO: Sneaking and blocking applies to when in water !
             hAllowedDistance = Magic.modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
+			useBaseModifiers = true;
             if (thisMove.from.inWater || !thisMove.from.inLava) { // (We don't really have other liquids, though.)
                 final int level = BridgeEnchant.getDepthStriderLevel(player);
                 if (level > 0) {
                     // The hard way.
                     hAllowedDistance *= Magic.modDepthStrider[level];
                     // Modifiers: Most speed seems to be reached on ground, but couldn't nail down.
-                    useBaseModifiers = true;
                 } else if (player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
                     // TODO: Allow for faster swimming above water with Dolhphins Grace
 				    hAllowedDistance *= Magic.modDolphinsGrace;
-					useBaseModifiers = true;
-            }
+            }   if (level > 0 && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+				hAllowedDistance *= Magic.modDepthStrider[level] * Magic.modDolphinsGrace * 4;
+			}
             }
             // (Friction is used as is.)
-        }
+			
+			// Allows faster speed for player when swimming above water since from -> to does not seem to detect correctly
+        } else if (thisMove.from.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE) || thisMove.to.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+			hAllowedDistance = Magic.modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed * Magic.modDolphinsGrace / 100D;
+		}
         // TODO: !sfDirty is very coarse, should use friction instead.
         else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) 
                 && (!checkPermissions || !pData.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING, player))) {
