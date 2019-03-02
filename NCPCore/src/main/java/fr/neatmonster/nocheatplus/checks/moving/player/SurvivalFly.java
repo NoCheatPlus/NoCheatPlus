@@ -1582,12 +1582,17 @@ public class SurvivalFly extends Check {
         hDistanceAboveLimit = bunnyHop(from, to, hAllowedDistance, hDistanceAboveLimit, sprinting, thisMove, lastMove, data, cc);
 
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
-        if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
+        if (hDistanceAboveLimit > 0.12 && !skipPermChecks && !thisMove.from.inLiquid && !thisMove.to.inLiquid && !player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE))  {
             // TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
             hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, true);
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
-            tags.add("permchecks");
+            tags.add("permchecks-outliq");
         }
+		if (hDistanceAboveLimit > 0.6 && !skipPermChecks && thisMove.from.inLiquid && thisMove.to.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+			hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, true);
+            hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
+            tags.add("permchecks-inliq");
+		}
 
         // Check being moved by blocks.
         if (cc.trackBlockMove && hDistanceAboveLimit > 0.0 
