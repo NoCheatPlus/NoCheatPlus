@@ -1085,7 +1085,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         StaticLog.setStreamID(Streams.STATUS);
         // Tell the server administrator that we finished loading NoCheatPlus now.
         logManager.info(Streams.INIT, "Version " + getDescription().getVersion() + " is enabled.");
-        logManager.severe(Streams.INIT, "You are running a modified version of NCP. This version should only be used on 1.13 servers. This is only intended as a band-aid fix while NCP can be properly updated to 1.13. You may be sacrificing cheat protection for compatibility");
+        logManager.warning(Streams.INIT, "You are running a modified version of NCP. This version should only be used on 1.13 servers. This is only intended as a band-aid fix while NCP can be properly updated to 1.13. You may be sacrificing cheat protection for compatibility");
     }
 
     /**
