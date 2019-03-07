@@ -364,6 +364,8 @@ public class MaterialUtil {
     /** All water blocks. */
     public static final Set<Material> WATER = Collections.unmodifiableSet(
             BridgeMaterial.getAllBlocks("water", "stationary_water"));
+     public static final Set<Material> NEWLIQ = Collections.unmodifiableSet(
+            BridgeMaterial.getAllBlocks("SEA_PICKLE", "TALL_SEAGRASS", "KELP_PLANT", "SEAGRASS"));
 
     /** Wood types (1.13 rather). */
     public static final Set<Material> WOOD_BLOCKS = Collections.unmodifiableSet(addBlocks(
@@ -510,6 +512,7 @@ public class MaterialUtil {
             RAILS,
             WALL_BANNERS,
             INSTANT_PLANTS,
+			NEWLIQ,
             BridgeMaterial.getAllBlocks("structure_void", "end_gateway"),
             new HashSet<Material>(Arrays.asList(
                     Material.LEVER,
