@@ -675,6 +675,7 @@ public class BlockProperties {
     public static final long F_HEIGHT100                    = f_flag();
     /** Climbable like ladder and vine (allow to land on without taking damage). */
     public static final long F_CLIMBABLE                    = f_flag();
+	public static final long F_CLIMBLIQ                     = f_flag();
     /** The block can change shape. This is most likely not 100% accurate... */
     public static final long F_VARIABLE                     = f_flag();
     //    /** The block has full bounds (0..1), inaccurate! */
@@ -1031,6 +1032,9 @@ public class BlockProperties {
         }
         for (final Material mat : MaterialUtil.WOODEN_SLABS) {
             setFlag(mat, stepFlags);
+        }
+		for (final Material mat : MaterialUtil.NEWLIQ) {
+            setFlag(mat, stepFlags | F_GROUND_HEIGHT | F_CLIMBABLE | F_CLIMBLIQ);
         }
 
         // Rails
