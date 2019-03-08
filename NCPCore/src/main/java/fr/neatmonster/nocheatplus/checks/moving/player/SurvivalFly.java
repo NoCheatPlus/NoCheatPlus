@@ -387,7 +387,7 @@ public class SurvivalFly extends Check {
             if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && !toOnGround && !fromOnGround 
                     && lastMove.toIsValid && lastMove.yDistance == 0D 
                     && BlockProperties.isLiquid(to.getTypeId()) && BlockProperties.isLiquid(from.getTypeId())
-                    && !from.isHeadObstructed() && !to.isHeadObstructed() // TODO: Might decrease margin here.
+                    && !from.isHeadObstructed() && !to.isHeadObstructed() && !player.isSwimming() // TODO: Might decrease margin here.
                     ) {
                 // TODO: Relative hdistance.
                 // TODO: Might check actual bounds (collidesBlock). Might implement + use BlockProperties.getCorrectedBounds or getSomeHeight.
