@@ -164,7 +164,7 @@ public class Passable extends Check {
         rayTracing.loop();
         rayTracing.setIgnoreInitiallyColliding(false);
         //rayTracing.setCutOppositeDirectionMargin(false);
-        if (rayTracing.collides()) {
+        if (rayTracing.collides() && !player.isSwimming()) {
             tags = "raytracing_collide_";
         }
         else if (rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
