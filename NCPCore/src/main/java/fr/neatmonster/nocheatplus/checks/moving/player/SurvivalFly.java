@@ -1869,7 +1869,11 @@ public class SurvivalFly extends Check {
         data.sfNoLowJump = true;
 
         // Expected envelopes.
-        final double baseSpeed = Magic.swimBaseSpeedV(); // TODO: Lava?
+        final double baseSpeed;
+        if (player.isOnGround()) {
+        baseSpeed = Magic.swimBaseSpeedV() + 0.1;   
+        } else {
+        baseSpeed = Magic.swimBaseSpeedV(); } // TODO: Lava?
         final double yDistAbs = Math.abs(yDistance);
 
         // TODO: Later also cover things like a sudden stop.
