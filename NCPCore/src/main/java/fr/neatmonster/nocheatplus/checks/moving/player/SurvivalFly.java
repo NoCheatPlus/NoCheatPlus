@@ -456,7 +456,7 @@ public class SurvivalFly extends Check {
         }
         else if (thisMove.from.inLiquid) { // && (Math.abs(yDistance) > 0.2 || to.isInLiquid())) {
             // Swimming...
-            final double[] res = vDistLiquid(from, to, toOnGround, yDistance, lastMove, data);
+            final double[] res = vDistLiquid(from, to, toOnGround, yDistance, lastMove, data, player);
             vAllowedDistance = res[0];
             vDistanceAboveLimit = res[1];
             if (vDistanceAboveLimit <= 0.0 && yDistance > 0.0 && Math.abs(yDistance) > Magic.swimBaseSpeedV()) {
@@ -1865,7 +1865,7 @@ public class SurvivalFly extends Check {
      */
     private double[] vDistLiquid(final PlayerLocation from, final PlayerLocation to, 
             final boolean toOnGround, final double yDistance, final PlayerMoveData lastMove, 
-            final MovingData data) {
+            final MovingData data, final Player player) {
         data.sfNoLowJump = true;
 
         // Expected envelopes.
