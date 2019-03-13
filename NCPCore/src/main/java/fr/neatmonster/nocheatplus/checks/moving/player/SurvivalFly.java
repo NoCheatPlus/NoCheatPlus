@@ -1174,6 +1174,9 @@ public class SurvivalFly extends Check {
                      * slightly above the top.
                      */
                 }
+				else if (BlockProperties.isNewLiq(from.getTypeIdBelowLiq())) {
+					
+				}
                 else {
                     // Violation.
                     vDistRelVL = true;
@@ -1209,6 +1212,9 @@ public class SurvivalFly extends Check {
                 // Allow too strong decrease.
                 // TODO: Another magic check here? Route most checks through methods anyway?
             }
+			else if (BlockProperties.isNewLiq(from.getTypeIdBelowLiq())) {
+					
+			}
             else {
                 vDistRelVL = true;
             }
@@ -1246,6 +1252,9 @@ public class SurvivalFly extends Check {
             else if (lastMove.toIsValid && MagicAir.oddJunction(from, to, yDistance, yDistChange, yDistDiffEx, maxJumpGain, resetTo, thisMove, lastMove, data, cc)) {
                 // Several types of odd in-air moves, mostly with gravity near maximum, friction, medium change.
             }
+			else if (BlockProperties.isNewLiq(from.getTypeIdBelowLiq())) {
+					
+				}
             else {
                 // Violation.
                 vDistRelVL = true;
@@ -1428,11 +1437,15 @@ public class SurvivalFly extends Check {
             else if (thisMove.verVelUsed == null) { // Only skip if just used.
                 // Here yDistance can be negative and positive.
                 //                if (yDistance != 0.0) {
+				if (BlockProperties.isNewLiq(from.getTypeIdBelow())) {
+					
+				} else {
                 data.vDistAcc.add((float) yDistance);
                 final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc" + (data.isVelocityJumpPhase() ? "dirty" : ""));
                 if (accAboveLimit > vDistanceAboveLimit) {
                     if (data.getOrUseVerticalVelocity(yDistance) == null) {
                         vDistanceAboveLimit = accAboveLimit;
+					}
                     }
                 }
                 //                }
@@ -1511,8 +1524,13 @@ public class SurvivalFly extends Check {
                 // Moving upwards after falling without having touched the ground.
                 if (data.bunnyhopDelay < 9 && !((lastMove.touchedGround || lastMove.from.onGroundOrResetCond) && lastMove.yDistance == 0D) && data.getOrUseVerticalVelocity(yDistance) == null) {
                     // TODO: adjust limit for bunny-hop.
-                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+					if (BlockProperties.isNewLiq(from.getTypeIdBelow())) {
+					// Exempts player if they are above a 'newliquid' block (1.13 water blocks)
+					// Fixes issue with player swimming above a kelp plant (or related)
+					} else {
+					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
                     tags.add("ychincfly");
+					}
                 }
                 else {
                     tags.add("ychincair");
