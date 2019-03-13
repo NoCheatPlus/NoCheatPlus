@@ -2637,6 +2637,17 @@ public class BlockProperties {
     public static final boolean isLiquid(final Material blockType) {
         return (getBlockFlags(blockType) & F_LIQUID) != 0;
     }
+	
+    /**
+     * Checks if is apart of 1.13 water blocks.
+     *
+     * @param blockType
+     *            the block type
+     * @return true, if is liquid
+     */
+     public static final boolean isNewLiq(final Material blockType) {
+        return (getBlockFlags(blockType) & F_CLIMBLIQ) != 0;
+    }
 
     /**
      * Test for water type of blocks.
