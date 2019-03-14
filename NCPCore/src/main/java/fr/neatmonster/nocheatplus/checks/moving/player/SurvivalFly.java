@@ -1974,15 +1974,12 @@ public class SurvivalFly extends Check {
         // TODO: yDistance < 0.0 ?
         final double maxSpeed = yDistance < 0.0 ? Magic.climbSpeedDescend : Magic.climbSpeedAscend;
         if (Math.abs(yDistance) > maxSpeed) {
-            if (from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE) & !((from.getBlockFlags() & BlockProperties.F_CLIMBLIQ) != 0)) {
-                if (yDistance > data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier)+ 0.1) {
+            if (from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)) {
+                if ((yDistance > data.liftOffEnvelope.getMaxJumpGain(data.jumpAmplifier)+ 0.1) && !((from.getBlockFlags() & BlockProperties.F_CLIMBLIQ) != 0)) {
                     tags.add("climbstep");
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - maxSpeed);
-                }
-            } if ((from.getBlockFlags() & BlockProperties.F_CLIMBLIQ) != 0) {
-				
-			}
-            else {
+				}
+                } else if (!((from.getBlockFlags() & BlockProperties.F_CLIMBLIQ) != 0)) {
                 tags.add("climbspeed");
                 vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance) - maxSpeed);
             }
