@@ -319,7 +319,7 @@ public class SurvivalFly extends Check {
         if (hasHdist) {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
-            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, false);
+            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, from, false);
             // Judge if horizontal speed is above limit.
             hDistanceAboveLimit = hDistance - hAllowedDistance;
 
@@ -849,7 +849,7 @@ public class SurvivalFly extends Check {
      */
     private double setAllowedhDist(final Player player, final boolean sprinting, 
             final PlayerMoveData thisMove, 
-            final MovingData data, final MovingConfig cc, final IPlayerData pData,
+            final MovingData data, final MovingConfig cc, final IPlayerData pData, final PlayerLocation from,
             final boolean checkPermissions)
     {
         // TODO: Optimize for double checking?
@@ -889,8 +889,12 @@ public class SurvivalFly extends Check {
             // (Friction is used as is.)
 			
 			// Allows faster speed for player when swimming above water since from -> to does not seem to detect correctly
-        } else if (thisMove.from.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE) || thisMove.to.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+        } else if ((BlockProperties.isLiquid(from.getTypeIdBelow()) || BlockProperties.isNewLiq(from.getTypeIdBelow())) && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
 			hAllowedDistance = Magic.modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed * Magic.modDolphinsGrace / 100D;
+			final int level = BridgeEnchant.getDepthStriderLevel(player);
+			if (level > 0) {
+			hAllowedDistance = Magic.modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed * Magic.modDolphinsGrace * Magic.modDepthStrider[level] / 100D;
+			}
 		}
         // TODO: !sfDirty is very coarse, should use friction instead.
         else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) 
@@ -1607,12 +1611,12 @@ public class SurvivalFly extends Check {
         // After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
         if (hDistanceAboveLimit > 0.12 && !skipPermChecks && !thisMove.from.inLiquid && !thisMove.to.inLiquid && !player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE))  {
             // TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
-            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, true);
+            hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, from, true);
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks-outliq");
         }
 		if (hDistanceAboveLimit > 0.6 && !skipPermChecks && thisMove.from.inLiquid && thisMove.to.inLiquid && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
-			hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, true);
+			hAllowedDistance = setAllowedhDist(player, sprinting, thisMove, data, cc, pData, from, true);
             hDistanceAboveLimit = thisMove.hDistance - hAllowedDistance;
             tags.add("permchecks-inliq");
 		}
