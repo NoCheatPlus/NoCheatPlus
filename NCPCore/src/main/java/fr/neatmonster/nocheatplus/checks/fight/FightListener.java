@@ -880,9 +880,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final FightData data = DataManager.getGenericInstance(player, FightData.class);
     	
     	if (entity instanceof Parrot) {
+	data.exemptArmSwing = true;
     	} else {
-		data.exemptArmSwing = false;
-		}
+	data.exemptArmSwing = false;
+	}
      }
 
     @Override
