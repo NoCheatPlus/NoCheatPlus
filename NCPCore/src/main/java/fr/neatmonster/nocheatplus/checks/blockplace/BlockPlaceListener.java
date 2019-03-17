@@ -264,11 +264,11 @@ public class BlockPlaceListener extends CheckListener {
                     skippedRedundantChecks ++;
                 }
                 else if (directionCheck) {
-					if (blockAgainst.getType() == Material.LADDER || BlockProperties.isCarpet(blockAgainst.getType())) {
-					} 
-					else if (direction.check(player, loc, eyeHeight, block, flyingHandle, data, cc, pData)) {
-					cancelled = true;
-					}
+		   if (blockAgainst.getType() == Material.LADDER || BlockProperties.isCarpet(blockAgainst.getType())) {
+			} 
+			else if (direction.check(player, loc, eyeHeight, block, flyingHandle, data, cc, pData)) {
+			cancelled = true;
+			}
                 }
             }
             useLoc.setWorld(null);
