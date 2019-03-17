@@ -46,7 +46,7 @@ public class NoSwing extends Check {
             // Yes, reward them with reduction of their violation level.
             data.noSwingArmSwung = false;
             data.noSwingVL *= 0.9D;
-        } else {
+        } else if (!data.exemptArmSwing) {
             // No, increase their violation level.
             data.noSwingVL += 1D;
 
@@ -56,6 +56,6 @@ public class NoSwing extends Check {
         }
 
         return cancel;
-    }
+    } 
 
 }
