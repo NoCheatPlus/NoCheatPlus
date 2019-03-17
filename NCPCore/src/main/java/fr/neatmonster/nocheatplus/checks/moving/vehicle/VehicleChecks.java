@@ -115,8 +115,6 @@ public class VehicleChecks extends CheckListener {
 
     /** The vehicle moving envelope check. */
     private final VehicleEnvelope vehicleEnvelope = new VehicleEnvelope();
-    
-    public Vehicle vehicleType; 
 
     public VehicleChecks() {
         super(CheckType.MOVING_VEHICLE);
@@ -132,7 +130,6 @@ public class VehicleChecks extends CheckListener {
     public void onVehicleMove(final VehicleMoveEvent event) {
         // Check data.
         final Vehicle vehicle = event.getVehicle();
-        vehicleType = event.getVehicle();
         if (vehicle == null) {
             return;
         }
