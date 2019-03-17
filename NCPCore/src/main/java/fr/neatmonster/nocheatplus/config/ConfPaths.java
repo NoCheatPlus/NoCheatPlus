@@ -743,6 +743,7 @@ public abstract class ConfPaths {
 
     private static final String NET_KEEPALIVEFREQUENCY                      = NET + "keepalivefrequency.";
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE               = NET_KEEPALIVEFREQUENCY + SUB_ACTIVE;
+	public static final String  NET_KEEPALIVEFREQUENCY_SECONDS              = NET_KEEPALIVEFREQUENCY + "seconds";
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS              = NET_KEEPALIVEFREQUENCY + "actions";
 
     private static final String NET_PACKETFREQUENCY                         = NET + "packetfrequency.";
