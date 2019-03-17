@@ -564,6 +564,7 @@ public class DefaultConfig extends ConfigFile {
 
         // KeepAliveFrequency
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE, "default", 785);
+		set(ConfPaths.NET_KEEPALIVEFREQUENCY_SECONDS, 30, 1153);
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, "cancel vl>10 cancel log:keepalive:0:10:if vl>40 cancel log:keepalive:0:10:icf vl>100 cancel log:keepalive:0:10:icf cmd:kickalive", 785);
 
         // PacketFrequency (pre 1.9).
