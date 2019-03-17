@@ -19,6 +19,7 @@ import java.util.Iterator;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -30,6 +31,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -869,6 +871,19 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final double health = Math.min(BridgeHealth.getHealth(player) + BridgeHealth.getAmount(event), BridgeHealth.getMaxHealth(player));
         data.godModeHealth = Math.max(data.godModeHealth, health);
     }
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void entityInteract(PlayerInteractEntityEvent e) {
+		
+    	Entity entity = e.getRightClicked();
+    	final Player player = e.getPlayer();
+    	final FightData data = DataManager.getGenericInstance(player, FightData.class);
+    	
+    	if (entity instanceof Parrot) {
+    	} else {
+		data.exemptArmSwing = false;
+		}
+     }
 
     @Override
     public void playerJoins(final Player player) {
