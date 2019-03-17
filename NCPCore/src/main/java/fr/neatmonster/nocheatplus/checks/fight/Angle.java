@@ -23,8 +23,12 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.IPlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.location.TrigUtil;
+import org.bukkit.ChatColor;
 
 /**
  * A check used to verify if the player isn't using a forcefield in order to attack multiple entities at the same time.
@@ -89,7 +93,7 @@ public class Angle extends Check {
      */
     public boolean check(final Player player, final Location loc, 
             final Entity damagedEntity, final boolean worldChanged, 
-            final FightData data, final FightConfig cc) {
+            final FightData data, final FightConfig cc, final IPlayerData pData) {
 
         if (worldChanged){
             data.angleHits.clear();
@@ -149,43 +153,98 @@ public class Angle extends Check {
         // Average target switching.
         final double averageSwitching = (double) deltaSwitchTarget / n;
 
-        // Declare the variable.
+        // Declare the variables.
         double violation = 0.0;
+        double violationone = 0.0;
+        double violationtwo = 0.0;
+        double violationthree = 0.0;
+        double violationfour = 0.0;
 
         // If the average move is between 0 and 0.2 block(s), add it to the violation.
         if (averageMove >= 0.0 && averageMove < 0.2D) {
-            violation += 20.0 * (0.2 - averageMove) / 0.2;
+            violationone += 20.0 * (0.2 - averageMove) / 0.2;
+            if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+                player.sendMessage(ChatColor.RED + "NC+ Debug: " + ChatColor.RESET + "avgMove: " + averageMove + " avgMove VL: " + violationone + "/" + cc.angleMove);
+            }
         }
 
         // If the average time elapsed is between 0 and 150 millisecond(s), add it to the violation.
         if (averageTime >= 0.0 && averageTime < 150.0) {
-            violation += 30.0 * (150.0 - averageTime) / 150.0;
+            violationtwo += 30.0 * (150.0 - averageTime) / 150.0;
+            if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+                player.sendMessage(ChatColor.RED + "NC+ Debug: " + ChatColor.RESET + "avgTime: " + averageTime + " avgTime VL: " + violationtwo + "/" + cc.angleTime);
+            }
         }
 
         // If the average difference of yaw is superior to 50 degrees, add it to the violation.
         if (averageYaw > 50.0) {
-            violation += 30.0 * averageYaw / 180.0;
+            violationthree += 30.0 * averageYaw / 180.0;
+            if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+                player.sendMessage(ChatColor.RED + "NC+ Debug: " + ChatColor.RESET + "avgYaw: " + averageYaw + " avgYaw VL: " + violationthree + "/" + cc.angleYaw);
+            }
         }
 
         if (averageSwitching > 0.0) {
-            violation += 20.0 * averageSwitching;
+            violationfour += 20.0 * averageSwitching;
+            if (pData.isDebugActive(type) && pData.hasPermission(Permissions.ADMINISTRATION_DEBUG, player)){
+                player.sendMessage(ChatColor.RED + "NC+ Debug: " + ChatColor.RESET + "avgSwitch: " + averageSwitching + " avgSwitch VL: " + violationfour + "/" + cc.angleSwitch);
+            }
         }
 
         // Is the violation is superior to the threshold defined in the configuration?
-        if (violation > cc.angleThreshold) {
+        if (violationone > cc.angleMove) {
             // Has the server lagged?
             if (TickTask.getLag(maxTimeDiff, true) < 1.5f){
                 // TODO: 1.5 is a fantasy value.
                 // If it hasn't, increment the violation level.
+            	violation = violationone;
                 data.angleVL += violation;
             }
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.angleVL, violation, cc.angleActions).willCancel();
+        } else if (violationtwo > cc.angleTime) {
+        	// Has the server lagged?
+            if (TickTask.getLag(maxTimeDiff, true) < 1.5f){
+                // TODO: 1.5 is a fantasy value.
+                // If it hasn't, increment the violation level.
+            	violation = violationtwo;
+                data.angleVL += violation;
+            }
+
+            // Execute whatever actions are associated with this check and the violation level and find out if we should
+            // cancel the event.
+            cancel = executeActions(player, data.angleVL, violation, cc.angleActions).willCancel();
+        } else if (violationthree > cc.angleYaw) {
+        	// Has the server lagged?
+            if (TickTask.getLag(maxTimeDiff, true) < 1.5f){
+                // TODO: 1.5 is a fantasy value.
+                // If it hasn't, increment the violation level.
+            	violation = violationthree;
+                data.angleVL += violation;
+            }
+
+            // Execute whatever actions are associated with this check and the violation level and find out if we should
+            // cancel the event.
+            cancel = executeActions(player, data.angleVL, violation, cc.angleActions).willCancel();
+        	
+        } else if (violationfour > cc.angleSwitch) {
+        	// Has the server lagged?
+            if (TickTask.getLag(maxTimeDiff, true) < 1.5f){
+                // TODO: 1.5 is a fantasy value.
+                // If it hasn't, increment the violation level.
+            	violation = violationfour;
+                data.angleVL += violation;
+            }
+
+            // Execute whatever actions are associated with this check and the violation level and find out if we should
+            // cancel the event.
+            cancel = executeActions(player, data.angleVL, violation, cc.angleActions).willCancel();
+        	
         } else {
-            // Reward the player by lowering their violation level.
-            data.angleVL *= 0.98D;            
+        	// Reward the player by lowering their violation level.
+            data.angleVL *= 0.98D;  
         }
 
         return cancel;
