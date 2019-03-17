@@ -65,6 +65,7 @@ public class NetConfig extends ACheckConfig {
     public final ActionList flyingFrequencyRedundantActions;
 
     public final ActionList keepAliveFrequencyActions;
+	public final int keepAliveFrequencyStartupDelay;
 
     public final float packetFrequencyPacketsPerSecond;
     public final int packetFrequencySeconds;
@@ -98,6 +99,7 @@ public class NetConfig extends ACheckConfig {
         flyingFrequencyRedundantActions = config.getOptimizedActionList(ConfPaths.NET_FLYINGFREQUENCY_REDUNDANT_ACTIONS, Permissions.NET_FLYINGFREQUENCY);
 
         keepAliveFrequencyActions = config.getOptimizedActionList(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, Permissions.NET_KEEPALIVEFREQUENCY);
+		keepAliveFrequencyStartupDelay = config.getInt(ConfPaths.NET_KEEPALIVEFREQUENCY_SECONDS) * 1000;
 
         if (ServerVersion.compareMinecraftVersion("1.9") >= 0) {
             // TODO: Disable packet frequency or activate 'pessimistically'.
