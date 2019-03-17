@@ -20,11 +20,9 @@ import java.util.List;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -109,7 +107,7 @@ public class VehicleEnvelope extends Check {
     public SetBackEntry check(final Player player, final Entity vehicle, 
             final VehicleMoveData thisMove, final boolean isFake, 
             final MovingData data, final MovingConfig cc, 
-            final IPlayerData pData, final VehicleChecks vc) {
+            final IPlayerData pData) {
         final boolean debug = pData.isDebugActive(type);
         // Delegate to a sub-check.
         tags.clear();
@@ -119,7 +117,7 @@ public class VehicleEnvelope extends Check {
             data.ws.setJustUsedIds(debugDetails); // Add just used workaround ids to this list directly, for now.
         }
         final boolean violation = checkEntity(player, vehicle, thisMove, isFake, 
-                data, cc, debug, vc);
+                data, cc, debug);
         if (debug && !debugDetails.isEmpty()) {
             debugDetails(player);
             debugDetails.clear();
@@ -168,7 +166,7 @@ public class VehicleEnvelope extends Check {
     private boolean checkEntity(final Player player, final Entity vehicle, 
             final VehicleMoveData thisMove, final boolean isFake, 
             final MovingData data, final MovingConfig cc,
-            final boolean debug, final VehicleChecks vc) {
+            final boolean debug) {
         boolean violation = false;
         if (debug) {
             debugDetails.add("inair: " + data.sfJumpPhase);
@@ -254,7 +252,7 @@ public class VehicleEnvelope extends Check {
         }
         else if (checkDetails.inAir) {
             // In-air move.
-            if (checkInAir(thisMove, data, debug, player, vc)) {
+            if (checkInAir(thisMove, data, debug)) {
                 violation = true;
             }
         }
@@ -383,7 +381,7 @@ public class VehicleEnvelope extends Check {
      * @return
      */
     private boolean checkInAir(final VehicleMoveData thisMove, final MovingData data,
-            final boolean debug, final Player player, final VehicleChecks vc) {
+            final boolean debug) {
 
         // TODO: Distinguish sfJumpPhase and inAirDescendCount (after reaching the highest point).
 
@@ -419,9 +417,6 @@ public class VehicleEnvelope extends Check {
         final double maxDescend = getInAirMaxDescend(thisMove, data);
         if (data.sfJumpPhase > (checkDetails.canJump ? MagicVehicle.maxJumpPhaseAscend : 1)
                 && thisMove.yDistance > Math.max(minDescend, -checkDetails.gravityTargetSpeed)) {
-			if (player.hasPotionEffect(PotionEffectType.JUMP) && vc.vehicleType instanceof Horse) {
-        		
-        	}
             tags.add("slow_fall_vdist");
             violation = true;
         }
