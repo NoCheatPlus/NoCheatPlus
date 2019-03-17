@@ -326,7 +326,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true, 785); // Not a check type.
 
         set(ConfPaths.FIGHT_ANGLE_CHECK, "default", 785);
-        set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50, 785);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_MOVE, 50, 1145);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_TIME, 50, 1145);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_YAW, 50, 1145);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_SWITCH, 50, 1145);
         set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:angle:3:5:f cancel vl>250 log:angle:0:5:cif cancel", 785);
 
         set(ConfPaths.FIGHT_CRITICAL_CHECK, "default", 785);
@@ -564,7 +567,7 @@ public class DefaultConfig extends ConfigFile {
 
         // KeepAliveFrequency
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIVE, "default", 785);
-	set(ConfPaths.NET_KEEPALIVEFREQUENCY_SECONDS, 20, 1153);
+        set(ConfPaths.NET_KEEPALIVEFREQUENCY_SECONDS, 20, 1153);
         set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, "cancel vl>10 cancel log:keepalive:0:10:if vl>40 cancel log:keepalive:0:10:icf vl>100 cancel log:keepalive:0:10:icf cmd:kickalive", 785);
 
         // PacketFrequency (pre 1.9).
