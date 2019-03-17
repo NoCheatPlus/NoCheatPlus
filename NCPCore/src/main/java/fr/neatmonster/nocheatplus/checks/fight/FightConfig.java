@@ -32,7 +32,10 @@ import fr.neatmonster.nocheatplus.worlds.IWorldData;
  */
 public class FightConfig extends ACheckConfig {
 
-    public final double     angleThreshold;
+    public final double     angleMove;
+    public final double     angleYaw;
+    public final double     angleSwitch;
+    public final double     angleTime;
     public final ActionList angleActions;
 
     public final long		toolChangeAttackPenalty;
@@ -92,7 +95,10 @@ public class FightConfig extends ACheckConfig {
     public FightConfig(final IWorldData worldData) {
         super(worldData);
         final ConfigFile config = worldData.getRawConfiguration();
-        angleThreshold = config.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD);
+        angleMove = config.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD_MOVE);
+        angleSwitch = config.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD_SWITCH);
+        angleYaw = config.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD_YAW);
+        angleTime = config.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD_TIME);
         angleActions = config.getOptimizedActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
 
         toolChangeAttackPenalty = config.getLong(ConfPaths.FIGHT_TOOLCHANGEPENALTY);
