@@ -263,9 +263,12 @@ public class BlockPlaceListener extends CheckListener {
                 if (isInteractBlock && bdata.isPassedCheck(CheckType.BLOCKINTERACT_DIRECTION)) {
                     skippedRedundantChecks ++;
                 }
-                else if (directionCheck && direction.check(player, loc, eyeHeight, block, 
-                        flyingHandle, data, cc, pData)) {
-                    cancelled = true;
+                else if (directionCheck) {
+					if (blockAgainst.getType() == Material.LADDER || BlockProperties.isCarpet(blockAgainst.getType())) {
+					} 
+					else if (direction.check(player, loc, eyeHeight, block, flyingHandle, data, cc, pData)) {
+					cancelled = true;
+					}
                 }
             }
             useLoc.setWorld(null);
@@ -284,18 +287,19 @@ public class BlockPlaceListener extends CheckListener {
         if (cancelled) {
             event.setCancelled(cancelled);
         }
-        else {
+		// Debug check breaks when checking blockAgainst is equal to something, disabled for now
+        /* else {
             // Debug log (only if not cancelled, to avoid spam).
             if (debug) {
                 debugBlockPlace(player, placedMat, block, blockAgainst, 
                         skippedRedundantChecks, flyingHandle, pData);
             }
-        }
+         } */
         // Cleanup
         // Reminder(currently unused): useLoc.setWorld(null);
     }
 
-    private void debugBlockPlace(final Player player, final Material placedMat, 
+    /** private void debugBlockPlace(final Player player, final Material placedMat, 
             final Block block, final Block blockAgainst, 
             final int skippedRedundantChecks, final FlyingQueueHandle flyingHandle,
             final IPlayerData pData) {
@@ -314,7 +318,7 @@ public class BlockPlaceListener extends CheckListener {
                 return;
             }
         }
-    }
+     } */
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onSignChange(final SignChangeEvent event) {
