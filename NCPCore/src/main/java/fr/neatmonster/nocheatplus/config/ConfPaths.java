@@ -462,7 +462,11 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_ANGLE                              = FIGHT + "angle.";
     public static final String  FIGHT_ANGLE_CHECK                        = FIGHT_ANGLE + SUB_ACTIVE;
-    public static final String  FIGHT_ANGLE_THRESHOLD                    = FIGHT_ANGLE + "threshold";
+    public static final String  FIGHT_ANGLE_THRESHOLD                    = FIGHT_ANGLE + "threshold.";
+    public static final String  FIGHT_ANGLE_THRESHOLD_MOVE               = FIGHT_ANGLE_THRESHOLD + "average_move";
+    public static final String  FIGHT_ANGLE_THRESHOLD_TIME               = FIGHT_ANGLE_THRESHOLD + "average_time";
+    public static final String  FIGHT_ANGLE_THRESHOLD_YAW                = FIGHT_ANGLE_THRESHOLD + "average_yaw";
+    public static final String  FIGHT_ANGLE_THRESHOLD_SWITCH             = FIGHT_ANGLE_THRESHOLD + "average_switch";
     public static final String  FIGHT_ANGLE_ACTIONS                      = FIGHT_ANGLE + "actions";
 
     private static final String FIGHT_CRITICAL                           = FIGHT + "critical.";
@@ -685,6 +689,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_LOADCHUNKS_TELEPORT                  = MOVING_LOADCHUNKS + "teleport";
     public static final String  MOVING_LOADCHUNKS_WORLDCHANGE               = MOVING_LOADCHUNKS + "worldchange";
     public static final String  MOVING_SPRINTINGGRACE                       = MOVING + "sprintinggrace";
+    public static final String  MOVING_FLYINGGRACE                          = MOVING + "flyinggrace";
     public static final String  MOVING_ASSUMESPRINT                         = MOVING + "assumesprint";
     public static final String  MOVING_SPEEDGRACE                           = MOVING + "speedgrace";
     public static final String  MOVING_ENFORCELOCATION                      = MOVING + "enforcelocation";
@@ -743,7 +748,7 @@ public abstract class ConfPaths {
 
     private static final String NET_KEEPALIVEFREQUENCY                      = NET + "keepalivefrequency.";
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIVE               = NET_KEEPALIVEFREQUENCY + SUB_ACTIVE;
-	public static final String  NET_KEEPALIVEFREQUENCY_SECONDS              = NET_KEEPALIVEFREQUENCY + "seconds";
+    public static final String  NET_KEEPALIVEFREQUENCY_SECONDS              = NET_KEEPALIVEFREQUENCY + "seconds";
     public static final String  NET_KEEPALIVEFREQUENCY_ACTIONS              = NET_KEEPALIVEFREQUENCY + "actions";
 
     private static final String NET_PACKETFREQUENCY                         = NET + "packetfrequency.";
