@@ -395,7 +395,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 cancelled = true;
             }
             // Angle check.
-            if (angle.check(player, loc, damaged, worldChanged, data, cc)) {
+            if (angle.check(player, loc, damaged, worldChanged, data, cc, pData)) {
                 if (!cancelled && debug) {
                     debug(player, "FIGHT_ANGLE cancel without yawrate cancel.");
                 }
