@@ -326,10 +326,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true, 785); // Not a check type.
 
         set(ConfPaths.FIGHT_ANGLE_CHECK, "default", 785);
-        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_MOVE, 50, 1145);
-        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_TIME, 50, 1145);
-        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_YAW, 50, 1145);
-        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_SWITCH, 50, 1145);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_MOVE, 50, 1153);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_TIME, 50, 1153);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_YAW, 50, 1153);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD_SWITCH, 50, 1153);
         set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:angle:3:5:f cancel vl>250 log:angle:0:5:cif cancel", 785);
 
         set(ConfPaths.FIGHT_CRITICAL_CHECK, "default", 785);
@@ -405,6 +405,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_FASTCONSUME_WHITELIST, false, 785);
         set(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, new LinkedList<String>(), 785);
         set(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, "log:fastconsume:2:5:if cancel", 785);
+        
+        set(ConfPaths.INVENTORY_INVENTORYMOVE_CHECK, "default", 1153);
+        set(ConfPaths.INVENTORY_INVENTORYMOVE_ACTIONS, "log:inventorymove:2:5:if cancel", 785);
 
         set(ConfPaths.INVENTORY_GUTENBERG_CHECK, "default", 785);
         set(ConfPaths.INVENTORY_GUTENBERG_ACTIONS, "cancel log:gutenberg:0:10:icf cmd:kickinvaliddata", 785);
@@ -628,6 +631,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end, 785);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end, 785);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end, 785);
+        set(ConfPaths.STRINGS + ".inventorymove", start + "interacted with inventory while it was not possible" + end, 1153);
         set(ConfPaths.STRINGS + ".keepalive", start + "spams keep-alive packets (god/freecam?)" + end, 785);
         set(ConfPaths.STRINGS + ".kick", "kick [player]", 785);
         set(ConfPaths.STRINGS + ".kickalive", "ncp kick [player] Too many keep-alive packets.", 785);
