@@ -27,6 +27,7 @@ public class InventoryData extends ACheckData {
 
     // Violation levels.
     public double   dropVL;
+    public double   invMoveVL;
     public double   fastClickVL;
     public double   instantBowVL;
     public double   instantEatVL;
