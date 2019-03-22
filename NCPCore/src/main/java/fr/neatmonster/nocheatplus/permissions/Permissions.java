@@ -152,6 +152,7 @@ public class Permissions {
     public static final RegisteredPermission  INVENTORY_GUTENBERG          = add(INVENTORY + ".gutenberg");
     public static final RegisteredPermission  INVENTORY_INSTANTBOW         = add(INVENTORY + ".instantbow");
     public static final RegisteredPermission  INVENTORY_INSTANTEAT         = add(INVENTORY + ".instanteat");
+    public static final RegisteredPermission  INVENTORY_MOVE               = add(INVENTORY + ".inventorymove");
     public static final RegisteredPermission  INVENTORY_ITEMS              = add(INVENTORY + ".items");
     public static final RegisteredPermission  INVENTORY_OPEN               = add(INVENTORY + ".open");
 
