@@ -60,6 +60,8 @@ public class InventoryConfig extends ACheckConfig {
 
     public final boolean	openClose;
     public final boolean	openCancelOther;
+    
+    public final ActionList invMoveActionList;
 
     // Hot fixes.
     public final boolean hotFixFallingBlockEndPortalActive;
@@ -100,6 +102,8 @@ public class InventoryConfig extends ACheckConfig {
 
         openClose = data.getBoolean(ConfPaths.INVENTORY_OPEN_CLOSE);
         openCancelOther = data.getBoolean(ConfPaths.INVENTORY_OPEN_CANCELOTHER);
+        
+        invMoveActionList = data.getOptimizedActionList(ConfPaths.INVENTORY_INVENTORYMOVE_ACTIONS, Permissions.INVENTORY_MOVE);
 
         hotFixFallingBlockEndPortalActive = data.getBoolean(ConfPaths.INVENTORY_HOTFIX_DUPE_FALLINGBLOCKENDPORTAL);
     }
