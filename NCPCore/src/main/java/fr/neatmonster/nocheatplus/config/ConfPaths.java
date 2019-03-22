@@ -584,6 +584,10 @@ public abstract class ConfPaths {
     // TODO: close and cancelother on open-section-level are temporary.
     public static final  String INVENTORY_OPEN_CLOSE                     = INVENTORY_OPEN + "close";
     public static final  String INVENTORY_OPEN_CANCELOTHER               = INVENTORY_OPEN + "cancelother";
+    
+    public static final  String INVENTORY_INVENTORYMOVE                  = INVENTORY + "inventorymove.";
+    public static final  String INVENTORY_INVENTORYMOVE_CHECK            = INVENTORY_INVENTORYMOVE + SUB_ACTIVE;
+    public static final  String INVENTORY_INVENTORYMOVE_ACTIONS          = INVENTORY_INVENTORYMOVE + "actions";
 
     // Inventory hot-fix.
     private static final String INVENTORY_HOTFIX                            = INVENTORY + "hotfix.";
