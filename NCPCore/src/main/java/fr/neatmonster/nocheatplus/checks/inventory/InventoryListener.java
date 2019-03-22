@@ -77,6 +77,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
 
     /** The drop check. */
     private final Drop       drop       = addCheck(new Drop());
+    
+    /** Inventory Move check */
+    private final InventoryMove invMove = addCheck(new InventoryMove());
 
     /** The fast click check. */
     private final FastClick  fastClick  = addCheck(new FastClick());
@@ -264,6 +267,15 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                 }
             }
         }
+        
+        // Inventory Move check
+        if (invMove.isEnabled(player, pData)) {
+        	if (invMove.check(player, data, pData)) {
+        		cancel = true;	
+        	}
+        }
+        
+        
         data.lastClickTime = now;
         if (cancel) {
             event.setCancelled(true);
