@@ -20,7 +20,9 @@ public class InventoryMove extends Check {
 		boolean cancel = false;
 		
 		if (player.isBlocking() || player.isSprinting() || player.isSneaking() || player.isSwimming()) {
-			cancel = executeActions(player, data.invMoveVL, 1.0, pData.getGenericInstance(InventoryConfig.class).invMoveActionList).willCancel();
+			data.invMoveVL += 1D;
+			
+			cancel = executeActions(player, data.invMoveVL, 1D, pData.getGenericInstance(InventoryConfig.class).invMoveActionList).willCancel();
 		}
 		return cancel;
 	}
