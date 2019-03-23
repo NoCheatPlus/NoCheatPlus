@@ -120,6 +120,8 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
     /** Is the player on the ground?. */
     Boolean onGround = null;
+    
+    Boolean onSoulSand = null;
 
 
     // "Heavy" object members that need to be set to null on cleanup. //
@@ -483,12 +485,12 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         }
         return nodeBelow;
     }
-	
-	/**
+    
+    /**
      * Get existing or create.
      * @return
      */
-	public IBlockCacheNode getOrCreateBlockCacheNodeBelowLiq() {
+    public IBlockCacheNode getOrCreateBlockCacheNodeBelowLiq() {
         if (nodeBelow == null) {
             nodeBelow = blockCache.getOrCreateBlockCacheNode(blockX, blockY - 1.2, blockZ, false);
         }
@@ -518,13 +520,13 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         }
         return nodeBelow.getType();
     }
-	
-	/**
-     * Gets the type id slighly lower.
+    
+    /**
+     * Gets the type id slightly lower.
      *
      * @return the type id below
      */
-	public Material getTypeIdBelowLiq() {
+    public Material getTypeIdBelowLiq() {
         if (nodeBelow == null) {
             getOrCreateBlockCacheNodeBelowLiq();
         }
@@ -795,6 +797,21 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
             }
         }
         return onIce;
+    }
+    
+    public boolean isOnSoulSand() {
+        if (onSoulSand == null) {
+            // TODO: Use a box here too ?
+            // TODO: check if player is really sneaking (refactor from survivalfly to static access in Combined ?)!
+            if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_SOULSAND) == 0) {
+                // TODO: check onGroundMinY !?
+                onSoulSand = false;
+            } else {
+                // TODO: Might skip the isOnGround part, e.g. if boats sink in slightly. Needs testing.
+                onSoulSand = isOnGround() && BlockProperties.collides(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, BlockProperties.F_SOULSAND);
+            }
+        }
+        return onSoulSand;
     }
 
     /**
@@ -1348,6 +1365,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
         this.inLava = other.isInLava();
         this.inWeb = other.isInWeb();
         this.onIce = other.isOnIce();
+        this.onSoulSand = other.isOnSoulSand();
         this.onClimbable = other.isOnClimbable();
         // Complex checks last.
         if (!onGround && !isResetCond()) {
@@ -1416,7 +1434,7 @@ public class RichBoundsLocation implements IGetBukkitLocation, IGetBlockPosition
 
         // Reset cached values.
         node = nodeBelow = null;
-        aboveStairs = inLava = inWater = inWeb = onIce = onGround = onClimbable = passable = passableBox = null;
+        aboveStairs = inLava = inWater = inWeb = onIce = onSoulSand = onGround = onClimbable = passable = passableBox = null;
         onGroundMinY = Double.MAX_VALUE;
         notOnGroundMaxY = Double.MIN_VALUE;
         blockFlags = null;
