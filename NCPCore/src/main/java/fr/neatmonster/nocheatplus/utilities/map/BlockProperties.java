@@ -652,6 +652,7 @@ public class BlockProperties {
 
     /** The Constant F_LIQUID. */
     public static final long F_LIQUID                       = f_flag();
+    public static final long F_NEWLIQ                       = f_flag();
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
     public static final long F_SOLID                        = f_flag();
@@ -675,7 +676,7 @@ public class BlockProperties {
     public static final long F_HEIGHT100                    = f_flag();
     /** Climbable like ladder and vine (allow to land on without taking damage). */
     public static final long F_CLIMBABLE                    = f_flag();
-	public static final long F_CLIMBLIQ                     = f_flag();
+    public static final long F_CLIMBLIQ                     = f_flag();
     /** The block can change shape. This is most likely not 100% accurate... */
     public static final long F_VARIABLE                     = f_flag();
     //    /** The block has full bounds (0..1), inaccurate! */
@@ -814,6 +815,7 @@ public class BlockProperties {
 
     /** Cobweb like blocks (adhesive). */
     public static final long F_COBWEB                       = f_flag();
+    public static final long F_SOULSAND                     = f_flag();
 
     /**
      * Block change tracking: ordinary right click interaction (use) can change
@@ -1033,7 +1035,7 @@ public class BlockProperties {
         for (final Material mat : MaterialUtil.WOODEN_SLABS) {
             setFlag(mat, stepFlags);
         }
-		for (final Material mat : MaterialUtil.NEWLIQ) {
+        for (final Material mat : MaterialUtil.NEWLIQ) {
             setFlag(mat, stepFlags | F_GROUND_HEIGHT | F_CLIMBABLE | F_CLIMBLIQ);
         }
 
@@ -1263,11 +1265,14 @@ public class BlockProperties {
         }
         for (Material mat : MaterialUtil.BEDS) { // TODO: Beds are special.
             setBlock(mat, leafType);
-        }
+	}
 
         // Cobweb
         setFlag(BridgeMaterial.COBWEB, F_COBWEB | BlockFlags.FULL_BOUNDS 
                 | F_IGN_PASSABLE);
+        
+        // Soulsand
+        setFlag(Material.SOUL_SAND, F_SOULSAND | BlockFlags.FULL_BOUNDS);
 
         // Huge mushroom type (...)
         for (Material mat : new Material[]{ 
@@ -2637,7 +2642,7 @@ public class BlockProperties {
     public static final boolean isLiquid(final Material blockType) {
         return (getBlockFlags(blockType) & F_LIQUID) != 0;
     }
-	
+    
     /**
      * Checks if is apart of 1.13 water blocks.
      *
@@ -2645,7 +2650,7 @@ public class BlockProperties {
      *            the block type
      * @return true, if is liquid
      */
-     public static final boolean isNewLiq(final Material blockType) {
+    public static final boolean isNewLiq(final Material blockType) {
         return (getBlockFlags(blockType) & F_CLIMBLIQ) != 0;
     }
 
