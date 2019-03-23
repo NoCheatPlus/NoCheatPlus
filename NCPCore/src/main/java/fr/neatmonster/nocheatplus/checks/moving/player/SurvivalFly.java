@@ -867,6 +867,9 @@ public class SurvivalFly extends Check {
             hAllowedDistance = Magic.modWeb * thisMove.walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
+		else if (thisMove.to.onSoulSand && thisMove.from.onSoulSand) {
+        	hAllowedDistance = Magic.modSoulSand * thisMove.walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+        }
         else if (thisMove.from.inLiquid && thisMove.to.inLiquid) {
             // Check all liquids (lava might demand even slower speed though).
             // TODO: Test how to go with only checking from (less dolphins).
