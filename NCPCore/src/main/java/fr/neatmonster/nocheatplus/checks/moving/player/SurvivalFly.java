@@ -266,8 +266,12 @@ public class SurvivalFly extends Check {
 
         // Renew the "dirty"-flag (in-air phase affected by velocity).
         if (data.isVelocityJumpPhase() || data.resetVelocityJumpPhase(tags)) {
+			if (data.timeRiptiding + 500 > now) {
+				
+			} else {
             // (Reset is done after checks run.) 
             tags.add("dirty");
+			}
         }
 
         // Check if head is obstructed.
@@ -855,6 +859,7 @@ public class SurvivalFly extends Check {
         // TODO: Optimize for double checking?
         final PlayerMoveData lastMove = data.playerMoves.getFirstPastMove();
         double hAllowedDistance = 0D;
+		long now = System.currentTimeMillis();
 
         final boolean sfDirty = data.isVelocityJumpPhase();
         double friction = data.lastFrictionHorizontal; // Friction to use with this move.
@@ -887,12 +892,18 @@ public class SurvivalFly extends Check {
 				    hAllowedDistance *= Magic.modDolphinsGrace;
             }   if (level > 0 && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
 				hAllowedDistance *= Magic.modDepthStrider[level] * Magic.modDolphinsGrace * 4;
+              } if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+				hAllowedDistance *= Magic.modRiptide;
+				}
 			}
-            }
             // (Friction is used as is.)
 			
-			// Allows faster speed for player when swimming above water since from -> to does not seem to detect correctly
-        } else if ((BlockProperties.isLiquid(from.getTypeIdBelow()) || BlockProperties.isNewLiq(from.getTypeIdBelow())) && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+			
+		} else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+        	hAllowedDistance = Magic.modRiptide * thisMove.walkSpeed * cc.survivalFlySpeedingSpeed / 100D;
+        }
+		// Allows faster speed for player when swimming above water since from -> to does not seem to detect correctly
+		else if ((BlockProperties.isLiquid(from.getTypeIdBelow()) || BlockProperties.isNewLiq(from.getTypeIdBelow()) && player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE))) {
 			hAllowedDistance = Magic.modSwim * thisMove.walkSpeed * cc.survivalFlySwimmingSpeed * Magic.modDolphinsGrace / 100D;
 			final int level = BridgeEnchant.getDepthStriderLevel(player);
 			if (level > 0) {
@@ -1102,6 +1113,9 @@ public class SurvivalFly extends Check {
                 }
             }
             strictVdistRel = false;
+        } else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+        	vAllowedDistance = lastMove.yDistance * 5.0D;
+			strictVdistRel = false;
         }
         else if (lastMove.toIsValid) {
             if (lastMove.yDistance >= -Math.max(Magic.GRAVITY_MAX / 2.0, 1.3 * Math.abs(yDistance)) && lastMove.yDistance <= 0.0 
@@ -1183,6 +1197,8 @@ public class SurvivalFly extends Check {
                 }
 				else if (BlockProperties.isNewLiq(from.getTypeIdBelowLiq())) {
 					
+				} else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+					vDistRelVL = false;
 				}
                 else {
                     // Violation.
@@ -1262,6 +1278,9 @@ public class SurvivalFly extends Check {
 			else if (BlockProperties.isNewLiq(from.getTypeIdBelowLiq())) {
 					
 				}
+			else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+				vDistRelVL = false;
+			}
             else {
                 // Violation.
                 vDistRelVL = true;
@@ -1297,6 +1316,9 @@ public class SurvivalFly extends Check {
                 else if (Magic.skipPaper(thisMove, lastMove, data)) {
                     // Tag already set above.
                 }
+				else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+					tags.add("yriptide");
+				}
                 // Attempt to use velocity.
                 else if (data.getOrUseVerticalVelocity(yDistance) == null) {
                     // Violation.
@@ -1349,6 +1371,10 @@ public class SurvivalFly extends Check {
             if (yDistance < 0.5) {
                 // Ignore falling, and let accounting deal with it.
             }
+		    else if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+				
+			}
+			
             else if (resetFrom) {
                 // Ignore bunny etc.
             }
@@ -1446,7 +1472,9 @@ public class SurvivalFly extends Check {
                 //                if (yDistance != 0.0) {
 				if (BlockProperties.isNewLiq(from.getTypeIdBelow())) {
 					
-				} else {
+				} else if (data.timeRiptiding + 500 > now)  {
+				}
+				else {
                 data.vDistAcc.add((float) yDistance);
                 final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc" + (data.isVelocityJumpPhase() ? "dirty" : ""));
                 if (accAboveLimit > vDistanceAboveLimit) {
@@ -1519,6 +1547,7 @@ public class SurvivalFly extends Check {
     private double yDirChange(final PlayerLocation from, final PlayerLocation to, 
             final double yDistance, double vDistanceAboveLimit, 
             final PlayerMoveData lastMove, final MovingData data) {
+			long now = System.currentTimeMillis();
         // TODO: Does this account for velocity in a sufficient way?
         if (yDistance > 0) {
             // TODO: Clear active vertical velocity here ?
@@ -1534,6 +1563,9 @@ public class SurvivalFly extends Check {
 					if (BlockProperties.isNewLiq(from.getTypeIdBelow())) {
 					// Exempts player if they are above a 'newliquid' block (1.13 water blocks)
 					// Fixes issue with player swimming above a kelp plant (or related)
+					} 
+					else if (data.timeRiptiding + 1000 > now) {
+						
 					} else {
 					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
                     tags.add("ychincfly");
@@ -1604,6 +1636,8 @@ public class SurvivalFly extends Check {
             final PlayerMoveData thisMove, final PlayerMoveData lastMove, 
             final MovingData data, final MovingConfig cc, final IPlayerData pData, 
             final boolean skipPermChecks) {
+				
+		long now = System.currentTimeMillis();
 
         // TODO: Still not entirely sure about this checking order.
         // TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
@@ -1679,6 +1713,10 @@ public class SurvivalFly extends Check {
             // Ensure we never end up below zero.
             data.sfHorizontalBuffer = Math.max(0.0, data.sfHorizontalBuffer - amount);
         }
+		
+		if (player.isRiptiding() || (data.timeRiptiding + 3000 > now)) {
+			tags.add("hriptide");
+		}
 
         // Add the hspeed tag on violation.
         if (hDistanceAboveLimit > 0.0) {
@@ -1892,6 +1930,7 @@ public class SurvivalFly extends Check {
             final boolean toOnGround, final double yDistance, final PlayerMoveData lastMove, 
             final MovingData data, final Player player) {
         data.sfNoLowJump = true;
+		long now = System.currentTimeMillis();
 
         // Expected envelopes.
         final double baseSpeed;
@@ -1930,6 +1969,10 @@ public class SurvivalFly extends Check {
         if (data.getOrUseVerticalVelocity(yDistance) != null) {
             return new double[]{yDistance, 0.0};
         }
+		
+		if (player.isRiptiding() || (data.timeRiptiding + 1000 > now)) {
+			return new double[]{yDistance, 0.0};
+		}
 
         // At this point a violation.
         tags.add(yDistance < 0.0 ? "swimdown" : "swimup");
