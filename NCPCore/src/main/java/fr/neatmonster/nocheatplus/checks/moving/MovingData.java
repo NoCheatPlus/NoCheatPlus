@@ -96,6 +96,7 @@ public class MovingData extends ACheckData implements IDataOnRemoveSubCheckData,
     public double         jumpAmplifier = 0;
     /** Last time the player was actually sprinting. */
     public long           timeSprinting = 0;
+	public long           timeRiptiding = 0;
     public double         multSprinting = 1.30000002; // Multiplier at the last time sprinting.
     /** Compatibility entry for bouncing of slime blocks and the like. */
     public SimpleEntry verticalBounce = null;
