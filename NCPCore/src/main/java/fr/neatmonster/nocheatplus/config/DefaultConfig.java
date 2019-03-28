@@ -188,7 +188,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, unifiedBlockReachActions, 785);
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, "default", 785);
-        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList("WATER_LILY", "LILY_PAD", Material.FLINT_AND_STEEL.toString()), 785);
+        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList("LILY_PAD", Material.FLINT_AND_STEEL.toString()), 785);
         set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel", 785);
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, "default", 785);
@@ -685,11 +685,94 @@ public class DefaultConfig extends ConfigFile {
         // Make blocks ign_passable+ground_height.
         for (final String name : Arrays.asList(
                 // TODO: 
-                "piston_moving_piece",
                 "moving_piston"
                 )) {
             set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + name, "default+ign_passable+ground_height", 785);
         }
+        for (final String woodtype : Arrays.asList(
+                "OAK",
+                "SPRUCE",
+                "BIRCH",
+                "JUNGLE",
+                "ACACIA",
+                "DARK_OAK"
+                )) { 
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_FENCE", "HEIGHT150+THICK_FENCE+VARIABLE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "NETHER_BRICK_FENCE", "HEIGHT150+THICK_FENCE+VARIABLE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_FENCE_GATE", "PASSABLE_X4+VARIABLE_USE+HEIGHT150+THICK_FENCE+VARIABLE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_DOOR", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "IRON_DOOR", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_SLAB", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+            
+        } for (final String colors : Arrays.asList(
+                "WHITE",
+                "BLUE",
+                "RED",
+                "MAGENTA",
+                "LIME",
+                "YELLOW",
+                "PINK",
+                "GRAY", 
+                "BROWN",
+                "GREEN",
+                "LIGHT_BLUE",
+                "CYAN",
+                "PURPLE",
+                "BLACK",
+                "LIGHT_GRAY",
+                "ORANGE"
+                )) { 
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + colors + "_BED", "default+ground_height", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + colors + "_STAINED_GLASS_PANE", "THIN_FENCE+VARIABLE+ground_height+ground", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + colors + "_SHULKER_BOX", "default+HEIGHT150+ground", 1154);
+        } for (final String headType : Arrays.asList(
+                "ZOMBIE",
+                "PLAYER",
+                "CREEPER",
+                "DRAGON"
+                )) { 
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + headType + "_HEAD", "solid+ground_height+ground+ground+ign_passable", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "SKELETON_SKULL", "solid+ground_height+ground+ground+ign_passable", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "WITHER_SKELETON_WALL_SKULL", "solid+ground_height+ground+ground+ign_passable", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + headType + "_WALL_HEAD", "solid+ground_height+ground+ground+ign_passable", 1154);
+        } for (final String slabType : Arrays.asList(
+                "STONE",
+                "SANDSTONE",
+                "PETRIFIED_OAK",
+                "COBBLESTONE",
+                "BRICK",
+                "STONE_BRICK",
+                "NETHER_BRICK",
+                "QUARTZ",
+                "RED_SANDSTONE",
+                "PURPUR",
+                "PRISMARINE",
+                "PRISMARINE_BRICK",
+                "DARK_PRISMARINE"
+                )) { 
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + slabType + "_SLAB", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+        }
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "MAGMA_BLOCK", "default+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "LILY_PAD", "default+ign_passable+ground_height", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "END_ROD", "default+ign_passable", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "IRON_BARS", "THIN_FENCE+VARIABLE+ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "GLASS_PANE", "THIN_FENCE+VARIABLE+ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "COBBLESTONE_WALL", "HEIGHT150+VARIABLE+THICK_FENCE+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "MOSSY_COBBLESTONE_WALL", "HEIGHT150+VARIABLE+THICK_FENCE+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "ANVIL", "default+ground_height", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "DAMAGED_ANVIL", "default+ground_height", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "CHIPPED_ANVIL", "default+ground_height", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "GRASS_PATH", "default+ground_height", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "SHULKER_BOX", "default+HEIGHT150+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "CHEST", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "TRAPPED_CHEST", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "ENDER_CHEST", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "FARMLAND", "default+height100+ground_height+min_height16_15", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "TURTLE_EGG", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "SEA_PICKLE", "default+ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "CAULDRON", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "CONDUIT", "ground_height+ground", 1154);
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "DAYLIGHT_DETECTOR", "default+GROUND+XZ100+ground_height", 1154);
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_ACTIVE, true, 1036); // With lastChangedBuildNumber.
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_PISTONS, true, 785);
         set(ConfPaths.COMPATIBILITY_BLOCKS_CHANGETRACKER_MAXAGETICKS, 80, 785);
