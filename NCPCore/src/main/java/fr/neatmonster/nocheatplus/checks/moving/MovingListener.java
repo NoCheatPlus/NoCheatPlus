@@ -472,6 +472,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             earlyReturn = false;
             token = null;
         }
+		
+		if (player.isRiptiding()) {
+        	data.timeRiptiding = System.currentTimeMillis();
+        }
 
         final boolean debug = pData.isDebugActive(checkType);
 
