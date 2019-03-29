@@ -702,7 +702,7 @@ public class DefaultConfig extends ConfigFile {
             set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_FENCE_GATE", "PASSABLE_X4+VARIABLE_USE+HEIGHT150+THICK_FENCE+VARIABLE+ground", 1154);
             set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_DOOR", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
             set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "IRON_DOOR", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
-            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_SLAB", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+            set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + woodtype + "_SLAB", "default+GROUND+XZ100+ground_height", 1154);
             
         } for (final String colors : Arrays.asList(
                 "WHITE",
@@ -750,7 +750,7 @@ public class DefaultConfig extends ConfigFile {
                 "PRISMARINE_BRICK",
                 "DARK_PRISMARINE"
                 )) { 
-        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + slabType + "_SLAB", "PASSABLE_X4+VARIABLE_USE+ground", 1154);
+        	set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + slabType + "_SLAB", "default+GROUND+XZ100+ground_height", 1154);
         }
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "MAGMA_BLOCK", "default+ground", 1154);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + "." + "LILY_PAD", "default+ign_passable+ground_height", 1154);
