@@ -41,6 +41,7 @@ public class InventoryConfig extends ACheckConfig {
     public final boolean 	fastClickTweaks1_5;
     public final float		fastClickShortTermLimit;
     public final float		fastClickNormalLimit;
+    public final int        chestOpenLimit;
     public final ActionList fastClickActions;
 
     public final long		fastConsumeDuration;
@@ -83,6 +84,7 @@ public class InventoryConfig extends ACheckConfig {
         fastClickTweaks1_5 = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_TWEAKS1_5);
         fastClickShortTermLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_SHORTTERM);
         fastClickNormalLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_NORMAL);
+        chestOpenLimit = data.getInt(ConfPaths.INVENTORY_FASTCLICK_LIMIT_CHEST);
         fastClickActions = data.getOptimizedActionList(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, Permissions.INVENTORY_FASTCLICK);
 
         fastConsumeDuration = (long) (1000.0 * data.getDouble(ConfPaths.INVENTORY_FASTCONSUME_DURATION));
