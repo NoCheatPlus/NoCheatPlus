@@ -165,6 +165,19 @@ public class FastClick extends Check {
 
         return cancel;
     }
+    
+    // Checks if a player interacts with a chest too quickly after opening it
+    public boolean fastClickChest(final Player player, final InventoryData data, final InventoryConfig cc) {
+    	boolean cancel = false;
+    	if (Math.abs(data.lastClickTime - data.chestOpenTime) < cc.chestOpenLimit) {
+    	    data.fastClickVL += cc.chestOpenLimit / Math.abs(data.lastClickTime - data.chestOpenTime);
+    	    double violation = cc.chestOpenLimit / Math.abs(data.lastClickTime - data.chestOpenTime);
+            final ViolationData vd = new ViolationData(this, player, data.fastClickVL, violation, cc.fastClickActions);
+            cancel = executeActions(vd).willCancel();
+    	    cancel = true;
+    	}
+    	return cancel;
+    }
 
     private float detectTweaks1_5(final InventoryView view, 
             final int slot, final ItemStack clicked, 
