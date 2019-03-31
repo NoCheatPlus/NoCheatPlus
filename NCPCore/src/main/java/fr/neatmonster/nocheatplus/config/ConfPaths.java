@@ -549,6 +549,7 @@ public abstract class ConfPaths {
     private static final String INVENTORY_FASTCLICK_LIMIT                = INVENTORY_FASTCLICK + "limit.";
     public static final String  INVENTORY_FASTCLICK_LIMIT_SHORTTERM      = INVENTORY_FASTCLICK_LIMIT + "shortterm";
     public static final String  INVENTORY_FASTCLICK_LIMIT_NORMAL         = INVENTORY_FASTCLICK_LIMIT + "normal";
+    public static final String  INVENTORY_FASTCLICK_LIMIT_CHEST          = INVENTORY_FASTCLICK_LIMIT + "chest";
     public static final String  INVENTORY_FASTCLICK_ACTIONS              = INVENTORY_FASTCLICK + "actions";
 
     private static final String INVENTORY_FASTCONSUME                    = INVENTORY + "fastconsume.";
