@@ -388,6 +388,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_FASTCLICK_TWEAKS1_5, true, 785);
         set(ConfPaths.INVENTORY_FASTCLICK_LIMIT_SHORTTERM, 4, 785);
         set(ConfPaths.INVENTORY_FASTCLICK_LIMIT_NORMAL, 15, 785);
+        set(ConfPaths.INVENTORY_FASTCLICK_LIMIT_CHEST, 152, 1154);
         set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel", 785);
 
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, "default", 785);
