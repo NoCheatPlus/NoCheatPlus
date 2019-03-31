@@ -14,6 +14,9 @@
  */
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,8 +33,10 @@ import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -43,6 +48,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.block.Chest;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
@@ -93,6 +99,8 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     protected final Items items 		= addCheck(new Items());
 
     private final Open open 			= addCheck(new Open());
+    
+    private boolean keepCancel = false;
 
     private final boolean hasInventoryAction;
 
@@ -264,7 +272,13 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                         inventoryAction, data, cc, pData)) {
                     // The check requested the event to be cancelled.
                     cancel = true;
-                }
+                  // Listen for more than just a chest?
+                } if (event.getInventory().getType().equals(InventoryType.CHEST) || event.getInventory().getType().equals(InventoryType.ENDER_CHEST)) {
+        			if (fastClick.fastClickChest(player, data, cc)) {
+        				cancel = true;
+        				keepCancel = true;
+        			}
+        		}
             }
         }
         
@@ -277,9 +291,35 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         
         
         data.lastClickTime = now;
-        if (cancel) {
+        if (cancel || keepCancel) {
             event.setCancelled(true);
         }
+    }
+    
+    /** 
+    * Listens for when a player closes a chest.
+    * We do this to keep canceling the attempt to click within the chest if
+    * fastClickChest is true. 
+    */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void closeChest(InventoryCloseEvent event) {
+    	keepCancel = false;
+    }
+    
+    /** 
+    * Listens for when a player opens a chest.
+    * We do this to compare the times between opening a chest and
+    * interacting with it.
+    */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void chestOpen(PlayerInteractEvent event) {
+    	final Player player = (Player) event.getPlayer();
+    	final IPlayerData pData = DataManager.getPlayerData(player);
+    	final InventoryData data = pData.getGenericInstance(InventoryData.class);
+    	
+    	if (event.getClickedBlock().getType() == Material.CHEST || event.getClickedBlock().getType() == Material.ENDER_CHEST) {
+    		data.chestOpenTime = System.currentTimeMillis();
+    	}
     }
 
     /**
