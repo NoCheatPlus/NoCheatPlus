@@ -14,10 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.utilities.ds.map;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Intended for Minecraft coordinates, probably not for too high values.<br>
@@ -139,13 +136,12 @@ public abstract class AbstractCoordHashMap<V, E extends fr.neatmonster.nocheatpl
                 }
             }
         } else if (size + 1 > entries.length * loadFactor) {
-            resize(size + 1);
+            resize((int) Math.floor(size * 1.25));
             slot = absHash % entries.length;
             bucket = entries[slot];
         }
         if (bucket == null) {
-            // TODO: use array list ?
-            bucket = new LinkedList<E>();
+            bucket = new ArrayList<E>();
             entries[slot] = bucket;
         }
         bucket.add(newEntry(x, y, z, value, hash));
