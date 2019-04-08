@@ -464,20 +464,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             MovingUtil.ensureChunksLoaded(player, from, to, lastMove, "move", data, cc);
         }
         // TODO: On pistons pulling the player back: -1.15 yDistance for split move 1 (untracked position > 0.5 yDistance!).
+        boolean samePos = TrigUtil.isSamePos(from, loc);
+        boolean samePos2 = TrigUtil.isSamePos(loc, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ());
         if (
                 // Handling split moves has been disabled.
                 !cc.splitMoves ||
                 // The usual case: no micro move happened.
-                TrigUtil.isSamePos(from, loc)
+                samePos
                 // Special case / bug? TODO: Which/why, which version of MC/spigot?
-                || lastMove.valid && TrigUtil.isSamePos(loc, lastMove.from.getX(), lastMove.from.getY(), lastMove.from.getZ())
+                || lastMove.valid && samePos2
                 // Could also be other envelopes (0.9 velocity upwards), too tedious to research.
                 //&& data.lastYDist < -SurvivalFly.GRAVITY_MIN && data.lastYDist > -SurvivalFly.GRAVITY_MAX - SurvivalFly.GRAVITY_MIN
                 ) {
             // Fire move from -> to
             // (Special case: Location has not been updated last moving event.)
             moveInfo.set(player, from, to, cc.yOnGround);
-            checkPlayerMove(player, from, to, 0, moveInfo, data, cc, event);
+            if(!samePos || !samePos2) { // only perform move checks if we've actually moved
+                checkPlayerMove(player, from, to, 0, moveInfo, data, cc, event);
+            }
         }
         else {
             // Split into two moves.

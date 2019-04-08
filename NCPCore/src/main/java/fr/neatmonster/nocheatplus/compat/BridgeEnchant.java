@@ -108,8 +108,13 @@ public final class BridgeEnchant {
      *         Will return 0 if not available.
      */
     public static int getDepthStriderLevel(final Player player) {
+        // Checking item enchantments requires reading NBT which is expensive,
+        // and since the advantage is minor, we can just give all players the
+        // benefit of the doubt and assume they have DEPTH_STRIDER 3 at all times
+        // to negate the performance loss for this check
+        return 3;
         // Cap at three.
-        return Math.min(3, getMaxLevelArmor(player, DEPTH_STRIDER));
+        // return Math.min(3, getMaxLevelArmor(player, DEPTH_STRIDER));
     }
 
 }
