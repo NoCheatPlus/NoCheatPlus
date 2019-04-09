@@ -368,6 +368,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerMove(final PlayerMoveEvent event) {
+        // don't process moves in the same block
+        if (TrigUtil.isSameBlock(event.getFrom(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ())) return;
+
         counters.add(idMoveEvent, 1);
         final Player player = event.getPlayer();
 
@@ -479,9 +482,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Fire move from -> to
             // (Special case: Location has not been updated last moving event.)
             moveInfo.set(player, from, to, cc.yOnGround);
-            if(!samePos || !samePos2) { // only perform move checks if we've actually moved
-                checkPlayerMove(player, from, to, 0, moveInfo, data, cc, event);
-            }
+            checkPlayerMove(player, from, to, 0, moveInfo, data, cc, event);
         }
         else {
             // Split into two moves.
