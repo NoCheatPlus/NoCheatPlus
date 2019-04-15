@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -176,7 +177,7 @@ public class CheckUtils {
         // TODO: Checking for the thread might be a temporary measure.
         final String permission =  checkType.getPermission();
         if (isPrimaryThread) {
-            if (permission != null && player.hasPermission(permission)) {
+            if (permission != null && PermissionCache.hasPermission(player, permission)) {
                 return true;
             }
         }

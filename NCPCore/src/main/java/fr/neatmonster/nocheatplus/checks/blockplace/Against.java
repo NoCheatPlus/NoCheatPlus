@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -57,7 +58,7 @@ public class Against extends Check {
             if (isInteractBlock && !BlockProperties.isAir(matAgainst) && ! BlockProperties.isLiquid(matAgainst)) {
                 // Block was placed against something (e.g. cactus), allow it.
             }
-            else if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
+            else if (!PermissionCache.hasPermission(player, Permissions.BLOCKPLACE_AGAINST_AIR)) {
                 violation = true;
             }
         }
@@ -65,7 +66,7 @@ public class Against extends Check {
             // TODO: F_PLACE_AGAINST_WATER|LIQUID...
             if ((placedMat != Material.WATER_LILY 
                     || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  
-                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
+                    && !PermissionCache.hasPermission(player, Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
                 violation = true;
             }
         }

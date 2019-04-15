@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -392,7 +393,7 @@ public class SurvivalFly extends Check {
             if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > thisMove.walkSpeed && !data.hasActiveHorVel()) {
                 // (Ignore some cases, in order to prevent false positives.)
                 // TODO: speed effects ?
-                if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+                if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
                     // (Might have to account for speeding permissions.)
                     // TODO: hDistance is too harsh?
                     hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
@@ -855,13 +856,13 @@ public class SurvivalFly extends Check {
             // (Friction is used as is.)
         }
         // TODO: !sfDirty is very coarse, should use friction instead.
-        else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
+        else if (!sfDirty && thisMove.from.onGround && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = Magic.modSneak * thisMove.walkSpeed * cc.survivalFlySneakingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
             // TODO: Attribute modifiers can count in here, e.g. +0.5 (+ 50% doesn't seem to pose a problem, neither speed effect 2).
         }
         // TODO: !sfDirty is very coarse, should use friction instead.
-        else if (!sfDirty && thisMove.from.onGround && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
+        else if (!sfDirty && thisMove.from.onGround && player.isBlocking() && (!checkPermissions || !PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
             hAllowedDistance = Magic.modBlock * thisMove.walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
             friction = 0.0; // Ensure friction can't be used to speed.
         }
@@ -924,7 +925,7 @@ public class SurvivalFly extends Check {
         }
 
         // Speeding bypass permission (can be combined with other bypasses).
-        if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
+        if (checkPermissions && PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
             hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
         }
 
@@ -1274,7 +1275,7 @@ public class SurvivalFly extends Check {
             }
             else {
                 // Potential violation.
-                if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP) && data.getOrUseVerticalVelocity(yDistance) == null) {
+                if (!PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_STEP) && data.getOrUseVerticalVelocity(yDistance) == null) {
                     vDistanceAboveLimit = yDistance - cc.sfStepHeight;
                     tags.add("step");
                 }

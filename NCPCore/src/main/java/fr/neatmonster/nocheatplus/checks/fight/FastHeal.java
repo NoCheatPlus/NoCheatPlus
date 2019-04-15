@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -60,7 +61,7 @@ public class FastHeal extends Check {
             }
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && PermissionCache.hasPermission(player, Permissions.ADMINISTRATION_DEBUG)){
             player.sendMessage("Regain health(SATIATED): " + (time - data.fastHealRefTime) + " ms "+ "(buffer=" + data.fastHealBuffer + ")" +" , cancel=" + cancel);
         }
 

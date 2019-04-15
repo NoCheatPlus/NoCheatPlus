@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -224,7 +225,7 @@ public class TickTask implements Runnable {
             final ICheckData data = entry.checkType.getDataFactory().getData(player);
             for (int j = 0; j < perms.length; j ++) {
                 final String permission = perms[j];
-                data.setCachedPermission(permission, player.hasPermission(permission));
+                data.setCachedPermission(permission, PermissionCache.hasPermission(player, permission));
             }
         }
     }

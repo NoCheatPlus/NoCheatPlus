@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -77,7 +78,7 @@ public class WrongBlock extends Check {
         }
 
         if (wrongBlock) {
-            if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+            if ((data.debug) && PermissionCache.hasPermission(player, Permissions.ADMINISTRATION_DEBUG)) {
                 player.sendMessage("WrongBlock failure with dist: " + dist);
             }
             data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);

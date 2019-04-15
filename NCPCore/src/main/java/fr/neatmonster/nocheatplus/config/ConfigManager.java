@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -264,7 +265,6 @@ public class ConfigManager {
         //        globalConfig.setActionFactory();
         newWorldsMap.put(null, globalConfig);
 
-
         final MemoryConfiguration worldDefaults = PathUtils.getWorldsDefaultConfig(globalConfig); 
 
         // Try to obtain and parse the world-specific configuration files.
@@ -306,6 +306,7 @@ public class ConfigManager {
             //            worldConfig.setActionFactory();
         }
         ConfigManager.worldsMap = newWorldsMap;
+        PermissionCache.init();
         isInitialized = true;
     }
 

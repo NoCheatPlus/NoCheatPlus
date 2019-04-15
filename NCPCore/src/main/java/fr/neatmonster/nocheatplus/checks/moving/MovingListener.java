@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -368,9 +369,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerMove(final PlayerMoveEvent event) {
-        // don't process moves in the same block
-        if (TrigUtil.isSameBlock(event.getFrom(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ())) return;
-
         counters.add(idMoveEvent, 1);
         final Player player = event.getPlayer();
 
@@ -666,7 +664,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else if (cc.creativeFlyCheck 
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY, true) 
-                && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)) {
+                && !PermissionCache.hasPermission(player, Permissions.MOVING_CREATIVEFLY)) {
             checkCf = true;
             checkSf = false;
             prepareCreativeFlyCheck(player, from, to, moveInfo, thisMove, multiMoveCount, tick, data, cc);
@@ -774,7 +772,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
         if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR 
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE, true) 
-                && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+                && !PermissionCache.hasPermission(player, Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set back locations from the other checks, if needed. 
             newTo = passable.check(player, pFrom, pTo, data, cc, tick, useBlockChangeTracker);
             if (newTo != null) {
@@ -860,7 +858,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Morepackets.
         if (cc.morePacketsCheck && (newTo == null || data.isMorePacketsSetBackOldest())
                 && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS, true) 
-                && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
+                && !PermissionCache.hasPermission(player, Permissions.MOVING_MOREPACKETS)) {
             /* (Always check morepackets, if there is a chance that setting/overriding newTo is appropriate,
             to avoid packet speeding using micro-violations.) */
             final Location mpNewTo = morePackets.check(player, pFrom, pTo, newTo == null, data, cc);

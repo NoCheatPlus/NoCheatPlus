@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -191,7 +192,7 @@ public class BlockBreakListener extends CheckListener {
 
         // Destroying liquid blocks.
         if (!cancelled && BlockProperties.isLiquid(block.getType()) 
-                && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID) 
+                && !PermissionCache.hasPermission(player, Permissions.BLOCKBREAK_BREAK_LIQUID)
                 && !NCPExemptionManager.isExempted(player, CheckType.BLOCKBREAK_BREAK, true)){
             cancelled = true;
         }

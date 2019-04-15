@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -92,7 +93,7 @@ public class InstantBow extends Check {
             }
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if (data.debug && PermissionCache.hasPermission(player, Permissions.ADMINISTRATION_DEBUG)) {
             player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
 

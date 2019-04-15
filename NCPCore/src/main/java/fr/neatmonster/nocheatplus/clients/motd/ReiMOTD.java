@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.clients.motd;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -43,43 +44,43 @@ public class ReiMOTD extends ClientMOTD {
         String rei = "";
 
         // Allow Rei's Minimap's cave mode.
-        if (allowAll || player.hasPermission(Permissions.REI_CAVE)){
+        if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_CAVE)){
             rei += "§1";
         }
 
         // Allow Rei's Minimap's radar.
-        if (allowAll || player.hasPermission(Permissions.REI_RADAR)){
+        if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR)){
             // TODO: Does this allow all radar features?
             rei += "§2§3§4§5§6§7";
         }
         else{
             // Allow Rei's Minimap's player radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_PLAYER)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_PLAYER)){
                 rei += "§2";
             }
 
             // Allow Rei's Minimap's animal radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_ANIMAL)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_ANIMAL)){
                 rei += "§3";
             }
 
             // Allow Rei's Minimap's mob radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_MOB)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_MOB)){
                 rei += "§4";
             }
 
             // Allow Rei's Minimap's slime radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_SLIME)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_SLIME)){
                 rei += "§5";
             }
 
             // Allow Rei's Minimap's squid radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_SQUID)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_SQUID)){
                 rei += "§6";
             }
 
             // Allow Rei's Minimap's other radar
-            if (allowAll || player.hasPermission(Permissions.REI_RADAR_OTHER)){
+            if (allowAll || PermissionCache.hasPermission(player, Permissions.REI_RADAR_OTHER)){
                 rei += "§7";
             }
         }

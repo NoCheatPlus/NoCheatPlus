@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -117,7 +118,7 @@ public class FastBreak extends Check {
             data.fastBreakVL *= 0.9D;
         }
 
-        if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if ((data.debug) && PermissionCache.hasPermission(player, Permissions.ADMINISTRATION_DEBUG)) {
             // General stats:
             if (data.stats != null) {
                 data.stats.addStats(data.stats.getId(blockType+ "/u", true), elapsedTime);

@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
@@ -145,7 +146,7 @@ public class FastClick extends Check {
             cancel = executeActions(vd).willCancel();
         }
 
-        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && PermissionCache.hasPermission(player, Permissions.ADMINISTRATION_DEBUG)){
             player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " | " + data.fastClickFreq.score(1f) + " | cursor=" + cursor + " | clicked=" + clicked);
         }
 

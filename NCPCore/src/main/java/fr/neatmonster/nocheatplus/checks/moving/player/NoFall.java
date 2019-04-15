@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.moving.player;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -346,7 +347,7 @@ public class NoFall extends Check {
      */
     public boolean isEnabled(final Player player , final MovingConfig cc) {
         return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL, true) 
-                && !player.hasPermission(Permissions.MOVING_NOFALL);
+                && !PermissionCache.hasPermission(player, Permissions.MOVING_NOFALL);
     }
 
 }

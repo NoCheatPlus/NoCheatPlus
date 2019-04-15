@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -412,7 +413,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             for (final String name : names) {
                 if (!done.contains(name)) {
                     final Player player = DataManager.getPlayerExact(name);
-                    if (player != null && player.hasPermission(Permissions.NOTIFY)) {
+                    if (player != null && PermissionCache.hasPermission(player, Permissions.NOTIFY)) {
                         if (hasTurnedOffNotifications(player)) {
                             continue;
                         }
@@ -1310,7 +1311,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 final Player player = event.getPlayer();
                 // Check if login is denied:
                 checkDenyLoginsNames();
-                if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) {
+                if (PermissionCache.hasPermission(player, Permissions.BYPASS_DENY_LOGIN)) {
                     return;
                 }
                 if (isLoginDenied(player.getName())) {
@@ -1405,6 +1406,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 logManager.severe(Streams.INIT, t);
             }
         }
+        PermissionCache.clearPlayer(player);
         if (clearExemptionsOnLeave) {
             NCPExemptionManager.unexempt(player);
         }
@@ -1417,7 +1419,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             for (final String permission : pr.getDefaultPermissions()) {
                 Boolean state = checked.get(permission);
                 if (state == null) {
-                    state = player.hasPermission(permission);
+                    state = PermissionCache.hasPermission(player, permission);
                     checked.put(permission, state);
                 }
                 pr.setPermission(name, permission, state);

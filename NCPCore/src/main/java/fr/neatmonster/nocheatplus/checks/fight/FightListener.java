@@ -16,6 +16,7 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import java.util.Iterator;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -192,7 +193,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //     			damagedPlayer.getLocation(useLoc2);
             //     		}
             // Log.
-            if (data.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+            if (data.debug && PermissionCache.hasPermission(damagedPlayer, Permissions.ADMINISTRATION_DEBUG)) {
                 damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getHandle().getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
             }
             // Check for self hit exploits (mind that projectiles are excluded from this.)
@@ -292,7 +293,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             cancelled = true;
         }
 
-        if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING)) {
+        if (!cancelled && player.isBlocking() && !PermissionCache.hasPermission(player, Permissions.MOVING_SURVIVALFLY_BLOCKING)) {
             // TODO: Permission ?
             cancelled = true;
         }

@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import fr.neatmonster.nocheatplus.command.admin.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
@@ -32,13 +33,6 @@ import fr.neatmonster.nocheatplus.command.actions.DenyLoginCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickCommand;
 import fr.neatmonster.nocheatplus.command.actions.TellCommand;
 import fr.neatmonster.nocheatplus.command.actions.delay.DelayCommand;
-import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
-import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
-import fr.neatmonster.nocheatplus.command.admin.InspectCommand;
-import fr.neatmonster.nocheatplus.command.admin.LagCommand;
-import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
-import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
-import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.command.admin.debug.DebugCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptionsCommand;
@@ -120,6 +114,7 @@ public class NoCheatPlusCommand extends BaseCommand{
                 new LogCommand(plugin),
                 new ResetCommand(plugin),
                 new DebugCommand(plugin),
+                new PermissionCacheCommand(plugin),
                 // Testing:
                 new StopWatchCommand(access),
         }){

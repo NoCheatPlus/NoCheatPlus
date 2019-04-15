@@ -14,6 +14,7 @@
  */
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
+import fr.neatmonster.nocheatplus.permissions.PermissionCache;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -371,7 +372,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // TODO: Add a check type for exemption?
-        if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)) {
+        if (!PermissionCache.hasPermission(player, Permissions.BLOCKPLACE_BOATSANYWHERE)) {
             final Result previousUseBlock = event.useInteractedBlock();
             event.setCancelled(true);
             event.setUseItemInHand(Result.DENY);
