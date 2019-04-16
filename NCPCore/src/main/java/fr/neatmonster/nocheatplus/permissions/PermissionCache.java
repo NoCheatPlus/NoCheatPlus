@@ -5,7 +5,6 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cache for permission checks
@@ -15,13 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PermissionCache {
 
-    private static boolean INITIALIZED = false;
+    public static boolean INITIALIZED = false;
     private static Set<String> PERMISSION_GROUPS;
     private static Map<PermissionInfo, Boolean> PERMISSION_CACHE;
 
     public static void init() {
         INITIALIZED = true;
-        PERMISSION_CACHE = new ConcurrentHashMap<PermissionInfo, Boolean>();
+        PERMISSION_CACHE = new HashMap<>();
         List<String> permissionPolicies = ConfigManager.getConfigFile().getStringList("permission-policy");
         PERMISSION_GROUPS = new HashSet<>();
         PERMISSION_GROUPS.addAll(permissionPolicies);
@@ -35,7 +34,7 @@ public class PermissionCache {
     public static boolean hasPermission(Player player, String permission) {
         for (String permissionGroup : PERMISSION_GROUPS) {
             if (permission.startsWith(permissionGroup)) {
-                PermissionInfo info = new PermissionInfo(player.getUniqueId(), permission);
+                PermissionInfo info = new PermissionInfo(player.getUniqueId(), permissionGroup);
                 return PERMISSION_CACHE.computeIfAbsent(info, (i) -> player.hasPermission(permission));
             }
         }

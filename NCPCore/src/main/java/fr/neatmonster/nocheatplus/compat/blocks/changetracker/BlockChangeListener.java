@@ -34,6 +34,7 @@ public class BlockChangeListener implements Listener {
     public static long F_MOVABLE_IGNORE = BlockProperties.F_LIQUID;
     /** These blocks might be pushed or pulled. */
     public static long F_MOVABLE = BlockProperties.F_GROUND | BlockProperties.F_SOLID;
+    public static boolean PISTON_TRACKING = false; // Archon: We don't need to track this
 
     private final BlockChangeTracker tracker;
     private final boolean retractHasBlocks;
@@ -99,17 +100,17 @@ public class BlockChangeListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPistonExtend(final BlockPistonExtendEvent event) {
-        if (!enabled) {
+        if (!enabled || !PISTON_TRACKING) {
             return;
         }
         final BlockFace direction = event.getDirection();
         //DebugUtil.debug("EXTEND event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()));
-        //tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
+        tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPistonRetract(final BlockPistonRetractEvent event) {
-        if (!enabled) {
+        if (!enabled || !PISTON_TRACKING) {
             return;
         }
         final List<Block> blocks;

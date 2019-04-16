@@ -18,9 +18,19 @@ public class PermissionCacheCommand extends BaseCommand {
         try {
             boolean value = Boolean.parseBoolean(args[1]);
             if (value) {
-                PermissionCache.init();
+                if (!PermissionCache.INITIALIZED) {
+                    PermissionCache.init();
+                    sender.sendMessage("Permission cache is on");
+                } else {
+                    sender.sendMessage("Permission cache wasn't off?");
+                }
             } else {
-                PermissionCache.close();
+                if (PermissionCache.INITIALIZED) {
+                    PermissionCache.close();
+                    sender.sendMessage("Permission cache is off");
+                } else {
+                    sender.sendMessage("Permission cache wasn't on?");
+                }
             }
         } catch (Exception e) {
             sender.sendMessage("There was an error: " + e.getMessage());
