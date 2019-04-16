@@ -104,7 +104,7 @@ public class BlockChangeListener implements Listener {
         }
         final BlockFace direction = event.getDirection();
         //DebugUtil.debug("EXTEND event=" + event.getDirection() + " piston=" + getDirection(event.getBlock()));
-        tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
+        //tracker.addPistonBlocks(event.getBlock().getRelative(direction), direction, event.getBlocks());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
