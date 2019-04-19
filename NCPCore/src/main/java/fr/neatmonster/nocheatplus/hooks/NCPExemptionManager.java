@@ -186,8 +186,8 @@ public class NCPExemptionManager {
      */
     public static final boolean isExempted(final Player player, final CheckType checkType,
             final boolean isPrimaryThread) {
-        return isExempted(player.getUniqueId(), checkType) 
-                || settings.isExemptedBySettings(player, isPrimaryThread);
+        return isExempted(player.getUniqueId(), checkType);
+               // || settings.isExemptedBySettings(player, isPrimaryThread);
     }
 
     /**
